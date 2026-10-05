@@ -14,6 +14,7 @@ import { useLearningEvents } from '@/data/learning/events';
 import { describeAgo, startOfDay } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
 import { type AppNotification, buildNotifications, markNotificationsRead, useReadNotifications } from '@/data/notifications';
+import { markSocialNotificationsRead, readSocialNotificationIds, socialAppNotifications, useSocial } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 type Filter = 'all' | 'learning' | 'updates';
@@ -21,21 +22,33 @@ type Filter = 'all' | 'learning' | 'updates';
 function useNotifications() {
   const { memory, progress, now } = useLearning();
   const events = useLearningEvents();
-  const read = useReadNotifications();
+  const localRead = useReadNotifications();
+  const social = useSocial();
   const items = useMemo(
     () =>
-      buildNotifications({
-        memory,
-        events,
-        streak: progress.streak,
-        lastActivityDate: progress.lastActivityDate,
-        xp: progress.xp,
-        now,
-      }),
-    [memory, events, progress.streak, progress.lastActivityDate, progress.xp, now]
+      [
+        ...socialAppNotifications(social.notifications),
+        ...buildNotifications({
+          memory,
+          events,
+          streak: progress.streak,
+          lastActivityDate: progress.lastActivityDate,
+          xp: progress.xp,
+          now,
+        }),
+      ].sort((a, b) => b.at - a.at),
+    [social.notifications, memory, events, progress.streak, progress.lastActivityDate, progress.xp, now]
   );
+  const read = useMemo(() => new Set([...localRead, ...readSocialNotificationIds(social.notifications)]), [localRead, social.notifications]);
   const unread = items.filter((item) => !read.has(item.id)).length;
   return { items, read, unread, now };
+}
+
+// Local read marks for derived notifications; social ones are also marked
+// read on the account (so the badge clears on every device).
+function markRead(ids: string[]) {
+  markNotificationsRead(ids);
+  markSocialNotificationsRead(ids);
 }
 
 // The bell in the Home header: unread badge + the notification centre.
@@ -62,7 +75,7 @@ export function NotificationCenter({ visible, onClose }: { visible: boolean; onC
   ].filter((group) => group.items.length > 0);
 
   function open(item: AppNotification) {
-    markNotificationsRead([item.id]);
+    markRead([item.id]);
     if (item.href) {
       onClose();
       router.push(item.href);
@@ -77,7 +90,7 @@ export function NotificationCenter({ visible, onClose }: { visible: boolean; onC
       subtitle={unread > 0 ? `${unread} unread` : 'You are all caught up.'}
       footer={
         unread > 0 ? (
-          <Button label="Mark all as read" variant="secondary" onPress={() => markNotificationsRead(items.map((item) => item.id))} fullWidth />
+          <Button label="Mark all as read" variant="secondary" onPress={() => markRead(items.map((item) => item.id))} fullWidth />
         ) : undefined
       }
     >

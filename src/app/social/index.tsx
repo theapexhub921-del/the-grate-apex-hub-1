@@ -3,16 +3,15 @@ import { useMemo } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { AnimatedNumber } from '@/components/ui/animated-number';
-import { AvatarStack } from '@/components/ui/avatar';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Card, PressableCard } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
 import { Columns, PageHeader, Screen } from '@/components/ui/screen';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { getFriendRequests, getFriends } from '@/data/friends';
 import { addDays, startOfDay } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
 import { getRankProgress, LEAGUE_RULES } from '@/data/ranks';
+import { personName, useSocial } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // Features that need classmate connections — shown honestly as upcoming.
@@ -28,8 +27,9 @@ export default function SocialScreen() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const { width } = useWindowDimensions();
-  const friends = getFriends();
-  const requests = getFriendRequests();
+  const social = useSocial();
+  const friends = social.people.filter((person) => person.relationship === 'friends');
+  const requests = social.people.filter((person) => person.relationship === 'incoming');
   const { progress, attempts, now } = useLearning();
   const rank = getRankProgress(progress.xp);
 
@@ -79,7 +79,7 @@ export default function SocialScreen() {
           </View>
         ))}
       </View>
-      <Text style={styles.note}>When classmates can connect, this is the activity your league will compare.</Text>
+      <Text style={styles.note}>Friends see your weekly XP and streak — never your answers or scores.</Text>
     </Card>
   );
 
@@ -107,27 +107,39 @@ export default function SocialScreen() {
     </Card>
   );
 
+  // Weekly XP among you and your friends (friends' figures come from the
+  // server; yours from your own ledger).
+  const board = [
+    { id: 'me', name: 'You', uri: null as string | null, xp: xpThisWeek, me: true },
+    ...friends.map((friend) => ({ id: friend.userId, name: personName(friend), uri: friend.avatarUrl, xp: friend.weeklyXp ?? 0, me: false })),
+  ].sort((a, b) => b.xp - a.xp);
+
   const circle = (
-    <PressableCard
-      onPress={() => router.push('/social/friends')}
-      accessibilityLabel="Friends preview. Shows sample data until connecting with classmates is available."
-      style={styles.card}
-    >
+    <PressableCard onPress={() => router.push('/social/friends')} accessibilityLabel="Open Friends" style={styles.card}>
       <View style={styles.cardHeader}>
         <Text style={styles.cardTitle}>Study circle</Text>
-        <Pill label="Sample preview" tone="warning" />
+        {requests.length ? <Pill label={`${requests.length} request${requests.length === 1 ? '' : 's'}`} tone="gold" /> : <Icon name="chevronRight" size={18} color={colors.textTertiary} />}
       </View>
-      <View style={styles.circleRow}>
-        <AvatarStack people={friends.map((friend) => ({ id: friend.id, name: friend.name }))} size={38} />
-        <Icon name="chevronRight" size={18} color={colors.textTertiary} />
-      </View>
-      <View>
-          <Text style={styles.circleText}>
-            {friends.length} sample friend{friends.length === 1 ? '' : 's'}
-            {requests.length ? ` · ${requests.length} sample request${requests.length === 1 ? '' : 's'}` : ''}
-          </Text>
-          <Text style={styles.note}>A preview of how friends will look. Real connections are coming.</Text>
-      </View>
+      {friends.length > 0 ? (
+        <View style={styles.board}>
+          <Text style={styles.boardLabel}>THIS WEEK</Text>
+          {board.slice(0, 6).map((entry, index) => (
+            <View key={entry.id} style={styles.boardRow}>
+              <Text style={styles.boardPlace}>{index + 1}</Text>
+              <Text style={[styles.boardName, entry.me && styles.boardMe]} numberOfLines={1}>{entry.name}</Text>
+              <Text style={styles.boardXp}>{entry.xp} XP</Text>
+            </View>
+          ))}
+        </View>
+      ) : (
+        <View style={styles.circleRow}>
+          <Icon name="social" size={26} color={colors.primaryText} />
+          <View style={styles.flex}>
+            <Text style={styles.circleText}>{social.status === 'loading' ? 'Loading your friends…' : 'No friends yet'}</Text>
+            <Text style={styles.note}>Find classmates by username and compare weekly XP.</Text>
+          </View>
+        </View>
+      )}
     </PressableCard>
   );
 
@@ -222,5 +234,12 @@ function createStyles(colors: ThemeColors) {
     soonRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
     soonIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: colors.primarySubtle, alignItems: 'center', justifyContent: 'center' },
     soonTitle: { fontSize: 14, fontWeight: '800', color: colors.text },
+    board: { gap: 8 },
+    boardLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: colors.textSecondary },
+    boardRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    boardPlace: { ...Type.numeral, fontSize: 13, width: 18, color: colors.textTertiary },
+    boardName: { flex: 1, minWidth: 0, fontSize: 14, fontWeight: '600', color: colors.text },
+    boardMe: { fontWeight: '800', color: colors.primaryText },
+    boardXp: { ...Type.numeral, fontSize: 13, color: colors.textSecondary },
   });
 }

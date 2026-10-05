@@ -126,6 +126,15 @@ The learning engine is in `src/data/learning/`:
 
 Question history and quiz attempts are in `src/data/question-history.ts` and `src/data/quiz-history.ts`.
 
+Social (real friends) is in `src/data/social.ts`, backed by `supabase/migrations/20261005000000_social.sql`:
+
+* Usernames, learner search, friend requests (one row per pair in `friendships`) and social notifications (`notifications`, shown in the bell).
+* Every action goes through a `SECURITY DEFINER` function that uses `auth.uid()`; clients cannot read other learners' rows or write friendships, notifications or XP directly.
+* XP awards are capped at 150 per event on the server, and `user_learning_stats.total_xp` can only change through the XP functions.
+* The store refreshes over Supabase Realtime and clears on sign-out.
+
+Database changes go in `supabase/migrations/` (the live project is `dkmossrgptfgutkqefws`); apply them only with the owner's approval.
+
 Progress functionality is currently in:
 
 `src/data/progress.ts`

@@ -1,8 +1,8 @@
 -- GRATEAPEX learning engine — schema extensions.
 --
--- NOT YET APPLIED. The app works without this migration (it falls back
--- to the current schema and keeps the extra data on the device). Once it
--- is applied, the app detects the new capabilities automatically:
+-- Applied to the live project on 2026-10-05. The app also works without it
+-- (it falls back to the older schema and keeps the extra data on the
+-- device); with it, the app detects the new capabilities automatically:
 --   1. question_attempts accepts the new answer modes
 --      (topic-quiz, recall, apex, mastery-check)
 --   2. quiz_attempts stores topic quizzes and review sessions

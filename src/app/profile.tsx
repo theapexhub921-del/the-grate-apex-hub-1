@@ -24,7 +24,7 @@ type MenuItem = { icon: IconName; label: string; detail: string; href: Href };
 
 const menuItems: MenuItem[] = [
   { icon: 'chart', label: 'My Progress', detail: 'Quizzes, subjects and memory', href: '/progress' },
-  { icon: 'social', label: 'Friends', detail: 'Preview — sample data', href: '/social/friends' },
+  { icon: 'social', label: 'Friends', detail: 'Find classmates and requests', href: '/social/friends' },
   { icon: 'settings', label: 'Settings', detail: 'Appearance, navigation, account', href: '/settings' as Href },
 ];
 
