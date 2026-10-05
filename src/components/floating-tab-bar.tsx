@@ -1,4 +1,4 @@
-import { router, usePathname } from 'expo-router';
+import { usePathname } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { type LayoutChangeEvent, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
@@ -26,7 +26,7 @@ export function useTabBarClearance() {
  * selection pill. Touch-first (no hover states), 44px+ targets, and it
  * slides away while reading when "Auto-hide" is selected in Settings.
  */
-export function FloatingTabBar() {
+export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => void }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const insets = useSafeAreaInsets();
@@ -68,7 +68,8 @@ export function FloatingTabBar() {
 
   return (
     <Animated.View
-      style={[styles.wrap, { bottom: insets.bottom + TAB_BAR_INSET, pointerEvents: hidden ? 'none' : 'box-none' }, barStyle]}
+      pointerEvents={hidden ? 'none' : 'box-none'}
+      style={[styles.wrap, { bottom: insets.bottom + TAB_BAR_INSET }, barStyle]}
     >
       <View
         style={[styles.bar, elevation(colors, 3)]}
@@ -81,7 +82,7 @@ export function FloatingTabBar() {
           return (
             <Pressable
               key={item.route}
-              onPress={() => router.navigate(item.path as never)}
+              onPress={() => onNavigate(item.route)}
               accessibilityRole="tab"
               accessibilityState={{ selected }}
               accessibilityLabel={item.accessibilityLabel}

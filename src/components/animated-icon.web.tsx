@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { Animated as RNAnimated, Easing as RNEasing, StyleSheet, View } from 'react-native';
 import Animated, { Keyframe, Easing, useReducedMotion } from 'react-native-reanimated';
 
-import { IntroCredit } from '@/components/intro-credit';
 import classes from './animated-icon.module.css';
 const DURATION = 300;
 const INTRO_DURATION_MS = 3000;
@@ -69,6 +68,7 @@ export function AnimatedSplashOverlay({ appReady }: AnimatedSplashOverlayProps) 
 
   return (
     <RNAnimated.View
+      pointerEvents="none"
       style={[styles.splashOverlay, { opacity: overlayOpacity }]}>
       <View style={styles.logoStage}>
         {!reduceMotion && (
@@ -112,7 +112,6 @@ export function AnimatedSplashOverlay({ appReady }: AnimatedSplashOverlayProps) 
         />
         )}
       </View>
-      <IntroCredit progress={progress} />
     </RNAnimated.View>
   );
 }
@@ -197,8 +196,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1000,
-    // Never blocks taps, even while fading out.
-    pointerEvents: 'none',
     // The spinning energy arcs are square boxes with round corners; their
     // invisible corners must not widen the page (a brief sideways scroll on
     // phones). Everything visible is well inside the screen, so this

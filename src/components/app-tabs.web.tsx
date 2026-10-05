@@ -49,7 +49,9 @@ export default function AppTabs() {
       <View style={[styles.content, { paddingLeft: docked ? SIDEBAR_WIDTH : 0 }]}>
         <Tabs
           backBehavior="history"
-          tabBar={() => (useRail || isAuthRoute ? null : <FloatingTabBar />)}
+          tabBar={({ navigation }) =>
+            useRail || isAuthRoute ? null : <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
+          }
           screenOptions={{
             headerShown: false,
             // Screens are transparent so the atmosphere shows through.

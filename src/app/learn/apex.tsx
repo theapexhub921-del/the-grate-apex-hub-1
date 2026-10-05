@@ -15,6 +15,7 @@ import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { ApexWordmark } from '@/components/motion/apex-wordmark';
 import { QuestionCard } from '@/components/question-card';
+import { useTabBarScroll } from '@/components/tab-bar-visibility';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
@@ -355,11 +356,12 @@ function ApexArena({ courseId, available }: { courseId?: string; available: stri
 // dims the light while questions are on screen, so reading stays easy.
 function Arena({ children, scroll = true, intensity = 'high' }: { children: ReactNode; scroll?: boolean; intensity?: 'high' | 'low' }) {
   const colors = useTheme();
+  const tabBarScroll = useTabBarScroll();
   const inner = <View style={styles.inner}>{children}</View>;
   return (
     <View style={[styles.arena, { backgroundColor: colors.apexBackground }]}>
       <ArenaLight intensity={intensity} />
-      {scroll ? <ScrollView contentContainerStyle={styles.scroll}>{inner}</ScrollView> : <View style={styles.scroll}>{inner}</View>}
+      {scroll ? <ScrollView {...tabBarScroll} contentContainerStyle={styles.scroll}>{inner}</ScrollView> : <View style={styles.scroll}>{inner}</View>}
     </View>
   );
 }

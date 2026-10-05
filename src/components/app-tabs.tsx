@@ -36,7 +36,9 @@ export default function AppTabs() {
       <Tabs
         // Back (incl. Android back button) returns to the page you came from.
         backBehavior="history"
-        tabBar={() => (isAuthRoute ? null : <FloatingTabBar />)}
+        tabBar={({ navigation }) =>
+          isAuthRoute ? null : <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
+        }
         screenOptions={{
           headerShown: false,
           // Transparent screens let the atmosphere show through.

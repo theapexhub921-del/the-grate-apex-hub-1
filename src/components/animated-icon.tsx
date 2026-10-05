@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import Animated, { Easing, Keyframe, useReducedMotion } from 'react-native-reanimated';
 
-import { IntroCredit } from '@/components/intro-credit';
 const DURATION = 600;
 const INTRO_DURATION_MS = 3000;
 const INITIAL_SCALE_FACTOR = Dimensions.get('screen').height / 90;
@@ -88,6 +87,7 @@ export function AnimatedSplashOverlay({ appReady }: AnimatedSplashOverlayProps) 
             setNativeSplashHidden(true);
           });
       }}
+      pointerEvents="none"
       style={[styles.splashOverlay, { opacity: overlayOpacity }]}>
       <View pointerEvents="none" style={styles.logoStage}>
         {!reduceMotion && (
@@ -131,7 +131,6 @@ export function AnimatedSplashOverlay({ appReady }: AnimatedSplashOverlayProps) 
         />
         )}
       </View>
-      <IntroCredit progress={progress} />
     </RNAnimated.View>
   );
 }
