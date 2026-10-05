@@ -1,0 +1,146 @@
+import { router, usePathname } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { type LayoutChangeEvent, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { activeNavPath, NAV_ITEMS, NavIconView } from '@/components/nav-items';
+import { useTabBarHidden } from '@/components/tab-bar-visibility';
+import { webStyle } from '@/components/ui/web';
+import { MOTION, SPRING } from '@/constants/motion';
+import { elevation, TAB_BAR_HEIGHT, TAB_BAR_INSET, type ThemeColors } from '@/constants/theme';
+import { useTabBarMode } from '@/data/navigation-settings';
+import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+
+const MAX_BAR_WIDTH = 520;
+
+// Distance from the bottom of the window to the top of the bar, so other
+// floating elements (the OrigiNate signature, toasts) can sit above it.
+export function useTabBarClearance() {
+  const insets = useSafeAreaInsets();
+  return insets.bottom + TAB_BAR_INSET + TAB_BAR_HEIGHT;
+}
+
+/**
+ * The mobile navigation: a floating bar in the thumb zone with a sliding
+ * selection pill. Touch-first (no hover states), 44px+ targets, and it
+ * slides away while reading when "Auto-hide" is selected in Settings.
+ */
+export function FloatingTabBar() {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  const insets = useSafeAreaInsets();
+  const pathname = usePathname();
+  const reduceMotion = useReducedMotion();
+  const mode = useTabBarMode();
+  const scrolledAway = useTabBarHidden();
+  const hidden = mode === 'autoHide' && scrolledAway;
+
+  const active = activeNavPath(pathname);
+  const activeIndex = NAV_ITEMS.findIndex((item) => item.path === active);
+
+  const [barWidth, setBarWidth] = useState(0);
+  const itemWidth = barWidth > 0 ? (barWidth - 8) / NAV_ITEMS.length : 0;
+
+  const pillX = useSharedValue(0);
+  const pillOpacity = useSharedValue(activeIndex >= 0 ? 1 : 0);
+  const offset = useSharedValue(0);
+
+  useEffect(() => {
+    if (itemWidth <= 0) return;
+    const x = Math.max(0, activeIndex) * itemWidth;
+    pillX.value = reduceMotion ? x : withSpring(x, SPRING.snappy);
+    pillOpacity.value = withTiming(activeIndex >= 0 ? 1 : 0, { duration: MOTION.micro });
+  }, [activeIndex, itemWidth, pillX, pillOpacity, reduceMotion]);
+
+  useEffect(() => {
+    const distance = TAB_BAR_HEIGHT + TAB_BAR_INSET + insets.bottom + 24;
+    offset.value = withTiming(hidden ? distance : 0, { duration: reduceMotion ? 0 : MOTION.standard });
+  }, [hidden, insets.bottom, offset, reduceMotion]);
+
+  const pillStyle = useAnimatedStyle(() => ({
+    opacity: pillOpacity.value,
+    transform: [{ translateX: pillX.value }],
+  }));
+  const barStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: offset.value }],
+  }));
+
+  return (
+    <Animated.View
+      style={[styles.wrap, { bottom: insets.bottom + TAB_BAR_INSET, pointerEvents: hidden ? 'none' : 'box-none' }, barStyle]}
+    >
+      <View
+        style={[styles.bar, elevation(colors, 3)]}
+        onLayout={(event: LayoutChangeEvent) => setBarWidth(event.nativeEvent.layout.width)}
+        accessibilityRole="tablist"
+      >
+        {itemWidth > 0 ? <Animated.View style={[styles.pill, { width: itemWidth }, pillStyle]} /> : null}
+        {NAV_ITEMS.map((item) => {
+          const selected = item.path === active;
+          return (
+            <Pressable
+              key={item.route}
+              onPress={() => router.navigate(item.path as never)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected }}
+              accessibilityLabel={item.accessibilityLabel}
+              style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
+            >
+              <NavIconView icon={item.icon} color={selected ? colors.navActive : colors.navInactive} size={22} active={selected} />
+              <Text style={[styles.label, selected && styles.labelActive]} numberOfLines={1}>
+                {item.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </Animated.View>
+  );
+}
+
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    wrap: {
+      position: 'absolute',
+      left: TAB_BAR_INSET,
+      right: TAB_BAR_INSET,
+      alignItems: 'center',
+      zIndex: 40,
+    },
+    bar: {
+      width: '100%',
+      maxWidth: MAX_BAR_WIDTH,
+      height: TAB_BAR_HEIGHT,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 4,
+      borderRadius: 24,
+      backgroundColor: colors.navSurface,
+      borderWidth: 1,
+      borderColor: colors.navBorder,
+      ...webStyle({ backdropFilter: 'blur(18px) saturate(150%)', WebkitBackdropFilter: 'blur(18px) saturate(150%)' }),
+      // No backdrop blur on native: a solid elevated surface keeps labels crisp.
+      ...(Platform.OS !== 'web' ? { backgroundColor: colors.surfaceElevated } : null),
+    },
+    pill: {
+      position: 'absolute',
+      left: 4,
+      top: 6,
+      bottom: 6,
+      borderRadius: 18,
+      backgroundColor: colors.navActiveSubtle,
+    },
+    item: {
+      flex: 1,
+      height: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 3,
+      ...webStyle({ cursor: 'pointer', outlineStyle: 'none', WebkitTapHighlightColor: 'transparent' }),
+    },
+    itemPressed: { transform: [{ scale: 0.94 }] },
+    label: { fontSize: 10.5, fontWeight: '700', color: colors.navInactive, letterSpacing: 0.2 },
+    labelActive: { color: colors.navActive },
+  });
+}
