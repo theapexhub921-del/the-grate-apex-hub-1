@@ -23,6 +23,7 @@ const SECTION_LABELS: [string, string][] = [
   ['/learn/results', 'Results'],
   ['/learn/review', 'Review'],
   ['/learn/apex', 'Apex Challenge'],
+  ['/learn/flashcards', 'Flashcards'],
   ['/learn/topic', 'Topic'],
   ['/learn/quiz', 'Quiz'],
   ['/learn/lesson', 'Lesson'],

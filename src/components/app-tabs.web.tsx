@@ -87,6 +87,7 @@ export default function AppTabs() {
           <Tabs.Screen name="learn/topic" options={{ href: null }} />
           <Tabs.Screen name="learn/review" options={{ href: null }} />
           <Tabs.Screen name="learn/apex" options={{ href: null }} />
+          <Tabs.Screen name="learn/flashcards" options={{ href: null }} />
         </Tabs>
       </View>
 

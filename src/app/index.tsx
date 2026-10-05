@@ -5,6 +5,7 @@ import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SubjectGlyph, TopicGlyph } from '@/components/learning/glyphs';
 import { MemoryDistribution } from '@/components/learning/memory-ui';
 import { NextActionHero, NextActionList } from '@/components/learning/next-action-card';
+import { QuestionOfTheDay } from '@/components/learning/question-of-the-day';
 import { ReviewCalendar } from '@/components/learning/review-calendar';
 import { LogoMark } from '@/components/logo-mark';
 import { AnimatedContent } from '@/components/motion';
@@ -33,6 +34,7 @@ import { getSubjectInfo, getSubjectStatus, subjects } from '@/data/subjects';
 import { useDisplayName } from '@/data/user';
 import { useGreeting } from '@/hooks/use-greeting';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { isLocalPreview } from '@/lib/local-preview';
 import { routes } from '@/lib/routes';
 
 // Home — the command centre. It answers "what should I do next?" first,
@@ -280,6 +282,7 @@ export default function HomeScreen() {
             <View style={styles.column}>
               {position}
               {hero}
+              {isLocalPreview() ? <QuestionOfTheDay /> : null}
               {calendar}
               {courseMastery}
               {activity}
@@ -307,6 +310,7 @@ export default function HomeScreen() {
           {position}
           {hero}
           {today}
+          {isLocalPreview() ? <QuestionOfTheDay /> : null}
           {calendar}
           {courseMastery}
           <RankProgressCard lifetimeXp={progress.xp} />
