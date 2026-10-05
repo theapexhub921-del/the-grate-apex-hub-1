@@ -12,7 +12,7 @@ import { Screen } from '@/components/ui/screen';
 import { ErrorScreen, InlineNotice } from '@/components/ui/state-views';
 import { setPendingXpReward } from '@/components/xp-toast';
 import type { ThemeColors } from '@/constants/theme';
-import { findLesson, getLessonQuizBank, getQuestionsByIds, getTopic } from '@/data/curriculum';
+import { findLesson, getLessonQuestions, getLessonQuizBank, getQuestionsByIds, getTopic } from '@/data/curriculum';
 import type { AttemptMode } from '@/data/learning-sync';
 import { logSessionStart, submitQuiz } from '@/data/learning/actions';
 import { selectQuestions, type SelectionRequest } from '@/data/learning/selection';
@@ -21,8 +21,9 @@ import { nowMs } from '@/data/learning/time';
 import { XP_RULES } from '@/data/learning/xp-rules';
 import { useProgress } from '@/data/progress';
 import { ensureQuestionHistoryLoaded } from '@/data/question-history';
-import { type AttemptKind, ensureQuizHistoryLoaded, getQuizHistory } from '@/data/quiz-history';
+import { type AttemptKind, type CustomQuizSettings, ensureQuizHistoryLoaded, getQuizHistory } from '@/data/quiz-history';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { isLocalPreview } from '@/lib/local-preview';
 import { param, routes } from '@/lib/routes';
 import type { Href } from 'expo-router';
 
@@ -39,6 +40,7 @@ type QuizPlan = {
   request: Omit<SelectionRequest, 'seed' | 'now'>;
   backHref: Href;
   crumbs: { label: string; href?: Href }[];
+  customQuiz?: CustomQuizSettings;
 };
 
 // /learn/quiz?lesson=<id>[&masteryCheck=true]   lesson quiz / mastery check
@@ -53,7 +55,19 @@ export default function QuizRoute() {
   const practice =
     param(params.practice) ?? (param(params.practiceWrong) === 'true' ? param(params.wrongQuestions) : undefined);
   const masteryCheck = param(params.masteryCheck) === 'true';
+  const custom = param(params.custom) === '1';
   const attemptToken = param(params.attempt) ?? '';
+  const customLessonIds = custom ? [...new Set((param(params.lessons) ?? '').split(',').filter(Boolean))] : undefined;
+  const customSize = custom ? Math.max(1, Math.min(50, Number(param(params.size)) || 10)) : undefined;
+  const feedback = param(params.feedback) === 'submit' ? 'submit' : 'instant';
+  const parsedSeconds = Number(param(params.seconds));
+  const perQuestionSeconds = custom && Number.isInteger(parsedSeconds) && parsedSeconds >= 5 && parsedSeconds <= 120 ? parsedSeconds : undefined;
+  const customSettings: CustomQuizSettings | undefined =
+    custom && customLessonIds?.length
+      ? { lessonIds: customLessonIds, size: customSize ?? 10, feedback, secondsPerQuestion: perQuestionSeconds }
+      : undefined;
+
+  if (custom && !isLocalPreview()) return <Redirect href={routes.learn()} />;
 
   if (param(params.challenge) === 'apex' || (!lessonId && !topicId && !practice && param(params.course))) {
     return <Redirect href={routes.apex(param(params.course))} />;
@@ -61,11 +75,16 @@ export default function QuizRoute() {
 
   return (
     <QuizScreen
-      key={`${lessonId ?? ''}:${topicId ?? ''}:${practice ?? ''}:${masteryCheck}:${attemptToken}`}
+      key={`${lessonId ?? ''}:${topicId ?? ''}:${practice ?? ''}:${masteryCheck}:${custom}:${attemptToken}`}
       lessonId={lessonId}
       topicId={topicId}
       practiceIds={practice ? practice.split(',').filter(Boolean) : undefined}
       masteryCheck={masteryCheck}
+      customLessonIds={customLessonIds}
+      customSize={customSize}
+      customSettings={customSettings}
+      initialFeedback={custom ? feedback : undefined}
+      perQuestionSeconds={perQuestionSeconds}
     />
   );
 }
@@ -75,9 +94,33 @@ function buildPlan(input: {
   topicId?: string;
   practiceIds?: string[];
   masteryCheck: boolean;
+  customLessonIds?: string[];
+  customSize?: number;
+  customSettings?: CustomQuizSettings;
   completed: string[];
 }): QuizPlan | null {
-  const { lessonId, topicId, practiceIds, masteryCheck, completed } = input;
+  const { lessonId, topicId, practiceIds, masteryCheck, customLessonIds, customSize, customSettings, completed } = input;
+
+  if (customLessonIds && customLessonIds.length > 0) {
+    const lessonIds = customLessonIds.filter((id) => findLesson(id));
+    const questionIds = Array.from(
+      new Set(lessonIds.flatMap((id) => getLessonQuestions(id).filter((question) => question.usage !== 'learn').map((question) => question.id)))
+    );
+    if (questionIds.length === 0) return null;
+    const size = Math.min(customSize ?? 10, questionIds.length);
+    const topicIds = new Set(lessonIds.map((id) => findLesson(id)?.topic.id).filter((id): id is string => Boolean(id)));
+    return {
+      kind: 'practice',
+      attemptMode: 'practice',
+      title: 'Custom practice',
+      subtitle: `A fresh set of up to ${size} questions from your selected lessons.`,
+      topicId: topicIds.size === 1 ? Array.from(topicIds)[0] : '',
+      request: { scope: { kind: 'questions', questionIds }, size },
+      backHref: routes.customQuizBuilder(),
+      crumbs: [{ label: 'Custom practice' }],
+      customQuiz: customSettings ? { ...customSettings, lessonIds, size } : undefined,
+    };
+  }
 
   if (practiceIds && practiceIds.length > 0) {
     const questions = getQuestionsByIds(practiceIds);
@@ -143,17 +186,27 @@ function QuizScreen({
   topicId,
   practiceIds,
   masteryCheck,
+  customLessonIds,
+  customSize,
+  customSettings,
+  initialFeedback,
+  perQuestionSeconds,
 }: {
   lessonId?: string;
   topicId?: string;
   practiceIds?: string[];
   masteryCheck: boolean;
+  customLessonIds?: string[];
+  customSize?: number;
+  customSettings?: CustomQuizSettings;
+  initialFeedback?: FeedbackMode;
+  perQuestionSeconds?: number;
 }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const progress = useProgress();
-  const plan = buildPlan({ lessonId, topicId, practiceIds, masteryCheck, completed: progress.completedLessons });
-  const [mode, setMode] = useState<FeedbackMode>('instant');
+  const plan = buildPlan({ lessonId, topicId, practiceIds, masteryCheck, customLessonIds, customSize, customSettings, completed: progress.completedLessons });
+  const [mode, setMode] = useState<FeedbackMode>(initialFeedback ?? 'instant');
   const [items, setItems] = useState<SessionItem[] | null>(null);
   const [seed, setSeed] = useState('');
   const [starting, setStarting] = useState(false);
@@ -232,6 +285,7 @@ function QuizScreen({
       timeSeconds: result.timeSeconds,
       feedbackMode: mode,
       practice: plan.kind === 'practice',
+      customQuiz: plan.customQuiz,
     });
     const extra = outcome.milestones.reduce((sum, item) => sum + item.xp, 0);
     if (outcome.xpApplied !== 0 || extra !== 0) {
@@ -250,6 +304,7 @@ function QuizScreen({
         items={items}
         mode={mode}
         onModeChange={setMode}
+        perQuestionSeconds={perQuestionSeconds}
         attemptMode={plan.attemptMode}
         sessionId={`quiz:${seed}`}
         seed={seed}

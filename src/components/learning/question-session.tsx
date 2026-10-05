@@ -43,6 +43,7 @@ export function QuestionSession({
   items,
   mode,
   onModeChange,
+  perQuestionSeconds,
   attemptMode,
   sessionId,
   seed,
@@ -55,6 +56,7 @@ export function QuestionSession({
   items: SessionItem[];
   mode: FeedbackMode;
   onModeChange?: (mode: FeedbackMode) => void;
+  perQuestionSeconds?: number;
   attemptMode: AttemptMode;
   sessionId: string;
   seed: string;
@@ -73,17 +75,53 @@ export function QuestionSession({
   const [checked, setChecked] = useState<Set<string>>(() => new Set());
   const [skipped, setSkipped] = useState<Set<string>>(() => new Set());
   const [recorded, setRecorded] = useState<Set<string>>(() => new Set());
+  const [timedOut, setTimedOut] = useState<Set<string>>(() => new Set());
   const [confirming, setConfirming] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [startedAt] = useState(() => Date.now());
   const [elapsed, setElapsed] = useState(0);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const remainingByQuestion = useRef(new Map<string, number>());
+  const total = items.length;
+  const current = items[index];
+  const question = current?.question;
+  const currentQuestionId = question?.id;
+  const currentQuestionComplete = question ? isAnswerComplete(question, answers[question.id]) : false;
 
   useEffect(() => {
     const timer = setInterval(() => setElapsed(secondsSince(startedAt)), 1000);
     return () => clearInterval(timer);
   }, [startedAt]);
+
+  useEffect(() => {
+    if (!currentQuestionId || !perQuestionSeconds || currentQuestionComplete || timedOut.has(currentQuestionId)) return;
+
+    const remaining = remainingByQuestion.current;
+    let seconds = remaining.get(currentQuestionId) ?? perQuestionSeconds;
+    setTimeLeft(seconds);
+    const timer = setInterval(() => {
+      seconds -= 1;
+      remaining.set(currentQuestionId, seconds);
+      setTimeLeft(seconds);
+      if (seconds > 0) return;
+
+      clearInterval(timer);
+      setTimedOut((previous) => new Set(previous).add(currentQuestionId));
+      setSkipped((previous) => new Set(previous).add(currentQuestionId));
+      if (mode === 'instant') setChecked((previous) => new Set(previous).add(currentQuestionId));
+      else {
+        setIndex((currentIndex) => Math.min(total, currentIndex + 1));
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+      remaining.set(currentQuestionId, seconds);
+    };
+  }, [currentQuestionComplete, currentQuestionId, index, mode, perQuestionSeconds, timedOut, total]);
 
   useEffect(
     () => () => {
@@ -92,9 +130,6 @@ export function QuestionSession({
     []
   );
 
-  const total = items.length;
-  const current = items[index];
-  const question = current?.question;
   const answeredCount = items.filter((item) => isAnswerComplete(item.question, answers[item.question.id])).length;
   const unanswered = total - answeredCount;
   const isChecked = question ? checked.has(question.id) : false;
@@ -116,7 +151,7 @@ export function QuestionSession({
   }
 
   function select(value: Answer) {
-    if (!question || recorded.has(question.id)) return;
+    if (!question || recorded.has(question.id) || timedOut.has(question.id)) return;
     setAnswers((previous) => ({ ...previous, [question.id]: value }));
     setSkipped((previous) => {
       if (!previous.has(question.id)) return previous;
@@ -150,7 +185,7 @@ export function QuestionSession({
   }
 
   function skip() {
-    if (!question || isRecorded) return;
+    if (!question || isRecorded || timedOut.has(question.id)) return;
     setAnswers((previous) => {
       const next = { ...previous };
       delete next[question.id];
@@ -197,7 +232,7 @@ export function QuestionSession({
         if (mode === 'instant') {
           if (!isChecked && complete) void check();
           else if (isChecked) go(index + 1);
-        } else if (complete) {
+        } else if (complete || (question && timedOut.has(question.id))) {
           go(index + 1);
         }
       },
@@ -278,6 +313,13 @@ export function QuestionSession({
 
       {question ? (
         <>
+          {perQuestionSeconds ? (
+            <Pill
+              label={timedOut.has(question.id) ? 'Time expired' : `Time left: ${timeLeft ?? perQuestionSeconds}s`}
+              tone={timedOut.has(question.id) || (timeLeft !== null && timeLeft <= 5) ? 'warning' : 'primary'}
+              style={styles.questionTimer}
+            />
+          ) : null}
           {showReasons && current.reason && REASON_LABEL[current.reason] ? (
             <Pill label={REASON_LABEL[current.reason]!.label} tone={REASON_LABEL[current.reason]!.tone} style={styles.reason} />
           ) : null}
@@ -296,7 +338,7 @@ export function QuestionSession({
           />
           <View style={styles.actions}>
             <Button label="Back" variant="ghost" onPress={() => go(index - 1)} disabled={index === 0} />
-            <Button label="Skip" variant="secondary" onPress={skip} disabled={isRecorded} />
+            <Button label="Skip" variant="secondary" onPress={skip} disabled={isRecorded || timedOut.has(question.id)} />
             <View style={styles.flex} />
             {mode === 'instant' ? (
               isChecked ? (
@@ -306,10 +348,10 @@ export function QuestionSession({
               )
             ) : (
               <Button
-                label={index === total - 1 ? 'Continue to finish' : 'Continue'}
+                label={timedOut.has(question.id) ? (index === total - 1 ? 'Finish' : 'Next question') : index === total - 1 ? 'Continue to finish' : 'Continue'}
                 trailing="→"
                 onPress={() => go(index + 1)}
-                disabled={!complete}
+                disabled={!complete && !timedOut.has(question.id)}
                 shortcut={isWeb ? 'Enter' : undefined}
               />
             )}
@@ -362,6 +404,7 @@ export function QuestionSession({
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     screen: { flex: 1 },
+    questionTimer: { marginBottom: 8 },
     flex: { flex: 1 },
     kicker: { fontSize: 11, fontWeight: '800', letterSpacing: 1.1, color: colors.textTertiary },
     navCard: { gap: 12 },

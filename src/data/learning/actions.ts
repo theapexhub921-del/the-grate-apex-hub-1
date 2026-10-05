@@ -36,7 +36,7 @@ import {
 import { awardXp, completeLesson, getProgressSnapshot, hasAward, type XpSourceType } from '@/data/progress';
 import { type Answer, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
 import { type QuestionAttempt, recordQuestionAttempts } from '@/data/question-history';
-import { type AttemptKind, type QuizAttempt, recordQuizAttempt } from '@/data/quiz-history';
+import { type AttemptKind, type CustomQuizSettings, type QuizAttempt, recordQuizAttempt } from '@/data/quiz-history';
 import type { RecallPrompt } from '@/data/lesson-types';
 
 export function attemptFor(
@@ -170,6 +170,7 @@ export type QuizSubmission = {
   timeSeconds: number;
   feedbackMode: 'instant' | 'submit' | 'timed';
   practice?: boolean;
+  customQuiz?: CustomQuizSettings;
 };
 
 export type QuizOutcome = {
@@ -258,6 +259,7 @@ export async function submitQuiz(submission: QuizSubmission): Promise<QuizOutcom
     questionIds: questions.map((question) => question.id),
     answers,
     feedbackMode: submission.feedbackMode,
+    customQuiz: submission.customQuiz,
     practice: Boolean(submission.practice),
     xp: { net: xp.net, lines: xp.lines },
     completedAt: Date.now(),

@@ -139,7 +139,9 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
       : attempt.kind === 'apex'
         ? 'Apex Challenge'
         : attempt.kind === 'practice'
-          ? 'Practice'
+          ? attempt.customQuiz
+            ? 'Custom practice'
+            : 'Practice'
           : attempt.kind === 'topic'
             ? `${topic?.title ?? 'Topic'} — cumulative quiz`
             : found?.lesson.title ?? 'Quiz';
@@ -215,7 +217,16 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
             : 'This needs more practice — the misses below are your plan.';
 
   function retake() {
-    if (attempt.kind === 'topic' && topic) router.replace(routes.topicQuiz(topic.id));
+    if (attempt.customQuiz) {
+      router.replace(
+        routes.customQuiz({
+          lessonIds: attempt.customQuiz.lessonIds,
+          size: attempt.customQuiz.size,
+          feedback: attempt.customQuiz.feedback,
+          secondsPerQuestion: attempt.customQuiz.secondsPerQuestion,
+        })
+      );
+    } else if (attempt.kind === 'topic' && topic) router.replace(routes.topicQuiz(topic.id));
     else if (attempt.kind === 'review') router.replace(routes.review({ topicId: attempt.topicId || undefined, focus: 'mixed' }));
     else if (attempt.kind === 'apex') router.replace(routes.apex(topic?.courseId ?? (attempt.courseId || undefined)));
     else if (attempt.lessonId) router.replace(routes.lessonQuiz(attempt.lessonId));
@@ -403,7 +414,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
           ]}
           style={styles.crumbs}
         />
-        <Text style={styles.kindLabel}>{KIND_LABEL[attempt.kind]}</Text>
+        <Text style={styles.kindLabel}>{attempt.customQuiz ? 'CUSTOM PRACTICE' : KIND_LABEL[attempt.kind]}</Text>
         <Text style={styles.title} accessibilityRole="header">
           {title}
         </Text>

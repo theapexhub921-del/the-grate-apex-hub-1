@@ -71,6 +71,20 @@ export const routes = {
         })}` as Href)
       : fallback('practice', '/learn'),
 
+  customQuizBuilder: () => '/learn/custom-quiz' as Href,
+
+  customQuiz: (options: { lessonIds: string[]; size: number; feedback: 'instant' | 'submit'; secondsPerQuestion?: number }) =>
+    options.lessonIds.length > 0
+      ? (`/learn/quiz${query({
+          custom: 1,
+          lessons: options.lessonIds.join(','),
+          size: options.size,
+          feedback: options.feedback,
+          seconds: options.secondsPerQuestion,
+          attempt: Date.now(),
+        })}` as Href)
+      : fallback('customQuiz', '/learn/custom-quiz'),
+
   results: (attemptId: string | null | undefined) =>
     valid(attemptId) ? (`/learn/results${query({ attempt: attemptId })}` as Href) : fallback('results', '/progress'),
 

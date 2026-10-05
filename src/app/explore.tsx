@@ -14,6 +14,8 @@ import { type ExploreItem, getCategoryLabel, getFeaturedItem, getItemsByCategory
 import { POWERUP_MULTIPLIERS, XP_RULES } from '@/data/learning/xp-rules';
 import { useProgress } from '@/data/progress';
 import { getRankProgress, LEAGUE_RULES, RANKS } from '@/data/ranks';
+import { isLocalPreview } from '@/lib/local-preview';
+import { routes } from '@/lib/routes';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // Explore = optional discovery. Nothing here is graded or tracked.
@@ -122,7 +124,21 @@ export default function ExploreScreen() {
           {newFeatures.map((item) => (
             <ItemCard key={item.id} item={item} size="sm" />
           ))}
-        </View>
+          {isLocalPreview() ? (
+            <PressableCard
+              onPress={() => router.push(routes.customQuizBuilder())}
+              accessibilityLabel="Open Custom practice. Build a quiz from selected lessons, with optional timed drill. Local preview only."
+              style={styles.newsCard}
+            >
+              <View style={styles.newsHeader}>
+                <Icon name="lesson" size={18} color={colors.primaryText} />
+                <Text style={styles.newsTitle}>Custom practice</Text>
+                <Pill label="Local preview" />
+              </View>
+              <Text style={styles.newsText}>Choose lessons, set the quiz length and feedback, or add a timer for each question.</Text>
+            </PressableCard>
+          ) : null}
+          </View>
       </View>
 
       <SectionHeader title={getCategoryLabel('concept')} subtitle="Clinical connections: ideas that explain what you will see in patients." style={styles.section} />

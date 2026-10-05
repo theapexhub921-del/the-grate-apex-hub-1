@@ -19,6 +19,13 @@ import {
 
 export type AttemptKind = 'lesson' | 'topic' | 'practice' | 'review' | 'apex' | 'mastery-check';
 
+export type CustomQuizSettings = {
+  lessonIds: string[];
+  size: number;
+  feedback: 'instant' | 'submit';
+  secondsPerQuestion?: number;
+};
+
 export type QuizAttempt = {
   id: string;
   kind: AttemptKind;
@@ -36,6 +43,7 @@ export type QuizAttempt = {
   questionIds: string[];
   answers?: Record<string, Answer>; // local only — shown on Results
   feedbackMode?: 'instant' | 'submit' | 'timed';
+  customQuiz?: CustomQuizSettings; // local-only settings used to retake a custom quiz
   practice: boolean; // true for "Practice Wrong Answers" runs
   xp?: { net: number; lines: { label: string; amount: number }[] };
   completedAt: number;
@@ -77,6 +85,8 @@ function attemptTypeFor(kind: AttemptKind): CloudQuizKind {
       return 'topic';
     case 'review':
       return 'review';
+    case 'practice':
+      return 'practice';
     default:
       return 'lesson';
   }
@@ -86,6 +96,7 @@ function normalize(item: Record<string, unknown>): QuizAttempt | null {
   if (typeof item.percentage !== 'number' || typeof item.completedAt !== 'number') return null;
   const partial = item as Partial<QuizAttempt> & { attemptType?: string };
   const kind = kindFromLegacy(partial);
+  const customQuiz = normalizeCustomQuiz(partial.customQuiz);
   return {
     id: isUuid(partial.id) ? partial.id : createLearningRecordId(),
     kind,
@@ -103,9 +114,28 @@ function normalize(item: Record<string, unknown>): QuizAttempt | null {
     questionIds: Array.isArray(partial.questionIds) ? partial.questionIds : [],
     answers: partial.answers && typeof partial.answers === 'object' ? partial.answers : undefined,
     feedbackMode: partial.feedbackMode,
+    customQuiz,
     practice: Boolean(partial.practice),
     xp: partial.xp,
     completedAt: partial.completedAt ?? Date.now(),
+  };
+}
+
+function normalizeCustomQuiz(value: unknown): CustomQuizSettings | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const settings = value as Partial<CustomQuizSettings>;
+  const lessonIds = Array.isArray(settings.lessonIds) ? settings.lessonIds.filter((id): id is string => typeof id === 'string') : [];
+  if (!lessonIds.length || !Number.isInteger(settings.size) || !settings.size || settings.size < 1 || settings.size > 50) return undefined;
+  if (settings.feedback !== 'instant' && settings.feedback !== 'submit') return undefined;
+  const secondsPerQuestion = settings.secondsPerQuestion;
+  return {
+    lessonIds,
+    size: settings.size,
+    feedback: settings.feedback,
+    secondsPerQuestion:
+      Number.isInteger(secondsPerQuestion) && secondsPerQuestion && secondsPerQuestion >= 5 && secondsPerQuestion <= 120
+        ? secondsPerQuestion
+        : undefined,
   };
 }
 
