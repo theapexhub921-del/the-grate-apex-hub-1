@@ -694,6 +694,15 @@ export default function LoginScreen() {
                 </>
               )}
             </View>
+            <View style={styles.legalRow}>
+              <Interactive onPress={() => router.push('/privacy' as Href)} accessibilityLabel="Privacy Policy" style={styles.switchLink}>
+                <Text style={styles.legalText}>Privacy Policy</Text>
+              </Interactive>
+              <Text style={styles.legalText}>·</Text>
+              <Interactive onPress={() => router.push('/terms' as Href)} accessibilityLabel="Terms of Service" style={styles.switchLink}>
+                <Text style={styles.legalText}>Terms of Service</Text>
+              </Interactive>
+            </View>
             {!isWide ? <Text style={styles.mobileMotto}>Reach the Apex of GrAteness.</Text> : null}
           </View>
         </View>
@@ -1028,6 +1037,8 @@ function createStyles(colors: ThemeColors) {
     googleText: { fontSize: 15, fontWeight: '700', color: '#1F1F1F' },
     switchRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 18 },
     switchText: { fontSize: 13.5, color: colors.textSecondary },
+    legalRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 14 },
+    legalText: { fontSize: 12.5, color: colors.textTertiary, textDecorationLine: 'underline' },
     switchLink: { borderRadius: 6, paddingHorizontal: 2, paddingVertical: 2 },
   });
 }

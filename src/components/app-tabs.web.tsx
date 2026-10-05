@@ -33,7 +33,7 @@ export default function AppTabs() {
   const reduceMotion = useReducedMotion();
 
   // Unauthenticated screens must not show the authenticated navigation.
-  const isAuthRoute = segments[0] === 'login' || (segments[0] as string) === 'onboarding';
+  const isAuthRoute = ['login', 'onboarding', 'privacy', 'terms'].includes(segments[0] as string);
   const isDesktop = width >= DESKTOP_BREAKPOINT;
   const useRail = !isAuthRoute && isDesktop;
   const docked = useRail && mode === 'alwaysVisible';
@@ -72,6 +72,8 @@ export default function AppTabs() {
           <Tabs.Screen name="settings" options={{ href: null }} />
           <Tabs.Screen name="login" options={{ href: null }} />
           <Tabs.Screen name="onboarding" options={{ href: null }} />
+          <Tabs.Screen name="privacy" options={{ href: null }} />
+          <Tabs.Screen name="terms" options={{ href: null }} />
           <Tabs.Screen name="social/friends" options={{ href: null }} />
           <Tabs.Screen name="explore/discovery" options={{ href: null }} />
           <Tabs.Screen name="learn/anatomy" options={{ href: null }} />

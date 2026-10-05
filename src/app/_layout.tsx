@@ -45,6 +45,11 @@ function AppGuard({ children }: { children: ReactNode }) {
     const onLoginScreen = segments[0] === 'login';
     const onOnboarding = (segments[0] as string) === 'onboarding';
 
+    // Privacy policy and terms are public (Google and visitors must be able
+    // to read them without an account).
+    const first = segments[0] as string;
+    if (first === 'privacy' || first === 'terms') return;
+
     if (!session) {
       // Unauthenticated: push to /login unless already there.
       if (!onLoginScreen) {

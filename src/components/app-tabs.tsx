@@ -28,7 +28,7 @@ export default function AppTabs() {
   // Unauthenticated screens (login, forgot password, set new password) must
   // not show the authenticated navigation. The auth guard already keeps
   // signed-out users on /login; this simply hides the shell around it.
-  const isAuthRoute = segments[0] === 'login' || (segments[0] as string) === 'onboarding';
+  const isAuthRoute = ['login', 'onboarding', 'privacy', 'terms'].includes(segments[0] as string);
 
   return (
     <View style={styles.shell}>
@@ -59,6 +59,8 @@ export default function AppTabs() {
         <Tabs.Screen name="settings" options={{ href: null }} />
         <Tabs.Screen name="login" options={{ href: null }} />
         <Tabs.Screen name="onboarding" options={{ href: null }} />
+        <Tabs.Screen name="privacy" options={{ href: null }} />
+        <Tabs.Screen name="terms" options={{ href: null }} />
         <Tabs.Screen name="social/friends" options={{ href: null }} />
         <Tabs.Screen name="explore/discovery" options={{ href: null }} />
         <Tabs.Screen name="learn/anatomy" options={{ href: null }} />
