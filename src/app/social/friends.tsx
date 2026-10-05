@@ -1,6 +1,6 @@
 import type { Href } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 
 import { BackLink } from '@/components/learning/nav-bits';
 import { Avatar } from '@/components/ui/avatar';
@@ -15,6 +15,7 @@ import {
   respondToFriendRequest,
   searchLearners,
   sendFriendRequest,
+  setShareActivity,
   setUsername,
   type SocialPerson,
   useSocial,
@@ -42,6 +43,7 @@ export default function FriendsScreen() {
       <PageHeader title="Friends" subtitle="Your study circle." style={styles.header} />
 
       <UsernameCard username={social.username} />
+      <ShareActivityCard share={social.shareActivity} />
       <SearchCard />
 
       {social.status === 'loading' && social.people.length === 0 ? (
@@ -149,6 +151,30 @@ function UsernameCard({ username }: { username: string | null }) {
         <Button label="Save" size="sm" onPress={save} loading={busy} disabled={value.length < 3 || busy} />
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
+    </View>
+  );
+}
+
+function ShareActivityCard({ share }: { share: boolean }) {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  const [error, setError] = useState<string | null>(null);
+  return (
+    <View style={[styles.card, styles.usernameRow]}>
+      <View style={styles.rowInfo}>
+        <Text style={styles.rowName}>Share my activity with friends</Text>
+        <Text style={styles.rowDetail}>Friends see when you complete a lesson, a topic or the Apex Challenge — never your answers or scores.</Text>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+      </View>
+      <Switch
+        value={share}
+        onValueChange={(next) => {
+          setError(null);
+          setShareActivity(next).catch((caught) => setError(caught instanceof Error ? caught.message : 'Please try again.'));
+        }}
+        trackColor={{ true: colors.primary, false: colors.track }}
+        accessibilityLabel="Share my activity with friends"
+      />
     </View>
   );
 }

@@ -39,16 +39,29 @@ export type SocialNotification = {
   createdAt: number;
 };
 
+export type FriendActivity = {
+  id: string;
+  userId: string;
+  name: string;
+  avatarUrl: string | null;
+  type: 'LESSON_COMPLETED' | 'TOPIC_COMPLETED' | 'APEX_CHALLENGE_COMPLETED';
+  topicId: string | null;
+  lessonId: string | null;
+  at: number;
+};
+
 type State = {
   status: 'idle' | 'loading' | 'ready' | 'error';
   userId: string | null;
   username: string | null;
+  shareActivity: boolean;
+  activity: FriendActivity[];
   people: SocialPerson[];
   notifications: SocialNotification[];
   error: string | null;
 };
 
-const EMPTY: State = { status: 'idle', userId: null, username: null, people: [], notifications: [], error: null };
+const EMPTY: State = { status: 'idle', userId: null, username: null, shareActivity: true, activity: [], people: [], notifications: [], error: null };
 let state: State = EMPTY;
 const listeners = new Set<() => void>();
 let channel: RealtimeChannel | null = null;
@@ -108,6 +121,30 @@ type NotificationRow = {
   created_at: string;
 };
 
+type ActivityRow = {
+  user_id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  event_type: FriendActivity['type'];
+  topic_id: string | null;
+  lesson_id: string | null;
+  occurred_at: string;
+};
+
+function toActivity(row: ActivityRow): FriendActivity {
+  return {
+    id: `${row.user_id}:${row.event_type}:${row.lesson_id ?? row.topic_id ?? ''}:${row.occurred_at}`,
+    userId: row.user_id,
+    name: personName({ displayName: row.display_name, username: row.username }),
+    avatarUrl: row.avatar_url,
+    type: row.event_type,
+    topicId: row.topic_id,
+    lessonId: row.lesson_id,
+    at: Date.parse(row.occurred_at),
+  };
+}
+
 function toPerson(row: PersonRow): SocialPerson {
   return {
     userId: row.user_id,
@@ -137,10 +174,11 @@ function toNotification(row: NotificationRow): SocialNotification {
 // ── Loading ─────────────────────────────────────────────────────────
 
 async function load(userId: string) {
-  const [friends, notes, profile] = await Promise.all([
+  const [friends, notes, profile, activity] = await Promise.all([
     supabase.rpc('grateapex_list_friends'),
     supabase.rpc('grateapex_list_notifications'),
-    supabase.from('profiles').select('username').eq('id', userId).maybeSingle(),
+    supabase.from('profiles').select('username, share_activity').eq('id', userId).maybeSingle(),
+    supabase.rpc('grateapex_friend_activity'),
   ]);
   if (state.userId !== userId) return; // signed out meanwhile
   const error = friends.error ?? notes.error;
@@ -155,7 +193,10 @@ async function load(userId: string) {
     people: ((friends.data ?? []) as PersonRow[]).map(toPerson),
     notifications: ((notes.data ?? []) as NotificationRow[]).map(toNotification),
     username: (profile.data as { username: string | null } | null)?.username ?? state.username,
+    shareActivity: (profile.data as { share_activity?: boolean } | null)?.share_activity ?? state.shareActivity,
+    activity: activity.error ? state.activity : ((activity.data ?? []) as ActivityRow[]).map(toActivity),
   });
+  if (activity.error) report('activity', activity.error);
 }
 
 export function refreshSocial() {
@@ -241,6 +282,20 @@ export function removeFriendship(friendshipId: string) {
 export async function setUsername(username: string) {
   const saved = await run('set username', () => supabase.rpc('grateapex_set_username', { p_username: username }));
   setState({ username: typeof saved === 'string' ? saved : username.trim().toLowerCase() });
+}
+
+// Whether friends see your lesson/topic/Apex completions.
+export async function setShareActivity(share: boolean) {
+  const userId = state.userId;
+  if (!userId) return;
+  const previous = state.shareActivity;
+  setState({ shareActivity: share });
+  const { error } = await supabase.from('profiles').update({ share_activity: share }).eq('id', userId);
+  if (error) {
+    setState({ shareActivity: previous });
+    report('share activity', error);
+    throw new Error(friendlySocialError(error));
+  }
 }
 
 export async function searchLearners(query: string): Promise<SocialPerson[]> {

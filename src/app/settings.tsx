@@ -19,6 +19,7 @@ import { setDisplayName, useAvatarUrl, useDisplayName } from '@/data/user';
 import { useAuth } from '@/hooks/use-auth';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { deleteMyAccount } from '@/lib/account';
 import { routes } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 
@@ -68,6 +69,10 @@ export default function SettingsScreen() {
   // Authentication session.
   const { user } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteText, setDeleteText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Refill the box whenever the saved name changes (e.g. after it loads).
   const [lastSavedName, setLastSavedName] = useState(savedName);
@@ -97,6 +102,19 @@ export default function SettingsScreen() {
       setSigningOut(false);
       router.replace('/login');
     }
+  }
+
+  async function handleDeleteAccount() {
+    if (deleting || deleteText.trim().toUpperCase() !== 'DELETE') return;
+    setDeleting(true);
+    setDeleteError(null);
+    const { error } = await deleteMyAccount();
+    setDeleting(false);
+    if (error) {
+      setDeleteError(error);
+      return;
+    }
+    router.replace('/login');
   }
 
   return (
@@ -241,6 +259,41 @@ export default function SettingsScreen() {
                 <Text style={styles.optionDescription}>Sign out of your account on this device.</Text>
               </View>
             </Interactive>
+            {deleteOpen ? (
+              <View style={[styles.optionRow, styles.rowDivider, styles.deleteBox]}>
+                <Text style={[styles.optionLabel, styles.signOutText]}>Delete your account permanently?</Text>
+                <Text style={styles.optionDescription}>
+                  This erases your profile, progress, XP, quiz and review history, friends and notifications. It cannot be undone. Type DELETE to confirm.
+                </Text>
+                <TextInput
+                  value={deleteText}
+                  onChangeText={setDeleteText}
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                  placeholder="DELETE"
+                  placeholderTextColor={colors.textTertiary}
+                  accessibilityLabel="Type DELETE to confirm"
+                  style={styles.deleteInput}
+                />
+                {deleteError ? <Text style={styles.signOutText}>{deleteError}</Text> : null}
+                <View style={styles.deleteActions}>
+                  <Button label="Delete my account" size="sm" onPress={() => void handleDeleteAccount()} loading={deleting} disabled={deleteText.trim().toUpperCase() !== 'DELETE' || deleting} />
+                  <Button label="Cancel" size="sm" variant="secondary" onPress={() => { setDeleteOpen(false); setDeleteText(''); setDeleteError(null); }} disabled={deleting} />
+                </View>
+              </View>
+            ) : (
+              <Interactive
+                onPress={() => setDeleteOpen(true)}
+                accessibilityLabel="Delete account"
+                style={({ hovered }) => [styles.optionRow, styles.rowDivider, hovered && styles.rowHover]}
+              >
+                <Icon name="warning" size={18} color={colors.error} />
+                <View style={styles.flex}>
+                  <Text style={[styles.optionLabel, styles.signOutText]}>Delete account</Text>
+                  <Text style={styles.optionDescription}>Permanently erase your account and all your data.</Text>
+                </View>
+              </Interactive>
+            )}
           </>
         ) : (
           <Interactive onPress={() => router.push('/login')} accessibilityLabel="Sign in" style={({ hovered }) => [styles.optionRow, hovered && styles.rowHover]}>
@@ -387,6 +440,17 @@ function createStyles(colors: ThemeColors) {
     radioSelected: { borderColor: colors.primary },
     radioDot: { width: 11, height: 11, borderRadius: 6, backgroundColor: colors.primary },
     signOutText: { color: colors.error },
+    deleteBox: { flexDirection: 'column', alignItems: 'stretch', gap: 8 },
+    deleteInput: {
+      minHeight: 42,
+      paddingHorizontal: 12,
+      borderRadius: Radius.md,
+      borderWidth: 1,
+      borderColor: colors.errorBorder,
+      color: colors.text,
+      fontSize: 15,
+    },
+    deleteActions: { flexDirection: 'row', gap: 10 },
     signInText: { color: colors.primaryText },
   });
 }

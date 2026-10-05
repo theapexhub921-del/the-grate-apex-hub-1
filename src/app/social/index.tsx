@@ -11,12 +11,12 @@ import { Type, type ThemeColors } from '@/constants/theme';
 import { addDays, startOfDay } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
 import { getRankProgress, LEAGUE_RULES } from '@/data/ranks';
-import { personName, useSocial } from '@/data/social';
+import { findLesson, getTopic } from '@/data/curriculum';
+import { type FriendActivity, personName, useSocial } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // Features that need classmate connections — shown honestly as upcoming.
 const comingSoon: { id: string; icon: IconName; title: string; description: string }[] = [
-  { id: 'classmate-activity', icon: 'announcement', title: 'Classmate activity', description: 'See what your study circle is working on.' },
   { id: 'leaderboard', icon: 'rank', title: 'Weekly leagues', description: 'Compete with learners at your rank.' },
   { id: 'study-groups', icon: 'social', title: 'Study groups', description: 'Revise a topic together in small groups.' },
 ];
@@ -80,6 +80,32 @@ export default function SocialScreen() {
         ))}
       </View>
       <Text style={styles.note}>Friends see your weekly XP and streak — never your answers or scores.</Text>
+    </Card>
+  );
+
+  const activityCard = (
+    <Card style={styles.card}>
+      <View style={styles.cardHeader}>
+        <Text style={styles.cardTitle}>Friend activity</Text>
+        <Pill label="Last 14 days" />
+      </View>
+      {social.activity.length > 0 ? (
+        <View style={styles.activityList}>
+          {social.activity.slice(0, 8).map((item) => (
+            <View key={item.id} style={styles.activityRow}>
+              <Icon name={item.type === 'APEX_CHALLENGE_COMPLETED' ? 'challenge' : item.type === 'TOPIC_COMPLETED' ? 'course' : 'lesson'} size={16} color={colors.primaryText} />
+              <Text style={styles.activityText}>
+                <Text style={styles.activityName}>{item.name}</Text> {describeActivity(item)}
+              </Text>
+              <Text style={styles.activityWhen}>{relativeDay(item.at, today)}</Text>
+            </View>
+          ))}
+        </View>
+      ) : (
+        <Text style={styles.note}>
+          {friends.length > 0 ? 'When your friends complete lessons, topics or the Apex Challenge, it shows up here.' : 'Add friends to see what they’re working on.'}
+        </Text>
+      )}
     </Card>
   );
 
@@ -168,6 +194,7 @@ export default function SocialScreen() {
         main={
           <View style={styles.column}>
             {week}
+            {activityCard}
             {leagues}
           </View>
         }
@@ -180,6 +207,20 @@ export default function SocialScreen() {
       />
     </Screen>
   );
+}
+
+function describeActivity(item: FriendActivity) {
+  if (item.type === 'APEX_CHALLENGE_COMPLETED') return 'took on the Apex Challenge';
+  if (item.type === 'TOPIC_COMPLETED') return `finished ${getTopic(item.topicId)?.title ?? 'a topic'}`;
+  const title = findLesson(item.lessonId)?.lesson.title;
+  return title ? `completed “${title}”` : 'completed a lesson';
+}
+
+function relativeDay(at: number, today: number) {
+  const days = Math.floor((today - startOfDay(at)) / 86_400_000);
+  if (days <= 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  return `${days} days ago`;
 }
 
 function WeekStat({ icon, value, label }: { icon: IconName; value: number; label: string }) {
@@ -235,6 +276,11 @@ function createStyles(colors: ThemeColors) {
     soonIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: colors.primarySubtle, alignItems: 'center', justifyContent: 'center' },
     soonTitle: { fontSize: 14, fontWeight: '800', color: colors.text },
     board: { gap: 8 },
+    activityList: { gap: 10 },
+    activityRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    activityText: { flex: 1, minWidth: 0, fontSize: 13.5, lineHeight: 19, color: colors.textSecondary },
+    activityName: { fontWeight: '800', color: colors.text },
+    activityWhen: { fontSize: 11.5, fontWeight: '700', color: colors.textTertiary },
     boardLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: colors.textSecondary },
     boardRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     boardPlace: { ...Type.numeral, fontSize: 13, width: 18, color: colors.textTertiary },
