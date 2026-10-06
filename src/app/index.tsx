@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { AnimatedContent } from '@/components/motion';
+import { ApexCoinWalletCard } from '@/components/apex-coin-wallet-card';
 import { LogoMark } from '@/components/logo-mark';
 import { SupabaseSocialFeed } from '@/components/social/supabase-social-feed';
 import { CommunityPostsFeed } from '@/components/social/community-posts-feed';
@@ -45,6 +46,8 @@ export default function HomeScreen() {
         <Text style={styles.title} accessibilityRole="header">Welcome to the community 👋</Text>
         <Text style={styles.subtitle}>Study alongside fellow learners, share your progress and cheer each other on.</Text>
       </AnimatedContent>
+
+      <ApexCoinWalletCard />
 
       <View style={styles.socialFeed}>
         <SupabaseSocialFeed>

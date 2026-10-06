@@ -4,7 +4,7 @@ import { ColorSchemeName, Colors, ThemeColors } from '@/constants/theme';
 import { useAppearancePreference } from '@/data/settings';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-// 'apex', 'light' or 'dark', based on the learner's Settings choice.
+// Uses the learner's selected palette from Settings.
 // "System" follows the device / browser appearance (light or dark).
 export function useResolvedColorScheme(): ColorSchemeName {
   const preference = useAppearancePreference();

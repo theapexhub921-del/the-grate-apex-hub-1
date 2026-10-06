@@ -11,6 +11,7 @@ import {
   HomeDemo,
   LearnDemo,
   PersonaliseDemo,
+  PlanningDemo,
   ProgressDemo,
   QuizDemo,
   ReadDemo,
@@ -81,7 +82,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'sparkle',
       kicker: 'WELCOME',
       title: `Welcome to GrAteApex Hub, ${name}`,
-      body: 'A two-minute tour of how everything fits together. Try each piece as you go — nothing here touches your real progress.',
+      body: 'A quick tour of the main features. Try each sample as you go — practice actions do not change your learning progress.',
       demo: () => <WelcomeDemo />,
     },
     {
@@ -99,7 +100,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
                 <View style={styles.aboutTeamIcon}>
                   <Icon name={member.icon} size={16} color={colors.primaryText} />
                 </View>
-                <View style={styles.flex}>
+                <View style={styles.teamMemberCopy}>
                   <Text style={styles.aboutTeamName}>{member.name}</Text>
                   <Text style={styles.aboutTeamRole}>{member.role}</Text>
                 </View>
@@ -123,7 +124,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'learn',
       kicker: 'LEARN',
       title: 'Subjects → courses → topics → lessons',
-      body: 'Everything comes from your lecturers’ slides. Topics run in order — finish one, move to the next.',
+      body: 'Choose your class and semester, then follow its subjects, courses, topics and lessons. Topics run in order — finish one, move to the next.',
       tryIt: 'Tap your way down to a lesson.',
       demo: (props) => <LearnDemo {...props} />,
     },
@@ -166,11 +167,20 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
     {
       id: 'progress',
       icon: 'rank',
-      kicker: 'XP & RANKS',
-      title: 'Progress you can feel',
-      body: 'Real learning earns XP. Lifetime XP carries you through ten ranks, from Medical Student to Consultant.',
+      kicker: 'XP, STREAKS & REWARDS',
+      title: 'Progress that builds good habits',
+      body: 'Learning earns XP and advances your rank. Weekly challenges can earn streak freezes, and Apex Coins can restore a lost streak.',
       tryIt: 'Finish an example lesson.',
       demo: (props) => <ProgressDemo {...props} />,
+    },
+    {
+      id: 'planning',
+      icon: 'calendar',
+      kicker: 'PLAN YOUR WEEK',
+      title: 'Turn your goals into a study routine',
+      body: 'Build a lesson path and timetable in Learn, then set lesson, XP or streak goals from Home. Your next learning step still appears on Home.',
+      tryIt: 'Choose days for a sample study timetable.',
+      demo: (props) => <PlanningDemo {...props} />,
     },
     {
       id: 'apex',
@@ -193,11 +203,33 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
     {
       id: 'social',
       icon: 'social',
-      kicker: 'SOCIAL',
-      title: 'Connect with your classmates',
-      body: 'Find friends, start a study group, discuss assignments and message accepted friends. Live table conferences will follow when call hosting is connected.',
-      tryIt: 'See how classmates can study together.',
+      kicker: 'CONNECT',
+      title: 'Study with your classmates',
+      body: 'Find friends, share posts, message accepted friends and discuss topics in groups. Table Conferences support text-first sessions; live calls are still in development.',
+      tryIt: 'Explore a sample group or study session.',
       demo: (props) => <SocialDemo {...props} />,
+    },
+    {
+      id: 'team',
+      icon: 'profile',
+      kicker: 'MEET THE TEAM',
+      title: 'The people behind GrAteApex Hub',
+      body: 'The people building and supporting GrAteApex Hub.',
+      demo: () => (
+        <SimFrame>
+          <View style={styles.aboutTeam}>
+            {EXPLORE_TEAM.map((member) => (
+              <View key={member.name} style={styles.aboutTeamRow}>
+                <View style={styles.aboutTeamIcon}><Icon name={member.icon} size={16} color={colors.accentText} /></View>
+                <View style={styles.teamMemberCopy}>
+                  <Text style={styles.aboutTeamName}>{member.name}</Text>
+                  <Text style={styles.aboutTeamRole}>{member.role}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </SimFrame>
+      ),
     },
     {
       id: 'personalise',
@@ -213,7 +245,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'achievement',
       kicker: 'YOU’RE READY',
       title: `You’re all set, ${name}`,
-      body: 'Share a study moment on Home, open Learn to start a lesson, and visit Explore for feature guides and updates. You can replay this introduction anytime from Settings.',
+      body: 'Open Learn for lessons and your study plan, Home for goals and progress, Connect to study with classmates, and Explore for discoveries and product updates. Replay this introduction anytime from Settings.',
       demo: () => (
         <SimFrame kind="real">
           <View style={styles.finish}>
@@ -221,8 +253,8 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
               <Icon name="play" size={22} color="#0A1F5C" filled />
             </View>
             <Text style={styles.finishKicker}>READY TO BEGIN?</Text>
-            <Text style={styles.finishTitle}>Your people are on Home</Text>
-            <Text style={styles.finishText}>Stories and posts on Home · lessons and your study plan in Learn</Text>
+            <Text style={styles.finishTitle}>Start where you need most</Text>
+            <Text style={styles.finishText}>Lessons and plans in Learn · classmates in Connect · discoveries and updates in Explore</Text>
           </View>
         </SimFrame>
       ),
@@ -384,6 +416,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     root: { flex: 1 },
+    flex: { flex: 1, minWidth: 0 },
     topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 10 },
     brand: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     brandText: { ...Type.overline, letterSpacing: 1.6, color: colors.textSecondary },
@@ -444,6 +477,7 @@ function createStyles(colors: ThemeColors) {
     aboutTeam: { gap: 10, paddingVertical: 4 },
     aboutTeamRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
     aboutTeamIcon: { width: 32, height: 32, borderRadius: 10, backgroundColor: colors.accentSubtle, alignItems: 'center', justifyContent: 'center' },
+    teamMemberCopy: { flex: 1, minWidth: 0 },
     aboutTeamName: { ...Type.callout, color: colors.text, fontWeight: '700' },
     aboutTeamRole: { ...Type.caption, color: colors.textSecondary, marginTop: 1 },
     radius: { borderRadius: Radius.lg },

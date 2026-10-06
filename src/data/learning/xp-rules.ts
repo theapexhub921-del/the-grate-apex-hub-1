@@ -30,8 +30,8 @@ export const XP_RULES = {
 export const POWERUP_MULTIPLIERS = [1, 1.5, 2, 2.5, 3] as const;
 export type PowerupMultiplier = (typeof POWERUP_MULTIPLIERS)[number];
 
-// Powerups are not earnable yet; this is the single hook the reward flow
-// reads, so they can be switched on without touching any screen.
+// Returns the default when a caller has no consumed power-up. Reward actions
+// pass the selected inventory multiplier explicitly.
 export function getActiveMultiplier(): PowerupMultiplier {
   return 1;
 }

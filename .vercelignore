@@ -12,8 +12,10 @@ content/
 # Local build output and caches (Vercel makes its own).
 node_modules/
 dist/
+dist-verify/
 web-build/
 .expo/
+supabase/.temp/
 
 # Editor / tool folders
 .claude/

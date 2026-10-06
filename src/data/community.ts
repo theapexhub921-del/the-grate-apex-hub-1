@@ -31,6 +31,7 @@ export type CommunityPost = {
   media_url?: string | null;
   reactions: number;
   comments: number;
+  reshares: number;
   my_reaction: string | null;
 };
 
@@ -143,21 +144,35 @@ export async function createCommunityStory(body: string, media?: CommunityMedia)
   return data as CommunityStory;
 }
 
+export async function deleteCommunityStory(storyId: string, mediaPath: string | null) {
+  const authorId = await signedInUserId();
+  if (mediaPath) {
+    const { error: mediaError } = await supabase.storage.from('community-media').remove([mediaPath]);
+    if (mediaError) throw mediaError;
+  }
+  const { data, error } = await supabase.from('community_stories').delete()
+    .eq('id', storyId).eq('author_id', authorId).select('id').maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('This story could not be found or you do not own it.');
+}
+
 export async function listCommunityFeed(limit = 50): Promise<CommunityPost[]> {
   const { data: rows, error } = await supabase.from('community_posts')
     .select('id, author_id, body, media_path, media_type, reshared_post_id, created_at')
     .is('deleted_at', null).order('created_at', { ascending: false }).limit(Math.min(Math.max(limit, 1), 100));
   if (error) throw error;
-  const posts = (rows ?? []) as Omit<CommunityPost, 'media_url' | 'reactions' | 'comments' | 'my_reaction'>[];
+  const posts = (rows ?? []) as Omit<CommunityPost, 'media_url' | 'reactions' | 'comments' | 'reshares' | 'my_reaction'>[];
   if (!posts.length) return [];
   const ids = posts.map((post) => post.id);
-  const [{ data: reactionRows, error: reactionError }, { data: commentRows, error: commentError }, userId] = await Promise.all([
+  const [{ data: reactionRows, error: reactionError }, { data: commentRows, error: commentError }, { data: reshareRows, error: reshareError }, userId] = await Promise.all([
     supabase.from('community_post_reactions').select('post_id, user_id').in('post_id', ids),
     supabase.from('community_post_comments').select('post_id').in('post_id', ids).is('deleted_at', null),
+    supabase.from('community_posts').select('reshared_post_id').in('reshared_post_id', ids).is('deleted_at', null),
     signedInUserId(),
   ]);
   if (reactionError) throw reactionError;
   if (commentError) throw commentError;
+  if (reshareError) throw reshareError;
   const originalIds = [...new Set(posts.flatMap((post) => post.reshared_post_id ? [post.reshared_post_id] : []))];
   const originalsById = new Map<string, { body: string; author_id: string; media_path: string | null; media_type: 'image' | 'video' | null }>();
   if (originalIds.length) {
@@ -184,6 +199,7 @@ export async function listCommunityFeed(limit = 50): Promise<CommunityPost[]> {
       reshared_media_type: original?.media_type ?? null,
       reactions: reactions.length,
       comments: (commentRows ?? []).filter((row) => row.post_id === post.id).length,
+      reshares: (reshareRows ?? []).filter((row) => row.reshared_post_id === post.id).length,
       my_reaction: reactions.find((row) => row.user_id === userId) ? 'like' : null,
     };
   }));
@@ -221,6 +237,18 @@ export async function createCommunityPost(body: string, media?: CommunityMedia, 
     throw error;
   }
   return data;
+}
+
+export async function deleteCommunityPost(postId: string, mediaPath: string | null) {
+  const authorId = await signedInUserId();
+  if (mediaPath) {
+    const { error: mediaError } = await supabase.storage.from('community-media').remove([mediaPath]);
+    if (mediaError) throw mediaError;
+  }
+  const { data, error } = await supabase.from('community_posts').update({ deleted_at: new Date().toISOString() })
+    .eq('id', postId).eq('author_id', authorId).is('deleted_at', null).select('id').maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error('This post could not be found or you do not own it.');
 }
 
 function safeFileName(value: string) {

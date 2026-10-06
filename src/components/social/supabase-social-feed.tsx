@@ -3,7 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import type { ReactNode } from 'react';
 import { useEffect, useId, useMemo, useState } from 'react';
-import { Linking, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Linking, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -14,7 +14,7 @@ import { Card } from '@/components/ui/interactive';
 import { SectionHeader } from '@/components/ui/screen';
 import { Sheet } from '@/components/ui/sheet';
 import { findLesson, getTopic } from '@/data/curriculum';
-import { createCommunityStory, listLiveStories, type CommunityMedia, type CommunityStory } from '@/data/community';
+import { createCommunityStory, deleteCommunityStory, listLiveStories, type CommunityMedia, type CommunityStory } from '@/data/community';
 import { personName, refreshSocial, type FriendActivity, type SocialPerson, useSocial } from '@/data/social';
 import { useAvatarUrl, useDisplayName } from '@/data/user';
 import { type ThemeColors, Type } from '@/constants/theme';
@@ -33,6 +33,7 @@ export function SupabaseSocialFeed({ children }: { children?: ReactNode }) {
   const [storyDraft, setStoryDraft] = useState('');
   const [storyMedia, setStoryMedia] = useState<CommunityMedia | undefined>();
   const [storyBusy, setStoryBusy] = useState(false);
+  const [storyDeleting, setStoryDeleting] = useState(false);
   const [storyError, setStoryError] = useState<string | null>(null);
   const [storySequence, setStorySequence] = useState<CommunityStory[]>([]);
   const [storyIndex, setStoryIndex] = useState(0);
@@ -105,6 +106,37 @@ export function SupabaseSocialFeed({ children }: { children?: ReactNode }) {
     } finally {
       setStoryBusy(false);
     }
+  }
+
+  async function deleteStory(story: CommunityStory) {
+    if (storyDeleting) return;
+    setStoryDeleting(true);
+    setStoryError(null);
+    try {
+      await deleteCommunityStory(story.id, story.media_path);
+      setStories((all) => all.filter((item) => item.id !== story.id));
+      const remaining = storySequence.filter((item) => item.id !== story.id);
+      if (!remaining.length) closeStorySequence();
+      else {
+        setStorySequence(remaining);
+        setStoryIndex((index) => Math.min(index, remaining.length - 1));
+      }
+    } catch (caught) {
+      setStoryError(caught instanceof Error ? caught.message : 'Could not delete this story.');
+    } finally {
+      setStoryDeleting(false);
+    }
+  }
+
+  function confirmDeleteStory(story: CommunityStory) {
+    if (Platform.OS === 'web') {
+      if (globalThis.confirm('Delete this story and its attached photo or video?')) void deleteStory(story);
+      return;
+    }
+    Alert.alert('Delete this story?', 'This removes the story and its attached photo or video.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: () => { void deleteStory(story); } },
+    ]);
   }
 
   async function chooseStoryMedia() {
@@ -252,6 +284,7 @@ export function SupabaseSocialFeed({ children }: { children?: ReactNode }) {
             <View style={styles.storyModalHeader}>
               <Avatar uri={selectedStory.author_id === social.userId ? avatarUrl : social.people.find((person) => person.userId === selectedStory.author_id)?.avatarUrl} name={storyAuthorName(selectedStory, social.people, social.userId, displayName)} size={38} />
               <View style={styles.storyModalByline}><Text style={styles.storyModalName}>{storyAuthorName(selectedStory, social.people, social.userId, displayName)}</Text><Text style={styles.storyModalTime}>{timeAgo(new Date(selectedStory.created_at).getTime())}</Text></View>
+              {selectedStory.author_id === social.userId ? <Button label="Delete" variant="ghost" size="sm" icon={<Icon name="trash" size={16} color={colors.error} />} onPress={() => confirmDeleteStory(selectedStory)} disabled={storyDeleting} /> : null}
               <Pressable onPress={closeStorySequence} accessibilityRole="button" accessibilityLabel="Close story" style={styles.storyClose}><Icon name="close" size={20} color={colors.text} /></Pressable>
             </View>
             <View style={styles.storyModalBody}>

@@ -10,6 +10,17 @@ export async function readApexCoinBalance() {
   return Number(data?.balance ?? 0);
 }
 
+export async function sendApexCoins(recipientId: string, amount: number) {
+  if (!recipientId) throw new Error('Choose a friend first.');
+  if (!Number.isSafeInteger(amount) || amount < 1) throw new Error('Enter a whole number greater than zero.');
+  const { data, error } = await supabase.rpc('grateapex_send_apex_coins', {
+    p_recipient_id: recipientId,
+    p_amount: amount,
+  });
+  if (error) throw error;
+  return Number(data ?? 0);
+}
+
 export async function awardApexCoins(reward: ApexCoinReward, sourceId: string) {
   if (!sourceId.trim()) throw new Error('A completion reference is required.');
   const { data, error } = await supabase.rpc('grateapex_award_apex_coins', {

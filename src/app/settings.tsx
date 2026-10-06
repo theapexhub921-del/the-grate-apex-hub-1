@@ -1,6 +1,6 @@
 import { Href, router } from 'expo-router';
 import { type ReactNode, useEffect, useState } from 'react';
-import { Platform, StyleSheet, Switch, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { Linking, Platform, Share, StyleSheet, Switch, Text, TextInput, useWindowDimensions, View } from 'react-native';
 
 import { ATMOSPHERE } from '@/components/atmosphere/config';
 import { BackLink } from '@/components/learning/nav-bits';
@@ -22,6 +22,7 @@ import {
   setNotificationPreference,
   usePageZoomPreference,
   useAppearancePreference,
+  APPEARANCE_OPTIONS,
   usePushNotificationsPreference,
   useNotificationPreferences,
   setFontSizePreference,
@@ -34,6 +35,8 @@ import {
 import { setDisplayName, useDisplayName } from '@/data/user';
 import { ABOUT_US } from '@/data/about';
 import { EXPLORE_TEAM } from '@/data/explore';
+import { grantPowerup } from '@/data/learning/powerups';
+import { dayKey } from '@/data/learning/time';
 import { useAuth } from '@/hooks/use-auth';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -43,16 +46,6 @@ import { supabase } from '@/lib/supabase';
 
 const HOME_HREF = '/' as Href;
 type ThemeSwatchScheme = Exclude<AppearancePreference, 'system'>;
-
-const appearanceOptions: { value: AppearancePreference; label: string; description: string }[] = [
-  { value: 'apex', label: 'Apex', description: 'Cobalt and deep navy with gold highlights.' },
-  { value: 'light', label: 'Light', description: 'Soft off-white, easy in daylight.' },
-  { value: 'dark', label: 'Dark', description: 'Layered charcoal for night study.' },
-  { value: 'system', label: 'System', description: 'Follows your device: Light or Dark.' },
-  { value: 'violet', label: 'Violet', description: 'A deep violet and lavender study space.' },
-  { value: 'black', label: 'Pure black', description: 'True black surfaces with clean white accents.' },
-  { value: 'pink', label: 'Pink', description: 'A warm rose palette with soft pink highlights.' },
-];
 
 const navigationOptions: { value: TabBarMode; label: string; description: string }[] = [
   {
@@ -109,6 +102,8 @@ export default function SettingsScreen() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [sharingApp, setSharingApp] = useState(false);
+  const [shareNotice, setShareNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -164,6 +159,43 @@ export default function SettingsScreen() {
     router.replace('/login');
   }
 
+  async function shareApp() {
+    if (sharingApp) return;
+    setSharingApp(true);
+    setShareNotice(null);
+    try {
+      let shared = false;
+      let copiedLink = false;
+      if (Platform.OS === 'web' && typeof navigator !== 'undefined') {
+        const browserNavigator = navigator as Navigator & { share?: (data: ShareData) => Promise<void> };
+        if (browserNavigator.share) {
+          await browserNavigator.share({ title: 'GrAteApex Hub', text: 'Study, practise and connect with GrAteApex Hub.', url: 'https://grateapex.vercel.app/' });
+          shared = true;
+        } else if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText('https://grateapex.vercel.app/');
+          shared = true;
+          copiedLink = true;
+        }
+      } else {
+        const result = await Share.share({ title: 'GrAteApex Hub', message: 'Study, practise and connect with GrAteApex Hub: https://grateapex.vercel.app/' });
+        shared = result.action === Share.sharedAction;
+      }
+      if (!shared) {
+        setShareNotice('Sharing was cancelled or is not available in this browser.');
+        return;
+      }
+      const awarded = await grantPowerup('share', dayKey(Date.now()), 1.5);
+      setShareNotice(awarded
+        ? `${copiedLink ? 'Link copied.' : 'Thanks for sharing GrAteApex Hub.'} A 1.5× XP power-up is ready for your next lesson or quiz.`
+        : `${copiedLink ? 'Link copied.' : 'Thanks for sharing GrAteApex Hub.'} You have already earned today’s share power-up.`);
+    } catch (error) {
+      const aborted = error instanceof Error && error.name === 'AbortError';
+      setShareNotice(aborted ? 'Sharing was cancelled.' : 'Could not share the app. Please try again.');
+    } finally {
+      setSharingApp(false);
+    }
+  }
+
   return (
     <Screen width="prose">
       <BackLink fallback={HOME_HREF} />
@@ -195,7 +227,7 @@ export default function SettingsScreen() {
 
       <SettingsSection title="Appearance">
         <View style={[styles.themeGrid, desktop && styles.themeGridDesktop]}>
-          {appearanceOptions.map((option) => {
+          {APPEARANCE_OPTIONS.map((option) => {
             const selected = appearance === option.value;
             const scheme = option.value === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : option.value;
             return (
@@ -265,6 +297,8 @@ export default function SettingsScreen() {
         <Text style={styles.optionDescription}>This preference is saved to your account. Privacy filtering is being applied to social queries as that backend migration is enabled.</Text>
         <View style={styles.zoomOptions}>{(['public', 'friends', 'private'] as const).map((value) => <Interactive key={value} onPress={() => void setPrivacyPreference('profileVisibility', value)} accessibilityRole="radio" accessibilityState={{ checked: privacy.profileVisibility === value }} style={[styles.zoomOption, privacy.profileVisibility === value && styles.zoomOptionSelected]}><Text style={[styles.zoomText, privacy.profileVisibility === value && styles.zoomTextSelected]}>{value[0].toUpperCase() + value.slice(1)}</Text></Interactive>)}</View>
         <PrivacySwitch label="Show my activity to friends" value={privacy.activityVisible} onChange={(value) => void setPrivacyPreference('activityVisible', value)} />
+        <PrivacySwitch label="Show when I’m online" value={privacy.shareOnlineStatus} onChange={(value) => void setPrivacyPreference('shareOnlineStatus', value)} />
+        <Text style={styles.optionDescription}>Only accepted friends can see your online status. It turns off automatically when you sign out.</Text>
         <PrivacySwitch label="Let students find me" value={privacy.discoverable} onChange={(value) => void setPrivacyPreference('discoverable', value)} />
         <View style={styles.optionRow}><View style={styles.flex}><Text style={styles.optionLabel}>Messages</Text><Text style={styles.optionDescription}>Choose who may start a conversation.</Text></View><View style={styles.zoomOptions}>{(['friends', 'everyone'] as const).map((value) => <Interactive key={value} onPress={() => void setPrivacyPreference('messagingPermission', value)} accessibilityRole="radio" accessibilityState={{ checked: privacy.messagingPermission === value }} style={[styles.zoomOption, privacy.messagingPermission === value && styles.zoomOptionSelected]}><Text style={[styles.zoomText, privacy.messagingPermission === value && styles.zoomTextSelected]}>{value}</Text></Interactive>)}</View></View>
         <View style={styles.optionRow}><View style={styles.flex}><Text style={styles.optionLabel}>Friend requests</Text><Text style={styles.optionDescription}>Choose who may send you a request.</Text></View><View style={styles.zoomOptions}>{(['everyone', 'friends'] as const).map((value) => <Interactive key={value} onPress={() => void setPrivacyPreference('friendRequestPermission', value)} accessibilityRole="radio" accessibilityState={{ checked: privacy.friendRequestPermission === value }} style={[styles.zoomOption, privacy.friendRequestPermission === value && styles.zoomOptionSelected]}><Text style={[styles.zoomText, privacy.friendRequestPermission === value && styles.zoomTextSelected]}>{value}</Text></Interactive>)}</View></View>
@@ -350,6 +384,39 @@ export default function SettingsScreen() {
           </View>
           <Icon name="chevronRight" size={18} color={colors.textTertiary} />
         </Interactive>
+      </SettingsSection>
+
+      <SettingsSection title="Install on your devices">
+        <Text style={styles.optionDescription}>Install the web app from your browser. It works on phones, tablets and computers; an app-store download is not required.</Text>
+        <View style={styles.optionRow}>
+          <View style={styles.flex}>
+            <Text style={styles.optionLabel}>iPhone and iPad</Text>
+            <Text style={styles.optionDescription}>Open this site in Safari, tap Share, then choose Add to Home Screen.</Text>
+          </View>
+        </View>
+        <View style={[styles.optionRow, styles.rowDivider]}>
+          <View style={styles.flex}>
+            <Text style={styles.optionLabel}>Android phones and tablets</Text>
+            <Text style={styles.optionDescription}>Open in Chrome, tap ⋮, then choose Install app or Add to Home screen.</Text>
+          </View>
+        </View>
+        <View style={[styles.optionRow, styles.rowDivider]}>
+          <View style={styles.flex}>
+            <Text style={styles.optionLabel}>Windows, Mac, Linux and Chromebook</Text>
+            <Text style={styles.optionDescription}>In Chrome or Edge, use the install icon in the address bar or choose Install GrAteApex Hub from the browser menu. On Mac Safari, choose File → Add to Dock.</Text>
+          </View>
+        </View>
+        <Interactive onPress={() => void Linking.openURL('https://grateapex.vercel.app/')} accessibilityRole="link" style={styles.optionRow}>
+          <Icon name="share" size={18} color={colors.primaryText} />
+          <View style={styles.flex}><Text style={styles.optionLabel}>Open GrAteApex Hub</Text><Text style={styles.optionDescription}>grateapex.vercel.app</Text></View>
+          <Icon name="chevronRight" size={18} color={colors.textTertiary} />
+        </Interactive>
+      </SettingsSection>
+
+      <SettingsSection title="Share the app">
+        <Text style={styles.optionDescription}>Invite a classmate to study with you. After a successful share, earn one 1.5× XP power-up per day for your next lesson or quiz.</Text>
+        <Button label={sharingApp ? 'Sharing…' : 'Share GrAteApex Hub'} variant="secondary" icon={<Icon name="share" size={17} color={colors.text} />} onPress={() => void shareApp()} disabled={sharingApp} />
+        {shareNotice ? <Text style={styles.optionDescription} accessibilityLiveRegion="polite">{shareNotice}</Text> : null}
       </SettingsSection>
 
       <SettingsSection title="About us">
@@ -519,7 +586,7 @@ function createStyles(colors: ThemeColors) {
       backgroundColor: colors.surfaceSunken,
     },
     themeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-    themeGridDesktop: { flexWrap: 'nowrap' },
+    themeGridDesktop: { flexWrap: 'wrap' },
     zoomOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
     zoomOption: { minWidth: 54, minHeight: 40, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
     zoomOptionSelected: { borderColor: colors.primary, backgroundColor: colors.primarySubtle },
@@ -535,7 +602,7 @@ function createStyles(colors: ThemeColors) {
       ...webStyle(cssTransition('border-color, transform', MOTION.micro)),
     },
     themeCardMobile: { width: '48%', flexGrow: 1 },
-    themeCardDesktop: { flex: 1 },
+    themeCardDesktop: { width: '31%', flexGrow: 1, minWidth: 180 },
     themeCardHover: { borderColor: colors.primaryBorder },
     themeCardSelected: { borderColor: colors.primary },
     themeText: { paddingHorizontal: 4, paddingBottom: 4 },

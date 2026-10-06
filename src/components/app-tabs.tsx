@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 
 import { Atmosphere } from '@/components/atmosphere/atmosphere';
+import { OnlinePresenceSync } from '@/components/online-presence-sync';
 import { useAtmosphereMood } from '@/components/atmosphere/config';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
 import { HomeGreetingWallpaper } from '@/components/social/home-greeting-wallpaper';
@@ -34,6 +35,7 @@ export default function AppTabs() {
 
   return (
     <View style={styles.shell}>
+      <OnlinePresenceSync />
       <Atmosphere mood={mood} />
       {(segments[0] as string | undefined) === 'index' ? <HomeGreetingWallpaper /> : null}
       <Tabs

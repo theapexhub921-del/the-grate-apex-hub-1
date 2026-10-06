@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { RankProgressCard } from '@/components/rank-progress';
+import { ApexCoinWalletCard } from '@/components/apex-coin-wallet-card';
 import { AvatarPicker } from '@/components/avatar/avatar-picker';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 import { Avatar } from '@/components/ui/avatar';
@@ -111,10 +112,10 @@ export default function ProfileScreen() {
       />
       {friends.length ? friends.slice(0, 3).map((friend) => (
         <View key={friend.userId} style={styles.friendRow}>
-          <Avatar uri={friend.avatarUrl} name={personName(friend)} size={40} />
+          <Avatar uri={friend.avatarUrl} name={personName(friend)} size={40} status={friend.isOnline ? 'online' : null} />
           <View style={styles.friendText}>
             <Text style={styles.friendName}>{personName(friend)}</Text>
-            <Text style={styles.friendHandle}>{friend.username ? '@' + friend.username : 'GrAteApex Hub friend'}</Text>
+            <Text style={styles.friendHandle}>{friend.isOnline ? 'Online' : friend.username ? '@' + friend.username : 'GrAteApex Hub friend'}</Text>
           </View>
           {friend.totalXp !== null ? <Text style={styles.friendXp}>{friend.totalXp} XP</Text> : null}
         </View>
@@ -200,6 +201,8 @@ export default function ProfileScreen() {
     <Screen width="content">
       <PageHeader title="Profile" subtitle="Your identity, connections and achievements." right={<IconButton icon="settings" label="Settings" onPress={() => router.push('/settings' as Href)} />} />
       {identity}
+      <View style={styles.gap} />
+      <ApexCoinWalletCard />
       <AvatarPicker visible={avatarPickerOpen} onClose={() => setAvatarPickerOpen(false)} />
       <View style={styles.gap} />
       {desktop ? (

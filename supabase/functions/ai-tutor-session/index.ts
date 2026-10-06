@@ -17,7 +17,9 @@ function jsonError(message: string, status: number) {
 async function safetyIdentifier(userId: string) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(userId));
   const hex = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
-  return `grateapex_${hex}`;
+  // OpenAI limits safety identifiers to 64 characters. Keep a stable prefix
+  // and truncate the one-way hash to fit that limit.
+  return `grateapex_${hex.slice(0, 54)}`;
 }
 
 export default {
@@ -59,14 +61,16 @@ export default {
 
     const result = await upstream.json().catch(() => null);
     if (!upstream.ok) {
-      const providerError = result?.error as { type?: unknown; code?: unknown } | undefined;
+      const providerError = result?.error as { type?: unknown; code?: unknown; param?: unknown } | undefined;
       const errorType = typeof providerError?.type === 'string' ? providerError.type : 'unknown_error';
       const errorCode = typeof providerError?.code === 'string' ? providerError.code : 'no_code';
+      const errorParam = typeof providerError?.param === 'string' ? providerError.param : null;
       const requestId = upstream.headers.get('x-request-id');
       console.error('OpenAI Realtime session request failed', {
         status: upstream.status,
         type: errorType,
         code: errorCode,
+        param: errorParam,
         requestId,
       });
       return jsonError(
@@ -74,7 +78,9 @@ export default {
         502,
       );
     }
-    if (typeof result?.client_secret?.value !== 'string') {
+    // Realtime client_secrets currently returns {value, expires_at, session}.
+    // Normalize it to the nested shape already consumed by the app.
+    if (typeof result?.value !== 'string' || typeof result?.expires_at !== 'number') {
       console.error('OpenAI Realtime session response did not include a client secret', {
         requestId: upstream.headers.get('x-request-id'),
       });
@@ -82,7 +88,10 @@ export default {
     }
 
     return Response.json({
-      client_secret: result.client_secret,
+      client_secret: {
+        value: result.value,
+        expires_at: result.expires_at,
+      },
       model: REALTIME_MODEL,
     });
   }),

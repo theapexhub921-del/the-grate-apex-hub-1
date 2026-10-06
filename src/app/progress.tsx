@@ -24,6 +24,7 @@ import { describeAgo } from '@/data/learning/time';
 import { getStreakStatus } from '@/data/progression';
 import { useLearning } from '@/data/learning/use-learning';
 import { formatXp } from '@/data/learning/xp-rules';
+import { usePowerups } from '@/data/learning/powerups';
 import type { QuizAttempt } from '@/data/quiz-history';
 import { getSubjectStatus, getSubjectStatusLabel, subjects } from '@/data/subjects';
 import { useThemedStyles } from '@/hooks/use-theme';
@@ -51,6 +52,7 @@ function attemptTitle(attempt: QuizAttempt) {
 export default function ProgressScreen() {
   const styles = useThemedStyles(createStyles);
   const { progress, inputs, quizzes, attempts, now } = useLearning();
+  const powerups = usePowerups();
   const [showAll, setShowAll] = useState(false);
   const [coinBalance, setCoinBalance] = useState<number | null>(null);
   const [freezeBalance, setFreezeBalance] = useState<number | null>(null);
@@ -171,6 +173,20 @@ export default function ProgressScreen() {
       <LevelProgressCard xp={progress.xp} />
 
       <Card style={styles.card}>
+        <SectionHeader title="Power-ups" subtitle={`${powerups.length} ready`} style={styles.noMargin} />
+        <Text style={styles.meta}>Complete a lesson or quiz to earn a boost. Your strongest stored boost applies automatically to your next lesson or quiz.</Text>
+        {powerups.length > 0 ? (
+          <View style={styles.powerupRow}>
+            {[1.5, 2, 2.5, 3].map((multiplier) => {
+              const count = powerups.filter((powerup) => powerup.multiplier === multiplier).length;
+              return count > 0 ? <Pill key={multiplier} label={`×${multiplier} · ${count}`} tone="gold" /> : null;
+            })}
+          </View>
+        ) : <Text style={styles.muted}>Your next completed lesson or quiz will earn your first boost.</Text>}
+        <Text style={styles.meta}>Streak boosts unlock at 7, 15, 30, 60, 90 and 100 days, then 150, 200, 365, 500 and 1,000 days.</Text>
+      </Card>
+
+      <Card style={styles.card}>
         <SectionHeader title="Apex Coins" subtitle={coinBalance === null ? 'Balance unavailable' : `${coinBalance.toLocaleString()} coins`} style={styles.noMargin} />
         <Text style={styles.meta}>Earn 5 coins for completing an Apex Challenge and 10 coins when you complete every lesson in a topic.</Text>
         <Text style={styles.meta}>Streak freezes: {freezeBalance === null ? 'balance unavailable' : freezeBalance}. Complete five lessons in a week to earn one; up to two can be stored. One is used automatically to cover a single missed day.</Text>
@@ -280,6 +296,7 @@ function createStyles(colors: ThemeColors) {
     score: { fontSize: 16, fontWeight: '800', color: colors.textSecondary },
     scoreGood: { color: colors.success },
     xpRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 10, paddingVertical: 4 },
+    powerupRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     xpLabel: { flex: 1, fontSize: 13, color: colors.textSecondary },
     xpAmount: { fontSize: 13, fontWeight: '800', color: colors.accentText },
     xpNegative: { color: colors.error },

@@ -18,7 +18,7 @@ import { getFeaturedItem } from '@/data/explore';
 import { APEX } from '@/data/learning/apex';
 import { XP_RULES } from '@/data/learning/xp-rules';
 import type { Answer } from '@/data/questions';
-import { type AppearancePreference, setAppearancePreference, useAppearancePreference } from '@/data/settings';
+import { APPEARANCE_OPTIONS, setAppearancePreference, useAppearancePreference } from '@/data/settings';
 import { subjects } from '@/data/subjects';
 import { setDisplayName, useDisplayName } from '@/data/user';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -66,9 +66,9 @@ export function WelcomeDemo() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const rows: { icon: IconName; title: string; text: string }[] = [
-    { icon: 'learn', title: 'Learn from your lectures', text: 'Lessons built only from the slides you are taught.' },
-    { icon: 'reinforce', title: 'Remember with spaced review', text: 'Each concept returns just before you would forget it.' },
-    { icon: 'rank', title: 'Grow from Medical Student to Consultant', text: 'XP, ranks and the Apex Challenge keep you moving.' },
+    { icon: 'learn', title: 'Learn from your lectures', text: 'Follow your curriculum, practise recall and review concepts.' },
+    { icon: 'calendar', title: 'Plan a steady study week', text: 'Build a lesson path, add study times and set goals.' },
+    { icon: 'social', title: 'Connect and grow together', text: 'Share with classmates, study in groups and earn progress rewards.' },
   ];
   return (
     <SimFrame>
@@ -382,8 +382,12 @@ export function ProgressDemo({ done, onDone }: DemoProps) {
       <Text style={styles.readText}>
         <Text style={styles.strong}>{nextRankAt - xp} XP</Text> to your next rank — its name stays a surprise until you get there.
       </Text>
+      <View style={styles.miniStats}>
+        <MiniStat icon="streak" value="5 lessons" label="weekly freeze" />
+        <MiniStat icon="xp" value="100 coins" label="streak restore" />
+      </View>
       {!done ? <Button label="Finish a lesson (example)" variant="gold" size="sm" onPress={onDone} style={styles.inlineStart} /> : null}
-      <DoneNote show={done} text="Lessons, quizzes and reviews earn 10–50 XP each. Ranks climb from Medical Student to Consultant; the full ladder lives in Explore." />
+      <DoneNote show={done} text="This is a preview: lessons earn XP, five lessons in a week earn a freeze, and 100 Apex Coins can restore a lost streak." />
     </SimFrame>
   );
 }
@@ -449,46 +453,108 @@ export function ExploreDemo({ done, onDone }: DemoProps) {
   );
 }
 
-// ── 11. Social ─────────────────────────────────────────────────────────
-export function SocialDemo({ done, onDone }: DemoProps) {
+// ── Planning and weekly goals ──────────────────────────────────────────
+export function PlanningDemo({ done, onDone }: DemoProps) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
-  const bars = [10, 35, 0, 50, 25, 45, 20];
+  const [days, setDays] = useState(['Mon', 'Wed', 'Fri']);
+  const week = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   return (
     <SimFrame>
-      <Text style={styles.levelLabel}>YOUR STUDY WEEK · EXAMPLE</Text>
-      <View style={styles.chart}>
-        {bars.map((value, index) => (
-          <View key={index} style={styles.chartTrack}>
-            <View style={[styles.chartBar, { height: `${Math.max(value ? 10 : 0, value * 2)}%`, backgroundColor: index === 6 ? colors.accent : colors.primary }]} />
-          </View>
-        ))}
+      <Text style={styles.levelLabel}>YOUR WEEK · PRACTICE PLAN</Text>
+      <Text style={styles.readText}>Choose study days for a sample weekly timetable.</Text>
+      <View style={styles.planDays}>
+        {week.map((day) => {
+          const selected = days.includes(day);
+          return (
+            <Interactive
+              key={day}
+              onPress={() => {
+                setDays((current) => selected ? current.filter((item) => item !== day) : [...current, day]);
+                onDone();
+              }}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: selected }}
+              accessibilityLabel={`${day} study day`}
+              style={[styles.planDay, selected && styles.planDaySelected]}
+            >
+              <Text style={[styles.planDayText, selected && styles.planDayTextSelected]}>{day}</Text>
+            </Interactive>
+          );
+        })}
       </View>
-      <Interactive onPress={onDone} accessibilityLabel="How weekly leagues work" style={({ hovered }) => [styles.row, styles.rowActive, hovered && styles.rowHover]}>
-        <Icon name="social" size={18} color={colors.primaryText} />
+      <View style={[styles.row, styles.rowIdle]}>
+        <Icon name="calendar" size={18} color={colors.primaryText} />
         <View style={styles.flex}>
-          <Text style={styles.rowTitle}>Weekly leagues</Text>
-          <Text style={styles.rowMeta}>{done ? 'Top 20% advance (if they meet the next level’s XP), bottom 20% move down.' : 'Tap to see how they work'}</Text>
+          <Text style={styles.rowTitle}>{days.length ? `${days.length} study blocks` : 'No study blocks yet'}</Text>
+          <Text style={styles.rowMeta}>{days.length ? days.join(' · ') : 'Choose a day above to add one'}</Text>
         </View>
-      </Interactive>
-      <DoneNote show={done} text="Social shows your real week. Friends and leagues open when classmates can connect." />
+      </View>
+      <View style={[styles.row, styles.rowIdle]}>
+        <Icon name="achievement" size={18} color={colors.accentText} />
+        <View style={styles.flex}>
+          <Text style={styles.rowTitle}>Goals</Text>
+          <Text style={styles.rowMeta}>Track lesson, XP or streak targets</Text>
+        </View>
+      </View>
+      <DoneNote show={done} text="Open the study planner in Learn and View goals on Home. This preview did not save anything." />
     </SimFrame>
   );
 }
 
-// ── 12. Make it yours (REAL settings) ──────────────────────────────────
+// ── Connect ────────────────────────────────────────────────────────────
+export function SocialDemo({ done, onDone }: DemoProps) {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  const [section, setSection] = useState('Friends');
+  const previews: Record<string, { title: string; detail: string; icon: IconName }> = {
+    Friends: { title: 'Find your classmates', detail: 'Send and manage friend requests.', icon: 'profile' },
+    Groups: { title: 'Study groups', detail: 'Invite friends and discuss a course together.', icon: 'social' },
+    Messages: { title: 'Private messages', detail: 'Text friends you have connected with.', icon: 'mail' },
+    Sessions: { title: 'Table Conferences', detail: 'Schedule a text-first study session. Live calls are coming later.', icon: 'calendar' },
+  };
+  const preview = previews[section];
+  return (
+    <SimFrame>
+      <Text style={styles.levelLabel}>CONNECT · PRACTICE</Text>
+      <View style={styles.connectSections}>
+        {Object.keys(previews).map((name) => {
+          const selected = name === section;
+          return (
+            <Interactive
+              key={name}
+              onPress={() => {
+                setSection(name);
+                onDone();
+              }}
+              accessibilityRole="tab"
+              accessibilityState={{ selected }}
+              style={[styles.themeChip, selected && styles.themeChipSelected]}
+            >
+              <Text style={[styles.connectSectionText, selected && styles.themeTextSelected]}>{name}</Text>
+            </Interactive>
+          );
+        })}
+      </View>
+      <View style={[styles.row, styles.rowActive]}>
+        <Icon name={preview.icon} size={20} color={colors.primaryText} />
+        <View style={styles.flex}>
+          <Text style={styles.rowTitle}>{preview.title}</Text>
+          <Text style={styles.rowMeta}>{preview.detail}</Text>
+        </View>
+      </View>
+      <DoneNote show={done} text="Connect includes friends, groups, messages and text-first study sessions. This sample did not send or save anything." />
+    </SimFrame>
+  );
+}
+
+// ── Make it yours (REAL settings) ──────────────────────────────────────
 export function PersonaliseDemo({ onDone }: DemoProps) {
   const styles = useThemedStyles(createStyles);
   const savedName = useDisplayName();
   const appearance = useAppearancePreference();
   const [name, setName] = useState(savedName ?? '');
   const [saved, setSaved] = useState(false);
-  const themes: { value: AppearancePreference; label: string }[] = [
-    { value: 'apex', label: 'Apex' },
-    { value: 'light', label: 'Light' },
-    { value: 'dark', label: 'Dark' },
-    { value: 'system', label: 'System' },
-  ];
 
   async function saveName() {
     if (!name.trim() || name.trim() === (savedName ?? '')) return;
@@ -521,7 +587,7 @@ export function PersonaliseDemo({ onDone }: DemoProps) {
 
       <Text style={[styles.levelLabel, styles.spaced]}>THEME</Text>
       <View style={styles.themeRow}>
-        {themes.map((theme) => (
+        {APPEARANCE_OPTIONS.map((theme) => (
           <Interactive
             key={theme.value}
             onPress={() => {
@@ -680,6 +746,13 @@ function createStyles(colors: ThemeColors) {
     },
     savedText: { fontSize: 12.5, fontWeight: '800', color: colors.successText },
     themeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    planDays: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
+    planDay: { minWidth: 43, paddingVertical: 9, paddingHorizontal: 8, alignItems: 'center', borderRadius: 11, backgroundColor: colors.surfaceMuted, borderWidth: 1, borderColor: colors.border },
+    planDaySelected: { backgroundColor: colors.primarySubtle, borderColor: colors.primary },
+    planDayText: { fontSize: 12, fontWeight: '700', color: colors.textSecondary },
+    planDayTextSelected: { color: colors.primaryText },
+    connectSections: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
+    connectSectionText: { fontSize: 12, fontWeight: '700', color: colors.textSecondary },
     themeChip: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 999, backgroundColor: colors.surfaceMuted, borderWidth: 1, borderColor: colors.border },
     themeChipSelected: { backgroundColor: colors.primarySubtle, borderColor: colors.primary },
     themeText: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },

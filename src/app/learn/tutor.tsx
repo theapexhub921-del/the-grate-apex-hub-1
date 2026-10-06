@@ -123,7 +123,24 @@ export default function TutorScreen() {
         },
         body: offer.sdp,
       });
-      if (!response.ok) throw new Error('The voice service did not accept the tutor call. Check that the session is configured and try again.');
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null) as {
+          error?: { code?: unknown; message?: unknown; param?: unknown; type?: unknown };
+        } | null;
+        const providerError = payload?.error;
+        const code = typeof providerError?.code === 'string' ? providerError.code : null;
+        const param = typeof providerError?.param === 'string' ? providerError.param : null;
+        const detail = typeof providerError?.message === 'string'
+          ? providerError.message.slice(0, 240)
+          : 'No additional error details were returned.';
+        const requestId = response.headers.get('x-request-id');
+        const context = [code, param ? `field ${param}` : null, requestId ? `request ${requestId}` : null]
+          .filter(Boolean)
+          .join(', ');
+        throw new Error(
+          `OpenAI rejected the voice call (HTTP ${response.status}${context ? `; ${context}` : ''}): ${detail}`,
+        );
+      }
       await peer.setRemoteDescription({ type: 'answer', sdp: await response.text() });
     } catch (caught) {
       if (peer) peer.close();

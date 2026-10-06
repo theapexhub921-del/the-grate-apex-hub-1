@@ -4,6 +4,7 @@ import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 
 import { Atmosphere } from '@/components/atmosphere/atmosphere';
+import { OnlinePresenceSync } from '@/components/online-presence-sync';
 import { useAtmosphereMood } from '@/components/atmosphere/config';
 import { DesktopSidebar } from '@/components/desktop-sidebar';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
@@ -42,6 +43,7 @@ export default function AppTabs() {
 
   return (
     <View style={styles.shell}>
+      <OnlinePresenceSync />
       {/* Keeps the document title correct on every route. */}
       <PageTitle />
       <Atmosphere mood={mood} />

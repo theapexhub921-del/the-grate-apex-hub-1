@@ -89,7 +89,10 @@ export const ATMOSPHERE: Record<ColorSchemeName, AtmospherePalette> = {
     base: '#211019', fieldA: ['#FF8FBC', 0.2], fieldB: ['#73344F', 0.45], fieldC: ['#10070C', 0.88],
     auroraA: ['#FF8FBC', 0.18], auroraB: ['#A94B74', 0.13], auroraC: ['#FFC1D7', 0.07], grid: ['#FFD0E0', 0.03], ray: ['#FFD0E0', 0.04], gold: ['#FFC1D7', 0.07], vignette: ['#0C0308', 0.5], grain: 0.07, grainBlend: 'overlay',
   },
-};
+  emerald: {
+    base: '#0D1915', fieldA: ['#2B986E', 0.3], fieldB: ['#174A37', 0.52], fieldC: ['#050B08', 0.9],
+    auroraA: ['#52D6A2', 0.2], auroraB: ['#338A68', 0.14], auroraC: ['#8AE8C2', 0.07], grid: ['#A2F0D0', 0.03], ray: ['#7CE2B8', 0.04], gold: ['#8AE8C2', 0.07], vignette: ['#020A07', 0.52], grain: 0.07, grainBlend: 'overlay',
+  },};
 
 // How strongly each layer shows, per mood (0–1 multipliers).
 export type MoodLevels = {

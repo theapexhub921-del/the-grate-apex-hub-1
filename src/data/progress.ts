@@ -16,6 +16,7 @@ import { dayKey } from '@/data/learning/time';
 import type { XpBreakdown } from '@/data/learning/xp-rules';
 import { getStreakStatus } from '@/data/progression';
 import { recordStreakActivityWithFreeze } from '@/data/community';
+import { grantPowerup } from '@/data/learning/powerups';
 
 // XP, level, streak and completed lessons — persisted with AsyncStorage
 // (account-scoped) and synced to Supabase.
@@ -189,7 +190,7 @@ function cloudStats() {
 function cloudLessonRows() {
   return progress.completedLessons.map((lessonId) => ({
     lessonId,
-    xp: findLesson(lessonId)?.lesson.xp ?? 0,
+    xp: progress.xpLedger.find((entry) => entry.key === `lesson:${lessonId}`)?.amount ?? findLesson(lessonId)?.lesson.xp ?? 0,
     completedAt: progress.lessonCompletedAt[lessonId],
   }));
 }
@@ -299,11 +300,13 @@ export function useProgress() {
 
 // Any study activity today keeps (or starts) the streak. Local dates.
 async function updateStreak(now = Date.now()) {
+  const previous = progress.streak;
   try {
     const serverStreak = await recordStreakActivityWithFreeze(now);
     if (serverStreak > 0) {
       progress.streak = serverStreak;
       progress.lastActivityDate = dayKey(now);
+      await awardStreakPowerups(previous, progress.streak);
       return;
     }
   } catch {
@@ -325,6 +328,33 @@ async function updateStreak(now = Date.now()) {
 
   progress.streak = last === yesterday.getTime() ? progress.streak + 1 : 1;
   progress.lastActivityDate = today;
+  await awardStreakPowerups(previous, progress.streak);
+}
+
+const STREAK_POWERUPS = [
+  { days: 7, multiplier: 1.5 },
+  { days: 15, multiplier: 1.5 },
+  { days: 30, multiplier: 2 },
+  { days: 60, multiplier: 2 },
+  { days: 90, multiplier: 2.5 },
+  { days: 100, multiplier: 3 },
+  { days: 150, multiplier: 2.5 },
+  { days: 200, multiplier: 3 },
+  { days: 365, multiplier: 3 },
+  { days: 500, multiplier: 3 },
+  { days: 1000, multiplier: 3 },
+] as const;
+
+async function awardStreakPowerups(previous: number, current: number) {
+  for (const milestone of STREAK_POWERUPS) {
+    if (previous < milestone.days && current >= milestone.days) {
+      try {
+        await grantPowerup('streak', String(milestone.days), milestone.multiplier);
+      } catch (error) {
+        console.warn('Could not award a streak power-up:', error);
+      }
+    }
+  }
 }
 
 function cloudSourceType(sourceType: XpSourceType): 'lesson' | 'quiz' {

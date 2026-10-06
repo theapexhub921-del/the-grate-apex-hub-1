@@ -9,7 +9,18 @@ import { getTabBarModePreference, setTabBarModeFromAccount } from '@/data/naviga
 // Account-related settings (name, Google account, privacy, …) will come
 // from the future account/backend system — do not add them here.
 
-export type AppearancePreference = 'apex' | 'light' | 'dark' | 'system' | 'violet' | 'black' | 'pink';
+export type AppearancePreference = 'apex' | 'light' | 'dark' | 'system' | 'violet' | 'black' | 'pink' | 'emerald';
+
+export const APPEARANCE_OPTIONS: { value: AppearancePreference; label: string; description: string }[] = [
+  { value: 'apex', label: 'Apex', description: 'Cobalt and deep navy with gold highlights.' },
+  { value: 'light', label: 'Light', description: 'Soft off-white, easy in daylight.' },
+  { value: 'dark', label: 'Dark', description: 'Layered charcoal for night study.' },
+  { value: 'system', label: 'System', description: 'Follows your device: Light or Dark.' },
+  { value: 'violet', label: 'Violet', description: 'A deep violet and lavender study space.' },
+  { value: 'black', label: 'Pure black', description: 'True black surfaces with clean white accents.' },
+  { value: 'pink', label: 'Pink', description: 'A warm rose palette with soft pink highlights.' },
+  { value: 'emerald', label: 'Emerald', description: 'A deep green palette with mint highlights.' },
+];
 export type PageZoomPreference = 80 | 90 | 100 | 110 | 125;
 export type FontSizePreference = 'small' | 'default' | 'large' | 'extra_large';
 export type ProfileVisibility = 'public' | 'friends' | 'private';
@@ -44,6 +55,7 @@ type SettingsData = {
   messagingPermission: MessagingPermission;
   friendRequestPermission: MessagingPermission;
   discoverable: boolean;
+  shareOnlineStatus: boolean;
 };
 
 const STORAGE_KEY = 'grateapex_settings';
@@ -60,15 +72,17 @@ const defaultSettings: SettingsData = {
   messagingPermission: 'friends',
   friendRequestPermission: 'everyone',
   discoverable: true,
+  shareOnlineStatus: false,
 };
 
-type PrivacySettings = Pick<SettingsData, 'profileVisibility' | 'activityVisible' | 'messagingPermission' | 'friendRequestPermission' | 'discoverable'>;
+type PrivacySettings = Pick<SettingsData, 'profileVisibility' | 'activityVisible' | 'messagingPermission' | 'friendRequestPermission' | 'discoverable' | 'shareOnlineStatus'>;
 const defaultPrivacySettings: PrivacySettings = {
   profileVisibility: defaultSettings.profileVisibility,
   activityVisible: defaultSettings.activityVisible,
   messagingPermission: defaultSettings.messagingPermission,
   friendRequestPermission: defaultSettings.friendRequestPermission,
   discoverable: defaultSettings.discoverable,
+  shareOnlineStatus: defaultSettings.shareOnlineStatus,
 };
 let cachedPrivacySettings: PrivacySettings = { ...defaultPrivacySettings };
 
@@ -80,6 +94,7 @@ function getPrivacySnapshot(): PrivacySettings {
       messagingPermission: settings.messagingPermission,
       friendRequestPermission: settings.friendRequestPermission,
       discoverable: settings.discoverable,
+      shareOnlineStatus: settings.shareOnlineStatus,
     };
   }
   return cachedPrivacySettings;
@@ -114,6 +129,7 @@ function isAppearance(value: unknown): value is AppearancePreference {
     || value === 'violet'
     || value === 'black'
     || value === 'pink'
+    || value === 'emerald'
   );
 }
 
@@ -145,6 +161,7 @@ async function loadSettings() {
       messagingPermission: data?.messagingPermission === 'everyone' ? 'everyone' : 'friends',
       friendRequestPermission: data?.friendRequestPermission === 'friends' ? 'friends' : 'everyone',
       discoverable: data?.discoverable !== false,
+      shareOnlineStatus: data?.shareOnlineStatus === true,
     };
 
     notify();
@@ -184,6 +201,7 @@ async function saveSettings() {
           messagingPermission: settings.messagingPermission,
           friendRequestPermission: settings.friendRequestPermission,
           discoverable: settings.discoverable,
+          shareOnlineStatus: settings.shareOnlineStatus,
         },
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' });
@@ -223,6 +241,7 @@ export async function syncSettingsFromAccount(userId: string) {
     messagingPermission: privacy?.messagingPermission === 'everyone' ? 'everyone' : privacy?.messagingPermission === 'friends' ? 'friends' : settings.messagingPermission,
     friendRequestPermission: privacy?.friendRequestPermission === 'friends' ? 'friends' : privacy?.friendRequestPermission === 'everyone' ? 'everyone' : settings.friendRequestPermission,
     discoverable: typeof privacy?.discoverable === 'boolean' ? privacy.discoverable : settings.discoverable,
+    shareOnlineStatus: privacy?.shareOnlineStatus === true,
   };
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
   if (typeof data.navigation_auto_hide === 'boolean') {
@@ -246,7 +265,7 @@ export function usePrivacyPreferences() {
   return useSyncExternalStore(subscribe, getPrivacySnapshot, () => defaultPrivacySettings);
 }
 
-export async function setPrivacyPreference<K extends 'profileVisibility' | 'activityVisible' | 'messagingPermission' | 'friendRequestPermission' | 'discoverable'>(key: K, value: SettingsData[K]) {
+export async function setPrivacyPreference<K extends 'profileVisibility' | 'activityVisible' | 'messagingPermission' | 'friendRequestPermission' | 'discoverable' | 'shareOnlineStatus'>(key: K, value: SettingsData[K]) {
   await ensureSettingsLoaded();
   settings = { ...settings, [key]: value };
   notify();

@@ -35,6 +35,7 @@ import {
 } from '@/data/learning/xp-rules';
 import { awardXp, completeLesson, getProgressSnapshot, hasAward, type XpSourceType } from '@/data/progress';
 import { awardApexCoins } from '@/data/apex-coins';
+import { consumePowerup, grantPowerup, returnPowerup } from '@/data/learning/powerups';
 import { type Answer, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
 import { type QuestionAttempt, recordQuestionAttempts } from '@/data/question-history';
 import { type AttemptKind, type CustomQuizSettings, type QuizAttempt, recordQuizAttempt, syncQuizAttemptToCloud } from '@/data/quiz-history';
@@ -143,8 +144,17 @@ export type LessonFinish = {
 export async function finishLesson(lessonId: string, via: 'lesson' | 'mastery-check' = 'lesson'): Promise<LessonFinish> {
   const found = findLesson(lessonId);
   if (!found) return { awarded: false, xp: 0, milestones: [] };
-  const xp = lessonCompletionXp(found.lesson.xp);
-  const awarded = await completeLesson(lessonId, found.topic.subject, xp);
+  const alreadyComplete = getProgressSnapshot().completedLessons.includes(lessonId);
+  const powerup = alreadyComplete ? null : await consumePowerup();
+  const xp = Math.round(lessonCompletionXp(found.lesson.xp) * (powerup?.multiplier ?? 1));
+  let awarded: boolean;
+  try {
+    awarded = await completeLesson(lessonId, found.topic.subject, xp);
+  } catch (error) {
+    if (powerup) await returnPowerup(powerup);
+    throw error;
+  }
+  if (!awarded && powerup) await returnPowerup(powerup);
 
   const session = getLessonSession(lessonId);
   if (session) saveLessonSession({ ...session, phase: 'complete' });
@@ -152,6 +162,7 @@ export async function finishLesson(lessonId: string, via: 'lesson' | 'mastery-ch
   const milestones: MilestoneAward[] = [];
   if (awarded) {
     void logLearningEvent('LESSON_COMPLETED', { topicId: found.topic.id, lessonId, data: { via, xp } });
+    await grantPowerup('lesson', lessonId, 1.5);
     const milestone = await awardTopicMilestone(found.topic.id);
     if (milestone) milestones.push(milestone);
   }
@@ -215,6 +226,9 @@ export async function submitQuiz(submission: QuizSubmission): Promise<QuizOutcom
   const wrongQuestions = answered.filter((question) => !isAnswerCorrect(question, answers[question.id]));
   const total = questions.length;
   const percentage = total > 0 ? Math.round((correctQuestions.length / total) * 100) : 0;
+  const earnsPowerup = answered.length > 0 && !submission.practice
+    && (submission.kind === 'lesson' || submission.kind === 'topic' || submission.kind === 'mastery-check');
+  const powerup = earnsPowerup ? await consumePowerup() : null;
 
   const after = currentMemoryModel(Date.now());
   const touched = new Set(
@@ -243,7 +257,7 @@ export async function submitQuiz(submission: QuizSubmission): Promise<QuizOutcom
       break;
     default: {
       const kind = submission.practice ? 'practice' : submission.kind === 'topic' ? 'topic' : submission.kind === 'mastery-check' ? 'mastery-check' : 'lesson';
-      xp = quizXp({ kind, correct: correctQuestions.length, answered: answered.length, total });
+      xp = quizXp({ kind, correct: correctQuestions.length, answered: answered.length, total, multiplier: powerup?.multiplier ?? 1 });
       sourceType = submission.practice ? 'practice' : 'quiz';
     }
   }
@@ -280,6 +294,7 @@ export async function submitQuiz(submission: QuizSubmission): Promise<QuizOutcom
             ? `Topic quiz · ${getTopic(submission.topicId)?.title ?? ''}`
             : `Quiz · ${findLesson(submission.lessonId)?.lesson.title ?? ''}`;
   const xpApplied = answered.length > 0 ? await awardXp({ sourceType, sourceId: attempt.id, amount: xp, label }) : 0;
+  if (earnsPowerup) await grantPowerup('quiz', attempt.id, 1.5);
 
   const milestones: MilestoneAward[] = [];
   for (const key of masteredKeys) {

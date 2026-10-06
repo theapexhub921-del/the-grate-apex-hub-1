@@ -267,8 +267,10 @@ function PersonRow({ person, first, compact }: { person: SocialPerson; first: bo
   }
 
   const detail =
-    person.relationship === 'friends' && person.weeklyXp !== null
-      ? `${person.weeklyXp} XP this week · ${person.streak ?? 0}-day streak`
+    person.relationship === 'friends' && person.isOnline
+      ? 'Online now'
+      : person.relationship === 'friends' && person.weeklyXp !== null
+        ? `${person.weeklyXp} XP this week · ${person.streak ?? 0}-day streak`
       : person.username
         ? `@${person.username}`
         : 'GrAteApex Hub learner';
@@ -317,7 +319,7 @@ function PersonRow({ person, first, compact }: { person: SocialPerson; first: bo
 
   return (
     <View style={[styles.row, !first && styles.rowDivider]}>
-      <Avatar uri={person.avatarUrl} name={name} size={compact ? 38 : 44} ring={person.relationship === 'friends' ? 'subtle' : 'none'} />
+      <Avatar uri={person.avatarUrl} name={name} size={compact ? 38 : 44} ring={person.relationship === 'friends' ? 'subtle' : 'none'} status={person.isOnline ? 'online' : null} />
       <View style={styles.rowInfo}>
         <Text style={styles.rowName} numberOfLines={1}>{name}</Text>
         <Text style={styles.rowDetail} numberOfLines={1}>{detail}</Text>

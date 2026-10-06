@@ -1,5 +1,5 @@
 /**
- * GRATEAPEX design tokens — one set of names, three palettes.
+ * GRATEAPEX design tokens — one set of names and a shared family of palettes.
  *
  * Brand anchors (from the logo):
  * - Logo blue  #1245C4 → identity; vivid cobalt → actions and active states
@@ -332,7 +332,15 @@ const pink: ThemeColors = {
   focusRing: '#FF9EC4', shadow: 'rgba(18, 4, 11, 0.48)', shadowStrong: 'rgba(18, 4, 11, 0.68)', overlay: 'rgba(12, 3, 8, 0.7)', backgroundElement: '#351A28', backgroundSelected: '#4A293A',
 };
 
-export const Colors = { light, dark, apex, violet, black, pink };
+const emerald: ThemeColors = {
+  ...dark,
+  primary: '#52D6A2', primaryPressed: '#38BC89', primaryText: '#7CE2B8', primarySubtle: '#15382E', primaryBorder: '#3D8F70', onPrimary: '#06251B',
+  accent: '#8AE8C2', accentSubtle: '#17382E', accentText: '#A2F0D0',
+  background: '#0D1915', surface: '#14231D', surfaceElevated: '#1B2D25', surfaceMuted: '#192A22', surfaceSunken: '#0A1410', track: '#2A4036',
+  border: '#2A4036', borderStrong: '#3D5E4E', divider: '#20352B', tabBar: '#14231D', tabBarBorder: '#2A4036', tabActive: '#7CE2B8', navSurface: 'rgba(20, 35, 29, 0.92)', navBorder: 'rgba(124, 226, 184, 0.14)', navActive: '#A2F0D0', navActiveSubtle: '#15382E',
+  focusRing: '#65DDAE', shadow: 'rgba(3, 14, 10, 0.5)', shadowStrong: 'rgba(3, 14, 10, 0.7)', overlay: 'rgba(2, 10, 7, 0.72)', backgroundElement: '#192A22', backgroundSelected: '#2A4036',
+};
+export const Colors = { light, dark, apex, violet, black, pink, emerald };
 
 export type ColorSchemeName = keyof typeof Colors;
 export type ThemeColor = keyof ThemeColors;

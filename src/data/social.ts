@@ -28,6 +28,7 @@ export type SocialPerson = {
   weeklyXp: number | null;
   streak: number | null;
   since: number | null;
+  isOnline: boolean;
 };
 
 export type SocialNotification = {
@@ -114,6 +115,7 @@ type PersonRow = {
   weekly_xp?: number | null;
   current_streak?: number | null;
   since?: string | null;
+  is_online?: boolean;
 };
 
 type NotificationRow = {
@@ -172,6 +174,7 @@ function toPerson(row: PersonRow): SocialPerson {
     weeklyXp: row.weekly_xp ?? null,
     streak: row.current_streak ?? null,
     since: row.since ? Date.parse(row.since) : null,
+    isOnline: row.is_online === true,
   };
 }
 
@@ -208,12 +211,13 @@ function toInAppNotification(row: InAppNotificationRow): SocialNotification {
 // ── Loading ─────────────────────────────────────────────────────────
 
 async function load(userId: string) {
-  const [friends, notes, profile, activity, inAppNotes] = await Promise.all([
+  const [friends, notes, profile, activity, inAppNotes, presence] = await Promise.all([
     supabase.rpc('grateapex_list_friends'),
     supabase.rpc('grateapex_list_notifications'),
     supabase.from('profiles').select('username, share_activity').eq('id', userId).maybeSingle(),
     supabase.rpc('grateapex_friend_activity'),
     supabase.from('in_app_notifications').select('id, kind, title, body, read_at, created_at, data').order('created_at', { ascending: false }).limit(50),
+    supabase.rpc('grateapex_friend_presence'),
   ]);
   if (state.userId !== userId) return; // signed out meanwhile
   const error = friends.error ?? notes.error;
@@ -225,7 +229,7 @@ async function load(userId: string) {
   setState({
     status: 'ready',
     error: null,
-    people: ((friends.data ?? []) as PersonRow[]).map(toPerson),
+    people: mergePresence(((friends.data ?? []) as PersonRow[]).map(toPerson), presence.data),
     notifications: [
       ...((notes.data ?? []) as NotificationRow[]).map(toNotification),
       ...((inAppNotes.data ?? []) as InAppNotificationRow[]).map(toInAppNotification),
@@ -236,6 +240,19 @@ async function load(userId: string) {
     activityError: activity.error ? friendlySocialError(activity.error) : null,
   });
   if (activity.error) report('activity', activity.error);
+}
+
+type PresenceRow = { user_id: string; is_online: boolean };
+function mergePresence(people: SocialPerson[], rows: unknown) {
+  const online = new Set(((rows ?? []) as PresenceRow[]).filter((row) => row.is_online === true).map((row) => row.user_id));
+  return people.map((person) => ({ ...person, isOnline: online.has(person.userId) }));
+}
+
+export async function refreshFriendPresence() {
+  if (!state.userId) return;
+  const { data, error } = await supabase.rpc('grateapex_friend_presence');
+  if (error) { report('friend presence', error); return; }
+  setState({ people: mergePresence(state.people, data) });
 }
 
 export function refreshSocial() {

@@ -16,6 +16,7 @@ import { routes } from '@/lib/routes';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { EXPLORE_CONTACT, EXPLORE_GUIDE, EXPLORE_TEAM, getExploreAnnouncements, getItemsByCategory, type ExploreAnnouncement, type ExploreItem } from '@/data/explore';
 import { ABOUT_US } from '@/data/about';
+import { useWeeklyExploreSession } from '@/data/weekly-explore';
 
 function GuideStep({ icon, number, title, detail }: { icon: IconName; number: string; title: string; detail: string }) {
   const styles = useThemedStyles(createStyles);
@@ -91,6 +92,12 @@ function AnnouncementCard({ item }: { item: ExploreAnnouncement }) {
 export default function ExploreScreen() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  const weeklySession = useWeeklyExploreSession();
+  const weeklyItems = weeklySession?.items ?? [];
+  const upcoming = weeklySession ? new Date(`${weeklySession.week_start}T00:00:00`) > new Date() : false;
+  const weekLabel = weeklySession
+    ? new Date(`${weeklySession.week_start}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    : '';
 
   return (
     <Screen width="wide">
@@ -119,14 +126,16 @@ export default function ExploreScreen() {
         </Card>
       </View>
 
+      {weeklySession ? <SectionHeader title={`${upcoming ? 'Next week' : 'This week'} · ${weeklySession.title}`} subtitle={`${weeklySession.summary} Begins ${weekLabel}.`} style={styles.section} /> : null}
+
       <SectionHeader title="Medical concepts" subtitle="A quick way into useful ideas that sit across the curriculum." style={styles.section} />
-      <View style={styles.featureGrid}>{getItemsByCategory('concept').map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
+      <View style={styles.featureGrid}>{[...getItemsByCategory('concept'), ...weeklyItems.filter((item) => item.category === 'concept')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
 
       <SectionHeader title="Connections" subtitle="Follow a mechanism from foundational science to what it can mean in a clinical setting." style={styles.section} />
-      <View style={styles.featureGrid}>{getItemsByCategory('connection').map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
+      <View style={styles.featureGrid}>{[...getItemsByCategory('connection'), ...weeklyItems.filter((item) => item.category === 'connection')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
 
       <SectionHeader title="Emerging research" subtitle="Peer-reviewed findings, dated and labelled by study design. Research here is supplemental and does not replace course material." style={styles.section} />
-      <View style={styles.featureGrid}>{getItemsByCategory('research').map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
+      <View style={styles.featureGrid}>{[...getItemsByCategory('research'), ...weeklyItems.filter((item) => item.category === 'research')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
 
       <PwaInstallCard />
       <SectionHeader title="Explore by theme" subtitle="Related features are grouped together. Open a theme for details, or try a short interactive walkthrough." style={styles.section} />
@@ -219,7 +228,7 @@ function Journey() {
         <View style={styles.ruleHeader}>
           <Icon name="sparkle" size={18} color={colors.accentText} />
           <Text style={styles.ruleTitle}>Power-ups</Text>
-          <Pill label="Coming soon" />
+          <Pill label="Available" tone="primary" />
         </View>
         <View style={styles.multipliers}>
           {POWERUP_MULTIPLIERS.filter((value) => value > 1).map((value) => (
@@ -228,7 +237,7 @@ function Journey() {
             </View>
           ))}
         </View>
-        <Text style={styles.ruleText}>Power-ups multiply the XP you gain. They never reduce a penalty or change whether an answer was right.</Text>
+        <Text style={styles.ruleText}>Complete a lesson or quiz to earn a boost. Streak milestones and sharing the app also earn boosts. The strongest stored boost applies to your next lesson or quiz; boosts multiply XP gains only.</Text>
       </Card>
       <Card style={styles.ruleCard}>
         <View style={styles.ruleHeader}>
