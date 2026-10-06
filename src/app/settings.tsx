@@ -33,6 +33,7 @@ import {
 } from '@/data/settings';
 import { setDisplayName, useDisplayName } from '@/data/user';
 import { ABOUT_US } from '@/data/about';
+import { EXPLORE_TEAM } from '@/data/explore';
 import { useAuth } from '@/hooks/use-auth';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -353,6 +354,18 @@ export default function SettingsScreen() {
 
       <SettingsSection title="About us">
         <Text style={styles.optionDescription}>{ABOUT_US}</Text>
+        <Text style={[styles.optionLabel, { marginTop: 16 }]}>Meet the team</Text>
+        <View>
+          {EXPLORE_TEAM.map((member, index) => (
+            <View key={member.name} style={[styles.optionRow, index > 0 && styles.rowDivider]}>
+              <Icon name={member.icon} size={18} color={colors.primaryText} />
+              <View style={styles.flex}>
+                <Text style={styles.optionLabel}>{member.name}</Text>
+                <Text style={styles.optionDescription}>{member.role}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
       </SettingsSection>
 
       <SettingsSection title="Account">
