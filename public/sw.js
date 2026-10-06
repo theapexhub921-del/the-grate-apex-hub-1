@@ -1,5 +1,48 @@
-const CACHE_NAME = 'grateapex-pwa-v1';
+const CACHE_NAME = 'grateapex-pwa-v2';
+const CACHE_PREFIX = 'grateapex-pwa-';
 const APP_SHELL = ['/', '/manifest.webmanifest', '/icons/grateapex-192.png', '/icons/grateapex-512.png'];
-self.addEventListener('install', (event) => { event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))); self.skipWaiting(); });
-self.addEventListener('activate', (event) => { event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))).then(() => self.clients.claim())); });
-self.addEventListener('fetch', (event) => { const request = event.request; if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return; if (request.mode === 'navigate') { event.respondWith(fetch(request).then((response) => { const copy = response.clone(); void caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)); return response; }).catch(async () => (await caches.match(request)) || (await caches.match('/')))); return; } event.respondWith(caches.match(request).then((cached) => cached || fetch(request).then((response) => { if (response.ok) { const copy = response.clone(); void caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)); } return response; }))); });
+const CACHEABLE_DESTINATIONS = new Set(['font', 'image', 'script', 'style']);
+
+self.addEventListener('install', (event) => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.addAll(APP_SHELL);
+    await self.skipWaiting();
+  })());
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const cacheNames = await caches.keys();
+    await Promise.all(cacheNames
+      .filter((name) => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME)
+      .map((name) => caches.delete(name)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith(fetch(request).catch(async () => (await caches.match(request)) || (await caches.match('/'))));
+    return;
+  }
+
+  // Only cache static, fingerprinted assets. App data and other requests must
+  // always reach the network so an installed shortcut cannot pin stale content.
+  if (!CACHEABLE_DESTINATIONS.has(request.destination)) return;
+
+  event.respondWith((async () => {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, response.clone());
+    }
+    return response;
+  })());
+});

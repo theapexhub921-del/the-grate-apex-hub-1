@@ -77,9 +77,32 @@ function TitleSync() {
       window.dispatchEvent(new Event('grateapex-install-prompt'));
     };
     window.addEventListener('beforeinstallprompt', onInstallPrompt);
-    if ('serviceWorker' in navigator) {
-      void navigator.serviceWorker.register('/sw.js').catch(() => undefined);
-    }
+    if (!('serviceWorker' in navigator)) return;
+
+    const wasControlled = Boolean(navigator.serviceWorker.controller);
+    let reloadingForUpdate = false;
+    const onControllerChange = () => {
+      if (!wasControlled || reloadingForUpdate) return;
+      reloadingForUpdate = true;
+      window.location.reload();
+    };
+    const checkForUpdate = () => {
+      if (document.visibilityState !== 'visible') return;
+      void navigator.serviceWorker.getRegistration()
+        .then((registration) => registration?.update())
+        .catch(() => undefined);
+    };
+
+    navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+    document.addEventListener('visibilitychange', checkForUpdate);
+    void navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+      .then((registration) => registration.update())
+      .catch(() => undefined);
+
+    return () => {
+      navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+      document.removeEventListener('visibilitychange', checkForUpdate);
+    };
   }, []);
 
   return null;
