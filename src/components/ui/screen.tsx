@@ -21,7 +21,7 @@ import {
 } from '@/constants/theme';
 import { useThemedStyles } from '@/hooks/use-theme';
 
-export const WIDE_MAX_WIDTH = 1240;
+export const WIDE_MAX_WIDTH = 1480;
 
 const WIDTHS = {
   prose: PROSE_MAX_WIDTH,

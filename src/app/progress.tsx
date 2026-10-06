@@ -1,8 +1,11 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { MemoryDistribution } from '@/components/learning/memory-ui';
+import { applyStreakRecovery } from '@/data/progress';
+import { buyStreakRecoveryWithCoins, readApexCoinBalance, readStreakRecoveryOffer, type StreakRecoveryOffer } from '@/data/apex-coins';
+import { getStreakFreezeBalance } from '@/data/community';
 import { StatTile } from '@/components/learning/nav-bits';
 import { LevelProgressCard } from '@/components/level-progress';
 import { SubjectGlyph, TopicGlyph } from '@/components/learning/glyphs';
@@ -18,6 +21,7 @@ import { findLesson, getTopic } from '@/data/curriculum';
 import { reviewConsistency } from '@/data/learning/calendar';
 import { curriculumProgress, subjectProgress, TOPIC_STATUS_LABEL } from '@/data/learning/progress-model';
 import { describeAgo } from '@/data/learning/time';
+import { getStreakStatus } from '@/data/progression';
 import { useLearning } from '@/data/learning/use-learning';
 import { formatXp } from '@/data/learning/xp-rules';
 import type { QuizAttempt } from '@/data/quiz-history';
@@ -48,9 +52,44 @@ export default function ProgressScreen() {
   const styles = useThemedStyles(createStyles);
   const { progress, inputs, quizzes, attempts, now } = useLearning();
   const [showAll, setShowAll] = useState(false);
+  const [coinBalance, setCoinBalance] = useState<number | null>(null);
+  const [freezeBalance, setFreezeBalance] = useState<number | null>(null);
+  const [recoveryOffer, setRecoveryOffer] = useState<StreakRecoveryOffer | null>(null);
+  const [recoveringStreak, setRecoveringStreak] = useState(false);
+  const [coinError, setCoinError] = useState<string | null>(null);
+  const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null);
   const overall = useMemo(() => curriculumProgress(inputs), [inputs]);
   const consistency = useMemo(() => reviewConsistency(attempts, now), [attempts, now]);
   const visible = showAll ? quizzes : quizzes.slice(0, RECENT_LIMIT);
+  const streakLapsed = getStreakStatus(progress.streak, progress.lastActivityDate, new Date(now)) === 'lapsed';
+  const canRecoverStreak = streakLapsed || Boolean(recoveryOffer);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([readApexCoinBalance(), readStreakRecoveryOffer(), getStreakFreezeBalance()]).then(([balance, offer, freezes]) => {
+      if (active) { setCoinBalance(balance); setRecoveryOffer(offer); setFreezeBalance(freezes.available); }
+    }).catch(() => { if (active) { setCoinBalance(null); setRecoveryOffer(null); } });
+    return () => { active = false; };
+  }, []);
+
+  async function recoverStreak() {
+    if (recoveringStreak || !canRecoverStreak || (coinBalance ?? 0) < 100) return;
+    const recoveryAt = Date.now();
+    setRecoveringStreak(true);
+    setCoinError(null);
+    setRecoveryNotice(null);
+    try {
+      const recovery = await buyStreakRecoveryWithCoins(recoveryAt);
+      await applyStreakRecovery(recoveryAt, recovery.streak);
+      setCoinBalance(recovery.balance);
+      setRecoveryOffer(null);
+      setRecoveryNotice('Your streak is restored. Complete a study activity today to keep it going.');
+    } catch (caught) {
+      setCoinError(caught instanceof Error ? caught.message : 'Could not recover this streak.');
+    } finally {
+      setRecoveringStreak(false);
+    }
+  }
 
   const main = (
     <View style={styles.column}>
@@ -130,6 +169,21 @@ export default function ProgressScreen() {
     <View style={styles.column}>
       <RankProgressCard lifetimeXp={progress.xp} />
       <LevelProgressCard xp={progress.xp} />
+
+      <Card style={styles.card}>
+        <SectionHeader title="Apex Coins" subtitle={coinBalance === null ? 'Balance unavailable' : `${coinBalance.toLocaleString()} coins`} style={styles.noMargin} />
+        <Text style={styles.meta}>Earn 5 coins for completing an Apex Challenge and 10 coins when you complete every lesson in a topic.</Text>
+        <Text style={styles.meta}>Streak freezes: {freezeBalance === null ? 'balance unavailable' : freezeBalance}. Complete five lessons in a week to earn one; up to two can be stored. One is used automatically to cover a single missed day.</Text>
+        {coinError ? <Text style={styles.error}>{coinError}</Text> : null}
+        {recoveryNotice ? <Text style={styles.success}>{recoveryNotice}</Text> : null}
+        {canRecoverStreak ? (
+          <>
+            <Text style={styles.meta}>Recover your {recoveryOffer?.lost_streak ?? progress.streak}-day streak for 100 Apex Coins.</Text>
+            <Button label={coinBalance !== null && coinBalance >= 100 ? 'Recover streak · 100 coins' : 'Earn 100 coins to recover'} onPress={() => void recoverStreak()} loading={recoveringStreak} disabled={coinBalance === null || coinBalance < 100 || recoveringStreak} />
+            {coinBalance !== null && coinBalance < 100 ? <Text style={styles.muted}>A paid recovery option is not available yet.</Text> : null}
+          </>
+        ) : null}
+      </Card>
 
       <Card style={styles.card}>
         <SectionHeader title="Quizzes & reviews" style={styles.noMargin} />
@@ -213,6 +267,9 @@ function createStyles(colors: ThemeColors) {
     rowTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 5 },
     subjectName: { fontSize: 15, fontWeight: '800', color: colors.text },
     meta: { fontSize: 12, color: colors.textSecondary },
+    muted: { fontSize: 12, color: colors.textTertiary },
+    error: { fontSize: 12, color: colors.error },
+    success: { fontSize: 12, color: colors.successText },
     topicRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingHorizontal: 6, borderRadius: 10 },
     topicEmoji: { fontSize: 20 },
     topicName: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.text },

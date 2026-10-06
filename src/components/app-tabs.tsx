@@ -6,6 +6,7 @@ import { useReducedMotion } from 'react-native-reanimated';
 import { Atmosphere } from '@/components/atmosphere/atmosphere';
 import { useAtmosphereMood } from '@/components/atmosphere/config';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
+import { HomeGreetingWallpaper } from '@/components/social/home-greeting-wallpaper';
 import { NAV_ITEMS } from '@/components/nav-items';
 import { Signature } from '@/components/signature';
 import { MOTION } from '@/constants/motion';
@@ -29,15 +30,17 @@ export default function AppTabs() {
   // not show the authenticated navigation. The auth guard already keeps
   // signed-out users on /login; this simply hides the shell around it.
   const isAuthRoute = ['login', 'onboarding', 'privacy', 'terms'].includes(segments[0] as string);
+  const isWidgetRoute = segments[0] === 'widget';
 
   return (
     <View style={styles.shell}>
       <Atmosphere mood={mood} />
+      {(segments[0] as string | undefined) === 'index' ? <HomeGreetingWallpaper /> : null}
       <Tabs
         // Back (incl. Android back button) returns to the page you came from.
         backBehavior="history"
         tabBar={({ navigation }) =>
-          isAuthRoute ? null : <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
+          isAuthRoute || isWidgetRoute ? null : <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
         }
         screenOptions={{
           headerShown: false,
@@ -61,6 +64,7 @@ export default function AppTabs() {
         <Tabs.Screen name="onboarding" options={{ href: null }} />
         <Tabs.Screen name="privacy" options={{ href: null }} />
         <Tabs.Screen name="terms" options={{ href: null }} />
+          <Tabs.Screen name="widget" options={{ href: null }} />
         <Tabs.Screen name="social/friends" options={{ href: null }} />
         <Tabs.Screen name="explore/discovery" options={{ href: null }} />
         <Tabs.Screen name="learn/anatomy" options={{ href: null }} />
@@ -75,8 +79,9 @@ export default function AppTabs() {
         <Tabs.Screen name="learn/review" options={{ href: null }} />
         <Tabs.Screen name="learn/apex" options={{ href: null }} />
         <Tabs.Screen name="learn/flashcards" options={{ href: null }} />
+        <Tabs.Screen name="learn/tutor" options={{ href: null }} />
       </Tabs>
-      <Signature aboveTabBar={!isAuthRoute} />
+      {!isWidgetRoute ? <Signature aboveTabBar={!isAuthRoute} /> : null}
     </View>
   );
 }

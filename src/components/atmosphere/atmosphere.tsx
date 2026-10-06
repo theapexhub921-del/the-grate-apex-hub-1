@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { ATMOSPHERE, type AtmosphereMood, MOODS } from '@/components/atmosphere/config';
+import { PageMotifs } from '@/components/atmosphere/page-motifs';
 import { useResolvedColorScheme } from '@/hooks/use-theme';
 
 // Native atmosphere: the same tonal fields and glow as the web version,
@@ -43,6 +44,7 @@ export function Atmosphere({ mood }: { mood: AtmosphereMood }) {
           field.scale > 0 ? <Rect key={field.id} x="0" y="0" width="100%" height="100%" fill={`url(#${field.id})`} /> : null
         )}
       </Svg>
+      <PageMotifs lively={mood === 'lively' || mood === 'expressive' || mood === 'auth'} />
     </View>
   );
 }

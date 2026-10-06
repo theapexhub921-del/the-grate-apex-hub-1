@@ -6,8 +6,8 @@ import { Icon, type IconName } from '@/components/ui/icon';
 // list for the left navigation rail. Keeping one source means the two
 // navigations can never drift apart, and the five-tab identity stays fixed.
 //
-// Order is the product order (owner's choice, 2026-10-03):
-// Home, Learn, Social, Explore, Profile.
+// Keep five stable top-level destinations; Learn contains the deeper course,
+// review, quiz and progress routes.
 
 export type NavItem = {
   /** Expo Router route name used by <Tabs.Screen name="…" />. */
@@ -23,13 +23,22 @@ export type NavItem = {
 export const NAV_ITEMS: readonly NavItem[] = [
   { route: 'index', label: 'Home', path: '/', icon: 'home', accessibilityLabel: 'Home — your command centre' },
   { route: 'learn/index', label: 'Learn', path: '/learn', icon: 'learn', accessibilityLabel: 'Learn — subjects and lectures' },
-  { route: 'social/index', label: 'Social', path: '/social', icon: 'social', accessibilityLabel: 'Social — your study community' },
-  { route: 'explore', label: 'Explore', path: '/explore', icon: 'explore', accessibilityLabel: 'Explore — discovery and the GRATEAPEX journey' },
+  { route: 'social/index', label: 'Connect', path: '/social', icon: 'social', accessibilityLabel: 'Connect — your people and social activity' },
+  { route: 'explore', label: 'Explore', path: '/explore', icon: 'explore', accessibilityLabel: 'Explore — discovery and the GrAteApex Hub journey' },
   { route: 'profile', label: 'Profile', path: '/profile', icon: 'profile', accessibilityLabel: 'Profile — your academic identity' },
 ];
 
+/** Phone tab order, with Learn as the raised center destination. */
+export const MOBILE_NAV_ITEMS: readonly NavItem[] = [
+  NAV_ITEMS[0], // Home
+  NAV_ITEMS[2], // Connect
+  NAV_ITEMS[1], // Learn
+  NAV_ITEMS[3], // Explore
+  NAV_ITEMS[4], // Profile
+];
+
 // Which destination owns a path: '/learn/lesson' belongs to Learn,
-// '/social/friends' to Social. Settings and Progress belong to none.
+// '/social/friends' to Connect. Settings and Progress belong to none.
 export function activeNavPath(pathname: string): string | null {
   if (pathname === '/' || pathname === '') return '/';
   const match = NAV_ITEMS.find((item) => item.path !== '/' && (pathname === item.path || pathname.startsWith(`${item.path}/`)));

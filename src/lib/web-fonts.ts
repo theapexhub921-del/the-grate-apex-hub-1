@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 // blocking the first paint: the stylesheet is added after start-up, text
 // renders immediately in the system font, then swaps (font-display: swap).
 // If the font cannot be reached, everything stays readable in the fallback.
-const HREF = 'https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap';
+const HREF = 'https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800;900&display=swap';
 
 let requested = false;
 

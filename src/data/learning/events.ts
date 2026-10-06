@@ -134,7 +134,7 @@ export async function logLearningEvent(
   events = [event, ...events].slice(0, LIMIT);
   notify();
   await save();
-  void saveCloudLearningEvents([event]);
+  await saveCloudLearningEvents([event]);
   return event;
 }
 

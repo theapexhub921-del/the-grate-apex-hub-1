@@ -2,17 +2,21 @@ import { DarkTheme, DefaultTheme, type Href, ThemeProvider, useRouter, useSegmen
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { type ReactNode, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
 import { LearningSync } from '@/components/learning/learning-sync';
 import { PageTitle } from '@/components/page-title';
 import { needsOnboarding, useOnboardingState } from '@/data/onboarding';
+import { useFontSizePreference, usePageZoomPreference } from '@/data/settings';
+import { applyWebFontScale } from '@/lib/web-font-scaling';
+import { readClassSelection } from '@/data/class-curriculum';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
 import { useIsClient } from '@/hooks/use-is-client';
 import { useResolvedColorScheme, useTheme } from '@/hooks/use-theme';
 import { loadWebFonts } from '@/lib/web-fonts';
+import { routes } from '@/lib/routes';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -71,6 +75,16 @@ function AppGuard({ children }: { children: ReactNode }) {
       return;
     }
 
+    const onClassSelection = first === 'class-selection';
+    const classSelection = readClassSelection(session.user.user_metadata);
+    if (!classSelection) {
+      if (!onClassSelection) router.replace('/class-selection' as Href);
+      return;
+    }
+    if (onClassSelection) {
+      router.replace(routes.learnEnvironment(classSelection));
+      return;
+    }
     // Authenticated on /login: send them to the app home.
     if (onLoginScreen) {
       router.replace('/');
@@ -83,11 +97,23 @@ function AppGuard({ children }: { children: ReactNode }) {
 export default function TabLayout() {
   const [appShellReady, setAppShellReady] = useState(false);
   const isClient = useIsClient();
+  const pageZoom = usePageZoomPreference();
+  const fontSize = useFontSizePreference();
 
   // Web: fetch the display font once the app is running (never blocks paint).
   useEffect(() => {
     loadWebFonts();
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      document.documentElement.style.zoom = String(pageZoom / 100);
+    }
+  }, [pageZoom]);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') applyWebFontScale(fontSize);
+  }, [fontSize]);
 
   // Light / Dark from Settings ("System" follows the device).
   const scheme = useResolvedColorScheme();

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { InteractiveLayer } from '@/components/learning/interactive-layer';
+import { ClassAccessCard } from '@/components/learning/class-access-card';
 import { MemoryStateBadge } from '@/components/learning/memory-ui';
 import { Breadcrumbs } from '@/components/learning/nav-bits';
 import { ReadingLayer } from '@/components/learning/reading-layer';
@@ -14,6 +15,7 @@ import { ErrorScreen, InlineNotice, LoadingState } from '@/components/ui/state-v
 import { XpReward, XpToast } from '@/components/xp-toast';
 import type { ThemeColors } from '@/constants/theme';
 import { conceptKey, findLesson, getCourseInfo, getLessonQuizBank, isTrackableConcept } from '@/data/curriculum';
+import { classLessonCompletion, firstClassOffering, firstIncompleteClassBefore, isClassAhead, readAcademicTrial, readClassSelection } from '@/data/class-curriculum';
 import { beginLesson, finishLesson, type LessonFinish } from '@/data/learning/actions';
 import { saveLessonSession, useLessonSessions } from '@/data/learning/lesson-sessions';
 import { describeDue } from '@/data/learning/time';
@@ -21,6 +23,7 @@ import { useLearning } from '@/data/learning/use-learning';
 import { lessonCompletionXp } from '@/data/learning/xp-rules';
 import { getSubjectInfo } from '@/data/subjects';
 import { useThemedStyles } from '@/hooks/use-theme';
+import { useAuth } from '@/hooks/use-auth';
 import { param, routes } from '@/lib/routes';
 
 type View3 = 'learn' | 'read';
@@ -56,8 +59,13 @@ function LessonPlayer({
   restart: boolean;
 }) {
   const styles = useThemedStyles(createStyles);
+  const { user } = useAuth();
+  const ownSelection = readClassSelection(user?.user_metadata);
+  const trial = readAcademicTrial(user?.user_metadata);
   const scrollRef = useRef<ScrollView>(null);
   const found = findLesson(lessonId);
+  const foundLesson = found?.lesson;
+  const foundTopic = found?.topic;
   const sessions = useLessonSessions();
   const { progress, memory, now } = useLearning();
   const [xpReward, setXpReward] = useState<XpReward | null>(null);
@@ -69,7 +77,12 @@ function LessonPlayer({
   const lesson = found?.lesson;
   const hasInteractive = (lesson?.interactive?.length ?? 0) > 0;
   const completed = lesson ? progress.completedLessons.includes(lesson.id) : false;
-  const session = lesson ? sessions[lesson.id] : undefined;
+  const session = lesson ? sessions[lesson.id] : undefined;  const firstOffering = found ? firstClassOffering(found.topic.subject) : null;
+  const requiredLevel = ownSelection && firstOffering && isClassAhead(firstOffering, ownSelection) && !trial.active
+    ? firstIncompleteClassBefore(firstOffering, ownSelection, progress.lessonCompletedAt)
+    : null;
+  const requiredProgress = requiredLevel ? classLessonCompletion(requiredLevel.selection, progress.lessonCompletedAt) : null;
+  const classLocked = Boolean(firstOffering && requiredLevel);
 
   const [view, setView] = useState<View3>(() => {
     if (requestedLayer) return requestedLayer;
@@ -80,7 +93,7 @@ function LessonPlayer({
 
   // Start (or resume) the lesson session once.
   useEffect(() => {
-    if (!lesson) return;
+    if (!lesson || classLocked) return;
     let cancelled = false;
     void (async () => {
       try {
@@ -100,15 +113,15 @@ function LessonPlayer({
     };
     // Run once per lesson open.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lesson?.id]);
+  }, [lesson?.id, classLocked]);
 
   const concepts = useMemo(() => {
-    if (!found) return [];
-    return found.lesson.concepts.filter(isTrackableConcept).map((concept) => ({
+    if (!foundLesson || !foundTopic) return [];
+    return foundLesson.concepts.filter(isTrackableConcept).map((concept) => ({
       concept,
-      memory: memory.concepts.get(conceptKey(found.topic.id, concept.id)),
+      memory: memory.concepts.get(conceptKey(foundTopic.id, concept.id)),
     }));
-  }, [found, memory]);
+  }, [foundLesson, foundTopic, memory]);
 
   if (!found || !lesson) {
     return (
@@ -120,6 +133,9 @@ function LessonPlayer({
     );
   }
 
+  if (firstOffering && requiredLevel) {
+    return <Screen width="wide"><ClassAccessCard target={firstOffering} current={requiredLevel.selection} lessonsComplete={requiredProgress?.completed ?? 0} lessonsTotal={requiredProgress?.total ?? 0} trialUsed={trial.used} trialExpiresAt={trial.active ? trial.expiresAt : undefined} onStartTrial={() => router.replace(routes.learnEnvironment(firstOffering))} onBack={() => router.replace(routes.learn())} /></Screen>;
+  }
   if (!ready && !completed && hasInteractive && !session) {
     return <LoadingState label="Opening your lesson…" />;
   }

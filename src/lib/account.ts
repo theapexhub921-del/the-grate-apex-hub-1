@@ -19,7 +19,7 @@ export async function deleteMyAccount(): Promise<{ error: string | null }> {
     if (typeof __DEV__ !== 'undefined' && __DEV__) console.warn('Account deletion failed', error);
     return {
       error: /fetch|network|Failed to/i.test(error.message)
-        ? 'Could not reach GRATEAPEX. Check your connection and try again.'
+        ? 'Could not reach GrAteApex Hub. Check your connection and try again.'
         : 'Your account could not be deleted. Please try again.',
     };
   }

@@ -18,7 +18,8 @@ export function LogoMark({ height = 32 }: LogoMarkProps) {
   const colors = useTheme();
   const [lit, setLit] = useState(false);
 
-  const size = { width: height * ASPECT_RATIO, height };
+  const displayHeight = height * 1.2;
+  const size = { width: displayHeight * ASPECT_RATIO, height: displayHeight };
 
   return (
     <Pressable
@@ -27,9 +28,9 @@ export function LogoMark({ height = 32 }: LogoMarkProps) {
       onPressIn={() => setLit(true)}
       onPressOut={() => setLit(false)}
       accessibilityRole="image"
-      accessibilityLabel="GRATEAPEX logo"
+      accessibilityLabel="GrAteApex Hub logo"
     >
-      <View style={[size, lit && styles.lit]}>
+      <View style={[size, styles.scaled, lit && styles.lit]}>
         <Image
           source={require('@/assets/images/grateapex-mark-letters.png')}
           style={[styles.layer, size]}
@@ -47,6 +48,7 @@ export function LogoMark({ height = 32 }: LogoMarkProps) {
 }
 
 const styles = StyleSheet.create({
+  scaled: { transform: [{ scale: 1.07 }] },
   layer: {
     position: 'absolute',
     top: 0,
@@ -57,7 +59,7 @@ const styles = StyleSheet.create({
   // `filter` is a web-only style; on native it is ignored harmlessly, so the
   // press still reads through the slight scale.
   lit: {
-    transform: [{ scale: 1.06 }],
+    transform: [{ scale: 1.13 }],
     ...(Platform.OS === 'web'
       ? {
           filter: 'drop-shadow(0px 0px 7px rgba(253, 192, 10, 0.55))',

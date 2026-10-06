@@ -1,6 +1,6 @@
 import { router, usePathname } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { LogoMark } from '@/components/logo-mark';
 import { activeNavPath, NAV_ITEMS, NavIconView } from '@/components/nav-items';
@@ -39,8 +39,11 @@ const FLOAT_INSET = 10;
 export function DesktopSidebar({ docked }: { docked: boolean }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  const { height: viewportHeight } = useWindowDimensions();
   const pathname = usePathname();
   const active = activeNavPath(pathname);
+  const railHeight = Math.max(0, viewportHeight - (docked ? 0 : FLOAT_INSET * 2));
+  const navIconSize = Math.min(24, railHeight / (NAV_ITEMS.length * 2));
 
   const progress = useProgress();
   const displayName = useDisplayName();
@@ -121,7 +124,7 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
       >
         <View style={styles.brandRow}>
           <LogoMark height={26} />
-          <Text style={styles.wordmark}>GRATEAPEX</Text>
+          <Text style={styles.wordmark}>GrAteApex Hub</Text>
         </View>
 
         <View style={styles.navList}>
@@ -141,7 +144,7 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
                 style={[styles.navItem, isHovered && styles.navItemHovered, selected && styles.navItemActive]}
               >
                 {selected ? <View style={styles.activeBar} /> : null}
-                <NavIconView icon={item.icon} color={selected ? colors.navActive : isHovered ? colors.text : colors.navInactive} size={20} active={selected} />
+                <NavIconView icon={item.icon} color={selected ? colors.navActive : isHovered ? colors.text : colors.navInactive} size={navIconSize} active={selected} />
                 <Text style={[styles.navLabel, (selected || isHovered) && styles.navLabelActive]} numberOfLines={1}>
                   {item.label}
                 </Text>
@@ -254,7 +257,7 @@ function createStyles(colors: ThemeColors) {
       paddingHorizontal: 8,
       paddingBottom: 24,
     },
-    wordmark: { fontSize: 14, fontWeight: '800', letterSpacing: 1.4, color: colors.logoLetters },
+    wordmark: { fontSize: 18, fontWeight: '800', letterSpacing: 1.1, color: colors.logoLetters },
     navList: { flex: 1, gap: 4 },
     navItem: {
       flexDirection: 'row',

@@ -2,6 +2,7 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { MemoryDistribution } from '@/components/learning/memory-ui';
+import { ClassAccessCard } from '@/components/learning/class-access-card';
 import { Breadcrumbs } from '@/components/learning/nav-bits';
 import { NextActionHero } from '@/components/learning/next-action-card';
 import { PendingTopicCard, TopicCard } from '@/components/learning/topic-card';
@@ -12,11 +13,13 @@ import { Screen, SectionHeader } from '@/components/ui/screen';
 import { ErrorScreen } from '@/components/ui/state-views';
 import { isDesktopWidth, type ThemeColors } from '@/constants/theme';
 import { getCourseInfo, getCourseTopicEntries, getTopic } from '@/data/curriculum';
+import { classLessonCompletion, firstClassOffering, firstIncompleteClassBefore, isClassAhead, readAcademicTrial, readClassSelection } from '@/data/class-curriculum';
 import { getNextActions } from '@/data/learning/next-action';
 import { courseProgress } from '@/data/learning/progress-model';
 import { useLearning } from '@/data/learning/use-learning';
 import { getSubjectInfo } from '@/data/subjects';
 import { useThemedStyles } from '@/hooks/use-theme';
+import { useAuth } from '@/hooks/use-auth';
 import { param, routes } from '@/lib/routes';
 
 // A course: /learn/course?course=<course id>
@@ -27,6 +30,9 @@ export default function CourseRoute() {
   const id = param(courseParam);
   const styles = useThemedStyles(createStyles);
   const { width } = useWindowDimensions();
+  const { user } = useAuth();
+  const ownSelection = readClassSelection(user?.user_metadata);
+  const trial = readAcademicTrial(user?.user_metadata);
   const { inputs, now } = useLearning();
   const course = getCourseInfo(id);
   const progress = course ? courseProgress(course.id, inputs) : null;
@@ -48,7 +54,14 @@ export default function CourseRoute() {
   const subject = getSubjectInfo(course.subject);
   const pending = getCourseTopicEntries(course.id).filter((entry) => entry.status !== 'published');
   const action = progress.topics.length ? getNextActions(inputs, { courseId: course.id })[0] : null;
-  const desktop = isDesktopWidth(width);
+  const desktop = isDesktopWidth(width);  const firstOffering = course ? firstClassOffering(course.subject) : null;
+  const requiredLevel = ownSelection && firstOffering && isClassAhead(firstOffering, ownSelection) && !trial.active
+    ? firstIncompleteClassBefore(firstOffering, ownSelection, inputs.completedAt)
+    : null;
+  const requiredProgress = requiredLevel ? classLessonCompletion(requiredLevel.selection, inputs.completedAt) : null;
+  if (course && firstOffering && requiredLevel) {
+    return <Screen width="wide"><ClassAccessCard target={firstOffering} current={requiredLevel.selection} lessonsComplete={requiredProgress?.completed ?? 0} lessonsTotal={requiredProgress?.total ?? 0} trialUsed={trial.used} trialExpiresAt={trial.active ? trial.expiresAt : undefined} onStartTrial={() => router.replace(routes.learnEnvironment(firstOffering))} onBack={() => router.replace(routes.learn())} /></Screen>;
+  }
 
   return (
     <Screen width="wide">

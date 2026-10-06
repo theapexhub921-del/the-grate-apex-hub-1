@@ -34,9 +34,10 @@ import {
   type XpBreakdown,
 } from '@/data/learning/xp-rules';
 import { awardXp, completeLesson, getProgressSnapshot, hasAward, type XpSourceType } from '@/data/progress';
+import { awardApexCoins } from '@/data/apex-coins';
 import { type Answer, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
 import { type QuestionAttempt, recordQuestionAttempts } from '@/data/question-history';
-import { type AttemptKind, type CustomQuizSettings, type QuizAttempt, recordQuizAttempt } from '@/data/quiz-history';
+import { type AttemptKind, type CustomQuizSettings, type QuizAttempt, recordQuizAttempt, syncQuizAttemptToCloud } from '@/data/quiz-history';
 import type { RecallPrompt } from '@/data/lesson-types';
 
 export function attemptFor(
@@ -126,7 +127,10 @@ async function awardTopicMilestone(topicId: string): Promise<MilestoneAward | nu
     amount: milestoneXp('topicCompleted'),
     label: `Topic completed · ${topic.title}`,
   });
-  void logLearningEvent('TOPIC_COMPLETED', { topicId, refId: topicId });
+  await logLearningEvent('TOPIC_COMPLETED', { topicId, refId: topicId });
+  void awardApexCoins('topic_completion', topicId).catch((error) => {
+    if (typeof __DEV__ !== 'undefined' && __DEV__) console.warn('Could not award Apex Coins for topic completion.', error);
+  });
   return { label: `Topic completed · ${topic.title}`, xp };
 }
 
@@ -313,6 +317,15 @@ export async function submitQuiz(submission: QuizSubmission): Promise<QuizOutcom
     refId: attempt.id,
     data: { kind: attempt.kind, score: attempt.score, total, percentage, xp: xp.net },
   });
+
+  if (attempt.kind === 'apex' && !attempt.practice) {
+    try {
+      const attemptSynced = await syncQuizAttemptToCloud(attempt);
+      if (attemptSynced) await awardApexCoins('apex_challenge', attempt.id);
+    } catch (error) {
+      if (typeof __DEV__ !== 'undefined' && __DEV__) console.warn('Could not award Apex Coins for Apex Challenge completion.', error);
+    }
+  }
 
   touchClock();
   return {

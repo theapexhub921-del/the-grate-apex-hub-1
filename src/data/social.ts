@@ -32,11 +32,14 @@ export type SocialPerson = {
 
 export type SocialNotification = {
   id: string;
-  type: 'friend_request' | 'friend_accepted';
+  type: 'friend_request' | 'friend_accepted' | 'mention' | 'comment' | 'message' | 'group_activity' | 'social_activity';
   actorName: string;
   actorAvatarUrl: string | null;
   readAt: number | null;
   createdAt: number;
+  title?: string;
+  body?: string;
+  href?: Href;
 };
 
 export type FriendActivity = {
@@ -59,13 +62,15 @@ type State = {
   people: SocialPerson[];
   notifications: SocialNotification[];
   error: string | null;
+  activityError: string | null;
 };
 
-const EMPTY: State = { status: 'idle', userId: null, username: null, shareActivity: true, activity: [], people: [], notifications: [], error: null };
+const EMPTY: State = { status: 'idle', userId: null, username: null, shareActivity: true, activity: [], people: [], notifications: [], error: null, activityError: null };
 let state: State = EMPTY;
 const listeners = new Set<() => void>();
 let channel: RealtimeChannel | null = null;
-let loading: Promise<void> | null = null;
+let channelGeneration = 0;
+let loading: { userId: string; promise: Promise<void> } | null = null;
 
 function setState(next: Partial<State>) {
   state = { ...state, ...next };
@@ -75,7 +80,7 @@ function setState(next: Partial<State>) {
 // ── Names and messages ──────────────────────────────────────────────
 
 export function personName(person: Pick<SocialPerson, 'displayName' | 'username'>) {
-  return person.displayName?.trim() || (person.username ? `@${person.username}` : 'GRATEAPEX learner');
+  return person.displayName?.trim() || (person.username ? `@${person.username}` : 'GrAteApex Hub learner');
 }
 
 const MESSAGES: Record<string, string> = {
@@ -88,7 +93,7 @@ const MESSAGES: Record<string, string> = {
 export function friendlySocialError(error: unknown) {
   const message = error instanceof Error ? error.message : typeof error === 'object' && error && 'message' in error ? String((error as { message: unknown }).message) : '';
   for (const [code, text] of Object.entries(MESSAGES)) if (message.includes(code)) return text;
-  if (/fetch|network|Failed to/i.test(message)) return 'Could not reach GRATEAPEX. Check your connection and try again.';
+  if (/fetch|network|Failed to/i.test(message)) return 'Could not reach GrAteApex Hub. Check your connection and try again.';
   return 'Something went wrong. Please try again.';
 }
 
@@ -119,6 +124,16 @@ type NotificationRow = {
   actor_avatar_url: string | null;
   read_at: string | null;
   created_at: string;
+};
+
+type InAppNotificationRow = {
+  id: string;
+  kind: SocialNotification['type'];
+  title: string;
+  body: string;
+  read_at: string | null;
+  created_at: string;
+  data: { source_type?: string } | null;
 };
 
 type ActivityRow = {
@@ -171,14 +186,34 @@ function toNotification(row: NotificationRow): SocialNotification {
   };
 }
 
+function toInAppNotification(row: InAppNotificationRow): SocialNotification {
+  const source = row.data?.source_type;
+  const href: Href = source === 'messages' ? '/social/messages'
+    : source === 'group_discussions' ? '/social/groups'
+      : source === 'table_conference_messages' ? '/social/conferences'
+        : '/';
+  return {
+    id: `inapp:${row.id}`,
+    type: row.kind,
+    actorName: '',
+    actorAvatarUrl: null,
+    readAt: row.read_at ? Date.parse(row.read_at) : null,
+    createdAt: Date.parse(row.created_at),
+    title: row.title,
+    body: row.body,
+    href,
+  };
+}
+
 // ── Loading ─────────────────────────────────────────────────────────
 
 async function load(userId: string) {
-  const [friends, notes, profile, activity] = await Promise.all([
+  const [friends, notes, profile, activity, inAppNotes] = await Promise.all([
     supabase.rpc('grateapex_list_friends'),
     supabase.rpc('grateapex_list_notifications'),
     supabase.from('profiles').select('username, share_activity').eq('id', userId).maybeSingle(),
     supabase.rpc('grateapex_friend_activity'),
+    supabase.from('in_app_notifications').select('id, kind, title, body, read_at, created_at, data').order('created_at', { ascending: false }).limit(50),
   ]);
   if (state.userId !== userId) return; // signed out meanwhile
   const error = friends.error ?? notes.error;
@@ -191,10 +226,14 @@ async function load(userId: string) {
     status: 'ready',
     error: null,
     people: ((friends.data ?? []) as PersonRow[]).map(toPerson),
-    notifications: ((notes.data ?? []) as NotificationRow[]).map(toNotification),
+    notifications: [
+      ...((notes.data ?? []) as NotificationRow[]).map(toNotification),
+      ...((inAppNotes.data ?? []) as InAppNotificationRow[]).map(toInAppNotification),
+    ],
     username: (profile.data as { username: string | null } | null)?.username ?? state.username,
     shareActivity: (profile.data as { share_activity?: boolean } | null)?.share_activity ?? state.shareActivity,
     activity: activity.error ? state.activity : ((activity.data ?? []) as ActivityRow[]).map(toActivity),
+    activityError: activity.error ? friendlySocialError(activity.error) : null,
   });
   if (activity.error) report('activity', activity.error);
 }
@@ -202,10 +241,13 @@ async function load(userId: string) {
 export function refreshSocial() {
   const userId = state.userId;
   if (!userId) return Promise.resolve();
-  loading ??= load(userId).finally(() => {
-    loading = null;
+  if (loading?.userId === userId) return loading.promise;
+
+  const promise = load(userId).finally(() => {
+    if (loading?.promise === promise) loading = null;
   });
-  return loading;
+  loading = { userId, promise };
+  return promise;
 }
 
 function stopRealtime() {
@@ -217,15 +259,20 @@ function startRealtime(userId: string) {
   stopRealtime();
   const refresh = () => void refreshSocial();
   channel = supabase
-    .channel(`social:${userId}`)
+    // A fresh topic also protects the web dev server from reusing an already
+    // joined channel after a fast auth refresh or hot module reload.
+    .channel(`social:${userId}:${++channelGeneration}`)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` }, refresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'in_app_notifications', filter: `recipient_id=eq.${userId}` }, refresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'friendships', filter: `requester_id=eq.${userId}` }, refresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'friendships', filter: `addressee_id=eq.${userId}` }, refresh)
     .subscribe();
 }
 
 function startFor(userId: string | null) {
-  if (userId === state.userId && state.status !== 'idle') return;
+  // getSession() and the auth-change listener can both report the same
+  // initial session. Do not subscribe twice for one account.
+  if (userId === state.userId) return;
   stopRealtime();
   state = { ...EMPTY, userId };
   listeners.forEach((listener) => listener());
@@ -314,33 +361,35 @@ const SOCIAL_PREFIX = 'social:';
 const FRIENDS_HREF = '/social/friends' as Href;
 
 export function socialAppNotifications(notifications: readonly SocialNotification[]): AppNotification[] {
-  return notifications.map((note) => ({
-    id: `${SOCIAL_PREFIX}${note.id}`,
-    group: 'updates',
-    title: note.type === 'friend_request' ? 'Friend request' : 'Request accepted',
-    body: note.type === 'friend_request' ? `${note.actorName} wants to connect.` : `${note.actorName} is now your friend.`,
-    at: note.createdAt,
-    href: FRIENDS_HREF,
-    icon: 'social',
-    tone: note.type === 'friend_request' ? 'gold' : 'success',
-  }));
+  return notifications.map((note) => {
+    const inApp = note.id.startsWith('inapp:');
+    return {
+      id: inApp ? note.id : `${SOCIAL_PREFIX}${note.id}`,
+      group: 'updates',
+      title: note.title ?? (note.type === 'friend_request' ? 'Friend request' : 'Request accepted'),
+      body: note.body ?? (note.type === 'friend_request' ? `${note.actorName} wants to connect.` : `${note.actorName} is now your friend.`),
+      at: note.createdAt,
+      href: note.href ?? FRIENDS_HREF,
+      icon: note.type === 'mention' ? 'social' : 'social',
+      tone: note.type === 'friend_request' ? 'gold' : note.type === 'friend_accepted' ? 'success' : 'primary',
+    };
+  });
 }
 
 export function readSocialNotificationIds(notifications: readonly SocialNotification[]) {
-  return new Set(notifications.filter((note) => note.readAt).map((note) => `${SOCIAL_PREFIX}${note.id}`));
+  return new Set(notifications.filter((note) => note.readAt).map((note) => note.id.startsWith('inapp:') ? note.id : `${SOCIAL_PREFIX}${note.id}`));
 }
 
 export function markSocialNotificationsRead(ids: string[]) {
   const socialIds = ids.filter((id) => id.startsWith(SOCIAL_PREFIX)).map((id) => id.slice(SOCIAL_PREFIX.length));
-  if (socialIds.length === 0 || !state.userId) return;
+  const inAppIds = ids.filter((id) => id.startsWith('inapp:')).map((id) => id.slice('inapp:'.length));
+  if ((socialIds.length === 0 && inAppIds.length === 0) || !state.userId) return;
   const now = Date.now();
-  setState({ notifications: state.notifications.map((note) => (socialIds.includes(note.id) && !note.readAt ? { ...note, readAt: now } : note)) });
-  void supabase
-    .from('notifications')
-    .update({ read_at: new Date(now).toISOString() })
-    .in('id', socialIds)
-    .is('read_at', null)
-    .then(({ error }) => {
-      if (error) report('mark read', error);
-    });
+  setState({ notifications: state.notifications.map((note) => {
+    const sourceIds = note.id.startsWith('inapp:') ? inAppIds : socialIds;
+    const localId = note.id.startsWith('inapp:') ? note.id.slice('inapp:'.length) : note.id;
+    return sourceIds.includes(localId) && !note.readAt ? { ...note, readAt: now } : note;
+  }) });
+  if (socialIds.length) void supabase.from('notifications').update({ read_at: new Date(now).toISOString() }).in('id', socialIds).is('read_at', null).then(({ error }) => { if (error) report('mark read', error); });
+  if (inAppIds.length) void supabase.from('in_app_notifications').update({ read_at: new Date(now).toISOString() }).in('id', inAppIds).is('read_at', null).then(({ error }) => { if (error) report('mark in-app read', error); });
 }

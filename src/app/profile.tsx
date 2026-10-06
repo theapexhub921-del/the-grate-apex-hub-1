@@ -2,15 +2,15 @@ import { type Href, router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
-import { AvatarPicker } from '@/components/avatar/avatar-picker';
 import { RankProgressCard } from '@/components/rank-progress';
+import { AvatarPicker } from '@/components/avatar/avatar-picker';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { IconButton } from '@/components/ui/icon-button';
 import { Card, Interactive } from '@/components/ui/interactive';
-import { Columns, PageHeader, Screen } from '@/components/ui/screen';
+import { Columns, PageHeader, Screen, SectionHeader } from '@/components/ui/screen';
 import { webStyle } from '@/components/ui/web';
 import { elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
 import { curriculumProgress } from '@/data/learning/progress-model';
@@ -18,6 +18,7 @@ import { dayKey } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
 import { getRankProgress } from '@/data/ranks';
 import { useAvatarUrl, useDisplayName } from '@/data/user';
+import { personName, useSocial } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 type MenuItem = { icon: IconName; label: string; detail: string; href: Href };
@@ -39,8 +40,10 @@ export default function ProfileScreen() {
   const overall = useMemo(() => curriculumProgress(inputs), [inputs]);
   const displayName = useDisplayName();
   const avatarUrl = useAvatarUrl();
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
+  const social = useSocial();
+  const friends = social.people.filter((person) => person.relationship === 'friends');
   const rank = getRankProgress(progress.xp);
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   // Milestones are derived from the learning record — earned, never given.
   const reviewDays = new Set(attempts.filter((attempt) => attempt.mode === 'review' || attempt.mode === 'recall').map((attempt) => dayKey(attempt.attemptedAt))).size;
@@ -65,16 +68,21 @@ export default function ProfileScreen() {
 
   const identity = (
     <View style={[styles.identity, elevation(colors, 2)]}>
-      <Interactive onPress={() => setPickerOpen(true)} accessibilityLabel="Change your avatar" style={({ pressed }) => [pressed && styles.pressed]}>
-        <Avatar uri={avatarUrl} name={displayName} size={96} ring="gold" />
-        <View style={styles.editBadge}>
-          <Icon name="camera" size={14} color="#0A1F5C" strokeWidth={2.2} />
-        </View>
-      </Interactive>
+      <View style={styles.profileAvatar}>
+        <Avatar uri={avatarUrl} name={displayName ?? 'Doc.'} size={76} ring="gold" />
+        <Interactive
+          onPress={() => setAvatarPickerOpen(true)}
+          accessibilityLabel="Change profile picture"
+          style={styles.changeAvatar}
+        >
+          <Icon name="camera" size={15} color={colors.onPrimary} />
+        </Interactive>
+      </View>
       <View style={styles.identityText}>
         <Text style={styles.name} numberOfLines={1}>
           {displayName ? `Doc. ${displayName}` : 'Doc.'}
         </Text>
+        <Text style={styles.username}>{social.username ? '@' + social.username : social.status === 'loading' ? 'Loading username...' : 'Add a username in Connect'}</Text>
         <View style={styles.badges}>
           <View style={styles.rankBadge}>
             <Icon name="rank" size={14} color="#0A1F5C" strokeWidth={2.2} />
@@ -86,13 +94,43 @@ export default function ProfileScreen() {
           </View>
         </View>
         <View style={styles.identityActions}>
-          <Button label="Change avatar" size="sm" variant="secondary" icon={<Icon name="camera" size={15} color={colors.text} />} onPress={() => setPickerOpen(true)} />
           <Button label={displayName ? 'Edit name' : 'Set your name'} size="sm" variant="ghost" onPress={() => router.push('/settings' as Href)} />
+          <Button label="Change picture" size="sm" variant="ghost" onPress={() => setAvatarPickerOpen(true)} />
         </View>
       </View>
     </View>
   );
 
+  const socialConnections = (
+    <Card style={styles.socialCard}>
+      <SectionHeader
+        title="Your circle"
+        subtitle="Friends make the GrAteApex Hub journey more social."
+        style={styles.noMargin}
+        right={<Text style={styles.cardMeta}>{friends.length} friends</Text>}
+      />
+      {friends.length ? friends.slice(0, 3).map((friend) => (
+        <View key={friend.userId} style={styles.friendRow}>
+          <Avatar uri={friend.avatarUrl} name={personName(friend)} size={40} />
+          <View style={styles.friendText}>
+            <Text style={styles.friendName}>{personName(friend)}</Text>
+            <Text style={styles.friendHandle}>{friend.username ? '@' + friend.username : 'GrAteApex Hub friend'}</Text>
+          </View>
+          {friend.totalXp !== null ? <Text style={styles.friendXp}>{friend.totalXp} XP</Text> : null}
+        </View>
+      )) : (
+        <Text style={styles.cardMeta}>
+          {social.status === 'loading' ? 'Loading your friends...' : 'Your friend list is empty. Find classmates to build your circle.'}
+        </Text>
+      )}
+      <Button
+        label={friends.length ? 'Manage friends' : 'Find classmates'}
+        variant="secondary"
+        size="sm"
+        onPress={() => router.push('/social/friends' as Href)}
+      />
+    </Card>
+  );
   const statGrid = (
     <View style={styles.statGrid}>
       {stats.map((stat) => (
@@ -160,8 +198,9 @@ export default function ProfileScreen() {
 
   return (
     <Screen width="content">
-      <PageHeader title="Profile" subtitle="Your academic identity in GRATEAPEX." right={<IconButton icon="settings" label="Settings" onPress={() => router.push('/settings' as Href)} />} />
+      <PageHeader title="Profile" subtitle="Your identity, connections and achievements." right={<IconButton icon="settings" label="Settings" onPress={() => router.push('/settings' as Href)} />} />
       {identity}
+      <AvatarPicker visible={avatarPickerOpen} onClose={() => setAvatarPickerOpen(false)} />
       <View style={styles.gap} />
       {desktop ? (
         <Columns
@@ -175,6 +214,7 @@ export default function ProfileScreen() {
           side={
             <View style={styles.column}>
               <RankProgressCard lifetimeXp={progress.xp} />
+              {socialConnections}
               {menu}
             </View>
           }
@@ -184,10 +224,10 @@ export default function ProfileScreen() {
           <RankProgressCard lifetimeXp={progress.xp} />
           {statGrid}
           {achievementsCard}
+          {socialConnections}
           {menu}
         </View>
       )}
-      <AvatarPicker visible={pickerOpen} onClose={() => setPickerOpen(false)} />
     </Screen>
   );
 }
@@ -225,6 +265,9 @@ function createStyles(colors: ThemeColors) {
       borderColor: colors.surfaceElevated,
     },
     identityText: { flex: 1, minWidth: 220, gap: 8 },
+    profileAvatar: { position: 'relative', alignItems: 'center', justifyContent: 'center' },
+    changeAvatar: { position: 'absolute', right: -2, bottom: -2, width: 30, height: 30, borderRadius: 15, backgroundColor: colors.primary, borderWidth: 2, borderColor: colors.surfaceElevated, alignItems: 'center', justifyContent: 'center' },
+    username: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },
     name: { ...Type.title1, color: colors.text },
     badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     rankBadge: {
@@ -265,6 +308,13 @@ function createStyles(colors: ThemeColors) {
     statValue: { ...Type.numeral, fontSize: 22, color: colors.text, marginTop: 4 },
     statLabel: { fontSize: 12, fontWeight: '700', color: colors.textSecondary },
     card: { gap: 14 },
+    socialCard: { gap: 12, marginTop: 12 },
+    noMargin: { marginBottom: 0 },
+    friendRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 3 },
+    friendText: { flex: 1, minWidth: 0, gap: 2 },
+    friendName: { fontSize: 13.5, fontWeight: '800', color: colors.text },
+    friendHandle: { fontSize: 11.5, color: colors.textTertiary },
+    friendXp: { fontSize: 11.5, fontWeight: '800', color: colors.accentText },
     cardHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
     cardTitle: { ...Type.title3, color: colors.text },
     cardMeta: { fontSize: 12, fontWeight: '700', color: colors.textTertiary },

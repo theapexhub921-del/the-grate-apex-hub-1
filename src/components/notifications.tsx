@@ -14,6 +14,7 @@ import { useLearningEvents } from '@/data/learning/events';
 import { describeAgo, startOfDay } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
 import { type AppNotification, buildNotifications, markNotificationsRead, useReadNotifications } from '@/data/notifications';
+import { useNotificationPreferences } from '@/data/settings';
 import { markSocialNotificationsRead, readSocialNotificationIds, socialAppNotifications, useSocial } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -23,6 +24,7 @@ function useNotifications() {
   const { memory, progress, now } = useLearning();
   const events = useLearningEvents();
   const localRead = useReadNotifications();
+  const preferences = useNotificationPreferences();
   const social = useSocial();
   const items = useMemo(
     () =>
@@ -36,12 +38,20 @@ function useNotifications() {
           xp: progress.xp,
           now,
         }),
-      ].sort((a, b) => b.at - a.at),
-    [social.notifications, memory, events, progress.streak, progress.lastActivityDate, progress.xp, now]
+      ].filter((item) => preferences[preferenceFor(item)]).sort((a, b) => b.at - a.at),
+    [social.notifications, memory, events, progress.streak, progress.lastActivityDate, progress.xp, now, preferences]
   );
   const read = useMemo(() => new Set([...localRead, ...readSocialNotificationIds(social.notifications)]), [localRead, social.notifications]);
   const unread = items.filter((item) => !read.has(item.id)).length;
   return { items, read, unread, now };
+}
+
+function preferenceFor(item: AppNotification) {
+  if (item.id.startsWith('inapp:')) return 'socialEngagement' as const;
+  if (item.id.startsWith('social:')) return 'friendRequests' as const;
+  if (item.group === 'updates') return 'announcements' as const;
+  if (item.id.startsWith('streak-')) return 'streakReminders' as const;
+  return 'learningReminders' as const;
 }
 
 // Local read marks for derived notifications; social ones are also marked

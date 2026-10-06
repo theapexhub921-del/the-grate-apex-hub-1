@@ -7,6 +7,7 @@ import { Atmosphere } from '@/components/atmosphere/atmosphere';
 import { useAtmosphereMood } from '@/components/atmosphere/config';
 import { DesktopSidebar } from '@/components/desktop-sidebar';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
+import { HomeGreetingWallpaper } from '@/components/social/home-greeting-wallpaper';
 import { NAV_ITEMS } from '@/components/nav-items';
 import { PageTitle } from '@/components/page-title';
 import { Signature } from '@/components/signature';
@@ -34,8 +35,9 @@ export default function AppTabs() {
 
   // Unauthenticated screens must not show the authenticated navigation.
   const isAuthRoute = ['login', 'onboarding', 'privacy', 'terms'].includes(segments[0] as string);
+  const isWidgetRoute = segments[0] === 'widget';
   const isDesktop = width >= DESKTOP_BREAKPOINT;
-  const useRail = !isAuthRoute && isDesktop;
+  const useRail = !isAuthRoute && !isWidgetRoute && isDesktop;
   const docked = useRail && mode === 'alwaysVisible';
 
   return (
@@ -43,6 +45,7 @@ export default function AppTabs() {
       {/* Keeps the document title correct on every route. */}
       <PageTitle />
       <Atmosphere mood={mood} />
+      {(segments[0] as string | undefined) === 'index' ? <HomeGreetingWallpaper /> : null}
 
       {useRail ? <DesktopSidebar docked={docked} /> : null}
 
@@ -50,7 +53,7 @@ export default function AppTabs() {
         <Tabs
           backBehavior="history"
           tabBar={({ navigation }) =>
-            useRail || isAuthRoute ? null : <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
+            useRail || isAuthRoute || isWidgetRoute ? null : <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
           }
           screenOptions={{
             headerShown: false,
@@ -74,6 +77,7 @@ export default function AppTabs() {
           <Tabs.Screen name="onboarding" options={{ href: null }} />
           <Tabs.Screen name="privacy" options={{ href: null }} />
           <Tabs.Screen name="terms" options={{ href: null }} />
+          <Tabs.Screen name="widget" options={{ href: null }} />
           <Tabs.Screen name="social/friends" options={{ href: null }} />
           <Tabs.Screen name="explore/discovery" options={{ href: null }} />
           <Tabs.Screen name="learn/anatomy" options={{ href: null }} />
@@ -88,10 +92,11 @@ export default function AppTabs() {
           <Tabs.Screen name="learn/review" options={{ href: null }} />
           <Tabs.Screen name="learn/apex" options={{ href: null }} />
           <Tabs.Screen name="learn/flashcards" options={{ href: null }} />
+          <Tabs.Screen name="learn/tutor" options={{ href: null }} />
         </Tabs>
       </View>
 
-      <Signature aboveTabBar={!useRail && !isAuthRoute} />
+      {!isWidgetRoute ? <Signature aboveTabBar={!useRail && !isAuthRoute} /> : null}
     </View>
   );
 }

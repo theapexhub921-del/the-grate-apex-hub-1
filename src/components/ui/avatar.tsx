@@ -1,6 +1,7 @@
 import { useId } from 'react';
-import { Image, type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
+import { Image } from 'expo-image';
 
 import { AvatarPresetArt, getAvatarPreset } from '@/components/avatar/presets';
 import { Type, type ThemeColors } from '@/constants/theme';
@@ -14,7 +15,7 @@ export type AvatarRing = 'none' | 'primary' | 'gold' | 'subtle';
 const INITIAL_GRADIENTS: readonly (readonly [string, string])[] = [
   ['#2A5BD7', '#0B2C8A'],
   ['#1B3A94', '#0B1E5B'],
-  ['#3E6FE6', '#1245C4'],
+  ['#54A0FF', '#0F62D4'],
   ['#24408F', '#101F52'],
 ];
 
@@ -24,12 +25,7 @@ function hash(text: string) {
   return Math.abs(value);
 }
 
-/**
- * One avatar, from whatever the learner chose:
- *   "preset:<id>" → illustrated GRATEAPEX avatar
- *   any other URL / data URI → their own photo
- *   nothing → initials on a brand gradient (never a fake photo)
- */
+/** One shared avatar renderer for profiles, posts, comments, messages and groups. */
 export function Avatar({
   uri,
   name,
@@ -50,10 +46,9 @@ export function Avatar({
   const colors = useTheme();
   const styles = useThemedStyles(createStyles);
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
-  const preset = getAvatarPreset(uri);
-  const photo = uri && !preset ? uri : null;
-  const initials = getInitials(name?.trim() || 'GRATEAPEX').slice(0, 2) || 'G';
+  const initials = getInitials(name?.trim() || 'GrAteApex Hub').slice(0, 2) || 'G';
   const gradient = INITIAL_GRADIENTS[hash(name ?? '') % INITIAL_GRADIENTS.length];
+  const preset = getAvatarPreset(uri);
 
   const ringWidth = ring === 'none' ? 0 : size >= 64 ? 3 : 2;
   const gap = ring === 'none' ? 0 : size >= 64 ? 3 : 2;
@@ -71,8 +66,8 @@ export function Avatar({
       <View style={{ width: inner, height: inner, borderRadius: inner / 2, overflow: 'hidden' }}>
         {preset ? (
           <AvatarPresetArt preset={preset} size={inner} />
-        ) : photo ? (
-          <Image source={{ uri: photo }} style={{ width: inner, height: inner }} resizeMode="cover" />
+        ) : uri ? (
+          <Image source={{ uri }} contentFit="cover" style={{ width: inner, height: inner }} accessibilityLabel={label ?? `${name ?? 'Learner'}'s profile photo`} />
         ) : (
           <View style={StyleSheet.absoluteFill}>
             <Svg width={inner} height={inner}>

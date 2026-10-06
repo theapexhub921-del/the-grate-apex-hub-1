@@ -4,7 +4,7 @@ import { type LayoutChangeEvent, Platform, Pressable, StyleSheet, Text, View } f
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { activeNavPath, NAV_ITEMS, NavIconView } from '@/components/nav-items';
+import { activeNavPath, MOBILE_NAV_ITEMS, NavIconView } from '@/components/nav-items';
 import { useTabBarHidden } from '@/components/tab-bar-visibility';
 import { webStyle } from '@/components/ui/web';
 import { MOTION, SPRING } from '@/constants/motion';
@@ -37,10 +37,11 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
   const hidden = mode === 'autoHide' && scrolledAway;
 
   const active = activeNavPath(pathname);
-  const activeIndex = NAV_ITEMS.findIndex((item) => item.path === active);
+  const activeIndex = MOBILE_NAV_ITEMS.findIndex((item) => item.path === active);
+  const learnIndex = MOBILE_NAV_ITEMS.findIndex((item) => item.path === '/learn');
 
   const [barWidth, setBarWidth] = useState(0);
-  const itemWidth = barWidth > 0 ? (barWidth - 8) / NAV_ITEMS.length : 0;
+  const itemWidth = barWidth > 0 ? (barWidth - 8) / MOBILE_NAV_ITEMS.length : 0;
 
   const pillX = useSharedValue(0);
   const pillOpacity = useSharedValue(activeIndex >= 0 ? 1 : 0);
@@ -76,9 +77,10 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
         onLayout={(event: LayoutChangeEvent) => setBarWidth(event.nativeEvent.layout.width)}
         accessibilityRole="tablist"
       >
-        {itemWidth > 0 ? <Animated.View style={[styles.pill, { width: itemWidth }, pillStyle]} /> : null}
-        {NAV_ITEMS.map((item) => {
+        {itemWidth > 0 && activeIndex !== learnIndex ? <Animated.View style={[styles.pill, { width: itemWidth }, pillStyle]} /> : null}
+        {MOBILE_NAV_ITEMS.map((item, index) => {
           const selected = item.path === active;
+          const isLearn = index === learnIndex;
           return (
             <Pressable
               key={item.route}
@@ -86,10 +88,14 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
               accessibilityRole="tab"
               accessibilityState={{ selected }}
               accessibilityLabel={item.accessibilityLabel}
-              style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
+              style={({ pressed }) => [styles.item, isLearn && styles.learnItem, pressed && styles.itemPressed]}
             >
-              <NavIconView icon={item.icon} color={selected ? colors.navActive : colors.navInactive} size={22} active={selected} />
-              <Text style={[styles.label, selected && styles.labelActive]} numberOfLines={1}>
+              {isLearn ? (
+                <View style={[styles.learnIcon, elevation(colors, 3)]}>
+                  <NavIconView icon={item.icon} color={colors.primaryText} size={26} active />
+                </View>
+              ) : <NavIconView icon={item.icon} color={selected ? colors.navActive : colors.navInactive} size={22} active={selected} />}
+              <Text style={[styles.label, selected && styles.labelActive, isLearn && styles.learnLabel]} numberOfLines={1}>
                 {item.label}
               </Text>
             </Pressable>
@@ -140,6 +146,20 @@ function createStyles(colors: ThemeColors) {
       gap: 3,
       ...webStyle({ cursor: 'pointer', outlineStyle: 'none', WebkitTapHighlightColor: 'transparent' }),
     },
+    learnItem: { overflow: 'visible', justifyContent: 'flex-end', paddingBottom: 7 },
+    learnIcon: {
+      position: 'absolute',
+      top: -18,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      borderWidth: 4,
+      borderColor: colors.surfaceElevated,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    learnLabel: { paddingTop: 0 },
     itemPressed: { transform: [{ scale: 0.94 }] },
     label: { fontSize: 10.5, fontWeight: '700', color: colors.navInactive, letterSpacing: 0.2 },
     labelActive: { color: colors.navActive },

@@ -1,7 +1,6 @@
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { AVATAR_PRESETS, AvatarPresetArt, presetValue } from '@/components/avatar/presets';
 import { SubjectGlyph, TopicGlyph } from '@/components/learning/glyphs';
 import { ApexWordmark } from '@/components/motion/apex-wordmark';
 import { QuestionCard } from '@/components/question-card';
@@ -21,13 +20,13 @@ import { XP_RULES } from '@/data/learning/xp-rules';
 import type { Answer } from '@/data/questions';
 import { type AppearancePreference, setAppearancePreference, useAppearancePreference } from '@/data/settings';
 import { subjects } from '@/data/subjects';
-import { setAvatarUrl, setDisplayName, useAvatarUrl, useDisplayName } from '@/data/user';
+import { setDisplayName, useDisplayName } from '@/data/user';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // Miniature, working pieces of GRATEAPEX for the first-run introduction.
 // Everything here is PRACTICE: answers, XP and schedules shown are examples
-// and are never recorded — except "Make it yours", whose choices (name,
-// avatar, theme) are real settings and say so.
+// and are never recorded — except "Make it yours", whose name and theme
+// choices are real settings and say so.
 
 export type DemoProps = { done: boolean; onDone: () => void };
 
@@ -441,7 +440,7 @@ export function ExploreDemo({ done, onDone }: DemoProps) {
       <View style={styles.row}>
         <Icon name="rank" size={18} color={colors.primaryText} />
         <View style={styles.flex}>
-          <Text style={styles.rowTitle}>The GRATEAPEX Journey</Text>
+          <Text style={styles.rowTitle}>The GrAteApex Hub journey</Text>
           <Text style={styles.rowMeta}>The full rank ladder, XP rules and leagues</Text>
         </View>
       </View>
@@ -481,7 +480,6 @@ export function SocialDemo({ done, onDone }: DemoProps) {
 export function PersonaliseDemo({ onDone }: DemoProps) {
   const styles = useThemedStyles(createStyles);
   const savedName = useDisplayName();
-  const avatar = useAvatarUrl();
   const appearance = useAppearancePreference();
   const [name, setName] = useState(savedName ?? '');
   const [saved, setSaved] = useState(false);
@@ -520,28 +518,6 @@ export function PersonaliseDemo({ onDone }: DemoProps) {
         {saved ? <Text style={styles.savedText}>Saved</Text> : null}
       </View>
       <Text style={styles.muted}>Shown on Home as “Doc. {name.trim() || 'you'}”.</Text>
-
-      <Text style={[styles.levelLabel, styles.spaced]}>CHOOSE AN AVATAR</Text>
-      <View style={styles.avatarRow}>
-        {AVATAR_PRESETS.map((preset) => {
-          const selected = avatar === presetValue(preset.id);
-          return (
-            <Interactive
-              key={preset.id}
-              onPress={() => {
-                void setAvatarUrl(presetValue(preset.id));
-                onDone();
-              }}
-              accessibilityRole="radio"
-              accessibilityState={{ checked: selected }}
-              accessibilityLabel={preset.label}
-              style={[styles.avatarTile, selected && styles.avatarTileSelected]}
-            >
-              <AvatarPresetArt preset={preset} size={44} />
-            </Interactive>
-          );
-        })}
-      </View>
 
       <Text style={[styles.levelLabel, styles.spaced]}>THEME</Text>
       <View style={styles.themeRow}>
@@ -703,9 +679,6 @@ function createStyles(colors: ThemeColors) {
       color: colors.text,
     },
     savedText: { fontSize: 12.5, fontWeight: '800', color: colors.successText },
-    avatarRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-    avatarTile: { padding: 3, borderRadius: 16, borderWidth: 2, borderColor: 'transparent' },
-    avatarTileSelected: { borderColor: colors.accent },
     themeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     themeChip: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 999, backgroundColor: colors.surfaceMuted, borderWidth: 1, borderColor: colors.border },
     themeChipSelected: { backgroundColor: colors.primarySubtle, borderColor: colors.primary },

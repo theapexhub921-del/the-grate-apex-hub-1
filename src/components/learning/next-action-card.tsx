@@ -8,7 +8,7 @@ import { Interactive } from '@/components/ui/interactive';
 import { webStyle } from '@/components/ui/web';
 import { elevation, Radius, Type, type ThemeColors } from '@/constants/theme';
 import type { NextAction } from '@/data/learning/next-action';
-import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { useResolvedColorScheme, useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 const KIND_LABEL: Record<NextAction['kind'], string> = {
   'resume-lesson': 'Continue where you left off',
@@ -39,8 +39,10 @@ const KIND_ICON: Record<NextAction['kind'], IconName> = {
 export function NextActionHero({ action }: { action: NextAction }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  const scheme = useResolvedColorScheme();
+  const heroStart = scheme === 'apex' ? colors.background : colors.rewardBackground;
   return (
-    <View style={[styles.hero, elevation(colors, 2)]} accessibilityRole="summary">
+    <View style={[styles.hero, elevation(colors, 2), { backgroundColor: colors.apexBackground }, webStyle({ backgroundImage: 'linear-gradient(135deg, ' + heroStart + ' 0%, ' + colors.apexSurface + ' 56%, ' + colors.apexBackground + ' 100%)' })]} accessibilityRole="summary">
       {/* Light inside the hero: a gold glow top-right, deep blue below. */}
       <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" preserveAspectRatio="none">
         <Defs>
@@ -49,8 +51,8 @@ export function NextActionHero({ action }: { action: NextAction }) {
             <Stop offset="1" stopColor="#FDC00A" stopOpacity={0} />
           </RadialGradient>
           <RadialGradient id="heroLight" cx="0%" cy="0%" rx="80%" ry="120%" fx="0%" fy="0%">
-            <Stop offset="0" stopColor="#3E74F0" stopOpacity={0.55} />
-            <Stop offset="1" stopColor="#3E74F0" stopOpacity={0} />
+            <Stop offset="0" stopColor={heroStart} stopOpacity={0.55} />
+            <Stop offset="1" stopColor={heroStart} stopOpacity={0} />
           </RadialGradient>
         </Defs>
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#heroLight)" />
@@ -60,7 +62,7 @@ export function NextActionHero({ action }: { action: NextAction }) {
       </Svg>
       <View style={styles.kickerRow}>
         <View style={styles.kickerIcon}>
-          <Icon name={KIND_ICON[action.kind]} size={14} color="#0A1F5C" filled={action.kind === 'resume-lesson' || action.kind === 'apex'} strokeWidth={2.2} />
+          <Icon name={KIND_ICON[action.kind]} size={14} color={colors.apexBackground} filled={action.kind === 'resume-lesson' || action.kind === 'apex'} strokeWidth={2.2} />
         </View>
         <Text style={styles.heroKicker}>{KIND_LABEL[action.kind].toUpperCase()}</Text>
       </View>
@@ -113,11 +115,9 @@ function createStyles(colors: ThemeColors) {
     hero: {
       borderRadius: Radius.xl,
       padding: 24,
-      backgroundColor: '#0A2A84',
       borderWidth: 1,
       borderColor: 'rgba(140, 175, 255, 0.28)',
       overflow: 'hidden',
-      ...webStyle({ backgroundImage: 'linear-gradient(135deg, #123FB8 0%, #0A2A84 55%, #081F66 100%)' }),
     },
     kickerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
     kickerIcon: {
@@ -128,9 +128,9 @@ function createStyles(colors: ThemeColors) {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    heroKicker: { ...Type.overline, color: '#FFD04A' },
-    heroTitle: { ...Type.title2, fontSize: 24, lineHeight: 31, color: '#FFFFFF', maxWidth: 620 },
-    heroDetail: { fontSize: 15, lineHeight: 22, color: '#C9D6F7', marginTop: 6, maxWidth: 560 },
+    heroKicker: { ...Type.overline, color: colors.accentText },
+    heroTitle: { ...Type.title2, fontSize: 24, lineHeight: 31, color: colors.apexText, maxWidth: 620 },
+    heroDetail: { fontSize: 15, lineHeight: 22, color: colors.apexMuted, marginTop: 6, maxWidth: 560 },
     heroButton: { marginTop: 20, alignSelf: 'flex-start' },
     list: {
       backgroundColor: colors.surface,

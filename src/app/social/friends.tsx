@@ -21,6 +21,7 @@ import {
   useSocial,
 } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { blockCommunityUser, reportCommunityContent } from '@/data/community';
 
 // '/social' is the Social hub (social/index.tsx). Cast because the
 // generated route types can lag behind newly added routes.
@@ -248,6 +249,7 @@ function PersonRow({ person, first, compact }: { person: SocialPerson; first: bo
   const styles = useThemedStyles(createStyles);
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  const [blockConfirm, setBlockConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const name = personName(person);
 
@@ -269,7 +271,7 @@ function PersonRow({ person, first, compact }: { person: SocialPerson; first: bo
       ? `${person.weeklyXp} XP this week · ${person.streak ?? 0}-day streak`
       : person.username
         ? `@${person.username}`
-        : 'GRATEAPEX learner';
+        : 'GrAteApex Hub learner';
 
   let actions: React.ReactNode = null;
   if (person.relationship === 'incoming' && person.friendshipId) {
@@ -303,6 +305,15 @@ function PersonRow({ person, first, compact }: { person: SocialPerson; first: bo
   } else {
     actions = <Button label="Add friend" size="sm" onPress={() => act(() => sendFriendRequest(person.userId))} loading={busy} />;
   }
+
+  if (!compact) actions = <View style={styles.actions}>
+    {actions}
+    {blockConfirm ? <>
+      <Button label="Confirm block" size="sm" variant="secondary" onPress={() => act(() => blockCommunityUser(person.userId, person.friendshipId))} loading={busy} />
+      <Button label="Cancel" size="sm" variant="ghost" onPress={() => setBlockConfirm(false)} disabled={busy} />
+    </> : <Button label="Block" size="sm" variant="ghost" onPress={() => setBlockConfirm(true)} disabled={busy} accessibilityLabel={`Block ${name}`} />}
+    <Button label="Report" size="sm" variant="ghost" onPress={() => act(() => reportCommunityContent('user', person.userId))} loading={busy} accessibilityLabel={`Report ${name}`} />
+  </View>;
 
   return (
     <View style={[styles.row, !first && styles.rowDivider]}>

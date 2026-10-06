@@ -60,6 +60,17 @@ const ICONS = {
       <Path d="M16 14.4c2.3.1 4 1.7 4.6 4.3" {...stroke(color, sw)} />
     </>
   ),
+  heart: ({ color, filled, sw }) => (
+    <Path d="M20.4 8.8c0 4.5-8.4 10.4-8.4 10.4S3.6 13.3 3.6 8.8a4.3 4.3 0 0 1 8.4-1.2 4.3 4.3 0 0 1 8.4 1.2Z" {...stroke(color, sw)} fill={filled ? color : 'none'} />
+  ),
+  share: ({ color, filled, sw }) => (
+    <>
+      <Path d="m8.6 12.1 6.8-4.2M8.6 12.1l6.8 4.2" {...stroke(color, sw)} />
+      <Circle cx={6.1} cy={12.1} r={2.2} {...stroke(color, sw)} fill={filled ? color : 'none'} />
+      <Circle cx={17.9} cy={5.1} r={2.2} {...stroke(color, sw)} fill={filled ? color : 'none'} />
+      <Circle cx={17.9} cy={19.1} r={2.2} {...stroke(color, sw)} fill={filled ? color : 'none'} />
+    </>
+  ),
   profile: ({ color, filled, sw }) => (
     <>
       <Circle cx={12} cy={8.4} r={3.6} {...stroke(color, sw)} fill={filled ? color : 'none'} />
@@ -243,6 +254,7 @@ const ICONS = {
   // ── Utility ──
   check: ({ color, sw }) => <Path d="m5 12.6 4.4 4.4L19 7.4" {...stroke(color, sw)} />,
   close: ({ color, sw }) => <Path d="m6.4 6.4 11.2 11.2M17.6 6.4 6.4 17.6" {...stroke(color, sw)} />,
+  trash: ({ color, sw }) => <><Path d="M4.8 7.2h14.4M9 7.2V4.8h6v2.4M7 7.4l.8 12h8.4l.8-12M10 10.5v5.8M14 10.5v5.8" {...stroke(color, sw)} /></>,
   plus: ({ color, sw }) => <Path d="M12 5v14M5 12h14" {...stroke(color, sw)} />,
   minus: ({ color, sw }) => <Path d="M5 12h14" {...stroke(color, sw)} />,
   chevronRight: ({ color, sw }) => <Path d="m9.6 6 6 6-6 6" {...stroke(color, sw)} />,
@@ -326,7 +338,7 @@ export function Icon({
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      style={style}
+      style={[{ transform: [{ scale: 1.07 }] }, style]}
       // Standard ARIA props: they work on native and render as real
       // attributes on the web (the legacy accessibility* props would be
       // passed to the <svg> element and trigger React warnings).

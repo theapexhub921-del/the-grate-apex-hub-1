@@ -1,21 +1,38 @@
 import { Href, router } from 'expo-router';
-import { type ReactNode, useState } from 'react';
-import { StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { type ReactNode, useEffect, useState } from 'react';
+import { Platform, StyleSheet, Switch, Text, TextInput, useWindowDimensions, View } from 'react-native';
 
 import { ATMOSPHERE } from '@/components/atmosphere/config';
-import { AvatarPicker } from '@/components/avatar/avatar-picker';
 import { BackLink } from '@/components/learning/nav-bits';
-import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
+import { Sheet } from '@/components/ui/sheet';
 import { PageHeader, Screen } from '@/components/ui/screen';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import { Colors, elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
 import { setTabBarMode, type TabBarMode, useTabBarMode } from '@/data/navigation-settings';
-import { type AppearancePreference, setAppearancePreference, useAppearancePreference } from '@/data/settings';
-import { setDisplayName, useAvatarUrl, useDisplayName } from '@/data/user';
+import {
+  type AppearancePreference,
+  type FontSizePreference,
+  setPageZoomPreference,
+  setAppearancePreference,
+  setPushNotificationsPreference,
+  setNotificationPreference,
+  usePageZoomPreference,
+  useAppearancePreference,
+  usePushNotificationsPreference,
+  useNotificationPreferences,
+  setFontSizePreference,
+  useFontSizePreference,
+  usePrivacyPreferences,
+  setPrivacyPreference,
+  syncSettingsFromAccount,
+  type NotificationCategory,
+} from '@/data/settings';
+import { setDisplayName, useDisplayName } from '@/data/user';
+import { ABOUT_US } from '@/data/about';
 import { useAuth } from '@/hooks/use-auth';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -24,12 +41,16 @@ import { routes } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 
 const HOME_HREF = '/' as Href;
+type ThemeSwatchScheme = Exclude<AppearancePreference, 'system'>;
 
 const appearanceOptions: { value: AppearancePreference; label: string; description: string }[] = [
-  { value: 'apex', label: 'Apex', description: 'Royal blue and gold — the GRATEAPEX look.' },
+  { value: 'apex', label: 'Apex', description: 'Cobalt and deep navy with gold highlights.' },
   { value: 'light', label: 'Light', description: 'Soft off-white, easy in daylight.' },
   { value: 'dark', label: 'Dark', description: 'Layered charcoal for night study.' },
   { value: 'system', label: 'System', description: 'Follows your device: Light or Dark.' },
+  { value: 'violet', label: 'Violet', description: 'A deep violet and lavender study space.' },
+  { value: 'black', label: 'Pure black', description: 'True black surfaces with clean white accents.' },
+  { value: 'pink', label: 'Pink', description: 'A warm rose palette with soft pink highlights.' },
 ];
 
 const navigationOptions: { value: TabBarMode; label: string; description: string }[] = [
@@ -46,20 +67,34 @@ const navigationOptions: { value: TabBarMode; label: string; description: string
 ];
 
 const MAX_NAME_LENGTH = 30;
+const notificationOptions: { key: NotificationCategory; label: string; description: string }[] = [
+  { key: 'friendActivity', label: 'Friend activity', description: 'Learning milestones from friends.' },
+  { key: 'friendRequests', label: 'Friend requests', description: 'Requests to connect with classmates.' },
+  { key: 'messages', label: 'Messages', description: 'New direct messages.' },
+  { key: 'groupActivity', label: 'Group activity', description: 'Invitations and study group discussions.' },
+  { key: 'studyReminders', label: 'Study reminders', description: 'Reminders for your planned study time.' },
+  { key: 'learningReminders', label: 'Learning reminders', description: 'Lessons and reviews you planned to complete.' },
+  { key: 'goalReminders', label: 'Goal reminders', description: 'Progress toward your personal goals.' },
+  { key: 'streakReminders', label: 'Streak reminders', description: 'A reminder when your learning streak is at risk.' },
+  { key: 'announcements', label: 'Announcements', description: 'Platform news and feature updates.' },
+  { key: 'socialEngagement', label: 'Social engagement', description: 'Reactions and replies to your posts.' },
+];
 
-// Settings — quiet and grouped. Opened from the gear on Home, the rail
-// and Profile. Each group is one <SettingsSection>; future groups
-// (Notifications, Privacy, Data, About) are added once they really exist.
+// Settings are grouped into collapsible sections and opened from the gear
+// on Home, the rail and Profile.
 export default function SettingsScreen() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const { width } = useWindowDimensions();
   const desktop = isDesktopWidth(width);
   const appearance = useAppearancePreference();
+  const pageZoom = usePageZoomPreference();
+  const fontSize = useFontSizePreference();
+  const privacy = usePrivacyPreferences();
+  const pushNotificationsEnabled = usePushNotificationsPreference();
+  const notificationPreferences = useNotificationPreferences();
   const tabBarMode = useTabBarMode();
   const systemScheme = useColorScheme();
-  const avatarUrl = useAvatarUrl();
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   // Display name.
   const savedName = useDisplayName();
@@ -68,11 +103,22 @@ export default function SettingsScreen() {
 
   // Authentication session.
   const { user } = useAuth();
+  const [preferenceSyncError, setPreferenceSyncError] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [deleteText, setDeleteText] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let active = true;
+    syncSettingsFromAccount(user.id).then(() => {
+      if (active) setPreferenceSyncError(false);
+    }).catch(() => {
+      if (active) setPreferenceSyncError(true);
+    });
+    return () => { active = false; };
+  }, [user?.id]);
 
   // Refill the box whenever the saved name changes (e.g. after it loads).
   const [lastSavedName, setLastSavedName] = useState(savedName);
@@ -105,7 +151,7 @@ export default function SettingsScreen() {
   }
 
   async function handleDeleteAccount() {
-    if (deleting || deleteText.trim().toUpperCase() !== 'DELETE') return;
+    if (deleting) return;
     setDeleting(true);
     setDeleteError(null);
     const { error } = await deleteMyAccount();
@@ -123,22 +169,6 @@ export default function SettingsScreen() {
       <PageHeader title="Settings" subtitle="Your profile, appearance and navigation." style={styles.header} />
 
       <SettingsSection title="Profile">
-        <View style={styles.profileRow}>
-          <Interactive onPress={() => setPickerOpen(true)} accessibilityLabel="Change your avatar" style={({ pressed }) => [pressed && styles.pressed]}>
-            <Avatar uri={avatarUrl} name={savedName} size={64} ring="gold" />
-            <View style={styles.editBadge}>
-              <Icon name="camera" size={13} color="#0A1F5C" strokeWidth={2.2} />
-            </View>
-          </Interactive>
-          <View style={styles.flex}>
-            <Text style={styles.optionLabel}>Avatar</Text>
-            <Text style={styles.optionDescription}>Illustrated male or female avatar, or your own photo.</Text>
-            <Button label="Change avatar" size="sm" variant="secondary" onPress={() => setPickerOpen(true)} style={styles.inlineButton} />
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
         <Text style={styles.optionLabel}>Display name</Text>
         <Text style={styles.optionDescription}>{nameSaved && !nameChanged ? 'Saved.' : 'Shown on Home as "Doc. <name>".'}</Text>
         <View style={styles.nameInputRow}>
@@ -200,6 +230,45 @@ export default function SettingsScreen() {
         </View>
       </SettingsSection>
 
+      <SettingsSection title="Font size and zoom">
+        <Text style={styles.optionDescription}>Font size changes text while preserving the page layout. Zoom changes the whole web app.</Text>
+        <Text style={styles.optionLabel}>Font size</Text>
+        <View style={styles.zoomOptions}>
+          {([{ value: 'small', label: 'Small' }, { value: 'default', label: 'Default' }, { value: 'large', label: 'Large' }, { value: 'extra_large', label: 'Extra Large' }] as const).map((option) => (
+            <Interactive key={option.value} onPress={() => void setFontSizePreference(option.value as FontSizePreference)} accessibilityRole="radio" accessibilityState={{ checked: fontSize === option.value }} style={[styles.zoomOption, fontSize === option.value && styles.zoomOptionSelected]}>
+              <Text style={[styles.zoomText, fontSize === option.value && styles.zoomTextSelected]}>{option.label}</Text>
+            </Interactive>
+          ))}
+        </View>
+        {Platform.OS === 'web' ? (
+          <View style={styles.zoomOptions}>
+            {([80, 90, 100, 110, 125] as const).map((value) => (
+              <Interactive
+                key={value}
+                onPress={() => void setPageZoomPreference(value)}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: pageZoom === value }}
+                accessibilityLabel={`${value}% app zoom`}
+                style={[styles.zoomOption, pageZoom === value && styles.zoomOptionSelected]}
+              >
+                <Text style={[styles.zoomText, pageZoom === value && styles.zoomTextSelected]}>{value}%</Text>
+              </Interactive>
+            ))}
+          </View>
+        ) : null}
+        {Platform.OS !== 'web' ? <Text style={styles.optionDescription}>App zoom is currently available in the web experience. Native screens continue to respect your device accessibility settings.</Text> : null}
+      </SettingsSection>
+
+      <SettingsSection title="Privacy">
+        <Text style={styles.optionLabel}>Profile visibility</Text>
+        <Text style={styles.optionDescription}>This preference is saved to your account. Privacy filtering is being applied to social queries as that backend migration is enabled.</Text>
+        <View style={styles.zoomOptions}>{(['public', 'friends', 'private'] as const).map((value) => <Interactive key={value} onPress={() => void setPrivacyPreference('profileVisibility', value)} accessibilityRole="radio" accessibilityState={{ checked: privacy.profileVisibility === value }} style={[styles.zoomOption, privacy.profileVisibility === value && styles.zoomOptionSelected]}><Text style={[styles.zoomText, privacy.profileVisibility === value && styles.zoomTextSelected]}>{value[0].toUpperCase() + value.slice(1)}</Text></Interactive>)}</View>
+        <PrivacySwitch label="Show my activity to friends" value={privacy.activityVisible} onChange={(value) => void setPrivacyPreference('activityVisible', value)} />
+        <PrivacySwitch label="Let students find me" value={privacy.discoverable} onChange={(value) => void setPrivacyPreference('discoverable', value)} />
+        <View style={styles.optionRow}><View style={styles.flex}><Text style={styles.optionLabel}>Messages</Text><Text style={styles.optionDescription}>Choose who may start a conversation.</Text></View><View style={styles.zoomOptions}>{(['friends', 'everyone'] as const).map((value) => <Interactive key={value} onPress={() => void setPrivacyPreference('messagingPermission', value)} accessibilityRole="radio" accessibilityState={{ checked: privacy.messagingPermission === value }} style={[styles.zoomOption, privacy.messagingPermission === value && styles.zoomOptionSelected]}><Text style={[styles.zoomText, privacy.messagingPermission === value && styles.zoomTextSelected]}>{value}</Text></Interactive>)}</View></View>
+        <View style={styles.optionRow}><View style={styles.flex}><Text style={styles.optionLabel}>Friend requests</Text><Text style={styles.optionDescription}>Choose who may send you a request.</Text></View><View style={styles.zoomOptions}>{(['everyone', 'friends'] as const).map((value) => <Interactive key={value} onPress={() => void setPrivacyPreference('friendRequestPermission', value)} accessibilityRole="radio" accessibilityState={{ checked: privacy.friendRequestPermission === value }} style={[styles.zoomOption, privacy.friendRequestPermission === value && styles.zoomOptionSelected]}><Text style={[styles.zoomText, privacy.friendRequestPermission === value && styles.zoomTextSelected]}>{value}</Text></Interactive>)}</View></View>
+      </SettingsSection>
+
       <SettingsSection title="Navigation">
         {navigationOptions.map((option, index) => {
           const selected = tabBarMode === option.value;
@@ -222,6 +291,51 @@ export default function SettingsScreen() {
         })}
       </SettingsSection>
 
+      <SettingsSection title="Notifications">
+        {preferenceSyncError ? <Text style={styles.optionDescription}>Your choices are saved on this device. Account sync is unavailable until the preferences database migration is applied.</Text> : null}
+        <Text style={styles.optionDescription}>Category choices also filter the notifications shown in the app. Push delivery is not active yet.</Text>
+        <View style={styles.optionRow}>
+          <Icon name="bell" size={18} color={colors.primaryText} />
+          <View style={styles.flex}>
+            <Text style={styles.optionLabel}>Push notification preference</Text>
+            <Text style={styles.optionDescription}>Save whether you want reminders. Push delivery is not connected yet; turning this on will not send notifications today.</Text>
+          </View>
+          <Switch
+            value={pushNotificationsEnabled}
+            onValueChange={(enabled) => void setPushNotificationsPreference(enabled)}
+            trackColor={{ false: colors.track, true: colors.primary }}
+            thumbColor={colors.surface}
+            accessibilityLabel="Push notification preference"
+          />
+        </View>
+        {notificationOptions.map((option) => (
+          <View key={option.key} style={styles.optionRow}>
+            <View style={styles.flex}>
+              <Text style={styles.optionLabel}>{option.label}</Text>
+              <Text style={styles.optionDescription}>{option.description}</Text>
+            </View>
+            <Switch
+              value={notificationPreferences[option.key]}
+              onValueChange={(enabled) => void setNotificationPreference(option.key, enabled)}
+              trackColor={{ false: colors.track, true: colors.primary }}
+              thumbColor={colors.surface}
+              accessibilityLabel={`${option.label} notification preference`}
+            />
+          </View>
+        ))}
+      </SettingsSection>
+
+      <SettingsSection title="Legal">
+        <Interactive onPress={() => router.push('/terms' as Href)} accessibilityRole="link" style={styles.optionRow}>
+          <View style={styles.flex}><Text style={styles.optionLabel}>Terms & Conditions</Text><Text style={styles.optionDescription}>Read the terms that apply to your account.</Text></View>
+          <Icon name="chevronRight" size={18} color={colors.textTertiary} />
+        </Interactive>
+        <Interactive onPress={() => router.push('/privacy' as Href)} accessibilityRole="link" style={[styles.optionRow, styles.rowDivider]}>
+          <View style={styles.flex}><Text style={styles.optionLabel}>Privacy Policy</Text><Text style={styles.optionDescription}>Review how account and learning data are handled.</Text></View>
+          <Icon name="chevronRight" size={18} color={colors.textTertiary} />
+        </Interactive>
+      </SettingsSection>
+
       <SettingsSection title="Help">
         <Interactive
           onPress={() => router.push(routes.onboarding({ replay: true }))}
@@ -231,10 +345,14 @@ export default function SettingsScreen() {
           <Icon name="play" size={18} color={colors.primaryText} />
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>Replay the introduction</Text>
-            <Text style={styles.optionDescription}>The interactive tour of how GRATEAPEX works. Nothing in it affects your progress.</Text>
+            <Text style={styles.optionDescription}>The interactive tour of how GrAteApex Hub works. Nothing in it affects your progress.</Text>
           </View>
           <Icon name="chevronRight" size={18} color={colors.textTertiary} />
         </Interactive>
+      </SettingsSection>
+
+      <SettingsSection title="About us">
+        <Text style={styles.optionDescription}>{ABOUT_US}</Text>
       </SettingsSection>
 
       <SettingsSection title="Account">
@@ -259,41 +377,17 @@ export default function SettingsScreen() {
                 <Text style={styles.optionDescription}>Sign out of your account on this device.</Text>
               </View>
             </Interactive>
-            {deleteOpen ? (
-              <View style={[styles.optionRow, styles.rowDivider, styles.deleteBox]}>
-                <Text style={[styles.optionLabel, styles.signOutText]}>Delete your account permanently?</Text>
-                <Text style={styles.optionDescription}>
-                  This erases your profile, progress, XP, quiz and review history, friends and notifications. It cannot be undone. Type DELETE to confirm.
-                </Text>
-                <TextInput
-                  value={deleteText}
-                  onChangeText={setDeleteText}
-                  autoCapitalize="characters"
-                  autoCorrect={false}
-                  placeholder="DELETE"
-                  placeholderTextColor={colors.textTertiary}
-                  accessibilityLabel="Type DELETE to confirm"
-                  style={styles.deleteInput}
-                />
-                {deleteError ? <Text style={styles.signOutText}>{deleteError}</Text> : null}
-                <View style={styles.deleteActions}>
-                  <Button label="Delete my account" size="sm" onPress={() => void handleDeleteAccount()} loading={deleting} disabled={deleteText.trim().toUpperCase() !== 'DELETE' || deleting} />
-                  <Button label="Cancel" size="sm" variant="secondary" onPress={() => { setDeleteOpen(false); setDeleteText(''); setDeleteError(null); }} disabled={deleting} />
-                </View>
+            <Interactive
+              onPress={() => setDeleteOpen(true)}
+              accessibilityLabel="Delete account"
+              style={({ hovered }) => [styles.optionRow, styles.rowDivider, hovered && styles.rowHover]}
+            >
+              <Icon name="warning" size={18} color={colors.error} />
+              <View style={styles.flex}>
+                <Text style={[styles.optionLabel, styles.signOutText]}>Delete account</Text>
+                <Text style={styles.optionDescription}>Permanently erase your account and all your data.</Text>
               </View>
-            ) : (
-              <Interactive
-                onPress={() => setDeleteOpen(true)}
-                accessibilityLabel="Delete account"
-                style={({ hovered }) => [styles.optionRow, styles.rowDivider, hovered && styles.rowHover]}
-              >
-                <Icon name="warning" size={18} color={colors.error} />
-                <View style={styles.flex}>
-                  <Text style={[styles.optionLabel, styles.signOutText]}>Delete account</Text>
-                  <Text style={styles.optionDescription}>Permanently erase your account and all your data.</Text>
-                </View>
-              </Interactive>
-            )}
+            </Interactive>
           </>
         ) : (
           <Interactive onPress={() => router.push('/login')} accessibilityLabel="Sign in" style={({ hovered }) => [styles.optionRow, hovered && styles.rowHover]}>
@@ -306,15 +400,25 @@ export default function SettingsScreen() {
         )}
       </SettingsSection>
 
-      <AvatarPicker visible={pickerOpen} onClose={() => setPickerOpen(false)} />
+      <Sheet visible={deleteOpen} onClose={() => { if (!deleting) { setDeleteOpen(false); setDeleteError(null); } }} title="Delete your account?" subtitle="This action cannot be undone." footer={<View style={styles.confirmActions}><Button label="Cancel" variant="secondary" onPress={() => { setDeleteOpen(false); setDeleteError(null); }} disabled={deleting} /><Button label="Delete account" variant="danger" onPress={() => void handleDeleteAccount()} loading={deleting} /> </View>}>
+        <Text style={styles.optionDescription}>Your profile, learning progress, XP, quiz and review history, friends and notifications will be permanently erased.</Text>
+        {deleteError ? <Text style={styles.signOutText}>{deleteError}</Text> : null}
+      </Sheet>
+
     </Screen>
   );
 }
 
-// A miniature of the theme: its page light, a card and its accent.
-function ThemeSwatch({ scheme, split }: { scheme: 'apex' | 'light' | 'dark'; split?: boolean }) {
+function PrivacySwitch({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void }) {
+  const colors = useTheme();
   const styles = useThemedStyles(createStyles);
-  const render = (name: 'apex' | 'light' | 'dark') => {
+  return <View style={styles.optionRow}><Text style={[styles.optionLabel, styles.flex]}>{label}</Text><Switch value={value} onValueChange={onChange} trackColor={{ false: colors.track, true: colors.primary }} thumbColor={colors.surface} accessibilityLabel={label} /></View>;
+}
+
+// A miniature of the theme: its page light, a card and its accent.
+function ThemeSwatch({ scheme, split }: { scheme: ThemeSwatchScheme; split?: boolean }) {
+  const styles = useThemedStyles(createStyles);
+  const render = (name: ThemeSwatchScheme) => {
     const palette = Colors[name];
     const field = ATMOSPHERE[name];
     return (
@@ -343,13 +447,10 @@ function ThemeSwatch({ scheme, split }: { scheme: 'apex' | 'light' | 'dark'; spl
 
 // A titled group of settings rows.
 function SettingsSection({ title, children }: { title: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const colors = useTheme();
   const styles = useThemedStyles(createStyles);
-  return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title.toUpperCase()}</Text>
-      <View style={styles.sectionCard}>{children}</View>
-    </View>
-  );
+  return <View style={styles.section}><Interactive onPress={() => setOpen((value) => !value)} accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.sectionToggle}><View style={styles.sectionTitleRow}><Text style={styles.sectionTitle}>{title}</Text><Text style={styles.sectionCount}>{open ? 'Hide' : 'Show'}</Text><Icon name={open ? 'chevronUp' : 'chevronDown'} size={16} color={colors.textTertiary} /></View></Interactive>{open ? <View style={styles.sectionCard}>{children}</View> : null}</View>;
 }
 
 function createStyles(colors: ThemeColors) {
@@ -358,7 +459,10 @@ function createStyles(colors: ThemeColors) {
     header: { marginTop: 14 },
     pressed: { transform: [{ scale: 0.98 }] },
     section: { marginBottom: 22 },
-    sectionTitle: { ...Type.overline, color: colors.textTertiary, marginBottom: 8, marginLeft: 4 },
+    sectionToggle: { paddingVertical: 8, paddingHorizontal: 4 },
+    sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    sectionTitle: { ...Type.title3, color: colors.text, flex: 1 },
+    sectionCount: { fontSize: 12, color: colors.textTertiary },
     sectionCard: {
       backgroundColor: colors.surface,
       borderRadius: Radius.lg,
@@ -403,6 +507,11 @@ function createStyles(colors: ThemeColors) {
     },
     themeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
     themeGridDesktop: { flexWrap: 'nowrap' },
+    zoomOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+    zoomOption: { minWidth: 54, minHeight: 40, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+    zoomOptionSelected: { borderColor: colors.primary, backgroundColor: colors.primarySubtle },
+    zoomText: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },
+    zoomTextSelected: { color: colors.primaryText },
     themeCard: {
       borderRadius: 16,
       borderWidth: 2,
@@ -440,17 +549,7 @@ function createStyles(colors: ThemeColors) {
     radioSelected: { borderColor: colors.primary },
     radioDot: { width: 11, height: 11, borderRadius: 6, backgroundColor: colors.primary },
     signOutText: { color: colors.error },
-    deleteBox: { flexDirection: 'column', alignItems: 'stretch', gap: 8 },
-    deleteInput: {
-      minHeight: 42,
-      paddingHorizontal: 12,
-      borderRadius: Radius.md,
-      borderWidth: 1,
-      borderColor: colors.errorBorder,
-      color: colors.text,
-      fontSize: 15,
-    },
-    deleteActions: { flexDirection: 'row', gap: 10 },
+    confirmActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10 },
     signInText: { color: colors.primaryText },
   });
 }

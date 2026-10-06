@@ -56,7 +56,7 @@ export const AVATAR_PRESETS: readonly Preset[] = [
     hair: { base: '#161210', light: '#3D332D', dark: '#0B0908' },
     iris: '#2A1A10',
     scrub: { base: '#123A8F', dark: '#0C2966' },
-    bg: ['#4A7BEF', '#1245C4'],
+    bg: ['#54A0FF', '#0F62D4'],
   },
   {
     id: 'female-1',
@@ -90,7 +90,7 @@ export const AVATAR_PRESETS: readonly Preset[] = [
     hair: { base: '#2E4A94', light: '#4A69BB', dark: '#20356E' }, // the hijab
     iris: '#5A3A22',
     scrub: { base: '#1F8A70', dark: '#156B56' },
-    bg: ['#4A7BEF', '#1245C4'],
+    bg: ['#54A0FF', '#0F62D4'],
   },
 ];
 

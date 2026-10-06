@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
+import { supabase } from '@/lib/supabase';
 
 // Navigation preferences for this device.
 // Saved under its own key — separate from appearance (settings.ts)
@@ -72,6 +73,11 @@ function ensureLoaded() {
   return loadPromise;
 }
 
+export async function getTabBarModePreference(): Promise<TabBarMode> {
+  await ensureLoaded();
+  return settings.tabBarMode;
+}
+
 async function save() {
   try {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
@@ -97,5 +103,21 @@ export async function setTabBarMode(tabBarMode: TabBarMode) {
   settings = { ...settings, tabBarMode };
   notify();
 
+  await save();
+  try {
+    const { data } = await supabase.auth.getSession();
+    const userId = data.session?.user.id;
+    if (userId) {
+      const { error } = await supabase.from('user_preferences').upsert({ user_id: userId, navigation_auto_hide: tabBarMode === 'autoHide', updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+      if (error) console.warn('Could not sync navigation preference:', error.message);
+    }
+  } catch (error) { console.warn('Could not sync navigation preference:', error); }
+}
+
+/** Apply the account's navigation choice locally without writing it back. */
+export async function setTabBarModeFromAccount(tabBarMode: TabBarMode) {
+  await ensureLoaded();
+  settings = { ...settings, tabBarMode };
+  notify();
   await save();
 }

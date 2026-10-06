@@ -4,7 +4,7 @@ import { ScrollViewStyleReset } from 'expo-router/html';
 
 // Web metadata for every page. Expo Router renders this into the exported
 // HTML shell, so the browser tab / window title shows the product name
-// ("GRATEAPEX") instead of falling back to the development URL.
+// ("GrAteApex Hub") instead of falling back to the development URL.
 //
 // `ScrollViewStyleReset` is kept so scrolling behaves like the app.
 export default function Root({ children }: { children: React.ReactNode }) {
@@ -25,21 +25,26 @@ export default function Root({ children }: { children: React.ReactNode }) {
             and the social/preview metadata lives in the head. */}
         <meta
           name="description"
-          content="GRATEAPEX — a focused learning app for medical students. Work through lectures, test your understanding and track your progression."
+          content="GrAteApex Hub — a focused learning app for medical students. Work through lectures, test your understanding and track your progression."
         />
 
         {/* Open Graph / social preview */}
-        <meta property="og:title" content="GRATEAPEX" />
+        <meta property="og:title" content="GrAteApex Hub" />
         <meta
           property="og:description"
           content="A focused learning app for medical students."
         />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="GRATEAPEX" />
+        <meta name="twitter:title" content="GrAteApex Hub" />
+
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="GrAteApex Hub" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
         {/* Keep the theme colour in sync with the splash screen */}
-        <meta name="theme-color" content="#1245C4" />
+        <meta name="theme-color" content="#1436B8" />
 
         {/* The display font (Manrope) is added after start-up by
             lib/web-fonts.ts, so it can never block the first paint. */}
@@ -53,7 +58,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
         {/* Expo Router injects its own empty <title> ahead of anything in
             this file when statically exporting, so the browser would fall
             back to showing the URL. Setting it here guarantees the tab reads
-            "GRATEAPEX" in both development and the exported build. */}
+            "GrAteApex Hub" in both development and the exported build. */}
         <TitleSync />
         {children}
       </body>
@@ -65,7 +70,16 @@ export default function Root({ children }: { children: React.ReactNode }) {
 function TitleSync() {
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    document.title = 'GRATEAPEX';
+    document.title = 'GrAteApex Hub';
+    const onInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      (window as Window & { grateapexInstallPrompt?: Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> } }).grateapexInstallPrompt = event as Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
+      window.dispatchEvent(new Event('grateapex-install-prompt'));
+    };
+    window.addEventListener('beforeinstallprompt', onInstallPrompt);
+    if ('serviceWorker' in navigator) {
+      void navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+    }
   }, []);
 
   return null;
@@ -75,6 +89,6 @@ function TitleSync() {
 // Matches the Apex field so there is no flash of a different colour.
 const responsiveBackground = `
 body {
-  background-color: #0A2572;
+  background-color: #1436B8;
 }
 `;

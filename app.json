@@ -1,18 +1,23 @@
 {
   "expo": {
-    "name": "GRATEAPEX",
-    "slug": "GRATEAPEX",
+    "name": "GrAte APex Hub",
+    "slug": "grateapex",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/grateapex-logo.png",
+    "icon": "./assets/images/grateapex-app-icon.png",
     "scheme": "grateapex",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "com.grateapex.app",
+      "icon": "./assets/images/grateapex-app-icon.png",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.grateapex.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#1436B8",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -37,6 +42,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f0ce8287-44e7-4d85-a445-121d61ae88f4"
+      }
+    },
+    "owner": "grateapex"
   }
 }

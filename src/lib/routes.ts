@@ -34,11 +34,15 @@ function query(params: Record<string, string | number | boolean | undefined | nu
 export const routes = {
   home: () => '/' as Href,
   onboarding: (options: { replay?: boolean } = {}) => `/onboarding${query({ replay: options.replay ? 1 : undefined })}` as Href,
+  classSelection: () => '/class-selection' as Href,
   learn: () => '/learn' as Href,
+  learnEnvironment: (selection: { classId: string; semester: number }) =>
+    `/learn${query({ viewClass: selection.classId, viewSemester: selection.semester })}` as Href,
   progress: () => '/progress' as Href,
   explore: () => '/explore' as Href,
 
-  subject: (subject: SubjectId) => `/learn/${subject}` as Href,
+  subject: (subject: SubjectId, selection?: { classId: string; semester: number }) =>
+    `/learn/${subject}${query({ viewClass: selection?.classId, viewSemester: selection?.semester })}` as Href,
 
   course: (courseId: string | null | undefined) =>
     valid(courseId) ? (`/learn/course${query({ course: courseId })}` as Href) : fallback('course', '/learn'),

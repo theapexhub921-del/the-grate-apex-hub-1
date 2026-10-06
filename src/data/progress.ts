@@ -14,6 +14,8 @@ import {
 } from '@/data/learning-sync';
 import { dayKey } from '@/data/learning/time';
 import type { XpBreakdown } from '@/data/learning/xp-rules';
+import { getStreakStatus } from '@/data/progression';
+import { recordStreakActivityWithFreeze } from '@/data/community';
 
 // XP, level, streak and completed lessons — persisted with AsyncStorage
 // (account-scoped) and synced to Supabase.
@@ -296,7 +298,17 @@ export function useProgress() {
 }
 
 // Any study activity today keeps (or starts) the streak. Local dates.
-function updateStreak(now = Date.now()) {
+async function updateStreak(now = Date.now()) {
+  try {
+    const serverStreak = await recordStreakActivityWithFreeze(now);
+    if (serverStreak > 0) {
+      progress.streak = serverStreak;
+      progress.lastActivityDate = dayKey(now);
+      return;
+    }
+  } catch {
+    // Keep offline learning usable; the existing local streak calculation is the fallback.
+  }
   const today = dayKey(now);
   if (!progress.lastActivityDate) {
     progress.streak = 1;
@@ -341,7 +353,7 @@ export async function awardXp(input: {
   progress.xp = Math.max(0, progress.xp + net);
   const applied = progress.xp - before;
   progress.level = levelFor(progress.xp);
-  if (input.countsAsActivity !== false) updateStreak();
+  if (input.countsAsActivity !== false) await updateStreak();
 
   progress.awardedKeys.push(key);
   progress.xpLedger = [
@@ -366,11 +378,24 @@ export async function awardXp(input: {
 export async function markStudyActivity() {
   await ensureProgressLoaded();
   const before = progress.lastActivityDate;
-  updateStreak();
+  await updateStreak();
   if (before !== progress.lastActivityDate) {
     await saveProgress();
     notify();
   }
+}
+
+/** Continue a lapsed streak after the server has atomically charged the coin cost. */
+export async function applyStreakRecovery(at = Date.now(), restoredStreak?: number) {
+  await ensureProgressLoaded();
+  if (restoredStreak === undefined && (progress.streak <= 0 || getStreakStatus(progress.streak, progress.lastActivityDate, new Date(at)) !== 'lapsed')) {
+    throw new Error('There is no lapsed streak to recover.');
+  }
+  if (restoredStreak !== undefined) progress.streak = Math.max(1, Math.floor(restoredStreak));
+  progress.lastActivityDate = dayKey(at);
+  await saveProgress();
+  notify();
+  void saveCloudProgress([], cloudStats());
 }
 
 export async function completeLesson(lessonId: string, _subject: Subject, xp: number, at = Date.now()) {
@@ -383,7 +408,7 @@ export async function completeLesson(lessonId: string, _subject: Subject, xp: nu
   progress.lessonCompletedAt[lessonId] = at;
   progress.lessonsCompleted = progress.completedLessons.length;
   syncSubjectProgress();
-  updateStreak(at);
+  await updateStreak(at);
 
   const key = `lesson:${lessonId}`;
   if (!progress.awardedKeys.includes(key)) {

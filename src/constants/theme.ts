@@ -2,7 +2,7 @@
  * GRATEAPEX design tokens — one set of names, three palettes.
  *
  * Brand anchors (from the logo):
- * - Logo blue  #1245C4 → identity, main actions, active states
+ * - Logo blue  #1245C4 → identity; vivid cobalt → actions and active states
  * - Star gold  #FDC00A → rewards, highlights, the Apex identity
  *
  * Screens never pick a palette themselves: they read the active one with
@@ -22,11 +22,11 @@ import { Platform, type TextStyle, type ViewStyle } from 'react-native';
 
 const light = {
   // ── Brand ──────────────────────────────────────────────────────────
-  primary: '#1245C4', // filled buttons, active states, progress fills
-  primaryPressed: '#0E369B',
-  primaryText: '#1245C4', // blue text/links on the page background
-  primarySubtle: '#EAF0FC', // light blue background (selected / info)
-  primaryBorder: '#C3D3F5',
+  primary: '#1677F2', // bright, friendly cobalt for filled buttons and active states
+  primaryPressed: '#0D5FCC',
+  primaryText: '#0B57B8', // readable blue text/links on the page background
+  primarySubtle: '#EAF2FF', // light blue background (selected / info)
+  primaryBorder: '#B8D0FA',
   onPrimary: '#FFFFFF', // text/icons on primary
   onPrimaryMuted: '#BFD0F5', // quieter text on primary
   secondary: '#0B1E5B', // deep navy — strong secondary emphasis
@@ -38,10 +38,10 @@ const light = {
   accentText: '#7A5A00',
 
   // ── Surfaces ───────────────────────────────────────────────────────
-  background: '#F3F5FA', // off-white page (never pure white everywhere)
-  surface: '#FFFFFF',
+  background: '#F6F6F2', // a soft, warm paper tint
+  surface: '#FFFEFC',
   surfaceElevated: '#FFFFFF',
-  surfaceMuted: '#F2F4FA', // quiet fills inside cards
+  surfaceMuted: '#F1F3F8', // quiet fills inside cards
   surfaceSunken: '#EBEFF7', // inputs and wells
   track: '#E3E8F3', // empty part of progress bars
 
@@ -71,20 +71,20 @@ const light = {
   warningStrong: '#9A5A20',
   warningSubtle: '#FFF3E6',
   warningBorder: '#F0C9A0',
-  info: '#1245C4',
+  info: '#1677F2',
   infoSubtle: '#EAF0FC',
-  infoText: '#1245C4',
+  infoText: '#0B57B8',
 
   // ── Navigation ─────────────────────────────────────────────────────
   // Legacy bar tokens (still read by older components)
-  tabBar: '#1245C4',
-  tabBarBorder: '#1245C4',
+  tabBar: '#1677F2',
+  tabBarBorder: '#1677F2',
   tabActive: '#FFFFFF',
   tabInactive: '#AFC4F2',
   // Floating bar / rail
   navSurface: 'rgba(255, 255, 255, 0.88)',
   navBorder: 'rgba(15, 30, 80, 0.10)',
-  navActive: '#1245C4',
+  navActive: '#0B57B8',
   navActiveSubtle: '#E6EDFC',
   navInactive: '#66708A',
 
@@ -97,13 +97,13 @@ const light = {
 
   // Memory states (learning engine) — meaning, not decoration
   stateNew: '#B7C1D6',
-  stateLearning: '#1245C4',
+  stateLearning: '#1677F2',
   stateStruggling: '#C62828',
   stateRemembered: '#1F8A4C',
   stateMastered: '#D99A00',
 
   // Keyboard focus ring
-  focusRing: '#1245C4',
+  focusRing: '#3D8BFF',
 
   // Depth
   shadow: 'rgba(16, 30, 80, 0.10)',
@@ -127,11 +127,11 @@ export type ThemeColors = typeof light;
 // Layered dark neutrals + the same GRATEAPEX blue and gold.
 // Blues are brighter than the logo so they stay readable on dark.
 const dark: ThemeColors = {
-  primary: '#3B6BEA',
-  primaryPressed: '#2F5BD0',
-  primaryText: '#93B0F7',
-  primarySubtle: '#172443',
-  primaryBorder: '#2D4479',
+  primary: '#5A97FF',
+  primaryPressed: '#4783F2',
+  primaryText: '#A9C7FF',
+  primarySubtle: '#17294A',
+  primaryBorder: '#3D65A6',
   onPrimary: '#FFFFFF',
   onPrimaryMuted: '#C4D3F7',
   secondary: '#DCE4F7',
@@ -171,7 +171,7 @@ const dark: ThemeColors = {
   warningStrong: '#F4A259',
   warningSubtle: '#2F2213',
   warningBorder: '#6B4A26',
-  info: '#93B0F7',
+  info: '#A9C7FF',
   infoSubtle: '#172443',
   infoText: '#AFC4FA',
 
@@ -191,12 +191,12 @@ const dark: ThemeColors = {
   logoLetters: '#FFFFFF',
 
   stateNew: '#4A5266',
-  stateLearning: '#93B0F7',
+  stateLearning: '#A9C7FF',
   stateStruggling: '#F47272',
   stateRemembered: '#5FCB7E',
   stateMastered: '#FDC00A',
 
-  focusRing: '#93B0F7',
+  focusRing: '#8CB5FF',
 
   shadow: 'rgba(0, 0, 0, 0.45)',
   shadowStrong: 'rgba(0, 0, 0, 0.6)',
@@ -213,15 +213,15 @@ const dark: ThemeColors = {
 };
 
 // Apex (default): the GRATEAPEX logo as a theme.
-// A deep royal-blue field (lit by the atmosphere layers), deeper blue cards,
+// A bright, clear cobalt field (lit by the atmosphere layers), blue cards,
 // white text. Blue actions would disappear on a blue page, so "primary"
 // becomes the logo's star gold (with navy text on it).
 const apex: ThemeColors = {
   primary: '#FDC00A', // gold buttons, progress fills, selected states
   primaryPressed: '#E8AE00',
   primaryText: '#FFD04A', // gold highlight text (selected labels, links)
-  primarySubtle: '#163CA6', // selected backgrounds
-  primaryBorder: '#4C74DC',
+  primarySubtle: '#145FC5', // selected backgrounds
+  primaryBorder: '#62A0FF',
   onPrimary: '#0A1F5C', // navy text on gold
   onPrimaryMuted: '#3D4E80',
   secondary: '#FFFFFF',
@@ -232,12 +232,12 @@ const apex: ThemeColors = {
   accentText: '#FFD04A',
 
   // Surfaces (Apex)
-  background: '#0A2572', // deep royal field; the atmosphere lights it
-  surface: '#0F3190', // cards
-  surfaceElevated: '#143A9F', // heroes, sheets, popovers
-  surfaceMuted: '#0B2A7E', // quiet fills inside cards
-  surfaceSunken: '#08205F',
-  track: '#0A2468',
+  background: '#1436B8', // saturated cobalt from the background reference
+  surface: '#102B98', // layered blue cards
+  surfaceElevated: '#1939AA', // heroes, sheets, popovers
+  surfaceMuted: '#142F9B', // quiet fills inside cards
+  surfaceSunken: '#0D237D',
+  track: '#142984',
 
   text: '#FFFFFF',
   textSecondary: '#DCE6FD',
@@ -245,9 +245,9 @@ const apex: ThemeColors = {
   textTertiary: '#B3C5F2',
   textDisabled: '#8DA2D8',
 
-  border: '#2F57C4',
-  borderStrong: '#4A78E0',
-  divider: '#1D44AC',
+  border: '#2847B4',
+  borderStrong: '#4666D2',
+  divider: '#1B369F',
   hairline: 'rgba(170, 200, 255, 0.14)',
   highlight: 'rgba(255, 255, 255, 0.10)',
 
@@ -264,21 +264,21 @@ const apex: ThemeColors = {
   warningSubtle: '#3D3170',
   warningBorder: '#B48A58',
   info: '#8FB8FF',
-  infoSubtle: '#163CA6',
-  infoText: '#BFD5FF',
+  infoSubtle: '#172F91',
+  infoText: '#C9DCFF',
 
   // Legacy bar tokens
-  tabBar: '#081E62',
-  tabBarBorder: '#081E62',
+  tabBar: '#0B1D72',
+  tabBarBorder: '#0B1D72',
   tabActive: '#FDC00A',
   tabInactive: '#A9BEF0',
-  navSurface: 'rgba(7, 26, 86, 0.84)',
+  navSurface: 'rgba(8, 24, 103, 0.88)',
   navBorder: 'rgba(150, 185, 255, 0.18)',
   navActive: '#FDC00A',
   navActiveSubtle: 'rgba(253, 192, 10, 0.14)',
   navInactive: '#B3C5F2',
 
-  rewardBackground: '#071B5C',
+  rewardBackground: '#081D70',
   rewardMuted: '#C9D6F7',
 
   logoLetters: '#FFFFFF',
@@ -295,17 +295,44 @@ const apex: ThemeColors = {
   shadowStrong: 'rgba(2, 8, 40, 0.65)',
   overlay: 'rgba(3, 10, 40, 0.62)',
 
-  apexBackground: '#040A22',
-  apexSurface: '#0B1640',
+  apexBackground: '#061052',
+  apexSurface: '#101F70',
   apexText: '#FFFFFF',
   apexMuted: '#A9BCF0',
   apexGlow: '#FDC00A',
 
-  backgroundElement: '#0B2A7E',
-  backgroundSelected: '#0A2468',
+  backgroundElement: '#1737A8',
+  backgroundSelected: '#122D91',
 };
 
-export const Colors = { light, dark, apex };
+const violet: ThemeColors = {
+  ...dark,
+  primary: '#B794FF', primaryPressed: '#A77AF7', primaryText: '#D4BEFF', primarySubtle: '#291A45', primaryBorder: '#684C9B', onPrimary: '#190D2B',
+  accent: '#D9B8FF', accentSubtle: '#302044', accentText: '#E0C8FF',
+  background: '#160F21', surface: '#21172E', surfaceElevated: '#2B1F3B', surfaceMuted: '#281D37', surfaceSunken: '#130D1C', track: '#392A4D',
+  border: '#3B2C50', borderStrong: '#59436F', divider: '#342643', tabBar: '#21172E', tabBarBorder: '#3B2C50', tabActive: '#D4BEFF', navSurface: 'rgba(33, 23, 46, 0.9)', navBorder: 'rgba(224, 200, 255, 0.14)', navActive: '#E0C8FF', navActiveSubtle: '#302044',
+  focusRing: '#C3A0FF', shadow: 'rgba(9, 4, 16, 0.5)', shadowStrong: 'rgba(9, 4, 16, 0.68)', overlay: 'rgba(8, 4, 14, 0.7)', backgroundElement: '#281D37', backgroundSelected: '#392A4D',
+};
+
+const black: ThemeColors = {
+  ...dark,
+  primary: '#F4F4F5', primaryPressed: '#D4D4D8', primaryText: '#E4E4E7', primarySubtle: '#202024', primaryBorder: '#52525B', onPrimary: '#09090B',
+  accent: '#FFFFFF', accentSubtle: '#222225', accentText: '#FAFAFA',
+  background: '#000000', surface: '#09090B', surfaceElevated: '#111113', surfaceMuted: '#151517', surfaceSunken: '#000000', track: '#27272A',
+  border: '#27272A', borderStrong: '#3F3F46', divider: '#1C1C1F', tabBar: '#09090B', tabBarBorder: '#27272A', tabActive: '#FFFFFF', navSurface: 'rgba(9, 9, 11, 0.92)', navBorder: 'rgba(255, 255, 255, 0.1)', navActive: '#FFFFFF', navActiveSubtle: '#202024',
+  focusRing: '#D4D4D8', shadow: 'rgba(0, 0, 0, 0.65)', shadowStrong: 'rgba(0, 0, 0, 0.82)', overlay: 'rgba(0, 0, 0, 0.76)', backgroundElement: '#151517', backgroundSelected: '#27272A',
+};
+
+const pink: ThemeColors = {
+  ...dark,
+  primary: '#FF8FBC', primaryPressed: '#F06EA4', primaryText: '#FFB5D1', primarySubtle: '#421D32', primaryBorder: '#A04E76', onPrimary: '#32101F',
+  accent: '#FFC1D7', accentSubtle: '#40202F', accentText: '#FFD0E0',
+  background: '#211019', surface: '#2D1723', surfaceElevated: '#391D2C', surfaceMuted: '#351A28', surfaceSunken: '#1B0F16', track: '#4A293A',
+  border: '#4A293A', borderStrong: '#704057', divider: '#3E2331', tabBar: '#2D1723', tabBarBorder: '#4A293A', tabActive: '#FFB5D1', navSurface: 'rgba(45, 23, 35, 0.9)', navBorder: 'rgba(255, 181, 209, 0.15)', navActive: '#FFD0E0', navActiveSubtle: '#421D32',
+  focusRing: '#FF9EC4', shadow: 'rgba(18, 4, 11, 0.48)', shadowStrong: 'rgba(18, 4, 11, 0.68)', overlay: 'rgba(12, 3, 8, 0.7)', backgroundElement: '#351A28', backgroundSelected: '#4A293A',
+};
+
+export const Colors = { light, dark, apex, violet, black, pink };
 
 export type ColorSchemeName = keyof typeof Colors;
 export type ThemeColor = keyof ThemeColors;
@@ -410,7 +437,7 @@ export const WIDE_BREAKPOINT = 1280;
 // hard to read, so prose is capped narrower than dashboards.
 export const PROSE_MAX_WIDTH = 760;
 // General content column for dashboards and card grids.
-export const CONTENT_MAX_WIDTH = 1120;
+export const CONTENT_MAX_WIDTH = 1360;
 // Roomier shell for the full-bleed learning surfaces (quiz, results).
 export const LEARNING_MAX_WIDTH = 880;
 

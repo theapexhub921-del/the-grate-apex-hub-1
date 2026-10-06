@@ -14,7 +14,7 @@ import { useTheme } from '@/hooks/use-theme';
 //                 colour, like a periodic-table square.
 
 export const SUBJECT_TINTS: Record<SubjectId, { gradient: readonly [string, string]; ink: string; soft: string }> = {
-  biochemistry: { gradient: ['#3A6FEA', '#1245C4'], ink: '#FFFFFF', soft: '#3A6FEA' },
+  biochemistry: { gradient: ['#3B5BDF', '#142A98'], ink: '#FFFFFF', soft: '#91A9FF' },
   physiology: { gradient: ['#1FA08F', '#0E6159'], ink: '#FFFFFF', soft: '#1FA08F' },
   anatomy: { gradient: ['#273766', '#121B3E'], ink: '#FDC00A', soft: '#6F7FB8' },
 };

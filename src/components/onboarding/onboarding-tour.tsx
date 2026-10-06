@@ -27,12 +27,14 @@ import { cssTransition, MOTION } from '@/constants/motion';
 import { elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
 import { getNextActions } from '@/data/learning/next-action';
 import { useLearning } from '@/data/learning/use-learning';
-import { completeOnboarding } from '@/data/onboarding';
+import { acceptCurrentLegalVersions, completeOnboarding, needsLegalAcceptance } from '@/data/onboarding';
 import { useDisplayName } from '@/data/user';
 import { useAuth } from '@/hooks/use-auth';
 import { useGreeting } from '@/hooks/use-greeting';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { InlineNotice } from '@/components/ui/state-views';
+import { Interactive } from '@/components/ui/interactive';
 
 // The first-run introduction: a short, interactive walk through a
 // miniature GRATEAPEX. Skippable at any point; finishing or skipping is
@@ -64,13 +66,19 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
   const [index, setIndex] = useState(0);
   const [doneSteps, setDoneSteps] = useState<Record<string, boolean>>({});
   const [leaving, setLeaving] = useState(false);
+  const [termsChecked, setTermsChecked] = useState(false);
+  const [privacyChecked, setPrivacyChecked] = useState(false);
+  const [legalSaved, setLegalSaved] = useState(false);
+  const [legalSaving, setLegalSaving] = useState(false);
+  const [legalError, setLegalError] = useState<string | null>(null);
+  const showLegalGate = !legalSaved && needsLegalAcceptance(user);
 
   const chapters: Chapter[] = [
     {
       id: 'welcome',
       icon: 'sparkle',
       kicker: 'WELCOME',
-      title: `Welcome to GRATEAPEX, ${name}`,
+      title: `Welcome to GrAteApex Hub, ${name}`,
       body: 'A two-minute tour of how everything fits together. Try each piece as you go — nothing here touches your real progress.',
       demo: () => <WelcomeDemo />,
     },
@@ -78,10 +86,10 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       id: 'home',
       icon: 'home',
       kicker: 'HOME',
-      title: 'Your next best action',
-      body: 'Home is your command centre. It always leads with the one thing worth doing next — a lesson, a quiz, or reviews that are due.',
-      tryIt: 'Tap “Begin” on the card.',
-      demo: (props) => <HomeDemo {...props} nextTitle={nextAction?.title ?? 'Start Fatty Acid Biosynthesis'} greeting={`${greeting}, ${name}`} />,
+      title: 'Your study circle, all in one place',
+      body: 'Home is your social space. Share Stories, photos, videos and study moments, then like, comment on and reshare posts from friends.',
+      tryIt: 'See how Stories and the community feed work.',
+      demo: (props) => <HomeDemo {...props} nextTitle={nextAction?.title ?? 'Your next lesson is waiting in Learn'} greeting={`${greeting}, ${name}`} />,
     },
     {
       id: 'learn',
@@ -150,18 +158,18 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       id: 'explore',
       icon: 'explore',
       kicker: 'EXPLORE',
-      title: 'Medicine beyond the syllabus',
-      body: 'Clinical connections, what’s new in GRATEAPEX, and the full rank ladder. Optional, and never graded.',
-      tryIt: 'Open the featured story.',
+      title: 'Explore every feature',
+      body: 'Explore explains how each part of GrAteApex Hub works, shares announcements, and shows what is coming next. There is more to discover in Explore.',
+      tryIt: 'See the feature guide and updates.',
       demo: (props) => <ExploreDemo {...props} />,
     },
     {
       id: 'social',
       icon: 'social',
       kicker: 'SOCIAL',
-      title: 'Learn alongside your classmates',
-      body: 'Your study week lives here. Weekly leagues and friends open when classmates can connect.',
-      tryIt: 'See how leagues work.',
+      title: 'Connect with your classmates',
+      body: 'Find friends, start a study group, discuss assignments and message accepted friends. Live table conferences will follow when call hosting is connected.',
+      tryIt: 'See how classmates can study together.',
       demo: (props) => <SocialDemo {...props} />,
     },
     {
@@ -169,8 +177,8 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'profile',
       kicker: 'PROFILE & SETTINGS',
       title: 'Make it yours',
-      body: 'Your name, avatar and theme. These are real settings — they save now, and you can change them anytime in Profile and Settings.',
-      tryIt: 'Pick an avatar or a theme (optional).',
+      body: 'Choose a profile photo, an illustrated avatar or initials, and set your theme, text zoom, and navigation style. You can revisit your choices anytime in Profile and Settings.',
+      tryIt: 'Make the app feel like yours (optional).',
       demo: (props) => <PersonaliseDemo {...props} />,
     },
     {
@@ -178,16 +186,16 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'achievement',
       kicker: 'YOU’RE READY',
       title: `You’re all set, ${name}`,
-      body: 'Your first real lesson is waiting on Home — tap the gold button to begin. You can replay this introduction anytime from Settings.',
+      body: 'Share a study moment on Home, open Learn to start a lesson, and visit Explore for feature guides and updates. You can replay this introduction anytime from Settings.',
       demo: () => (
         <SimFrame kind="real">
           <View style={styles.finish}>
             <View style={styles.finishIcon}>
               <Icon name="play" size={22} color="#0A1F5C" filled />
             </View>
-            <Text style={styles.finishKicker}>YOUR FIRST LESSON</Text>
-            <Text style={styles.finishTitle}>{nextAction?.title ?? 'Start Fatty Acid Biosynthesis'}</Text>
-            <Text style={styles.finishText}>{nextAction?.detail ?? 'Lesson 1 · about 8 minutes'}</Text>
+            <Text style={styles.finishKicker}>READY TO BEGIN?</Text>
+            <Text style={styles.finishTitle}>Your people are on Home</Text>
+            <Text style={styles.finishText}>Stories and posts on Home · lessons and your study plan in Learn</Text>
           </View>
         </SimFrame>
       ),
@@ -203,6 +211,19 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
     setLeaving(true);
     if (user) await completeOnboarding(user.id, how);
     router.replace('/');
+  }
+
+  async function acceptLegal() {
+    if (!termsChecked || !privacyChecked || legalSaving) return;
+    setLegalSaving(true);
+    setLegalError(null);
+    const result = await acceptCurrentLegalVersions();
+    setLegalSaving(false);
+    if (result.error) {
+      setLegalError(result.error);
+      return;
+    }
+    setLegalSaved(true);
   }
 
   const next = () => (index === last ? void finish('finished') : setIndex(Math.min(last, index + 1)));
@@ -271,6 +292,35 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
     </AnimatedContent>
   );
 
+  if (showLegalGate) {
+    return (
+      <View style={styles.root}>
+        <View style={[styles.topBar, { paddingTop: insets.top + 12 }]}>
+          <View style={styles.brand}>
+            <LogoMark height={24} />
+            <Text style={styles.brandText}>WELCOME TO GrAteApex Hub</Text>
+          </View>
+        </View>
+        <ScrollView style={styles.scroll} contentContainerStyle={[styles.legalContent, desktop && styles.contentDesktop]}>
+          <View style={styles.textBlock}>
+            <Text style={styles.kicker}>BEFORE WE BEGIN</Text>
+            <Text style={styles.title} accessibilityRole="header">A clear start for your account</Text>
+            <Text style={styles.body}>Please review and explicitly accept the current Terms & Conditions and acknowledge the Privacy Policy. We record each version and the time you accept it with your account.</Text>
+          </View>
+          <View style={styles.legalChecks}>
+            <ConsentRow checked={termsChecked} onPress={() => setTermsChecked((value) => !value)} label="I have read and agree to the Terms & Conditions." onOpen={() => router.push('/terms' as never)} linkLabel="Read Terms & Conditions" />
+            <ConsentRow checked={privacyChecked} onPress={() => setPrivacyChecked((value) => !value)} label="I have read and acknowledge the Privacy Policy." onOpen={() => router.push('/privacy' as never)} linkLabel="Read Privacy Policy" />
+          </View>
+          {legalError ? <InlineNotice tone="error" title="Acceptance was not saved" message={legalError} /> : null}
+          <View style={styles.controls}>
+            <View />
+            <Button label="Accept and continue" variant="gold" size="lg" loading={legalSaving} disabled={!termsChecked || !privacyChecked} onPress={() => void acceptLegal()} />
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.root}>
       <View style={[styles.topBar, { paddingTop: insets.top + 12 }]}>
@@ -315,6 +365,14 @@ function createStyles(colors: ThemeColors) {
     segmentDone: { backgroundColor: colors.primary },
     segmentCurrent: { backgroundColor: colors.accent },
     scroll: { flex: 1 },
+    legalContent: { padding: 24, paddingBottom: 36, gap: 26, width: '100%', maxWidth: 720, alignSelf: 'center', flexGrow: 1, justifyContent: 'center' },
+    legalChecks: { gap: 12 },
+    consentRow: { gap: 8, borderWidth: 1, borderColor: colors.border, borderRadius: Radius.lg, backgroundColor: colors.surface, padding: 16 },
+    consentMain: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    consentBox: { width: 22, height: 22, borderRadius: 6, borderWidth: 1.5, borderColor: colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
+    consentBoxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
+    consentLabel: { flex: 1, ...Type.callout, color: colors.text, fontWeight: '700' },
+    consentLink: { ...Type.caption, color: colors.primaryText, fontWeight: '800', paddingLeft: 34 },
     content: { padding: 20, paddingBottom: 32, gap: 18, width: '100%', maxWidth: 640, alignSelf: 'center' },
     contentDesktop: { maxWidth: 1120, paddingTop: 48, paddingHorizontal: 40, flexGrow: 1, justifyContent: 'center' },
     columns: { flexDirection: 'row', alignItems: 'center', gap: 56 },
@@ -358,4 +416,24 @@ function createStyles(colors: ThemeColors) {
     finishText: { fontSize: 14, lineHeight: 20, color: colors.textSecondary, textAlign: 'center' },
     radius: { borderRadius: Radius.lg },
   });
+}
+
+function ConsentRow({ checked, onPress, label, onOpen, linkLabel }: {
+  checked: boolean;
+  onPress: () => void;
+  label: string;
+  onOpen: () => void;
+  linkLabel: string;
+}) {
+  const colors = useTheme();
+  const styles = useThemedStyles(createStyles);
+  return (
+    <View style={styles.consentRow}>
+      <Interactive onPress={onPress} accessibilityRole="checkbox" accessibilityState={{ checked }} accessibilityLabel={label} style={styles.consentMain}>
+        <View style={[styles.consentBox, checked && styles.consentBoxChecked]}>{checked ? <Icon name="check" size={14} color={colors.onPrimary} strokeWidth={3} /> : null}</View>
+        <Text style={styles.consentLabel}>{label}</Text>
+      </Interactive>
+      <Interactive onPress={onOpen} accessibilityRole="link" style={styles.consentLink}><Text style={styles.consentLink}>{linkLabel}</Text></Interactive>
+    </View>
+  );
 }

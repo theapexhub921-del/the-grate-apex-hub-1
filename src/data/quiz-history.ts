@@ -267,6 +267,11 @@ export async function recordQuizAttempt(
   return savedAttempt;
 }
 
+/** Await the cloud row when a follow-up server operation requires it. */
+export function syncQuizAttemptToCloud(attempt: QuizAttempt) {
+  return saveCloudQuizAttempt(toCloudAttempt(attempt));
+}
+
 let activeLearningUserId: string | null | undefined;
 subscribeToLearningAuthChanges((userId) => {
   if (activeLearningUserId === userId) return;

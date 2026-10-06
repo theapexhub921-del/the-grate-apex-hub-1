@@ -15,6 +15,11 @@ import { supabase } from '@/lib/supabase';
 
 const STORAGE_KEY = 'grateapex_onboarding';
 
+// Bump these values whenever the published legal copy changes. A learner
+// must accept the current versions again before continuing onboarding.
+export const TERMS_VERSION = '2026-10-05';
+export const PRIVACY_VERSION = '2026-10-05';
+
 // Accounts created before the introduction existed are not sent through
 // it automatically (they already know the app); they can replay it.
 export const ONBOARDING_RELEASE = Date.parse('2026-10-03T00:00:00Z');
@@ -72,10 +77,46 @@ export function useOnboardingState(): Snapshot {
 /** True when this signed-in learner should be taken through the introduction. */
 export function needsOnboarding(user: User | null | undefined, local: Records): boolean {
   if (!user) return false;
-  if (user.user_metadata?.onboarding_completed === true) return false;
-  if (local[user.id]) return false;
   const created = Date.parse(user.created_at ?? '');
-  return Number.isFinite(created) && created >= ONBOARDING_RELEASE;
+  const isNewAccount = Number.isFinite(created) && created >= ONBOARDING_RELEASE;
+  if (!isNewAccount) return false;
+  const metadata = user.user_metadata ?? {};
+  const legalAccepted = metadata.terms_accepted === true
+    && metadata.terms_version === TERMS_VERSION
+    && metadata.privacy_acknowledged === true
+    && metadata.privacy_version === PRIVACY_VERSION;
+  if (!legalAccepted) return true;
+  if (metadata.onboarding_completed === true || local[user.id]) return false;
+  return true;
+}
+
+export function needsLegalAcceptance(user: User | null | undefined): boolean {
+  if (!user) return false;
+  const created = Date.parse(user.created_at ?? '');
+  if (!Number.isFinite(created) || created < ONBOARDING_RELEASE) return false;
+  const metadata = user.user_metadata ?? {};
+  return !(metadata.terms_accepted === true && metadata.terms_version === TERMS_VERSION
+    && metadata.privacy_acknowledged === true && metadata.privacy_version === PRIVACY_VERSION);
+}
+
+/** Record explicit legal consent on the signed-in account before the tour. */
+export async function acceptCurrentLegalVersions(): Promise<{ error: string | null }> {
+  const acceptedAt = new Date().toISOString();
+  try {
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        terms_accepted: true,
+        terms_accepted_at: acceptedAt,
+        terms_version: TERMS_VERSION,
+        privacy_acknowledged: true,
+        privacy_acknowledged_at: acceptedAt,
+        privacy_version: PRIVACY_VERSION,
+      },
+    });
+    return { error: error?.message ?? null };
+  } catch (problem) {
+    return { error: problem instanceof Error ? problem.message : 'Could not save your acceptance. Please try again.' };
+  }
 }
 
 /** Marks the introduction as done (finished or skipped) for this learner. */

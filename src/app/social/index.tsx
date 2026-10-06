@@ -1,24 +1,28 @@
 import { router } from 'expo-router';
 import { useMemo } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import Svg, { Circle, Defs, LinearGradient, Line, Path, Stop } from 'react-native-svg';
 
 import { AnimatedNumber } from '@/components/ui/animated-number';
+import { Button } from '@/components/ui/button';
+import { Avatar } from '@/components/ui/avatar';
+import { IconButton } from '@/components/ui/icon-button';
+import { NotificationBell } from '@/components/notifications';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Card, PressableCard } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
 import { Columns, PageHeader, Screen } from '@/components/ui/screen';
+import { FriendBattlesCard, WeeklyChallengeCard, WeeklyLeagueCard } from '@/components/social/connect-challenges';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { addDays, startOfDay } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
-import { getRankProgress, LEAGUE_RULES } from '@/data/ranks';
 import { findLesson, getTopic } from '@/data/curriculum';
 import { type FriendActivity, personName, useSocial } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
-// Features that need classmate connections — shown honestly as upcoming.
+// The voice tutor remains the only Connect feature still in development.
 const comingSoon: { id: string; icon: IconName; title: string; description: string }[] = [
-  { id: 'leaderboard', icon: 'rank', title: 'Weekly leagues', description: 'Compete with learners at your rank.' },
-  { id: 'study-groups', icon: 'social', title: 'Study groups', description: 'Revise a topic together in small groups.' },
+  { id: 'tutor', icon: 'sparkle', title: 'AI tutor and GrAteApex Hub voice', description: 'Open the voice study preview from Learn. Lecture-file grounding is still in development.' },
 ];
 
 // Social — the academic community. Your own week is real; classmate
@@ -31,7 +35,6 @@ export default function SocialScreen() {
   const friends = social.people.filter((person) => person.relationship === 'friends');
   const requests = social.people.filter((person) => person.relationship === 'incoming');
   const { progress, attempts, now } = useLearning();
-  const rank = getRankProgress(progress.xp);
 
   const today = startOfDay(now);
   const weekStart = addDays(today, -6);
@@ -51,6 +54,13 @@ export default function SocialScreen() {
     [progress.xpLedger, today]
   );
   const maxXp = Math.max(1, ...days.map((day) => day.xp));
+  const graphPoints = days.map((day, index) => ({
+    x: 16 + index * 48,
+    y: 82 - (day.xp / maxXp) * 62,
+    isToday: day.isToday,
+  }));
+  const graphLine = createSmoothPath(graphPoints);
+  const graphArea = `${graphLine} L ${graphPoints[graphPoints.length - 1].x} 90 L ${graphPoints[0].x} 90 Z`;
 
   const week = (
     <Card style={styles.card}>
@@ -65,19 +75,35 @@ export default function SocialScreen() {
         <WeekStat icon="streak" value={progress.streak} label="streak" />
       </View>
       <View style={styles.chart} accessibilityLabel={`XP per day this week: ${days.map((day) => day.xp).join(', ')}`}>
-        {days.map((day) => (
-          <View key={day.start} style={styles.chartColumn}>
-            <View style={styles.chartTrack}>
-              <View
-                style={[
-                  styles.chartBar,
-                  { height: `${Math.max(day.xp > 0 ? 8 : 0, (day.xp / maxXp) * 100)}%`, backgroundColor: day.isToday ? colors.accent : colors.primary },
-                ]}
-              />
-            </View>
-            <Text style={[styles.chartLabel, day.isToday && styles.chartLabelToday]}>{day.label}</Text>
-          </View>
-        ))}
+        <Svg style={styles.graph} viewBox="0 0 320 100" preserveAspectRatio="none">
+          <Defs>
+            <LinearGradient id="weekXpFill" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0" stopColor={colors.primary} stopOpacity="0.22" />
+              <Stop offset="1" stopColor={colors.primary} stopOpacity="0.01" />
+            </LinearGradient>
+          </Defs>
+          {[20, 40, 60, 80].map((y) => (
+            <Line key={y} x1="16" y1={y} x2="304" y2={y} stroke={colors.divider} strokeWidth="1" strokeDasharray="3 5" />
+          ))}
+          <Path d={graphArea} fill="url(#weekXpFill)" />
+          <Path d={graphLine} fill="none" stroke={colors.primary} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          {graphPoints.map((point, index) => (
+            <Circle
+              key={days[index].start}
+              cx={point.x}
+              cy={point.y}
+              r={point.isToday ? 5 : 3.5}
+              fill={point.isToday ? colors.accent : colors.primary}
+              stroke={colors.surface}
+              strokeWidth="2"
+            />
+          ))}
+        </Svg>
+        <View style={styles.chartLabels}>
+          {days.map((day) => (
+            <Text key={day.start} style={[styles.chartLabel, day.isToday && styles.chartLabelToday]}>{day.label}</Text>
+          ))}
+        </View>
       </View>
       <Text style={styles.note}>Friends see your weekly XP and streak — never your answers or scores.</Text>
     </Card>
@@ -106,30 +132,6 @@ export default function SocialScreen() {
           {friends.length > 0 ? 'When your friends complete lessons, topics or the Apex Challenge, it shows up here.' : 'Add friends to see what they’re working on.'}
         </Text>
       )}
-    </Card>
-  );
-
-  const promote = Math.round(LEAGUE_RULES.promotionShare * 100);
-  const relegate = Math.round(LEAGUE_RULES.relegationShare * 100);
-  const leagues = (
-    <Card style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>Weekly leagues</Text>
-        <Pill label="Opening soon" />
-      </View>
-      <Text style={styles.body}>
-        Each week you compete with learners at your rank{rank ? ` — the ${rank.rank.name} league` : ''}. Ranks themselves only change with lifetime XP.
-      </Text>
-      <View style={styles.zones} accessibilityLabel={`Top ${promote}% advance, middle stay, bottom ${relegate}% move down`}>
-        <View style={[styles.zone, { flex: promote, backgroundColor: colors.success }]} />
-        <View style={[styles.zone, { flex: 100 - promote - relegate, backgroundColor: colors.track }]} />
-        <View style={[styles.zone, { flex: relegate, backgroundColor: colors.warning }]} />
-      </View>
-      <View style={styles.zoneLegend}>
-        <ZoneRule color={colors.success} text={`Top ${promote}% advance — if they also meet the next level's XP requirement`} />
-        <ZoneRule color={colors.track} text="The middle stays in the league" />
-        <ZoneRule color={colors.warning} text={`Bottom ${relegate}% move down a league`} />
-      </View>
     </Card>
   );
 
@@ -169,6 +171,23 @@ export default function SocialScreen() {
     </PressableCard>
   );
 
+  const friendStreaks = (
+    <Card style={styles.card}>
+      <View style={styles.cardHeader}>
+        <Text style={styles.cardTitle}>Friend streaks</Text>
+        <Pill label="Real stats" tone="success" />
+      </View>
+      {friends.length ? friends.map((friend) => (
+        <View key={friend.userId} style={styles.friendStreakRow}>
+          <Avatar uri={friend.avatarUrl} name={personName(friend)} size={36} ring={friend.streak ? 'gold' : 'subtle'} />
+          <Text style={styles.boardName} numberOfLines={1}>{personName(friend)}</Text>
+          <Text style={styles.boardXp}>{friend.streak ?? 0} days</Text>
+        </View>
+      )) : <Text style={styles.note}>Connect with classmates to see their current learning streaks here.</Text>}
+      <Text style={styles.note}>An earned freeze protects one missed day. A lapsed streak can be restored for 100 Apex Coins.</Text>
+    </Card>
+  );
+
   const soon = (
     <Card style={styles.card} tone="outline">
       <Text style={styles.cardTitle}>Coming next</Text>
@@ -188,19 +207,27 @@ export default function SocialScreen() {
 
   return (
     <Screen width="content">
-      <PageHeader title="Social" subtitle="Learn alongside your classmates." />
+      <PageHeader title="Connect" subtitle="Find classmates, message friends and study together." right={<><NotificationBell /><IconButton icon="mail" label="Messages" onPress={() => router.push('/social/messages' as never)} /></>} />
+      <View style={styles.quickActions}>
+        <Button label="Study groups" variant="secondary" icon={<Icon name="social" size={16} color={colors.text} />} onPress={() => router.push('/social/groups' as never)} />
+        <Button label="Table conferences" variant="secondary" icon={<Icon name="connection" size={16} color={colors.text} />} onPress={() => router.push('/social/conferences' as never)} />
+        <Button label="Find classmates" variant="secondary" icon={<Icon name="profile" size={16} color={colors.text} />} onPress={() => router.push('/social/friends')} />
+      </View>
       <Columns
         sideWidth={width >= 1180 ? 380 : 340}
         main={
           <View style={styles.column}>
             {week}
             {activityCard}
-            {leagues}
+            <WeeklyChallengeCard />
+            <WeeklyLeagueCard />
+            <FriendBattlesCard friends={friends} />
           </View>
         }
         side={
           <View style={styles.column}>
             {circle}
+            {friendStreaks}
             {soon}
           </View>
         }
@@ -223,6 +250,16 @@ function relativeDay(at: number, today: number) {
   return `${days} days ago`;
 }
 
+function createSmoothPath(points: { x: number; y: number }[]) {
+  if (points.length < 2) return '';
+  return points.reduce((path, point, index) => {
+    if (index === 0) return `M ${point.x} ${point.y}`;
+    const previous = points[index - 1];
+    const midpoint = (previous.x + point.x) / 2;
+    return `${path} C ${midpoint} ${previous.y}, ${midpoint} ${point.y}, ${point.x} ${point.y}`;
+  }, '');
+}
+
 function WeekStat({ icon, value, label }: { icon: IconName; value: number; label: string }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
@@ -232,16 +269,6 @@ function WeekStat({ icon, value, label }: { icon: IconName; value: number; label
       <Icon name={icon} size={15} color={gold ? colors.accentText : colors.primaryText} filled={gold} />
       <AnimatedNumber value={value} style={styles.weekValue} />
       <Text style={styles.weekLabel}>{label}</Text>
-    </View>
-  );
-}
-
-function ZoneRule({ color, text }: { color: string; text: string }) {
-  const styles = useThemedStyles(createStyles);
-  return (
-    <View style={styles.zoneRule}>
-      <View style={[styles.zoneDot, { backgroundColor: color }]} />
-      <Text style={styles.note}>{text}</Text>
     </View>
   );
 }
@@ -259,20 +286,18 @@ function createStyles(colors: ThemeColors) {
     weekStat: { flex: 1, minWidth: 0, gap: 4, padding: 12, borderRadius: 14, backgroundColor: colors.surfaceMuted },
     weekValue: { ...Type.numeral, fontSize: 20, color: colors.text },
     weekLabel: { fontSize: 11, fontWeight: '700', color: colors.textSecondary },
-    chart: { flexDirection: 'row', gap: 8, height: 96, alignItems: 'flex-end' },
-    chartColumn: { flex: 1, alignItems: 'center', gap: 6, height: '100%' },
-    chartTrack: { flex: 1, width: '70%', maxWidth: 28, borderRadius: 8, backgroundColor: colors.surfaceSunken, justifyContent: 'flex-end', overflow: 'hidden' },
-    chartBar: { width: '100%', borderRadius: 8 },
+    chart: { height: 116, gap: 6 },
+    graph: { width: '100%', height: 96 },
+    chartLabels: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 5 },
     chartLabel: { fontSize: 11, fontWeight: '700', color: colors.textTertiary },
     chartLabelToday: { color: colors.text },
     zones: { flexDirection: 'row', height: 12, borderRadius: 6, overflow: 'hidden', gap: 3 },
     zone: { height: '100%', borderRadius: 4 },
-    zoneLegend: { gap: 6 },
-    zoneRule: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    zoneDot: { width: 10, height: 10, borderRadius: 3 },
     circleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 14 },
     circleText: { fontSize: 14, fontWeight: '700', color: colors.text },
     soonRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    quickActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 16 },
+    friendStreakRow: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingVertical: 5 },
     soonIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: colors.primarySubtle, alignItems: 'center', justifyContent: 'center' },
     soonTitle: { fontSize: 14, fontWeight: '800', color: colors.text },
     board: { gap: 8 },

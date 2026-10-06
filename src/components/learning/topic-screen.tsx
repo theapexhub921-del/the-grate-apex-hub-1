@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { TopicGlyph } from '@/components/learning/glyphs';
+import { ClassAccessCard } from '@/components/learning/class-access-card';
 import { MemoryDistribution, MemoryStateBadge } from '@/components/learning/memory-ui';
 import { Breadcrumbs, StatTile } from '@/components/learning/nav-bits';
 import { NextActionHero } from '@/components/learning/next-action-card';
@@ -15,6 +16,7 @@ import { ErrorScreen } from '@/components/ui/state-views';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { getSourceFile } from '@/data/content-catalog';
 import { getCourseInfo, getTopic, hasLessonQuiz } from '@/data/curriculum';
+import { classLessonCompletion, firstClassOffering, firstIncompleteClassBefore, isClassAhead, readAcademicTrial, readClassSelection } from '@/data/class-curriculum';
 import { getNextActions } from '@/data/learning/next-action';
 import {
   LESSON_STATUS_LABEL,
@@ -25,10 +27,14 @@ import { describeAgo, describeDue } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
 import { getSubjectInfo } from '@/data/subjects';
 import { useThemedStyles } from '@/hooks/use-theme';
+import { useAuth } from '@/hooks/use-auth';
 import { routes } from '@/lib/routes';
 
 export function TopicScreen({ topicId }: { topicId: string | undefined }) {
   const styles = useThemedStyles(createStyles);
+  const { user } = useAuth();
+  const ownSelection = readClassSelection(user?.user_metadata);
+  const trial = readAcademicTrial(user?.user_metadata);
   const { inputs, now } = useLearning();
   const topic = getTopic(topicId);
   const progress = useMemo(() => (topic ? topicProgress(topic, inputs) : null), [topic, inputs]);
@@ -49,7 +55,14 @@ export function TopicScreen({ topicId }: { topicId: string | undefined }) {
   const lectureFiles = topic.sourceFileIds
     .map((id) => getSourceFile(id))
     .filter((file): file is NonNullable<typeof file> => Boolean(file) && !file!.duplicateOf);
-  const unresolved = (topic.discrepancies ?? []).filter((item) => item.status === 'unresolved').length;
+  const firstOffering = firstClassOffering(topic.subject);
+  const requiredLevel = ownSelection && firstOffering && isClassAhead(firstOffering, ownSelection) && !trial.active
+    ? firstIncompleteClassBefore(firstOffering, ownSelection, inputs.completedAt)
+    : null;
+  const requiredProgress = requiredLevel ? classLessonCompletion(requiredLevel.selection, inputs.completedAt) : null;
+  if (firstOffering && requiredLevel) {
+    return <Screen width="wide"><ClassAccessCard target={firstOffering} current={requiredLevel.selection} lessonsComplete={requiredProgress?.completed ?? 0} lessonsTotal={requiredProgress?.total ?? 0} trialUsed={trial.used} trialExpiresAt={trial.active ? trial.expiresAt : undefined} onStartTrial={() => router.replace(routes.learnEnvironment(firstOffering))} onBack={() => router.replace(routes.learn())} /></Screen>;
+  }  const unresolved = (topic.discrepancies ?? []).filter((item) => item.status === 'unresolved').length;
   const clarified = (topic.discrepancies ?? []).filter((item) => item.status === 'resolved').length;
 
   const side = (

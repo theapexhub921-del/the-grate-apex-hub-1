@@ -1,10 +1,12 @@
 import type { AuthError } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 import { Href, router } from 'expo-router';
 import { type ReactNode, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -51,6 +53,8 @@ type Mode = 'signIn' | 'signUp' | 'checkEmail' | 'reset' | 'newPassword';
 
 const MIN_PASSWORD = 8;
 const ONBOARDING_HREF = '/onboarding' as Href;
+const PENDING_GOOGLE_CONSENT_KEY = 'grateapex_pending_google_legal_consent';
+const LEGAL_VERSION = '2026-10-05';
 
 // Email/password sign-in using Supabase.
 // Hidden from the tab bar; open it at /login.
@@ -79,6 +83,7 @@ export default function LoginScreen() {
   // "Create account" form.
   const [fullName, setFullName] = useState('');
   const [signUpConfirm, setSignUpConfirm] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [signedUpEmail, setSignedUpEmail] = useState('');
   const [maybeExisting, setMaybeExisting] = useState(false);
   const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent'>('idle');
@@ -93,7 +98,7 @@ export default function LoginScreen() {
 
   const canSubmit = email.trim() !== '' && password !== '' && !loading;
   const canSendReset = email.trim() !== '' && !loading;
-  const canSignUp = email.trim() !== '' && password !== '' && signUpConfirm !== '' && !loading;
+  const canSignUp = email.trim() !== '' && password !== '' && signUpConfirm !== '' && acceptedTerms && !loading;
   const canUpdatePassword =
     newPassword !== '' && confirmPassword !== '' && !loading;
 
@@ -127,6 +132,7 @@ export default function LoginScreen() {
           data.subscription.unsubscribe();
         };
       }
+      void recordPendingGoogleConsent();
       return () => {
         active = false;
         data.subscription.unsubscribe();
@@ -278,13 +284,20 @@ export default function LoginScreen() {
 
     try {
       const name = fullName.trim();
+      const acceptedAt = new Date().toISOString();
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
           // The confirmation email brings the learner back to /login.
           emailRedirectTo: Linking.createURL('/login'),
-          data: name ? { display_name: name } : undefined,
+          data: {
+            ...(name ? { display_name: name } : {}),
+            terms_accepted_at: acceptedAt,
+            terms_version: LEGAL_VERSION,
+            privacy_policy_accepted_at: acceptedAt,
+            privacy_policy_version: LEGAL_VERSION,
+          },
         },
       });
 
@@ -293,7 +306,7 @@ export default function LoginScreen() {
         return;
       }
 
-      // Shown on Home as "Doc. <name>" (synced to the profile once signed in).
+      // Shown in the learner's Learn greeting (synced to the profile once signed in).
       if (name) void setDisplayName(name);
 
       if (signUpData.session) {
@@ -310,6 +323,7 @@ export default function LoginScreen() {
       setMaybeExisting(Array.isArray(signUpData.user?.identities) && signUpData.user.identities.length === 0);
       setPassword('');
       setSignUpConfirm('');
+      setAcceptedTerms(false);
       setMode('checkEmail');
     } catch {
       setError('Could not reach the server. Check your connection and try again.');
@@ -342,6 +356,13 @@ export default function LoginScreen() {
 
   async function continueWithGoogle() {
     if (googleLoading || loading) return;
+    if (mode === 'signUp' && !acceptedTerms) {
+      setError('Please read and accept the Terms of Service and Privacy Policy before creating your account.');
+      return;
+    }
+    if (mode === 'signUp') {
+      await AsyncStorage.setItem(PENDING_GOOGLE_CONSENT_KEY, JSON.stringify({ at: new Date().toISOString(), version: LEGAL_VERSION }));
+    }
     setGoogleLoading(true);
     setError(null);
     const result = await signInWithGoogle();
@@ -379,10 +400,10 @@ export default function LoginScreen() {
       : mode === 'reset'
         ? 'Enter your email and we’ll send you a reset link.'
         : mode === 'signUp'
-          ? 'Join GRATEAPEX — your lectures, learned actively.'
+          ? 'Learn alongside a supportive community. One step at a time — you’ve got this.'
           : mode === 'checkEmail'
             ? 'One more step to activate your account.'
-            : 'Welcome back to GRATEAPEX.';
+            : 'Welcome back to GrAteApex Hub. Keep going — you’ve got this.';
 
   return (
     <View style={styles.screen}>
@@ -397,8 +418,8 @@ export default function LoginScreen() {
           ) : (
             // Phones: identity first, then straight to the form.
             <View style={styles.mobileBrand}>
-              <LogoMark height={40} />
-              <Text style={styles.brandName}>GRATEAPEX</Text>
+              <LogoMark height={52} />
+              <Text style={styles.brandName}>GrAteApex Hub</Text>
             </View>
           )}
 
@@ -408,7 +429,7 @@ export default function LoginScreen() {
                 {mode === 'signIn'
                   ? 'WELCOME BACK'
                   : mode === 'signUp'
-                    ? 'NEW TO GRATEAPEX'
+                    ? 'NEW TO GrAteApex Hub'
                     : mode === 'checkEmail'
                       ? 'ALMOST THERE'
                       : mode === 'reset'
@@ -550,6 +571,24 @@ export default function LoginScreen() {
                     <Text style={styles.hintText}>Use at least {MIN_PASSWORD} characters.</Text>
                   ) : null}
 
+                  <Pressable
+                    onPress={() => setAcceptedTerms((accepted) => !accepted)}
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: acceptedTerms }}
+                    accessibilityLabel="I have read and agree to the Terms of Service and Privacy Policy"
+                    style={styles.consentRow}
+                  >
+                    <View style={[styles.consentBox, acceptedTerms && styles.consentBoxChecked]}>
+                      {acceptedTerms ? <Icon name="check" size={13} color={colors.onPrimary} strokeWidth={3} /> : null}
+                    </View>
+                    <Text style={styles.consentCopy}>
+                      I agree to the{' '}
+                      <Text style={styles.consentLink} onPress={() => router.push('/terms' as Href)}>Terms of Service</Text>
+                      {' '}and have read the{' '}
+                      <Text style={styles.consentLink} onPress={() => router.push('/privacy' as Href)}>Privacy Policy</Text>.
+                    </Text>
+                  </Pressable>
+
                   {error ? <ErrorLine message={error} styles={styles} colors={colors} /> : null}
 
                   <Button label="Create account" size="lg" fullWidth loading={loading} disabled={!canSignUp} onPress={signUp} style={styles.submit} />
@@ -574,7 +613,7 @@ export default function LoginScreen() {
                     </Text>
                   </View>
                   {maybeExisting ? (
-                    <Text style={styles.hintText}>If this email already has a GRATEAPEX account, just sign in instead.</Text>
+                    <Text style={styles.hintText}>If this email already has a GrAteApex Hub account, just sign in instead.</Text>
                   ) : null}
                   {error ? <ErrorLine message={error} styles={styles} colors={colors} /> : null}
                   <Button label="Back to Sign In" size="lg" fullWidth onPress={() => switchMode('signIn')} style={styles.submit} />
@@ -686,7 +725,7 @@ export default function LoginScreen() {
                   <GoogleButton loading={googleLoading} disabled={loading} onPress={() => void continueWithGoogle()} styles={styles} />
 
                   <View style={styles.switchRow}>
-                    <Text style={styles.switchText}>New to GRATEAPEX?</Text>
+                    <Text style={styles.switchText}>New to GrAteApex Hub?</Text>
                     <Interactive onPress={() => switchMode('signUp')} accessibilityLabel="Create an account" style={styles.switchLink}>
                       <Text style={styles.linkText}>Create an account</Text>
                     </Interactive>
@@ -703,12 +742,32 @@ export default function LoginScreen() {
                 <Text style={styles.legalText}>Terms of Service</Text>
               </Interactive>
             </View>
-            {!isWide ? <Text style={styles.mobileMotto}>Reach the Apex of GrAteness.</Text> : null}
+            {!isWide ? <Text style={styles.mobileMotto}>Learn together. You’ve got this.</Text> : null}
           </View>
         </View>
       </ScrollView>
     </View>
   );
+}
+
+async function recordPendingGoogleConsent() {
+  try {
+    const saved = await AsyncStorage.getItem(PENDING_GOOGLE_CONSENT_KEY);
+    if (!saved) return;
+    const consent = JSON.parse(saved) as { at?: string; version?: string };
+    if (!consent.at || consent.version !== LEGAL_VERSION) return;
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) return;
+    const { error } = await supabase.auth.updateUser({ data: {
+      terms_accepted_at: consent.at,
+      terms_version: consent.version,
+      privacy_policy_accepted_at: consent.at,
+      privacy_policy_version: consent.version,
+    } });
+    if (!error) await AsyncStorage.removeItem(PENDING_GOOGLE_CONSENT_KEY);
+  } catch (problem) {
+    console.warn('Could not save account legal consent:', problem);
+  }
 }
 
 type LoginStyles = ReturnType<typeof createStyles>;
@@ -723,12 +782,12 @@ function BrandPanel({ styles, colors }: { styles: LoginStyles; colors: ThemeColo
   return (
     <View style={styles.brandPanel}>
       <View style={styles.brandHeader}>
-        <LogoMark height={48} />
-        <Text style={styles.brandName}>GRATEAPEX</Text>
+        <LogoMark height={68} />
+        <Text style={styles.brandName}>GrAteApex Hub</Text>
       </View>
       <View style={styles.brandStatement}>
         <View style={styles.brandAccent} />
-        <Text style={styles.brandMotto}>Reach the Apex of GrAteness.</Text>
+        <Text style={styles.brandMotto}>Learn together. You’ve got this.</Text>
         <Text style={styles.brandSubjects}>ANATOMY · BIOCHEMISTRY · PHYSIOLOGY</Text>
       </View>
       <View style={styles.points}>
@@ -928,12 +987,12 @@ function createStyles(colors: ThemeColors) {
     container: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, paddingTop: 40, paddingBottom: 60 },
     containerWide: { paddingHorizontal: 48, paddingVertical: 48 },
     layout: { width: '100%', maxWidth: 440, alignSelf: 'center', gap: 22 },
-    layoutWide: { maxWidth: 1080, flexDirection: 'row', alignItems: 'center', gap: 64 },
+    layoutWide: { maxWidth: 1240, flexDirection: 'row', alignItems: 'center', gap: 64 },
 
     // Brand (desktop)
-    brandPanel: { flex: 1.1, minWidth: 0, gap: 36 },
-    brandHeader: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-    brandName: { fontSize: 18, fontWeight: '800', letterSpacing: 2, color: colors.logoLetters },
+    brandPanel: { flex: 1.1, minWidth: 0, gap: 36, justifyContent: 'center' },
+    brandHeader: { flexDirection: 'row', alignItems: 'center', gap: 18, alignSelf: 'flex-start' },
+    brandName: { fontSize: 26, fontWeight: '800', letterSpacing: 1.4, color: colors.logoLetters },
     brandStatement: { gap: 12 },
     brandAccent: { width: 44, height: 4, borderRadius: 2, backgroundColor: colors.accent },
     brandMotto: { ...Type.display, fontSize: 46, lineHeight: 52, color: colors.text, maxWidth: 520 },
@@ -955,7 +1014,7 @@ function createStyles(colors: ThemeColors) {
     pointBody: { fontSize: 13.5, lineHeight: 20, color: colors.textSecondary, marginTop: 2 },
 
     // Brand (phones)
-    mobileBrand: { alignItems: 'center', gap: 10, marginBottom: 4 },
+    mobileBrand: { alignItems: 'flex-start', gap: 10, marginBottom: 4, paddingLeft: 8 },
     mobileMotto: { ...Type.overline, letterSpacing: 1.6, color: colors.textTertiary, textAlign: 'center', marginTop: 18 },
 
     // Form
@@ -1017,6 +1076,11 @@ function createStyles(colors: ThemeColors) {
     successText: { flex: 1, fontSize: 13.5, lineHeight: 19, color: colors.text },
     strong: { fontWeight: '800' },
     hintText: { fontSize: 12.5, lineHeight: 18, color: colors.textSecondary, marginTop: -4, marginBottom: 10 },
+    consentRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 6, marginTop: 2 },
+    consentBox: { width: 20, height: 20, borderRadius: 6, borderWidth: 1.5, borderColor: colors.borderStrong, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
+    consentBoxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
+    consentCopy: { flex: 1, fontSize: 12.5, lineHeight: 19, color: colors.textSecondary },
+    consentLink: { color: colors.primaryText, fontWeight: '700', textDecorationLine: 'underline' },
     or: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 16 },
     orLine: { flex: 1, height: 1, backgroundColor: colors.divider },
     orText: { fontSize: 12, fontWeight: '700', color: colors.textTertiary, textTransform: 'uppercase', letterSpacing: 1 },

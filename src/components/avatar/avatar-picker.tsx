@@ -52,7 +52,7 @@ export function AvatarPicker({ visible, onClose }: { visible: boolean; onClose: 
       visible={visible}
       onClose={onClose}
       title="Your avatar"
-      subtitle="How classmates will see you across GRATEAPEX."
+      subtitle="How classmates will see you across GrAteApex Hub."
       footer={<Button label="Done" onPress={onClose} fullWidth />}
     >
       <View style={styles.preview}>

@@ -47,7 +47,7 @@ export function takeOAuthPending(): boolean {
 export function friendlyGoogleError(message: string | null | undefined) {
   const text = (message ?? '').toLowerCase();
   if (text.includes('provider is not enabled') || text.includes('unsupported provider')) {
-    return 'Google sign-in isn’t switched on for GRATEAPEX yet. Please use your email and password for now.';
+    return 'Google sign-in isn’t switched on for GrAteApex Hub yet. Please use your email and password for now.';
   }
   if (text.includes('access_denied') || text.includes('cancel')) {
     return 'Google sign-in was cancelled.';

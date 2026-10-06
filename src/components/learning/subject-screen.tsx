@@ -1,19 +1,22 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { MemoryDistribution } from '@/components/learning/memory-ui';
 import { SubjectGlyph } from '@/components/learning/glyphs';
+import { ClassAccessCard } from '@/components/learning/class-access-card';
 import { Breadcrumbs } from '@/components/learning/nav-bits';
 import { NextActionHero } from '@/components/learning/next-action-card';
 import { PendingTopicCard, TopicCard } from '@/components/learning/topic-card';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/interactive';
+import { Pill } from '@/components/ui/pill';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { Columns, Screen, SectionHeader } from '@/components/ui/screen';
 import { EmptyState } from '@/components/ui/state-views';
 import { Type, isDesktopWidth, type ThemeColors } from '@/constants/theme';
+import { classLessonCompletion, firstClassOffering, firstIncompleteClassBefore, isClassAhead, isSubjectOffered, makeClassSelection, readAcademicTrial, readClassSelection, sameClassSelection } from '@/data/class-curriculum';
 import { getCourseTopicEntries, getCoursesForSubject, getTopic } from '@/data/curriculum';
 import { contentTopics } from '@/data/content-catalog';
 import type { SubjectId } from '@/data/lesson-types';
@@ -21,19 +24,55 @@ import { getNextActions } from '@/data/learning/next-action';
 import { courseProgress, subjectProgress, type TopicProgress } from '@/data/learning/progress-model';
 import { useLearning } from '@/data/learning/use-learning';
 import { getSubjectInfo, getSubjectStatus } from '@/data/subjects';
+import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { routes } from '@/lib/routes';
+import { param, routes } from '@/lib/routes';
 
 export function SubjectScreen({ subject }: { subject: SubjectId }) {
   const styles = useThemedStyles(createStyles);
   const { width } = useWindowDimensions();
   const desktop = isDesktopWidth(width);
+  const { user } = useAuth();
+  const params = useLocalSearchParams<{ viewClass?: string | string[]; viewSemester?: string | string[] }>();
+  const ownSelection = readClassSelection(user?.user_metadata);
+  const trial = readAcademicTrial(user?.user_metadata);
+  const viewSelection = makeClassSelection(param(params.viewClass), Number(param(params.viewSemester))) ?? ownSelection;
+  const isOwnSelection = sameClassSelection(viewSelection, ownSelection);
   const { inputs, now } = useLearning();
   const info = getSubjectInfo(subject);
   const status = getSubjectStatus(subject);
   const courses = getCoursesForSubject(subject);
   const progress = useMemo(() => subjectProgress(subject, inputs), [subject, inputs]);
   const unclassified = contentTopics.filter((topic) => topic.status === 'needs-classification' && topic.subject === null);
+  const subjectOffered = Boolean(viewSelection && isSubjectOffered(viewSelection, subject));  const firstOffering = firstClassOffering(subject);
+  const requestedFuture = ownSelection && viewSelection && isClassAhead(viewSelection, ownSelection)
+    ? viewSelection
+    : ownSelection && isOwnSelection && firstOffering && isClassAhead(firstOffering, ownSelection)
+      ? firstOffering
+      : null;
+  const requiredLevel = requestedFuture && ownSelection && !trial.active
+    ? firstIncompleteClassBefore(requestedFuture, ownSelection, inputs.completedAt)
+    : null;
+  const requiredProgress = requiredLevel ? classLessonCompletion(requiredLevel.selection, inputs.completedAt) : null;
+
+  if (requiredLevel && requestedFuture) {
+    return <Screen width="wide"><ClassAccessCard target={requestedFuture} current={requiredLevel.selection} lessonsComplete={requiredProgress?.completed ?? 0} lessonsTotal={requiredProgress?.total ?? 0} trialUsed={trial.used} trialExpiresAt={trial.active ? trial.expiresAt : undefined} onStartTrial={() => router.replace(routes.learnEnvironment(requestedFuture))} onBack={() => router.replace(routes.learn())} /></Screen>;
+  }
+
+  if (!subjectOffered) {
+    return (
+      <Screen width="wide">
+        <Breadcrumbs items={[{ label: 'Learn', href: viewSelection ? routes.learnEnvironment(viewSelection) : routes.learn() }, { label: info.name }]} style={styles.crumbs} />
+        <EmptyState
+          icon="course"
+          title="Coming soon"
+          message={viewSelection ? `${info.name} is not available in ${viewSelection.classId}, Semester ${viewSelection.semester} yet.` : 'Choose your class and semester to see its curriculum.'}
+          style={styles.empty}
+        />
+        <Button label="Back to Learn" variant="secondary" onPress={() => router.replace(viewSelection ? routes.learnEnvironment(viewSelection) : routes.learn())} />
+      </Screen>
+    );
+  }
 
   return (
     <Screen width="wide">
@@ -42,6 +81,7 @@ export function SubjectScreen({ subject }: { subject: SubjectId }) {
       <View style={styles.header}>
         <SubjectGlyph subject={subject} size={58} />
         <View style={styles.headerText}>
+          {viewSelection ? <Pill label={`${isOwnSelection ? 'My class' : 'Browsing'} · ${viewSelection.classId} · Semester ${viewSelection.semester}`} tone={isOwnSelection ? 'primary' : 'neutral'} /> : null}
           <Text style={styles.title} accessibilityRole="header">
             {info.name}
           </Text>
