@@ -25,6 +25,8 @@ import { Icon, type IconName } from '@/components/ui/icon';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import { elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
+import { ABOUT_US } from '@/data/about';
+import { EXPLORE_TEAM } from '@/data/explore';
 import { getNextActions } from '@/data/learning/next-action';
 import { useLearning } from '@/data/learning/use-learning';
 import { acceptCurrentLegalVersions, completeOnboarding, needsLegalAcceptance } from '@/data/onboarding';
@@ -81,6 +83,31 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       title: `Welcome to GrAteApex Hub, ${name}`,
       body: 'A two-minute tour of how everything fits together. Try each piece as you go — nothing here touches your real progress.',
       demo: () => <WelcomeDemo />,
+    },
+    {
+      id: 'about-us',
+      icon: 'profile',
+      kicker: 'ABOUT US',
+      title: 'A learning companion for medical students',
+      body: ABOUT_US,
+      demo: () => (
+        <SimFrame>
+          <View style={styles.aboutTeam}>
+            <Text style={styles.finishKicker}>MEET THE TEAM</Text>
+            {EXPLORE_TEAM.map((member) => (
+              <View key={member.name} style={styles.aboutTeamRow}>
+                <View style={styles.aboutTeamIcon}>
+                  <Icon name={member.icon} size={16} color={colors.primaryText} />
+                </View>
+                <View style={styles.flex}>
+                  <Text style={styles.aboutTeamName}>{member.name}</Text>
+                  <Text style={styles.aboutTeamRole}>{member.role}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </SimFrame>
+      ),
     },
     {
       id: 'home',
@@ -414,6 +441,11 @@ function createStyles(colors: ThemeColors) {
     finishKicker: { ...Type.overline, color: colors.textTertiary, marginTop: 6 },
     finishTitle: { ...Type.title2, color: colors.text, textAlign: 'center' },
     finishText: { fontSize: 14, lineHeight: 20, color: colors.textSecondary, textAlign: 'center' },
+    aboutTeam: { gap: 10, paddingVertical: 4 },
+    aboutTeamRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
+    aboutTeamIcon: { width: 32, height: 32, borderRadius: 10, backgroundColor: colors.accentSubtle, alignItems: 'center', justifyContent: 'center' },
+    aboutTeamName: { ...Type.callout, color: colors.text, fontWeight: '700' },
+    aboutTeamRole: { ...Type.caption, color: colors.textSecondary, marginTop: 1 },
     radius: { borderRadius: Radius.lg },
   });
 }
