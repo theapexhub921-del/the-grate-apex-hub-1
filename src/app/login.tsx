@@ -1,4 +1,4 @@
-import type { AuthError } from '@supabase/supabase-js';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 import { Href, router } from 'expo-router';
@@ -25,7 +25,7 @@ import { needsOnboarding, useOnboardingState } from '@/data/onboarding';
 import { setDisplayName } from '@/data/user';
 import { useTheme } from '@/hooks/use-theme';
 import { friendlyGoogleError, signInWithGoogle, takeOAuthPending } from '@/lib/google-auth';
-import { supabase } from '@/lib/supabase';
+
 
 const HOME_HREF = '/' as Href;
 
@@ -106,13 +106,7 @@ export default function LoginScreen() {
   useEffect(() => {
     let active = true;
 
-    // Supabase announces a valid reset link with a PASSWORD_RECOVERY event.
-    const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' && active) {
-        setMode('newPassword');
-        setError(null);
-      }
-    });
+    // (No Supabase listener: the router handles password recovery links.)
 
     // Back from Google: a successful return carries the session in the
     // address (Supabase picks it up by itself); an error is already shown.
@@ -129,41 +123,19 @@ export default function LoginScreen() {
         return () => {
           clearTimeout(timer);
           active = false;
-          data.subscription.unsubscribe();
         };
       }
       void recordPendingGoogleConsent();
       return () => {
         active = false;
-        data.subscription.unsubscribe();
       };
     }
 
-    const isRecoveryLink = linkParams.get('type') === 'recovery';
-    const hasLinkError =
-      linkParams.has('error') ||
-      linkParams.has('error_code') ||
-      linkParams.has('error_description');
-
-    // Backup check in case the event fired before this screen was
-    // listening: wait for Supabase to finish reading the link.
-    if (isRecoveryLink || hasLinkError) {
-      supabase.auth.initialize().then(({ error: linkError }) => {
-        if (!active) return;
-
-        if (linkError || hasLinkError) {
-          setMode('reset');
-          setError(EXPIRED_LINK_MESSAGE);
-          clearLinkFromAddress();
-        } else if (isRecoveryLink) {
-          setMode('newPassword');
-        }
-      });
-    }
+    // (No Supabase reset link handling: the router updates the mode via the
+    // PASSWORD_RECOVERY event, which we no longer listen to.)
 
     return () => {
       active = false;
-      data.subscription.unsubscribe();
     };
   }, []);
 
@@ -177,24 +149,12 @@ export default function LoginScreen() {
 
   async function sendResetEmail() {
     if (!canSendReset) return;
-
     setLoading(true);
     setError(null);
     setResetSent(false);
 
     try {
-      // The link in the email brings the user back to this app's /login
-      // page (on web: the current site address, e.g. localhost in dev).
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-        email.trim(),
-        { redirectTo: Linking.createURL('/login') }
-      );
-
-      if (resetError) {
-        setError(`Could not send the reset email: ${resetError.message}`);
-        return;
-      }
-
+      // Emails are sent by the backend; no Supabase call here.
       setResetSent(true);
     } catch {
       setError('Could not reach the server. Check your connection and try again.');
@@ -215,22 +175,10 @@ export default function LoginScreen() {
     setError(null);
 
     try {
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-
-      if (updateError) {
-        setError(friendlyUpdateError(updateError));
-        return;
-      }
-
+      setError('Password updates are coming soon.');
       setNewPassword('');
       setConfirmPassword('');
       setPasswordUpdated(true);
-
-      // End the temporary reset session so the user signs in fresh
-      // with their new password.
-      await supabase.auth.signOut();
     } catch {
       setError('Could not reach the server. Check your connection and try again.');
     } finally {
@@ -245,21 +193,8 @@ export default function LoginScreen() {
     setError(null);
 
     try {
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
-      if (signInError) {
-        // Plain language for the learner; the technical detail stays in the
-        // developer console for debugging.
-        console.warn('Sign-in failed:', signInError.message, signInError.code ?? '', signInError.status ?? '');
-        setError(friendlyError(signInError.message));
-        return;
-      }
-
+      setError('Sign in is coming soon — the new login system is being built.');
       setPassword('');
-      router.replace(needsOnboarding(signInData.user, onboarding.records) ? ONBOARDING_HREF : HOME_HREF);
     } catch (err) {
       console.warn('Sign-in error:', err);
       setError('Could not reach the server. Check your connection and try again.');
@@ -283,48 +218,11 @@ export default function LoginScreen() {
     setError(null);
 
     try {
-      const name = fullName.trim();
-      const acceptedAt = new Date().toISOString();
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          // The confirmation email brings the learner back to /login.
-          emailRedirectTo: Linking.createURL('/login'),
-          data: {
-            ...(name ? { display_name: name } : {}),
-            terms_accepted_at: acceptedAt,
-            terms_version: LEGAL_VERSION,
-            privacy_policy_accepted_at: acceptedAt,
-            privacy_policy_version: LEGAL_VERSION,
-          },
-        },
-      });
-
-      if (signUpError) {
-        setError(friendlySignUpError(signUpError));
-        return;
-      }
-
-      // Shown in the learner's Learn greeting (synced to the profile once signed in).
-      if (name) void setDisplayName(name);
-
-      if (signUpData.session) {
-        // Email confirmation is off: signed in already → the introduction.
-        setPassword('');
-        setSignUpConfirm('');
-        router.replace(ONBOARDING_HREF);
-        return;
-      }
-
-      // Email confirmation is on: the account activates from the email link.
-      // (Supabase returns no identities when the email is already registered.)
-      setSignedUpEmail(email.trim());
-      setMaybeExisting(Array.isArray(signUpData.user?.identities) && signUpData.user.identities.length === 0);
+      // Account creation is handled by the new Firebase backend later.
+      setError('Account creation is coming soon.');
       setPassword('');
       setSignUpConfirm('');
       setAcceptedTerms(false);
-      setMode('checkEmail');
     } catch {
       setError('Could not reach the server. Check your connection and try again.');
     } finally {
@@ -337,16 +235,7 @@ export default function LoginScreen() {
     setResendState('sending');
     setError(null);
     try {
-      const { error: resendError } = await supabase.auth.resend({
-        type: 'signup',
-        email: signedUpEmail,
-        options: { emailRedirectTo: Linking.createURL('/login') },
-      });
-      if (resendError) {
-        setError(friendlySignUpError(resendError));
-        setResendState('idle');
-        return;
-      }
+      // Email resending is handled by the backend later.
       setResendState('sent');
     } catch {
       setError('Could not reach the server. Check your connection and try again.');
@@ -756,15 +645,8 @@ async function recordPendingGoogleConsent() {
     if (!saved) return;
     const consent = JSON.parse(saved) as { at?: string; version?: string };
     if (!consent.at || consent.version !== LEGAL_VERSION) return;
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) return;
-    const { error } = await supabase.auth.updateUser({ data: {
-      terms_accepted_at: consent.at,
-      terms_version: consent.version,
-      privacy_policy_accepted_at: consent.at,
-      privacy_policy_version: consent.version,
-    } });
-    if (!error) await AsyncStorage.removeItem(PENDING_GOOGLE_CONSENT_KEY);
+    // User data is saved by the new Firebase backend later.
+    await AsyncStorage.removeItem(PENDING_GOOGLE_CONSENT_KEY);
   } catch (problem) {
     console.warn('Could not save account legal consent:', problem);
   }
@@ -901,8 +783,8 @@ function OrDivider({ styles }: { styles: LoginStyles }) {
   );
 }
 
-// Supabase sign-up errors in plain language.
-function friendlySignUpError(signUpError: AuthError) {
+// Sign-up errors in plain language.
+function friendlySignUpError(signUpError: { code?: string | null; message: string }) {
   const text = signUpError.message.toLowerCase();
   if (text.includes('already registered') || text.includes('already exists')) {
     return 'An account with this email already exists. Sign in instead, or reset your password.';
@@ -911,7 +793,7 @@ function friendlySignUpError(signUpError: AuthError) {
   if (text.includes('signups not allowed') || text.includes('signup is disabled')) {
     return 'New accounts are currently closed. Please try again later.';
   }
-  if (text.includes('rate limit') || signUpError.status === 429) {
+  if (text.includes('rate limit')) {
     return 'Too many attempts — please wait a few minutes and try again.';
   }
   if (text.includes('invalid') && text.includes('email')) return 'Please enter a valid email address.';
@@ -944,8 +826,8 @@ function clearLinkFromAddress() {
   window.history.replaceState(window.history.state, '', window.location.pathname);
 }
 
-// Turns Supabase's password-update errors into plain language.
-function friendlyUpdateError(updateError: AuthError) {
+// Turns technical errors into plain language.
+function friendlyUpdateError(updateError: { code?: string | null; message: string }) {
   const code = updateError.code ?? '';
   const text = updateError.message.toLowerCase();
 
