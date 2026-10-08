@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Linking, Platform, Share, StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/avatar';
@@ -12,6 +12,7 @@ import { Sheet } from '@/components/ui/sheet';
 import { addPostComment, createCommunityPost, deleteCommunityPost, listCommunityFeed, listPostComments, reportCommunityContent, togglePostLike, type CommunityMedia, type CommunityPost } from '@/data/community';
 import { personName, type SocialPerson, useSocial } from '@/data/social';
 import { useDisplayName } from '@/data/user';
+import { useAuth } from '@/hooks/use-auth';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import { MentionInput } from '@/components/social/mention-input';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -23,6 +24,7 @@ export function CommunityPostsFeed() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const social = useSocial();
+  const { user } = useAuth();
   const displayName = useDisplayName();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +37,7 @@ export function CommunityPostsFeed() {
   const [comments, setComments] = useState<PostComment[]>([]);
   const [commentDraft, setCommentDraft] = useState('');
   const [notice, setNotice] = useState('');
+  const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const refresh = useCallback(async () => {
     setError(null);
@@ -50,13 +53,17 @@ export function CommunityPostsFeed() {
   useEffect(() => { queueMicrotask(() => { void refresh(); }); }, [refresh]);
 
   useEffect(() => {
+    const scheduleRefresh = () => {
+      if (refreshTimer.current) clearTimeout(refreshTimer.current);
+      refreshTimer.current = setTimeout(() => { refreshTimer.current = null; void refresh(); }, 500);
+    };
     const channel = supabase
       .channel('community-posts-feed')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_posts' }, () => { void refresh(); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_post_comments' }, () => { void refresh(); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_post_reactions' }, () => { void refresh(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_posts' }, scheduleRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_post_comments' }, scheduleRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_post_reactions' }, scheduleRefresh)
       .subscribe();
-    return () => { void supabase.removeChannel(channel); };
+    return () => { if (refreshTimer.current) clearTimeout(refreshTimer.current); void supabase.removeChannel(channel); };
   }, [refresh]);
 
   async function chooseMedia() {
@@ -147,7 +154,7 @@ export function CommunityPostsFeed() {
 
   async function deletePost(post: CommunityPost) {
     try {
-      await deleteCommunityPost(post.id, post.media_path);
+      await deleteCommunityPost(post.id);
       setPosts((all) => all.filter((item) => item.id !== post.id));
       setSelectedPost((current) => current?.id === post.id ? null : current);
       setNotice('Post and its attached upload were deleted.');
@@ -185,7 +192,7 @@ export function CommunityPostsFeed() {
       {loading ? <Text style={styles.muted}>Loading your friends’ posts…</Text> : null}
       {!loading && !posts.length && !error ? <Card style={styles.empty}><Icon name="social" size={22} color={colors.primaryText} /><Text style={styles.emptyTitle}>Your feed is ready for your circle</Text><Text style={styles.muted}>Posts from you and accepted friends will appear here.</Text></Card> : null}
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} socialPeople={social.people} ownId={social.userId} ownName={displayName || 'You'} onOpen={() => void openPost(post)} onLike={() => void like(post)} onComment={() => void openPost(post)} onReshare={() => void publish(post.id)} onShare={() => void sharePost(post)} onReport={() => void report('post', post.id)} onDelete={() => confirmDeletePost(post)} />
+        <PostCard key={post.id} post={post} socialPeople={social.people} ownId={user?.id ?? social.userId} ownName={displayName || 'You'} onOpen={() => void openPost(post)} onLike={() => void like(post)} onComment={() => void openPost(post)} onReshare={() => void publish(post.id)} onShare={() => void sharePost(post)} onReport={() => void report('post', post.id)} onDelete={() => confirmDeletePost(post)} />
       ))}
       <Sheet visible={composeOpen} onClose={() => setComposeOpen(false)} title="Create a post" subtitle="Share something with accepted friends.">
         <View style={styles.composeSheet}>
@@ -200,9 +207,9 @@ export function CommunityPostsFeed() {
       </Sheet>
       <Sheet visible={selectedPost !== null} onClose={() => setSelectedPost(null)} title="Post" subtitle={selectedPost ? `${selectedPost.comments} comments · ${selectedPost.reshares} reshares` : undefined} width={800}>
         <View style={styles.postDetailSheet}>
-          {selectedPost ? <PostCard post={selectedPost} socialPeople={social.people} ownId={social.userId} ownName={displayName || 'You'} verticalActions onOpen={() => {}} onLike={() => void like(selectedPost)} onComment={() => void openPost(selectedPost)} onReshare={() => void publish(selectedPost.id)} onShare={() => void sharePost(selectedPost)} onReport={() => void report('post', selectedPost.id)} onDelete={() => confirmDeletePost(selectedPost)} /> : null}
+          {selectedPost ? <PostCard post={selectedPost} socialPeople={social.people} ownId={user?.id ?? social.userId} ownName={displayName || 'You'} verticalActions onOpen={() => {}} onLike={() => void like(selectedPost)} onComment={() => void openPost(selectedPost)} onReshare={() => void publish(selectedPost.id)} onShare={() => void sharePost(selectedPost)} onReport={() => void report('post', selectedPost.id)} onDelete={() => confirmDeletePost(selectedPost)} /> : null}
           <View style={styles.commentSheet}>
-          {comments.map((comment) => <View key={comment.id} style={styles.comment}><View style={styles.commentHead}><Text style={styles.commentAuthor}>{comment.author_id === social.userId ? 'You' : 'Friend'}</Text><Button label="Report" variant="ghost" size="sm" onPress={() => void report('comment', comment.id)} /></View><Text style={styles.body}>{comment.body}</Text></View>)}
+          {comments.map((comment) => { const author = social.people.find((person) => person.userId === comment.author_id); return <View key={comment.id} style={styles.comment}><View style={styles.commentHead}><Text style={styles.commentAuthor}>{comment.author_id === social.userId ? 'You' : author ? personName(author) : 'Username pending'}</Text><Button label="Report" variant="ghost" size="sm" onPress={() => void report('comment', comment.id)} /></View><Text style={styles.body}>{comment.body}</Text></View>; })}
           {!comments.length ? <Text style={styles.muted}>Be the first to comment.</Text> : null}
           <MentionInput people={social.people} value={commentDraft} onChangeText={setCommentDraft} maxLength={2000} placeholder="Add a comment…" placeholderTextColor={colors.textTertiary} accessibilityLabel="Write a comment" style={styles.input} />
           <Button label="Comment" size="sm" onPress={() => void sendComment()} loading={busy} disabled={!commentDraft.trim() || busy} />
@@ -231,14 +238,14 @@ function PostCard({ post, socialPeople, ownId, ownName, onOpen, onLike, onCommen
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const friend = socialPeople.find((person) => person.userId === post.author_id);
-  const name = friend ? personName(friend) : post.author_id === ownId ? ownName : 'Friend';
+  const name = friend ? personName(friend) : post.author_id === ownId ? ownName : 'Username pending';
   const resharedFriend = socialPeople.find((person) => person.userId === post.reshared_author_id);
-  const resharedName = post.reshared_author_id === ownId ? ownName : resharedFriend ? personName(resharedFriend) : 'Friend';
+  const resharedName = post.reshared_author_id === ownId ? ownName : resharedFriend ? personName(resharedFriend) : 'Username pending';
   return (
     <Card style={[styles.postCard, verticalActions && styles.postDetailCard]}>
       <View style={verticalActions ? styles.postDetailLayout : undefined}>
       <View style={verticalActions ? styles.postDetailContent : styles.postContent}>
-      <View style={styles.postHead}><Interactive onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Open post by ${name}`} style={styles.postAuthor}><Avatar uri={friend?.avatarUrl ?? null} name={name} size={42} ring="subtle" /><View style={styles.flex}><Text style={styles.author}>{name}</Text><Text style={styles.muted}>{new Date(post.created_at).toLocaleString()}</Text></View></Interactive>{post.reshared_post_id ? <Pill label="Reposted" /> : null}{post.author_id === ownId ? <Interactive onPress={onDelete} accessibilityLabel="Delete post" style={styles.deleteAction}><Icon name="trash" size={18} color={colors.error} /></Interactive> : null}</View>
+      <View style={styles.postHead}><Interactive onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Open post by ${name}`} style={styles.postAuthor}><Avatar uri={friend?.avatarUrl ?? null} name={name} size={42} ring="subtle" /><View style={styles.flex}><Text style={styles.author}>{name}</Text><Text style={styles.muted}>{new Date(post.created_at).toLocaleString()}</Text></View></Interactive>{post.reshared_post_id ? <Pill label="Reposted" /> : null}{post.author_id === ownId ? <Button label="Delete" size="sm" variant="ghost" icon={<Icon name="trash" size={16} color={colors.error} />} onPress={onDelete} accessibilityLabel="Delete post" /> : null}</View>
       {post.body ? <Interactive onPress={onOpen} accessibilityRole="button" accessibilityLabel="Open post" style={styles.postBodyOpen}><Text style={styles.body}>{post.body}</Text></Interactive> : null}
       {post.reshared_post_id ? (
         <View style={styles.reshareBox}>
@@ -287,7 +294,6 @@ function createStyles(colors: ThemeColors) {
     postBodyOpen: { alignSelf: 'stretch' },
     postHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     postAuthor: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 10 },
-    deleteAction: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
     flex: { flex: 1, minWidth: 0 },
     author: { ...Type.headline, color: colors.text },
     body: { ...Type.callout, color: colors.text, lineHeight: 21 },

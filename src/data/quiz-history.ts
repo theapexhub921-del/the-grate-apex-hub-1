@@ -161,7 +161,7 @@ async function loadHistory() {
 
   // Start cloud hydration after local loading so a network problem never
   // prevents the quiz/history screens from using their local data.
-  void hydrateQuizHistory();
+  await hydrateQuizHistory();
 }
 
 async function saveLocalHistory() {
@@ -229,8 +229,21 @@ export function ensureQuizHistoryLoaded() {
   return ensureLoaded();
 }
 
+/** Retry merging and uploading locally saved quiz results after reconnecting. */
+export async function syncQuizHistory() {
+  await ensureLoaded();
+  await hydrateQuizHistory();
+}
+
 export function getQuizHistory() {
   return attempts;
+}
+
+export async function resetQuizHistory() {
+  await ensureQuizHistoryLoaded();
+  attempts = [];
+  notify();
+  await saveLocalHistory();
 }
 
 // Newest attempt first.

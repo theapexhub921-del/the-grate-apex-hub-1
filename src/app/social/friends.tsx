@@ -187,6 +187,7 @@ function SearchCard() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SocialPerson[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const relationshipKey = social.people.map((person) => `${person.userId}:${person.relationship}`).sort().join('|');
 
   useEffect(() => {
     const trimmed = query.trim();
@@ -209,7 +210,7 @@ function SearchCard() {
       clearTimeout(timer);
     };
     // Re-run when friendships change so result buttons stay accurate.
-  }, [query, social.people]);
+  }, [query, relationshipKey]);
 
   const showResults = query.trim().length >= 2 && results;
 
@@ -268,12 +269,12 @@ function PersonRow({ person, first, compact }: { person: SocialPerson; first: bo
 
   const detail =
     person.relationship === 'friends' && person.isOnline
-      ? 'Online now'
+      ? `${person.username ? `@${person.username} · ` : ''}Online now`
       : person.relationship === 'friends' && person.weeklyXp !== null
-        ? `${person.weeklyXp} XP this week · ${person.streak ?? 0}-day streak`
+        ? `${person.username ? `@${person.username} · ` : ''}${person.weeklyXp} XP this week · ${person.streak ?? 0}-day streak`
       : person.username
         ? `@${person.username}`
-        : 'GrAteApex Hub learner';
+        : 'Username pending';
 
   let actions: React.ReactNode = null;
   if (person.relationship === 'incoming' && person.friendshipId) {

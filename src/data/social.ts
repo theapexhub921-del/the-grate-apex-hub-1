@@ -31,6 +31,11 @@ export type SocialPerson = {
   isOnline: boolean;
 };
 
+export type SocialRecommendation = SocialPerson & {
+  sameClass: boolean;
+  sharedConnections: number;
+};
+
 export type SocialNotification = {
   id: string;
   type: 'friend_request' | 'friend_accepted' | 'mention' | 'comment' | 'message' | 'group_activity' | 'social_activity';
@@ -81,7 +86,7 @@ function setState(next: Partial<State>) {
 // ── Names and messages ──────────────────────────────────────────────
 
 export function personName(person: Pick<SocialPerson, 'displayName' | 'username'>) {
-  return person.displayName?.trim() || (person.username ? `@${person.username}` : 'GrAteApex Hub learner');
+  return person.displayName?.trim() || (person.username ? `@${person.username}` : 'Username pending');
 }
 
 const MESSAGES: Record<string, string> = {
@@ -369,7 +374,23 @@ export async function searchLearners(query: string): Promise<SocialPerson[]> {
     report('search', error);
     throw new Error(friendlySocialError(error));
   }
+  // A display name is searchable too. Do not hide someone just because
+  // they have not chosen a username yet; the result UI clearly marks that
+  // state while still showing their name.
   return ((data ?? []) as PersonRow[]).map(toPerson);
+}
+
+export async function getRecommendedFriends(): Promise<SocialRecommendation[]> {
+  const { data, error } = await supabase.rpc('grateapex_recommend_friends');
+  if (error) {
+    report('recommend friends', error);
+    throw new Error(friendlySocialError(error));
+  }
+  return ((data ?? []) as (PersonRow & { same_class?: boolean; shared_connections?: number })[]).map((row) => ({
+    ...toPerson(row),
+    sameClass: row.same_class === true,
+    sharedConnections: row.shared_connections ?? 0,
+  }));
 }
 
 // ── Social notifications in the notification centre ─────────────────

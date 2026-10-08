@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
@@ -14,13 +14,14 @@ import { useLearningEvents } from '@/data/learning/events';
 import { describeAgo, startOfDay } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
 import { type AppNotification, buildNotifications, markNotificationsRead, useReadNotifications } from '@/data/notifications';
-import { useNotificationPreferences } from '@/data/settings';
+import { useNotificationPreferences, usePushNotificationsPreference } from '@/data/settings';
 import { markSocialNotificationsRead, readSocialNotificationIds, socialAppNotifications, useSocial } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { showDeviceNotification } from '@/lib/device-notifications';
 
 type Filter = 'all' | 'learning' | 'updates';
 
-function useNotifications() {
+export function useNotifications() {
   const { memory, progress, now } = useLearning();
   const events = useLearningEvents();
   const localRead = useReadNotifications();
@@ -46,12 +47,40 @@ function useNotifications() {
   return { items, read, unread, now };
 }
 
-function preferenceFor(item: AppNotification) {
+export function preferenceFor(item: AppNotification) {
   if (item.id.startsWith('inapp:')) return 'socialEngagement' as const;
   if (item.id.startsWith('social:')) return 'friendRequests' as const;
   if (item.group === 'updates') return 'announcements' as const;
   if (item.id.startsWith('streak-')) return 'streakReminders' as const;
   return 'learningReminders' as const;
+}
+
+// Delivers an alert at device level while the installed web app is in the
+// background. Existing unread items are deliberately not replayed on launch.
+export function DeviceNotificationBridge() {
+  const { items, read } = useNotifications();
+  const enabled = usePushNotificationsPreference();
+  const seen = useRef(new Set<string>());
+  const started = useRef(false);
+
+  useEffect(() => {
+    const unread = items.filter((item) => !read.has(item.id));
+    if (!started.current) {
+      unread.forEach((item) => seen.current.add(item.id));
+      started.current = true;
+      return;
+    }
+
+    for (const item of unread) {
+      if (seen.current.has(item.id)) continue;
+      seen.current.add(item.id);
+      if (enabled && typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+        void showDeviceNotification(item);
+      }
+    }
+  }, [items, read, enabled]);
+
+  return null;
 }
 
 // Local read marks for derived notifications; social ones are also marked

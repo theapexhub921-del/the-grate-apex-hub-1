@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, type StyleProp, type TextStyle, View, type ViewStyle } from 'react-native';
 
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, Interactive } from '@/components/ui/interactive';
+import { Interactive } from '@/components/ui/interactive';
 import { Sheet } from '@/components/ui/sheet';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { readApexCoinBalance, sendApexCoins } from '@/data/apex-coins';
@@ -11,7 +11,15 @@ import { personName, type SocialPerson, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
-export function ApexCoinWalletCard() {
+export function ApexCoinWalletCard({
+  style,
+  valueStyle,
+  labelStyle,
+}: {
+  style?: StyleProp<ViewStyle>;
+  valueStyle?: StyleProp<TextStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+}) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const { user } = useAuth();
@@ -54,14 +62,19 @@ export function ApexCoinWalletCard() {
   const friends = social.people.filter((person) => person.relationship === 'friends');
   return (
     <>
-      <Card tone="reward" style={styles.card}>
-        <View style={styles.copy}>
-          <Text style={styles.label}>APEX COINS</Text>
-          <Text style={styles.balance}>{balance === null ? '—' : balance.toLocaleString()}</Text>
-          <Text style={styles.detail}>Earned coins to use and share with friends.</Text>
+      <Interactive
+        onPress={() => { setMessage(null); setOpen(true); }}
+        accessibilityLabel={`Apex Coins: ${balance === null ? 'balance loading' : balance.toLocaleString()}`}
+        accessibilityHint="Opens options to share coins with a friend."
+        style={style}
+      >
+        <View style={styles.coinIcon}>
+          <Image source={require('@/assets/images/grateapex-mark-letters.png')} style={[styles.coinLayer, { tintColor: colors.onPrimary }]} resizeMode="contain" />
+          <Image source={require('@/assets/images/grateapex-mark-gold.png')} style={styles.coinLayer} resizeMode="contain" />
         </View>
-        <Button label="Share coins" variant="secondary" size="sm" onPress={() => { setMessage(null); setOpen(true); }} disabled={!friends.length} />
-      </Card>
+        <Text style={[styles.balance, valueStyle]}>{balance === null ? '—' : balance.toLocaleString()}</Text>
+        <Text style={[styles.label, labelStyle]}>Apex Coins</Text>
+      </Interactive>
       <Sheet visible={open} onClose={() => { if (!busy) setOpen(false); }} title="Share Apex Coins" subtitle="Send earned coins to an accepted friend." footer={<View style={styles.actions}><Button label="Cancel" variant="ghost" onPress={() => setOpen(false)} disabled={busy} /><Button label="Send coins" onPress={() => void gift()} loading={busy} disabled={!recipient || !amount} /></View>}>
         {friends.length ? <View style={styles.friendList}>{friends.map((friend) => <Interactive key={friend.userId} onPress={() => { setRecipient(friend); setMessage(null); }} accessibilityRole="radio" accessibilityState={{ checked: recipient?.userId === friend.userId }} style={[styles.friend, recipient?.userId === friend.userId && styles.friendSelected]}><Avatar uri={friend.avatarUrl} name={personName(friend)} size={34} status={friend.isOnline ? 'online' : null} /><Text style={styles.friendName}>{personName(friend)}</Text></Interactive>)}</View> : <Text style={styles.detail}>Add friends in Connect before sharing coins.</Text>}
         <Text style={styles.inputLabel}>AMOUNT</Text>
@@ -75,10 +88,10 @@ export function ApexCoinWalletCard() {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-    card: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 14 },
-    copy: { flex: 1, minWidth: 0 },
-    label: { ...Type.overline, color: colors.accentText, letterSpacing: 1 },
-    balance: { ...Type.display, color: colors.text, marginTop: 3 },
+    coinIcon: { width: 20, height: 20, position: 'relative' },
+    coinLayer: { position: 'absolute', width: 20, height: 17 },
+    label: { color: colors.textSecondary },
+    balance: { ...Type.numeral, fontSize: 22, color: colors.text, marginTop: 4 },
     detail: { ...Type.caption, color: colors.textSecondary, marginTop: 3 },
     actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10 },
     friendList: { gap: 6, marginBottom: 14 },

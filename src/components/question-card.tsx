@@ -16,6 +16,7 @@ import { webStyle } from '@/components/ui/web';
 import { SPRING } from '@/constants/motion';
 import { elevation, Type, type ThemeColors } from '@/constants/theme';
 import { difficultyLabel } from '@/data/lesson-types';
+import { useAnswerBouncePreference } from '@/data/settings';
 import {
   type Answer,
   correctAnswerText,
@@ -101,6 +102,7 @@ export function QuestionCard({
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const reduceMotion = useReducedMotion();
+  const answerBounceEnabled = useAnswerBouncePreference();
   const correct = revealed && isAnswerCorrect(question, value);
   const seed = shuffleSeed ?? question.id;
 
@@ -113,8 +115,9 @@ export function QuestionCard({
       mark.value = 0;
       return;
     }
-    if (reduceMotion) {
+    if (reduceMotion || !answerBounceEnabled) {
       mark.value = 1;
+      pop.value = 1;
       return;
     }
     mark.value = 0;
@@ -122,7 +125,7 @@ export function QuestionCard({
     pop.value = correct
       ? withSequence(withTiming(1.015, { duration: 110 }), withSpring(1, { damping: 12 }))
       : withSequence(withTiming(0.995, { duration: 90 }), withTiming(1, { duration: 160 }));
-  }, [revealed, correct, reduceMotion, pop, mark]);
+  }, [revealed, correct, reduceMotion, answerBounceEnabled, pop, mark]);
   const motion = useAnimatedStyle(() => ({ transform: [{ scale: pop.value }] }));
   const markStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, mark.value * 1.4), transform: [{ scale: 0.4 + 0.6 * mark.value }] }));
 

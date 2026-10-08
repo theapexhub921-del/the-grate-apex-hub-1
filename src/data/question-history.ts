@@ -98,7 +98,7 @@ async function loadHistory() {
   loaded = true;
   notify();
 
-  void hydrateQuestionHistory();
+  await hydrateQuestionHistory();
 }
 
 async function saveLocalHistory() {
@@ -154,12 +154,26 @@ export function ensureQuestionHistoryLoaded() {
   return loadPromise;
 }
 
+/** Retry merging and uploading locally saved answers after reconnecting. */
+export async function syncQuestionHistory() {
+  await ensureQuestionHistoryLoaded();
+  await hydrateQuestionHistory();
+}
+
 export function isQuestionHistoryLoaded() {
   return loaded;
 }
 
 export function getQuestionHistory() {
   return attempts;
+}
+
+export async function resetQuestionHistory() {
+  await ensureQuestionHistoryLoaded();
+  attempts = [];
+  loaded = true;
+  notify();
+  await saveLocalHistory();
 }
 
 export function useQuestionHistory() {

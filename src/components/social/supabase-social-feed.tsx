@@ -196,7 +196,7 @@ export function SupabaseSocialFeed({ children }: { children?: ReactNode }) {
           </Pressable>
           {friendStoryGroups.map(({ authorId, items }) => {
             const friend = social.people.find((person) => person.userId === authorId);
-            const name = friend ? personName(friend) : 'Friend';
+            const name = friend ? personName(friend) : 'Username pending';
             return (
               <Pressable key={authorId} onPress={() => openStorySequence(items)} accessibilityRole="button" accessibilityLabel={`View ${items.length} ${items.length === 1 ? 'story' : 'stories'} from ${name}`} style={styles.friendItem}>
                 <StoryAvatar uri={friend?.avatarUrl ?? null} name={name} hasStory />
@@ -303,7 +303,7 @@ export function SupabaseSocialFeed({ children }: { children?: ReactNode }) {
 function storyAuthorName(story: CommunityStory, people: readonly SocialPerson[], userId: string | null, displayName: string | null) {
   const friend = people.find((person) => person.userId === story.author_id);
   if (friend) return personName(friend);
-  return story.author_id === userId ? displayName || 'Your story' : 'Friend';
+  return story.author_id === userId ? displayName || 'Your story' : 'Username pending';
 }
 
 function StoryAvatar({ uri, name, hasStory }: { uri?: string | null; name: string; hasStory: boolean }) {

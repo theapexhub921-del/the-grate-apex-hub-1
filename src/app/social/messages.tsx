@@ -34,7 +34,7 @@ export default function MessagesScreen() {
           <Avatar uri={friend.avatarUrl} name={personName(friend)} size={46} ring="subtle" />
           <View style={styles.friendCopy}>
             <Text style={styles.name}>{personName(friend)}</Text>
-            <Text style={styles.detail}>{friend.username ? `@${friend.username}` : 'Friend'}</Text>
+            <Text style={styles.detail}>{friend.username ? `@${friend.username}` : 'Username pending'}</Text>
           </View>
           <Text style={[styles.open, { color: colors.primaryText }]}>Message ›</Text>
         </Interactive>

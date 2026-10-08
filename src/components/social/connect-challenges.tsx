@@ -86,7 +86,7 @@ export function WeeklyLeagueCard() {
       {me && me.league_size < 5 ? <Text style={styles.muted}>Standings are live. Promotion and relegation start when the league has at least five learners.</Text> : null}
       {shown.map((entry) => {
         const friend = social.people.find((person) => person.userId === entry.user_id);
-        const name = entry.is_viewer ? 'You' : friend ? personName(friend) : entry.display_name?.trim() || (entry.username ? `@${entry.username}` : 'Learner');
+        const name = entry.is_viewer ? 'You' : friend ? personName(friend) : entry.display_name?.trim() || (entry.username ? `@${entry.username}` : 'Username pending');
         return (
           <View key={entry.user_id} style={[styles.leagueRow, entry.is_viewer && styles.leagueMe]}>
           <Text style={styles.place}>{entry.league_position}</Text>
@@ -176,7 +176,7 @@ export function FriendBattlesCard({ friends }: { friends: readonly SocialPerson[
           const incoming = challenge.opponent_id === currentUserId;
           const otherId = incoming ? challenge.challenger_id : challenge.opponent_id;
           const friend = friends.find((person) => person.userId === otherId);
-          const friendLabel = friend ? personName(friend) : 'Friend';
+          const friendLabel = friend ? personName(friend) : 'Username pending';
           const topic = challenge.topic_id ? getTopic(challenge.topic_id) : null;
           const score = results[challenge.id];
           const mine = incoming ? score?.opponent : score?.challenger;

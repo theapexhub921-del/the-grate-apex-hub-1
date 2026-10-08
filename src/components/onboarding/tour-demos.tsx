@@ -18,10 +18,12 @@ import { getFeaturedItem } from '@/data/explore';
 import { APEX } from '@/data/learning/apex';
 import { XP_RULES } from '@/data/learning/xp-rules';
 import type { Answer } from '@/data/questions';
-import { APPEARANCE_OPTIONS, setAppearancePreference, useAppearancePreference } from '@/data/settings';
+import { APPEARANCE_OPTIONS, setAppearancePreference, setPushNotificationsPreference, useAppearancePreference } from '@/data/settings';
+import { setUsername, useSocial } from '@/data/social';
 import { subjects } from '@/data/subjects';
 import { setDisplayName, useDisplayName } from '@/data/user';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { enableDeviceNotifications } from '@/lib/device-notifications';
 
 // Miniature, working pieces of GRATEAPEX for the first-run introduction.
 // Everything here is PRACTICE: answers, XP and schedules shown are examples
@@ -33,19 +35,49 @@ export type DemoProps = { done: boolean; onDone: () => void };
 const FIRST_TOPIC_ID = 'fatty-acid-biosynthesis';
 
 // The frame every demo sits in, with an honest label.
-export function SimFrame({ children, kind = 'demo', dark = false }: { children: ReactNode; kind?: 'demo' | 'real'; dark?: boolean }) {
+export function SimFrame({ children, kind = 'demo', dark = false }: { children: ReactNode; kind?: 'demo' | 'real' | 'guide'; dark?: boolean }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  const real = kind === 'real';
+  const guide = kind === 'guide';
   return (
     <View style={[styles.frame, dark && styles.frameDark, elevation(colors, 3)]}>
-      <View style={[styles.frameLabel, kind === 'real' ? styles.frameLabelReal : null]}>
-        <Icon name={kind === 'real' ? 'check' : 'sparkle'} size={12} color={kind === 'real' ? colors.successText : colors.accentText} strokeWidth={2.4} />
-        <Text style={[styles.frameLabelText, kind === 'real' ? styles.frameLabelTextReal : null]}>
-          {kind === 'real' ? 'REAL SETTINGS · SAVED TO YOUR PROFILE' : 'TUTORIAL · PRACTICE ONLY — NOT RECORDED'}
+      <View style={[styles.frameLabel, (real || guide) ? styles.frameLabelReal : null]}>
+        <Icon name={real ? 'check' : guide ? 'share' : 'sparkle'} size={12} color={real || guide ? colors.successText : colors.accentText} strokeWidth={2.4} />
+        <Text style={[styles.frameLabelText, (real || guide) ? styles.frameLabelTextReal : null]}>
+          {real ? 'REAL SETTINGS · SAVED TO YOUR PROFILE' : guide ? 'DEVICE GUIDE · INSTALL FOR QUICK ACCESS' : 'TUTORIAL · PRACTICE ONLY — NOT RECORDED'}
         </Text>
       </View>
       <View style={styles.frameBody}>{children}</View>
     </View>
+  );
+}
+
+export function InstallGuideDemo() {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  const steps: { icon: IconName; title: string; detail: string }[] = [
+    { icon: 'share', title: 'iPhone or iPad', detail: 'Safari → Share → Add to Home Screen.' },
+    { icon: 'home', title: 'Android phone or tablet', detail: 'Chrome → ⋮ → Install app or Add to Home screen.' },
+    { icon: 'profile', title: 'Desktop or laptop', detail: 'Chrome/Edge: use the install icon or browser menu. Mac Safari: File → Add to Dock.' },
+  ];
+  return (
+    <SimFrame kind="guide">
+      <View style={styles.installGuide}>
+        {steps.map((step) => (
+          <View key={step.title} style={styles.welcomeRow}>
+            <View style={styles.welcomeIcon}>
+              <Icon name={step.icon} size={19} color={colors.accentText} />
+            </View>
+            <View style={styles.flex}>
+              <Text style={styles.welcomeTitle}>{step.title}</Text>
+              <Text style={styles.muted}>{step.detail}</Text>
+            </View>
+          </View>
+        ))}
+        <Text style={styles.muted}>Sign in on each device to sync your account and progress. Find these steps again in Settings → Install on your devices.</Text>
+      </View>
+    </SimFrame>
   );
 }
 
@@ -608,6 +640,88 @@ export function PersonaliseDemo({ onDone }: DemoProps) {
   );
 }
 
+// ── Username (REAL account setting) ───────────────────────────────────
+export function UsernameDemo({ done, onDone }: DemoProps) {
+  const styles = useThemedStyles(createStyles);
+  const social = useSocial();
+  const [value, setValue] = useState(social.username ?? '');
+  const [saved, setSaved] = useState(Boolean(social.username));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save() {
+    if (value.length < 3 || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await setUsername(value);
+      setSaved(true);
+      onDone();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not save your username. Please try again.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <SimFrame kind="real">
+      <Text style={styles.levelLabel}>HOW CLASSMATES FIND YOU</Text>
+      <View style={styles.nameRow}>
+        <TextInput
+          value={value}
+          onChangeText={(text) => { setValue(text.toLowerCase().replace(/[^a-z0-9_]/g, '')); setSaved(false); }}
+          onSubmitEditing={() => void save()}
+          placeholder="e.g. doc_amara"
+          autoCapitalize="none"
+          autoCorrect={false}
+          maxLength={20}
+          style={styles.nameInput}
+          accessibilityLabel="Choose your username"
+        />
+        <Button label={saved ? 'Saved' : 'Save'} size="sm" onPress={() => void save()} loading={busy} disabled={value.length < 3 || busy} />
+      </View>
+      <Text style={styles.muted}>Your username appears beside your name when classmates search, add or study with you. Use 3–20 lowercase letters, numbers or underscores.</Text>
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      <DoneNote show={done || saved} text={`Saved as @${social.username ?? value}. You can change this later in Connect.`} />
+    </SimFrame>
+  );
+}
+
+// ── Device notifications (REAL preference) ─────────────────────────────
+export function NotificationsDemo({ done, onDone }: DemoProps) {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  async function enable() {
+    if (busy) return;
+    setBusy(true);
+    const result = await enableDeviceNotifications();
+    await setPushNotificationsPreference(result.granted);
+    setMessage(result.granted ? 'Device notifications are on. A test notification has been sent.' : result.message ?? 'Notifications were not enabled.');
+    if (result.granted) onDone();
+    setBusy(false);
+  }
+
+  return (
+    <SimFrame kind="real">
+      <View style={styles.row}>
+        <View style={styles.welcomeIcon}><Icon name="bell" size={20} color={colors.primaryText} /></View>
+        <View style={styles.flex}>
+          <Text style={styles.rowTitle}>Stay updated outside the app</Text>
+          <Text style={styles.rowMeta}>Allow alerts for friend requests, study reminders and the notification categories you choose.</Text>
+        </View>
+      </View>
+      <Button label="Allow notifications" variant="secondary" size="sm" onPress={() => void enable()} loading={busy} />
+      {message ? <Text style={styles.muted}>{message}</Text> : null}
+      <Text style={styles.muted}>You can change this at any time in Settings → Notifications.</Text>
+      <DoneNote show={done} text="You will receive selected updates as device alerts while the installed web app is in the background." />
+    </SimFrame>
+  );
+}
+
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     flex: { flex: 1, minWidth: 0 },
@@ -651,6 +765,7 @@ function createStyles(colors: ThemeColors) {
     doneText: { flex: 1, fontSize: 12.5, lineHeight: 18, color: colors.text },
 
     welcome: { gap: 14 },
+    installGuide: { gap: 16 },
     welcomeRow: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
     welcomeIcon: { width: 40, height: 40, borderRadius: 13, backgroundColor: colors.accentSubtle, alignItems: 'center', justifyContent: 'center' },
     welcomeTitle: { ...Type.headline, color: colors.text },
@@ -745,6 +860,7 @@ function createStyles(colors: ThemeColors) {
       color: colors.text,
     },
     savedText: { fontSize: 12.5, fontWeight: '800', color: colors.successText },
+    errorText: { fontSize: 12.5, lineHeight: 18, color: colors.error },
     themeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     planDays: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
     planDay: { minWidth: 43, paddingVertical: 9, paddingHorizontal: 8, alignItems: 'center', borderRadius: 11, backgroundColor: colors.surfaceMuted, borderWidth: 1, borderColor: colors.border },

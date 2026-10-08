@@ -7,6 +7,7 @@ import { Platform, View } from 'react-native';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
 import { LearningSync } from '@/components/learning/learning-sync';
+import { DeviceNotificationBridge } from '@/components/notifications';
 import { PageTitle } from '@/components/page-title';
 import { needsOnboarding, useOnboardingState } from '@/data/onboarding';
 import { useFontSizePreference, usePageZoomPreference } from '@/data/settings';
@@ -145,6 +146,7 @@ export default function TabLayout() {
             <AppGuard>
               <AppTabs />
               <LearningSync />
+              <DeviceNotificationBridge />
             </AppGuard>
           ) : (
             // Pre-rendered web HTML: just the shell and the page title, so

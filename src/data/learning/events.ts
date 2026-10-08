@@ -82,18 +82,17 @@ async function load() {
   }
 
   const remote = await loadCloudLearningEvents();
-  if (remote.length > 0) {
-    const byId = new Map(events.map((event) => [event.id, event]));
-    for (const event of remote) {
-      if (!byId.has(event.id)) byId.set(event.id, { ...event, type: event.type as LearningEventType });
-    }
-    const localIds = new Set(events.map((event) => event.id));
-    const remoteIds = new Set(remote.map((event) => event.id));
-    events = Array.from(byId.values()).sort((a, b) => b.at - a.at).slice(0, LIMIT);
-    notify();
-    await save();
-    void saveCloudLearningEvents(events.filter((event) => localIds.has(event.id) && !remoteIds.has(event.id)));
+  const localIds = new Set(events.map((event) => event.id));
+  const remoteIds = new Set(remote.map((event) => event.id));
+  const byId = new Map(events.map((event) => [event.id, event]));
+  for (const event of remote) {
+    if (!byId.has(event.id)) byId.set(event.id, { ...event, type: event.type as LearningEventType });
   }
+  events = Array.from(byId.values()).sort((a, b) => b.at - a.at).slice(0, LIMIT);
+  notify();
+  await save();
+  // Also retry local-only events when the cloud has no rows yet.
+  await saveCloudLearningEvents(events.filter((event) => localIds.has(event.id) && !remoteIds.has(event.id)));
 }
 
 export function ensureEventsLoaded() {
@@ -101,8 +100,21 @@ export function ensureEventsLoaded() {
   return loadPromise;
 }
 
+/** Retry uploading this device's learning timeline after reconnecting. */
+export async function syncLearningEvents() {
+  await ensureEventsLoaded();
+  await load();
+}
+
 export function getLearningEvents() {
   return events;
+}
+
+export async function resetLearningEvents() {
+  await ensureEventsLoaded();
+  events = [];
+  notify();
+  await save();
 }
 
 export function useLearningEvents() {

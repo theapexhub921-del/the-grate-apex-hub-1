@@ -7,6 +7,7 @@ import {
   saveCloudReviewItems,
   subscribeToLearningAuthChanges,
   type CloudReviewItem,
+  writeLearningCache,
 } from '@/data/learning-sync';
 import type { LegacySchedule, MemoryModel } from '@/data/learning/memory';
 
@@ -94,8 +95,36 @@ export function ensureLegacyScheduleLoaded() {
   return loadPromise;
 }
 
+/** Retry saving locally cached review schedules after reconnecting. */
+export async function syncLegacyReviewSchedule() {
+  await ensureLegacyScheduleLoaded();
+  const requestedUserId = await getAuthenticatedLearningUserId();
+  if (!requestedUserId || legacy.length === 0) return;
+  const rows = legacy.map((item): CloudReviewItem => ({
+    lessonId: item.lessonId,
+    concept: item.concept,
+    stage: Math.max(0, Math.min(4, item.stage)),
+    dueAt: item.dueAt,
+    misses: item.misses,
+    lastReviewedAt: item.lastReviewedAt,
+    firstTrackedAt: item.firstTrackedAt ?? item.lastReviewedAt,
+    reason: item.misses > 0 ? 'missed' : 'learned',
+  }));
+  if ((await getAuthenticatedLearningUserId()) === requestedUserId) await saveCloudReviewItems(rows);
+}
+
 export function getLegacySchedulesSnapshot(): LegacySchedule[] {
   return legacy;
+}
+
+export async function resetLegacyReviewSchedule() {
+  await ensureLegacyScheduleLoaded();
+  if (projectTimer) clearTimeout(projectTimer);
+  projectTimer = null;
+  projected.clear();
+  legacy = [];
+  notify();
+  await writeLearningCache(STORAGE_KEY, JSON.stringify({ items: {} }));
 }
 
 export function useLegacySchedules(): LegacySchedule[] {
@@ -123,7 +152,7 @@ function serialize(row: CloudReviewItem) {
 }
 
 // Writes changed concept schedules to Supabase (debounced).
-export function projectScheduleToCloud(model: MemoryModel) {
+export function projectScheduleToCloud(model: MemoryModel, force = false) {
   if (projectTimer) clearTimeout(projectTimer);
   projectTimer = setTimeout(() => {
     projectTimer = null;
@@ -143,7 +172,7 @@ export function projectScheduleToCloud(model: MemoryModel) {
       };
       const key = `${row.lessonId}::${row.concept}`;
       const value = serialize(row);
-      if (projected.get(key) === value) continue;
+      if (!force && projected.get(key) === value) continue;
       projected.set(key, value);
       rows.push(row);
     }

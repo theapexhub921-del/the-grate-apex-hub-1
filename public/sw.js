@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grateapex-pwa-v2';
+const CACHE_NAME = 'grateapex-pwa-v4';
 const CACHE_PREFIX = 'grateapex-pwa-';
 const APP_SHELL = ['/', '/manifest.webmanifest', '/icons/grateapex-192.png', '/icons/grateapex-512.png'];
 const CACHEABLE_DESTINATIONS = new Set(['font', 'image', 'script', 'style']);
@@ -44,5 +44,20 @@ self.addEventListener('fetch', (event) => {
       await cache.put(request, response.clone());
     }
     return response;
+  })());
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const href = event.notification.data?.href || '/';
+  event.waitUntil((async () => {
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const existing = windows[0];
+    if (existing) {
+      await existing.focus();
+      if ('navigate' in existing) await existing.navigate(href);
+      return;
+    }
+    await self.clients.openWindow(href);
   })());
 });

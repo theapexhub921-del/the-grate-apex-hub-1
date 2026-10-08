@@ -1,5 +1,5 @@
 import { type Href, router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { RankProgressCard } from '@/components/rank-progress';
@@ -19,7 +19,7 @@ import { dayKey } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
 import { getRankProgress } from '@/data/ranks';
 import { useAvatarUrl, useDisplayName } from '@/data/user';
-import { personName, useSocial } from '@/data/social';
+import { getRecommendedFriends, personName, sendFriendRequest, useSocial, type SocialRecommendation } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 type MenuItem = { icon: IconName; label: string; detail: string; href: Href };
@@ -44,7 +44,18 @@ export default function ProfileScreen() {
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
   const social = useSocial();
   const friends = social.people.filter((person) => person.relationship === 'friends');
+  const [recommendations, setRecommendations] = useState<SocialRecommendation[]>([]);
+  const relationshipKey = social.people.map((person) => `${person.userId}:${person.relationship}`).sort().join('|');
   const rank = getRankProgress(progress.xp);
+
+  useEffect(() => {
+    if (social.status !== 'ready') return;
+    let active = true;
+    getRecommendedFriends()
+      .then((people) => { if (active) setRecommendations(people); })
+      .catch(() => { if (active) setRecommendations([]); });
+    return () => { active = false; };
+  }, [social.status, relationshipKey]);
 
   // Milestones are derived from the learning record — earned, never given.
   const reviewDays = new Set(attempts.filter((attempt) => attempt.mode === 'review' || attempt.mode === 'recall').map((attempt) => dayKey(attempt.attemptedAt))).size;
@@ -83,7 +94,9 @@ export default function ProfileScreen() {
         <Text style={styles.name} numberOfLines={1}>
           {displayName ? `Doc. ${displayName}` : 'Doc.'}
         </Text>
-        <Text style={styles.username}>{social.username ? '@' + social.username : social.status === 'loading' ? 'Loading username...' : 'Add a username in Connect'}</Text>
+        <Text style={styles.username}>
+          {social.status === 'loading' ? 'Username: Loading…' : `Username: ${social.username ? `@${social.username}` : '—'}`}
+        </Text>
         <View style={styles.badges}>
           <View style={styles.rankBadge}>
             <Icon name="rank" size={14} color="#0A1F5C" strokeWidth={2.2} />
@@ -115,7 +128,7 @@ export default function ProfileScreen() {
           <Avatar uri={friend.avatarUrl} name={personName(friend)} size={40} status={friend.isOnline ? 'online' : null} />
           <View style={styles.friendText}>
             <Text style={styles.friendName}>{personName(friend)}</Text>
-            <Text style={styles.friendHandle}>{friend.isOnline ? 'Online' : friend.username ? '@' + friend.username : 'GrAteApex Hub friend'}</Text>
+            <Text style={styles.friendHandle}>{`${friend.username ? `Username: @${friend.username}` : 'Username: —'}${friend.isOnline ? ' · Online' : ''}`}</Text>
           </View>
           {friend.totalXp !== null ? <Text style={styles.friendXp}>{friend.totalXp} XP</Text> : null}
         </View>
@@ -132,6 +145,17 @@ export default function ProfileScreen() {
       />
     </Card>
   );
+  const recommendationsCard = (
+    <Card style={styles.socialCard}>
+      <SectionHeader title="People you may know" right={<Text style={styles.cardMeta}>{recommendations.length} suggestions</Text>} />
+      <Text style={styles.cardMeta}>Classmates and learners connected to your study circle.</Text>
+      {recommendations.map((person) => <RecommendedFriendRow key={person.userId} person={person} />)}
+      {!recommendations.length ? (
+        <Text style={styles.cardMeta}>{social.status === 'ready' ? 'No suggestions yet. Try again as more classmates join GrAteApex Hub.' : 'Looking for classmates to recommend…'}</Text>
+      ) : null}
+      <Button label="Find more classmates" variant="secondary" size="sm" onPress={() => router.push('/social/friends' as Href)} />
+    </Card>
+  );
   const statGrid = (
     <View style={styles.statGrid}>
       {stats.map((stat) => (
@@ -141,6 +165,11 @@ export default function ProfileScreen() {
           <Text style={styles.statLabel}>{stat.label}</Text>
         </View>
       ))}
+      <ApexCoinWalletCard
+        style={[styles.stat, desktop ? styles.statDesktop : styles.statMobile]}
+        valueStyle={styles.statValue}
+        labelStyle={styles.statLabel}
+      />
     </View>
   );
 
@@ -202,9 +231,7 @@ export default function ProfileScreen() {
       <PageHeader title="Profile" subtitle="Your identity, connections and achievements." right={<IconButton icon="settings" label="Settings" onPress={() => router.push('/settings' as Href)} />} />
       {identity}
       <View style={styles.gap} />
-      <ApexCoinWalletCard />
       <AvatarPicker visible={avatarPickerOpen} onClose={() => setAvatarPickerOpen(false)} />
-      <View style={styles.gap} />
       {desktop ? (
         <Columns
           sideWidth={360}
@@ -218,6 +245,7 @@ export default function ProfileScreen() {
             <View style={styles.column}>
               <RankProgressCard lifetimeXp={progress.xp} />
               {socialConnections}
+              {recommendationsCard}
               {menu}
             </View>
           }
@@ -228,10 +256,47 @@ export default function ProfileScreen() {
           {statGrid}
           {achievementsCard}
           {socialConnections}
+          {recommendationsCard}
           {menu}
         </View>
       )}
     </Screen>
+  );
+}
+
+function RecommendedFriendRow({ person }: { person: SocialRecommendation }) {
+  const styles = useThemedStyles(createStyles);
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function addFriend() {
+    setBusy(true);
+    setError(null);
+    try {
+      await sendFriendRequest(person.userId);
+      setSent(true);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not send request. Please try again.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <View style={styles.recommendationWrap}>
+      <View style={styles.friendRow}>
+        <Avatar uri={person.avatarUrl} name={personName(person)} size={40} />
+        <View style={styles.friendText}>
+          <Text style={styles.friendName} numberOfLines={1}>{personName(person)}</Text>
+          <Text style={styles.friendHandle} numberOfLines={1}>
+            {`${person.username ? `Username: @${person.username}` : 'Username: —'}${person.sameClass ? ' · Same class' : person.sharedConnections ? ` · ${person.sharedConnections} mutual ${person.sharedConnections === 1 ? 'connection' : 'connections'}` : ''}`}
+          </Text>
+        </View>
+        <Button label={sent ? 'Requested' : 'Add'} size="sm" variant={sent ? 'secondary' : 'primary'} onPress={() => void addFriend()} loading={busy} disabled={sent || busy} />
+      </View>
+      {error ? <Text style={styles.recommendationError}>{error}</Text> : null}
+    </View>
   );
 }
 
@@ -318,6 +383,8 @@ function createStyles(colors: ThemeColors) {
     friendName: { fontSize: 13.5, fontWeight: '800', color: colors.text },
     friendHandle: { fontSize: 11.5, color: colors.textTertiary },
     friendXp: { fontSize: 11.5, fontWeight: '800', color: colors.accentText },
+    recommendationWrap: { gap: 2 },
+    recommendationError: { fontSize: 11, color: colors.textSecondary, marginLeft: 50 },
     cardHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
     cardTitle: { ...Type.title3, color: colors.text },
     cardMeta: { fontSize: 12, fontWeight: '700', color: colors.textTertiary },

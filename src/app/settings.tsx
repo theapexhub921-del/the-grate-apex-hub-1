@@ -19,11 +19,13 @@ import {
   setPageZoomPreference,
   setAppearancePreference,
   setPushNotificationsPreference,
+  setAnswerBouncePreference,
   setNotificationPreference,
   usePageZoomPreference,
   useAppearancePreference,
   APPEARANCE_OPTIONS,
   usePushNotificationsPreference,
+  useAnswerBouncePreference,
   useNotificationPreferences,
   setFontSizePreference,
   useFontSizePreference,
@@ -37,12 +39,14 @@ import { ABOUT_US } from '@/data/about';
 import { EXPLORE_TEAM } from '@/data/explore';
 import { grantPowerup } from '@/data/learning/powerups';
 import { dayKey } from '@/data/learning/time';
+import { resetAllLearningProgress } from '@/data/progress';
 import { useAuth } from '@/hooks/use-auth';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { deleteMyAccount } from '@/lib/account';
 import { routes } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
+import { enableDeviceNotifications } from '@/lib/device-notifications';
 
 const HOME_HREF = '/' as Href;
 type ThemeSwatchScheme = Exclude<AppearancePreference, 'system'>;
@@ -86,6 +90,7 @@ export default function SettingsScreen() {
   const fontSize = useFontSizePreference();
   const privacy = usePrivacyPreferences();
   const pushNotificationsEnabled = usePushNotificationsPreference();
+  const answerBounceEnabled = useAnswerBouncePreference();
   const notificationPreferences = useNotificationPreferences();
   const tabBarMode = useTabBarMode();
   const systemScheme = useColorScheme();
@@ -98,10 +103,15 @@ export default function SettingsScreen() {
   // Authentication session.
   const { user } = useAuth();
   const [preferenceSyncError, setPreferenceSyncError] = useState(false);
+  const [pushNotificationNotice, setPushNotificationNotice] = useState<string | null>(null);
   const [signingOut, setSigningOut] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [resetProgressOpen, setResetProgressOpen] = useState(false);
+  const [resettingProgress, setResettingProgress] = useState(false);
+  const [resetProgressError, setResetProgressError] = useState<string | null>(null);
+  const [resetProgressDone, setResetProgressDone] = useState(false);
   const [sharingApp, setSharingApp] = useState(false);
   const [shareNotice, setShareNotice] = useState<string | null>(null);
 
@@ -157,6 +167,38 @@ export default function SettingsScreen() {
       return;
     }
     router.replace('/login');
+  }
+
+  async function handleResetProgress() {
+    if (resettingProgress) return;
+    setResettingProgress(true);
+    setResetProgressError(null);
+    setResetProgressDone(false);
+    try {
+      await resetAllLearningProgress();
+      setResetProgressOpen(false);
+      setResetProgressDone(true);
+    } catch (error) {
+      const code = typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
+      if (code === 'PGRST202' || code === '42883') {
+        setResetProgressError('Apply Supabase migration 20261007100000_reset_learning_progress.sql, then try again.');
+      } else {
+        setResetProgressError(error instanceof Error ? error.message : 'Could not reset progress. Please try again.');
+      }
+    } finally {
+      setResettingProgress(false);
+    }
+  }
+
+  async function updatePushNotifications(enabled: boolean) {
+    setPushNotificationNotice(null);
+    if (!enabled) {
+      await setPushNotificationsPreference(false);
+      return;
+    }
+    const result = await enableDeviceNotifications();
+    await setPushNotificationsPreference(result.granted);
+    if (!result.granted) setPushNotificationNotice(result.message ?? 'Notifications could not be enabled.');
   }
 
   async function shareApp() {
@@ -292,6 +334,22 @@ export default function SettingsScreen() {
         {Platform.OS !== 'web' ? <Text style={styles.optionDescription}>App zoom is currently available in the web experience. Native screens continue to respect your device accessibility settings.</Text> : null}
       </SettingsSection>
 
+      <SettingsSection title="Quiz experience">
+        <View style={styles.optionRow}>
+          <View style={styles.flex}>
+            <Text style={styles.optionLabel}>Bounce after an answer</Text>
+            <Text style={styles.optionDescription}>Show the short feedback bounce when a quiz answer is revealed.</Text>
+          </View>
+          <Switch
+            value={answerBounceEnabled}
+            onValueChange={(enabled) => void setAnswerBouncePreference(enabled)}
+            trackColor={{ false: colors.track, true: colors.primary }}
+            thumbColor={colors.surface}
+            accessibilityLabel="Bounce after a quiz answer"
+          />
+        </View>
+      </SettingsSection>
+
       <SettingsSection title="Privacy">
         <Text style={styles.optionLabel}>Profile visibility</Text>
         <Text style={styles.optionDescription}>This preference is saved to your account. Privacy filtering is being applied to social queries as that backend migration is enabled.</Text>
@@ -328,21 +386,22 @@ export default function SettingsScreen() {
 
       <SettingsSection title="Notifications">
         {preferenceSyncError ? <Text style={styles.optionDescription}>Your choices are saved on this device. Account sync is unavailable until the preferences database migration is applied.</Text> : null}
-        <Text style={styles.optionDescription}>Category choices also filter the notifications shown in the app. Push delivery is not active yet.</Text>
+        <Text style={styles.optionDescription}>Choose which updates you want. When device notifications are enabled, new eligible updates can also appear outside the app.</Text>
         <View style={styles.optionRow}>
           <Icon name="bell" size={18} color={colors.primaryText} />
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>Push notification preference</Text>
-            <Text style={styles.optionDescription}>Save whether you want reminders. Push delivery is not connected yet; turning this on will not send notifications today.</Text>
+            <Text style={styles.optionDescription}>Allow browser notifications for new updates while GrAteApex Hub is in the background.</Text>
           </View>
           <Switch
             value={pushNotificationsEnabled}
-            onValueChange={(enabled) => void setPushNotificationsPreference(enabled)}
+            onValueChange={(enabled) => void updatePushNotifications(enabled)}
             trackColor={{ false: colors.track, true: colors.primary }}
             thumbColor={colors.surface}
             accessibilityLabel="Push notification preference"
           />
         </View>
+        {pushNotificationNotice ? <Text style={styles.optionDescription}>{pushNotificationNotice}</Text> : null}
         {notificationOptions.map((option) => (
           <View key={option.key} style={styles.optionRow}>
             <View style={styles.flex}>
@@ -387,7 +446,7 @@ export default function SettingsScreen() {
       </SettingsSection>
 
       <SettingsSection title="Install on your devices">
-        <Text style={styles.optionDescription}>Install the web app from your browser. It works on phones, tablets and computers; an app-store download is not required.</Text>
+        <Text style={styles.optionDescription}>Install GrAteApex Hub from your browser and open it once while online. Lessons and your saved progress remain available on this device offline; new learning activity syncs to your account when you reconnect.</Text>
         <View style={styles.optionRow}>
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>iPhone and iPad</Text>
@@ -478,11 +537,23 @@ export default function SettingsScreen() {
             </View>
           </Interactive>
         )}
+        <View style={styles.accountDivider} />
+        <Text style={styles.optionLabel}>Learning progress</Text>
+        <Text style={styles.optionDescription}>Clear your XP, streak, completed lessons, quiz and question history, review schedule, and learning activity from this device and your account.</Text>
+        {resetProgressDone ? <Text style={styles.resetSuccess}>All learning progress has been reset.</Text> : null}
+        <View style={styles.resetAction}>
+          <Button label="Reset all progress" variant="danger" icon={<Icon name="trash" size={16} color="#FFFFFF" />} onPress={() => { setResetProgressError(null); setResetProgressOpen(true); }} />
+        </View>
       </SettingsSection>
 
       <Sheet visible={deleteOpen} onClose={() => { if (!deleting) { setDeleteOpen(false); setDeleteError(null); } }} title="Delete your account?" subtitle="This action cannot be undone." footer={<View style={styles.confirmActions}><Button label="Cancel" variant="secondary" onPress={() => { setDeleteOpen(false); setDeleteError(null); }} disabled={deleting} /><Button label="Delete account" variant="danger" onPress={() => void handleDeleteAccount()} loading={deleting} /> </View>}>
         <Text style={styles.optionDescription}>Your profile, learning progress, XP, quiz and review history, friends and notifications will be permanently erased.</Text>
         {deleteError ? <Text style={styles.signOutText}>{deleteError}</Text> : null}
+      </Sheet>
+
+      <Sheet visible={resetProgressOpen} onClose={() => { if (!resettingProgress) { setResetProgressOpen(false); setResetProgressError(null); } }} title="Reset all progress?" subtitle="This action cannot be undone." footer={<View style={styles.confirmActions}><Button label="Cancel" variant="secondary" onPress={() => { setResetProgressOpen(false); setResetProgressError(null); }} disabled={resettingProgress} /><Button label="Reset progress" variant="danger" onPress={() => void handleResetProgress()} loading={resettingProgress} /> </View>}>
+        <Text style={styles.optionDescription}>Your learning history, XP, level, streaks, lesson completions, quiz and question attempts, review schedule, and saved learning activity will be cleared from your account and this device.</Text>
+        {resetProgressError ? <Text style={styles.signOutText}>{resetProgressError}</Text> : null}
       </Sheet>
 
     </Screen>
@@ -567,6 +638,7 @@ function createStyles(colors: ThemeColors) {
     },
     inlineButton: { alignSelf: 'flex-start', marginTop: 8 },
     divider: { height: 1, backgroundColor: colors.divider, marginVertical: 16 },
+    accountDivider: { height: 1, backgroundColor: colors.divider, marginVertical: 16 },
     optionRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 4, borderRadius: 12 },
     rowDivider: { borderTopWidth: 1, borderTopColor: colors.divider, borderRadius: 0 },
     rowHover: { backgroundColor: colors.surfaceMuted },
@@ -629,6 +701,8 @@ function createStyles(colors: ThemeColors) {
     radioSelected: { borderColor: colors.primary },
     radioDot: { width: 11, height: 11, borderRadius: 6, backgroundColor: colors.primary },
     signOutText: { color: colors.error },
+    resetSuccess: { ...Type.callout, color: colors.primaryText, marginTop: 10 },
+    resetAction: { alignItems: 'flex-start', marginTop: 14 },
     confirmActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10 },
     signInText: { color: colors.primaryText },
   });

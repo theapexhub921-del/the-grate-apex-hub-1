@@ -335,7 +335,7 @@ export const EXPLORE_GUIDE: readonly ExploreGuideEntry[] = [
   { title: 'Study Plans', detail: 'Pick published topics and follow a generated lesson path. Plans are saved with your account.', status: 'available' },
   { title: 'Timetable', detail: 'Add, edit and remove private recurring class or study blocks. Your timetable is saved with your account.', status: 'available' },
   { title: 'Goals', detail: 'Create lesson, XP or learning streak targets with progress and optional deadlines. Goal progress updates from learning activity.', status: 'available' },
-  { title: 'Notifications', detail: 'Choose event preferences; device push delivery is not connected yet.', status: 'limited' },
+  { title: 'Notifications', detail: 'Choose event preferences and allow device alerts while the installed web app is in the background.', status: 'available' },
   { title: 'Posts, reactions, comments and reshares', detail: 'Share what is on your mind, upload photos or videos, mention friends by @username, react, comment, reshare and report content.', status: 'available' },
   { title: 'Apex Challenge', detail: 'Take a timed challenge across a course and compare it with your own best score.', status: 'available' },
   { title: 'Past Question Bank', detail: 'A home for verified past-question material. No question content is published yet.', status: 'coming-soon' },

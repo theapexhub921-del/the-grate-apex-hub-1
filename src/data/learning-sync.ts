@@ -247,6 +247,14 @@ export async function loadCloudProgress(): Promise<CloudProgress | null> {
   }
 }
 
+/** Clear all server-backed learning records for the signed-in learner. */
+export async function resetCloudLearningProgress() {
+  const userId = await getUserId();
+  if (!userId) throw new Error('Sign in before resetting your learning progress.');
+  const { error } = await supabase.rpc('grateapex_reset_learning_progress');
+  if (error) throw error;
+}
+
 async function mergeStats(userId: string, stats: CloudLearningStats, operation: string) {
   const { data: remoteStats, error: readError } = await supabase
     .from('user_learning_stats')

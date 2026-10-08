@@ -7,11 +7,18 @@ import {
   loadCloudProgress,
   readLearningCache,
   recordCloudXpAdjustment,
+  resetCloudLearningProgress,
   saveCloudProgress,
   saveCloudXpEvent,
   subscribeToLearningAuthChanges,
   writeLearningCache,
 } from '@/data/learning-sync';
+import { ensureEventsLoaded, resetLearningEvents } from '@/data/learning/events';
+import { ensureLessonSessionsLoaded, resetLessonSessions } from '@/data/learning/lesson-sessions';
+import { ensurePowerupsLoaded, resetPowerups } from '@/data/learning/powerups';
+import { ensureLegacyScheduleLoaded, resetLegacyReviewSchedule } from '@/data/review';
+import { ensureQuestionHistoryLoaded, resetQuestionHistory } from '@/data/question-history';
+import { ensureQuizHistoryLoaded, resetQuizHistory } from '@/data/quiz-history';
 import { dayKey } from '@/data/learning/time';
 import type { XpBreakdown } from '@/data/learning/xp-rules';
 import { getStreakStatus } from '@/data/progression';
@@ -120,6 +127,7 @@ const progress: ProgressData = {
 
 const listeners = new Set<() => void>();
 let progressLoadPromise: Promise<void> | null = null;
+let progressSyncPromise: Promise<void> | null = null;
 let snapshot: ProgressData = createSnapshot();
 
 function notify() {
@@ -172,10 +180,20 @@ async function loadProgress() {
 
     // Hydration and upload are background work: local progress remains
     // usable immediately if Supabase is slow or unavailable.
-    void syncProgressWithSupabase(hasLocalProgress);
+    const sync = syncProgressWithSupabase(hasLocalProgress);
+    progressSyncPromise = sync;
+    void sync.then(
+      () => { if (progressSyncPromise === sync) progressSyncPromise = null; },
+      (error) => { console.warn('Could not sync progress:', error); if (progressSyncPromise === sync) progressSyncPromise = null; }
+    );
   } catch (error) {
     console.log('Could not load progress:', error);
-    void syncProgressWithSupabase(false);
+    const sync = syncProgressWithSupabase(false);
+    progressSyncPromise = sync;
+    void sync.then(
+      () => { if (progressSyncPromise === sync) progressSyncPromise = null; },
+      (syncError) => { console.warn('Could not sync progress:', syncError); if (progressSyncPromise === sync) progressSyncPromise = null; }
+    );
   }
 }
 
@@ -236,7 +254,18 @@ async function syncProgressWithSupabase(hasLocalProgress: boolean) {
   if (hasLocalProgress || remote.completedLessons.length > 0) {
     await saveCloudProgress(cloudLessonRows(), cloudStats());
   }
+  // XP records already carry stable source keys. Replaying them after an
+  // offline session is safe because the server rejects duplicate keys.
+  await Promise.all(progress.xpLedger
+    .filter((entry) => entry.amount > 0 && entry.sourceType !== 'lesson')
+    .map((entry) => saveCloudXpEvent(cloudSourceType(entry.sourceType), entry.key, entry.amount, cloudStats())));
   void flushPendingPenalty();
+}
+
+/** Retry the local-first progress sync after a connection is restored. */
+export async function syncLearningProgress() {
+  await ensureProgressLoaded();
+  await syncProgressWithSupabase(true);
 }
 
 async function flushPendingPenalty() {
@@ -473,6 +502,38 @@ function resetProgress() {
     progress.subjects[subject].progress = 0;
   });
   notify();
+}
+
+/** Reset the signed-in learner's cloud and on-device learning history. */
+export async function resetAllLearningProgress() {
+  const userId = await getAuthenticatedLearningUserId();
+  if (!userId) throw new Error('Sign in before resetting your learning progress.');
+  await ensureProgressLoaded();
+  if (progressSyncPromise) await progressSyncPromise;
+
+  await Promise.all([
+    ensureEventsLoaded(),
+    ensureLessonSessionsLoaded(),
+    ensurePowerupsLoaded(),
+    ensureLegacyScheduleLoaded(),
+    ensureQuestionHistoryLoaded(),
+    ensureQuizHistoryLoaded(),
+  ]);
+  if ((await getAuthenticatedLearningUserId()) !== userId) throw new Error('Your account changed. Please try again.');
+
+  await resetCloudLearningProgress();
+  if ((await getAuthenticatedLearningUserId()) !== userId) throw new Error('Your account changed. Please sign in again.');
+
+  resetProgress();
+  await saveProgress();
+  await Promise.all([
+    resetLearningEvents(),
+    resetLessonSessions(),
+    resetPowerups(),
+    resetLegacyReviewSchedule(),
+    resetQuestionHistory(),
+    resetQuizHistory(),
+  ]);
 }
 
 let activeLearningUserId: string | null | undefined;

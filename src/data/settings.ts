@@ -56,6 +56,7 @@ type SettingsData = {
   friendRequestPermission: MessagingPermission;
   discoverable: boolean;
   shareOnlineStatus: boolean;
+  answerBounceEnabled: boolean;
 };
 
 const STORAGE_KEY = 'grateapex_settings';
@@ -73,6 +74,7 @@ const defaultSettings: SettingsData = {
   friendRequestPermission: 'everyone',
   discoverable: true,
   shareOnlineStatus: false,
+  answerBounceEnabled: true,
 };
 
 type PrivacySettings = Pick<SettingsData, 'profileVisibility' | 'activityVisible' | 'messagingPermission' | 'friendRequestPermission' | 'discoverable' | 'shareOnlineStatus'>;
@@ -162,6 +164,7 @@ async function loadSettings() {
       friendRequestPermission: data?.friendRequestPermission === 'friends' ? 'friends' : 'everyone',
       discoverable: data?.discoverable !== false,
       shareOnlineStatus: data?.shareOnlineStatus === true,
+      answerBounceEnabled: data?.answerBounceEnabled !== false,
     };
 
     notify();
@@ -194,7 +197,7 @@ async function saveSettings() {
         font_size: settings.fontSize,
         zoom: settings.pageZoom,
         navigation_auto_hide: (await getTabBarModePreference()) === 'autoHide',
-        notification_preferences: { pushEnabled: settings.pushNotificationsEnabled, ...settings.notifications },
+        notification_preferences: { pushEnabled: settings.pushNotificationsEnabled, answerBounceEnabled: settings.answerBounceEnabled, ...settings.notifications },
         privacy_preferences: {
           profileVisibility: settings.profileVisibility,
           activityVisible: settings.activityVisible,
@@ -242,6 +245,7 @@ export async function syncSettingsFromAccount(userId: string) {
     friendRequestPermission: privacy?.friendRequestPermission === 'friends' ? 'friends' : privacy?.friendRequestPermission === 'everyone' ? 'everyone' : settings.friendRequestPermission,
     discoverable: typeof privacy?.discoverable === 'boolean' ? privacy.discoverable : settings.discoverable,
     shareOnlineStatus: privacy?.shareOnlineStatus === true,
+    answerBounceEnabled: typeof notifications?.answerBounceEnabled === 'boolean' ? notifications.answerBounceEnabled : settings.answerBounceEnabled,
   };
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
   if (typeof data.navigation_auto_hide === 'boolean') {
@@ -315,6 +319,18 @@ export function usePushNotificationsPreference(): boolean {
 export async function setPushNotificationsPreference(enabled: boolean) {
   await ensureSettingsLoaded();
   settings = { ...settings, pushNotificationsEnabled: enabled };
+  notify();
+  await saveSettings();
+}
+
+/** Whether correct-answer feedback has its short bounce animation. */
+export function useAnswerBouncePreference(): boolean {
+  return useSyncExternalStore(subscribe, () => settings.answerBounceEnabled, () => defaultSettings.answerBounceEnabled);
+}
+
+export async function setAnswerBouncePreference(enabled: boolean) {
+  await ensureSettingsLoaded();
+  settings = { ...settings, answerBounceEnabled: enabled };
   notify();
   await saveSettings();
 }

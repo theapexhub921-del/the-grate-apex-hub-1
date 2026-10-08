@@ -108,6 +108,15 @@ export function clearLessonSession(lessonId: string) {
   persistSoon();
 }
 
+export async function resetLessonSessions() {
+  await ensureLessonSessionsLoaded();
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = null;
+  sessions = {};
+  notify();
+  await writeLearningCache(STORAGE_KEY, JSON.stringify(sessions));
+}
+
 export function newLessonSession(lessonId: string, stepCount: number, contentVersion: number): LessonSession {
   const now = Date.now();
   return {

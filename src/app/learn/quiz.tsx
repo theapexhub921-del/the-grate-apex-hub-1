@@ -27,7 +27,7 @@ import { isLocalPreview } from '@/lib/local-preview';
 import { param, routes } from '@/lib/routes';
 import type { Href } from 'expo-router';
 
-const LESSON_QUIZ_SIZE = 25;
+const LESSON_QUIZ_SIZE = 30;
 const TOPIC_QUIZ_SIZE = 30;
 
 type QuizPlan = {
@@ -150,7 +150,7 @@ function buildPlan(input: {
       title: found.lesson.title,
       subtitle: isCheck
         ? `Already know this? Score ${XP_RULES.masteryCheckPercent}% or more and the lesson is completed for you.`
-        : 'Each attempt draws a fresh mix: new questions first, then the ones you found hard. Earlier lessons top it up.',
+        : 'Each 30-question attempt draws a fresh mix: new questions first, then the ones you found hard. Earlier lessons can top it up when needed.',
       lessonId,
       topicId: found.topic.id,
       request: { scope: { kind: 'lesson', lessonId }, size: LESSON_QUIZ_SIZE },

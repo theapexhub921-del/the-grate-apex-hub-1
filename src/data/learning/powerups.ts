@@ -71,6 +71,10 @@ function ensureLoaded() {
   return loadPromise;
 }
 
+export function ensurePowerupsLoaded() {
+  return ensureLoaded();
+}
+
 export function usePowerups(): readonly Powerup[] {
   return useSyncExternalStore(
     (listener) => {
@@ -81,6 +85,14 @@ export function usePowerups(): readonly Powerup[] {
     () => inventory,
     () => EMPTY
   );
+}
+
+export async function resetPowerups() {
+  await ensureLoaded();
+  inventory = [];
+  earnedKeys = new Set();
+  await save();
+  notify();
 }
 
 export async function grantPowerup(source: PowerupSource, sourceId: string, multiplier: Exclude<PowerupMultiplier, 1> = 1.5) {
