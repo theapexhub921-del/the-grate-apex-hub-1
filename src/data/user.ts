@@ -112,17 +112,19 @@ function ensureLoaded() {
   return loadPromise;
 }
 
-// React to authentication changes (login, logout).
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    void syncProfileWithSupabase();
-  } else {
-    cachedName = null;
-    cachedAvatar = null;
-    notify();
-    void AsyncStorage.removeItem(USER_KEY);
-  }
-});
+// React to authentication changes (login, logout) in browser environments.
+if (typeof window !== 'undefined') {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      void syncProfileWithSupabase();
+    } else {
+      cachedName = null;
+      cachedAvatar = null;
+      notify();
+      void AsyncStorage.removeItem(USER_KEY);
+    }
+  });
+}
 
 export async function setDisplayName(name: string) {
   const trimmed = name.trim();
