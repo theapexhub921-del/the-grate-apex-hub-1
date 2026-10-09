@@ -31,8 +31,14 @@ import {
   signInWithEmailAndPassword,
   updatePassword as fbUpdatePassword,
 } from 'firebase/auth';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import {
+  legacyLoginEmail,
+  type LoginIdentifier,
+  loginFromRegistry,
+  parseLoginIdentifier,
+} from '@/lib/login-identifier';
 
 
 const HOME_HREF = '/' as Href;
@@ -206,13 +212,19 @@ export default function LoginScreen() {
     setLoading(true);
     setError(null);
 
+    // An email, or a username from the original app (see login-identifier.ts).
+    const identifier = parseLoginIdentifier(email);
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      await signInWithEmailAndPassword(auth, await resolveSignInEmail(identifier), password);
       setPassword('');
       router.replace(HOME_HREF);
     } catch (err: any) {
       console.warn('Sign-in error:', err);
-      setError(friendlyError(err?.message, err?.code));
+      setError(
+        identifier.kind === 'username' && isWrongUsernameOrPassword(err?.code)
+          ? 'Incorrect username or password. Please try again.'
+          : friendlyError(err?.message, err?.code)
+      );
     } finally {
       setLoading(false);
     }
@@ -620,20 +632,20 @@ export default function LoginScreen() {
                 </>
               ) : (
                 <>
-                  <Field label="Email" icon="mail" styles={styles} colors={colors}>
+                  <Field label="Username or email" icon="profile" styles={styles} colors={colors}>
                     <TextInput
                       style={styles.input}
                       value={email}
                       onChangeText={setEmail}
-                      placeholder="you@example.com"
+                      placeholder="Your username or you@example.com"
                       placeholderTextColor={colors.textTertiary}
                       autoCapitalize="none"
                       autoCorrect={false}
-                      autoComplete="email"
+                      autoComplete="username"
                       keyboardType="email-address"
-                      textContentType="emailAddress"
+                      textContentType="username"
                       returnKeyType="next"
-                      accessibilityLabel="Email"
+                      accessibilityLabel="Username or email"
                     />
                   </Field>
 
@@ -690,6 +702,33 @@ export default function LoginScreen() {
         </View>
       </ScrollView>
     </View>
+  );
+}
+
+// The email Firebase signs in with. A username becomes its hidden legacy
+// login; the public usernames registry says which one if the account was
+// renamed. If the registry can't be read, the name itself is used (as in the
+// original app). Only a read — nothing is written.
+async function resolveSignInEmail(identifier: LoginIdentifier) {
+  if (identifier.kind === 'email') return identifier.email;
+  let login = identifier.username;
+  try {
+    const entry = await getDoc(doc(db, 'usernames', identifier.username));
+    if (entry.exists()) login = loginFromRegistry(identifier.username, entry.data());
+  } catch {
+    // Registry unreadable, or the name can't be a document id: use the name.
+  }
+  return legacyLoginEmail(login);
+}
+
+// A username that doesn't exist, or a wrong password, gives the same message
+// either way, so the sign-in form never reveals which usernames are taken.
+function isWrongUsernameOrPassword(code?: string | null) {
+  return (
+    code === 'auth/invalid-credential' ||
+    code === 'auth/wrong-password' ||
+    code === 'auth/user-not-found' ||
+    code === 'auth/invalid-email'
   );
 }
 
