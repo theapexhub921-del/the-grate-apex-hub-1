@@ -12,9 +12,10 @@ import { isDesktopWidth, Type, type ThemeColors } from '@/constants/theme';
 import { POWERUP_MULTIPLIERS, XP_RULES } from '@/data/learning/xp-rules';
 import { useProgress } from '@/data/progress';
 import { getRankProgress, LEAGUE_RULES, RANKS } from '@/data/ranks';
+import { CONTACT_EMAIL, openContactEmail } from '@/lib/contact';
 import { routes } from '@/lib/routes';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { EXPLORE_CONTACT, EXPLORE_GUIDE, EXPLORE_TEAM, getExploreAnnouncements, getItemsByCategory, type ExploreAnnouncement, type ExploreItem } from '@/data/explore';
+import { EXPLORE_GUIDE, EXPLORE_TEAM, getExploreAnnouncements, getItemsByCategory, type ExploreAnnouncement, type ExploreItem } from '@/data/explore';
 import { ABOUT_US } from '@/data/about';
 import { useWeeklyExploreSession } from '@/data/weekly-explore';
 
@@ -93,6 +94,8 @@ export default function ExploreScreen() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const weeklySession = useWeeklyExploreSession();
+  const [noEmailApp, setNoEmailApp] = useState(false);
+  const emailUs = () => void openContactEmail().then((opened) => setNoEmailApp(!opened));
   const weeklyItems = weeklySession?.items ?? [];
   const upcoming = weeklySession ? new Date(`${weeklySession.week_start}T00:00:00`) > new Date() : false;
   const weekLabel = weeklySession
@@ -107,20 +110,20 @@ export default function ExploreScreen() {
         <Card style={styles.introCard}>
           <View style={styles.introBrand}><Icon name="sparkle" size={22} color={colors.accentText} /><Text style={styles.introLabel}>WELCOME TO GrAteApex Hub</Text></View>
           <Text style={styles.introTitle}>Learn your way. Rise together.</Text>
-          <Text style={styles.introBody}>Bring your lecture material into focused lessons, practise with fresh questions, and return to concepts when they are due. Home is your social space for Stories and community posts. Explore explains every feature, shares updates and shows what is coming next.</Text>
+          <Text style={styles.introBody}>Bring your lecture material into focused lessons, practise with fresh questions, and return to concepts when they are due. Feed is your social space for Stories and community posts. Explore explains every feature, shares updates and shows what is coming next.</Text>
           <View style={styles.introActions}>
             <Interactive onPress={() => router.push(routes.onboarding({ replay: true }))} accessibilityRole="button" style={styles.guideLink}>
               <Icon name="learn" size={16} color={colors.primaryText} /><Text style={styles.guideLinkText}>Replay the full introduction</Text>
             </Interactive>
-            <Interactive onPress={() => void Linking.openURL(`mailto:${EXPLORE_CONTACT.email}?subject=${encodeURIComponent(EXPLORE_CONTACT.subject)}`)} accessibilityRole="link" style={styles.guideLink}>
+            <Interactive onPress={emailUs} accessibilityRole="link" style={styles.guideLink}>
               <Icon name="mail" size={16} color={colors.primaryText} /><Text style={styles.guideLinkText}>Questions or ideas? Contact us</Text>
             </Interactive>
           </View>
         </Card>
         <Card style={styles.guideCard} tone="insight">
           <Text style={styles.guideTitle}>Your quick guide</Text>
-          <GuideStep icon="home" number="01" title="Home" detail="Post Stories, photos, videos and study moments. Like, comment on and reshare friends’ posts." />
-          <GuideStep icon="lesson" number="02" title="Learn" detail="Follow lecture topics, build an optional study plan and use the review calendar." />
+          <GuideStep icon="home" number="01" title="Feed" detail="Post Stories, photos, videos and study moments. Like, comment on and reshare friends’ posts." />
+          <GuideStep icon="lesson" number="02" title="Study" detail="Follow lecture topics, build an optional study plan and use the review calendar." />
           <GuideStep icon="social" number="03" title="Connect" detail="Find classmates, create study groups, discuss assignments and message accepted friends." />
           <GuideStep icon="explore" number="04" title="Explore" detail="Learn what each feature does, see announcements and discover what’s being built." />
         </Card>
@@ -161,9 +164,14 @@ export default function ExploreScreen() {
       <Card style={[styles.aboutCard, styles.contactCard]}>
         <Text style={styles.featureTitle}>Contact us</Text>
         <Text style={styles.featureDescription}>Send the GrAteApex Hub team a question, idea or feedback.</Text>
-        <Interactive onPress={() => void Linking.openURL(`mailto:${EXPLORE_CONTACT.email}?subject=${encodeURIComponent(EXPLORE_CONTACT.subject)}`)} accessibilityRole="link" style={styles.guideLink}>
+        <Interactive onPress={emailUs} accessibilityRole="link" style={styles.guideLink}>
           <Icon name="mail" size={16} color={colors.primaryText} /><Text style={styles.guideLinkText}>Email the GrAteApex Hub team</Text>
         </Interactive>
+        {/* Always visible, so the address can be copied if no email app opens. */}
+        <Text selectable style={styles.featureDescription}>
+          {noEmailApp ? 'No email app could be opened on this device. ' : 'Or write to us at '}
+          <Text selectable style={styles.contactAddress}>{CONTACT_EMAIL}</Text>
+        </Text>
       </Card>
 
       <Journey />
@@ -287,6 +295,7 @@ function createStyles(colors: ThemeColors) {
     introActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 4 },
     guideLink: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 9, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.primarySubtle },
     guideLinkText: { fontSize: 13, fontWeight: '700', color: colors.primaryText },
+    contactAddress: { fontWeight: '700', color: colors.text },
     guideTitle: { ...Type.title3, color: colors.text },
     guideStep: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
     guideStepIcon: { width: 30, height: 30, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySubtle },
