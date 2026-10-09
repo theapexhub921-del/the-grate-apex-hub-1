@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { AnimatedContent } from '@/components/motion';
 import { ApexCoinButton } from '@/components/apex-coin-button';
 import { LogoMark } from '@/components/logo-mark';
-import { SupabaseSocialFeed } from '@/components/social/supabase-social-feed';
+import { SocialActivityFeed } from '@/components/social/supabase-social-feed';
 import { CommunityPostsFeed } from '@/components/social/community-posts-feed';
 import { ReviewCalendar } from '@/components/learning/review-calendar';
 import { RankProgressCard } from '@/components/rank-progress';
@@ -49,9 +49,9 @@ export default function HomeScreen() {
       </AnimatedContent>
 
       <View style={styles.socialFeed}>
-        <SupabaseSocialFeed>
+        <SocialActivityFeed>
           <CommunityPostsFeed />
-        </SupabaseSocialFeed>
+        </SocialActivityFeed>
       </View>
 
       <View style={styles.progressRail}>

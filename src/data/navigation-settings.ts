@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
-import { supabase } from '@/lib/supabase';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 
 // Navigation preferences for this device.
 // Saved under its own key — separate from appearance (settings.ts)
@@ -105,11 +106,9 @@ export async function setTabBarMode(tabBarMode: TabBarMode) {
 
   await save();
   try {
-    const { data } = await supabase.auth.getSession();
-    const userId = data.session?.user.id;
+    const userId = auth.currentUser?.uid;
     if (userId) {
-      const { error } = await supabase.from('user_preferences').upsert({ user_id: userId, navigation_auto_hide: tabBarMode === 'autoHide', updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
-      if (error) console.warn('Could not sync navigation preference:', error.message);
+      await setDoc(doc(db, 'users', userId), { autoHideNav: tabBarMode === 'autoHide' }, { merge: true });
     }
   } catch (error) { console.warn('Could not sync navigation preference:', error); }
 }

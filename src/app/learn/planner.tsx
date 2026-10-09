@@ -170,7 +170,7 @@ export default function PlannerScreen() {
         {entries.length ? entries.map((entry) => (
           <View key={entry.id} style={styles.entry}>
             <View style={styles.flex}><Text style={styles.lessonTitle}>{DAYS[entry.weekday]} · {entry.start_time.slice(0,5)}–{entry.end_time.slice(0,5)}</Text><Text style={styles.muted}>{entry.title}{entry.subject ? ` · ${entry.subject}` : ''}</Text></View>
-            <Button label="Edit" size="sm" variant="ghost" onPress={() => { setEditingId(entry.id); setTitle(entry.title); setSubject(entry.subject); setDay(DAYS[entry.weekday]); setStart(entry.start_time.slice(0,5)); setEnd(entry.end_time.slice(0,5)); }} />
+            <Button label="Edit" size="sm" variant="ghost" onPress={() => { setEditingId(entry.id); setTitle(entry.title ?? ''); setSubject(entry.subject ?? ''); setDay(DAYS[entry.weekday]); setStart(entry.start_time.slice(0,5)); setEnd(entry.end_time.slice(0,5)); }} />
             <Button label="Remove" size="sm" variant="ghost" onPress={() => void removeEntry(entry.id)} />
           </View>
         )) : <Text style={styles.muted}>No timetable blocks yet. Add one whenever it would help.</Text>}

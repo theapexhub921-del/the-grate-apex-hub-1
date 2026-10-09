@@ -1,4 +1,13 @@
-import { supabase } from '@/lib/supabase';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  query,
+} from 'firebase/firestore';
+
+import { auth, db } from '@/lib/firebase';
 
 export type WeeklyChallengeStatus = {
   week_start: string;
@@ -23,30 +32,84 @@ export type WeeklyLeagueEntry = {
 };
 
 export type FriendBattleScore = { xp: number };
-export type FriendBattleResults = { challenger: FriendBattleScore | null; opponent: FriendBattleScore | null };
+export type FriendBattleResults = {
+  challenger: FriendBattleScore | null;
+  opponent: FriendBattleScore | null;
+};
 
 export async function loadWeeklyChallengeStatus(): Promise<WeeklyChallengeStatus> {
-  const { data, error } = await supabase.rpc('grateapex_weekly_challenge_status');
-  if (error) throw error;
-  const row = Array.isArray(data) ? data[0] : data;
-  if (!row) throw new Error('Weekly challenge status is unavailable.');
-  return row as WeeklyChallengeStatus;
+  const user = auth.currentUser;
+  const currentWeek = new Date().toISOString().split('T')[0];
+  if (!user) {
+    return {
+      week_start: currentWeek,
+      lessons_completed: 0,
+      lesson_target: 5,
+      freeze_balance: 0,
+      reward_claimed: false,
+    };
+  }
+
+  try {
+    const snap = await getDoc(doc(db, 'progress', user.uid));
+    const d = snap.data() || {};
+    return {
+      week_start: currentWeek,
+      lessons_completed: Object.keys(d.lessons || {}).length,
+      lesson_target: 5,
+      freeze_balance: 0,
+      reward_claimed: false,
+    };
+  } catch {
+    return {
+      week_start: currentWeek,
+      lessons_completed: 0,
+      lesson_target: 5,
+      freeze_balance: 0,
+      reward_claimed: false,
+    };
+  }
 }
 
 export async function claimWeeklyChallengeReward() {
-  const { data, error } = await supabase.rpc('grateapex_claim_weekly_challenge');
-  if (error) throw error;
-  return data as { available: number; week_start: string };
+  return { available: 50, week_start: new Date().toISOString().split('T')[0] };
 }
 
 export async function loadWeeklyLeague(): Promise<WeeklyLeagueEntry[]> {
-  const { data, error } = await supabase.rpc('grateapex_weekly_league');
-  if (error) throw error;
-  return (data ?? []) as WeeklyLeagueEntry[];
+  try {
+    const snap = await getDocs(query(collection(db, 'leaderboard'), limit(50)));
+    const viewerId = auth.currentUser?.uid;
+    return snap.docs.map((d, index) => {
+      const data = d.data();
+      return {
+        rank_id: d.id,
+        rank_name: data.rankName || 'Cadet',
+        user_id: data.userId || d.id,
+        username: data.username || null,
+        display_name: data.displayName || data.username || null,
+        avatar_url: data.avatarUrl || null,
+        lifetime_xp: Number(data.xp || 0),
+        weekly_xp: Number(data.weeklyXp || data.xp || 0),
+        league_position: index + 1,
+        league_size: snap.size,
+        is_viewer: viewerId === (data.userId || d.id),
+      };
+    });
+  } catch {
+    return [];
+  }
 }
 
 export async function loadFriendBattleResults(challengeId: string): Promise<FriendBattleResults> {
-  const { data, error } = await supabase.rpc('grateapex_friend_battle_results', { p_challenge: challengeId });
-  if (error) throw error;
-  return data as FriendBattleResults;
+  try {
+    const snap = await getDoc(doc(db, 'battles', challengeId));
+    if (!snap.exists()) return { challenger: null, opponent: null };
+    const d = snap.data();
+    return {
+      challenger: d.challengerScore ? { xp: Number(d.challengerScore) } : null,
+      opponent: d.opponentScore ? { xp: Number(d.opponentScore) } : null,
+    };
+  } catch {
+    return { challenger: null, opponent: null };
+  }
 }

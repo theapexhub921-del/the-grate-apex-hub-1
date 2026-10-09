@@ -16,7 +16,6 @@ import { useAuth } from '@/hooks/use-auth';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import { MentionInput } from '@/components/social/mention-input';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { supabase } from '@/lib/supabase';
 
 type PostComment = { id: string; author_id: string; body: string; created_at: string };
 
@@ -53,18 +52,10 @@ export function CommunityPostsFeed() {
   useEffect(() => { queueMicrotask(() => { void refresh(); }); }, [refresh]);
 
   useEffect(() => {
-    const scheduleRefresh = () => {
+    return () => {
       if (refreshTimer.current) clearTimeout(refreshTimer.current);
-      refreshTimer.current = setTimeout(() => { refreshTimer.current = null; void refresh(); }, 500);
     };
-    const channel = supabase
-      .channel('community-posts-feed')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_posts' }, scheduleRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_post_comments' }, scheduleRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_post_reactions' }, scheduleRefresh)
-      .subscribe();
-    return () => { if (refreshTimer.current) clearTimeout(refreshTimer.current); void supabase.removeChannel(channel); };
-  }, [refresh]);
+  }, []);
 
   async function chooseMedia() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();

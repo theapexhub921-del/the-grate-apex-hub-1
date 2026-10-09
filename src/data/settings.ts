@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
-import { supabase } from '@/lib/supabase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 import { getTabBarModePreference, setTabBarModeFromAccount } from '@/data/navigation-settings';
 
 // App settings that belong to this device (not to an account).
@@ -188,70 +189,104 @@ async function saveSettings() {
     console.log('Could not save settings:', error);
   }
   try {
-    const { data } = await supabase.auth.getSession();
-    const userId = data.session?.user.id;
+    const userId = auth.currentUser?.uid;
     if (userId) {
-      const { error } = await supabase.from('user_preferences').upsert({
-        user_id: userId,
-        appearance: settings.appearance,
-        font_size: settings.fontSize,
-        zoom: settings.pageZoom,
-        navigation_auto_hide: (await getTabBarModePreference()) === 'autoHide',
-        notification_preferences: { pushEnabled: settings.pushNotificationsEnabled, answerBounceEnabled: settings.answerBounceEnabled, ...settings.notifications },
-        privacy_preferences: {
-          profileVisibility: settings.profileVisibility,
-          activityVisible: settings.activityVisible,
-          messagingPermission: settings.messagingPermission,
-          friendRequestPermission: settings.friendRequestPermission,
-          discoverable: settings.discoverable,
-          shareOnlineStatus: settings.shareOnlineStatus,
+      await setDoc(
+        doc(db, 'users', userId),
+        {
+          preferences: {
+            appearance: settings.appearance,
+            font_size: settings.fontSize,
+            zoom: settings.pageZoom,
+            navigation_auto_hide: (await getTabBarModePreference()) === 'autoHide',
+            notification_preferences: {
+              pushEnabled: settings.pushNotificationsEnabled,
+              answerBounceEnabled: settings.answerBounceEnabled,
+              ...settings.notifications,
+            },
+            privacy_preferences: {
+              profileVisibility: settings.profileVisibility,
+              activityVisible: settings.activityVisible,
+              messagingPermission: settings.messagingPermission,
+              friendRequestPermission: settings.friendRequestPermission,
+              discoverable: settings.discoverable,
+              shareOnlineStatus: settings.shareOnlineStatus,
+            },
+          },
+          updatedAt: Date.now(),
         },
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' });
-      if (error) console.warn('Could not sync account settings:', error.message);
+        { merge: true }
+      );
     }
-  } catch (error) { console.warn('Could not sync account settings:', error); }
+  } catch (error) {
+    console.warn('Could not sync account settings:', error);
+  }
 }
 
 /** Load account preferences onto this device after sign-in, seeding the account on first use. */
 export async function syncSettingsFromAccount(userId: string) {
   await ensureSettingsLoaded();
-  const { data, error } = await supabase.from('user_preferences')
-    .select('appearance, font_size, zoom, notification_preferences, privacy_preferences, navigation_auto_hide')
-    .eq('user_id', userId).maybeSingle();
-  if (error) throw error;
-  if (!data) {
-    await saveSettings();
-    return;
-  }
+  try {
+    const snap = await getDoc(doc(db, 'users', userId));
+    const data = snap.data()?.preferences;
+    if (!data) {
+      await saveSettings();
+      return;
+    }
 
-  const notifications = data.notification_preferences as Record<string, unknown> | null;
-  const privacy = data.privacy_preferences as Record<string, unknown> | null;
-  settings = {
-    ...settings,
-    appearance: isAppearance(data.appearance) ? data.appearance : settings.appearance,
-    fontSize: ['small', 'default', 'large', 'extra_large'].includes(data.font_size) ? data.font_size as FontSizePreference : settings.fontSize,
-    pageZoom: isPageZoom(data.zoom) ? data.zoom : settings.pageZoom,
-    pushNotificationsEnabled: typeof notifications?.pushEnabled === 'boolean' ? notifications.pushEnabled : settings.pushNotificationsEnabled,
-    notifications: Object.fromEntries(
-      Object.keys(defaultNotificationPreferences).map((key) => [
-        key,
-        typeof notifications?.[key] === 'boolean' ? notifications[key] : settings.notifications[key as NotificationCategory],
-      ])
-    ) as NotificationPreferences,
-    profileVisibility: ['public', 'friends', 'private'].includes(String(privacy?.profileVisibility)) ? privacy?.profileVisibility as ProfileVisibility : settings.profileVisibility,
-    activityVisible: typeof privacy?.activityVisible === 'boolean' ? privacy.activityVisible : settings.activityVisible,
-    messagingPermission: privacy?.messagingPermission === 'everyone' ? 'everyone' : privacy?.messagingPermission === 'friends' ? 'friends' : settings.messagingPermission,
-    friendRequestPermission: privacy?.friendRequestPermission === 'friends' ? 'friends' : privacy?.friendRequestPermission === 'everyone' ? 'everyone' : settings.friendRequestPermission,
-    discoverable: typeof privacy?.discoverable === 'boolean' ? privacy.discoverable : settings.discoverable,
-    shareOnlineStatus: privacy?.shareOnlineStatus === true,
-    answerBounceEnabled: typeof notifications?.answerBounceEnabled === 'boolean' ? notifications.answerBounceEnabled : settings.answerBounceEnabled,
-  };
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-  if (typeof data.navigation_auto_hide === 'boolean') {
-    await setTabBarModeFromAccount(data.navigation_auto_hide ? 'autoHide' : 'alwaysVisible');
+    const notifications = data.notification_preferences as Record<string, unknown> | null;
+    const privacy = data.privacy_preferences as Record<string, unknown> | null;
+    settings = {
+      ...settings,
+      appearance: isAppearance(data.appearance) ? data.appearance : settings.appearance,
+      fontSize: ['small', 'default', 'large', 'extra_large'].includes(data.font_size)
+        ? (data.font_size as FontSizePreference)
+        : settings.fontSize,
+      pageZoom: isPageZoom(data.zoom) ? data.zoom : settings.pageZoom,
+      pushNotificationsEnabled:
+        typeof notifications?.pushEnabled === 'boolean'
+          ? notifications.pushEnabled
+          : settings.pushNotificationsEnabled,
+      notifications: Object.fromEntries(
+        Object.keys(defaultNotificationPreferences).map((key) => [
+          key,
+          typeof notifications?.[key] === 'boolean'
+            ? notifications[key]
+            : settings.notifications[key as NotificationCategory],
+        ])
+      ) as NotificationPreferences,
+      profileVisibility: ['public', 'friends', 'private'].includes(String(privacy?.profileVisibility))
+        ? (privacy?.profileVisibility as ProfileVisibility)
+        : settings.profileVisibility,
+      activityVisible:
+        typeof privacy?.activityVisible === 'boolean' ? privacy.activityVisible : settings.activityVisible,
+      messagingPermission:
+        privacy?.messagingPermission === 'everyone'
+          ? 'everyone'
+          : privacy?.messagingPermission === 'friends'
+            ? 'friends'
+            : settings.messagingPermission,
+      friendRequestPermission:
+        privacy?.friendRequestPermission === 'friends'
+          ? 'friends'
+          : privacy?.friendRequestPermission === 'everyone'
+            ? 'everyone'
+            : settings.friendRequestPermission,
+      discoverable: typeof privacy?.discoverable === 'boolean' ? privacy.discoverable : settings.discoverable,
+      shareOnlineStatus: privacy?.shareOnlineStatus === true,
+      answerBounceEnabled:
+        typeof notifications?.answerBounceEnabled === 'boolean'
+          ? notifications.answerBounceEnabled
+          : settings.answerBounceEnabled,
+    };
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    if (typeof data.navigation_auto_hide === 'boolean') {
+      await setTabBarModeFromAccount(data.navigation_auto_hide ? 'autoHide' : 'alwaysVisible');
+    }
+    notify();
+  } catch (error) {
+    console.warn('Could not sync settings from Firestore:', error);
   }
-  notify();
 }
 
 export function useFontSizePreference(): FontSizePreference {
@@ -269,17 +304,25 @@ export function usePrivacyPreferences() {
   return useSyncExternalStore(subscribe, getPrivacySnapshot, () => defaultPrivacySettings);
 }
 
-export async function setPrivacyPreference<K extends 'profileVisibility' | 'activityVisible' | 'messagingPermission' | 'friendRequestPermission' | 'discoverable' | 'shareOnlineStatus'>(key: K, value: SettingsData[K]) {
+export async function setPrivacyPreference<
+  K extends
+    | 'profileVisibility'
+    | 'activityVisible'
+    | 'messagingPermission'
+    | 'friendRequestPermission'
+    | 'discoverable'
+    | 'shareOnlineStatus',
+>(key: K, value: SettingsData[K]) {
   await ensureSettingsLoaded();
   settings = { ...settings, [key]: value };
   notify();
   await saveSettings();
   if (key === 'activityVisible') {
-    const { data } = await supabase.auth.getSession();
-    const userId = data.session?.user.id;
+    const userId = auth.currentUser?.uid;
     if (userId) {
-      const { error } = await supabase.from('profiles').update({ share_activity: value }).eq('id', userId);
-      if (error) console.warn('Could not sync activity visibility:', error.message);
+      await setDoc(doc(db, 'users', userId), { share_activity: value }, { merge: true }).catch((err) =>
+        console.warn('Could not sync activity visibility:', err)
+      );
     }
   }
 }

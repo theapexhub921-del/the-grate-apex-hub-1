@@ -25,6 +25,14 @@ import { needsOnboarding, useOnboardingState } from '@/data/onboarding';
 import { setDisplayName } from '@/data/user';
 import { useTheme } from '@/hooks/use-theme';
 import { friendlyGoogleError, signInWithGoogle, takeOAuthPending } from '@/lib/google-auth';
+import {
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  updatePassword as fbUpdatePassword,
+} from 'firebase/auth';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 
 
 const HOME_HREF = '/' as Href;
@@ -154,10 +162,11 @@ export default function LoginScreen() {
     setResetSent(false);
 
     try {
-      // Emails are sent by the backend; no Supabase call here.
+      await sendPasswordResetEmail(auth, email.trim());
       setResetSent(true);
-    } catch {
-      setError('Could not reach the server. Check your connection and try again.');
+    } catch (err: any) {
+      console.warn('Reset email error:', err);
+      setError(friendlyError(err?.message, err?.code));
     } finally {
       setLoading(false);
     }
@@ -175,12 +184,17 @@ export default function LoginScreen() {
     setError(null);
 
     try {
-      setError('Password updates are coming soon.');
-      setNewPassword('');
-      setConfirmPassword('');
-      setPasswordUpdated(true);
-    } catch {
-      setError('Could not reach the server. Check your connection and try again.');
+      if (auth.currentUser) {
+        await fbUpdatePassword(auth.currentUser, newPassword);
+        setPasswordUpdated(true);
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        setError('No active session. Please request a new password reset link.');
+      }
+    } catch (err: any) {
+      console.warn('Update password error:', err);
+      setError(friendlyError(err?.message, err?.code));
     } finally {
       setLoading(false);
     }
@@ -193,11 +207,12 @@ export default function LoginScreen() {
     setError(null);
 
     try {
-      setError('Sign in is coming soon — the new login system is being built.');
+      await signInWithEmailAndPassword(auth, email.trim(), password);
       setPassword('');
-    } catch (err) {
+      router.replace(HOME_HREF);
+    } catch (err: any) {
       console.warn('Sign-in error:', err);
-      setError('Could not reach the server. Check your connection and try again.');
+      setError(friendlyError(err?.message, err?.code));
     } finally {
       setLoading(false);
     }
@@ -218,13 +233,52 @@ export default function LoginScreen() {
     setError(null);
 
     try {
-      // Account creation is handled by the new Firebase backend later.
-      setError('Account creation is coming soon.');
+      const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      const uid = cred.user.uid;
+      const username = fullName.trim() || email.split('@')[0];
+
+      // Store user document in users/{uid} matching existing Firestore schema
+      await setDoc(
+        doc(db, 'users', uid),
+        {
+          username,
+          createdAt: serverTimestamp(),
+          onboardingDone: false,
+          tutorialDone: false,
+          semester: 1,
+          hall: '',
+          autoHideNav: true,
+          classLocked: false,
+          remindersOff: false,
+        },
+        { merge: true }
+      );
+
+      // Initialize progress doc
+      await setDoc(
+        doc(db, 'progress', uid),
+        {
+          xp: 0,
+          updatedAt: Date.now(),
+          savedAt: serverTimestamp(),
+          lessons: {},
+          subjects: {},
+          topics: {},
+          days: {},
+          cards: {},
+          seen: {},
+          terms: {},
+          tests: {},
+        },
+        { merge: true }
+      );
+
       setPassword('');
       setSignUpConfirm('');
-      setAcceptedTerms(false);
-    } catch {
-      setError('Could not reach the server. Check your connection and try again.');
+      router.replace(HOME_HREF);
+    } catch (err: any) {
+      console.warn('Sign-up error:', err);
+      setError(friendlyError(err?.message, err?.code));
     } finally {
       setLoading(false);
     }
@@ -845,20 +899,38 @@ function friendlyUpdateError(updateError: { code?: string | null; message: strin
   return `Could not update your password: ${updateError.message}`;
 }
 
-// Turns Supabase's technical messages into plain language.
-function friendlyError(message: string) {
-  const text = message.toLowerCase();
+// Turns authentication error messages into plain language.
+function friendlyError(message?: string | null, code?: string | null) {
+  const text = (message || '').toLowerCase();
+  const c = code || '';
 
-  if (text.includes('invalid login credentials')) {
-    return 'Incorrect email or password.';
+  if (
+    c === 'auth/invalid-credential' ||
+    c === 'auth/wrong-password' ||
+    c === 'auth/user-not-found' ||
+    text.includes('invalid credential') ||
+    text.includes('invalid login credentials') ||
+    text.includes('wrong-password') ||
+    text.includes('user-not-found')
+  ) {
+    return 'Incorrect email or password. Please try again or reset your password.';
   }
-  if (text.includes('email not confirmed')) {
-    return 'Please confirm your email address first — check your inbox for the link.';
+  if (c === 'auth/email-already-in-use' || text.includes('email already')) {
+    return 'An account with this email already exists. Please sign in instead.';
   }
-  if (text.includes('rate limit') || text.includes('too many')) {
+  if (c === 'auth/invalid-email' || text.includes('invalid email') || text.includes('invalid-email')) {
+    return 'Please enter a valid email address.';
+  }
+  if (c === 'auth/weak-password' || text.includes('weak password') || text.includes('weak-password')) {
+    return 'Password is too weak. Please use at least 8 characters.';
+  }
+  if (c === 'auth/too-many-requests' || text.includes('too many') || text.includes('rate limit')) {
     return 'Too many attempts — please wait a few minutes and try again.';
   }
-  return 'Sign-in failed. Please try again.';
+  if (c === 'auth/network-request-failed' || text.includes('network')) {
+    return 'Network error. Please check your internet connection.';
+  }
+  return message || 'Authentication failed. Please try again.';
 }
 
 function createStyles(colors: ThemeColors) {

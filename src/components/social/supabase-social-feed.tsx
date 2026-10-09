@@ -20,8 +20,8 @@ import { useAvatarUrl, useDisplayName } from '@/data/user';
 import { type ThemeColors, Type } from '@/constants/theme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
-/** Feed built only from friend profiles and activity returned by Supabase. */
-export function SupabaseSocialFeed({ children }: { children?: ReactNode }) {
+/** Feed built only from friend profiles and activity. */
+export function SocialActivityFeed({ children }: { children?: ReactNode }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const social = useSocial();
@@ -408,3 +408,5 @@ function createStyles(colors: ThemeColors) {
     errorText: { ...Type.caption, color: colors.error },
   });
 }
+
+export const SupabaseSocialFeed = SocialActivityFeed;

@@ -13,7 +13,6 @@ import { inviteFriendToGroup, listGroupDiscussion, listVisibleStudyGroups, postT
 import { personName, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { supabase } from '@/lib/supabase';
 
 export default function StudyGroupScreen() {
   const styles = useThemedStyles(createStyles);
@@ -46,19 +45,7 @@ export default function StudyGroupScreen() {
 
   useEffect(() => { queueMicrotask(() => { void refresh(); }); }, [refresh]);
 
-  useEffect(() => {
-    if (!groupId) return;
-    const channel = supabase
-      .channel(`group-discussion-${groupId}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'group_discussions',
-        filter: `group_id=eq.${groupId}`,
-      }, () => { void refresh(); })
-      .subscribe();
-    return () => { void supabase.removeChannel(channel); };
-  }, [groupId, refresh]);
+  // Refresh handled on load and after sending
 
   async function send() {
     if (!groupId || !draft.trim() || busy) return;

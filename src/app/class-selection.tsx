@@ -7,9 +7,10 @@ import { Card, Interactive } from '@/components/ui/interactive';
 import { PageHeader, Screen, SectionHeader } from '@/components/ui/screen';
 import { CLASS_IDS, classSelectionMetadata, readClassSelection, SEMESTERS, type ClassId, type Semester } from '@/data/class-curriculum';
 import { useAuth } from '@/hooks/use-auth';
-import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { supabase } from '@/lib/supabase';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 import { routes } from '@/lib/routes';
+import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { type ThemeColors } from '@/constants/theme';
 
 export default function ClassSelectionScreen() {
@@ -35,29 +36,27 @@ export default function ClassSelectionScreen() {
     setError(null);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.getUser();
-      if (authError || !authData.user) {
+      const currentUid = auth.currentUser?.uid;
+      if (!currentUid) {
         setError('Your sign-in could not be confirmed. Please sign in again and try once more.');
         return;
       }
 
-      // Account placement is a one-time choice. A stale selection screen
-      // must never overwrite a class already saved to the signed-in account.
-      const existing = readClassSelection(authData.user.user_metadata);
-      if (existing) {
-        router.replace(routes.learnEnvironment(existing));
-        return;
-      }
+      const meta = classSelectionMetadata({ classId, semester });
+      const semNum = Number(String(semester).replace(/\D/g, '')) || 1;
 
-      const { data, error: updateError } = await supabase.auth.updateUser({
-        data: classSelectionMetadata({ classId, semester }),
-      });
-      const saved = readClassSelection(data.user?.user_metadata);
-      if (updateError || !saved || saved.classId !== classId || saved.semester !== semester) {
-        setError('Your class selection could not be saved. Please check your connection and try again.');
-        return;
-      }
+      await setDoc(
+        doc(db, 'users', currentUid),
+        {
+          classId,
+          semester: semNum,
+          classLocked: true,
+          ...meta,
+        },
+        { merge: true }
+      );
 
+      const saved = { classId, semester };
       router.replace(routes.learnEnvironment(saved));
     } catch {
       setError('Your class selection could not be saved. Please check your connection and try again.');

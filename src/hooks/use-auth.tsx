@@ -1,4 +1,3 @@
-import type { Session, User } from '@supabase/supabase-js';
 import {
   createContext,
   type ReactNode,
@@ -7,14 +6,30 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
+import { doc, onSnapshot } from 'firebase/firestore';
 
-import { supabase } from '@/lib/supabase';
+import { auth, db } from '@/lib/firebase';
 
-export type AuthState = {
-  session: Session | null;
-  user: User | null;
+export interface AuthUser {
+  id: string; // for compatibility with code referencing user.id
+  uid: string; // Firebase uid
+  email: string | null;
+  displayName: string | null;
+  created_at?: string;
+  user_metadata?: Record<string, any>;
+  profile?: Record<string, any>;
+}
+
+export interface AuthSession {
+  user: AuthUser;
+}
+
+export interface AuthState {
+  session: AuthSession | null;
+  user: AuthUser | null;
   loading: boolean;
-};
+}
 
 const AuthContext = createContext<AuthState>({
   session: null,
@@ -23,43 +38,66 @@ const AuthContext = createContext<AuthState>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
+    let unsubSnapshot: (() => void) | null = null;
 
-    // Fetch the existing Supabase session on startup.
-    supabase.auth
-      .getSession()
-      .then(({ data: { session: initialSession }, error }) => {
-        if (!mounted) return;
-        if (!error && initialSession) {
-          setSession(initialSession);
-        } else {
-          setSession(null);
-        }
+    const unsubAuth = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      if (unsubSnapshot) {
+        unsubSnapshot();
+        unsubSnapshot = null;
+      }
+
+      if (!firebaseUser) {
+        setSession(null);
         setLoading(false);
-      })
-      .catch(() => {
-        if (mounted) {
-          setSession(null);
+        return;
+      }
+
+      // Read live Firestore profile
+      const userRef = doc(db, 'users', firebaseUser.uid);
+      unsubSnapshot = onSnapshot(
+        userRef,
+        (snap) => {
+          const profile = snap.data() || {};
+          const authUser: AuthUser = {
+            id: firebaseUser.uid,
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: profile.username || firebaseUser.displayName || null,
+            created_at: firebaseUser.metadata.creationTime,
+            user_metadata: {
+              ...profile,
+              onboarding_completed: profile.onboardingDone === true,
+              full_name: profile.username || firebaseUser.displayName || '',
+            },
+            profile,
+          };
+          setSession({ user: authUser });
+          setLoading(false);
+        },
+        () => {
+          // If Firestore is offline or document not yet created, still create basic auth state
+          const authUser: AuthUser = {
+            id: firebaseUser.uid,
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            created_at: firebaseUser.metadata.creationTime,
+            user_metadata: {},
+            profile: {},
+          };
+          setSession({ user: authUser });
           setLoading(false);
         }
-      });
-
-    // Subscribe to session and authentication state changes.
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      if (!mounted) return;
-      setSession(currentSession);
-      setLoading(false);
+      );
     });
 
     return () => {
-      mounted = false;
-      subscription.unsubscribe();
+      if (unsubSnapshot) unsubSnapshot();
+      unsubAuth();
     };
   }, []);
 

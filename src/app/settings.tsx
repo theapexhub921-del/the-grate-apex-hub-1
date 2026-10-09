@@ -45,7 +45,8 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { deleteMyAccount } from '@/lib/account';
 import { routes } from '@/lib/routes';
-import { supabase } from '@/lib/supabase';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { enableDeviceNotifications } from '@/lib/device-notifications';
 
 const HOME_HREF = '/' as Href;
@@ -144,10 +145,7 @@ export default function SettingsScreen() {
     if (signingOut) return;
     setSigningOut(true);
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.warn('Error signing out:', error.message);
-      }
+      await signOut(auth);
     } catch (err) {
       console.warn('Unexpected error signing out:', err);
     } finally {

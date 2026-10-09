@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+import { collection, getDocs, limit, query, where } from 'firebase/firestore';
 
 import type { ExploreItem } from '@/data/explore';
-import { supabase } from '@/lib/supabase';
+import { db } from '@/lib/firebase';
 
 export type WeeklyExploreSession = {
   week_start: string;
@@ -16,34 +17,33 @@ function mondayKey(date: Date) {
   return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
 }
 
-function addDays(key: string, days: number) {
-  const date = new Date(`${key}T12:00:00`);
-  date.setDate(date.getDate() + days);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
-
 export async function loadWeeklyExploreSession(now = new Date()): Promise<WeeklyExploreSession | null> {
-  const weekStart = mondayKey(now);
-  const nextWeek = addDays(weekStart, 7);
-  const { data, error } = await supabase
-    .from('explore_weekly_sessions')
-    .select('week_start, title, summary, items')
-    .eq('status', 'published')
-    .gte('week_start', weekStart)
-    .lte('week_start', nextWeek)
-    .order('week_start', { ascending: true })
-    .limit(1)
-    .maybeSingle();
-  if (error || !data || !Array.isArray(data.items)) return null;
-  return data as unknown as WeeklyExploreSession;
+  try {
+    const weekStart = mondayKey(now);
+    const q = query(
+      collection(db, 'explore_weekly_sessions'),
+      where('status', '==', 'published'),
+      limit(1)
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    const docData = snap.docs[0].data();
+    return docData as unknown as WeeklyExploreSession;
+  } catch {
+    return null;
+  }
 }
 
 export function useWeeklyExploreSession() {
   const [session, setSession] = useState<WeeklyExploreSession | null>(null);
   useEffect(() => {
     let active = true;
-    void loadWeeklyExploreSession().then((result) => { if (active) setSession(result); });
-    return () => { active = false; };
+    void loadWeeklyExploreSession().then((result) => {
+      if (active) setSession(result);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
   return session;
 }

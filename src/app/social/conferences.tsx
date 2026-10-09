@@ -12,7 +12,7 @@ import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import { conferenceParticipants, createConference, joinConference, leaveConference, listConferenceMessages, listConferences, sendConferenceMessage, type ConferenceMessage, type TableConference } from '@/data/conferences';
 import { listVisibleStudyGroups, type StudyGroup } from '@/data/community';
 import { personName, useSocial } from '@/data/social';
-import { supabase } from '@/lib/supabase';
+import { auth } from '@/lib/firebase';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 export default function ConferencesScreen() {
@@ -36,7 +36,12 @@ export default function ConferencesScreen() {
   const [busy, setBusy] = useState(false);
 
   async function reload() {
-    try { const [{ data }, upcoming, groupList] = await Promise.all([supabase.auth.getUser(), listConferences(), listVisibleStudyGroups()]); setUserId(data.user?.id ?? ''); setConferences(upcoming); setGroups(groupList); }
+    try {
+      const [upcoming, groupList] = await Promise.all([listConferences(), listVisibleStudyGroups()]);
+      setUserId(auth.currentUser?.uid ?? '');
+      setConferences(upcoming);
+      setGroups(groupList);
+    }
     catch (e) { setError(e instanceof Error ? e.message : 'Could not load conferences.'); }
   }
   useEffect(() => { queueMicrotask(() => { void reload(); }); }, []);

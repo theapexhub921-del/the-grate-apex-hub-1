@@ -8,7 +8,8 @@ import { Type, type ThemeColors } from '@/constants/theme';
 import { ACADEMIC_TRIAL_DAYS, academicTrialMetadata, readAcademicTrial, type ClassSelection } from '@/data/class-curriculum';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { supabase } from '@/lib/supabase';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export function ClassAccessCard({ target, current, lessonsComplete, lessonsTotal, trialUsed, trialExpiresAt, onStartTrial, onBack }: {
   target: ClassSelection;
@@ -30,13 +31,24 @@ export function ClassAccessCard({ target, current, lessonsComplete, lessonsTotal
   const remaining = now && trialExpiresAt ? Math.max(0, Math.ceil((trialExpiresAt - now) / 86400000)) : 0;
   async function startTrial() {
     if (saving || trialUsed || !user) return;
-    setSaving(true); setError(null);
-    const startedAt = Date.now();
-    const { data, error: saveError } = await supabase.auth.updateUser({ data: academicTrialMetadata(startedAt) });
-    const saved = readAcademicTrial(data.user?.user_metadata);
-    setSaving(false);
-    if (saveError || !saved.active) { setError(saveError?.message ?? 'The free trial could not be saved. Try again.'); return; }
-    onStartTrial();
+    setSaving(true);
+    setError(null);
+    try {
+      const startedAt = Date.now();
+      await setDoc(
+        doc(db, 'users', user.id),
+        {
+          trialStartedAt: serverTimestamp(),
+          ...academicTrialMetadata(startedAt),
+        },
+        { merge: true }
+      );
+      setSaving(false);
+      onStartTrial();
+    } catch (err: any) {
+      setSaving(false);
+      setError(err?.message ?? 'The free trial could not be saved. Try again.');
+    }
   }
   return <Card style={styles.card} tone="insight">
     <View style={styles.heading}><View style={styles.icon}><Icon name="lock" size={20} color={colors.primaryText} /></View><View style={styles.copy}><Text style={styles.kicker}>NEXT LEVEL · {target.classId} · SEMESTER {target.semester}</Text><Text style={styles.title}>Finish the required content first</Text></View><Pill label="Locked" /></View>

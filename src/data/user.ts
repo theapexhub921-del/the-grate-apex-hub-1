@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { getCurrentProfile, updateCurrentProfile } from '@/lib/profiles';
-import { supabase } from '@/lib/supabase';
 
 // The student's display name and avatar.
 //
@@ -111,15 +112,11 @@ function ensureLoaded() {
   return loadPromise;
 }
 
-// React to authentication changes (login, logout, token refresh).
-supabase.auth.onAuthStateChange((event) => {
-  if (
-    event === 'SIGNED_IN' ||
-    event === 'USER_UPDATED' ||
-    event === 'TOKEN_REFRESHED'
-  ) {
+// React to authentication changes (login, logout).
+onAuthStateChanged(auth, (user) => {
+  if (user) {
     void syncProfileWithSupabase();
-  } else if (event === 'SIGNED_OUT') {
+  } else {
     cachedName = null;
     cachedAvatar = null;
     notify();

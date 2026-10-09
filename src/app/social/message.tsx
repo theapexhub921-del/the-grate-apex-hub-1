@@ -16,7 +16,6 @@ import { deleteCommunityMessage, getOrCreateFriendConversation, listConversation
 import { useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { supabase } from '@/lib/supabase';
 
 export default function DirectMessageScreen() {
   const styles = useThemedStyles(createStyles);
@@ -64,19 +63,7 @@ export default function DirectMessageScreen() {
     return () => { active = false; };
   }, [friendId, refresh]);
 
-  useEffect(() => {
-    if (!conversationId) return;
-    const channel = supabase
-      .channel(`direct-message-${conversationId}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `conversation_id=eq.${conversationId}`,
-      }, () => { void refresh(conversationId); })
-      .subscribe();
-    return () => { void supabase.removeChannel(channel); };
-  }, [conversationId, refresh]);
+  // Messages reload on user actions
 
   async function send() {
     if (!conversationId || !draft.trim() || busy) return;

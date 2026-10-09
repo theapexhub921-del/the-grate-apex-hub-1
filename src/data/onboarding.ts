@@ -1,16 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { User } from '@supabase/supabase-js';
 import { useSyncExternalStore } from 'react';
+import { doc, updateDoc, setDoc } from 'firebase/firestore';
 
-import { supabase } from '@/lib/supabase';
+import { auth, db } from '@/lib/firebase';
+import type { AuthUser } from '@/hooks/use-auth';
 
 // First-run introduction ("onboarding") state.
 //
 // A learner sees the interactive introduction once, after their first
 // sign-in. Completion (finished OR skipped) is remembered in two places:
 //   - on this device (AsyncStorage), so it applies instantly and offline
-//   - on the Supabase account (auth user metadata), so it follows the
-//     learner to other devices — no database table or migration needed.
+//   - on the Firebase account (Firestore users document), so it follows the
+//     learner to other devices.
 // Settings → "Replay the introduction" can always show it again.
 
 const STORAGE_KEY = 'grateapex_onboarding';
@@ -25,7 +26,7 @@ export const PRIVACY_VERSION = '2026-10-05';
 export const ONBOARDING_RELEASE = Date.parse('2026-10-03T00:00:00Z');
 
 type Entry = { at: number; how: 'finished' | 'skipped' };
-type Records = Record<string, Entry>; // by Supabase user id
+type Records = Record<string, Entry>; // by user id
 
 let records: Records = {};
 let ready = false;
@@ -75,36 +76,50 @@ export function useOnboardingState(): Snapshot {
 }
 
 /** True when this signed-in learner should be taken through the introduction. */
-export function needsOnboarding(user: User | null | undefined, local: Records): boolean {
+export function needsOnboarding(user: AuthUser | null | undefined, local: Records): boolean {
   if (!user) return false;
+  // If the user already completed onboarding in Firestore
+  if (user.user_metadata?.onboarding_completed === true || user.profile?.onboardingDone === true) {
+    return false;
+  }
   const created = Date.parse(user.created_at ?? '');
   const isNewAccount = Number.isFinite(created) && created >= ONBOARDING_RELEASE;
   if (!isNewAccount) return false;
   const metadata = user.user_metadata ?? {};
-  const legalAccepted = metadata.terms_accepted === true
-    && metadata.terms_version === TERMS_VERSION
-    && metadata.privacy_acknowledged === true
-    && metadata.privacy_version === PRIVACY_VERSION;
+  const legalAccepted =
+    metadata.terms_accepted === true &&
+    metadata.terms_version === TERMS_VERSION &&
+    metadata.privacy_acknowledged === true &&
+    metadata.privacy_version === PRIVACY_VERSION;
   if (!legalAccepted) return true;
   if (metadata.onboarding_completed === true || local[user.id]) return false;
   return true;
 }
 
-export function needsLegalAcceptance(user: User | null | undefined): boolean {
+export function needsLegalAcceptance(user: AuthUser | null | undefined): boolean {
   if (!user) return false;
   const created = Date.parse(user.created_at ?? '');
   if (!Number.isFinite(created) || created < ONBOARDING_RELEASE) return false;
   const metadata = user.user_metadata ?? {};
-  return !(metadata.terms_accepted === true && metadata.terms_version === TERMS_VERSION
-    && metadata.privacy_acknowledged === true && metadata.privacy_version === PRIVACY_VERSION);
+  return !(
+    metadata.terms_accepted === true &&
+    metadata.terms_version === TERMS_VERSION &&
+    metadata.privacy_acknowledged === true &&
+    metadata.privacy_version === PRIVACY_VERSION
+  );
 }
 
 /** Record explicit legal consent on the signed-in account before the tour. */
 export async function acceptCurrentLegalVersions(): Promise<{ error: string | null }> {
   const acceptedAt = new Date().toISOString();
+  const currentUid = auth.currentUser?.uid;
+  if (!currentUid) return { error: 'No signed-in user.' };
+
   try {
-    const { error } = await supabase.auth.updateUser({
-      data: {
+    const userRef = doc(db, 'users', currentUid);
+    await setDoc(
+      userRef,
+      {
         terms_accepted: true,
         terms_accepted_at: acceptedAt,
         terms_version: TERMS_VERSION,
@@ -112,8 +127,9 @@ export async function acceptCurrentLegalVersions(): Promise<{ error: string | nu
         privacy_acknowledged_at: acceptedAt,
         privacy_version: PRIVACY_VERSION,
       },
-    });
-    return { error: error?.message ?? null };
+      { merge: true }
+    );
+    return { error: null };
   } catch (problem) {
     return { error: problem instanceof Error ? problem.message : 'Could not save your acceptance. Please try again.' };
   }
@@ -128,14 +144,21 @@ export async function completeOnboarding(userId: string, how: Entry['how']) {
   } catch (problem) {
     console.warn('Could not save onboarding state:', problem);
   }
-  // Follow the learner across devices. Failure is harmless: the local
-  // record already keeps them out of the introduction on this device.
+
+  // Persist to Firestore users doc
   try {
-    const { error } = await supabase.auth.updateUser({
-      data: { onboarding_completed: true, onboarding_completed_at: new Date().toISOString(), onboarding_result: how },
-    });
-    if (error) console.warn('Could not save onboarding state to the account:', error.message);
+    const userRef = doc(db, 'users', userId);
+    await setDoc(
+      userRef,
+      {
+        onboardingDone: true,
+        tutorialDone: how === 'finished',
+        onboarding_completed_at: new Date().toISOString(),
+        onboarding_result: how,
+      },
+      { merge: true }
+    );
   } catch (problem) {
-    console.warn('Could not save onboarding state to the account:', problem);
+    console.warn('Could not save onboarding state to Firestore:', problem);
   }
 }
