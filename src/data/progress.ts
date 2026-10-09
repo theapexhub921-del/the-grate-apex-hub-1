@@ -205,8 +205,10 @@ function cloudStats() {
   };
 }
 
+// Only lessons of this app's curriculum are synced: the cloud document is
+// shared with the original app, whose lesson entries must stay untouched.
 function cloudLessonRows() {
-  return progress.completedLessons.map((lessonId) => ({
+  return progress.completedLessons.filter((lessonId) => findLesson(lessonId)).map((lessonId) => ({
     lessonId,
     xp: progress.xpLedger.find((entry) => entry.key === `lesson:${lessonId}`)?.amount ?? findLesson(lessonId)?.lesson.xp ?? 0,
     completedAt: progress.lessonCompletedAt[lessonId],
@@ -232,6 +234,7 @@ async function syncProgressWithSupabase(hasLocalProgress: boolean) {
         : progress.streak;
 
   for (const row of remote.completedLessons) {
+    if (!findLesson(row.lessonId)) continue; // not a lesson of this app
     if (!progress.completedLessons.includes(row.lessonId)) progress.completedLessons.push(row.lessonId);
     const local = progress.lessonCompletedAt[row.lessonId];
     if (row.completedAt && (!local || row.completedAt < local)) {

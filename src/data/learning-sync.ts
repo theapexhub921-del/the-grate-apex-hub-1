@@ -188,15 +188,15 @@ export async function loadCloudProgress(): Promise<CloudProgress | null> {
 
     let completedLessons: CloudLessonRow[] = [];
     if (d.lessons && typeof d.lessons === 'object' && !Array.isArray(d.lessons)) {
-      completedLessons = Object.entries(d.lessons).map(([id, val]: [string, any]) => ({
-        lessonId: id,
-        completedAt:
-          typeof val === 'number'
-            ? val
-            : val && typeof val === 'object' && 'completedAt' in val
-              ? toMillis(val.completedAt)
-              : null,
-      }));
+      // The original app shares this document: its entries are numbers (how
+      // many sections of an old lesson were finished), not completions, so
+      // they are skipped here and never rewritten (see saveCloudProgress).
+      completedLessons = Object.entries(d.lessons)
+        .filter(([, val]) => typeof val !== 'number')
+        .map(([id, val]: [string, any]) => ({
+          lessonId: id,
+          completedAt: val && typeof val === 'object' && 'completedAt' in val ? toMillis(val.completedAt) : null,
+        }));
     } else if (Array.isArray(d.lessons)) {
       completedLessons = d.lessons.map((item: any) =>
         typeof item === 'string'
@@ -256,6 +256,8 @@ export async function saveCloudProgress(
 
     const updatedLessons: Record<string, any> = { ...existingLessons };
     for (const l of completedLessons) {
+      // Never replace the original app's section counts.
+      if (typeof existingLessons[l.lessonId] === 'number') continue;
       updatedLessons[l.lessonId] = {
         completedAt: l.completedAt || Date.now(),
         xp: l.xp,
