@@ -265,7 +265,7 @@ const exploreItems: ExploreItem[] = [
   {
     id: 'grateapex-lesson-quizzes',
     category: 'grateapex',
-    topic: 'Learn',
+    topic: 'Study',
     title: 'Lesson quizzes',
     summary: 'Check your understanding with a short quiz after each lesson.',
     basicIdea:
@@ -275,7 +275,7 @@ const exploreItems: ExploreItem[] = [
     publishedAt: '2026-09-01',
     featured: false,
     tags: ['learn', 'quizzes'],
-    action: { label: 'Go to Learn', href: '/learn' },
+    action: { label: 'Go to Study', href: '/learn' },
   },
   {
     id: 'grateapex-reinforcement-calendar',
@@ -284,28 +284,28 @@ const exploreItems: ExploreItem[] = [
     title: 'The reinforcement calendar',
     summary: 'See exactly when each concept comes back for review.',
     basicIdea:
-      'Every concept you learn is scheduled to return just before you are likely to forget it. The calendar on Home shows what is due each day, what is overdue, which concepts need work, and the reviews you have already done. Open a day to see its concepts and how close each one is to mastery.',
+      'Every concept you learn is scheduled to return just before you are likely to forget it. The calendar on Feed shows what is due each day, what is overdue, which concepts need work, and the reviews you have already done. Open a day to see its concepts and how close each one is to mastery.',
     provenance: FEATURE,
     sources: [],
     publishedAt: '2026-10-03',
     featured: true,
     tags: ['review', 'spaced-repetition', 'calendar'],
-    action: { label: 'Open Home', href: '/' },
+    action: { label: 'Open Feed', href: '/' },
   },
   {
     id: 'grateapex-avatars',
     category: 'grateapex',
-    topic: 'Profile',
+    topic: 'You',
     title: 'Choose your avatar',
     summary: 'Pick an illustrated avatar or upload your own photo.',
     basicIdea:
-      'Open your Profile and tap your avatar. Choose one of the illustrated male or female avatars, upload a photo of your own, or keep your initials. Your choice is saved to your account.',
+      'Open You and tap your avatar. Choose one of the illustrated male or female avatars, upload a photo of your own, or keep your initials. Your choice is saved to your account.',
     provenance: FEATURE,
     sources: [],
     publishedAt: '2026-10-03',
     featured: false,
     tags: ['profile', 'avatar'],
-    action: { label: 'Open Profile', href: '/profile' },
+    action: { label: 'Open You', href: '/profile' },
   },
 ];
 
@@ -315,10 +315,10 @@ const announcements: readonly ExploreAnnouncement[] = [
 ];
 
 export const EXPLORE_GUIDE: readonly ExploreGuideEntry[] = [
-  { title: 'Home', detail: 'Your next learning action, progress and a social view of classmates.', status: 'available' },
-  { title: 'Learn', detail: 'Follow the course structure, study lessons, answer quizzes and revisit concepts through spaced review.', status: 'available' },
+  { title: 'Feed', detail: 'Your next learning action, progress and a social view of classmates.', status: 'available' },
+  { title: 'Study', detail: 'Follow the course structure, study lessons, answer quizzes and revisit concepts through spaced review.', status: 'available' },
   { title: 'Connect', detail: 'Find classmates, manage friend requests, use study groups, text-first conferences, messages and the friend feed. Live voice calls are a separate planned feature.', status: 'available' },
-  { title: 'Profile', detail: 'Show your name and avatar alongside your learning identity and achievements.', status: 'available' },
+  { title: 'You', detail: 'Show your name and avatar alongside your learning identity and achievements.', status: 'available' },
   { title: 'Settings', detail: 'Choose your theme, text size, web zoom, navigation, notification preferences and privacy choices. These controls are available in the app.', status: 'available' },
   { title: 'XP and ranks', detail: 'Earn XP from learning tasks and follow your progress through the rank ladder.', status: 'available' },
   { title: 'Learning power-ups', detail: 'Earn XP boosts from completed lessons, quizzes, streak milestones and one successful app share per day. The strongest stored boost applies to your next lesson or quiz.', status: 'available' },

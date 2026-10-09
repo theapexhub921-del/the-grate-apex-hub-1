@@ -128,7 +128,7 @@ function LessonPlayer({
       <ErrorScreen
         title="Lesson not found"
         message={lessonId ? `There is no lesson called “${lessonId}”. It may have been renamed or removed.` : 'This link does not name a lesson.'}
-        primary={{ label: 'Go to Learn', onPress: () => router.replace(routes.learn()) }}
+        primary={{ label: 'Go to Study', onPress: () => router.replace(routes.learn()) }}
       />
     );
   }
@@ -354,7 +354,7 @@ function LessonPlayer({
       <Screen ref={scrollRef} width="wide">
         <Breadcrumbs
           items={[
-            { label: 'Learn', href: routes.learn() },
+            { label: 'Study', href: routes.learn() },
             { label: subject.name, href: routes.subject(topic.subject) },
             ...(course && course.title !== subject.name ? [{ label: course.title, href: routes.course(course.id) }] : []),
             { label: topic.title, href: routes.topic(topic.id) },

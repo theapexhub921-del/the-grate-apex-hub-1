@@ -68,7 +68,7 @@ export default function ResultsRoute() {
         title="Results not found"
         message="These results are not saved on this device. Your attempts are listed on My Progress."
         primary={{ label: 'Open My Progress', onPress: () => router.replace(routes.progress()) }}
-        secondary={{ label: 'Go to Learn', onPress: () => router.replace(routes.learn()) }}
+        secondary={{ label: 'Go to Study', onPress: () => router.replace(routes.learn()) }}
       />
     );
   }
@@ -397,7 +397,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
         {topic ? (
           <Button label="Back to topic" variant="ghost" onPress={() => router.push(routes.topic(topic.id))} fullWidth />
         ) : (
-          <Button label="Back to Learn" variant="ghost" onPress={() => router.push(routes.learn())} fullWidth />
+          <Button label="Back to Study" variant="ghost" onPress={() => router.push(routes.learn())} fullWidth />
         )}
       </View>
     </View>
@@ -408,7 +408,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
       <Screen width="wide">
         <Breadcrumbs
           items={[
-            { label: 'Learn', href: routes.learn() },
+            { label: 'Study', href: routes.learn() },
             ...(topic ? [{ label: topic.title, href: routes.topic(topic.id) }] : []),
             { label: 'Results' },
           ]}

@@ -137,7 +137,7 @@ export function HomeDemo({ done, onDone, nextTitle, greeting }: DemoProps & { ne
         <MiniStat icon="reinforce" value="0" label="reviews due" />
         <MiniStat icon="streak" value="0" label="day streak" />
       </View>
-      <DoneNote show={done} text="Home always points to your best next step — it updates after every lesson, quiz and review." />
+      <DoneNote show={done} text="Feed always points to your best next step — it updates after every lesson, quiz and review." />
     </SimFrame>
   );
 }
@@ -162,7 +162,7 @@ export function LearnDemo({ done, onDone }: DemoProps) {
   const course = getCoursesForSubject('biochemistry')[0];
   const topics = course ? getCourseTopics(course.id).slice(0, 3) : [];
   const topic = topics[0];
-  const crumbs = ['Learn', 'Biochemistry', course?.title ?? 'Course', topic?.title ?? 'Topic'].slice(0, depth + 1);
+  const crumbs = ['Study', 'Biochemistry', course?.title ?? 'Course', topic?.title ?? 'Topic'].slice(0, depth + 1);
 
   function go(next: number) {
     setDepth(next);
@@ -529,7 +529,7 @@ export function PlanningDemo({ done, onDone }: DemoProps) {
           <Text style={styles.rowMeta}>Track lesson, XP or streak targets</Text>
         </View>
       </View>
-      <DoneNote show={done} text="Open the study planner in Learn and View goals on Home. This preview did not save anything." />
+      <DoneNote show={done} text="Open the study planner in Study and View goals on Feed. This preview did not save anything." />
     </SimFrame>
   );
 }
@@ -615,7 +615,7 @@ export function PersonaliseDemo({ onDone }: DemoProps) {
         />
         {saved ? <Text style={styles.savedText}>Saved</Text> : null}
       </View>
-      <Text style={styles.muted}>Shown on Home as “Doc. {name.trim() || 'you'}”.</Text>
+      <Text style={styles.muted}>Shown on Feed as “Doc. {name.trim() || 'you'}”.</Text>
 
       <Text style={[styles.levelLabel, styles.spaced]}>THEME</Text>
       <View style={styles.themeRow}>
@@ -635,7 +635,7 @@ export function PersonaliseDemo({ onDone }: DemoProps) {
           </Interactive>
         ))}
       </View>
-      <Text style={styles.muted}>Change any of these later in Profile and Settings. You can also upload your own photo there.</Text>
+      <Text style={styles.muted}>Change any of these later in You and Settings. You can also upload your own photo there.</Text>
     </SimFrame>
   );
 }

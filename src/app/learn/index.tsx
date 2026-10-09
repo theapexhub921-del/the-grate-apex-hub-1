@@ -202,7 +202,7 @@ export default function LearnScreen() {
           <Pill label="Coming soon" />
         </View>
         <Text style={styles.reviewTitle}>Past questions</Text>
-        <Text style={styles.reviewText}>A past-question bank is planned for Learn. Materials will be added when they are ready to share.</Text>
+        <Text style={styles.reviewText}>A past-question bank is planned for Study. Materials will be added when they are ready to share.</Text>
       </Card>
       <Card style={styles.reviewCard}>
         <View style={styles.reviewHeader}>

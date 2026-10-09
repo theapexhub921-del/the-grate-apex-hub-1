@@ -221,7 +221,7 @@ function QuizScreen({
             ? 'This quiz could not be found. The lesson, topic or questions may have been renamed.'
             : 'This link does not say which quiz to open.'
         }
-        primary={{ label: 'Go to Learn', onPress: () => router.replace(routes.learn()) }}
+        primary={{ label: 'Go to Study', onPress: () => router.replace(routes.learn()) }}
       />
     );
   }
@@ -313,7 +313,7 @@ function QuizScreen({
         reviewNote={plan.kind === 'practice' ? null : 'This concept comes back for review tomorrow.'}
         header={
           <View style={styles.sessionHeader}>
-            <Breadcrumbs items={[{ label: 'Learn', href: routes.learn() }, ...plan.crumbs]} />
+            <Breadcrumbs items={[{ label: 'Study', href: routes.learn() }, ...plan.crumbs]} />
             <Text style={styles.sessionTitle} numberOfLines={2}>
               {plan.title}
             </Text>
@@ -325,7 +325,7 @@ function QuizScreen({
 
   return (
     <Screen width="learning">
-      <Breadcrumbs items={[{ label: 'Learn', href: routes.learn() }, ...plan.crumbs]} style={styles.crumbs} />
+      <Breadcrumbs items={[{ label: 'Study', href: routes.learn() }, ...plan.crumbs]} style={styles.crumbs} />
       <Text style={styles.kicker}>
         {plan.kind === 'mastery-check'
           ? 'MASTERY CHECK'

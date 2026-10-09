@@ -202,7 +202,7 @@ export function getNextActions(
             kind: 'explore-learn',
             title: 'Choose what to learn',
             detail: 'Pick a subject and topic to begin.',
-            cta: 'Go to Learn',
+            cta: 'Go to Study',
             href: routes.learn(),
             priority: 20,
           }

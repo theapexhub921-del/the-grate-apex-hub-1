@@ -234,7 +234,7 @@ function ApexArena({ courseId, available }: { courseId?: string; available: stri
             );
           })
         )}
-        <Button label="Back to Learn" variant="ghost" onPress={() => router.replace(routes.learn())} style={styles.ghost} />
+        <Button label="Back to Study" variant="ghost" onPress={() => router.replace(routes.learn())} style={styles.ghost} />
       </Arena>
     );
   }

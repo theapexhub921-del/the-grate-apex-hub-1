@@ -228,7 +228,7 @@ export default function ProfileScreen() {
 
   return (
     <Screen width="content">
-      <PageHeader title="Profile" subtitle="Your identity, connections and achievements." right={<IconButton icon="settings" label="Settings" onPress={() => router.push('/settings' as Href)} />} />
+      <PageHeader title="You" subtitle="Your identity, connections and achievements." right={<IconButton icon="settings" label="Settings" onPress={() => router.push('/settings' as Href)} />} />
       {identity}
       <View style={styles.gap} />
       <AvatarPicker visible={avatarPickerOpen} onClose={() => setAvatarPickerOpen(false)} />

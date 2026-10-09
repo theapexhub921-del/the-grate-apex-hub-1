@@ -243,7 +243,7 @@ export default function SettingsScreen() {
 
       <SettingsSection title="Profile">
         <Text style={styles.optionLabel}>Display name</Text>
-        <Text style={styles.optionDescription}>{nameSaved && !nameChanged ? 'Saved.' : 'Shown on Home as "Doc. <name>".'}</Text>
+        <Text style={styles.optionDescription}>{nameSaved && !nameChanged ? 'Saved.' : 'Shown on Feed as "Doc. <name>".'}</Text>
         <View style={styles.nameInputRow}>
           <TextInput
             style={styles.nameInput}

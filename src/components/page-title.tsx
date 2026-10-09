@@ -29,18 +29,18 @@ const SECTION_LABELS: [string, string][] = [
   ['/learn/lesson', 'Lesson'],
   ['/learn/course', 'Course'],
   ['/learn/fatty-acid-biosynthesis', 'Topic'],
-  ['/learn', 'Learn'],
+  ['/learn', 'Study'],
   ['/explore/discovery', 'Discovery'],
   ['/explore', 'Explore'],
   ['/social/friends', 'Friends'],
-  ['/social', 'Social'],
+  ['/social', 'Connect'],
   ['/progress', 'Progress'],
   ['/settings', 'Settings'],
-  ['/profile', 'Profile'],
+  ['/profile', 'You'],
   ['/login', 'Sign in'],
 ];
 
-/** "GrAteApex Hub — Learn" for a pathname, or just "GrAteApex Hub" for Home. */
+/** "GrAteApex Hub — Study" for a pathname, or just "GrAteApex Hub" for Feed. */
 export function titleForPath(pathname: string | null): string {
   if (!pathname || pathname === '/') {
     return APP_NAME;

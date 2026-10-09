@@ -118,9 +118,9 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'home',
       kicker: 'HOME',
       title: 'Your study circle, all in one place',
-      body: 'Home is your social space. Share Stories, photos, videos and study moments, then like, comment on and reshare posts from friends.',
+      body: 'Feed is your social space. Share Stories, photos, videos and study moments, then like, comment on and reshare posts from friends.',
       tryIt: 'See how Stories and the community feed work.',
-      demo: (props) => <HomeDemo {...props} nextTitle={nextAction?.title ?? 'Your next lesson is waiting in Learn'} greeting={`${greeting}, ${name}`} />,
+      demo: (props) => <HomeDemo {...props} nextTitle={nextAction?.title ?? 'Your next lesson is waiting in Study'} greeting={`${greeting}, ${name}`} />,
     },
     {
       id: 'learn',
@@ -163,7 +163,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'reinforce',
       kicker: 'REVIEW',
       title: 'Spaced repetition, built in',
-      body: 'Each concept is scheduled to come back just before you would forget it. The calendar on Home shows exactly what’s due and when.',
+      body: 'Each concept is scheduled to come back just before you would forget it. The calendar on Feed shows exactly what’s due and when.',
       tryIt: 'Tap a day with dots.',
       demo: (props) => <ReviewDemo {...props} />,
     },
@@ -181,7 +181,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'calendar',
       kicker: 'PLAN YOUR WEEK',
       title: 'Turn your goals into a study routine',
-      body: 'Build a lesson path and timetable in Learn, then set lesson, XP or streak goals from Home. Your next learning step still appears on Home.',
+      body: 'Build a lesson path and timetable in Study, then set lesson, XP or streak goals from Feed. Your next learning step still appears on Feed.',
       tryIt: 'Choose days for a sample study timetable.',
       demo: (props) => <PlanningDemo {...props} />,
     },
@@ -239,7 +239,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'profile',
       kicker: 'PROFILE & SETTINGS',
       title: 'Make it yours',
-      body: 'Choose a profile photo, an illustrated avatar or initials, and set your theme, text zoom, and navigation style. You can revisit your choices anytime in Profile and Settings.',
+      body: 'Choose a profile photo, an illustrated avatar or initials, and set your theme, text zoom, and navigation style. You can revisit your choices anytime in You and Settings.',
       tryIt: 'Make the app feel like yours (optional).',
       demo: (props) => <PersonaliseDemo {...props} />,
     },
@@ -274,7 +274,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'achievement',
       kicker: 'YOU’RE READY',
       title: `You’re all set, ${name}`,
-      body: 'Open Learn for lessons and your study plan, Home for goals and progress, Connect to study with classmates, and Explore for discoveries and product updates. Replay this introduction anytime from Settings.',
+      body: 'Open Study for lessons and your study plan, Feed for goals and progress, Connect to study with classmates, and Explore for discoveries and product updates. Replay this introduction anytime from Settings.',
       demo: () => (
         <SimFrame kind="real">
           <View style={styles.finish}>
@@ -283,7 +283,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
             </View>
             <Text style={styles.finishKicker}>READY TO BEGIN?</Text>
             <Text style={styles.finishTitle}>Start where you need most</Text>
-            <Text style={styles.finishText}>Lessons and plans in Learn · classmates in Connect · discoveries and updates in Explore</Text>
+            <Text style={styles.finishText}>Lessons and plans in Study · classmates in Connect · discoveries and updates in Explore</Text>
           </View>
         </SimFrame>
       ),
@@ -363,7 +363,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
         <View />
       )}
       <Button
-        label={index === 0 ? 'Start the tour' : index === last ? (replay ? 'Back to Home' : 'Go to Home') : 'Next'}
+        label={index === 0 ? 'Start the tour' : index === last ? (replay ? 'Back to Feed' : 'Go to Feed') : 'Next'}
         trailing="→"
         variant={index === last ? 'gold' : 'primary'}
         size="lg"

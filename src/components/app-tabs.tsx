@@ -54,7 +54,7 @@ export default function AppTabs() {
           transitionSpec: { animation: 'timing', config: { duration: reduceMotion ? 0 : MOTION.standard - 40 } },
         }}
       >
-        {/* Tab order: Home, Explore, Learn, Social, Profile */}
+        {/* Tab order: see MOBILE_NAV_ITEMS in nav-items.tsx */}
         {NAV_ITEMS.map((item) => (
           <Tabs.Screen key={item.route} name={item.route} options={{ title: item.label, tabBarAccessibilityLabel: item.accessibilityLabel }} />
         ))}

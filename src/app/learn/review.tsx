@@ -204,7 +204,7 @@ function ReviewScreen({
         reviewNote="Missed in review — it returns tomorrow and its interval restarts."
         header={
           <View style={styles.sessionHeader}>
-            <Breadcrumbs items={[{ label: 'Learn', href: routes.learn() }, { label: 'Review' }]} />
+            <Breadcrumbs items={[{ label: 'Study', href: routes.learn() }, { label: 'Review' }]} />
             <Text style={styles.sessionTitle}>Review · {scopeLabel}</Text>
           </View>
         }
@@ -218,7 +218,7 @@ function ReviewScreen({
     <Screen width="learning">
       <Breadcrumbs
         items={[
-          { label: 'Learn', href: routes.learn() },
+          { label: 'Study', href: routes.learn() },
           ...(topic ? [{ label: topic.title, href: routes.topic(topic.id) }] : []),
           { label: 'Review' },
         ]}
@@ -237,7 +237,7 @@ function ReviewScreen({
           icon="reinforce"
           title="Nothing to review yet"
           message="Complete a lesson and its concepts will be scheduled here — first tomorrow, then at growing intervals."
-          action={{ label: 'Go to Learn', onPress: () => router.push(routes.learn()) }}
+          action={{ label: 'Go to Study', onPress: () => router.push(routes.learn()) }}
         />
       ) : (
         <>

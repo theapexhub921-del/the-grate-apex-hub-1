@@ -46,7 +46,7 @@ export default function CourseRoute() {
       <ErrorScreen
         title="Course not found"
         message={id ? `There is no course called “${id}”.` : 'This link does not name a course.'}
-        primary={{ label: 'Go to Learn', onPress: () => router.replace(routes.learn()) }}
+        primary={{ label: 'Go to Study', onPress: () => router.replace(routes.learn()) }}
       />
     );
   }
@@ -67,7 +67,7 @@ export default function CourseRoute() {
     <Screen width="wide">
       <Breadcrumbs
         items={[
-          { label: 'Learn', href: routes.learn() },
+          { label: 'Study', href: routes.learn() },
           { label: subject.name, href: routes.subject(course.subject) },
           { label: course.title },
         ]}

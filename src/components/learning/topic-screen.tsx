@@ -45,7 +45,7 @@ export function TopicScreen({ topicId }: { topicId: string | undefined }) {
       <ErrorScreen
         title="Topic not found"
         message={topicId ? `There is no published topic called “${topicId}”.` : 'This link does not name a topic.'}
-        primary={{ label: 'Go to Learn', onPress: () => router.replace(routes.learn()) }}
+        primary={{ label: 'Go to Study', onPress: () => router.replace(routes.learn()) }}
       />
     );
   }
@@ -158,7 +158,7 @@ export function TopicScreen({ topicId }: { topicId: string | undefined }) {
     <Screen width="wide">
       <Breadcrumbs
         items={[
-          { label: 'Learn', href: routes.learn() },
+          { label: 'Study', href: routes.learn() },
           { label: subject.name, href: routes.subject(topic.subject) },
           ...(course && course.title !== subject.name ? [{ label: course.title, href: routes.course(course.id) }] : []),
           { label: topic.title },

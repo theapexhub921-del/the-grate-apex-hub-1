@@ -52,7 +52,7 @@ export function ApexCoinButton() {
             <Text style={styles.rewardText}>Complete a topic</Text>
             <Text style={styles.rewardAmount}>+10</Text>
           </View>
-          <Text style={styles.note}>You can also share Apex Coins with accepted friends from your Profile.</Text>
+          <Text style={styles.note}>You can also share Apex Coins with accepted friends from the You tab.</Text>
         </View>
       </Sheet>
     </>

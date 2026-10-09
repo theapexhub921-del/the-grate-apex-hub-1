@@ -6,7 +6,7 @@ import { Icon, type IconName } from '@/components/ui/icon';
 // list for the left navigation rail. Keeping one source means the two
 // navigations can never drift apart, and the five-tab identity stays fixed.
 //
-// Keep five stable top-level destinations; Learn contains the deeper course,
+// Keep five stable top-level destinations; Study (/learn) contains the deeper course,
 // review, quiz and progress routes.
 
 export type NavItem = {
@@ -21,23 +21,23 @@ export type NavItem = {
 };
 
 export const NAV_ITEMS: readonly NavItem[] = [
-  { route: 'index', label: 'Home', path: '/', icon: 'home', accessibilityLabel: 'Home — your command centre' },
-  { route: 'learn/index', label: 'Learn', path: '/learn', icon: 'learn', accessibilityLabel: 'Learn — subjects and lectures' },
+  { route: 'index', label: 'Feed', path: '/', icon: 'home', accessibilityLabel: 'Feed — your command centre' },
+  { route: 'learn/index', label: 'Study', path: '/learn', icon: 'learn', accessibilityLabel: 'Study — subjects and lectures' },
   { route: 'social/index', label: 'Connect', path: '/social', icon: 'social', accessibilityLabel: 'Connect — your people and social activity' },
   { route: 'explore', label: 'Explore', path: '/explore', icon: 'explore', accessibilityLabel: 'Explore — discovery and the GrAteApex Hub journey' },
-  { route: 'profile', label: 'Profile', path: '/profile', icon: 'profile', accessibilityLabel: 'Profile — your academic identity' },
+  { route: 'profile', label: 'You', path: '/profile', icon: 'profile', accessibilityLabel: 'You — your academic identity' },
 ];
 
-/** Phone tab order, with Learn as the raised center destination. */
+/** Phone tab order, with Study as the raised center destination. */
 export const MOBILE_NAV_ITEMS: readonly NavItem[] = [
-  NAV_ITEMS[0], // Home
+  NAV_ITEMS[0], // Feed
   NAV_ITEMS[2], // Connect
-  NAV_ITEMS[1], // Learn
+  NAV_ITEMS[1], // Study
   NAV_ITEMS[3], // Explore
-  NAV_ITEMS[4], // Profile
+  NAV_ITEMS[4], // You
 ];
 
-// Which destination owns a path: '/learn/lesson' belongs to Learn,
+// Which destination owns a path: '/learn/lesson' belongs to Study,
 // '/social/friends' to Connect. Settings and Progress belong to none.
 export function activeNavPath(pathname: string): string | null {
   if (pathname === '/' || pathname === '') return '/';

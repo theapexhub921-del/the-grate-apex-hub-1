@@ -62,21 +62,21 @@ export function SubjectScreen({ subject }: { subject: SubjectId }) {
   if (!subjectOffered) {
     return (
       <Screen width="wide">
-        <Breadcrumbs items={[{ label: 'Learn', href: viewSelection ? routes.learnEnvironment(viewSelection) : routes.learn() }, { label: info.name }]} style={styles.crumbs} />
+        <Breadcrumbs items={[{ label: 'Study', href: viewSelection ? routes.learnEnvironment(viewSelection) : routes.learn() }, { label: info.name }]} style={styles.crumbs} />
         <EmptyState
           icon="course"
           title="Coming soon"
           message={viewSelection ? `${info.name} is not available in ${viewSelection.classId}, Semester ${viewSelection.semester} yet.` : 'Choose your class and semester to see its curriculum.'}
           style={styles.empty}
         />
-        <Button label="Back to Learn" variant="secondary" onPress={() => router.replace(viewSelection ? routes.learnEnvironment(viewSelection) : routes.learn())} />
+        <Button label="Back to Study" variant="secondary" onPress={() => router.replace(viewSelection ? routes.learnEnvironment(viewSelection) : routes.learn())} />
       </Screen>
     );
   }
 
   return (
     <Screen width="wide">
-      <Breadcrumbs items={[{ label: 'Learn', href: routes.learn() }, { label: info.name }]} style={styles.crumbs} />
+      <Breadcrumbs items={[{ label: 'Study', href: routes.learn() }, { label: info.name }]} style={styles.crumbs} />
 
       <View style={styles.header}>
         <SubjectGlyph subject={subject} size={58} />

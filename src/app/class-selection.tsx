@@ -70,7 +70,7 @@ export default function ClassSelectionScreen() {
       <PageHeader
         eyebrow="Your learning path"
         title="Choose your class and semester"
-        subtitle="This sets the curriculum you’ll see in Learn."
+        subtitle="This sets the curriculum you’ll see in Study."
         style={styles.pageHeader}
       />
 
@@ -116,7 +116,7 @@ export default function ClassSelectionScreen() {
 
         <View style={styles.note}>
           <Text style={styles.noteTitle}>Your choice is permanent</Text>
-          <Text style={styles.noteText}>You can browse subjects from other classes in Learn. That preview will not change your selected class.</Text>
+          <Text style={styles.noteText}>You can browse subjects from other classes in Study. That preview will not change your selected class.</Text>
         </View>
 
         {error ? <Text style={[styles.error, { color: colors.error }]} accessibilityRole="alert">{error}</Text> : null}
