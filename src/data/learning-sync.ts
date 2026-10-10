@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   collection,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -10,10 +11,18 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
+  writeBatch,
 } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
-import { appLessonEntries, mergeAppLessons } from '@/data/legacy-lessons';
+import {
+  appLessonIdsInSharedMap,
+  completionWrites,
+  readCompletions,
+  type StoredCompletion,
+  streakFromDays,
+} from '@/data/lesson-completions';
+import { mergeAppLessons } from '@/data/legacy-lessons';
 import { auth, db } from '@/lib/firebase';
 
 const LEGACY_CACHE_OWNER_KEY = 'grateapex_learning_cache_owner';
@@ -175,31 +184,21 @@ export async function loadCloudProgress(): Promise<CloudProgress | null> {
 
     const d = snap.data() || {};
     const totalXp = Number(d.xp ?? 0);
-    const streak =
-      typeof d.days === 'number'
-        ? d.days
-        : d.days && typeof d.days === 'object'
-          ? Object.keys(d.days).length
-          : Number(d.streak ?? 0);
+    // This app's own streak field, else the current streak from the original
+    // app's daily activity (not the number of days ever studied).
+    const streak = typeof d.streak === 'number' ? d.streak : streakFromDays(d.days);
 
     const lastActivity = d.savedAt?.toDate
       ? d.savedAt.toDate().toISOString().split('T')[0]
       : (d.lastActivityDate ?? null);
 
-    let completedLessons: CloudLessonRow[] = [];
-    if (d.lessons && typeof d.lessons === 'object' && !Array.isArray(d.lessons)) {
-      // Shared with the original app: its numeric entries are skipped (legacy-lessons.ts).
-      completedLessons = appLessonEntries(d.lessons).map(([id, val]: [string, any]) => ({
-        lessonId: id,
-        completedAt: val && typeof val === 'object' && 'completedAt' in val ? toMillis(val.completedAt) : null,
-      }));
-    } else if (Array.isArray(d.lessons)) {
-      completedLessons = d.lessons.map((item: any) =>
-        typeof item === 'string'
-          ? { lessonId: item, completedAt: null }
-          : { lessonId: item.lessonId || item.id, completedAt: item.completedAt ? toMillis(item.completedAt) : null }
-      );
-    }
+    // Completions subcollection + earlier object entries in the shared map
+    // (lesson-completions.ts); the original app's numbers are never read.
+    const stored = await readCompletionDocs(userId);
+    const completedLessons: CloudLessonRow[] = readCompletions(
+      stored ? [...stored].map(([id, value]) => ({ id, data: value })) : [],
+      d.lessons
+    );
 
     return {
       stats: {
@@ -215,26 +214,69 @@ export async function loadCloudProgress(): Promise<CloudProgress | null> {
   }
 }
 
-/** Clear all server-backed learning records for the signed-in learner. */
+// progress/{uid}/completions as a map, or null when it can't be read — for
+// example while its rule is not deployed (then nothing can be stored there).
+async function readCompletionDocs(userId: string): Promise<Map<string, StoredCompletion> | null> {
+  try {
+    const snap = await getDocs(collection(db, 'progress', userId, 'completions'));
+    const stored = new Map<string, StoredCompletion>();
+    snap.docs.forEach((item) => {
+      const data = item.data();
+      stored.set(item.id, { completedAt: Number(data.completedAt) || 0, xp: Number(data.xp) || 0 });
+    });
+    return stored;
+  } catch {
+    return null;
+  }
+}
+
+const isPermissionDenied = (error: unknown) => (error as { code?: string } | null)?.code === 'permission-denied';
+
+// Deletes every document in one of the learner's own subcollections. A path
+// the rules don't open can't hold anything, so "permission denied" on the
+// listing means there is nothing to delete.
+async function deleteOwnSubcollection(userId: string, name: 'completions' | 'attempts') {
+  let snap;
+  try {
+    snap = await getDocs(collection(db, 'progress', userId, name));
+  } catch (error) {
+    if (isPermissionDenied(error)) return;
+    throw error;
+  }
+  for (let i = 0; i < snap.docs.length; i += 400) {
+    const batch = writeBatch(db);
+    snap.docs.slice(i, i + 400).forEach((item) => batch.delete(item.ref));
+    await batch.commit();
+  }
+}
+
+/**
+ * Clear this app's learning records for the signed-in learner: its lesson
+ * completions, quiz attempts, XP and streak. The original app's own fields in
+ * the shared document (cards, seen, terms, days, its lesson section counts…)
+ * are left untouched. XP is one shared number, so it is reset too.
+ */
 export async function resetCloudLearningProgress() {
   const userId = await getUserId();
   if (!userId) throw new Error('Sign in before resetting your learning progress.');
 
+  await deleteOwnSubcollection(userId, 'completions');
+  await deleteOwnSubcollection(userId, 'attempts');
+
   const progressDocRef = doc(db, 'progress', userId);
-  await setDoc(progressDocRef, {
+  const snap = await getDoc(progressDocRef);
+  const update: Record<string, unknown> = {
     xp: 0,
     streak: 0,
-    lessons: {},
-    days: {},
-    subjects: {},
-    topics: {},
-    cards: {},
-    seen: {},
-    terms: {},
-    tests: {},
+    lastActivityDate: null,
     savedAt: serverTimestamp(),
     updatedAt: Date.now(),
-  });
+  };
+  // Earlier completions this app stored in the shared map (objects only).
+  for (const lessonId of appLessonIdsInSharedMap(snap.data()?.lessons)) {
+    update[`lessons.${lessonId}`] = deleteField();
+  }
+  if (snap.exists()) await updateDoc(progressDocRef, update);
 }
 
 export async function saveCloudProgress(
@@ -243,26 +285,40 @@ export async function saveCloudProgress(
 ) {
   const userId = await getUserId();
   if (!userId) return;
+  const progressDocRef = doc(db, 'progress', userId);
 
   try {
-    const progressDocRef = doc(db, 'progress', userId);
-    const snap = await getDoc(progressDocRef);
-    const existing = snap.data() || {};
-    // Never replaces the original app's section counts (legacy-lessons.ts).
-    const updatedLessons = mergeAppLessons(existing.lessons, completedLessons);
-
+    // Only this app's own fields, merged: the shared `lessons` map is not written.
     await setDoc(
       progressDocRef,
       {
         xp: stats.total_xp,
         streak: stats.current_streak,
         lastActivityDate: stats.last_activity_date,
-        lessons: updatedLessons,
         savedAt: serverTimestamp(),
         updatedAt: Date.now(),
       },
       { merge: true }
     );
+    if (completedLessons.length === 0) return;
+
+    const stored = await readCompletionDocs(userId);
+    if (stored) {
+      const writes = completionWrites(completedLessons, stored);
+      for (let i = 0; i < writes.length; i += 400) {
+        const batch = writeBatch(db);
+        writes.slice(i, i + 400).forEach((write) =>
+          batch.set(doc(db, 'progress', userId, 'completions', write.lessonId), { ...write, savedAt: serverTimestamp() })
+        );
+        await batch.commit();
+      }
+      return;
+    }
+
+    // The completions rule is not deployed yet: keep the earlier, protected
+    // behaviour (this app's objects in the shared map; numbers never replaced).
+    const snap = await getDoc(progressDocRef);
+    await setDoc(progressDocRef, { lessons: mergeAppLessons(snap.data()?.lessons, completedLessons) }, { merge: true });
   } catch (error) {
     console.warn('Could not save learning progress to Firestore:', error);
   }
