@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { SubjectGlyph } from '@/components/learning/glyphs';
 import { ClassAccessCard } from '@/components/learning/class-access-card';

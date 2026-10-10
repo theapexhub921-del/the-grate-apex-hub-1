@@ -1,5 +1,6 @@
 import { useEffect, useState, type ComponentType } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 import { ExploreDemo, LearnDemo, ReviewDemo, SimFrame, type DemoProps } from '@/components/onboarding/tour-demos';
 import { Button } from '@/components/ui/button';
 import { Icon, type IconName } from '@/components/ui/icon';

@@ -1,4 +1,5 @@
-import { type StyleProp, Text, type TextStyle } from 'react-native';
+import { type StyleProp, type TextStyle } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { MOTION } from '@/constants/motion';
 import { useTween } from '@/hooks/use-tween';

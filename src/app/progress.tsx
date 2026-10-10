@@ -1,6 +1,7 @@
 import { type Href, router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { MemoryDistribution } from '@/components/learning/memory-ui';
 import { applyStreakRecovery } from '@/data/progress';

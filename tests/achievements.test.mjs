@@ -99,5 +99,5 @@ describe('app experience (no default)', () => {
     assert.equal(needsExperience({}, true, false), false, 'switch off: nobody is asked');
     assert.equal(isExperience('originate'), true);
   });
-  it('the switch stays off until The Originals and Hybrid exist', () => assert.equal(EXPERIENCES_ENABLED, false));
+  it('the switch is on now that The Originals and Hybrid are built (owner request, 2026-10-10)', () => assert.equal(EXPERIENCES_ENABLED, true));
 });

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';

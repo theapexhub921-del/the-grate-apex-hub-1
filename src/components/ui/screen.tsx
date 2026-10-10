@@ -3,11 +3,11 @@ import {
   ScrollView,
   type StyleProp,
   StyleSheet,
-  Text,
   useWindowDimensions,
   View,
   type ViewStyle,
 } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { useTabBarScroll } from '@/components/tab-bar-visibility';
 import {
@@ -19,6 +19,7 @@ import {
   Type,
   type ThemeColors,
 } from '@/constants/theme';
+import { useExperience } from '@/hooks/use-experience';
 import { useThemedStyles } from '@/hooks/use-theme';
 
 export const WIDE_MAX_WIDTH = 1480;
@@ -80,14 +81,19 @@ export function PageHeader({
   style?: StyleProp<ViewStyle>;
 }) {
   const styles = useThemedStyles(createStyles);
+  // The Originals: the original ScreenHeader — a 30pt title, muted subtitle, no eyebrow.
+  // Hybrid: the original 30pt title over this app's eyebrow and subtitle.
+  const experience = useExperience();
+  const originals = experience === 'originals';
+  const legacyTitle = experience !== 'originate';
   return (
-    <View style={[styles.pageHeader, style]}>
+    <View style={[styles.pageHeader, originals && styles.legacyHeader, style]}>
       <View style={styles.sectionText}>
-        {eyebrow ? <Text style={styles.eyebrow}>{eyebrow.toUpperCase()}</Text> : null}
-        <Text style={styles.pageTitle} accessibilityRole="header">
+        {eyebrow && !originals ? <Text style={styles.eyebrow}>{eyebrow.toUpperCase()}</Text> : null}
+        <Text style={[styles.pageTitle, legacyTitle && styles.legacyTitle]} accessibilityRole="header">
           {title}
         </Text>
-        {subtitle ? <Text style={styles.pageSubtitle}>{subtitle}</Text> : null}
+        {subtitle ? <Text style={[styles.pageSubtitle, originals && styles.legacySubtitle]}>{subtitle}</Text> : null}
       </View>
       {right ? <View style={styles.pageRight}>{right}</View> : null}
     </View>
@@ -186,5 +192,8 @@ function createStyles(colors: ThemeColors) {
     sectionTitle: { ...Type.title3, color: colors.text },
     sectionSubtitle: { fontSize: 13, color: colors.textSecondary, marginTop: 2, lineHeight: 18 },
     eyebrow: { ...Type.overline, color: colors.textTertiary, marginBottom: 6 },
+    legacyHeader: { alignItems: 'flex-start', marginBottom: 16 },
+    legacyTitle: { fontFamily: undefined, fontSize: 30, lineHeight: undefined, fontWeight: '800', letterSpacing: -0.5 },
+    legacySubtitle: { fontSize: undefined, color: colors.textTertiary, marginTop: 4, lineHeight: 20 },
   });
 }

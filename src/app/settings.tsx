@@ -2,9 +2,12 @@ import { Href, router } from 'expo-router';
 
 import { EXPERIENCE_INFO, EXPERIENCES_ENABLED, isExperience } from '@/data/experience';
 import { type ReactNode, useEffect, useState } from 'react';
-import { Linking, Platform, Share, StyleSheet, Switch, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { Linking, Platform, Share, StyleSheet, Switch, useWindowDimensions, View } from 'react-native';
+import { Text, TextInput } from '@/components/ui/text';
 
 import { ATMOSPHERE } from '@/components/atmosphere/config';
+import { useOriginalAutoHide } from '@/components/experience/legacy-navigation';
+import { OriginalThemePicker } from '@/components/experience/original-theme-picker';
 import { BackLink } from '@/components/learning/nav-bits';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -20,6 +23,8 @@ import {
   type FontSizePreference,
   setPageZoomPreference,
   setAppearancePreference,
+  setHybridThemeFamily,
+  useHybridThemeFamily,
   setPushNotificationsPreference,
   setAnswerBouncePreference,
   setNotificationPreference,
@@ -43,9 +48,11 @@ import { grantPowerup } from '@/data/learning/powerups';
 import { dayKey } from '@/data/learning/time';
 import { resetAllLearningProgress } from '@/data/progress';
 import { useAuth } from '@/hooks/use-auth';
+import { useExperience } from '@/hooks/use-experience';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { deleteMyAccount, FULL_ACCOUNT_DELETION } from '@/lib/account';
+import { updateCurrentProfile } from '@/lib/profiles';
 import { routes } from '@/lib/routes';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -89,6 +96,9 @@ export default function SettingsScreen() {
   const { width } = useWindowDimensions();
   const desktop = isDesktopWidth(width);
   const appearance = useAppearancePreference();
+  const experience = useExperience();
+  const hybridFamily = useHybridThemeFamily();
+  const originalAutoHide = useOriginalAutoHide();
   const pageZoom = usePageZoomPreference();
   const fontSize = useFontSizePreference();
   const privacy = usePrivacyPreferences();
@@ -276,14 +286,28 @@ export default function SettingsScreen() {
       ) : null}
 
       <SettingsSection title="Appearance">
+        {/* The Originals: only the original app's themes, with its unlock rules.
+            Hybrid: both families. Originate: this app's themes. Each family's
+            choice is saved separately, so switching experience changes neither. */}
+        {experience === 'originals' ? <OriginalThemePicker /> : null}
+        {experience === 'hybrid' ? (
+          <>
+            <Text style={styles.optionDescription}>Hybrid can wear this app&apos;s themes or the original app&apos;s themes.</Text>
+            <Text style={styles.themeFamily}>GrAteApex Hub themes</Text>
+          </>
+        ) : null}
+        {experience !== 'originals' ? (
         <View style={[styles.themeGrid, desktop && styles.themeGridDesktop]}>
           {APPEARANCE_OPTIONS.map((option) => {
-            const selected = appearance === option.value;
+            const selected = appearance === option.value && (experience !== 'hybrid' || hybridFamily === 'originate');
             const scheme = option.value === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : option.value;
             return (
               <Interactive
                 key={option.value}
-                onPress={() => setAppearancePreference(option.value)}
+                onPress={() => {
+                  void setAppearancePreference(option.value);
+                  if (experience === 'hybrid') void setHybridThemeFamily('originate');
+                }}
                 accessibilityRole="radio"
                 accessibilityState={{ checked: selected }}
                 accessibilityLabel={`${option.label} theme. ${option.description}`}
@@ -311,6 +335,13 @@ export default function SettingsScreen() {
             );
           })}
         </View>
+        ) : null}
+        {experience === 'hybrid' ? (
+          <>
+            <Text style={styles.themeFamily}>Original themes</Text>
+            <OriginalThemePicker />
+          </>
+        ) : null}
       </SettingsSection>
 
       <SettingsSection title="Font size and zoom">
@@ -371,12 +402,13 @@ export default function SettingsScreen() {
       </SettingsSection>
 
       <SettingsSection title="Navigation">
+        {/* The Originals uses the original app's own setting (autoHideNav on the account). */}
         {navigationOptions.map((option, index) => {
-          const selected = tabBarMode === option.value;
+          const selected = experience === 'originals' ? (option.value === 'autoHide') === originalAutoHide : tabBarMode === option.value;
           return (
             <Interactive
               key={option.value}
-              onPress={() => setTabBarMode(option.value)}
+              onPress={() => (experience === 'originals' ? void updateCurrentProfile({ autoHideNav: option.value === 'autoHide' }) : setTabBarMode(option.value))}
               accessibilityRole="radio"
               accessibilityState={{ checked: selected }}
               accessibilityLabel={`${option.label}. ${option.description}`}
@@ -666,6 +698,7 @@ function createStyles(colors: ThemeColors) {
       backgroundColor: colors.surfaceSunken,
     },
     themeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+    themeFamily: { ...Type.overline, color: colors.textTertiary, marginTop: 14, marginBottom: 8 },
     themeGridDesktop: { flexWrap: 'wrap' },
     zoomOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
     zoomOption: { minWidth: 54, minHeight: 40, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },

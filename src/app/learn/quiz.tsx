@@ -1,6 +1,7 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { Breadcrumbs } from '@/components/learning/nav-bits';
 import { type FeedbackMode, QuestionSession, type SessionItem, type SessionResult } from '@/components/learning/question-session';

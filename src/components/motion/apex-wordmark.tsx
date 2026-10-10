@@ -1,4 +1,4 @@
-import { Text } from 'react-native';
+import { Text } from '@/components/ui/text';
 import Animated, { FadeIn, useReducedMotion } from 'react-native-reanimated';
 
 // Native: the APEX wordmark fades in (the web version draws a stroke —

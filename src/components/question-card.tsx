@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Text, TextInput } from '@/components/ui/text';
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,

@@ -1,0 +1,114 @@
+// The three experiences: the original app's font rule, colours, unlock rules
+// and background must be reproduced exactly (owner requirement).
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+
+const { experienceFont, hybridGlass, legacyFontFamily, legacyGradientAngle, legacyWeight, mixHex, withAlpha } = await import('@/data/experience-style');
+const { legacyLevel, legacyLockText, legacyRank, legacyThemeById, legacyThemeColors, legacyThemeUnlock, originalsThemeColors } = await import('@/data/legacy-theme-colors');
+
+const theme = (id) => legacyThemeById(id);
+
+describe('original font rule (old-reference/src/Text.tsx)', () => {
+  it('subtext (under 14, or a muted colour) is Montserrat', () => {
+    assert.equal(legacyFontFamily({ fontSize: 13 }), 'Montserrat');
+    assert.equal(legacyFontFamily({ fontSize: 16, color: '#999999' }), 'Montserrat');
+    assert.equal(legacyFontFamily({ fontSize: 12, fontWeight: '800' }), 'Montserrat');
+  });
+  it('headers (bold 700+, or 24 and over) are Poppins', () => {
+    assert.equal(legacyFontFamily({ fontSize: 16, fontWeight: '700' }), 'Poppins');
+    assert.equal(legacyFontFamily({ fontSize: 30, fontWeight: '400' }), 'Poppins');
+  });
+  it('normal text is Roboto, and so is an unset size (treated as 16)', () => {
+    assert.equal(legacyFontFamily({ fontSize: 15, fontWeight: '600' }), 'Roboto');
+    assert.equal(legacyFontFamily({}), 'Roboto');
+  });
+  it('weights snap to the original font files', () => {
+    assert.equal(legacyWeight('650', 'Poppins'), 600);
+    assert.equal(legacyWeight('600', 'Roboto'), 700);
+    assert.equal(legacyWeight('900', 'Montserrat'), 800);
+  });
+  it('Originate keeps its own fonts; Hybrid takes only the original headings; inputs are Roboto', () => {
+    assert.equal(experienceFont('originate', { fontSize: 30, fontWeight: '800' }), null);
+    assert.equal(experienceFont('hybrid', { fontSize: 15 }), null);
+    assert.match(experienceFont('hybrid', { fontSize: 22, fontWeight: '800' }).fontFamily, /^Poppins/);
+    assert.match(experienceFont('originals', { fontSize: 30, fontWeight: '700' }, true).fontFamily, /^Roboto/);
+  });
+});
+
+describe('original colours as this app’s tokens', () => {
+  it('Dark: the original values, untouched', () => {
+    const c = legacyThemeColors(theme('dark'));
+    assert.equal(c.background, '#000266');
+    assert.equal(c.primary, '#8fb3ff');
+    assert.equal(c.onPrimary, '#04123a');
+    assert.equal(c.accent, '#ffd34d'); // the original "accent" is the theme's gold
+    assert.equal(c.surface, 'rgba(255,255,255,0.06)');
+    assert.equal(c.border, 'rgba(255,255,255,0.12)');
+    assert.equal(c.textSecondary, '#c7cefa');
+    assert.equal(c.textTertiary, '#93a4e8');
+    assert.equal(c.tabBar, 'rgba(8,14,70,0.94)');
+    assert.equal(c.navSurface, 'rgba(0,0,40,0.38)');
+  });
+  it('light themes use the original light shell colours', () => {
+    const c = legacyThemeColors(theme('light'));
+    assert.equal(c.tabBar, 'rgba(255,255,255,0.94)');
+    assert.equal(c.error, '#dc2626');
+  });
+  it('The Originals draws no shadows; Hybrid keeps them', () => {
+    assert.equal(originalsThemeColors(theme('dark')).shadow, 'transparent');
+    assert.notEqual(legacyThemeColors(theme('dark')).shadow, 'transparent');
+  });
+  it('an unknown theme falls back to the original default (Dark)', () => {
+    assert.equal(theme('nope').id, 'dark');
+  });
+});
+
+describe('original theme unlock rules (screens/ThemePicker.tsx)', () => {
+  const base = { xp: 0, achievementLevels: {}, isAdmin: false };
+  it('level themes unlock at their original level (1 + every 150 XP)', () => {
+    assert.equal(legacyLevel(0), 1);
+    assert.equal(legacyLevel(599), 4);
+    assert.equal(legacyLevel(600), 5);
+    assert.deepEqual(legacyThemeUnlock(theme('matcha'), base), { unlocked: false, kind: 'level', level: 5 });
+    assert.deepEqual(legacyThemeUnlock(theme('matcha'), { ...base, xp: 600 }), { unlocked: true });
+    assert.deepEqual(legacyThemeUnlock(theme('dark'), base), { unlocked: true });
+  });
+  it('achievement themes need the achievement earned', () => {
+    const locked = legacyThemeUnlock(theme('christmas'), { ...base, achievement: () => ({ name: 'Christmas cram', desc: 'Study on 25 December' }) });
+    assert.equal(locked.unlocked, false);
+    assert.equal(legacyLockText(locked), '🔒 Earn the "Christmas cram" achievement: Study on 25 December');
+    assert.deepEqual(legacyThemeUnlock(theme('christmas'), { ...base, achievementLevels: { xmas: 1 } }), { unlocked: true });
+  });
+  it('admin-only themes are for admins', () => {
+    assert.equal(legacyThemeUnlock(theme('brat'), base).unlocked, false);
+    assert.equal(legacyThemeUnlock(theme('brat'), { ...base, isAdmin: true }).unlocked, true);
+  });
+  it('locked wording follows the original picker', () => {
+    assert.equal(legacyLockText({ unlocked: false, kind: 'level', level: 8 }), '🔒 Unlocks at Level 8');
+    assert.equal(legacyLockText({ unlocked: false, kind: 'level', level: 8 }, false), 'Unlocks at Level 8');
+  });
+  it('original ranks', () => {
+    assert.deepEqual(legacyRank(0), { level: 1, title: 'Fresher' });
+    assert.deepEqual(legacyRank(300), { level: 3, title: 'Riser' });
+    assert.deepEqual(legacyRank(150 * 24), { level: 25, title: 'Apex Scholar' });
+  });
+});
+
+describe('background and glass', () => {
+  it('the gradient angle matches expo-linear-gradient on the web for {0.1,0} → {0.9,1}', () => {
+    assert.ok(Math.abs(legacyGradientAngle(800, 800) - (90 + (Math.atan2(800, 640) * 180) / Math.PI)) < 1e-9);
+    assert.ok(Math.abs(legacyGradientAngle(400, 900) - (90 + (Math.atan2(900, 320) * 180) / Math.PI)) < 1e-9);
+  });
+  it('colour helpers', () => {
+    assert.equal(withAlpha('#ffffff', 0.5), 'rgba(255,255,255,0.5)');
+    assert.equal(withAlpha('rgba(1,2,3,0.4)', 0.5), 'rgba(1,2,3,0.4)');
+    assert.equal(mixHex('#ffffff', '#000000', 0.5), '#808080');
+  });
+  it('Hybrid glass makes resting surfaces translucent and keeps raised ones solid', () => {
+    const solid = { surface: '#ffffff', surfaceMuted: '#eeeeee', border: '#cccccc', surfaceElevated: '#ffffff' };
+    const glass = hybridGlass(solid);
+    assert.match(glass.surface, /^rgba\(255,255,255,0\.62\)$/);
+    assert.equal(glass.surfaceElevated, '#ffffff');
+  });
+});
+

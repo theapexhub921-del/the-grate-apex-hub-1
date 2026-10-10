@@ -1,6 +1,7 @@
 import { Redirect, router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { BackLink } from '@/components/learning/nav-bits';
 import { Button } from '@/components/ui/button';

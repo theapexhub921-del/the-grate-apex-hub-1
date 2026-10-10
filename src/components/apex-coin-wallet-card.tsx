@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, type StyleProp, type TextStyle, View, type ViewStyle } from 'react-native';
+import { Image, StyleSheet, type StyleProp, type TextStyle, View, type ViewStyle } from 'react-native';
+import { Text, TextInput } from '@/components/ui/text';
 
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';

@@ -1,5 +1,6 @@
 import { useId } from 'react';
-import { type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native';
+import { Text } from '@/components/ui/text';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { Image } from 'expo-image';
 

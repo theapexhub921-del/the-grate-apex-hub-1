@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { AnimatedNumber } from '@/components/ui/animated-number';
 import { Icon } from '@/components/ui/icon';

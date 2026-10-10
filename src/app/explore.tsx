@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Linking, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { Icon, type IconName } from '@/components/ui/icon';
 import { ExploreFeatureGroups } from '@/components/explore/feature-groups';

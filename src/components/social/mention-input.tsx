@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { StyleSheet, Text, TextInput, type TextInputProps, View } from 'react-native';
+import { StyleSheet, type TextInputProps, View } from 'react-native';
+import { Text, TextInput } from '@/components/ui/text';
 
 import { Avatar } from '@/components/ui/avatar';
 import { Interactive } from '@/components/ui/interactive';

@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { LogoMark } from '@/components/logo-mark';
 import { Button } from '@/components/ui/button';

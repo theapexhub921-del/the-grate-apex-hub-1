@@ -9,11 +9,10 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   useWindowDimensions,
   View,
 } from 'react-native';
+import { Text, TextInput } from '@/components/ui/text';
 import Svg, { Path as SvgPath } from 'react-native-svg';
 
 import { LogoMark } from '@/components/logo-mark';

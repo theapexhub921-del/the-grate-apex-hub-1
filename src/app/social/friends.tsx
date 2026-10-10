@@ -1,6 +1,7 @@
 import type { Href } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Switch, View } from 'react-native';
+import { Text, TextInput } from '@/components/ui/text';
 
 import { BackLink } from '@/components/learning/nav-bits';
 import { Avatar } from '@/components/ui/avatar';

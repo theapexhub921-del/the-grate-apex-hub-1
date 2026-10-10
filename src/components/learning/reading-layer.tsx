@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { PathwaySteps } from '@/components/pathway-steps';
 import { Icon, type IconName } from '@/components/ui/icon';

@@ -1,9 +1,32 @@
-# Three experiences — proposed architecture (for the owner's review)
+# Three experiences — architecture
 
-Status 2026-10-10: **proposal + foundation only.** The choice is stored and
-enforced, behind a switch that is **off** (`EXPERIENCES_ENABLED` in
-`src/data/experience.ts`), so no student is asked to choose until The Originals
-and Hybrid really look different. No screen has been redesigned.
+Status 2026-10-10: **built and switched on** (`EXPERIENCES_ENABLED = true`). Every signed-in
+learner chooses once (no default); Settings → Experience changes it.
+
+What each one is (owner's definition):
+
+- **The Originals** — the original app's UI as it was: its 15 themes with its own
+  unlock rules (original level = 1 + every 150 XP; Christmas/Valentine need their
+  achievement; brat is admins-only), its colours, emoji, fonts (Poppins / Roboto /
+  Montserrat by the original rule), glass panels, gradient pill buttons, gradient
+  background with floating science emoji, floating pill bar (phones) and 250px
+  emoji sidebar (desktop ≥ 1200px, auto-hide from the original `autoHideNav`
+  setting). The logo is the new GA mark (owner request).
+- **Originate** — this app, unchanged.
+- **Hybrid** — one blended interface: this app's layouts, navigation, icons and
+  motion with the original gradient background (with this app's drawn motifs),
+  frosted glass panels, gradient pill buttons for main actions, the original
+  30pt Poppins headings and course colours, and both families of themes.
+
+Where it lives: `src/hooks/use-experience.tsx` (active experience, previews),
+`src/hooks/use-theme.ts` (`themeColorsFor`), `src/data/experience-style.ts` (font
+rule, glass, gradient angle), `src/data/legacy-theme-colors.ts` (original themes
+as tokens, unlock rules, ranks), `src/components/experience/` (background,
+navigation, theme picker, sync), `src/components/ui/text.tsx` (fonts), and the
+primitives (Card, Button, PageHeader, SubjectGlyph). Tests:
+`tests/experiences.test.mjs`, `tests/legacy-themes.test.mjs`.
+
+The rest of this file is the original proposal, kept for reference.
 
 ## The three experiences
 

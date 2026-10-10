@@ -7,6 +7,7 @@ import { Platform, View } from 'react-native';
 import { AchievementWatcher } from '@/components/achievements/achievement-watcher';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
+import { ExperienceSync } from '@/components/experience/experience-sync';
 import { LearningSync } from '@/components/learning/learning-sync';
 import { DeviceNotificationBridge } from '@/components/notifications';
 import { PageTitle } from '@/components/page-title';
@@ -171,6 +172,7 @@ export default function TabLayout() {
         <View onLayout={() => setAppShellReady(true)} style={{ flex: 1 }}>
           {isClient ? (
             <AppGuard>
+              <ExperienceSync />
               <AppTabs />
               <LearningSync />
               <AchievementWatcher />

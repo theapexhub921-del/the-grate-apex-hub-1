@@ -1,6 +1,7 @@
 import { usePathname } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { type LayoutChangeEvent, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { type LayoutChangeEvent, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 

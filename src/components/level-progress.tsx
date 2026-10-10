@@ -1,10 +1,10 @@
 import {
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { getLevelProgress } from '@/data/progression';
 import { ThemeColors } from '@/constants/theme';

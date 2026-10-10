@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { LEGACY_THEMES } from '@/data/legacy-themes';
 import { getTabBarModePreference, setTabBarModeFromAccount } from '@/data/navigation-settings';
 
 // App settings that belong to this device (not to an account).
@@ -58,7 +59,14 @@ type SettingsData = {
   discoverable: boolean;
   shareOnlineStatus: boolean;
   answerBounceEnabled: boolean;
+  /** The original app's theme (The Originals; Hybrid when its family is 'originals'). */
+  legacyTheme: string;
+  /** Hybrid only: which family of themes colours it. */
+  hybridThemeFamily: HybridThemeFamily;
 };
+
+export type HybridThemeFamily = 'originate' | 'originals';
+const isLegacyThemeId = (value: unknown): value is string => typeof value === 'string' && LEGACY_THEMES.some((theme) => theme.id === value);
 
 const STORAGE_KEY = 'grateapex_settings';
 
@@ -76,6 +84,8 @@ const defaultSettings: SettingsData = {
   discoverable: true,
   shareOnlineStatus: false,
   answerBounceEnabled: true,
+  legacyTheme: 'dark', // the original app's default
+  hybridThemeFamily: 'originate',
 };
 
 type PrivacySettings = Pick<SettingsData, 'profileVisibility' | 'activityVisible' | 'messagingPermission' | 'friendRequestPermission' | 'discoverable' | 'shareOnlineStatus'>;
@@ -166,6 +176,8 @@ async function loadSettings() {
       discoverable: data?.discoverable !== false,
       shareOnlineStatus: data?.shareOnlineStatus === true,
       answerBounceEnabled: data?.answerBounceEnabled !== false,
+      legacyTheme: isLegacyThemeId(data?.legacyTheme) ? data.legacyTheme : defaultSettings.legacyTheme,
+      hybridThemeFamily: data?.hybridThemeFamily === 'originals' ? 'originals' : 'originate',
     };
 
     notify();
@@ -196,6 +208,8 @@ async function saveSettings() {
         {
           preferences: {
             appearance: settings.appearance,
+            legacy_theme: settings.legacyTheme,
+            hybrid_theme_family: settings.hybridThemeFamily,
             font_size: settings.fontSize,
             zoom: settings.pageZoom,
             navigation_auto_hide: (await getTabBarModePreference()) === 'autoHide',
@@ -239,6 +253,11 @@ export async function syncSettingsFromAccount(userId: string) {
     settings = {
       ...settings,
       appearance: isAppearance(data.appearance) ? data.appearance : settings.appearance,
+      legacyTheme: isLegacyThemeId(data.legacy_theme) ? data.legacy_theme : settings.legacyTheme,
+      hybridThemeFamily:
+        data.hybrid_theme_family === 'originals' || data.hybrid_theme_family === 'originate'
+          ? data.hybrid_theme_family
+          : settings.hybridThemeFamily,
       fontSize: ['small', 'default', 'large', 'extra_large'].includes(data.font_size)
         ? (data.font_size as FontSizePreference)
         : settings.fontSize,
@@ -396,6 +415,31 @@ export function usePageZoomPreference(): PageZoomPreference {
 export async function setPageZoomPreference(pageZoom: PageZoomPreference) {
   await ensureSettingsLoaded();
   settings = { ...settings, pageZoom };
+  notify();
+  await saveSettings();
+}
+
+/** The original app's theme the learner chose (id from LEGACY_THEMES). */
+export function useLegacyThemePreference(): string {
+  return useSyncExternalStore(subscribe, () => settings.legacyTheme, () => defaultSettings.legacyTheme);
+}
+
+/** Saves an original-app theme. The caller checks the unlock rules first. */
+export async function setLegacyThemePreference(legacyTheme: string) {
+  if (!isLegacyThemeId(legacyTheme)) return;
+  await ensureSettingsLoaded();
+  settings = { ...settings, legacyTheme };
+  notify();
+  await saveSettings();
+}
+
+export function useHybridThemeFamily(): HybridThemeFamily {
+  return useSyncExternalStore(subscribe, () => settings.hybridThemeFamily, () => defaultSettings.hybridThemeFamily);
+}
+
+export async function setHybridThemeFamily(hybridThemeFamily: HybridThemeFamily) {
+  await ensureSettingsLoaded();
+  settings = { ...settings, hybridThemeFamily };
   notify();
   await saveSettings();
 }

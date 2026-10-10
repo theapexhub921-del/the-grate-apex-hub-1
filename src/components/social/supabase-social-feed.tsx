@@ -3,7 +3,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import type { ReactNode } from 'react';
 import { useEffect, useId, useMemo, useState } from 'react';
-import { Alert, Linking, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Linking, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { Text, TextInput } from '@/components/ui/text';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 

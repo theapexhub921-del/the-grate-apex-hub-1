@@ -1,5 +1,6 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { MemoryDistribution } from '@/components/learning/memory-ui';
 import { ClassAccessCard } from '@/components/learning/class-access-card';

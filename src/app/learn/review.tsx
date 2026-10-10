@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { MemoryDistribution } from '@/components/learning/memory-ui';
 import { Breadcrumbs, StatTile } from '@/components/learning/nav-bits';

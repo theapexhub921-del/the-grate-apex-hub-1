@@ -12,6 +12,8 @@ import {
 import { useKeyboardModality, webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import { elevation, Radius, type ThemeColors } from '@/constants/theme';
+import { type ExperienceId } from '@/data/experience';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // The GRATEAPEX interaction language, shared by every clickable surface:
@@ -120,7 +122,8 @@ export function Card({
   tone?: CardTone;
 }) {
   const styles = useThemedStyles(createStyles);
-  return <View style={[styles.card, styles[tone], style]}>{children}</View>;
+  const experience = useExperience();
+  return <View style={[styles.card, styles[tone], experienceCard(styles, experience, tone), style]}>{children}</View>;
 }
 
 // A card that is one tap target (navigation cards, lesson rows…).
@@ -146,6 +149,8 @@ export function PressableCard({
   lift?: boolean;
 }) {
   const styles = useThemedStyles(createStyles);
+  const experience = useExperience();
+  const originals = experience === 'originals';
   return (
     <Interactive
       onPress={onPress}
@@ -157,15 +162,29 @@ export function PressableCard({
         styles.card,
         styles[tone],
         styles.pressable,
-        hovered && styles.hovered,
-        hovered && lift && styles.lifted,
-        pressed && styles.pressed,
+        experienceCard(styles, experience, tone),
+        // The original app's Hover: gold border and a 1px lift; a press dims it.
+        hovered && (originals ? styles.legacyHovered : styles.hovered),
+        hovered && lift && !originals && styles.lifted,
+        pressed && (originals ? styles.legacyPressed : styles.pressed),
         style,
       ]}
     >
       {children}
     </Interactive>
   );
+}
+
+type CardStyles = ReturnType<typeof createStyles>;
+
+// The Originals: every card is the original app's frosted "glass" Panel
+// (ui.tsx: card colour, 1px border, radius 22, no shadow); tones keep their
+// meaning through the border only. Hybrid: the same glass, blurred, on this
+// app's elevation.
+function experienceCard(styles: CardStyles, experience: ExperienceId, tone: CardTone) {
+  if (experience === 'originate') return null;
+  if (experience === 'hybrid') return styles.hybridGlass;
+  return [styles.legacyPanel, tone === 'primary' || tone === 'insight' ? styles.legacyPrimary : tone === 'reward' ? styles.legacyReward : tone === 'outline' ? styles.legacyOutline : null];
 }
 
 function createStyles(colors: ThemeColors) {
@@ -190,5 +209,16 @@ function createStyles(colors: ThemeColors) {
     hovered: { borderColor: colors.primaryBorder },
     lifted: { transform: [{ translateY: -2 }], ...elevation(colors, 2) },
     pressed: { transform: [{ translateY: 0 }, { scale: 0.99 }] },
+
+    legacyPanel: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 22, boxShadow: 'none' } as ViewStyle,
+    legacyPrimary: { borderColor: colors.primary },
+    legacyReward: { borderColor: colors.accent },
+    legacyOutline: { backgroundColor: 'transparent', borderStyle: 'dashed' },
+    legacyHovered: { borderColor: colors.accent, transform: [{ translateY: -1 }] },
+    legacyPressed: { opacity: 0.85 },
+    hybridGlass: {
+      borderRadius: 22,
+      ...webStyle({ backdropFilter: 'blur(16px) saturate(140%)', WebkitBackdropFilter: 'blur(16px) saturate(140%)' }),
+    } as ViewStyle,
   });
 }

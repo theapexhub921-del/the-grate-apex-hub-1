@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';

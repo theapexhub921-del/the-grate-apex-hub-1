@@ -1,7 +1,8 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Linking, Platform, Share, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Platform, Share, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';

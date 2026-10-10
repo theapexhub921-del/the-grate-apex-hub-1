@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { type LayoutChangeEvent, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { type LayoutChangeEvent, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 import Animated, { FadeIn, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { stateColor } from '@/components/learning/memory-ui';

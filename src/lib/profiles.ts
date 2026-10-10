@@ -102,6 +102,8 @@ export async function updateProfile(
 export async function updateCurrentProfile(
   updates: ProfileUpdate
 ): Promise<ProfileResponse> {
+  // After a page reload the signed-in user is restored asynchronously; wait for it.
+  await auth.authStateReady();
   const current = auth.currentUser;
   if (!current) {
     return {

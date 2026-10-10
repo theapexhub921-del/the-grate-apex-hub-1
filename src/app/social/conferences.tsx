@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text, TextInput } from '@/components/ui/text';
 
 import { Avatar } from '@/components/ui/avatar';
 import { BackLink } from '@/components/learning/nav-bits';

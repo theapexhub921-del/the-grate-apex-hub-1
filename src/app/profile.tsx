@@ -1,6 +1,7 @@
 import { type Href, router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { RankProgressCard } from '@/components/rank-progress';
 import { ApexCoinWalletCard } from '@/components/apex-coin-wallet-card';

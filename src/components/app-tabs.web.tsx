@@ -1,5 +1,5 @@
 import Tabs from 'expo-router/js-tabs';
-import { useSegments } from 'expo-router';
+import { type Href, router, useSegments } from 'expo-router';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 
@@ -7,6 +7,8 @@ import { Atmosphere } from '@/components/atmosphere/atmosphere';
 import { OnlinePresenceSync } from '@/components/online-presence-sync';
 import { useAtmosphereMood } from '@/components/atmosphere/config';
 import { DesktopSidebar } from '@/components/desktop-sidebar';
+import { LegacyBackground } from '@/components/experience/legacy-background';
+import { LEGACY_DESKTOP_MIN, LegacyFloatingBar, LegacySidebar } from '@/components/experience/legacy-navigation';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
 import { HomeGreetingWallpaper } from '@/components/social/home-greeting-wallpaper';
 import { NAV_ITEMS } from '@/components/nav-items';
@@ -16,6 +18,7 @@ import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import { DESKTOP_BREAKPOINT, SIDEBAR_WIDTH } from '@/constants/theme';
 import { useTabBarMode } from '@/data/navigation-settings';
+import { useExperience } from '@/hooks/use-experience';
 
 /**
  * Web navigation shell.
@@ -27,35 +30,49 @@ import { useTabBarMode } from '@/data/navigation-settings';
  * app. Destinations, order and hidden routes are identical to the native
  * shell, so the five-tab identity is preserved on every platform.
  */
+const NAV_PATHS = Object.fromEntries(NAV_ITEMS.map((item) => [item.route, item.path]));
+
 export default function AppTabs() {
   const segments = useSegments();
   const { width } = useWindowDimensions();
   const mode = useTabBarMode();
   const mood = useAtmosphereMood();
   const reduceMotion = useReducedMotion();
+  const experience = useExperience();
+  const originals = experience === 'originals';
 
   // Unauthenticated screens must not show the authenticated navigation.
   const isAuthRoute = ['login', 'onboarding', 'privacy', 'terms'].includes(segments[0] as string);
   const isWidgetRoute = segments[0] === 'widget';
-  const isDesktop = width >= DESKTOP_BREAKPOINT;
+  // The Originals keeps the original app's desktop width for its sidebar.
+  const isDesktop = width >= (originals ? LEGACY_DESKTOP_MIN : DESKTOP_BREAKPOINT);
   const useRail = !isAuthRoute && !isWidgetRoute && isDesktop;
-  const docked = useRail && mode === 'alwaysVisible';
+  const docked = useRail && mode === 'alwaysVisible' && !originals;
 
   return (
     <View style={styles.shell}>
       <OnlinePresenceSync />
       {/* Keeps the document title correct on every route. */}
       <PageTitle />
-      <Atmosphere mood={mood} />
-      {(segments[0] as string | undefined) === 'index' ? <HomeGreetingWallpaper /> : null}
+      {/* Originate: the atmosphere. The Originals and Hybrid: the original
+          app's gradient background (see experience/legacy-background). */}
+      {experience === 'originate' ? <Atmosphere mood={mood} /> : <LegacyBackground lively={mood === 'lively' || mood === 'expressive'} />}
+      {(segments[0] as string | undefined) === 'index' && !originals ? <HomeGreetingWallpaper /> : null}
 
-      {useRail ? <DesktopSidebar docked={docked} /> : null}
+      {useRail && !originals ? <DesktopSidebar docked={docked} /> : null}
 
-      <View style={[styles.content, { paddingLeft: docked ? SIDEBAR_WIDTH : 0 }]}>
+      <View style={[styles.content, originals && styles.row, { paddingLeft: docked ? SIDEBAR_WIDTH : 0 }]}>
+        {/* The original app's sidebar takes its own space beside the page. */}
+        {useRail && originals ? <LegacySidebar onNavigate={(route) => router.navigate(NAV_PATHS[route] as Href)} /> : null}
+        <View style={styles.tabs}>
         <Tabs
           backBehavior="history"
           tabBar={({ navigation }) =>
-            useRail || isAuthRoute || isWidgetRoute ? null : <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
+            useRail || isAuthRoute || isWidgetRoute ? null : originals ? (
+              <LegacyFloatingBar onNavigate={(route) => navigation.navigate(route as never)} />
+            ) : (
+              <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
+            )
           }
           screenOptions={{
             headerShown: false,
@@ -99,6 +116,7 @@ export default function AppTabs() {
           <Tabs.Screen name="learn/flashcards" options={{ href: null }} />
           <Tabs.Screen name="learn/tutor" options={{ href: null }} />
         </Tabs>
+        </View>
       </View>
 
       {!isWidgetRoute ? <Signature aboveTabBar={!useRail && !isAuthRoute} /> : null}
@@ -110,4 +128,6 @@ const styles = StyleSheet.create({
   shell: { flex: 1, overflow: 'hidden' },
   content: { flex: 1, zIndex: 1, ...webStyle(cssTransition('padding-left', MOTION.standard)) },
   scene: { backgroundColor: 'transparent' },
+  row: { flexDirection: 'row' },
+  tabs: { flex: 1 },
 });

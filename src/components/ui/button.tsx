@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
-import { ActivityIndicator, type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { ActivityIndicator, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import type { ThemeColors } from '@/constants/theme';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'gold' | 'danger' | 'apex';
@@ -63,6 +65,25 @@ export function Button({
   const inactive = Boolean(disabled) && !loading;
   const labelColor = inactive ? colors.textTertiary : textColor;
 
+  // The original app's pill buttons (ui.tsx): a soft gradient of the button's
+  // colour, fully rounded. The Originals uses them for every button; Hybrid for
+  // the filled (main) actions only, keeping this app's lift and shadow.
+  const experience = useExperience();
+  const originals = experience === 'originals';
+  const pill = originals || (experience === 'hybrid' && filled);
+  const pillColor = variant === 'primary' ? colors.primary : variant === 'gold' || variant === 'apex' ? colors.accent : variant === 'danger' ? colors.error : null;
+  const pillStyle = pill
+    ? [
+        styles.pill,
+        originals && styles[`pill_${size}` as const],
+        pillColor && !inactive ? { backgroundColor: pillColor, ...webStyle({ backgroundImage: `linear-gradient(90deg, ${pillColor}, ${softEnd(pillColor)})` }) } : null,
+        originals && !filled && (variant === 'secondary' ? styles.pillSecondary : styles.pillGhost),
+        originals && styles.pillFlat,
+        originals && inactive && styles.pillOff,
+      ]
+    : null;
+  const legacyLabel = originals && !filled ? { color: inactive ? colors.textTertiary : colors.textSecondary } : null;
+
   return (
     <Interactive
       onPress={onPress}
@@ -75,17 +96,19 @@ export function Button({
         styles[size],
         styles[variant],
         filled && !inactive && styles.filled,
-        inactive && (filled ? styles.disabledFilled : styles.disabledPlain),
+        inactive && !originals && (filled ? styles.disabledFilled : styles.disabledPlain),
         fullWidth && styles.fullWidth,
-        hovered && !inactive && styles[`${variant}Hover` as const],
-        hovered && filled && !inactive && styles.lift,
-        pressed && styles.pressed,
+        hovered && !inactive && !originals && styles[`${variant}Hover` as const],
+        hovered && filled && !inactive && !originals && styles.lift,
+        pillStyle,
+        // The original's TouchableOpacity: a press only dims the button.
+        pressed && (originals ? styles.pillPressed : styles.pressed),
         style,
       ]}
     >
       <View style={styles.content}>
         {loading ? <ActivityIndicator size="small" color={textColor} /> : icon}
-        <Text style={[styles.label, styles[`${size}Label` as const], { color: labelColor }]} numberOfLines={2}>
+        <Text style={[styles.label, styles[`${size}Label` as const], { color: labelColor }, originals && styles.pillLabel, legacyLabel]} numberOfLines={2}>
           {label}
         </Text>
         {trailingIcon && !loading ? <Icon name={trailingIcon} size={iconSize} color={labelColor} strokeWidth={2.1} /> : null}
@@ -100,6 +123,9 @@ export function Button({
 }
 
 const SHEEN = 'linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 55%)';
+
+// The original gradient ends on the same colour at 80% ('cc'), when the colour is '#rrggbb'.
+const softEnd = (color: string) => (/^#[0-9a-f]{6}$/i.test(color) ? `${color}cc` : color);
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
@@ -157,5 +183,16 @@ function createStyles(colors: ThemeColors) {
       ...webStyle({ display: 'flex' }),
     },
     kbdText: { fontSize: 10, fontWeight: '700' },
+
+    pill: { borderRadius: 999 },
+    pill_sm: { minHeight: 0, paddingVertical: 9, paddingHorizontal: 16 },
+    pill_md: { minHeight: 0, paddingVertical: 15, paddingHorizontal: 22 },
+    pill_lg: { minHeight: 0, paddingVertical: 15, paddingHorizontal: 22 },
+    pillFlat: { boxShadow: 'none', borderColor: 'transparent' } as ViewStyle,
+    pillGhost: { backgroundColor: 'transparent', ...webStyle({ backgroundImage: 'none' }) } as ViewStyle,
+    pillSecondary: { backgroundColor: colors.surface, borderColor: colors.border, ...webStyle({ backgroundImage: 'none' }) } as ViewStyle,
+    pillOff: { opacity: 0.5, ...webStyle({ cursor: 'not-allowed' }) } as ViewStyle,
+    pillPressed: { opacity: 0.85 },
+    pillLabel: { fontWeight: '700', letterSpacing: 0 },
   });
 }

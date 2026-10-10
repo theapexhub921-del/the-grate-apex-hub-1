@@ -1,10 +1,12 @@
 import { useId } from 'react';
-import { type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native';
+import { Text } from '@/components/ui/text';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { Icon } from '@/components/ui/icon';
 import { Type } from '@/constants/theme';
 import type { SubjectId } from '@/data/lesson-types';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme } from '@/hooks/use-theme';
 
 // Visual identity for subjects and topics — replaces emoji.
@@ -19,18 +21,26 @@ export const SUBJECT_TINTS: Record<SubjectId, { gradient: readonly [string, stri
   anatomy: { gradient: ['#273766', '#121B3E'], ink: '#FDC00A', soft: '#6F7FB8' },
 };
 
-function GradientTile({ size, radius, colors: stops }: { size: number; radius: number; colors: readonly [string, string] }) {
+// The Originals: the original hub's course icon — its emoji on its own
+// vertical gradient (old-reference/src/data/catalog.ts and StudyScreen GRADS).
+const ORIGINAL_COURSE: Record<SubjectId, { emoji: string; gradient: readonly [string, string] }> = {
+  biochemistry: { emoji: '🧪', gradient: ['#10b981', '#047857'] },
+  physiology: { emoji: '🫀', gradient: ['#f43f5e', '#b91c3c'] },
+  anatomy: { emoji: '🩻', gradient: ['#3b82f6', '#1d4ed8'] },
+};
+
+function GradientTile({ size, radius, colors: stops, vertical = false }: { size: number; radius: number; colors: readonly [string, string]; vertical?: boolean }) {
   const id = `t${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   return (
     <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
       <Defs>
-        <LinearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+        <LinearGradient id={id} x1="0" y1="0" x2={vertical ? '0' : '1'} y2="1">
           <Stop offset="0" stopColor={stops[0]} />
           <Stop offset="1" stopColor={stops[1]} />
         </LinearGradient>
       </Defs>
       <Rect x={0} y={0} width={size} height={size} rx={radius} fill={`url(#${id})`} />
-      <Rect x={0.5} y={0.5} width={size - 1} height={size - 1} rx={radius} fill="none" stroke="#FFFFFF" strokeOpacity={0.14} />
+      {vertical ? null : <Rect x={0.5} y={0.5} width={size - 1} height={size - 1} rx={radius} fill="none" stroke="#FFFFFF" strokeOpacity={0.14} />}
     </Svg>
   );
 }
@@ -38,13 +48,27 @@ function GradientTile({ size, radius, colors: stops }: { size: number; radius: n
 export function SubjectGlyph({ subject, size = 48, style }: { subject: SubjectId; size?: number; style?: StyleProp<ViewStyle> }) {
   const tint = SUBJECT_TINTS[subject];
   const radius = Math.round(size * 0.3);
+  const experience = useExperience();
+  if (experience === 'originals') {
+    const original = ORIGINAL_COURSE[subject];
+    return (
+      <View style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }, style]} aria-hidden>
+        <GradientTile size={size} radius={Math.round(size * 0.28)} colors={original.gradient} vertical />
+        <View style={styles.glyphIcon}>
+          <Text style={{ fontSize: Math.round(size * 0.52) }}>{original.emoji}</Text>
+        </View>
+      </View>
+    );
+  }
+  // Hybrid: this app's drawn icon on the original course colours.
+  const stops = experience === 'hybrid' ? ORIGINAL_COURSE[subject].gradient : tint.gradient;
   return (
     <View style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }, style]} aria-hidden>
-      <GradientTile size={size} radius={radius} colors={tint.gradient} />
+      <GradientTile size={size} radius={radius} colors={stops} />
       {/* Positioned above the tile: an absolutely positioned SVG would
           otherwise paint over an in-flow icon on the web. */}
       <View style={styles.glyphIcon}>
-        <Icon name={subject} size={Math.round(size * 0.52)} color={tint.ink} strokeWidth={1.9} />
+        <Icon name={subject} size={Math.round(size * 0.52)} color={experience === 'hybrid' ? '#FFFFFF' : tint.ink} strokeWidth={1.9} />
       </View>
     </View>
   );

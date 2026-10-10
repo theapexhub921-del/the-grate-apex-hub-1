@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { AppState, Platform, StyleSheet, Text, View } from 'react-native';
+import { AppState, Platform, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { useLearning } from '@/data/learning/use-learning';
 import { syncLearningEvents } from '@/data/learning/events';

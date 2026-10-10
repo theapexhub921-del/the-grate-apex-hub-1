@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text, TextInput } from '@/components/ui/text';
 
 import { SubjectGlyph, TopicGlyph } from '@/components/learning/glyphs';
 import { ApexWordmark } from '@/components/motion/apex-wordmark';

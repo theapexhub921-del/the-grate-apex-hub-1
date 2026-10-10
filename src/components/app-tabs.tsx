@@ -6,11 +6,14 @@ import { useReducedMotion } from 'react-native-reanimated';
 import { Atmosphere } from '@/components/atmosphere/atmosphere';
 import { OnlinePresenceSync } from '@/components/online-presence-sync';
 import { useAtmosphereMood } from '@/components/atmosphere/config';
+import { LegacyBackground } from '@/components/experience/legacy-background';
+import { LegacyFloatingBar } from '@/components/experience/legacy-navigation';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
 import { HomeGreetingWallpaper } from '@/components/social/home-greeting-wallpaper';
 import { NAV_ITEMS } from '@/components/nav-items';
 import { Signature } from '@/components/signature';
 import { MOTION } from '@/constants/motion';
+import { useExperience } from '@/hooks/use-experience';
 
 // Navigation for Android and iOS (web has its own app-tabs.web.tsx, which
 // moves these destinations into a left rail on desktop).
@@ -26,6 +29,7 @@ export default function AppTabs() {
   const segments = useSegments();
   const mood = useAtmosphereMood();
   const reduceMotion = useReducedMotion();
+  const experience = useExperience();
 
   // Unauthenticated screens (login, forgot password, set new password) must
   // not show the authenticated navigation. The auth guard already keeps
@@ -36,13 +40,17 @@ export default function AppTabs() {
   return (
     <View style={styles.shell}>
       <OnlinePresenceSync />
-      <Atmosphere mood={mood} />
-      {(segments[0] as string | undefined) === 'index' ? <HomeGreetingWallpaper /> : null}
+      {experience === 'originate' ? <Atmosphere mood={mood} /> : <LegacyBackground lively={mood === 'lively' || mood === 'expressive'} />}
+      {(segments[0] as string | undefined) === 'index' && experience !== 'originals' ? <HomeGreetingWallpaper /> : null}
       <Tabs
         // Back (incl. Android back button) returns to the page you came from.
         backBehavior="history"
         tabBar={({ navigation }) =>
-          isAuthRoute || isWidgetRoute ? null : <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
+          isAuthRoute || isWidgetRoute ? null : experience === 'originals' ? (
+            <LegacyFloatingBar onNavigate={(route) => navigation.navigate(route as never)} />
+          ) : (
+            <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
+          )
         }
         screenOptions={{
           headerShown: false,

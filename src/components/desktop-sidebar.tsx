@@ -1,6 +1,7 @@
 import { router, usePathname } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { LogoMark } from '@/components/logo-mark';
 import { activeNavPath, NAV_ITEMS, NavIconView } from '@/components/nav-items';

@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { MemoryDistribution } from '@/components/learning/memory-ui';
 import { SUBJECT_TINTS, TopicGlyph } from '@/components/learning/glyphs';

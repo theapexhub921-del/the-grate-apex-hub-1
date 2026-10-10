@@ -1,6 +1,7 @@
 import { type Href, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef } from 'react';
-import { Linking, type ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, type ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { BackLink } from '@/components/learning/nav-bits';
 import { Button } from '@/components/ui/button';

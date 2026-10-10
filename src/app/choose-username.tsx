@@ -1,6 +1,7 @@
 import { signOut } from 'firebase/auth';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text, TextInput } from '@/components/ui/text';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/interactive';

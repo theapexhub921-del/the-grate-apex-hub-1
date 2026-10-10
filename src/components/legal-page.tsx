@@ -1,5 +1,6 @@
 import { router, type Href } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/interactive';

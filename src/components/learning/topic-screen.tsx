@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { TopicGlyph } from '@/components/learning/glyphs';
 import { ClassAccessCard } from '@/components/learning/class-access-card';

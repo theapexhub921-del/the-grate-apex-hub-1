@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { type LayoutChangeEvent, type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { type LayoutChangeEvent, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native';
+import { Text } from '@/components/ui/text';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { Interactive } from '@/components/ui/interactive';

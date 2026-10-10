@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 import { AVATAR_PRESETS, AvatarPresetArt, getAvatarPreset, presetValue } from '@/components/avatar/presets';
 import { Avatar } from '@/components/ui/avatar';
