@@ -1,12 +1,10 @@
 // Question of the Day: the app's real code against the emulator with the rules
 // DEPLOYED TODAY — one answer per learner per day (shared with the original
 // app) and a tally that can only go up by one with a new answer.
-import { fileURLToPath } from 'node:url';
-
-import { auth, check, db, fbAuth, finish, freshUser, fs, loadRules, peek, seed } from './connect.mjs';
+import { auth, check, db, fbAuth, finish, freshUser, fs, loadRules, peek, rulesUnderTest, seed } from './connect.mjs';
 
 const qotd = await import('@/data/qotd');
-await loadRules(fileURLToPath(new URL('./deployed-2026-10-09.rules', import.meta.url)));
+await loadRules(rulesUnderTest());
 const day = qotd.qotdDay();
 const question = qotd.pickQuestion(day);
 check('today has a question and a UTC day key the rules accept', Boolean(question) && /^\d{4}-\d{2}-\d{2}$/.test(day), { day, question: question?.id });

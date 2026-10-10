@@ -1,13 +1,11 @@
 // Achievement levels and boosts: the app's real claim / reward code against the
 // emulator with the rules DEPLOYED TODAY (it only writes users/{uid}).
-import { fileURLToPath } from 'node:url';
-
-import { check, finish, freshUser, loadRules, peek, seed } from './connect.mjs';
+import { check, finish, freshUser, loadRules, peek, rulesUnderTest, seed } from './connect.mjs';
 
 const store = await import('@/data/achievements-store');
 const { computeMetrics, evaluateAchievements, NO_LEGACY } = await import('@/data/achievements');
 const powerups = await import('@/data/learning/powerups');
-await loadRules(fileURLToPath(new URL('./deployed-2026-10-09.rules', import.meta.url)));
+await loadRules(rulesUnderTest());
 
 const app = (xp) => ({ answers: [], quizzes: [], xp, lessonsCompleted: 0, lessonCompletedAt: [], topicsCompleted: 0, conceptsMastered: 0 });
 const statesAt = (xp) => evaluateAchievements(computeMetrics(app(xp), NO_LEGACY));

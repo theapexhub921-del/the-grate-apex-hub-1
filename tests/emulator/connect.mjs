@@ -19,6 +19,17 @@ if (!auth.emulatorConfig || db._getSettings().host !== FIRESTORE) throw new Erro
 export { app, auth, db, fbAuth, fs };
 export const projectId = app.options.projectId;
 
+/**
+ * The rules a check runs under: the rules deployed today (default), or the
+ * proposed firestore.rules with RULES=proposed — run the suite both ways to show
+ * the proposed additions break nothing.
+ */
+export function rulesUnderTest() {
+  const proposed = process.env.RULES === 'proposed';
+  console.log(`rules: ${proposed ? 'firestore.rules (proposed)' : 'deployed-2026-10-09.rules'}`);
+  return fileURLToPath(new URL(proposed ? '../../firestore.rules' : './deployed-2026-10-09.rules', import.meta.url));
+}
+
 /** Loads a rules file into the emulator for the app's project. Default: the repository's firestore.rules. */
 export async function loadRules(file = process.env.RULES_FILE || fileURLToPath(new URL('../../firestore.rules', import.meta.url))) {
   const response = await fetch(`http://${FIRESTORE}/emulator/v1/projects/${projectId}:securityRules`, {

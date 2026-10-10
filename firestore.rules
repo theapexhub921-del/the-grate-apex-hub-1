@@ -369,6 +369,18 @@ service cloud.firestore {
             || !(request.auth.uid in get(/databases/$(database)/documents/groups/$(gid)).data.memberUids));
     }
 
+    // Study planner (new app): one private document each for study plans, the
+    // timetable and personal goals. Owner only; nothing else can read them.
+    match /users/{uid}/planner/{kind} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && kind in ['studyPlans', 'timetableBlocks', 'goals']
+        && request.resource.data.keys().hasOnly(['items', 'updatedAt'])
+        && request.resource.data.items is list
+        && request.resource.data.items.size() <= 200
+        && request.resource.data.updatedAt == request.time;
+    }
+
     // Study groups. Only members can see a group or its chat.
     match /groups/{gid} {
       allow read: if request.auth.uid in resource.data.memberUids;

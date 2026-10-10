@@ -1,12 +1,10 @@
 // Posts, likes, comments, reports and blocks: the app's real code against the
 // emulator with the rules DEPLOYED TODAY, next to a post written by the original app.
-import { fileURLToPath } from 'node:url';
-
-import { check, db, finish, freshUser, fs, loadRules, peek, peekAll, seed, signInAs } from './connect.mjs';
+import { check, db, finish, freshUser, fs, loadRules, peek, peekAll, rulesUnderTest, seed, signInAs } from './connect.mjs';
 
 const community = await import('@/data/community');
 const { uploads } = await import('@/lib/media');
-await loadRules(fileURLToPath(new URL('./deployed-2026-10-09.rules', import.meta.url)));
+await loadRules(rulesUnderTest());
 const s = Date.now().toString(36).slice(-5);
 const a = await freshUser('post-a');
 const b = await freshUser('post-b');

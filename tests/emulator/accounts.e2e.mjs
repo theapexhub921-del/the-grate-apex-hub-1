@@ -1,15 +1,13 @@
 // Accounts, usernames, display names and class selection: the app's real code
 // (lib/accounts.ts, lib/profiles.ts) against the emulator with the rules
 // DEPLOYED TODAY — none of this needs a rule change.
-import { fileURLToPath } from 'node:url';
-
-import { auth, check, db, finish, fbAuth, freshUser, fs, loadRules, peek, projectId, seed, signInAs } from './connect.mjs';
+import { auth, check, db, fbAuth, finish, freshUser, fs, loadRules, peek, projectId, rulesUnderTest, seed, signInAs } from './connect.mjs';
 
 const accounts = await import('@/lib/accounts');
 const profiles = await import('@/lib/profiles');
 const { readClassSelection } = await import('@/data/class-curriculum');
 const { needsUsername } = await import('@/lib/login-identifier');
-await loadRules(fileURLToPath(new URL('./deployed-2026-10-09.rules', import.meta.url)));
+await loadRules(rulesUnderTest());
 
 const PASSWORD = 'emulator-only-password';
 const stamp = Date.now().toString(36);

@@ -107,7 +107,7 @@ export default function PlannerScreen() {
   return (
     <Screen width="content">
       <BackLink fallback={'/learn' as never} />
-      <PageHeader title="Your study planner" subtitle="Optional tools to shape your week around the subjects you want to study. Plans are saved on this device." />
+      <PageHeader title="Your study planner" subtitle="Optional tools to shape your week around the subjects you want to study." />
       {!ready ? <Text style={styles.body}>Loading your saved plans…</Text> : null}
       {error ? <InlineNotice tone="error" title="Planner issue" message={error} /> : null}
 
@@ -153,7 +153,7 @@ export default function PlannerScreen() {
         </Card>
       ) : plan ? <InlineNotice tone="info" title="Your topics are not available yet" message="The plan is saved. Its lesson path will appear when those topics have published lessons." /> : null}
 
-      <SectionHeader title="Personal timetable" subtitle="Add recurring class or study blocks. Your timetable is saved privately on this device." style={styles.sectionHeader} />
+      <SectionHeader title="Personal timetable" subtitle="Add recurring class or study blocks. Your timetable is private to you." style={styles.sectionHeader} />
       <Card style={styles.sectionCard}>
         <TextInput value={title} onChangeText={setTitle} maxLength={60} placeholder="Class or study block" placeholderTextColor={colors.textTertiary} accessibilityLabel="Timetable item name" style={styles.input} />
         <TextInput value={subject} onChangeText={setSubject} maxLength={100} placeholder="Subject (optional)" placeholderTextColor={colors.textTertiary} accessibilityLabel="Timetable subject" style={styles.input} />

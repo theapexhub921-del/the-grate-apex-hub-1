@@ -1,12 +1,15 @@
-import { auth } from '@/lib/firebase';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+
+import { auth, db } from '@/lib/firebase';
 import { readLearningCache, writeLearningCache } from '@/data/learning-sync';
 
 // Study plans, timetable and personal goals.
 //
-// Saved on this device for the signed-in learner (account-scoped cache). The
-// deployed Firestore rules have no place for planner data yet (the earlier
-// users/{uid}/studyPlans, timetableBlocks and goals paths are refused), so
-// nothing here pretends to sync. Cloud sync needs an owner-only rule first.
+// Always kept on this device for the signed-in learner (account-scoped cache),
+// and synced to the account at users/{uid}/planner/{kind} = { items, updatedAt }
+// when the rules allow it (firestore.rules — an owner-only block). Until then,
+// or offline, the device copy is used; nothing claims to have synced when it
+// didn't. Two devices editing the same list: the last save wins.
 
 export type StudyPlan = {
   id: string;
@@ -63,8 +66,7 @@ async function currentUserId() {
   return user.uid;
 }
 
-async function readAll<T>(kind: Kind): Promise<T[]> {
-  await currentUserId();
+async function readLocal<T>(kind: Kind): Promise<T[]> {
   try {
     const saved = await readLearningCache(KEYS[kind]);
     const parsed = saved ? JSON.parse(saved) : [];
@@ -74,13 +76,38 @@ async function readAll<T>(kind: Kind): Promise<T[]> {
   }
 }
 
+async function readAll<T>(kind: Kind): Promise<T[]> {
+  const uid = await currentUserId();
+  const local = await readLocal<T>(kind);
+  try {
+    const snap = await getDoc(doc(db, 'users', uid, 'planner', kind));
+    if (snap.exists()) {
+      const items = Array.isArray(snap.data().items) ? (snap.data().items as T[]) : [];
+      await writeLearningCache(KEYS[kind], JSON.stringify(items)).catch(() => undefined);
+      return items;
+    }
+    // First sync: the account has nothing yet, so this device's list goes up.
+    if (local.length) await saveToAccount(uid, kind, local);
+  } catch {
+    // Not allowed yet (rules) or offline: the device copy is used.
+  }
+  return local;
+}
+
+async function saveToAccount<T>(uid: string, kind: Kind, items: T[]) {
+  // Firestore refuses undefined values; JSON drops them.
+  await setDoc(doc(db, 'users', uid, 'planner', kind), { items: JSON.parse(JSON.stringify(items)), updatedAt: serverTimestamp() });
+}
+
 async function writeAll<T>(kind: Kind, items: T[]) {
-  await currentUserId();
+  const uid = await currentUserId();
+  if (items.length > 200) throw new Error('The planner keeps up to 200 entries of each kind.');
   try {
     await writeLearningCache(KEYS[kind], JSON.stringify(items));
   } catch {
     throw new Error('Your planner could not be saved on this device.');
   }
+  await saveToAccount(uid, kind, items).catch(() => undefined); // synced when the rules allow; else device only
 }
 
 async function upsert<T extends { id: string }>(kind: Kind, item: T) {

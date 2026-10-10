@@ -1,11 +1,9 @@
 // Study groups and direct messages: the app's real code against the emulator
 // with the rules DEPLOYED TODAY. a and b follow each other; c is not a friend.
-import { fileURLToPath } from 'node:url';
-
-import { check, finish, freshUser, loadRules, peek, peekAll, seed, signInAs } from './connect.mjs';
+import { check, finish, freshUser, loadRules, peek, peekAll, rulesUnderTest, seed, signInAs } from './connect.mjs';
 
 const community = await import('@/data/community');
-await loadRules(fileURLToPath(new URL('./deployed-2026-10-09.rules', import.meta.url)));
+await loadRules(rulesUnderTest());
 const s = Date.now().toString(36).slice(-5);
 const [a, b, c] = [await freshUser('grp-a'), await freshUser('grp-b'), await freshUser('grp-c')];
 a.username = `owner_${s}`; b.username = `friend_${s}`; c.username = `other_${s}`;

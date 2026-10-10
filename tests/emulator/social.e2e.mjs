@@ -1,12 +1,10 @@
 // Friends, followers and suggestions: the app's real social store against the
 // emulator with the rules DEPLOYED TODAY, starting from follows written in the
 // original app's format (follows/{follower}_{followee} = { follower, followee, … }).
-import { fileURLToPath } from 'node:url';
-
-import { check, db, finish, freshUser, fs, loadRules, peek, peekAll, seed, signInAs } from './connect.mjs';
+import { check, db, finish, freshUser, fs, loadRules, peek, peekAll, rulesUnderTest, seed, signInAs } from './connect.mjs';
 
 const social = await import('@/data/social');
-await loadRules(fileURLToPath(new URL('./deployed-2026-10-09.rules', import.meta.url)));
+await loadRules(rulesUnderTest());
 
 const s = Date.now().toString(36).slice(-5);
 const people = {};

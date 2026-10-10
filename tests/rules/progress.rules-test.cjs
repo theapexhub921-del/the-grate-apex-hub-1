@@ -153,3 +153,44 @@ describe('proposed rules: progress/{uid}/completions', () => {
     await today.cleanup();
   });
 });
+
+describe('proposed rules: users/{uid}/planner/{kind}', () => {
+  let env;
+  const db = (uid) => (uid ? env.authenticatedContext(uid).firestore() : env.unauthenticatedContext().firestore());
+  const ref = (uid, owner = ALICE, kind = 'studyPlans') => doc(db(uid), 'users', owner, 'planner', kind);
+  const body = (o = {}) => ({ items: [{ id: 'plan_1', title: 'Week' }], updatedAt: serverTimestamp(), ...o });
+  before(async () => { env = await environment(PROPOSED, 'demo-grateapex-planner'); });
+  beforeEach(async () => { await env.clearFirestore(); });
+  after(async () => { await env.cleanup(); });
+
+  it('ALLOW owner writes, reads and deletes each of the three planner documents', async () => {
+    for (const kind of ['studyPlans', 'timetableBlocks', 'goals']) {
+      await assertSucceeds(setDoc(ref(ALICE, ALICE, kind), body()));
+      await assertSucceeds(getDoc(ref(ALICE, ALICE, kind)));
+      await assertSucceeds(deleteDoc(ref(ALICE, ALICE, kind)));
+    }
+  });
+  it('DENY another student or signed out', async () => {
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'users', ALICE, 'planner', 'goals'), { items: [], updatedAt: new Date() }));
+    await assertFails(getDoc(ref(BOB, ALICE, 'goals')));
+    await assertFails(setDoc(ref(BOB, ALICE, 'goals'), body()));
+    await assertFails(setDoc(ref(null, ALICE, 'goals'), body()));
+  });
+  it('DENY other document names, extra fields, client time and more than 200 items', async () => {
+    await assertFails(setDoc(ref(ALICE, ALICE, 'notes'), body()));
+    await assertFails(setDoc(ref(ALICE), body({ xp: 1 })));
+    await assertFails(setDoc(ref(ALICE), body({ updatedAt: 5 })));
+    await assertFails(setDoc(ref(ALICE), body({ items: Array.from({ length: 201 }, (_, i) => ({ id: String(i) })) })));
+  });
+  it('UNCHANGED the users/{uid} profile rules still apply (username, class lock)', async () => {
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'users', ALICE), { username: 'alice_a', hall: 'HB1', semester: 1, classLocked: true }));
+    await assertFails(setDoc(doc(db(ALICE), 'users', ALICE), { hall: 'HB2' }, { merge: true }));
+    await assertFails(setDoc(doc(db(ALICE), 'users', ALICE), { username: 'Alice A' }, { merge: true }));
+    await assertSucceeds(setDoc(doc(db(ALICE), 'users', ALICE), { displayName: 'Alice' }, { merge: true }));
+  });
+  it('DENY today (deployed rules): the planner path is closed', async () => {
+    const today = await environment(BASELINE, 'demo-grateapex-planner-today');
+    await assertFails(setDoc(doc(today.authenticatedContext(ALICE).firestore(), 'users', ALICE, 'planner', 'goals'), body()));
+    await today.cleanup();
+  });
+});
