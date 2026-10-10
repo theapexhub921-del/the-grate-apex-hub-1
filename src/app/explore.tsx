@@ -95,11 +95,11 @@ export default function ExploreScreen() {
 
   return (
     <Screen width="wide">
-      <PageHeader eyebrow="The GrAteApex Hub guide" title="Explore" subtitle="A friendly guide to studying, connecting and growing with GrAteApex Hub." />
+      <PageHeader eyebrow="The GrAte Apex Hub guide" title="Explore" subtitle="A friendly guide to studying, connecting and growing with GrAte Apex Hub." />
 
       <View style={styles.introGrid}>
         <Card style={styles.introCard}>
-          <View style={styles.introBrand}><Icon name="sparkle" size={22} color={colors.accentText} /><Text style={styles.introLabel}>WELCOME TO GrAteApex Hub</Text></View>
+          <View style={styles.introBrand}><Icon name="sparkle" size={22} color={colors.accentText} /><Text style={styles.introLabel}>WELCOME TO GrAte Apex Hub</Text></View>
           <Text style={styles.introTitle}>Learn your way. Rise together.</Text>
           <Text style={styles.introBody}>Bring your lecture material into focused lessons, practise with fresh questions, and return to concepts when they are due. Feed is your social space for Stories and community posts. Explore explains every feature, shares updates and shows what is coming next.</Text>
           {/* Start here: fills the card to the simulation's height with the four first steps. */}
@@ -124,7 +124,7 @@ export default function ExploreScreen() {
             </Interactive>
           </View>
         </Card>
-        {/* "How GrAteApex Hub is organised": a tap-through simulation (owner request). */}
+        {/* "How GrAte Apex Hub is organised": a tap-through simulation (owner request). */}
         <OrganisationSimulator />
       </View>
 
@@ -142,18 +142,18 @@ export default function ExploreScreen() {
       <PwaInstallCard />
       <SectionHeader title="Explore by theme" subtitle="Related features are grouped together. Open a theme for details, or try a short interactive walkthrough." style={styles.section} />
       <ExploreFeatureGroups />
-      <SectionHeader title="GrAteApex Hub feature guide" subtitle="A plain-language guide to the app, its systems and the features you can explore." style={styles.section} />
+      <SectionHeader title="GrAte Apex Hub feature guide" subtitle="A plain-language guide to the app, its systems and the features you can explore." style={styles.section} />
       {/* A guided tour of every feature (owner request: a simulation, not a wall of cards). */}
       <FeatureGuideSimulator />
       <SectionHeader title="What's New" subtitle="Dated product updates, kept separate from medical research." style={styles.section} />
       <View style={styles.featureGrid}>{getExploreAnnouncements().map((item) => <AnnouncementCard key={item.id} item={item} />)}</View>
 
-      <SectionHeader title="About GrAteApex Hub" subtitle="A learning companion built around your course material and your study circle." style={styles.section} />
+      <SectionHeader title="About GrAte Apex Hub" subtitle="A learning companion built around your course material and your study circle." style={styles.section} />
       <Card style={styles.aboutCard}>
         <Text style={styles.featureDescription}>{ABOUT_US}</Text>
       </Card>
 
-      <SectionHeader title="Meet the team" subtitle="The people building and supporting GrAteApex Hub." style={styles.section} />
+      <SectionHeader title="Meet the team" subtitle="The people building and supporting GrAte Apex Hub." style={styles.section} />
       <View style={styles.featureGrid}>
         {EXPLORE_TEAM.map((member) => <Card key={member.name} style={styles.teamCard}>
           <View style={styles.featureIcon}><Icon name={member.icon} size={19} color={colors.primaryText} /></View>
@@ -163,9 +163,9 @@ export default function ExploreScreen() {
       </View>
       <Card style={[styles.aboutCard, styles.contactCard]}>
         <Text style={styles.featureTitle}>Contact us</Text>
-        <Text style={styles.featureDescription}>Send the GrAteApex Hub team a question, idea or feedback.</Text>
+        <Text style={styles.featureDescription}>Send the GrAte Apex Hub team a question, idea or feedback.</Text>
         <Interactive onPress={emailUs} accessibilityRole="link" style={styles.guideLink}>
-          <Icon name="mail" size={16} color={colors.primaryText} /><Text style={styles.guideLinkText}>Email the GrAteApex Hub team</Text>
+          <Icon name="mail" size={16} color={colors.primaryText} /><Text style={styles.guideLinkText}>Email the GrAte Apex Hub team</Text>
         </Interactive>
         {/* Always visible, so the address can be copied if no email app opens. */}
         <Text selectable style={styles.featureDescription}>
@@ -179,7 +179,7 @@ export default function ExploreScreen() {
   );
 }
 
-// "The GrAteApex Hub journey" — the one place the full rank ladder is revealed.
+// "The GrAte Apex Hub journey" — the one place the full rank ladder is revealed.
 // Everyday screens only ever show the current rank and the gap to the next.
 function Journey() {
   const styles = useThemedStyles(createStyles);
@@ -262,7 +262,7 @@ function Journey() {
   return (
     <View style={styles.journey}>
       <SectionHeader
-        title="The GrAteApex Hub journey"
+        title="The GrAte Apex Hub journey"
         subtitle="Lifetime XP carries you from your first lecture to Consultant. Each stage takes more than the last."
         style={styles.section}
       />

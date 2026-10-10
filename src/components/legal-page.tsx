@@ -33,7 +33,7 @@ export function LegalPage({ title, updated, intro, sections }: { title: string; 
           </View>
         ))}
       </Card>
-      <Button label="Back to GrAteApex Hub" variant="secondary" onPress={() => router.replace('/' as Href)} style={styles.back} />
+      <Button label="Back to GrAte Apex Hub" variant="secondary" onPress={() => router.replace('/' as Href)} style={styles.back} />
     </Screen>
   );
 }

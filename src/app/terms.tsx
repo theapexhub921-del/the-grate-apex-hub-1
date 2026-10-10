@@ -6,12 +6,12 @@ export default function TermsScreen() {
     <LegalPage
       title="Terms of Service"
       updated="5 October 2026"
-      intro="By using GrAteApex Hub, developed by OrigiNate, you agree to these terms."
+      intro="By using GrAte Apex Hub, developed by OrigiNate, you agree to these terms."
       sections={[
         {
           title: 'Educational use',
           paragraphs: [
-            'GrAteApex Hub is a study aid built from lecture material. It is not medical advice and does not replace your lecturers, textbooks or official course requirements. Where the app notes that sources disagree, check with your lecturer.',
+            'GrAte Apex Hub is a study aid built from lecture material. It is not medical advice and does not replace your lecturers, textbooks or official course requirements. Where the app notes that sources disagree, check with your lecturer.',
           ],
         },
         {
@@ -25,7 +25,7 @@ export default function TermsScreen() {
         {
           title: 'Content',
           paragraphs: [
-            'Course content in GrAteApex Hub is provided for your personal study. Do not copy or redistribute it outside the app.',
+            'Course content in GrAte Apex Hub is provided for your personal study. Do not copy or redistribute it outside the app.',
           ],
         },
         {
@@ -37,7 +37,7 @@ export default function TermsScreen() {
         {
           title: 'The service',
           paragraphs: [
-            'GrAteApex Hub is provided as it is, and features may change as the app develops. We work to keep it available and your data safe, but cannot guarantee uninterrupted service.',
+            'GrAte Apex Hub is provided as it is, and features may change as the app develops. We work to keep it available and your data safe, but cannot guarantee uninterrupted service.',
           ],
         },
         {

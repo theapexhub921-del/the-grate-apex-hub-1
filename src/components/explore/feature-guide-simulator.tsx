@@ -13,7 +13,7 @@ import { Type, type ThemeColors } from '@/constants/theme';
 import { EXPLORE_GUIDE, type ExploreGuideEntry } from '@/data/explore';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
-// Explore → "GrAteApex Hub feature guide", as a guided tour instead of a wall
+// Explore → "GrAte Apex Hub feature guide", as a guided tour instead of a wall
 // of cards: pick a group, and the features play one at a time on a small
 // screen (or step through them). Each shows its real status.
 

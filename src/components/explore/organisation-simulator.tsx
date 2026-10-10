@@ -13,7 +13,7 @@ import { MOTION } from '@/constants/motion';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
-// Explore → "How GrAteApex Hub is organised", as a small simulation: a phone
+// Explore → "How GrAte Apex Hub is organised", as a small simulation: a phone
 // with the five tabs. Tap one (or let it play) to see a sample screen and what
 // lives there. Sample screens only — no real names or numbers.
 
@@ -60,7 +60,7 @@ export function OrganisationSimulator() {
   return (
     <Card style={styles.card} tone="insight">
       <View style={styles.head}>
-        <Text style={styles.title}>How GrAteApex Hub is organised</Text>
+        <Text style={styles.title}>How GrAte Apex Hub is organised</Text>
         <Pill label="Simulation" tone="primary" />
       </View>
       <Text style={styles.lead}>Five tabs, one place each. Tap a tab on the phone to see what lives there.</Text>

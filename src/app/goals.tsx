@@ -60,7 +60,7 @@ export default function GoalsScreen() {
     <BackLink fallback="/" />
     <PageHeader title="Personal goals" subtitle="Set a target that fits your study life. Progress updates from your learning activity." />
     {error ? <InlineNotice tone="error" title="Goal sync issue" message={error} /> : null}
-    <SectionHeader title="Create a goal" subtitle="Lesson, XP and streak goals track automatically from your GrAteApex Hub progress." />
+    <SectionHeader title="Create a goal" subtitle="Lesson, XP and streak goals track automatically from your GrAte Apex Hub progress." />
     <Card style={styles.card}>
       <TextInput value={title} onChangeText={setTitle} maxLength={120} placeholder="e.g. Finish 10 lessons" placeholderTextColor={colors.textTertiary} style={styles.input} accessibilityLabel="Goal name" />
       <View style={styles.typeRow}>{GOAL_TYPES.map((item) => <Interactive key={item.value} onPress={() => setKind(item.value)} accessibilityRole="radio" accessibilityState={{ checked: kind === item.value }} style={[styles.typeChoice, kind === item.value && styles.typeChoiceActive]}><Text style={[styles.typeText, kind === item.value && styles.typeTextActive]}>{item.label}</Text></Interactive>)}</View>

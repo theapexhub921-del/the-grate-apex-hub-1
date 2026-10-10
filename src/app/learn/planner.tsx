@@ -112,7 +112,7 @@ export default function PlannerScreen() {
       {!ready ? <Text style={styles.body}>Loading your saved plans…</Text> : null}
       {error ? <InlineNotice tone="error" title="Planner issue" message={error} /> : null}
 
-      <SectionHeader title="Build a study plan" subtitle="Choose topics and a time period. GrAteApex Hub will make a lesson path from published course material." />
+      <SectionHeader title="Build a study plan" subtitle="Choose topics and a time period. GrAte Apex Hub will make a lesson path from published course material." />
       <Card style={styles.sectionCard}>
         <Text style={styles.label}>Topics</Text>
         <View style={styles.topicGrid}>

@@ -1,8 +1,8 @@
 /**
  * Web page titles, driven by the current route.
  *
- * GrAteApex Hub stays the product identity: the tab always starts with
- * "GrAteApex Hub", with the section appended ("GrAteApex Hub — Learn").
+ * GrAte Apex Hub stays the product identity: the tab always starts with
+ * "GrAte Apex Hub", with the section appended ("GrAte Apex Hub — Learn").
  *
  * Two mechanisms are used together on purpose:
  *  - `Head` (expo-router/head, react-helmet-async) is the official Expo Web
@@ -16,7 +16,7 @@ import { useEffect } from 'react';
 import Head from 'expo-router/head';
 import { usePathname } from 'expo-router';
 
-export const APP_NAME = 'GrAteApex Hub';
+export const APP_NAME = 'GrAte Apex Hub';
 
 // Route segment → human section name. Order matters: the first match wins.
 const SECTION_LABELS: [string, string][] = [
@@ -40,7 +40,7 @@ const SECTION_LABELS: [string, string][] = [
   ['/login', 'Sign in'],
 ];
 
-/** "GrAteApex Hub — Study" for a pathname, or just "GrAteApex Hub" for Feed. */
+/** "GrAte Apex Hub — Study" for a pathname, or just "GrAte Apex Hub" for Feed. */
 export function titleForPath(pathname: string | null): string {
   if (!pathname || pathname === '/') {
     return APP_NAME;

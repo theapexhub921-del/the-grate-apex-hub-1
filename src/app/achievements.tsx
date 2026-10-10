@@ -39,13 +39,13 @@ export default function AchievementsScreen() {
       <BoostPanel />
       {groups.map(({ group, items }) => (
         <View key={group} style={styles.section}>
-          <SectionHeader title={group === 'GRATEAPEX' ? 'GrAteApex Hub' : group} subtitle={`${items.reduce((n, s) => n + s.level, 0)} of ${items.length * 5} levels`} />
+          <SectionHeader title={group === 'GRATEAPEX' ? 'GrAte Apex Hub' : group} subtitle={`${items.reduce((n, s) => n + s.level, 0)} of ${items.length * 5} levels`} />
           <View style={styles.badges}>
             {items.map((state) => <AchievementBadge key={state.def.id} state={state} onPress={() => setOpen(state)} />)}
           </View>
         </View>
       ))}
-      <Sheet visible={Boolean(open)} onClose={() => setOpen(null)} title={open?.def.name ?? ''} subtitle={open ? `${open.def.group === 'GRATEAPEX' ? 'GrAteApex Hub' : open.def.group} · level ${open.level} of 5` : undefined}>
+      <Sheet visible={Boolean(open)} onClose={() => setOpen(null)} title={open?.def.name ?? ''} subtitle={open ? `${open.def.group === 'GRATEAPEX' ? 'GrAte Apex Hub' : open.def.group} · level ${open.level} of 5` : undefined}>
         {open ? <AchievementRow state={open} /> : null}
       </Sheet>
     </Screen>

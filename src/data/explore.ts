@@ -71,7 +71,7 @@ export const EXPLORE_TEAM: readonly ExploreTeamMember[] = [
   { name: 'Pernellluvsya', role: 'Technical officer', icon: 'profile' },
   { name: 'Kwame Twumasi', role: 'Technical Advisor', icon: 'profile' },
 ];
-export const EXPLORE_CONTACT = { email: 'theapexhub921@gmail.com', subject: 'GrAteApex Hub question' } as const;
+export const EXPLORE_CONTACT = { email: 'theapexhub921@gmail.com', subject: 'GrAte Apex Hub question' } as const;
 
 const SUPPLEMENTAL_REVIEWED: ExploreProvenance = {
   status: 'reviewed',
@@ -80,7 +80,7 @@ const SUPPLEMENTAL_REVIEWED: ExploreProvenance = {
 
 const FEATURE: ExploreProvenance = {
   status: 'feature',
-  note: 'A feature available in GrAteApex Hub today.',
+  note: 'A feature available in GrAte Apex Hub today.',
 };
 
 const exploreItems: ExploreItem[] = [
@@ -310,8 +310,8 @@ const exploreItems: ExploreItem[] = [
 ];
 
 const announcements: readonly ExploreAnnouncement[] = [
-  { id: 'explore-discovery-restored', title: 'Medical discovery returns to Explore', summary: 'Explore now brings concepts, mechanism-to-clinic connections and carefully qualified research summaries alongside the GrAteApex Hub feature guide.', publishedAt: '2026-10-05', status: 'preview' },
-  { id: 'community-foundations', title: 'Social learning foundations', summary: 'Posts, groups and friend messaging now share the GrAteApex Hub community data model. Planning and text-first conference work is joining that foundation.', publishedAt: '2026-10-05', status: 'preview' },
+  { id: 'explore-discovery-restored', title: 'Medical discovery returns to Explore', summary: 'Explore now brings concepts, mechanism-to-clinic connections and carefully qualified research summaries alongside the GrAte Apex Hub feature guide.', publishedAt: '2026-10-05', status: 'preview' },
+  { id: 'community-foundations', title: 'Social learning foundations', summary: 'Posts, groups and friend messaging now share the GrAte Apex Hub community data model. Planning and text-first conference work is joining that foundation.', publishedAt: '2026-10-05', status: 'preview' },
 ];
 
 export const EXPLORE_GUIDE: readonly ExploreGuideEntry[] = [
@@ -324,8 +324,8 @@ export const EXPLORE_GUIDE: readonly ExploreGuideEntry[] = [
   { title: 'Settings', detail: 'Choose your theme, text size, web zoom, navigation, notification preferences and privacy choices. These controls are available in the app.', status: 'available' },
   { title: 'XP and ranks', detail: 'Earn XP from learning tasks and follow your progress through the rank ladder.', status: 'available' },
   { title: 'Learning power-ups', detail: 'Earn XP boosts from completed lessons, quizzes, streak milestones and one successful app share per day; the strongest stored boost applies to your next lesson or quiz. Achievement levels give timed boosts that you activate, each lasting at most an hour.', status: 'available' },
-  { title: 'Achievements', detail: 'Every milestone from the original app plus GrAteApex Hub’s own, each with five levels. Each new level gives a timed XP boost.', status: 'available' },
-  { title: 'Install and share the app', detail: 'Install GrAteApex Hub from a mobile or desktop browser and share the app with classmates from Settings.', status: 'available' },
+  { title: 'Achievements', detail: 'Every milestone from the original app plus GrAte Apex Hub’s own, each with five levels. Each new level gives a timed XP boost.', status: 'available' },
+  { title: 'Install and share the app', detail: 'Install GrAte Apex Hub from a mobile or desktop browser and share the app with classmates from Settings.', status: 'available' },
   { title: 'Leagues', detail: 'See standings by total XP against learners at your rank, from the shared leaderboard. Weekly standings with promotion and relegation are coming soon.', status: 'limited' },
   { title: 'Learning streak', detail: 'Track consecutive days with a meaningful learning activity.', status: 'available' },
   { title: 'Friend streaks, freezes and restores', detail: 'View friends’ streaks. Earning and using streak freezes and recovering a lapsed streak are being rebuilt.', status: 'limited' },
@@ -398,6 +398,6 @@ export function getCategoryLabel(category: ExploreCategory) {
     case 'connection':
       return 'Connections';
     default:
-      return 'GrAteApex Hub';
+      return 'GrAte Apex Hub';
   }
 }

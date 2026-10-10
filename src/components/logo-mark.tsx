@@ -28,7 +28,7 @@ export function LogoMark({ height = 32 }: LogoMarkProps) {
       onPressIn={() => setLit(true)}
       onPressOut={() => setLit(false)}
       accessibilityRole="image"
-      accessibilityLabel="GrAteApex Hub logo"
+      accessibilityLabel="GrAte Apex Hub logo"
     >
       <View style={[size, styles.scaled, lit && styles.lit]}>
         <Image

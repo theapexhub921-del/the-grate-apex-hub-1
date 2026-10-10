@@ -321,7 +321,7 @@ export default function LoginScreen() {
           ? 'Learn alongside a supportive community. One step at a time — you’ve got this.'
           : mode === 'checkEmail'
             ? 'One more step to activate your account.'
-            : 'Welcome back to GrAteApex Hub. Keep going — you’ve got this.';
+            : 'Welcome back to GrAte Apex Hub. Keep going — you’ve got this.';
 
   return (
     <View style={styles.screen}>
@@ -337,7 +337,7 @@ export default function LoginScreen() {
             // Phones: identity first, then straight to the form.
             <View style={styles.mobileBrand}>
               <LogoMark height={52} />
-              <Text style={styles.brandName}>GrAteApex Hub</Text>
+              <Text style={styles.brandName}>GrAte Apex Hub</Text>
             </View>
           )}
 
@@ -347,7 +347,7 @@ export default function LoginScreen() {
                 {mode === 'signIn'
                   ? 'WELCOME BACK'
                   : mode === 'signUp'
-                    ? 'NEW TO GrAteApex Hub'
+                    ? 'NEW TO GrAte Apex Hub'
                     : mode === 'checkEmail'
                       ? 'ALMOST THERE'
                       : mode === 'reset'
@@ -549,7 +549,7 @@ export default function LoginScreen() {
                     </Text>
                   </View>
                   {maybeExisting ? (
-                    <Text style={styles.hintText}>If this email already has a GrAteApex Hub account, just sign in instead.</Text>
+                    <Text style={styles.hintText}>If this email already has a GrAte Apex Hub account, just sign in instead.</Text>
                   ) : null}
                   {error ? <ErrorLine message={error} styles={styles} colors={colors} /> : null}
                   <Button label="Back to Sign In" size="lg" fullWidth onPress={() => switchMode('signIn')} style={styles.submit} />
@@ -661,7 +661,7 @@ export default function LoginScreen() {
                   <GoogleButton loading={googleLoading} disabled={loading} onPress={() => void continueWithGoogle()} styles={styles} />
 
                   <View style={styles.switchRow}>
-                    <Text style={styles.switchText}>New to GrAteApex Hub?</Text>
+                    <Text style={styles.switchText}>New to GrAte Apex Hub?</Text>
                     <Interactive onPress={() => switchMode('signUp')} accessibilityLabel="Create an account" style={styles.switchLink}>
                       <Text style={styles.linkText}>Create an account</Text>
                     </Interactive>
@@ -723,7 +723,7 @@ function BrandPanel({ styles, colors }: { styles: LoginStyles; colors: ThemeColo
     <View style={styles.brandPanel}>
       <View style={styles.brandHeader}>
         <LogoMark height={68} />
-        <Text style={styles.brandName}>GrAteApex Hub</Text>
+        <Text style={styles.brandName}>GrAte Apex Hub</Text>
       </View>
       <View style={styles.brandStatement}>
         <View style={styles.brandAccent} />

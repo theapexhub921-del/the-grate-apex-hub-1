@@ -4,7 +4,7 @@ import { ScrollViewStyleReset } from 'expo-router/html';
 
 // Web metadata for every page. Expo Router renders this into the exported
 // HTML shell, so the browser tab / window title shows the product name
-// ("GrAteApex Hub") instead of falling back to the development URL.
+// ("GrAte Apex Hub") instead of falling back to the development URL.
 //
 // `ScrollViewStyleReset` is kept so scrolling behaves like the app.
 export default function Root({ children }: { children: React.ReactNode }) {
@@ -25,22 +25,22 @@ export default function Root({ children }: { children: React.ReactNode }) {
             and the social/preview metadata lives in the head. */}
         <meta
           name="description"
-          content="GrAteApex Hub — a focused learning app for medical students. Work through lectures, test your understanding and track your progression."
+          content="GrAte Apex Hub — a focused learning app for medical students. Work through lectures, test your understanding and track your progression."
         />
 
         {/* Open Graph / social preview */}
-        <meta property="og:title" content="GrAteApex Hub" />
+        <meta property="og:title" content="GrAte Apex Hub" />
         <meta
           property="og:description"
           content="A focused learning app for medical students."
         />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="GrAteApex Hub" />
+        <meta name="twitter:title" content="GrAte Apex Hub" />
 
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="GrAteApex Hub" />
+        <meta name="apple-mobile-web-app-title" content="GrAte Apex Hub" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
         {/* Keep the theme colour in sync with the splash screen */}
@@ -58,7 +58,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
         {/* Expo Router injects its own empty <title> ahead of anything in
             this file when statically exporting, so the browser would fall
             back to showing the URL. Setting it here guarantees the tab reads
-            "GrAteApex Hub" in both development and the exported build. */}
+            "GrAte Apex Hub" in both development and the exported build. */}
         <TitleSync />
         {children}
       </body>
@@ -70,7 +70,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
 function TitleSync() {
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    document.title = 'GrAteApex Hub';
+    document.title = 'GrAte Apex Hub';
     const onInstallPrompt = (event: Event) => {
       event.preventDefault();
       (window as Window & { grateapexInstallPrompt?: Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> } }).grateapexInstallPrompt = event as Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };

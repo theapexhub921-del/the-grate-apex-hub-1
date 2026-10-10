@@ -412,3 +412,53 @@ export function readSocialNotificationIds(records?: any): string[] {
 export function socialAppNotifications(records?: any): AppNotification[] {
   return [];
 }
+
+// ── Public profiles (any signed-in learner can view one) ────────────
+
+export type PublicProfile = {
+  userId: string;
+  username: string | null;
+  displayName: string | null;
+  avatarUrl: string | null;
+  bio: string | null;
+  classLabel: string | null;
+  totalXp: number | null;
+  followers: number;
+  following: number;
+  /** I follow them / they follow me. */
+  iFollow: boolean;
+  followsMe: boolean;
+};
+
+/** A learner's profile with real follower and following counts (users, scores, follows — all readable when signed in). */
+export async function getPublicProfile(uid: string): Promise<PublicProfile> {
+  const me = auth.currentUser?.uid ?? null;
+  const [people, followers, following] = await Promise.all([readPeople([uid]), followEdges(uid, 'followers'), followEdges(uid, 'following')]);
+  const data = people.get(uid);
+  const profile = data?.profile ?? {};
+  const score = data?.score ?? {};
+  const username = profile.username || score.username || null;
+  const hall = typeof profile.hall === 'string' && profile.hall ? profile.hall : null;
+  const semester = typeof profile.semester === 'number' ? profile.semester : null;
+  return {
+    userId: uid,
+    username,
+    displayName: profile.displayName || username,
+    avatarUrl: profile.avatar_url || profile.photo || null,
+    bio: typeof profile.bio === 'string' && profile.bio.trim() ? profile.bio.trim() : null,
+    classLabel: hall ? `${hall}${semester ? ` · Semester ${semester}` : ''}` : null,
+    totalXp: typeof score.xp === 'number' ? score.xp : null,
+    followers: followers.length,
+    following: following.length,
+    iFollow: Boolean(me && followers.some((edge) => edge.uid === me)),
+    followsMe: Boolean(me && following.some((edge) => edge.uid === me)),
+  };
+}
+
+/** Stops following someone (only the follower can remove their follow — the shared rules). */
+export async function unfollowLearner(targetUserId: string) {
+  const me = auth.currentUser?.uid;
+  if (!me) throw new Error('Sign in first.');
+  await deleteDoc(doc(db, 'follows', followId(me, targetUserId)));
+  await refreshSocial();
+}

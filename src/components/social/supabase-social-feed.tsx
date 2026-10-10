@@ -175,12 +175,6 @@ export function SocialActivityFeed({ children, showActivity = true }: { children
   return (
     <View style={styles.feed}>
       <View style={styles.storiesSection}>
-        <SectionHeader
-          title="Stories"
-          subtitle="Quick moments from your circle"
-          style={styles.noMargin}
-          right={<Button label="Add story" size="sm" onPress={() => setStoryOpen(true)} />}
-        />
         {storyError ? <Text style={styles.errorText}>{storyError}</Text> : null}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.friendStrip}>
           <Pressable
@@ -194,7 +188,6 @@ export function SocialActivityFeed({ children, showActivity = true }: { children
               {myStory ? <View style={styles.postedMark}><Icon name="check" size={10} color={colors.onPrimary} /></View> : <View style={styles.addBadge}><Icon name="plus" size={12} color={colors.primaryText} /></View>}
             </View>
             <Text style={styles.friendName} numberOfLines={1}>Your story</Text>
-            <Text style={styles.storyMeta} numberOfLines={1}>{myStory ? 'Posted · tap to view' : 'Add a moment'}</Text>
           </Pressable>
           {friendStoryGroups.map(({ authorId, items }) => {
             const friend = social.people.find((person) => person.userId === authorId);
@@ -203,25 +196,10 @@ export function SocialActivityFeed({ children, showActivity = true }: { children
               <Pressable key={authorId} onPress={() => openStorySequence(items)} accessibilityRole="button" accessibilityLabel={`View ${items.length} ${items.length === 1 ? 'story' : 'stories'} from ${name}`} style={styles.friendItem}>
                 <StoryAvatar uri={friend?.avatarUrl ?? null} name={name} hasStory />
                 <Text style={styles.friendName} numberOfLines={1}>{name}</Text>
-                {items.length > 1 ? <Text style={styles.storyMeta}>{items.length} stories</Text> : <Text style={styles.storyMeta}>View story</Text>}
               </Pressable>
             );
           })}
         </ScrollView>
-        {!friends.length ? (
-          <View style={styles.emptyRow}>
-            <Text style={styles.muted}>
-              {social.status === 'loading'
-                ? 'Loading your real friend list…'
-                : social.status === 'error'
-                  ? social.error ?? 'Could not load your friend list.'
-                  : social.userId
-                    ? 'No friends are connected yet. This row will fill with real classmates when you connect.'
-                    : 'Sign in and connect with classmates to see your circle here.'}
-            </Text>
-            {social.userId ? <Button label="Find classmates" variant="secondary" size="sm" onPress={() => router.push('/social/friends')} /> : null}
-          </View>
-        ) : null}
       </View>
 
       {children}

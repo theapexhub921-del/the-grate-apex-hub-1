@@ -85,7 +85,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       id: 'welcome',
       icon: 'sparkle',
       kicker: 'WELCOME',
-      title: `Welcome to GrAteApex Hub, ${name}`,
+      title: `Welcome to GrAte Apex Hub, ${name}`,
       body: 'A quick tour of the main features. Try each sample as you go — practice actions do not change your learning progress.',
       demo: () => <WelcomeDemo />,
     },
@@ -200,7 +200,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'explore',
       kicker: 'EXPLORE',
       title: 'Explore every feature',
-      body: 'Explore explains how each part of GrAteApex Hub works, shares announcements, and shows what is coming next. There is more to discover in Explore.',
+      body: 'Explore explains how each part of GrAte Apex Hub works, shares announcements, and shows what is coming next. There is more to discover in Explore.',
       tryIt: 'See the feature guide and updates.',
       demo: (props) => <ExploreDemo {...props} />,
     },
@@ -217,8 +217,8 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       id: 'team',
       icon: 'profile',
       kicker: 'MEET THE TEAM',
-      title: 'The people behind GrAteApex Hub',
-      body: 'The people building and supporting GrAteApex Hub.',
+      title: 'The people behind GrAte Apex Hub',
+      body: 'The people building and supporting GrAte Apex Hub.',
       demo: () => (
         <SimFrame>
           <View style={styles.aboutTeam}>
@@ -266,7 +266,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       id: 'install',
       icon: 'share',
       kicker: 'INSTALL ON YOUR DEVICES',
-      title: 'Keep GrAteApex Hub close at hand',
+      title: 'Keep GrAte Apex Hub close at hand',
       body: 'Add the app to your home screen or desktop for quick access. No app-store download is needed.',
       demo: () => <InstallGuideDemo />,
     },
@@ -387,7 +387,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
         <View style={[styles.topBar, { paddingTop: insets.top + 12 }]}>
           <View style={styles.brand}>
             <LogoMark height={24} />
-            <Text style={styles.brandText}>WELCOME TO GrAteApex Hub</Text>
+            <Text style={styles.brandText}>WELCOME TO GrAte Apex Hub</Text>
           </View>
         </View>
         <ScrollView style={styles.scroll} contentContainerStyle={[styles.legalContent, desktop && styles.contentDesktop]}>

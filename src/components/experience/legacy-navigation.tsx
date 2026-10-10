@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   sideInner: { width: 249, flex: 1, paddingHorizontal: 16, paddingVertical: 22 },
   brand: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6 },
   brandLogo: { marginRight: 12 },
-  brandName: { fontSize: 17, fontWeight: '800' },
+  brandName: { fontSize: 15, fontWeight: '800' },
   item: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 14, borderRadius: 14, marginBottom: 6, borderWidth: 1, borderColor: 'transparent' },
   itemIcon: { fontSize: 20, width: 34 },
   itemLabel: { fontSize: 15, fontWeight: '600' },

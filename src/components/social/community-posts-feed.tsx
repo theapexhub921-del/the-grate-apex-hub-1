@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Platform, Share, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
@@ -10,10 +11,11 @@ import { Icon } from '@/components/ui/icon';
 import { Card, Interactive } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
 import { VideoPlayer } from '@/components/ui/video-player';
+import { routes } from '@/lib/routes';
 import { ReportSheet, type ReportTarget } from '@/components/social/report-sheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Sheet } from '@/components/ui/sheet';
-import { addPostComment, createCommunityPost, deleteCommunityPost, listCommunityFeed, listPostComments, togglePostLike, type CommunityMedia, type CommunityPost } from '@/data/community';
+import { addPostComment, createCommunityPost, deleteCommunityPost, listCommunityFeed, listPostsBy, listPostComments, togglePostLike, type CommunityMedia, type CommunityPost } from '@/data/community';
 import { personName, type SocialPerson, useSocial } from '@/data/social';
 import { useDisplayName } from '@/data/user';
 import { useAuth } from '@/hooks/use-auth';
@@ -26,7 +28,8 @@ type PostComment = { id: string; author_id: string; author_name?: string | null;
 // Posts this learner chose "Not interested" for (this device only).
 const HIDDEN_KEY = 'grateapex_hidden_posts';
 
-export function CommunityPostsFeed() {
+/** Everyone's posts (Feed), or one learner's posts (their profile, with authorId). */
+export function CommunityPostsFeed({ authorId, showComposer = true }: { authorId?: string; showComposer?: boolean } = {}) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const social = useSocial();
@@ -59,13 +62,13 @@ export function CommunityPostsFeed() {
   const refresh = useCallback(async () => {
     setError(null);
     try {
-      const nextPosts = await listCommunityFeed();
+      const nextPosts = authorId ? await listPostsBy(authorId) : await listCommunityFeed();
       setPosts(nextPosts);
       setSelectedPost((current) => current ? nextPosts.find((post) => post.id === current.id) ?? current : current);
     }
     catch (caught) { setError(getErrorMessage(caught, 'Could not load posts.')); }
     finally { setLoading(false); }
-  }, []);
+  }, [authorId]);
 
   useEffect(() => { queueMicrotask(() => { void refresh(); }); }, [refresh]);
 
@@ -126,12 +129,12 @@ export function CommunityPostsFeed() {
 
   async function sharePost(post: CommunityPost) {
     const appUrl = 'https://grateapex.vercel.app/';
-    const message = `${post.body.trim() || 'A post from my GrAteApex Hub community'}\n\n${appUrl}`;
+    const message = `${post.body.trim() || 'A post from my GrAte Apex Hub community'}\n\n${appUrl}`;
     try {
       if (Platform.OS === 'web') {
         const browserNavigator = globalThis.navigator as Navigator & { share?: (data: ShareData) => Promise<void> };
         if (typeof browserNavigator.share === 'function') {
-          await browserNavigator.share({ title: 'GrAteApex Hub', text: post.body.trim(), url: appUrl });
+          await browserNavigator.share({ title: 'GrAte Apex Hub', text: post.body.trim(), url: appUrl });
         } else if (browserNavigator.clipboard?.writeText) {
           await browserNavigator.clipboard.writeText(message);
           setNotice('Post text and app link copied.');
@@ -140,7 +143,7 @@ export function CommunityPostsFeed() {
         }
         return;
       }
-      const result = await Share.share({ message, title: 'GrAteApex Hub' });
+      const result = await Share.share({ message, title: 'GrAte Apex Hub' });
       if (result.action === Share.sharedAction) setNotice('Post shared.');
     } catch (caught) {
       if (caught instanceof Error && caught.name === 'AbortError') return;
@@ -199,7 +202,7 @@ export function CommunityPostsFeed() {
 
   return (
     <View style={styles.feed}>
-      <Card style={styles.composerCard}>
+      {showComposer ? <Card style={styles.composerCard}>
         <View style={styles.composerHeader}>
           <Avatar name={displayName || 'You'} size={40} ring="subtle" />
           <Text style={styles.composerPrompt}>Share what’s on your mind</Text>
@@ -208,16 +211,16 @@ export function CommunityPostsFeed() {
           <Button label="Write a post" variant="secondary" size="sm" onPress={() => setComposeOpen(true)} />
           <Button label="Add photo or video" variant="ghost" size="sm" icon={<Icon name="image" size={16} color={colors.primaryText} />} onPress={() => { setComposeOpen(true); void chooseMedia(); }} />
         </View>
-      </Card>
+      </Card> : null}
       {notice ? <Text accessibilityRole="text" style={styles.notice}>{notice}</Text> : null}
       {error ? <Card style={styles.errorCard}><Text style={styles.errorTitle}>Community feed issue</Text><Text style={styles.muted}>{error}</Text><Button label="Try again" size="sm" variant="secondary" onPress={() => void refresh()} /></Card> : null}
-      {loading ? <Text style={styles.muted}>Loading your friends’ posts…</Text> : null}
-      {!loading && !posts.length && !error ? <Card style={styles.empty}><Icon name="social" size={22} color={colors.primaryText} /><Text style={styles.emptyTitle}>Your feed is ready for your circle</Text><Text style={styles.muted}>Posts from people across GrAteApex Hub will appear here.</Text></Card> : null}
+      {loading ? <Text style={styles.muted}>Loading posts…</Text> : null}
+      {!loading && !posts.length && !error ? <Card style={styles.empty}><Icon name="social" size={22} color={colors.primaryText} /><Text style={styles.emptyTitle}>Your feed is ready for your circle</Text><Text style={styles.muted}>Posts from people across GrAte Apex Hub will appear here.</Text></Card> : null}
       {posts.filter((post) => !hiddenIds.includes(post.id)).map((post) => (
         <PostCard key={post.id} post={post} socialPeople={social.people} ownId={user?.id ?? social.userId} ownName={displayName || 'You'} onOpen={() => void openPost(post)} onLike={() => void like(post)} onComment={() => void openPost(post)} onReshare={() => void repost(post)} onShare={() => void sharePost(post)} onReport={() => report('post', post.id, `post by ${post.author_name ? `@${post.author_name}` : 'a learner'}`)} onDelete={() => confirmDeletePost(post)} />
       ))}
       <ReportSheet target={reportTarget} reporter={displayName || 'a learner'} onClose={() => setReportTarget(null)} onHide={hidePost} onDone={(message) => { setReportTarget(null); setNotice(message); }} />
-      <Sheet visible={composeOpen} onClose={() => setComposeOpen(false)} title="Create a post" subtitle="Share something with the GrAteApex Hub community.">
+      <Sheet visible={composeOpen} onClose={() => setComposeOpen(false)} title="Create a post" subtitle="Share something with the GrAte Apex Hub community.">
         <View style={styles.composeSheet}>
         <Text style={styles.muted}>Share how you’re feeling, what’s happening in your life, or anything you’d like your friends to know.</Text>
         <MentionInput people={social.people} value={draft} onChangeText={setDraft} multiline maxLength={5000} placeholder="What’s on your mind today?" placeholderTextColor={colors.textTertiary} accessibilityLabel="Write a post" style={styles.postInput} />
@@ -268,7 +271,7 @@ function PostCard({ post, socialPeople, ownId, ownName, onOpen, onLike, onCommen
     <Card style={[styles.postCard, verticalActions && styles.postDetailCard]}>
       <View style={verticalActions ? styles.postDetailLayout : undefined}>
       <View style={verticalActions ? styles.postDetailContent : styles.postContent}>
-      <View style={styles.postHead}><Interactive onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Open post by ${name}`} style={styles.postAuthor}><Avatar uri={friend?.avatarUrl ?? null} name={name} size={42} ring="subtle" /><View style={styles.flex}><Text style={styles.author}>{name}</Text><Text style={styles.muted}>{new Date(post.created_at).toLocaleString()}</Text></View></Interactive>{post.reshared_post_id ? <Pill label="Reposted" /> : null}{post.author_id === ownId ? <Button label="Delete" size="sm" variant="ghost" icon={<Icon name="trash" size={16} color={colors.error} />} onPress={onDelete} accessibilityLabel="Delete post" /> : null}</View>
+      <View style={styles.postHead}><Interactive onPress={() => router.push(post.author_id && post.author_id !== ownId ? routes.profile(post.author_id) : ('/profile' as never))} accessibilityRole="link" accessibilityLabel={`View ${name}'s profile`} style={styles.postAuthor}><Avatar uri={friend?.avatarUrl ?? null} name={name} size={42} ring="subtle" /><View style={styles.flex}><Text style={styles.author}>{name}</Text><Text style={styles.muted}>{new Date(post.created_at).toLocaleString()}</Text></View></Interactive>{post.reshared_post_id ? <Pill label="Reposted" /> : null}{post.author_id === ownId ? <Button label="Delete" size="sm" variant="ghost" icon={<Icon name="trash" size={16} color={colors.error} />} onPress={onDelete} accessibilityLabel="Delete post" /> : null}</View>
       {post.body ? <Interactive onPress={onOpen} accessibilityRole="button" accessibilityLabel="Open post" style={styles.postBodyOpen}><Text style={styles.body}>{post.body}</Text></Interactive> : null}
       {post.reshared_post_id ? (
         <View style={styles.reshareBox}>

@@ -206,6 +206,18 @@ export async function listCommunityFeed(limitCount = 50): Promise<CommunityPost[
   });
 }
 
+/** A learner's own posts, newest first (no composite index needed: sorted here). */
+export async function listPostsBy(uid: string, limitCount = 30): Promise<CommunityPost[]> {
+  const all = await listCommunityFeed(200);
+  const own = all.filter((post) => post.author_id === uid);
+  if (own.length >= Math.min(limitCount, 5) || all.length < 200) return own.slice(0, limitCount);
+  // Older posts beyond the recent feed.
+  const snap = await getDocs(query(collection(db, 'posts'), where('authorUid', '==', uid), limit(limitCount)));
+  const ids = new Set(own.map((post) => post.id));
+  const extra = snap.docs.filter((item) => !ids.has(item.id)).map((item) => ({ id: item.id, author_id: uid, author_name: item.data().authorName ?? null, author_avatar: null, body: postText(item.data()), media_path: null, media_type: null, media_url: null, reshared_post_id: null, created_at: iso(item.data().createdAt), reactions: Number(item.data().likeCount) || 0, comments: Number(item.data().replyCount) || 0, reshares: 0, my_reaction: null } as CommunityPost));
+  return [...own, ...extra].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, limitCount);
+}
+
 export async function createCommunityPost(body: string, media?: CommunityMedia, resharedPostId?: string | null): Promise<CommunityPost> {
   const text = body.trim() || (resharedPostId ? REPOST_TEXT : '');
   if (text.length < 3) throw new Error('Posts need at least 3 characters.');

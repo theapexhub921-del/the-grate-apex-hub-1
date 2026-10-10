@@ -30,7 +30,7 @@ export default function StudyWidgetScreen() {
       <View style={styles.brandRow}>
         <LogoMark height={26} />
         <View style={styles.brandCopy}>
-          <Text style={styles.brandName}>GrAteApex Hub</Text>
+          <Text style={styles.brandName}>GrAte Apex Hub</Text>
           <Text style={styles.brandLabel}>STUDY WIDGET</Text>
         </View>
       </View>
@@ -62,7 +62,7 @@ export default function StudyWidgetScreen() {
         <Button label="Continue studying" variant="primary" fullWidth onPress={() => router.push(routes.learn())} />
         <Button label="Close widget" variant="ghost" fullWidth onPress={closeWidget} />
       </View>
-      <Text style={styles.footer}>Progress syncs with your GrAteApex Hub account.</Text>
+      <Text style={styles.footer}>Progress syncs with your GrAte Apex Hub account.</Text>
     </Screen>
   );
 }

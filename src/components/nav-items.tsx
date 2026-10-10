@@ -24,7 +24,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { route: 'index', label: 'Feed', path: '/', icon: 'home', accessibilityLabel: 'Feed — your command centre' },
   { route: 'learn/index', label: 'Study', path: '/learn', icon: 'learn', accessibilityLabel: 'Study — subjects and lectures' },
   { route: 'social/index', label: 'Connect', path: '/social', icon: 'social', accessibilityLabel: 'Connect — your people and social activity' },
-  { route: 'explore', label: 'Explore', path: '/explore', icon: 'explore', accessibilityLabel: 'Explore — discovery and the GrAteApex Hub journey' },
+  { route: 'explore', label: 'Explore', path: '/explore', icon: 'explore', accessibilityLabel: 'Explore — discovery and the GrAte Apex Hub journey' },
   { route: 'profile', label: 'You', path: '/profile', icon: 'profile', accessibilityLabel: 'You — your academic identity' },
 ];
 

@@ -477,7 +477,7 @@ export function ExploreDemo({ done, onDone }: DemoProps) {
       <View style={styles.row}>
         <Icon name="rank" size={18} color={colors.primaryText} />
         <View style={styles.flex}>
-          <Text style={styles.rowTitle}>The GrAteApex Hub journey</Text>
+          <Text style={styles.rowTitle}>The GrAte Apex Hub journey</Text>
           <Text style={styles.rowMeta}>The full rank ladder, XP rules and leagues</Text>
         </View>
       </View>

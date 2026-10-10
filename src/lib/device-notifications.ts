@@ -30,7 +30,7 @@ export async function enableDeviceNotifications(): Promise<DeviceNotificationRes
   await showDeviceNotification({
     id: 'grateapex-notifications-enabled',
     title: 'Notifications are on',
-    body: 'GrAteApex Hub will alert you about the updates you choose.',
+    body: 'GrAte Apex Hub will alert you about the updates you choose.',
     href: '/settings',
   });
   return { granted: true };

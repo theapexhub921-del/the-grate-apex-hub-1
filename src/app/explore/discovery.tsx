@@ -55,7 +55,7 @@ export default function DiscoveryScreen() {
           <Text style={styles.kicker}>
             {getCategoryLabel(item.category).toUpperCase()} · {item.topic.toUpperCase()}
           </Text>
-          {status === 'draft' ? <Pill label="Draft — awaiting review" tone="warning" /> : status === 'reviewed' ? <Pill label="Reviewed" tone="success" /> : <Pill label="GrAteApex Hub feature" tone="primary" />}
+          {status === 'draft' ? <Pill label="Draft — awaiting review" tone="warning" /> : status === 'reviewed' ? <Pill label="Reviewed" tone="success" /> : <Pill label="GrAte Apex Hub feature" tone="primary" />}
         </View>
         <Text style={styles.title} accessibilityRole="header">
           {item.title}

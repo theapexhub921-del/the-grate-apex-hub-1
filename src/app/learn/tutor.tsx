@@ -10,7 +10,7 @@ import { Type, type ThemeColors } from '@/constants/theme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { createRealtimeTutorSession } from '@/data/ai-tutor';
 
-type TranscriptLine = { id: string; speaker: 'You' | 'GrAteApex Hub'; text: string };
+type TranscriptLine = { id: string; speaker: 'You' | 'GrAte Apex Hub'; text: string };
 
 export default function TutorScreen() {
   const styles = useThemedStyles(createStyles);
@@ -102,7 +102,7 @@ export default function TutorScreen() {
           const event = JSON.parse(String(message.data)) as { type?: string; transcript?: unknown };
           if (event.type === 'conversation.item.input_audio_transcription.completed') addTranscript('You', event.transcript);
           if (event.type === 'response.audio_transcript.done' || event.type === 'response.output_audio_transcript.done') {
-            addTranscript('GrAteApex Hub', event.transcript);
+            addTranscript('GrAte Apex Hub', event.transcript);
           }
         } catch {
           // Ignore non-JSON transport messages; connection status remains useful.

@@ -8,12 +8,12 @@ export default function PrivacyScreen() {
     <LegalPage
       title="Privacy Policy"
       updated="5 October 2026"
-      intro="GrAteApex Hub is a learning app for medical students, developed by OrigiNate. This policy explains what we collect when you use GrAteApex Hub, why, and the choices you have."
+      intro="GrAte Apex Hub is a learning app for medical students, developed by OrigiNate. This policy explains what we collect when you use GrAte Apex Hub, why, and the choices you have."
       sections={[
         {
           title: 'What we collect',
           points: [
-            'Account: your email address and password. Passwords are stored only as a secure one-way hash by our authentication provider — nobody at GrAteApex Hub can read them.',
+            'Account: your email address and password. Passwords are stored only as a secure one-way hash by our authentication provider — nobody at GrAte Apex Hub can read them.',
             'If you continue with Google: your name, email address and profile picture link from your Google account. We never receive your Google password or any other Google data.',
             'Profile: your display name, username, avatar and your activity-sharing choice.',
             'Learning: lessons you complete, XP, quiz and question answers and scores, your review schedule and streak, and a timeline of learning events (for example, “lesson completed”).',
@@ -47,7 +47,7 @@ export default function PrivacyScreen() {
           paragraphs: [
             FULL_ACCOUNT_DELETION
               ? 'We keep your data while your account exists. You can permanently delete your account and all of its data at any time in Settings → Delete account. You can also turn off activity sharing on the Friends page.'
-              : 'We keep your data while your account exists. Settings → Delete account deletes your sign-in and your private learning progress straight away. Your public profile, username, leaderboard entry and what you shared (posts, comments, stories, messages) are removed by the GrAteApex Hub team on request: email theapexhub921@gmail.com before you delete. You can also turn off activity sharing on the Friends page.',
+              : 'We keep your data while your account exists. Settings → Delete account deletes your sign-in and your private learning progress straight away. Your public profile, username, leaderboard entry and what you shared (posts, comments, stories, messages) are removed by the GrAte Apex Hub team on request: email theapexhub921@gmail.com before you delete. You can also turn off activity sharing on the Friends page.',
           ],
         },
         {

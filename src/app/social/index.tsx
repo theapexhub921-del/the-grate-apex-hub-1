@@ -23,7 +23,7 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // The voice tutor remains the only Connect feature still in development.
 const comingSoon: { id: string; icon: IconName; title: string; description: string }[] = [
-  { id: 'tutor', icon: 'sparkle', title: 'AI tutor and GrAteApex Hub voice', description: 'Open the voice study preview from Study. Lecture-file grounding is still in development.' },
+  { id: 'tutor', icon: 'sparkle', title: 'AI tutor and GrAte Apex Hub voice', description: 'Open the voice study preview from Study. Lecture-file grounding is still in development.' },
 ];
 
 // Social — the academic community. Your own week is real; classmate

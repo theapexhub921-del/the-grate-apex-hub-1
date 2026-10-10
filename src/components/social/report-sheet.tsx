@@ -36,7 +36,7 @@ export type ReportReasonId = (typeof REPORT_REASONS)[number]['id'];
 
 /** The email the team receives (subject and body), as plain text. */
 export function reportEmail(target: ReportTarget, reason: string, details: string, reporter: string) {
-  const subject = `GrAteApex Hub report: ${reason}`;
+  const subject = `GrAte Apex Hub report: ${reason}`;
   const body = [`Reported ${target.type}: ${target.label}`, `Reference: ${target.type} ${target.id}`, `Reason: ${reason}`, details ? `Details: ${details}` : '', `Reported by: ${reporter}`, `When: ${new Date().toISOString()}`]
     .filter(Boolean)
     .join('\n');

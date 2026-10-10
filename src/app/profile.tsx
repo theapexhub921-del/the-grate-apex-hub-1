@@ -118,7 +118,7 @@ export default function ProfileScreen() {
     <Card style={styles.socialCard}>
       <SectionHeader
         title="Your circle"
-        subtitle="Friends make the GrAteApex Hub journey more social."
+        subtitle="Friends make the GrAte Apex Hub journey more social."
         style={styles.noMargin}
         right={<Text style={styles.cardMeta}>{friends.length} friends</Text>}
       />
@@ -150,7 +150,7 @@ export default function ProfileScreen() {
       <Text style={styles.cardMeta}>Classmates and learners connected to your study circle.</Text>
       {recommendations.map((person) => <RecommendedFriendRow key={person.userId} person={person} />)}
       {!recommendations.length ? (
-        <Text style={styles.cardMeta}>{social.status === 'ready' ? 'No suggestions yet. Try again as more classmates join GrAteApex Hub.' : 'Looking for classmates to recommend…'}</Text>
+        <Text style={styles.cardMeta}>{social.status === 'ready' ? 'No suggestions yet. Try again as more classmates join GrAte Apex Hub.' : 'Looking for classmates to recommend…'}</Text>
       ) : null}
       <Button label="Find more classmates" variant="secondary" size="sm" onPress={() => router.push('/social/friends' as Href)} />
     </Card>

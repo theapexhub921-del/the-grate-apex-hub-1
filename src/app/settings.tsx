@@ -222,7 +222,7 @@ export default function SettingsScreen() {
       if (Platform.OS === 'web' && typeof navigator !== 'undefined') {
         const browserNavigator = navigator as Navigator & { share?: (data: ShareData) => Promise<void> };
         if (browserNavigator.share) {
-          await browserNavigator.share({ title: 'GrAteApex Hub', text: 'Study, practise and connect with GrAteApex Hub.', url: 'https://grateapex.vercel.app/' });
+          await browserNavigator.share({ title: 'GrAte Apex Hub', text: 'Study, practise and connect with GrAte Apex Hub.', url: 'https://grateapex.vercel.app/' });
           shared = true;
         } else if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText('https://grateapex.vercel.app/');
@@ -230,7 +230,7 @@ export default function SettingsScreen() {
           copiedLink = true;
         }
       } else {
-        const result = await Share.share({ title: 'GrAteApex Hub', message: 'Study, practise and connect with GrAteApex Hub: https://grateapex.vercel.app/' });
+        const result = await Share.share({ title: 'GrAte Apex Hub', message: 'Study, practise and connect with GrAte Apex Hub: https://grateapex.vercel.app/' });
         shared = result.action === Share.sharedAction;
       }
       if (!shared) {
@@ -239,8 +239,8 @@ export default function SettingsScreen() {
       }
       const awarded = await grantPowerup('share', dayKey(Date.now()), 1.5);
       setShareNotice(awarded
-        ? `${copiedLink ? 'Link copied.' : 'Thanks for sharing GrAteApex Hub.'} A 1.5× XP power-up is ready for your next lesson or quiz.`
-        : `${copiedLink ? 'Link copied.' : 'Thanks for sharing GrAteApex Hub.'} You have already earned today’s share power-up.`);
+        ? `${copiedLink ? 'Link copied.' : 'Thanks for sharing GrAte Apex Hub.'} A 1.5× XP power-up is ready for your next lesson or quiz.`
+        : `${copiedLink ? 'Link copied.' : 'Thanks for sharing GrAte Apex Hub.'} You have already earned today’s share power-up.`);
     } catch (error) {
       const aborted = error instanceof Error && error.name === 'AbortError';
       setShareNotice(aborted ? 'Sharing was cancelled.' : 'Could not share the app. Please try again.');
@@ -377,7 +377,7 @@ export default function SettingsScreen() {
           <Icon name="bell" size={18} color={colors.primaryText} />
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>Push notification preference</Text>
-            <Text style={styles.optionDescription}>Allow browser notifications for new updates while GrAteApex Hub is in the background.</Text>
+            <Text style={styles.optionDescription}>Allow browser notifications for new updates while GrAte Apex Hub is in the background.</Text>
           </View>
           <Switch
             value={pushNotificationsEnabled}
@@ -425,14 +425,14 @@ export default function SettingsScreen() {
           <Icon name="play" size={18} color={colors.primaryText} />
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>Replay the introduction</Text>
-            <Text style={styles.optionDescription}>The interactive tour of how GrAteApex Hub works. Nothing in it affects your progress.</Text>
+            <Text style={styles.optionDescription}>The interactive tour of how GrAte Apex Hub works. Nothing in it affects your progress.</Text>
           </View>
           <Icon name="chevronRight" size={18} color={colors.textTertiary} />
         </Interactive>
       </SettingsSection>
 
       <SettingsSection title="Install on your devices">
-        <Text style={styles.optionDescription}>Install GrAteApex Hub from your browser and open it once while online. Lessons and your saved progress remain available on this device offline; new learning activity syncs to your account when you reconnect.</Text>
+        <Text style={styles.optionDescription}>Install GrAte Apex Hub from your browser and open it once while online. Lessons and your saved progress remain available on this device offline; new learning activity syncs to your account when you reconnect.</Text>
         <View style={styles.optionRow}>
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>iPhone and iPad</Text>
@@ -448,19 +448,19 @@ export default function SettingsScreen() {
         <View style={[styles.optionRow, styles.rowDivider]}>
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>Windows, Mac, Linux and Chromebook</Text>
-            <Text style={styles.optionDescription}>In Chrome or Edge, use the install icon in the address bar or choose Install GrAteApex Hub from the browser menu. On Mac Safari, choose File → Add to Dock.</Text>
+            <Text style={styles.optionDescription}>In Chrome or Edge, use the install icon in the address bar or choose Install GrAte Apex Hub from the browser menu. On Mac Safari, choose File → Add to Dock.</Text>
           </View>
         </View>
         <Interactive onPress={() => void Linking.openURL('https://grateapex.vercel.app/')} accessibilityRole="link" style={styles.optionRow}>
           <Icon name="share" size={18} color={colors.primaryText} />
-          <View style={styles.flex}><Text style={styles.optionLabel}>Open GrAteApex Hub</Text><Text style={styles.optionDescription}>grateapex.vercel.app</Text></View>
+          <View style={styles.flex}><Text style={styles.optionLabel}>Open GrAte Apex Hub</Text><Text style={styles.optionDescription}>grateapex.vercel.app</Text></View>
           <Icon name="chevronRight" size={18} color={colors.textTertiary} />
         </Interactive>
       </SettingsSection>
 
       <SettingsSection title="Share the app">
         <Text style={styles.optionDescription}>Invite a classmate to study with you. After a successful share, earn one 1.5× XP power-up per day for your next lesson or quiz.</Text>
-        <Button label={sharingApp ? 'Sharing…' : 'Share GrAteApex Hub'} variant="secondary" icon={<Icon name="share" size={17} color={colors.text} />} onPress={() => void shareApp()} disabled={sharingApp} />
+        <Button label={sharingApp ? 'Sharing…' : 'Share GrAte Apex Hub'} variant="secondary" icon={<Icon name="share" size={17} color={colors.text} />} onPress={() => void shareApp()} disabled={sharingApp} />
         {shareNotice ? <Text style={styles.optionDescription} accessibilityLiveRegion="polite">{shareNotice}</Text> : null}
       </SettingsSection>
 
@@ -533,7 +533,7 @@ export default function SettingsScreen() {
       </SettingsSection>
 
       <Sheet visible={deleteOpen} onClose={() => { if (!deleting) { setDeleteOpen(false); setDeleteError(null); } }} title="Delete your account?" subtitle="This action cannot be undone." footer={<View style={styles.confirmActions}><Button label="Cancel" variant="secondary" onPress={() => { setDeleteOpen(false); setDeleteError(null); }} disabled={deleting} /><Button label="Delete account" variant="danger" onPress={() => void handleDeleteAccount()} loading={deleting} /> </View>}>
-        <Text style={styles.optionDescription}>{FULL_ACCOUNT_DELETION ? 'Your profile, learning progress, XP, quiz and review history, friends, posts, messages and notifications will be permanently erased.' : 'Your sign-in and your private learning progress will be deleted now. Your public profile, username, leaderboard entry and what you shared stay until the GrAteApex Hub team removes them — email theapexhub921@gmail.com first to ask for that.'}</Text>
+        <Text style={styles.optionDescription}>{FULL_ACCOUNT_DELETION ? 'Your profile, learning progress, XP, quiz and review history, friends, posts, messages and notifications will be permanently erased.' : 'Your sign-in and your private learning progress will be deleted now. Your public profile, username, leaderboard entry and what you shared stay until the GrAte Apex Hub team removes them — email theapexhub921@gmail.com first to ask for that.'}</Text>
         {deleteError ? <Text style={styles.signOutText}>{deleteError}</Text> : null}
       </Sheet>
 

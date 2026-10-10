@@ -14,9 +14,9 @@ export type ExperienceId = (typeof EXPERIENCES)[number];
 export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: string }> = {
   originals: {
     name: 'The Originals',
-    summary: 'The original GrAteApex Hub, as it was: its colours, emoji, fonts, glass panels, gradient background and navigation — with every new feature inside it.',
+    summary: 'The original GrAte Apex Hub, as it was: its colours, emoji, fonts, glass panels, gradient background and navigation — with every new feature inside it.',
   },
-  originate: { name: 'Originate', summary: 'The new GrAteApex Hub design: its themes, layouts, icons, atmosphere and motion.' },
+  originate: { name: 'Originate', summary: 'The new GrAte Apex Hub design: its themes, layouts, icons, atmosphere and motion.' },
   hybrid: {
     name: 'Hybrid',
     summary: 'The best of both: the new layouts, navigation and icons, with the original gradient background, glass panels, pill buttons and headings.',

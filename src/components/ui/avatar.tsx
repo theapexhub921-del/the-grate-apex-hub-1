@@ -47,7 +47,7 @@ export function Avatar({
   const colors = useTheme();
   const styles = useThemedStyles(createStyles);
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
-  const initials = getInitials(name?.trim() || 'GrAteApex Hub').slice(0, 2) || 'G';
+  const initials = getInitials(name?.trim() || 'GrAte Apex Hub').slice(0, 2) || 'G';
   const gradient = INITIAL_GRADIENTS[hash(name ?? '') % INITIAL_GRADIENTS.length];
   const preset = getAvatarPreset(uri);
 

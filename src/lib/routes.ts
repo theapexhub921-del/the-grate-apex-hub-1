@@ -44,6 +44,9 @@ export const routes = {
   subject: (subject: SubjectId, selection?: { classId: string; semester: number }) =>
     `/learn/${subject}${query({ viewClass: selection?.classId, viewSemester: selection?.semester })}` as Href,
 
+  /** A learner's profile (your own goes to You). */
+  profile: (userId: string | null | undefined) => (valid(userId) ? (('/social/person' + query({ user: userId })) as Href) : ('/profile' as Href)),
+
   // The original app's courses (HB1), studied in this app (data/legacy-study.ts).
   legacyCourse: (courseId: string | null | undefined, selection?: { classId: string; semester: number }) =>
     valid(courseId)

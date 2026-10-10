@@ -88,7 +88,7 @@ export default function LearnScreen() {
       <Card style={styles.tutorCard} tone="primary">
         <View style={styles.tutorCopy}>
           <Text style={styles.tutorEyebrow}>VOICE STUDY PREVIEW</Text>
-          <Text style={styles.tutorTitle}>Study out loud with GrAteApex Hub</Text>
+          <Text style={styles.tutorTitle}>Study out loud with GrAte Apex Hub</Text>
           <Text style={styles.subjectTagline}>Ask a question, explain an idea and practise recall in a voice session.</Text>
         </View>
         <Button label="Open AI tutor" variant="secondary" trailing="chevronRight" onPress={() => router.push('/learn/tutor' as never)} />
