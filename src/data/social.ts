@@ -14,6 +14,7 @@ import {
 
 import { subscribeToLearningAuthChanges } from '@/data/learning-sync';
 import type { AppNotification } from '@/data/notifications';
+import { chooseUsername } from '@/lib/accounts';
 import { auth, db } from '@/lib/firebase';
 
 export type Relationship = 'none' | 'friends' | 'outgoing' | 'incoming';
@@ -225,14 +226,11 @@ export async function removeFriendship(friendshipId: string) {
   await refreshSocial();
 }
 
+// Reserves the name and updates the profile in one batch, as the shared rules
+// require (lib/accounts.ts). Throws a plain-language error when it can't.
 export async function setUsername(username: string) {
-  const currentUid = auth.currentUser?.uid;
-  if (!currentUid) throw new Error('Sign in to set username.');
-  const trimmed = username.trim().toLowerCase();
-
-  await setDoc(doc(db, 'users', currentUid), { username: trimmed }, { merge: true });
-  await setDoc(doc(db, 'usernames', trimmed), { userId: currentUid }, { merge: true });
-  setState({ username: trimmed });
+  const saved = await chooseUsername(username);
+  setState({ username: saved });
 }
 
 export async function setShareActivity(share: boolean) {

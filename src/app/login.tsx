@@ -26,19 +26,13 @@ import { setDisplayName } from '@/data/user';
 import { useTheme } from '@/hooks/use-theme';
 import { friendlyGoogleError, signInWithGoogle, takeOAuthPending } from '@/lib/google-auth';
 import {
-  createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   updatePassword as fbUpdatePassword,
 } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
-import {
-  legacyLoginEmail,
-  type LoginIdentifier,
-  loginFromRegistry,
-  parseLoginIdentifier,
-} from '@/lib/login-identifier';
+import { registerWithEmail, resolveSignInEmail } from '@/lib/accounts';
+import { auth } from '@/lib/firebase';
+import { cleanUsername, parseLoginIdentifier, validateUsername } from '@/lib/login-identifier';
 
 
 const HOME_HREF = '/' as Href;
@@ -96,6 +90,7 @@ export default function LoginScreen() {
 
   // "Create account" form.
   const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [signUpConfirm, setSignUpConfirm] = useState('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [signedUpEmail, setSignedUpEmail] = useState('');
@@ -112,7 +107,7 @@ export default function LoginScreen() {
 
   const canSubmit = email.trim() !== '' && password !== '' && !loading;
   const canSendReset = email.trim() !== '' && !loading;
-  const canSignUp = email.trim() !== '' && password !== '' && signUpConfirm !== '' && acceptedTerms && !loading;
+  const canSignUp = username.trim() !== '' && email.trim() !== '' && password !== '' && signUpConfirm !== '' && acceptedTerms && !loading;
   const canUpdatePassword =
     newPassword !== '' && confirmPassword !== '' && !loading;
 
@@ -241,50 +236,19 @@ export default function LoginScreen() {
       return;
     }
 
+    const usernameProblem = validateUsername(cleanUsername(username));
+    if (usernameProblem) {
+      setError(usernameProblem);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      const uid = cred.user.uid;
-      const username = fullName.trim() || email.split('@')[0];
-
-      // Store user document in users/{uid} matching existing Firestore schema
-      await setDoc(
-        doc(db, 'users', uid),
-        {
-          username,
-          createdAt: serverTimestamp(),
-          onboardingDone: false,
-          tutorialDone: false,
-          semester: 1,
-          hall: '',
-          autoHideNav: true,
-          classLocked: false,
-          remindersOff: false,
-        },
-        { merge: true }
-      );
-
-      // Initialize progress doc
-      await setDoc(
-        doc(db, 'progress', uid),
-        {
-          xp: 0,
-          updatedAt: Date.now(),
-          savedAt: serverTimestamp(),
-          lessons: {},
-          subjects: {},
-          topics: {},
-          days: {},
-          cards: {},
-          seen: {},
-          terms: {},
-          tests: {},
-        },
-        { merge: true }
-      );
-
+      // Username reserved and profile created together (lib/accounts.ts);
+      // nothing is left half-made if either fails.
+      await registerWithEmail({ email, password, username, displayName: fullName });
       setPassword('');
       setSignUpConfirm('');
       router.replace(HOME_HREF);
@@ -453,6 +417,24 @@ export default function LoginScreen() {
                 )
               ) : mode === 'signUp' ? (
                 <>
+                  <Field label="Username" icon="profile" styles={styles} colors={colors}>
+                    <TextInput
+                      style={styles.input}
+                      value={username}
+                      onChangeText={setUsername}
+                      placeholder="e.g. kofi_a"
+                      placeholderTextColor={colors.textTertiary}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      autoComplete="username"
+                      textContentType="username"
+                      maxLength={20}
+                      returnKeyType="next"
+                      accessibilityLabel="Username"
+                    />
+                  </Field>
+                  <Text style={styles.hintText}>Shown to other students. 3–20 lowercase letters, numbers or underscores.</Text>
+
                   <Field label="Your name (optional)" icon="profile" styles={styles} colors={colors}>
                     <TextInput
                       style={styles.input}
@@ -703,22 +685,6 @@ export default function LoginScreen() {
       </ScrollView>
     </View>
   );
-}
-
-// The email Firebase signs in with. A username becomes its hidden legacy
-// login; the public usernames registry says which one if the account was
-// renamed. If the registry can't be read, the name itself is used (as in the
-// original app). Only a read — nothing is written.
-async function resolveSignInEmail(identifier: LoginIdentifier) {
-  if (identifier.kind === 'email') return identifier.email;
-  let login = identifier.username;
-  try {
-    const entry = await getDoc(doc(db, 'usernames', identifier.username));
-    if (entry.exists()) login = loginFromRegistry(identifier.username, entry.data());
-  } catch {
-    // Registry unreadable, or the name can't be a document id: use the name.
-  }
-  return legacyLoginEmail(login);
 }
 
 // A username that doesn't exist, or a wrong password, gives the same message

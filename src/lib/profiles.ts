@@ -36,7 +36,8 @@ export async function getProfileById(userId: string): Promise<ProfileResponse> {
     const d = snap.data();
     const profile: Profile = {
       id: userId,
-      display_name: d.username || d.display_name || null,
+      // The separate display name, else the username (the original app has only usernames).
+      display_name: d.displayName || d.display_name || d.username || null,
       avatar_url: d.avatar_url || d.avatarUrl || null,
       created_at: d.createdAt ? (d.createdAt.toDate ? d.createdAt.toDate().toISOString() : String(d.createdAt)) : new Date().toISOString(),
       ...d,
@@ -72,10 +73,12 @@ export async function updateProfile(
 ): Promise<ProfileResponse> {
   try {
     const userDocRef = doc(db, 'users', userId);
-    const firestoreUpdates: Record<string, any> = { ...updates };
-    if (updates.display_name !== undefined) {
-      firestoreUpdates.username = updates.display_name;
-    }
+    // The display name is its own field. The username is never changed here:
+    // that needs a usernames claim (lib/accounts.ts → chooseUsername).
+    const { display_name: displayName, ...rest } = updates;
+    const firestoreUpdates: Record<string, any> = { ...rest };
+    delete firestoreUpdates.username;
+    if (displayName !== undefined) firestoreUpdates.displayName = displayName;
 
     await setDoc(userDocRef, firestoreUpdates, { merge: true });
 

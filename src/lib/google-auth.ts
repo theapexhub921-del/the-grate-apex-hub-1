@@ -1,7 +1,6 @@
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 
-import { auth, db } from '@/lib/firebase';
+import { auth } from '@/lib/firebase';
 
 export type GoogleResult =
   | { status: 'redirecting' }
@@ -43,27 +42,10 @@ export async function signInWithGoogle(): Promise<GoogleResult> {
   try {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    const cred = await signInWithPopup(auth, provider);
-
-    const userDocRef = doc(db, 'users', cred.user.uid);
-    const existing = await getDoc(userDocRef);
-    if (!existing.exists()) {
-      await setDoc(
-        userDocRef,
-        {
-          username: cred.user.displayName || cred.user.email?.split('@')[0] || 'Learner',
-          createdAt: serverTimestamp(),
-          onboardingDone: false,
-          tutorialDone: false,
-          semester: 1,
-          hall: '',
-          autoHideNav: true,
-          classLocked: false,
-          remindersOff: false,
-        },
-        { merge: true }
-      );
-    }
+    // No profile is created here: a first Google sign-in has no username yet,
+    // so the route guard sends the learner to /choose-username, which reserves
+    // one and creates the profile (lib/accounts.ts).
+    await signInWithPopup(auth, provider);
 
     return { status: 'signed-in' };
   } catch (error: any) {

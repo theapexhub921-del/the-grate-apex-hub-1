@@ -18,6 +18,27 @@ export function cleanUsername(raw: string) {
   return raw.trim().toLowerCase();
 }
 
+// The deployed rules' username format (usernames/{name} and username changes).
+export const USERNAME_PATTERN = /^[a-z0-9_]{3,20}$/;
+
+/** A plain-language problem with a (cleaned) username, or null when it is valid. */
+export function validateUsername(username: string): string | null {
+  if (username.length < 3 || username.length > 20) return 'Usernames are 3–20 characters.';
+  if (!USERNAME_PATTERN.test(username)) return 'Use only lowercase letters, numbers and underscores.';
+  return null;
+}
+
+/** True when a profile has no username in the shared format yet (new Google account, or an early new-app account). */
+export function needsUsername(username: unknown): boolean {
+  return typeof username !== 'string' || !USERNAME_PATTERN.test(username);
+}
+
+/** The original app's hidden login for a password account ("kofi_a@grateapex.app" → "kofi_a"), else null. */
+export function legacyLoginOf(email: string | null | undefined): string | null {
+  const suffix = `@${LEGACY_USERNAME_DOMAIN}`;
+  return email && email.toLowerCase().endsWith(suffix) ? email.slice(0, -suffix.length).toLowerCase() : null;
+}
+
 // Anything with an "@" is used as an email exactly as typed (trimmed);
 // everything else is treated as a username.
 export function parseLoginIdentifier(raw: string): LoginIdentifier {

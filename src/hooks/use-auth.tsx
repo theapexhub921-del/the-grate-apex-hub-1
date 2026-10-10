@@ -19,6 +19,8 @@ export interface AuthUser {
   created_at?: string;
   user_metadata?: Record<string, any>;
   profile?: Record<string, any>;
+  /** True once users/{uid} was read (it may not exist yet); false when it could not be read. */
+  profileLoaded: boolean;
 }
 
 export interface AuthSession {
@@ -66,14 +68,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             id: firebaseUser.uid,
             uid: firebaseUser.uid,
             email: firebaseUser.email,
-            displayName: profile.username || firebaseUser.displayName || null,
+            displayName: profile.displayName || profile.username || firebaseUser.displayName || null,
             created_at: firebaseUser.metadata.creationTime,
             user_metadata: {
               ...profile,
               onboarding_completed: profile.onboardingDone === true,
-              full_name: profile.username || firebaseUser.displayName || '',
+              full_name: profile.displayName || profile.username || firebaseUser.displayName || '',
             },
             profile,
+            profileLoaded: true,
           };
           setSession({ user: authUser });
           setLoading(false);
@@ -88,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             created_at: firebaseUser.metadata.creationTime,
             user_metadata: {},
             profile: {},
+            profileLoaded: false,
           };
           setSession({ user: authUser });
           setLoading(false);

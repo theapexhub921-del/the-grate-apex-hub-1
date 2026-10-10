@@ -37,3 +37,40 @@ describe('sign-in identifiers', () => {
     assert.equal(loginFromRegistry('kofi_a', undefined), 'kofi_a');
   });
 });
+
+const { validateUsername, needsUsername, legacyLoginOf } = await import('@/lib/login-identifier');
+const { readClassSelection } = await import('@/data/class-curriculum');
+
+describe('usernames (shared format ^[a-z0-9_]{3,20}$)', () => {
+  it('accepts valid names and explains invalid ones', () => {
+    assert.equal(validateUsername('kofi_a'), null);
+    assert.match(validateUsername('ab'), /3–20/);
+    assert.match(validateUsername('a'.repeat(21)), /3–20/);
+    assert.match(validateUsername('kofi a'), /lowercase/);
+    assert.match(validateUsername('Kofi'), /lowercase/);
+  });
+  it('asks for a username when the profile has none in the shared format', () => {
+    assert.equal(needsUsername('kofi_a'), false);
+    assert.equal(needsUsername('Amara Smith'), true);
+    assert.equal(needsUsername(undefined), true);
+    assert.equal(needsUsername(''), true);
+  });
+  it('recognises the original app’s hidden logins only', () => {
+    assert.equal(legacyLoginOf('Kofi_A@grateapex.app'), 'kofi_a');
+    assert.equal(legacyLoginOf('amara@example.com'), null);
+    assert.equal(legacyLoginOf(null), null);
+  });
+});
+
+describe('class selection', () => {
+  it('reads this app’s saved selection', () => {
+    assert.deepEqual(readClassSelection({ grateapex_academic_selection: { classId: 'HB2', semester: 2 } }), { classId: 'HB2', semester: 2 });
+  });
+  it('reads the original app’s locked hall and semester', () => {
+    assert.deepEqual(readClassSelection({ hall: 'HB1', semester: 1, classLocked: true }), { classId: 'HB1', semester: 1 });
+  });
+  it('ignores an unlocked or empty hall (a new account)', () => {
+    assert.equal(readClassSelection({ hall: '', semester: 1, classLocked: false }), null);
+    assert.equal(readClassSelection({ hall: 'HB1', semester: 1 }), null);
+  });
+});

@@ -77,6 +77,7 @@ export default function AppTabs() {
           <Tabs.Screen name="settings" options={{ href: null }} />
           <Tabs.Screen name="login" options={{ href: null }} />
           <Tabs.Screen name="onboarding" options={{ href: null }} />
+          <Tabs.Screen name="choose-username" options={{ href: null }} />
           <Tabs.Screen name="privacy" options={{ href: null }} />
           <Tabs.Screen name="terms" options={{ href: null }} />
           <Tabs.Screen name="widget" options={{ href: null }} />

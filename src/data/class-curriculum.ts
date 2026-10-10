@@ -26,10 +26,16 @@ export function makeClassSelection(classId: unknown, semester: unknown): ClassSe
 
 export function readClassSelection(userMetadata: unknown): ClassSelection | null {
   if (!userMetadata || typeof userMetadata !== 'object') return null;
-  const saved = (userMetadata as Record<string, unknown>)[SELECTION_KEY];
-  if (!saved || typeof saved !== 'object') return null;
-  const value = saved as Record<string, unknown>;
-  return makeClassSelection(value.classId, value.semester);
+  const profile = userMetadata as Record<string, unknown>;
+  const saved = profile[SELECTION_KEY];
+  if (saved && typeof saved === 'object') {
+    const value = saved as Record<string, unknown>;
+    const selection = makeClassSelection(value.classId, value.semester);
+    if (selection) return selection;
+  }
+  // The original app's (and the deployed rules') fields: a locked hall + semester.
+  if (profile.classLocked === true) return makeClassSelection(profile.hall, profile.semester);
+  return null;
 }
 
 export function classSelectionMetadata(selection: ClassSelection) {

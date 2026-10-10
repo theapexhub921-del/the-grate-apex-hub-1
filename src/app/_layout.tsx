@@ -15,6 +15,7 @@ import { applyWebFontScale } from '@/lib/web-font-scaling';
 import { readClassSelection } from '@/data/class-curriculum';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
 import { useIsClient } from '@/hooks/use-is-client';
+import { needsUsername } from '@/lib/login-identifier';
 import { useResolvedColorScheme, useTheme } from '@/hooks/use-theme';
 import { loadWebFonts } from '@/lib/web-fonts';
 import { routes } from '@/lib/routes';
@@ -65,6 +66,19 @@ function AppGuard({ children }: { children: ReactNode }) {
 
     // Authenticated on a password-recovery link: stay to set the password.
     if (onLoginScreen && isRecoveryUrl()) return;
+
+    // A username in the shared format comes first (new Google accounts, and
+    // early new-app accounts whose "username" was a full name). Only once the
+    // profile was actually read — never because it couldn't be loaded.
+    const onChooseUsername = first === 'choose-username';
+    if (session.user.profileLoaded && needsUsername(session.user.profile?.username)) {
+      if (!onChooseUsername) router.replace('/choose-username' as Href);
+      return;
+    }
+    if (onChooseUsername) {
+      router.replace('/');
+      return;
+    }
 
     // Wait for the saved introduction state (read from the device).
     if (!onboarding.ready) return;

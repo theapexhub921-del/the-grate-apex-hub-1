@@ -5,10 +5,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { Card, Interactive } from '@/components/ui/interactive';
 import { PageHeader, Screen, SectionHeader } from '@/components/ui/screen';
-import { CLASS_IDS, classSelectionMetadata, readClassSelection, SEMESTERS, type ClassId, type Semester } from '@/data/class-curriculum';
+import { CLASS_IDS, readClassSelection, SEMESTERS, type ClassId, type Semester } from '@/data/class-curriculum';
 import { useAuth } from '@/hooks/use-auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { saveClassSelection } from '@/lib/accounts';
 import { routes } from '@/lib/routes';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { type ThemeColors } from '@/constants/theme';
@@ -36,30 +35,12 @@ export default function ClassSelectionScreen() {
     setError(null);
 
     try {
-      const currentUid = auth.currentUser?.uid;
-      if (!currentUid) {
-        setError('Your sign-in could not be confirmed. Please sign in again and try once more.');
-        return;
-      }
-
-      const meta = classSelectionMetadata({ classId, semester });
-      const semNum = Number(String(semester).replace(/\D/g, '')) || 1;
-
-      await setDoc(
-        doc(db, 'users', currentUid),
-        {
-          classId,
-          semester: semNum,
-          classLocked: true,
-          ...meta,
-        },
-        { merge: true }
-      );
-
+      // Saved as hall + semester and locked, as the shared rules require.
       const saved = { classId, semester };
+      await saveClassSelection(saved);
       router.replace(routes.learnEnvironment(saved));
-    } catch {
-      setError('Your class selection could not be saved. Please check your connection and try again.');
+    } catch (problem) {
+      setError(problem instanceof Error ? problem.message : 'Your class selection could not be saved. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -116,7 +97,7 @@ export default function ClassSelectionScreen() {
 
         <View style={styles.note}>
           <Text style={styles.noteTitle}>Your choice is permanent</Text>
-          <Text style={styles.noteText}>You can browse subjects from other classes in Study. That preview will not change your selected class.</Text>
+          <Text style={styles.noteText}>You can browse subjects from other classes in Study; that preview will not change your selected class. To fix a mistake later, ask an administrator.</Text>
         </View>
 
         {error ? <Text style={[styles.error, { color: colors.error }]} accessibilityRole="alert">{error}</Text> : null}
