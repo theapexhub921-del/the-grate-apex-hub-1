@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { Linking, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
-import { Icon, type IconName } from '@/components/ui/icon';
+import { Icon } from '@/components/ui/icon';
 import { ExploreFeatureGroups } from '@/components/explore/feature-groups';
+import { OrganisationSimulator } from '@/components/explore/organisation-simulator';
 import { PwaInstallCard } from '@/components/pwa-install-card';
 import { Card, Interactive } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
@@ -19,20 +20,6 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { EXPLORE_GUIDE, EXPLORE_TEAM, getExploreAnnouncements, getItemsByCategory, type ExploreAnnouncement, type ExploreItem } from '@/data/explore';
 import { ABOUT_US } from '@/data/about';
 import { useWeeklyExploreSession } from '@/data/weekly-explore';
-
-function GuideStep({ icon, number, title, detail }: { icon: IconName; number: string; title: string; detail: string }) {
-  const styles = useThemedStyles(createStyles);
-  const colors = useTheme();
-  return (
-    <View style={styles.guideStep}>
-      <View style={styles.guideStepIcon}><Icon name={icon} size={17} color={colors.primaryText} /></View>
-      <View style={styles.guideStepCopy}>
-        <Text style={styles.guideStepTitle}>{number} · {title}</Text>
-        <Text style={styles.guideStepDetail}>{detail}</Text>
-      </View>
-    </View>
-  );
-}
 
 function DiscoveryCard({ item }: { item: ExploreItem }) {
   const styles = useThemedStyles(createStyles);
@@ -121,13 +108,8 @@ export default function ExploreScreen() {
             </Interactive>
           </View>
         </Card>
-        <Card style={styles.guideCard} tone="insight">
-          <Text style={styles.guideTitle}>Your quick guide</Text>
-          <GuideStep icon="home" number="01" title="Feed" detail="Post Stories, photos, videos and study moments. Like, comment on and reshare friends’ posts." />
-          <GuideStep icon="lesson" number="02" title="Study" detail="Follow lecture topics, build an optional study plan and use the review calendar." />
-          <GuideStep icon="social" number="03" title="Connect" detail="Find classmates, create study groups, discuss assignments and message accepted friends." />
-          <GuideStep icon="explore" number="04" title="Explore" detail="Learn what each feature does, see announcements and discover what’s being built." />
-        </Card>
+        {/* "How GrAteApex Hub is organised": a tap-through simulation (owner request). */}
+        <OrganisationSimulator />
       </View>
 
       {weeklySession ? <SectionHeader title={`${upcoming ? 'Next week' : 'This week'} · ${weeklySession.title}`} subtitle={`${weeklySession.summary} Begins ${weekLabel}.`} style={styles.section} /> : null}
@@ -286,9 +268,8 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     flex: { flex: 1, minWidth: 0 },
     section: { marginTop: 34 },
-    introGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
+    introGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, alignItems: 'flex-start' },
     introCard: { flex: 1.35, minWidth: 300, gap: 12, padding: 24 },
-    guideCard: { flex: 1, minWidth: 280, gap: 15, padding: 22 },
     introBrand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     introLabel: { ...Type.overline, color: colors.accentText },
     introTitle: { ...Type.title1, color: colors.text },
@@ -297,12 +278,6 @@ function createStyles(colors: ThemeColors) {
     guideLink: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 9, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.primarySubtle },
     guideLinkText: { fontSize: 13, fontWeight: '700', color: colors.primaryText },
     contactAddress: { fontWeight: '700', color: colors.text },
-    guideTitle: { ...Type.title3, color: colors.text },
-    guideStep: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-    guideStepIcon: { width: 30, height: 30, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySubtle },
-    guideStepCopy: { flex: 1, gap: 2 },
-    guideStepTitle: { fontSize: 13, fontWeight: '800', color: colors.text },
-    guideStepDetail: { fontSize: 12, lineHeight: 17, color: colors.textSecondary },
     featureGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
     featureCard: { flexBasis: '31%', flexGrow: 1, minWidth: 230, gap: 9, padding: 16 },
     featureTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },

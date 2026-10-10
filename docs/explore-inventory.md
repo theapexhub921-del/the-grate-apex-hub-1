@@ -10,7 +10,7 @@ Feature statuses that had become untrue were corrected (not removed) — see
 | # | Section | What it is | Proposal |
 |---|---|---|---|
 | 1 | Welcome card ("Learn your way. Rise together.") | Explains Feed/Study/Explore; buttons *Replay the introduction* and *Contact us* | **Keep, shortened**: one line about what's coming; keep both buttons |
-| 2 | "How GrAteApex Hub is organised" (4 steps: Feed, Study, Connect, Explore) | Explains implemented tabs | **Remove** (the introduction tour covers it) |
+| 2 | "How GrAteApex Hub is organised" (4 steps: Feed, Study, Connect, Explore) | Explains implemented tabs | **Replaced** 2026-10-10 by a tap-through simulation of the five tabs (owner request; `src/components/explore/organisation-simulator.tsx`) |
 | 3 | Weekly session ("This week · …") | Content from `explore_weekly_sessions` — the deployed rules refuse this collection, so it never shows | **Decide**: drop, or keep for later with an admin-written collection + rule |
 | 4 | Medical concepts / Connections / Emerging research | Medical discovery content (not feature promotion) | **Decide**: keep (it is Explore's own content) or move to `/explore/discovery` only |
 | 5 | Install the app card | Install instructions (implemented) | **Remove from Explore** — Settings already has install steps |
