@@ -73,6 +73,23 @@ console.log('rules: firestore.rules (proposed)');
   check('another student cannot write my completions', denied);
 }
 
+// ── Leaderboard (scores/{uid}) and the league ───────────────────────────
+{
+  const { uid } = await freshUser('board');
+  const name = `board_` + Date.now().toString(36).slice(-6);
+  await seed(`users/` + uid, { username: name, hall: 'HB1', semester: 1, classLocked: true });
+  await seed(`scores/` + uid, { username: name, xp: 40, answered: 120, accuracy: 0.8, courseXp: { biolchem: 40 } });
+  await sync.saveCloudProgress([], stats(640));
+  await new Promise((r) => setTimeout(r, 500));
+  const entry = await peek(`scores/` + uid);
+  check('leaderboard entry updated with the real username and XP', entry?.username === name && entry?.xp === 640 && entry?.hall === 'HB1', entry);
+  check('the original app’s answered/accuracy/courseXp are kept', entry?.answered === 120 && entry?.accuracy === 0.8 && entry?.courseXp?.biolchem === 40, entry);
+  const { loadWeeklyLeague } = await import('@/data/connect-features');
+  const league = await loadWeeklyLeague();
+  const me = league.find((row) => row.is_viewer);
+  check('the league reads the shared leaderboard and finds me in my rank', Boolean(me) && me.lifetime_xp === 640 && league.every((row) => row.rank_id === me.rank_id), league.slice(0, 3));
+}
+
 // ── Rules deployed today (before approval) ───────────────────────────────
 await loadRules(DEPLOYED);
 console.log('rules: deployed-2026-10-09.rules');

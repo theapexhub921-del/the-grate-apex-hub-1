@@ -12,8 +12,7 @@ import { claimWeeklyChallengeReward, loadFriendBattleResults, loadWeeklyChalleng
 import { createFriendChallenge, listFriendChallenges, respondToFriendChallenge, type FriendChallenge } from '@/data/community';
 import { publishedTopics, getTopic } from '@/data/curriculum';
 import { type SocialPerson, personName, useSocial } from '@/data/social';
-import { LEAGUE_RULES, getLeagueOutcome } from '@/data/ranks';
-import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { useThemedStyles } from '@/hooks/use-theme';
 
 export function WeeklyChallengeCard() {
   const styles = useThemedStyles(createStyles);
@@ -56,7 +55,6 @@ export function WeeklyChallengeCard() {
 
 export function WeeklyLeagueCard() {
   const styles = useThemedStyles(createStyles);
-  const colors = useTheme();
   const social = useSocial();
   const [entries, setEntries] = useState<WeeklyLeagueEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -71,19 +69,16 @@ export function WeeklyLeagueCard() {
 
   const me = entries.find((entry) => entry.is_viewer);
   const shown = entries.filter((entry) => entry.league_position <= 5 || entry.is_viewer);
-  const outcome = me ? getLeagueOutcome(me.league_position, me.league_size) : null;
-  const promote = Math.floor((me?.league_size ?? 0) * LEAGUE_RULES.promotionShare);
-  const relegate = Math.floor((me?.league_size ?? 0) * LEAGUE_RULES.relegationShare);
 
   return (
     <Card style={styles.card}>
       <View style={styles.headingRow}>
-        <SectionHeader title="Weekly league" subtitle={me ? `${me.rank_name} · resets Monday` : 'Same-rank learners · resets Monday'} style={styles.noMargin} />
+        <SectionHeader title="League" subtitle={me ? `${me.rank_name} · total XP` : 'Learners of your rank · total XP'} style={styles.noMargin} />
         {me ? <Pill label={`#${me.league_position} of ${me.league_size}`} tone="gold" /> : null}
       </View>
-      {loading ? <Text style={styles.muted}>Loading this week’s standings…</Text> : null}
+      {loading ? <Text style={styles.muted}>Loading the standings…</Text> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      {me && me.league_size < 5 ? <Text style={styles.muted}>Standings are live. Promotion and relegation start when the league has at least five learners.</Text> : null}
+      {!loading && !error && !me ? <Text style={styles.muted}>You’ll appear here after your first XP is saved.</Text> : null}
       {shown.map((entry) => {
         const friend = social.people.find((person) => person.userId === entry.user_id);
         const name = entry.is_viewer ? 'You' : friend ? personName(friend) : entry.display_name?.trim() || (entry.username ? `@${entry.username}` : 'Username pending');
@@ -92,13 +87,12 @@ export function WeeklyLeagueCard() {
           <Text style={styles.place}>{entry.league_position}</Text>
             <Avatar uri={entry.avatar_url} name={name} size={30} />
             <Text style={[styles.name, entry.is_viewer && styles.success]} numberOfLines={1}>{name}</Text>
-            <Text style={styles.score}>{entry.weekly_xp} XP</Text>
+            <Text style={styles.score}>{entry.lifetime_xp} XP</Text>
           </View>
         );
       })}
-      {me && me.league_size >= 5 ? <Text style={[styles.muted, { color: outcome === 'promoted' ? colors.successText : outcome === 'relegated' ? colors.warningText : colors.textSecondary }]}>
-        {outcome === 'promoted' ? `Promotion zone · top ${Math.round(LEAGUE_RULES.promotionShare * 100)}%` : outcome === 'relegated' ? `Relegation zone · bottom ${Math.round(LEAGUE_RULES.relegationShare * 100)}%` : `Holding position · top ${promote} advance, bottom ${relegate} move down`}
-      </Text> : null}
+      {/* Weekly XP, resets and promotion/relegation need weekly data neither app stores yet. */}
+      <Text style={styles.muted}>Weekly standings with promotion and relegation are coming soon.</Text>
       <Button label="Refresh standings" variant="ghost" size="sm" onPress={() => void refresh()} />
     </Card>
   );

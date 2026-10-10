@@ -4,9 +4,11 @@ import {
   getDoc,
   getDocs,
   limit,
+  orderBy,
   query,
 } from 'firebase/firestore';
 
+import { getRankProgress, RANKS } from '@/data/ranks';
 import { auth, db } from '@/lib/firebase';
 
 export type WeeklyChallengeStatus = {
@@ -75,29 +77,39 @@ export async function claimWeeklyChallengeReward() {
   return { available: 50, week_start: new Date().toISOString().split('T')[0] };
 }
 
+/**
+ * The league: learners of your rank, ordered by total XP, from the shared
+ * leaderboard (scores/{uid}, the same entries the original app shows). There
+ * is no weekly XP in either app, so `weekly_xp` is the total until weekly
+ * standings exist.
+ */
 export async function loadWeeklyLeague(): Promise<WeeklyLeagueEntry[]> {
-  try {
-    const snap = await getDocs(query(collection(db, 'leaderboard'), limit(50)));
-    const viewerId = auth.currentUser?.uid;
-    return snap.docs.map((d, index) => {
-      const data = d.data();
-      return {
-        rank_id: d.id,
-        rank_name: data.rankName || 'Cadet',
-        user_id: data.userId || d.id,
-        username: data.username || null,
-        display_name: data.displayName || data.username || null,
-        avatar_url: data.avatarUrl || null,
-        lifetime_xp: Number(data.xp || 0),
-        weekly_xp: Number(data.weeklyXp || data.xp || 0),
-        league_position: index + 1,
-        league_size: snap.size,
-        is_viewer: viewerId === (data.userId || d.id),
-      };
-    });
-  } catch {
-    return [];
+  const viewerId = auth.currentUser?.uid ?? null;
+  const snap = await getDocs(query(collection(db, 'scores'), orderBy('xp', 'desc'), limit(300)));
+  const rows = snap.docs.map((item) => ({ id: item.id, data: item.data() }));
+  if (viewerId && !rows.some((row) => row.id === viewerId)) {
+    const mine = await getDoc(doc(db, 'scores', viewerId));
+    if (mine.exists()) rows.push({ id: mine.id, data: mine.data() });
   }
+  const rankOf = (xp: unknown) => getRankProgress(Number(xp) || 0)?.rank ?? RANKS[0];
+  const viewerRow = rows.find((row) => row.id === viewerId);
+  const myRank = rankOf(viewerRow?.data.xp);
+  const league = rows
+    .filter((row) => rankOf(row.data.xp).id === myRank.id)
+    .sort((a, b) => (Number(b.data.xp) || 0) - (Number(a.data.xp) || 0));
+  return league.map((row, index) => ({
+    rank_id: myRank.id,
+    rank_name: myRank.name,
+    user_id: row.id,
+    username: row.data.username || null,
+    display_name: row.data.username || null,
+    avatar_url: null,
+    lifetime_xp: Number(row.data.xp) || 0,
+    weekly_xp: Number(row.data.xp) || 0,
+    league_position: index + 1,
+    league_size: league.length,
+    is_viewer: row.id === viewerId,
+  }));
 }
 
 export async function loadFriendBattleResults(challengeId: string): Promise<FriendBattleResults> {

@@ -279,6 +279,33 @@ export async function resetCloudLearningProgress() {
   if (snap.exists()) await updateDoc(progressDocRef, update);
 }
 
+/**
+ * The learner's public leaderboard entry, scores/{uid} — the same entry the
+ * original app shows. Only fields both apps agree on are written (merged, so
+ * the original app's answered/accuracy/courseXp stay as they are); the rules
+ * require the real username. Skipped until the learner has a username.
+ */
+async function saveLeaderboardSummary(userId: string, totalXp: number) {
+  try {
+    const profile = (await getDoc(doc(db, 'users', userId))).data();
+    const username = profile?.username;
+    if (typeof username !== 'string' || !/^[a-z0-9_]{3,20}$/.test(username)) return;
+    await setDoc(
+      doc(db, 'scores', userId),
+      {
+        username,
+        xp: Math.min(1_000_000, Math.max(0, Math.round(totalXp))),
+        hall: typeof profile?.hall === 'string' ? profile.hall : '',
+        semester: profile?.semester === 2 ? 2 : 1,
+        updatedAt: Date.now(),
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    console.warn('Could not update the leaderboard entry:', error);
+  }
+}
+
 export async function saveCloudProgress(
   completedLessons: { lessonId: string; xp: number; completedAt?: number }[],
   stats: CloudLearningStats
@@ -286,6 +313,7 @@ export async function saveCloudProgress(
   const userId = await getUserId();
   if (!userId) return;
   const progressDocRef = doc(db, 'progress', userId);
+  void saveLeaderboardSummary(userId, stats.total_xp);
 
   try {
     // Only this app's own fields, merged: the shared `lessons` map is not written.
