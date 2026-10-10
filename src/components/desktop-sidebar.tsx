@@ -37,6 +37,8 @@ const REVEAL_ZONE_PX = 28;
 // Grace period before hiding again, so it cannot flicker.
 const HIDE_DELAY_MS = 600;
 const FLOAT_INSET = 10;
+/** The slim rail's width (auto-hide mode). */
+export const COLLAPSED_WIDTH = 76;
 
 export function DesktopSidebar({ docked }: { docked: boolean }) {
   const styles = useThemedStyles(createStyles);
@@ -59,7 +61,10 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
   const [revealed, setRevealed] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const shown = docked || revealed;
+  // Auto-hide (Instagram-style): a slim icon rail that widens with labels while
+  // the pointer is over it, and narrows again when it leaves.
+  const collapsed = !docked && !revealed;
+  const shown = true;
 
   const clearTimer = () => {
     if (timer.current) clearTimeout(timer.current);
@@ -89,7 +94,7 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
       document.removeEventListener('mousemove', onMove);
       clearTimer();
     };
-  }, [docked, revealed, reveal, scheduleHide]);
+  }, [docked, revealed, reveal, scheduleHide, railWidth]);
 
   // Navigating from the floating rail tucks it away again.
   const go = (path: string) => {
@@ -100,36 +105,26 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
   return (
     <>
       {docked ? <SidebarResizeHandle /> : null}
-      {!docked ? (
-        // Edge handle: a hint that the rail exists, and a click target for
-        // touch-screen laptops (which have no hover).
-        <Pressable
-          onPress={reveal}
-          accessibilityRole="button"
-          accessibilityLabel="Show navigation"
-          style={[styles.handleZone, shown && styles.hidden]}
-        >
-          <View style={styles.handle} />
-        </Pressable>
-      ) : null}
 
       <View
         style={[
           styles.rail,
-          { width: railWidth },
-          docked ? styles.railDocked : [styles.railFloating, elevation(colors, 3)],
-          !shown && [styles.railHidden, { transform: [{ translateX: -(railWidth + FLOAT_INSET * 2) }] }],
+          { width: collapsed ? COLLAPSED_WIDTH : railWidth },
+          styles.railDocked,
+          !docked && !collapsed && elevation(colors, 3),
+          collapsed && styles.railCollapsed,
           { pointerEvents: shown ? 'auto' : 'none' },
         ]}
         // Keyboard users: tabbing into the rail reveals it.
         onFocus={!docked ? reveal : undefined}
         onBlur={!docked ? scheduleHide : undefined}
+        {...(!docked ? ({ onMouseEnter: reveal, onMouseLeave: () => { clearTimer(); timer.current = setTimeout(() => setRevealed(false), 180); } } as object) : {})}
         role="navigation"
         aria-hidden={!shown}
       >
         <View style={styles.brandRow}>
           <LogoMark height={26} />
-          <Text style={styles.wordmark}>GrAte Apex Hub</Text>
+          {collapsed ? null : <Text style={styles.wordmark}>GrAte Apex Hub</Text>}
         </View>
 
         <View style={styles.navList}>
@@ -150,16 +145,18 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
               >
                 {selected ? <View style={styles.activeBar} /> : null}
                 <NavIconView icon={item.icon} color={selected ? colors.navActive : isHovered ? colors.text : colors.navInactive} size={navIconSize} active={selected} />
-                <Text style={[styles.navLabel, (selected || isHovered) && styles.navLabelActive]} numberOfLines={1}>
-                  {item.label}
-                </Text>
+                {collapsed ? null : (
+                  <Text style={[styles.navLabel, (selected || isHovered) && styles.navLabelActive]} numberOfLines={1}>
+                    {item.label}
+                  </Text>
+                )}
               </Pressable>
             );
           })}
         </View>
 
         {/* Today at a glance: real streak and XP. */}
-        <View style={styles.today}>
+        <View style={[styles.today, collapsed && styles.hiddenBlock]}>
           <View style={styles.todayItem}>
             <Icon name="streak" size={16} color={progress.streak > 0 ? colors.accent : colors.textTertiary} filled={progress.streak > 0} />
             <Text style={styles.todayText}>
@@ -183,7 +180,7 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
             style={[styles.identity, hovered === 'identity' && styles.navItemHovered]}
           >
             <Avatar uri={avatarUrl} name={displayName} size={34} ring="gold" />
-            <View style={styles.identityText}>
+            <View style={[styles.identityText, collapsed && styles.hiddenBlock]}>
               <Text style={styles.footerName} numberOfLines={1}>
                 {displayName ? `Doc. ${displayName}` : 'Doc.'}
               </Text>
@@ -192,7 +189,7 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
               </Text>
             </View>
           </Pressable>
-          <IconButton icon="settings" label="Settings" onPress={() => go('/settings')} size={36} />
+          {collapsed ? null : <IconButton icon="settings" label="Settings" onPress={() => go('/settings')} size={36} />}
         </View>
       </View>
     </>
@@ -213,6 +210,8 @@ function createStyles(colors: ThemeColors) {
       ...webStyle({ cursor: 'pointer', ...cssTransition('opacity', MOTION.standard) }),
     },
     hidden: { opacity: 0 },
+    hiddenBlock: { display: 'none' },
+    railCollapsed: { paddingHorizontal: 10, alignItems: 'center' },
     handle: {
       marginLeft: 4,
       width: 4,
@@ -262,7 +261,7 @@ function createStyles(colors: ThemeColors) {
       paddingHorizontal: 8,
       paddingBottom: 24,
     },
-    wordmark: { fontSize: 18, fontWeight: '800', letterSpacing: 1.1, color: colors.logoLetters },
+    wordmark: { fontSize: 16, fontWeight: '800', letterSpacing: 0.3, color: colors.logoLetters },
     navList: { flex: 1, gap: 4 },
     navItem: {
       flexDirection: 'row',

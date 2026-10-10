@@ -13,7 +13,7 @@
 // so thresholds can be changed here without migrating saved data.
 
 // The final target: lifetime XP needed for the top rank.
-export const ULTIMATE_XP_TARGET = 1_000_000;
+export const ULTIMATE_XP_TARGET = 10_000_000;
 
 // Planning targets used when the thresholds are calculated later.
 export const PROGRESSION_TARGETS = {
@@ -21,8 +21,7 @@ export const PROGRESSION_TARGETS = {
   idealDailyHourUserMonths: 6,
 } as const;
 
-// The original app's ranks (owner decision, 2026-10-10), by level — level is
-// 1 + every 150 XP, so a rank's XP is (level − 1) × 150. Fresher to Immortal.
+// The original app's ranks (owner decision, 2026-10-10), Fresher to Immortal.
 export type RankId =
   | 'fresher'
   | 'riser'
@@ -47,22 +46,22 @@ export type Rank = {
 
 // Provisional ladder, lowest to highest. Easy to rename/reorder here.
 //
-// THRESHOLDS: the original app's ladder (a rank per level band; level = 1 + every
-// 150 XP). Ranks are always computed from lifetime XP — nothing is stored per rank.
+// The original ranks, stretched so Immortal takes 10,000,000 lifetime XP (owner
+// decision, 2026-10-10): each rank takes about 2.5× the XP of the one before.
 export const RANKS: readonly Rank[] = [
-  { id: 'fresher', name: 'Fresher', minXp: 0 }, // level 1
-  { id: 'riser', name: 'Riser', minXp: 300 }, // level 3
-  { id: 'scholar', name: 'Scholar', minXp: 750 }, // level 6
-  { id: 'sharp', name: 'Sharp', minXp: 1350 }, // level 10
-  { id: 'elite', name: 'Elite', minXp: 2250 }, // level 16
-  { id: 'apex-scholar', name: 'Apex Scholar', minXp: 3600 }, // level 25
-  { id: 'apex', name: 'Apex', minXp: 5850 }, // level 40
-  { id: 'master', name: 'Master', minXp: 10350 }, // level 70
-  { id: 'grandmaster', name: 'Grandmaster', minXp: 14850 }, // level 100
-  { id: 'endless', name: 'Endless', minXp: 29850 }, // level 200
-  { id: 'paragon', name: 'Paragon', minXp: 44850 }, // level 300
-  { id: 'ultimate', name: 'Ultimate', minXp: 59850 }, // level 400
-  { id: 'immortal', name: 'Immortal', minXp: 74850 }, // level 500
+  { id: 'fresher', name: 'Fresher', minXp: 0 },
+  { id: 'riser', name: 'Riser', minXp: 500 },
+  { id: 'scholar', name: 'Scholar', minXp: 1_250 },
+  { id: 'sharp', name: 'Sharp', minXp: 3_000 },
+  { id: 'elite', name: 'Elite', minXp: 7_500 },
+  { id: 'apex-scholar', name: 'Apex Scholar', minXp: 18_000 },
+  { id: 'apex', name: 'Apex', minXp: 45_000 },
+  { id: 'master', name: 'Master', minXp: 110_000 },
+  { id: 'grandmaster', name: 'Grandmaster', minXp: 275_000 },
+  { id: 'endless', name: 'Endless', minXp: 675_000 },
+  { id: 'paragon', name: 'Paragon', minXp: 1_650_000 },
+  { id: 'ultimate', name: 'Ultimate', minXp: 4_000_000 },
+  { id: 'immortal', name: 'Immortal', minXp: 10_000_000 },
 ];
 
 // True only when every threshold is decided and they strictly increase.

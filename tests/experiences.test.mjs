@@ -87,10 +87,12 @@ describe('original theme unlock rules (screens/ThemePicker.tsx)', () => {
     assert.equal(legacyLockText({ unlocked: false, kind: 'level', level: 8 }), '🔒 Unlocks at Level 8');
     assert.equal(legacyLockText({ unlocked: false, kind: 'level', level: 8 }, false), 'Unlocks at Level 8');
   });
-  it('original ranks', () => {
+  it('ranks: the original titles on one ladder, Fresher to Immortal over 10,000,000 XP', () => {
     assert.deepEqual(legacyRank(0), { level: 1, title: 'Fresher' });
-    assert.deepEqual(legacyRank(300), { level: 3, title: 'Riser' });
-    assert.deepEqual(legacyRank(150 * 24), { level: 25, title: 'Apex Scholar' });
+    assert.deepEqual(legacyRank(300), { level: 3, title: 'Fresher' });
+    assert.deepEqual(legacyRank(150 * 24), { level: 25, title: 'Sharp' });
+    assert.equal(legacyRank(10_000_000).title, 'Immortal');
+    assert.equal(legacyRank(9_999_999).title, 'Ultimate');
   });
 });
 

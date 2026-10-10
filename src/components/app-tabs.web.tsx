@@ -6,7 +6,7 @@ import { useReducedMotion } from 'react-native-reanimated';
 import { Atmosphere } from '@/components/atmosphere/atmosphere';
 import { OnlinePresenceSync } from '@/components/online-presence-sync';
 import { useAtmosphereMood } from '@/components/atmosphere/config';
-import { DesktopSidebar } from '@/components/desktop-sidebar';
+import { COLLAPSED_WIDTH, DesktopSidebar } from '@/components/desktop-sidebar';
 import { LegacyBackground } from '@/components/experience/legacy-background';
 import { LEGACY_DESKTOP_MIN, LegacyFloatingBar, LegacySidebar, useOriginalAutoHide } from '@/components/experience/legacy-navigation';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
@@ -64,7 +64,7 @@ export default function AppTabs() {
 
       {useRail && !originals ? <DesktopSidebar docked={docked} /> : null}
 
-      <View style={[styles.content, originals && styles.row, { paddingLeft: docked ? sidebarWidth : 0 }]}>
+      <View style={[styles.content, originals && styles.row, { paddingLeft: docked ? sidebarWidth : useRail && !originals ? COLLAPSED_WIDTH : 0 }]}>
         {/* The original app's sidebar takes its own space beside the page. */}
         {useRail && originals ? <LegacySidebar onNavigate={(route) => router.navigate(NAV_PATHS[route] as Href)} /> : null}
         {useRail && originals && !originalAutoHide ? <SidebarResizeHandle fallback={250} /> : null}

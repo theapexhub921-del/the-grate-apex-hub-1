@@ -5,6 +5,7 @@
 // app's palettes. Pure, for tests.
 import type { ThemeColors } from '@/constants/theme';
 import { contrastRatio } from '@/data/contrast';
+import { RANKS } from '@/data/ranks';
 import { EXTRA_THEMES } from '@/data/extra-themes';
 import { LEGACY_THEMES, legacyColorsOf, type LegacyThemeDef } from '@/data/legacy-themes';
 
@@ -156,14 +157,11 @@ export function legacyLockText(lock: Exclude<LegacyUnlock, { unlocked: true }>, 
   return `${lockMark}Unlocks at Level ${lock.level}`;
 }
 
-// The original app's rank titles by level (src/progress.tsx → rankFor), unchanged.
-const LEGACY_RANKS: readonly (readonly [number, string])[] = [[0, 'Fresher'], [3, 'Riser'], [6, 'Scholar'], [10, 'Sharp'], [16, 'Elite'], [25, 'Apex Scholar'], [40, 'Apex'], [70, 'Master'], [100, 'Grandmaster'], [200, 'Endless'], [300, 'Paragon'], [400, 'Ultimate'], [500, 'Immortal']];
-
-/** The original app's level and title for an XP total (shown in The Originals' sidebar). */
+/** Level (1 + every 150 XP) and rank title — one ladder for the whole app (data/ranks.ts). */
 export function legacyRank(xp: number) {
   const level = legacyLevel(xp);
-  let title = LEGACY_RANKS[0][1];
-  for (const [min, name] of LEGACY_RANKS) if (level >= min) title = name;
+  let title = RANKS[0].name;
+  for (const rank of RANKS) if (xp >= (rank.minXp ?? Infinity)) title = rank.name;
   return { level, title };
 }
 
