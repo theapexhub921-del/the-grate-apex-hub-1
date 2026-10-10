@@ -97,7 +97,7 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
               {isLearn && hybrid ? (
                 // Hybrid: the raised Study tab is a solid book, not a circle.
                 <View style={styles.learnBook}>
-                  <Svg width={46} height={46} viewBox="0 0 24 24">
+                  <Svg width={52} height={52} viewBox="0 0 24 24">
                     <Path d="M12 6.6C10.2 5.3 7.7 4.7 4.5 4.8v12.6c3.2-.1 5.7.5 7.5 1.8 1.8-1.3 4.3-1.9 7.5-1.8V4.8c-3.2-.1-5.7.5-7.5 1.8z" fill={colors.primary} stroke={colors.primary} strokeWidth={1.4} strokeLinejoin="round" />
                     <Path d="M12 6.9v12" stroke={colors.onPrimary} strokeWidth={1.3} strokeLinecap="round" />
                     <Path d="M6.6 8.2c1.4 0 2.6.3 3.6.8M6.6 10.8c1.4 0 2.6.3 3.6.8M17.4 8.2c-1.4 0-2.6.3-3.6.8M17.4 10.8c-1.4 0-2.6.3-3.6.8" stroke={colors.onPrimary} strokeWidth={1} strokeLinecap="round" opacity={0.75} />
@@ -105,7 +105,7 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
                 </View>
               ) : isLearn ? (
                 <View style={[styles.learnIcon, elevation(colors, 3)]}>
-                  <NavIconView icon={item.icon} color={colors.primaryText} size={26} active />
+                  <NavIconView icon={item.icon} color={colors.onPrimary} size={26} active />
                 </View>
               ) : <NavIconView icon={item.icon} color={selected ? colors.navActive : colors.navInactive} size={22} active={selected} />}
               <Text style={[styles.label, selected && styles.labelActive, isLearn && styles.learnLabel]} numberOfLines={1}>
@@ -173,7 +173,7 @@ function createStyles(colors: ThemeColors) {
       justifyContent: 'center',
     },
     learnLabel: { paddingTop: 0 },
-    learnBook: { position: 'absolute', top: -24, alignItems: 'center', justifyContent: 'center', ...webStyle({ filter: `drop-shadow(0px 6px 10px ${colors.shadow})` }) },
+    learnBook: { position: 'absolute', top: -28, alignItems: 'center', justifyContent: 'center', ...webStyle({ filter: `drop-shadow(0px 6px 10px ${colors.shadow})` }) },
     itemPressed: { transform: [{ scale: 0.94 }] },
     label: { fontSize: 10.5, fontWeight: '700', color: colors.navInactive, letterSpacing: 0.2 },
     labelActive: { color: colors.navActive },

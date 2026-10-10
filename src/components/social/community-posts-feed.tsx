@@ -183,11 +183,11 @@ export function CommunityPostsFeed() {
       {notice ? <Text accessibilityRole="text" style={styles.notice}>{notice}</Text> : null}
       {error ? <Card style={styles.errorCard}><Text style={styles.errorTitle}>Community feed issue</Text><Text style={styles.muted}>{error}</Text><Button label="Try again" size="sm" variant="secondary" onPress={() => void refresh()} /></Card> : null}
       {loading ? <Text style={styles.muted}>Loading your friends’ posts…</Text> : null}
-      {!loading && !posts.length && !error ? <Card style={styles.empty}><Icon name="social" size={22} color={colors.primaryText} /><Text style={styles.emptyTitle}>Your feed is ready for your circle</Text><Text style={styles.muted}>Posts from you and accepted friends will appear here.</Text></Card> : null}
+      {!loading && !posts.length && !error ? <Card style={styles.empty}><Icon name="social" size={22} color={colors.primaryText} /><Text style={styles.emptyTitle}>Your feed is ready for your circle</Text><Text style={styles.muted}>Posts from people across GrAteApex Hub will appear here.</Text></Card> : null}
       {posts.map((post) => (
         <PostCard key={post.id} post={post} socialPeople={social.people} ownId={user?.id ?? social.userId} ownName={displayName || 'You'} onOpen={() => void openPost(post)} onLike={() => void like(post)} onComment={() => void openPost(post)} onReshare={() => void publish(post.id)} onShare={() => void sharePost(post)} onReport={() => void report('post', post.id)} onDelete={() => confirmDeletePost(post)} />
       ))}
-      <Sheet visible={composeOpen} onClose={() => setComposeOpen(false)} title="Create a post" subtitle="Share something with accepted friends.">
+      <Sheet visible={composeOpen} onClose={() => setComposeOpen(false)} title="Create a post" subtitle="Share something with the GrAteApex Hub community.">
         <View style={styles.composeSheet}>
         <Text style={styles.muted}>Share how you’re feeling, what’s happening in your life, or anything you’d like your friends to know.</Text>
         <MentionInput people={social.people} value={draft} onChangeText={setDraft} multiline maxLength={5000} placeholder="What’s on your mind today?" placeholderTextColor={colors.textTertiary} accessibilityLabel="Write a post" style={styles.postInput} />

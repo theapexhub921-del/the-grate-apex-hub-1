@@ -46,6 +46,9 @@ const LEGACY_OVERRIDES: Record<string, { name?: string; level?: number }> = {
   blackout: { level: 4 },
 };
 
+// Free themes first, then by level; achievement and admin themes last.
+const rank = (entry: { level: number; ach?: string; adminOnly?: boolean }) => (entry.adminOnly ? 2000 : entry.ach ? 1000 : entry.level);
+
 export const THEME_CATALOG: readonly ThemeEntry[] = [
   ...NEWER.map((entry) => ({ ...entry, key: `newer:${entry.id}`, family: 'newer' as const })),
   ...LEGACY_THEMES.map((theme) => {
@@ -61,7 +64,7 @@ export const THEME_CATALOG: readonly ThemeEntry[] = [
       adminOnly: theme.adminOnly,
     };
   }),
-].sort((a, b) => a.level - b.level || (a.key === 'legacy:dark' ? -1 : b.key === 'legacy:dark' ? 1 : 0));
+].sort((a, b) => rank(a) - rank(b) || (a.key === 'legacy:dark' ? -1 : b.key === 'legacy:dark' ? 1 : 0));
 
 export type ThemeLock =
   | { unlocked: true }
