@@ -44,6 +44,18 @@ export const routes = {
   subject: (subject: SubjectId, selection?: { classId: string; semester: number }) =>
     `/learn/${subject}${query({ viewClass: selection?.classId, viewSemester: selection?.semester })}` as Href,
 
+  // The original app's courses (HB1), studied in this app (data/legacy-study.ts).
+  legacyCourse: (courseId: string | null | undefined, selection?: { classId: string; semester: number }) =>
+    valid(courseId)
+      ? (`/learn/hb-course${query({ course: courseId, viewClass: selection?.classId, viewSemester: selection?.semester })}` as Href)
+      : fallback('legacyCourse', '/learn'),
+  legacyLesson: (lessonId: string | null | undefined, section?: number) =>
+    valid(lessonId) ? (`/learn/hb-lesson${query({ lesson: lessonId, section })}` as Href) : fallback('legacyLesson', '/learn'),
+  legacyPractice: (options: { course: string; lesson?: string; set?: string; apex?: boolean }) =>
+    valid(options.course)
+      ? (`/learn/hb-practice${query({ course: options.course, lesson: options.lesson, set: options.set, apex: options.apex ? 1 : undefined, attempt: Date.now() })}` as Href)
+      : fallback('legacyPractice', '/learn'),
+
   course: (courseId: string | null | undefined) =>
     valid(courseId) ? (`/learn/course${query({ course: courseId })}` as Href) : fallback('course', '/learn'),
 
