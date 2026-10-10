@@ -50,3 +50,40 @@ describe('levels and rewards', () => {
     assert.deepEqual(newLevels({ l5: 5, xp1k: 2 }, states).filter((x) => ['l5', 'xp1k'].includes(x.id)), []);
   });
 });
+
+const { boostRemainingMs, clampSeconds, describeBoost, MAX_POWERUP_SECONDS, pickReward, REWARD_POOL } = await import('@/data/learning/boosts');
+
+describe('timed boosts (never more than one hour)', () => {
+  const T = 1_791_000_000_000;
+  const boost = (over = {}) => ({ id: 'b', multiplier: 2, activatedAt: T, durationSeconds: 2700, seenAt: T, ...over });
+
+  it('every reward is a valid multiplier lasting at most 3,600 seconds', () => {
+    assert.equal(MAX_POWERUP_SECONDS, 3600);
+    for (const item of REWARD_POOL) {
+      assert.ok([1.5, 2, 2.5, 3].includes(item.multiplier));
+      assert.ok(item.durationSeconds > 0 && item.durationSeconds <= 3600);
+    }
+  });
+  it('counts down from activation and stops at the end', () => {
+    assert.equal(boostRemainingMs(boost(), T), 2_700_000);
+    assert.equal(boostRemainingMs(boost(), T + 2_699_000), 1000);
+    assert.equal(boostRemainingMs(boost(), T + 2_700_000), 0);
+  });
+  it('a saved boost longer than an hour is capped at an hour', () => {
+    assert.equal(clampSeconds(86_400), 3600);
+    assert.equal(boostRemainingMs(boost({ durationSeconds: 86_400 }), T + 3_600_000), 0);
+    assert.equal(boostRemainingMs(boost({ durationSeconds: 86_400 }), T), 3_600_000);
+  });
+  it('setting the clock back ends the boost instead of extending it', () => {
+    assert.equal(boostRemainingMs(boost(), T - 1), 0);
+    assert.equal(boostRemainingMs(boost({ seenAt: T + 60_000 }), T + 30_000), 0);
+  });
+  it('the random pick always comes from the pool', () => {
+    assert.deepEqual(pickReward(() => 0), REWARD_POOL[0]);
+    assert.deepEqual(pickReward(() => 0.999999), REWARD_POOL[REWARD_POOL.length - 1]);
+    assert.ok(REWARD_POOL.includes(pickReward()));
+  });
+  it('describes a boost plainly', () => {
+    assert.equal(describeBoost({ multiplier: 2, durationSeconds: 2700 }), '×2 XP for 45 minutes');
+  });
+});

@@ -291,6 +291,12 @@ export function preloadProgress() {
   return ensureProgressLoaded();
 }
 
+/** Resolves once local progress is loaded and any cloud sync in flight has finished (or failed). */
+export async function waitForProgressSync() {
+  await ensureProgressLoaded();
+  if (progressSyncPromise) await progressSyncPromise.catch(() => undefined);
+}
+
 function subscribe(listener: () => void) {
   listeners.add(listener);
   return () => {

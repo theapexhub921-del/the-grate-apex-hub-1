@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { type ReactNode, useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 
+import { AchievementWatcher } from '@/components/achievements/achievement-watcher';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
 import { LearningSync } from '@/components/learning/learning-sync';
@@ -160,6 +161,7 @@ export default function TabLayout() {
             <AppGuard>
               <AppTabs />
               <LearningSync />
+              <AchievementWatcher />
               <DeviceNotificationBridge />
             </AppGuard>
           ) : (

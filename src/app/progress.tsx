@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { type Href, router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -53,6 +53,9 @@ export default function ProgressScreen() {
   const styles = useThemedStyles(createStyles);
   const { progress, inputs, quizzes, attempts, now } = useLearning();
   const powerups = usePowerups();
+  // Single-use power-ups apply automatically; timed boosts (achievement rewards) wait for activation.
+  const singleUse = powerups.filter((powerup) => powerup.kind !== 'timed');
+  const timedBoosts = powerups.filter((powerup) => powerup.kind === 'timed');
   const [showAll, setShowAll] = useState(false);
   const [coinBalance, setCoinBalance] = useState<number | null>(null);
   const [freezeBalance, setFreezeBalance] = useState<number | null>(null);
@@ -173,17 +176,18 @@ export default function ProgressScreen() {
       <LevelProgressCard xp={progress.xp} />
 
       <Card style={styles.card}>
-        <SectionHeader title="Power-ups" subtitle={`${powerups.length} ready`} style={styles.noMargin} />
+        <SectionHeader title="Power-ups" subtitle={`${singleUse.length} ready${timedBoosts.length ? ` · ${timedBoosts.length} timed boost${timedBoosts.length === 1 ? '' : 's'} to activate` : ''}`} style={styles.noMargin} />
         <Text style={styles.meta}>Complete a lesson or quiz to earn a boost. Your strongest stored boost applies automatically to your next lesson or quiz.</Text>
-        {powerups.length > 0 ? (
+        {singleUse.length > 0 ? (
           <View style={styles.powerupRow}>
             {[1.5, 2, 2.5, 3].map((multiplier) => {
-              const count = powerups.filter((powerup) => powerup.multiplier === multiplier).length;
+              const count = singleUse.filter((powerup) => powerup.multiplier === multiplier).length;
               return count > 0 ? <Pill key={multiplier} label={`×${multiplier} · ${count}`} tone="gold" /> : null;
             })}
           </View>
         ) : <Text style={styles.muted}>Your next completed lesson or quiz will earn your first boost.</Text>}
         <Text style={styles.meta}>Streak boosts unlock at 7, 15, 30, 60, 90 and 100 days, then 150, 200, 365, 500 and 1,000 days.</Text>
+        {timedBoosts.length > 0 ? <Button label="Activate timed boosts in Achievements" variant="ghost" size="sm" onPress={() => router.push('/achievements' as Href)} /> : null}
       </Card>
 
       <Card style={styles.card}>

@@ -6,6 +6,7 @@ import {
   subscribeToLearningAuthChanges,
   writeLearningCache,
 } from '@/data/learning-sync';
+import { type ActiveBoost, boostRemainingMs, clampSeconds, pickReward } from '@/data/learning/boosts';
 import type { PowerupMultiplier } from '@/data/learning/xp-rules';
 
 export type PowerupSource = 'lesson' | 'quiz' | 'streak' | 'share' | 'achievement';
@@ -22,44 +23,8 @@ export type Powerup = {
   durationSeconds?: number;
 };
 
-/** No power-up effect may last longer than one hour, under any circumstances. */
-export const MAX_POWERUP_SECONDS = 3600;
-
-/** The timed boosts an achievement level can award (one picked at random). */
-export const REWARD_POOL: readonly { multiplier: Exclude<PowerupMultiplier, 1>; durationSeconds: number }[] = [
-  { multiplier: 1.5, durationSeconds: 3600 },
-  { multiplier: 2, durationSeconds: 2700 },
-  { multiplier: 2.5, durationSeconds: 1800 },
-  { multiplier: 3, durationSeconds: 900 },
-];
-
-export type ActiveBoost = {
-  id: string;
-  multiplier: Exclude<PowerupMultiplier, 1>;
-  activatedAt: number;
-  durationSeconds: number;
-  /** Latest device time seen while active. If the clock ever goes back past it, the boost ends. */
-  seenAt: number;
-};
-
-const clampSeconds = (value: unknown) => Math.max(0, Math.min(MAX_POWERUP_SECONDS, Math.round(Number(value) || 0)));
-
-/**
- * Milliseconds left on a boost. 0 when expired, when the device clock reads
- * earlier than the activation, or when it went back after the boost was last
- * seen — so changing the clock or reloading can never extend an effect.
- */
-export function boostRemainingMs(active: ActiveBoost | null, now: number): number {
-  if (!active) return 0;
-  if (now < active.activatedAt || now < active.seenAt) return 0;
-  const end = active.activatedAt + clampSeconds(active.durationSeconds) * 1000;
-  return Math.max(0, end - now);
-}
-
-/** A reward pick; deterministic when a random source is given (tests). */
-export function pickReward(random: () => number = Math.random) {
-  return REWARD_POOL[Math.min(REWARD_POOL.length - 1, Math.floor(random() * REWARD_POOL.length))];
-}
+// The one-hour cap and boost timing live in boosts.ts (pure, tested).
+export { boostRemainingMs, describeBoost, MAX_POWERUP_SECONDS, pickReward, REWARD_POOL, type ActiveBoost } from '@/data/learning/boosts';
 
 const STORAGE_KEY = 'grateapex_powerups';
 const EMPTY: readonly Powerup[] = [];
@@ -191,6 +156,11 @@ export async function activatePowerup(id: string): Promise<ActiveBoost> {
   await save();
   notify();
   return active;
+}
+
+/** The inventory, outside React (emulator checks). */
+export function powerupInventory(): readonly Powerup[] {
+  return inventory;
 }
 
 export function activeBoostNow(now = Date.now()): ActiveBoost | null {

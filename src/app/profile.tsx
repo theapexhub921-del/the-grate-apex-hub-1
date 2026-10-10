@@ -15,7 +15,7 @@ import { Columns, PageHeader, Screen, SectionHeader } from '@/components/ui/scre
 import { webStyle } from '@/components/ui/web';
 import { elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
 import { curriculumProgress } from '@/data/learning/progress-model';
-import { dayKey } from '@/data/learning/time';
+import { useAchievements } from '@/data/achievements-store';
 import { useLearning } from '@/data/learning/use-learning';
 import { getRankProgress } from '@/data/ranks';
 import { useAvatarUrl, useDisplayName } from '@/data/user';
@@ -26,6 +26,7 @@ type MenuItem = { icon: IconName; label: string; detail: string; href: Href };
 
 const menuItems: MenuItem[] = [
   { icon: 'chart', label: 'My Progress', detail: 'Quizzes, subjects and memory', href: '/progress' },
+  { icon: 'xp', label: 'Achievements', detail: 'Five levels per milestone, and your boosts', href: '/achievements' as Href },
   { icon: 'social', label: 'Friends', detail: 'Find classmates and requests', href: '/social/friends' },
   { icon: 'settings', label: 'Settings', detail: 'Appearance, navigation, account', href: '/settings' as Href },
 ];
@@ -37,7 +38,7 @@ export default function ProfileScreen() {
   const colors = useTheme();
   const { width } = useWindowDimensions();
   const desktop = isDesktopWidth(width);
-  const { progress, inputs, quizzes, attempts } = useLearning();
+  const { progress, inputs } = useLearning();
   const overall = useMemo(() => curriculumProgress(inputs), [inputs]);
   const displayName = useDisplayName();
   const avatarUrl = useAvatarUrl();
@@ -58,16 +59,18 @@ export default function ProfileScreen() {
   }, [social.status, relationshipKey]);
 
   // Milestones are derived from the learning record — earned, never given.
-  const reviewDays = new Set(attempts.filter((attempt) => attempt.mode === 'review' || attempt.mode === 'recall').map((attempt) => dayKey(attempt.attemptedAt))).size;
-  const achievements: { icon: IconName; title: string; detail: string; earned: boolean }[] = [
-    { icon: 'lesson', title: 'First lesson', detail: 'Complete a lesson', earned: progress.lessonsCompleted >= 1 },
-    { icon: 'xp', title: 'Quiz ace', detail: 'Score 90%+ on a quiz', earned: quizzes.some((quiz) => (quiz.kind === 'lesson' || quiz.kind === 'topic') && quiz.percentage >= 90) },
-    { icon: 'course', title: 'Topic complete', detail: 'Finish every lesson in a topic', earned: overall.topicsCompleted >= 1 },
-    { icon: 'mastery', title: 'First mastery', detail: 'Master a concept', earned: overall.counts.mastered >= 1 },
-    { icon: 'reinforce', title: 'Consistent reviewer', detail: 'Review on 5 different days', earned: reviewDays >= 5 },
-    { icon: 'challenge', title: 'Apex contender', detail: 'Finish an Apex Challenge', earned: quizzes.some((quiz) => quiz.kind === 'apex') },
-  ];
-  const earned = achievements.filter((item) => item.earned).length;
+  // These six are this app's own, now with five levels each (data/achievements.ts).
+  const achievementStates = useAchievements().states;
+  const levelsDone = achievementStates.reduce((sum, state) => sum + state.level, 0);
+  const ICONS: Record<string, IconName> = { 'first-lesson': 'lesson', 'quiz-ace': 'xp', 'topic-complete': 'course', 'first-mastery': 'mastery', 'consistent-reviewer': 'reinforce', 'apex-contender': 'challenge' };
+  const achievements: { icon: IconName; title: string; detail: string; earned: boolean }[] = achievementStates
+    .filter((state) => state.def.group === 'GRATEAPEX')
+    .map((state) => ({
+      icon: ICONS[state.def.id] ?? 'xp',
+      title: state.level > 0 ? `${state.def.name} · L${state.level}` : state.def.name,
+      detail: state.next !== null ? state.def.goal(state.next) : 'All five levels complete',
+      earned: state.level > 0,
+    }));
 
   const stats: { icon: IconName; value: number; label: string }[] = [
     { icon: 'xp', value: progress.xp, label: 'Lifetime XP' },
@@ -178,7 +181,7 @@ export default function ProfileScreen() {
       <View style={styles.cardHeader}>
         <Text style={styles.cardTitle}>Milestones</Text>
         <Text style={styles.cardMeta}>
-          {earned} of {achievements.length} earned
+          {levelsDone} of {achievementStates.length * 5} levels
         </Text>
       </View>
       <View style={styles.achievementGrid}>

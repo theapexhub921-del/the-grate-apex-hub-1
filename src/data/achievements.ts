@@ -141,11 +141,13 @@ export type LegacyStats = {
   answered: number; correct: number; quizzes: number; perfectRounds: number; seen: number;
   lessonsStarted: number; sections: number; flashcards: number; testsDone: number; improved: number;
   fixed: number; examDate: boolean; days: Record<string, number>;
+  /** The shared XP total in the cloud document. */
+  xp: number;
 };
 
 export const NO_LEGACY: LegacyStats = {
   answered: 0, correct: 0, quizzes: 0, perfectRounds: 0, seen: 0, lessonsStarted: 0, sections: 0,
-  flashcards: 0, testsDone: 0, improved: 0, fixed: 0, examDate: false, days: {},
+  flashcards: 0, testsDone: 0, improved: 0, fixed: 0, examDate: false, days: {}, xp: 0,
 };
 
 const num = (value: unknown) => (typeof value === 'number' && Number.isFinite(value) ? value : 0);
@@ -173,6 +175,7 @@ export function legacyStats(doc: unknown): LegacyStats {
     fixed: Object.values(record(d.cards)).filter((c) => record(c).g).length,
     examDate: typeof d.examDate === 'string' && d.examDate.length > 0,
     days,
+    xp: Math.max(0, num(d.xp)),
   };
 }
 
@@ -200,6 +203,8 @@ const dayIndex = (key: string) => {
 
 /** Every measure the achievements use, from both apps' records. */
 export function computeMetrics(app: AppStats, legacy: LegacyStats = NO_LEGACY): Record<Metric, number> {
+  // XP is one shared number: the device may not have caught up with the cloud yet.
+  const xp = Math.max(0, app.xp, legacy.xp);
   // Questions answered per day: this app's answers + the original app's daily counts.
   const perDay = new Map<string, number>(Object.entries(legacy.days));
   for (const item of app.answers) perDay.set(dayKey(item.attemptedAt), (perDay.get(dayKey(item.attemptedAt)) ?? 0) + 1);
@@ -244,8 +249,8 @@ export function computeMetrics(app: AppStats, legacy: LegacyStats = NO_LEGACY): 
     longestStreak: longest,
     studyDays: days.length,
     bestDay: Math.max(0, ...perDay.values()),
-    level: Math.floor(Math.max(0, app.xp) / 100) + 1,
-    xp: Math.max(0, app.xp),
+    level: Math.floor(xp / 100) + 1,
+    xp,
     perfectRounds: counted.filter((quiz) => quiz.percentage >= 100).length + legacy.perfectRounds,
     accuracy80: accuracy >= 80 ? answered : 0,
     accuracy90: accuracy >= 90 ? answered : 0,
