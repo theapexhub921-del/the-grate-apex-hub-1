@@ -3,7 +3,7 @@
 import { ATMOSPHERE } from '@/components/atmosphere/palettes';
 import { type ColorSchemeName, Colors, type ThemeColors } from '@/constants/theme';
 import { composite, ensureContrast, luminance, worstContrast } from '@/data/contrast';
-import { withAlpha , hybridGlass } from '@/data/experience-style';
+import { hybridGlass, withAlpha } from '@/data/experience-style';
 import type { ExperienceId } from '@/data/experience';
 import { legacyThemeById, legacyThemeColors, originalsThemeColors } from '@/data/legacy-theme-colors';
 import { legacyColorsOf } from '@/data/legacy-themes';
@@ -13,22 +13,31 @@ import { effectiveThemeFamily, legacyAtmosphere, originalsFromNewer, originateFr
 export function rawThemeColors(experience: ExperienceId, scheme: ColorSchemeName, legacyTheme: string, chosen: ThemeFamily | null): ThemeColors {
   const family = effectiveThemeFamily(experience, chosen);
   const def = legacyThemeById(legacyTheme);
-  if (experience === 'originals') return family === 'legacy' ? originalsThemeColors(def) : originalsFromNewer(Colors[scheme], scheme === 'light');
-  if (experience === 'hybrid') return family === 'legacy' ? legacyThemeColors(def) : hybridGlass(Colors[scheme]);
+  if (experience === 'originals' || experience === 'hybrid') {
+    if (family !== 'legacy') return experience === 'originals' ? originalsFromNewer(Colors[scheme], scheme === 'light') : hybridGlass(Colors[scheme]);
+    const base = experience === 'originals' ? originalsThemeColors(def) : legacyThemeColors(def);
+    // A veiled page (Matcha, Rainbow) also gets glass with more body, so card text
+    // sits on a steady colour instead of the full gradient.
+    const scrim = gradientPage(scheme, def.id, 'legacy').scrim;
+    if (!scrim) return base;
+    const light = scrim.color === '#ffffff';
+    return { ...base, surface: withAlpha(scrim.color, light ? 0.55 : 0.38), surfaceMuted: withAlpha(scrim.color, light ? 0.4 : 0.28), hairline: withAlpha(def.ink, 0.16), border: withAlpha(def.ink, 0.2) };
+  }
   return family === 'legacy' ? originateFromLegacy(def) : Colors[scheme];
 }
 
 /**
  * A gradient page whose colours are too far apart for its text (Matcha runs from
  * light to dark green; Rainbow passes through yellow) gets a veil — white under
- * dark text, black under light text — just strong enough for body text to read.
+ * dark text, black under light text — strong enough for comfortable reading
+ * (7:1, more than the 4.5:1 minimum).
  */
-export function pageScrim(stops: readonly string[], ink: string): { color: string; alpha: number } | null {
+export function pageScrim(stops: readonly string[], ink: string, target = 7): { color: string; alpha: number } | null {
   if (worstContrast(ink, stops) >= 4.5) return null;
   const color = luminance(ink) < 0.4 ? '#ffffff' : '#000000';
   for (let alpha = 0.1; alpha <= 0.8 + 1e-9; alpha += 0.05) {
     const veiled = stops.map((stop) => composite(withAlpha(color, alpha), stop));
-    if (worstContrast(ink, veiled) >= 4.5) return { color, alpha: Math.round(alpha * 100) / 100 };
+    if (worstContrast(ink, veiled) >= target) return { color, alpha: Math.round(alpha * 100) / 100 };
   }
   return { color, alpha: 0.8 };
 }
