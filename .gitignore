@@ -52,3 +52,6 @@ example
 /dist-mobile-fix/
 /supabase/.temp/
 /old-reference/
+
+# Emulator logs (tests/emulator)
+*-debug.log
