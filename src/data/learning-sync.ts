@@ -10,7 +10,6 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
-  where,
 } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -317,18 +316,21 @@ export async function recordCloudXpAdjustment(amount: number, sourceId: string):
 }
 
 // ─── Quiz attempts ───────────────────────────────────────────────────
+// One document per attempt at progress/{uid}/attempts/{attemptId}, private to
+// the learner (firestore.rules). `scores/{uid}` is only the public leaderboard
+// summary and never holds attempts.
 
 export async function loadCloudQuizAttempts(): Promise<CloudQuizAttempt[]> {
   const userId = await getUserId();
   if (!userId) return [];
 
   try {
-    const scoresQuery = query(
-      collection(db, 'scores'),
-      where('userId', '==', userId),
+    const attemptsQuery = query(
+      collection(db, 'progress', userId, 'attempts'),
+      orderBy('completedAt', 'desc'),
       limit(200)
     );
-    const snap = await getDocs(scoresQuery);
+    const snap = await getDocs(attemptsQuery);
 
     return snap.docs.map((docSnap) => {
       const d = docSnap.data();
@@ -357,19 +359,35 @@ export async function saveCloudQuizAttempt(attempt: CloudQuizAttempt): Promise<b
   const userId = await getUserId();
   if (!userId || attempt.total <= 0) return false;
 
+  const attemptRef = doc(db, 'progress', userId, 'attempts', attempt.id);
   try {
-    const scoreDocRef = doc(db, 'scores', attempt.id);
-    await setDoc(
-      scoreDocRef,
-      {
-        ...attempt,
-        userId,
-        savedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
+    // Create only: the rules never let an attempt change, so sending the same
+    // attempt again (retry, second device) can't make a copy or alter it.
+    // Exactly the fields the rules allow — no XP.
+    await setDoc(attemptRef, {
+      id: attempt.id,
+      userId,
+      attemptType: attempt.attemptType,
+      courseId: attempt.courseId,
+      lessonId: attempt.lessonId,
+      score: attempt.score,
+      total: attempt.total,
+      percentage: attempt.percentage,
+      timeSeconds: attempt.timeSeconds,
+      wrongConcepts: attempt.wrongConcepts,
+      wrongQuestionIds: attempt.wrongQuestionIds,
+      practice: attempt.practice,
+      completedAt: attempt.completedAt,
+      savedAt: serverTimestamp(),
+    });
     return true;
   } catch (error) {
+    // Already saved earlier counts as saved.
+    try {
+      if ((await getDoc(attemptRef)).exists()) return true;
+    } catch {
+      // fall through
+    }
     console.warn('Could not save quiz attempt to Firestore:', error);
     return false;
   }
