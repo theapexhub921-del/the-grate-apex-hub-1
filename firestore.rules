@@ -381,6 +381,43 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time;
     }
 
+    // Apex Coin gifts between friends (new app). Coins only — XP can never be
+    // transferred. The sender pays and records the gift in ONE batch (the rule
+    // checks the sender's balance really went down by the amount); the friend's
+    // app then claims it, adding exactly that amount to their own balance in one
+    // batch. Only the two people involved can read a gift; it is never deleted.
+    match /coinTransfers/{id} {
+      allow read: if request.auth != null
+        && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['from', 'to', 'amount', 'status', 'createdAt'])
+        && request.resource.data.from == request.auth.uid
+        && request.resource.data.to is string
+        && request.resource.data.to != request.auth.uid
+        && request.resource.data.amount is int
+        && request.resource.data.amount >= 1
+        && request.resource.data.amount <= 1000
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time
+        // Friends only: each follows the other.
+        && exists(/databases/$(database)/documents/follows/$(request.auth.uid + '_' + request.resource.data.to))
+        && exists(/databases/$(database)/documents/follows/$(request.resource.data.to + '_' + request.auth.uid))
+        // The sender paid in the same batch.
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('coins', 0) >= request.resource.data.amount
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('coins', 0)
+             == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('coins', 0) - request.resource.data.amount;
+      allow update: if request.auth != null
+        && resource.data.to == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'claimedAt'])
+        && request.resource.data.status == 'claimed'
+        && request.resource.data.claimedAt == request.time
+        // The friend receives exactly the amount, in the same batch.
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('coins', 0)
+             == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('coins', 0) + resource.data.amount;
+      allow delete: if false;
+    }
+
     // Study groups. Only members can see a group or its chat.
     match /groups/{gid} {
       allow read: if request.auth.uid in resource.data.memberUids;

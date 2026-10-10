@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Interactive } from '@/components/ui/interactive';
 import { Sheet } from '@/components/ui/sheet';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { readApexCoinBalance, sendApexCoins } from '@/data/apex-coins';
+import { claimIncomingCoins, readApexCoinBalance, sendApexCoins } from '@/data/apex-coins';
 import { personName, type SocialPerson, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -34,7 +34,11 @@ export function ApexCoinWalletCard({
 
   const refresh = useCallback(async () => {
     if (!user) { setBalance(null); return; }
-    try { setBalance(await readApexCoinBalance()); } catch { /* Keep the last known balance while offline. */ }
+    try {
+      const received = await claimIncomingCoins();
+      if (received > 0) setMessage(`You received ${received.toLocaleString()} Apex Coins from friends.`);
+      setBalance(await readApexCoinBalance());
+    } catch { /* Keep the last known balance while offline. */ }
   }, [user]);
 
   useEffect(() => {
@@ -76,7 +80,7 @@ export function ApexCoinWalletCard({
         <Text style={[styles.balance, valueStyle]}>{balance === null ? '—' : balance.toLocaleString()}</Text>
         <Text style={[styles.label, labelStyle]}>Apex Coins</Text>
       </Interactive>
-      <Sheet visible={open} onClose={() => { if (!busy) setOpen(false); }} title="Share Apex Coins" subtitle="Send earned coins to an accepted friend." footer={<View style={styles.actions}><Button label="Cancel" variant="ghost" onPress={() => setOpen(false)} disabled={busy} /><Button label="Send coins" onPress={() => void gift()} loading={busy} disabled={!recipient || !amount} /></View>}>
+      <Sheet visible={open} onClose={() => { if (!busy) setOpen(false); }} title="Share Apex Coins" subtitle="Send earned coins to an accepted friend. Only coins can be shared — never XP." footer={<View style={styles.actions}><Button label="Cancel" variant="ghost" onPress={() => setOpen(false)} disabled={busy} /><Button label="Send coins" onPress={() => void gift()} loading={busy} disabled={!recipient || !amount} /></View>}>
         {friends.length ? <View style={styles.friendList}>{friends.map((friend) => <Interactive key={friend.userId} onPress={() => { setRecipient(friend); setMessage(null); }} accessibilityRole="radio" accessibilityState={{ checked: recipient?.userId === friend.userId }} style={[styles.friend, recipient?.userId === friend.userId && styles.friendSelected]}><Avatar uri={friend.avatarUrl} name={personName(friend)} size={34} status={friend.isOnline ? 'online' : null} /><Text style={styles.friendName}>{personName(friend)}</Text></Interactive>)}</View> : <Text style={styles.detail}>Add friends in Connect before sharing coins.</Text>}
         <Text style={styles.inputLabel}>AMOUNT</Text>
         <TextInput value={amount} onChangeText={(value) => setAmount(value.replace(/[^0-9]/g, ''))} placeholder="How many coins?" placeholderTextColor={colors.textTertiary} keyboardType="number-pad" accessibilityLabel="Amount of Apex Coins" style={styles.input} />

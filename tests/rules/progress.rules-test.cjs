@@ -14,7 +14,7 @@ const BASELINE = process.env.BASELINE_RULES || path.join(ROOT, 'tests', 'emulato
 
 const req = createRequire(path.join(process.env.DEPS, 'package.json'));
 const { initializeTestEnvironment, assertFails, assertSucceeds } = req('@firebase/rules-unit-testing');
-const { collection, deleteDoc, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, updateDoc } = req('firebase/firestore');
+const { collection, deleteDoc, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } = req('firebase/firestore');
 
 const [host, port] = (process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8085').split(':');
 const ALICE = 'alice';
@@ -191,6 +191,107 @@ describe('proposed rules: users/{uid}/planner/{kind}', () => {
   it('DENY today (deployed rules): the planner path is closed', async () => {
     const today = await environment(BASELINE, 'demo-grateapex-planner-today');
     await assertFails(setDoc(doc(today.authenticatedContext(ALICE).firestore(), 'users', ALICE, 'planner', 'goals'), body()));
+    await today.cleanup();
+  });
+});
+
+describe('proposed rules: coinTransfers (coin gifts between friends; never XP)', () => {
+  let env;
+  const CAROL = 'carol';
+  const db = (uid) => (uid ? env.authenticatedContext(uid) : env.unauthenticatedContext()).firestore();
+  const gift = (overrides = {}) => ({ from: ALICE, to: BOB, amount: 20, status: 'pending', createdAt: serverTimestamp(), ...overrides });
+  async function seed({ friends = true } = {}) {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const f = ctx.firestore();
+      await setDoc(doc(f, 'users', ALICE), { username: 'alice_a', coins: 50 });
+      await setDoc(doc(f, 'users', BOB), { username: 'bob_b', coins: 5 });
+      await setDoc(doc(f, 'users', CAROL), { username: 'carol_c', coins: 5 });
+      if (friends) {
+        await setDoc(doc(f, 'follows', `${ALICE}_${BOB}`), { follower: ALICE, followee: BOB });
+        await setDoc(doc(f, 'follows', `${BOB}_${ALICE}`), { follower: BOB, followee: ALICE });
+      }
+    });
+  }
+  function send(uid, { paid = 30, data = gift(), id = 'g1' } = {}) {
+    const f = db(uid);
+    const batch = writeBatch(f);
+    if (paid !== null) batch.update(doc(f, 'users', uid), { coins: paid });
+    batch.set(doc(f, 'coinTransfers', id), data);
+    return batch.commit();
+  }
+  async function seedGift(status = 'pending') {
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'coinTransfers', 'g1'), { from: ALICE, to: BOB, amount: 20, status, createdAt: new Date() }));
+  }
+  function claim(uid, { coins = 25 } = {}) {
+    const f = db(uid);
+    const batch = writeBatch(f);
+    batch.update(doc(f, 'users', uid), { coins });
+    batch.update(doc(f, 'coinTransfers', 'g1'), { status: 'claimed', claimedAt: serverTimestamp() });
+    return batch.commit();
+  }
+
+  before(async () => { env = await environment(PROPOSED, 'demo-grateapex-coins'); });
+  beforeEach(async () => { await env.clearFirestore(); });
+  after(async () => { await env.cleanup(); });
+
+  it('ALLOW a friend gift when the sender pays exactly the amount in the same batch', async () => { await seed(); await assertSucceeds(send(ALICE)); });
+  it('DENY a gift without paying, or paying less than the amount', async () => {
+    await seed();
+    await assertFails(send(ALICE, { paid: null }));
+    await assertFails(send(ALICE, { paid: 40 }));
+  });
+  it('DENY more than the balance, zero, fractions and over 1,000', async () => {
+    await seed();
+    await assertFails(send(ALICE, { paid: -10, data: gift({ amount: 60 }) }));
+    await assertFails(send(ALICE, { paid: 50, data: gift({ amount: 0 }) }));
+    await assertFails(send(ALICE, { paid: 49.5, data: gift({ amount: 0.5 }) }));
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'users', ALICE), { username: 'alice_a', coins: 5000 }));
+    await assertFails(send(ALICE, { paid: 3999, data: gift({ amount: 1001 }) }));
+  });
+  it('DENY gifts to non-friends, to yourself, or in someone else’s name', async () => {
+    await seed();
+    await assertFails(send(ALICE, { data: gift({ to: CAROL }) }));
+    await assertFails(send(ALICE, { data: gift({ to: ALICE }) }));
+    await assertFails(send(BOB, { paid: 0, data: gift({ from: ALICE, amount: 5 }) }));
+  });
+  it('DENY any XP or other extra field, and a gift that starts claimed', async () => {
+    await seed();
+    await assertFails(send(ALICE, { data: gift({ xp: 20 }) }));
+    await assertFails(send(ALICE, { data: gift({ status: 'claimed' }) }));
+  });
+  it('DENY one-sided follows (not friends)', async () => {
+    await seed({ friends: false });
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'follows', `${ALICE}_${BOB}`), { follower: ALICE, followee: BOB }));
+    await assertFails(send(ALICE));
+  });
+  it('ALLOW the friend to claim exactly the amount; DENY claiming more, twice, or by anyone else', async () => {
+    await seed();
+    await seedGift();
+    await assertFails(claim(BOB, { coins: 100 }));
+    await assertFails(claim(ALICE, { coins: 70 }));
+    await assertFails(claim(CAROL, { coins: 25 }));
+    await assertSucceeds(claim(BOB));
+    await assertFails(claim(BOB, { coins: 45 }));
+  });
+  it('ALLOW the two people to read a gift; DENY others; never deleted', async () => {
+    await seed();
+    await seedGift();
+    await assertSucceeds(getDoc(doc(db(ALICE), 'coinTransfers', 'g1')));
+    await assertSucceeds(getDocs(query(collection(db(BOB), 'coinTransfers'), where('to', '==', BOB), where('status', '==', 'pending'))));
+    await assertFails(getDoc(doc(db(CAROL), 'coinTransfers', 'g1')));
+    await assertFails(deleteDoc(doc(db(ALICE), 'coinTransfers', 'g1')));
+  });
+  it('DENY today (deployed rules): the whole gift is refused, so no coins are taken', async () => {
+    const today = await environment(BASELINE, 'demo-grateapex-coins-today');
+    await today.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'users', ALICE), { username: 'alice_a', coins: 50 }));
+    const f = today.authenticatedContext(ALICE).firestore();
+    const batch = writeBatch(f);
+    batch.update(doc(f, 'users', ALICE), { coins: 30 });
+    batch.set(doc(f, 'coinTransfers', 'g1'), gift());
+    await assertFails(batch.commit());
+    let coins;
+    await today.withSecurityRulesDisabled(async (ctx) => { coins = (await getDoc(doc(ctx.firestore(), 'users', ALICE))).data().coins; });
+    if (coins !== 50) throw new Error(`coins changed to ${coins}`);
     await today.cleanup();
   });
 });
