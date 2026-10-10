@@ -94,3 +94,30 @@ describe('legacy repair dry run', () => {
     assert.equal(plan.documentsToChange, 1);
   });
 });
+
+const { rankSuggestions, relationshipOf } = await import('@/data/friend-suggestions');
+
+describe('friends and suggestions (original app logic)', () => {
+  it('mutual follows are friends; one direction is a request', () => {
+    assert.equal(relationshipOf(true, true), 'friends');
+    assert.equal(relationshipOf(true, false), 'outgoing');
+    assert.equal(relationshipOf(false, true), 'incoming');
+    assert.equal(relationshipOf(false, false), 'none');
+  });
+  it('ranks followers first, then friends-of-friends, classmates and top students; never me or people I follow', () => {
+    const ranked = rankSuggestions({
+      me: { uid: 'me', hall: 'HB1', semester: 1 },
+      following: [{ uid: 'c', username: 'c_friend' }],
+      followers: [{ uid: 'b', username: 'b_fan' }, { uid: 'c', username: 'c_friend' }],
+      secondDegree: [{ via: { uid: 'c', username: 'c_friend' }, follows: [{ uid: 'd', username: 'd_fof' }, { uid: 'me', username: 'me_' }] }],
+      top: [{ uid: 'e', username: 'e_top', hall: 'HB1', semester: 1 }, { uid: 'f', username: 'f_top', hall: 'HB3', semester: 2 }, { uid: 'c', username: 'c_friend' }],
+    });
+    assert.deepEqual(ranked.map((s) => [s.uid, s.reason]), [['b', 'Follows you'], ['e', 'Same class: HB1'], ['d', 'Followed by @c_friend'], ['f', 'Top student']]);
+    assert.equal(ranked.find((s) => s.uid === 'd').sharedConnections, 1);
+    assert.equal(ranked.find((s) => s.uid === 'e').sameClass, true);
+  });
+  it('skips accounts without a username, and caps the list', () => {
+    const many = Array.from({ length: 20 }, (_, i) => ({ uid: `u${i}`, username: `user_${i}` }));
+    assert.equal(rankSuggestions({ me: { uid: 'me' }, following: [], followers: [{ uid: 'x', username: null }], secondDegree: [], top: many }).length, 8);
+  });
+});

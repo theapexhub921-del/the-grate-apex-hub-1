@@ -1,11 +1,14 @@
 import type { Href } from 'expo-router';
 import { useEffect, useSyncExternalStore } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
   limit,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -13,6 +16,7 @@ import {
 } from 'firebase/firestore';
 
 import { subscribeToLearningAuthChanges } from '@/data/learning-sync';
+import { rankSuggestions, relationshipOf } from '@/data/friend-suggestions';
 import type { AppNotification } from '@/data/notifications';
 import { chooseUsername } from '@/lib/accounts';
 import { auth, db } from '@/lib/firebase';
@@ -36,6 +40,8 @@ export type SocialPerson = {
 export type SocialRecommendation = SocialPerson & {
   sameClass: boolean;
   sharedConnections: number;
+  /** Why it is suggested, e.g. "Follows you" or "Same class: HB1". */
+  reason?: string;
 };
 
 export type SocialActivity = {
@@ -109,34 +115,96 @@ export function personName(
   return person.displayName?.trim() || person.username?.trim() || 'Learner';
 }
 
+// ─── Follows (shared with the original app) ──────────────────────────────
+// follows/{followerUid}_{followeeUid} = { follower, followee, followerName,
+// followeeName, createdAt }. Only the follower can create or delete it; it is
+// never edited. Two people who follow each other are friends.
+
+const followId = (follower: string, followee: string) => `${follower}_${followee}`;
+const millis = (value: any): number | null => (value?.toMillis ? value.toMillis() : typeof value === 'number' ? value : null);
+const DISMISSED_KEY = 'grateapex_dismissed_follow_requests';
+
+type FollowEdge = { uid: string; username: string | null; since: number | null };
+
+async function followEdges(uid: string, direction: 'following' | 'followers'): Promise<FollowEdge[]> {
+  const mine = direction === 'following';
+  const snap = await getDocs(query(collection(db, 'follows'), where(mine ? 'follower' : 'followee', '==', uid), limit(500)));
+  return snap.docs.map((item) => {
+    const d = item.data();
+    return {
+      uid: String(mine ? d.followee : d.follower),
+      username: (mine ? d.followeeName : d.followerName) || null,
+      since: millis(d.createdAt),
+    };
+  });
+}
+
+// Requests "declined" on this device. The rules let only the follower delete a
+// follow, so declining hides the request here; they still follow you.
+async function readDismissed(userId: string): Promise<Set<string>> {
+  try {
+    const saved = await AsyncStorage.getItem(`${DISMISSED_KEY}:${userId}`);
+    return new Set(saved ? (JSON.parse(saved) as string[]) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+type PersonData = { profile: Record<string, any>; score: Record<string, any> };
+
+async function readPeople(uids: string[]): Promise<Map<string, PersonData>> {
+  const unique = [...new Set(uids)];
+  const [profiles, scores] = await Promise.all([
+    Promise.all(unique.map((uid) => getDoc(doc(db, 'users', uid)).catch(() => null))),
+    Promise.all(unique.map((uid) => getDoc(doc(db, 'scores', uid)).catch(() => null))),
+  ]);
+  const people = new Map<string, PersonData>();
+  unique.forEach((uid, i) => people.set(uid, { profile: profiles[i]?.data() ?? {}, score: scores[i]?.data() ?? {} }));
+  return people;
+}
+
+function toPerson(uid: string, relationship: Relationship, friendshipId: string | null, since: number | null, fallbackName: string | null, data?: PersonData): SocialPerson {
+  const profile = data?.profile ?? {};
+  const score = data?.score ?? {};
+  const username = profile.username || score.username || fallbackName || null;
+  return {
+    userId: uid,
+    friendshipId,
+    username,
+    displayName: profile.displayName || username,
+    avatarUrl: profile.avatar_url || profile.photo || null,
+    relationship,
+    totalXp: typeof score.xp === 'number' ? score.xp : null,
+    weeklyXp: null, // not stored by either app
+    streak: typeof score.streak === 'number' ? score.streak : null,
+    since,
+    isOnline: profile.isOnline === true,
+  };
+}
+
 async function loadSocial(userId: string) {
   try {
-    const userDocRef = doc(db, 'users', userId);
-    const userSnap = await getDoc(userDocRef);
+    const [userSnap, following, followers, dismissed] = await Promise.all([
+      getDoc(doc(db, 'users', userId)),
+      followEdges(userId, 'following'),
+      followEdges(userId, 'followers'),
+      readDismissed(userId),
+    ]);
     const userData = userSnap.data() || {};
+    const iFollow = new Map(following.map((edge) => [edge.uid, edge]));
+    const followsMe = new Map(followers.map((edge) => [edge.uid, edge]));
+    const uids = [...new Set([...iFollow.keys(), ...followsMe.keys()])].filter((uid) => uid !== userId);
+    const details = await readPeople(uids);
 
-    const followsQuery = query(
-      collection(db, 'follows'),
-      where('followerId', '==', userId),
-      limit(100)
-    );
-    const followsSnap = await getDocs(followsQuery);
-
-    const people: SocialPerson[] = followsSnap.docs.map((docSnap) => {
-      const d = docSnap.data();
-      return {
-        userId: d.followingId || docSnap.id,
-        friendshipId: docSnap.id,
-        username: d.username || null,
-        displayName: d.displayName || d.username || null,
-        avatarUrl: d.avatarUrl || null,
-        relationship: 'friends',
-        totalXp: Number(d.totalXp || 0),
-        weeklyXp: Number(d.weeklyXp || 0),
-        streak: Number(d.streak || 0),
-        since: d.createdAt?.toMillis ? d.createdAt.toMillis() : Date.now(),
-        isOnline: Boolean(d.isOnline),
-      };
+    const people = uids.flatMap((uid) => {
+      const mine = iFollow.get(uid);
+      const theirs = followsMe.get(uid);
+      const relationship = relationshipOf(Boolean(mine), Boolean(theirs));
+      if (relationship === 'incoming' && dismissed.has(uid)) return [];
+      // The follow the actions work on: mine when I follow them, theirs for a request.
+      const friendshipId = mine ? followId(userId, uid) : followId(uid, userId);
+      const since = relationship === 'friends' ? Math.max(mine?.since ?? 0, theirs?.since ?? 0) || null : (mine ?? theirs)?.since ?? null;
+      return [toPerson(uid, relationship, friendshipId, since, mine?.username ?? theirs?.username ?? null, details.get(uid))];
     });
 
     setState({
@@ -148,11 +216,9 @@ async function loadSocial(userId: string) {
       activity: [],
       notifications: [],
     });
-  } catch (err: any) {
-    setState({
-      status: 'ready',
-      error: null,
-    });
+  } catch (err) {
+    console.warn('Could not load friends:', err);
+    setState({ status: 'error', error: 'Your friends could not be loaded. Check your connection and try again.' });
   }
 }
 
@@ -186,6 +252,16 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
+/** Starts the store without React (used by the emulator checks). */
+export function startSocial() {
+  ensureStarted();
+}
+
+/** The current social state, outside React. */
+export function socialState(): State {
+  return state;
+}
+
 export function useSocial(): State {
   useEffect(ensureStarted, []);
   return useSyncExternalStore(subscribe, () => state, () => state);
@@ -201,28 +277,52 @@ export function useFriendList(): SocialPerson[] {
   return social.people;
 }
 
+/** Follow someone (a "friend request" until they follow back). Also tells them, as the original app does. */
 export async function sendFriendRequest(targetUserId: string) {
-  const currentUid = auth.currentUser?.uid;
-  if (!currentUid) throw new Error('Sign in to add friends.');
-
-  const followId = `${currentUid}_${targetUserId}`;
-  await setDoc(doc(db, 'follows', followId), {
-    followerId: currentUid,
-    followingId: targetUserId,
+  const me = auth.currentUser?.uid;
+  if (!me) throw new Error('Sign in to add friends.');
+  if (targetUserId === me) throw new Error('You can’t follow yourself.');
+  const [mine, theirs] = await Promise.all([getDoc(doc(db, 'users', me)), getDoc(doc(db, 'users', targetUserId))]);
+  const myName = mine.data()?.username ?? null;
+  await setDoc(doc(db, 'follows', followId(me, targetUserId)), {
+    follower: me,
+    followee: targetUserId,
+    followerName: myName,
+    followeeName: theirs.data()?.username ?? null,
     createdAt: serverTimestamp(),
   });
-  await refreshSocial();
-}
-
-export async function respondToFriendRequest(friendshipId: string, accept: boolean) {
-  if (accept) {
-    await setDoc(doc(db, 'follows', friendshipId), { accepted: true }, { merge: true });
+  if (myName) {
+    // Their bell (both apps). Best effort: the follow above is what matters.
+    await setDoc(doc(collection(db, 'users', targetUserId, 'notifications')), {
+      type: 'follow', from: me, fromName: myName, read: false, createdAt: Date.now(),
+    }).catch(() => undefined);
   }
   await refreshSocial();
 }
 
+/** Accept = follow them back. Decline = hide the request on this device (only they can remove their follow). */
+export async function respondToFriendRequest(friendshipId: string, accept: boolean) {
+  const me = auth.currentUser?.uid;
+  if (!me) throw new Error('Sign in to manage friends.');
+  const follower = friendshipId.split('_')[0];
+  if (accept) {
+    await sendFriendRequest(follower);
+    return;
+  }
+  const dismissed = await readDismissed(me);
+  dismissed.add(follower);
+  await AsyncStorage.setItem(`${DISMISSED_KEY}:${me}`, JSON.stringify([...dismissed])).catch(() => undefined);
+  await refreshSocial();
+}
+
+/** Unfollow: cancels a request, or ends a friendship from my side. Only my own follow can be removed. */
 export async function removeFriendship(friendshipId: string) {
-  await setDoc(doc(db, 'follows', friendshipId), { status: 'removed' }, { merge: true });
+  const me = auth.currentUser?.uid;
+  if (!me) throw new Error('Sign in to manage friends.');
+  const [follower, followee] = friendshipId.split('_');
+  if (follower !== me && followee !== me) throw new Error('That connection isn’t yours to remove.');
+  const other = follower === me ? followee : follower;
+  await deleteDoc(doc(db, 'follows', followId(me, other)));
   await refreshSocial();
 }
 
@@ -240,43 +340,54 @@ export async function setShareActivity(share: boolean) {
   setState({ shareActivity: share });
 }
 
+/** Students whose username starts with the typed text (as in the original app). */
 export async function searchLearners(searchQuery: string): Promise<SocialPerson[]> {
-  const term = searchQuery.trim().toLowerCase();
+  const term = searchQuery.trim().toLowerCase().replace(/^@/, '');
   if (term.length < 2) return [];
-
-  try {
-    const q = query(collection(db, 'users'), limit(20));
-    const snap = await getDocs(q);
-
-    return snap.docs
-      .filter((d) => {
-        const u = d.data();
-        const username = String(u.username || '').toLowerCase();
-        return username.includes(term);
-      })
-      .map((d) => {
-        const u = d.data();
-        return {
-          userId: d.id,
-          friendshipId: null,
-          username: u.username || null,
-          displayName: u.username || 'Learner',
-          avatarUrl: u.avatar_url || null,
-          relationship: 'none',
-          totalXp: Number(u.xp || 0),
-          weeklyXp: 0,
-          streak: 0,
-          since: null,
-          isOnline: false,
-        };
-      });
-  } catch {
-    return [];
-  }
+  const me = auth.currentUser?.uid ?? null;
+  const snap = await getDocs(query(collection(db, 'users'), where('username', '>=', term), where('username', '<=', `${term}`), limit(10)));
+  const known = new Map(state.people.map((person) => [person.userId, person]));
+  return snap.docs
+    .filter((item) => item.id !== me)
+    .map((item) => known.get(item.id) ?? toPerson(item.id, 'none', null, null, null, { profile: item.data(), score: {} }));
 }
 
+/**
+ * Suggestions, recovered from the original app: people who follow you, people
+ * your follows follow, classmates in your hall, and top students (scores).
+ * People you already follow and yourself are left out.
+ */
 export async function getRecommendedFriends(): Promise<SocialRecommendation[]> {
-  return [];
+  const me = auth.currentUser?.uid;
+  if (!me) return [];
+  const [mine, following, followers, top] = await Promise.all([
+    getDoc(doc(db, 'users', me)),
+    followEdges(me, 'following'),
+    followEdges(me, 'followers'),
+    getDocs(query(collection(db, 'scores'), orderBy('xp', 'desc'), limit(60)))
+      .then((snap) => snap.docs.map((item) => ({ uid: item.id, ...(item.data() as { username?: string; hall?: string; semester?: number }) })))
+      .catch(() => []),
+  ]);
+  const secondDegree = await Promise.all(
+    following.slice(0, 6).map((via) => followEdges(via.uid, 'following').then((follows) => ({ via, follows })).catch(() => ({ via, follows: [] })))
+  );
+  const profile = mine.data() ?? {};
+  const ranked = rankSuggestions({ me: { uid: me, hall: profile.hall || null, semester: profile.semester ?? null }, following, followers, secondDegree, top });
+  const details = await readPeople(ranked.map((suggestion) => suggestion.uid));
+  const followsMe = new Set(followers.map((edge) => edge.uid));
+  return ranked.map((suggestion) => ({
+    ...toPerson(
+      suggestion.uid,
+      followsMe.has(suggestion.uid) ? 'incoming' : 'none',
+      followsMe.has(suggestion.uid) ? followId(suggestion.uid, me) : null,
+      null,
+      suggestion.username,
+      details.get(suggestion.uid)
+    ),
+    sameClass: suggestion.sameClass,
+    sharedConnections: suggestion.sharedConnections,
+    reason: suggestion.reason,
+  }));
 }
 
 export function toAppNotification(n: SocialNotification): AppNotification {

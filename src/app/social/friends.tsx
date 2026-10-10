@@ -282,7 +282,7 @@ function PersonRow({ person, first, compact }: { person: SocialPerson; first: bo
     actions = (
       <View style={styles.actions}>
         <Button label="Accept" size="sm" onPress={() => act(() => respondToFriendRequest(id, true))} loading={busy} />
-        <Button label="Decline" size="sm" variant="secondary" onPress={() => act(() => respondToFriendRequest(id, false))} disabled={busy} />
+        <Button label="Hide" size="sm" variant="secondary" onPress={() => act(() => respondToFriendRequest(id, false))} disabled={busy} accessibilityLabel={`Hide the request from ${name} on this device`} />
       </View>
     );
   } else if (person.relationship === 'outgoing' && person.friendshipId) {
