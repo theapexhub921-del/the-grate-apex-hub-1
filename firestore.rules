@@ -180,6 +180,39 @@ service cloud.firestore {
       allow read, write: if request.auth.uid == uid;
     }
 
+    // Quiz attempts (new app): one document per attempt, private to the owner.
+    // The id is the attempt's UUID, made once on the device, so sending an attempt
+    // again can never add a second copy; attempts are never edited. They carry no
+    // XP field. The owner may delete them (reset progress, account deletion).
+    match /progress/{uid}/attempts/{attemptId} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && attemptId.matches('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')
+        && request.resource.data.keys().hasAll(['id', 'userId', 'attemptType', 'courseId', 'lessonId', 'score', 'total',
+             'percentage', 'timeSeconds', 'wrongConcepts', 'wrongQuestionIds', 'practice', 'completedAt', 'savedAt'])
+        && request.resource.data.keys().hasOnly(['id', 'userId', 'attemptType', 'courseId', 'lessonId', 'score', 'total',
+             'percentage', 'timeSeconds', 'wrongConcepts', 'wrongQuestionIds', 'practice', 'completedAt', 'savedAt'])
+        && request.resource.data.id == attemptId
+        && request.resource.data.userId == uid
+        && request.resource.data.attemptType in ['lesson', 'apex_challenge', 'topic', 'review', 'practice']
+        && (request.resource.data.courseId == null || (request.resource.data.courseId is string && request.resource.data.courseId.size() <= 120))
+        && (request.resource.data.lessonId == null || (request.resource.data.lessonId is string && request.resource.data.lessonId.size() <= 120))
+        && request.resource.data.total is int && request.resource.data.total >= 1 && request.resource.data.total <= 100
+        && request.resource.data.score is int && request.resource.data.score >= 0
+        && request.resource.data.score <= request.resource.data.total
+        && request.resource.data.percentage is number
+        && request.resource.data.percentage >= 0 && request.resource.data.percentage <= 100
+        && request.resource.data.timeSeconds is number
+        && request.resource.data.timeSeconds >= 0 && request.resource.data.timeSeconds <= 86400
+        && request.resource.data.wrongConcepts is list && request.resource.data.wrongConcepts.size() <= 100
+        && request.resource.data.wrongQuestionIds is list && request.resource.data.wrongQuestionIds.size() <= 100
+        && request.resource.data.practice is bool
+        && request.resource.data.completedAt is int
+        && request.resource.data.savedAt == request.time;
+      allow update: if false;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
     // Public leaderboard entry. Readable by any signed-in student; writable
     // only by its owner, only with the owner's real username, and with sane numbers.
     match /scores/{uid} {
