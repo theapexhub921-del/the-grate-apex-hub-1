@@ -213,6 +213,23 @@ service cloud.firestore {
       allow delete: if request.auth != null && request.auth.uid == uid;
     }
 
+    // Lesson completions (new app): one document per completed lesson, private to
+    // the owner. Kept out of the shared `lessons` map, which the original app
+    // rewrites. The id is the lesson id; XP here is a record of the lesson's
+    // value, not a balance.
+    match /progress/{uid}/completions/{lessonId} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && lessonId.matches('^[a-z0-9-]{1,120}$')
+        && request.resource.data.keys().hasAll(['lessonId', 'completedAt', 'xp', 'savedAt'])
+        && request.resource.data.keys().hasOnly(['lessonId', 'completedAt', 'xp', 'savedAt'])
+        && request.resource.data.lessonId == lessonId
+        && request.resource.data.completedAt is int && request.resource.data.completedAt > 0
+        && request.resource.data.xp is int && request.resource.data.xp >= 0 && request.resource.data.xp <= 1000
+        && request.resource.data.savedAt == request.time;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
     // Public leaderboard entry. Readable by any signed-in student; writable
     // only by its owner, only with the owner's real username, and with sane numbers.
     match /scores/{uid} {
