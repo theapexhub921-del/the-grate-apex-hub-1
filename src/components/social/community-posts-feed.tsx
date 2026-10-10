@@ -17,7 +17,7 @@ import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import { MentionInput } from '@/components/social/mention-input';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
-type PostComment = { id: string; author_id: string; body: string; created_at: string };
+type PostComment = { id: string; author_id: string; author_name?: string | null; body: string; created_at: string };
 
 export function CommunityPostsFeed() {
   const styles = useThemedStyles(createStyles);
@@ -200,7 +200,7 @@ export function CommunityPostsFeed() {
         <View style={styles.postDetailSheet}>
           {selectedPost ? <PostCard post={selectedPost} socialPeople={social.people} ownId={user?.id ?? social.userId} ownName={displayName || 'You'} verticalActions onOpen={() => {}} onLike={() => void like(selectedPost)} onComment={() => void openPost(selectedPost)} onReshare={() => void publish(selectedPost.id)} onShare={() => void sharePost(selectedPost)} onReport={() => void report('post', selectedPost.id)} onDelete={() => confirmDeletePost(selectedPost)} /> : null}
           <View style={styles.commentSheet}>
-          {comments.map((comment) => { const author = social.people.find((person) => person.userId === comment.author_id); return <View key={comment.id} style={styles.comment}><View style={styles.commentHead}><Text style={styles.commentAuthor}>{comment.author_id === social.userId ? 'You' : author ? personName(author) : 'Username pending'}</Text><Button label="Report" variant="ghost" size="sm" onPress={() => void report('comment', comment.id)} /></View><Text style={styles.body}>{comment.body}</Text></View>; })}
+          {comments.map((comment) => { const author = social.people.find((person) => person.userId === comment.author_id); return <View key={comment.id} style={styles.comment}><View style={styles.commentHead}><Text style={styles.commentAuthor}>{comment.author_id === social.userId ? 'You' : author ? personName(author) : comment.author_name ? `@${comment.author_name}` : 'Username pending'}</Text><Button label="Report" variant="ghost" size="sm" onPress={() => void report('comment', comment.id)} /></View><Text style={styles.body}>{comment.body}</Text></View>; })}
           {!comments.length ? <Text style={styles.muted}>Be the first to comment.</Text> : null}
           <MentionInput people={social.people} value={commentDraft} onChangeText={setCommentDraft} maxLength={2000} placeholder="Add a comment…" placeholderTextColor={colors.textTertiary} accessibilityLabel="Write a comment" style={styles.input} />
           <Button label="Comment" size="sm" onPress={() => void sendComment()} loading={busy} disabled={!commentDraft.trim() || busy} />
@@ -229,7 +229,7 @@ function PostCard({ post, socialPeople, ownId, ownName, onOpen, onLike, onCommen
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const friend = socialPeople.find((person) => person.userId === post.author_id);
-  const name = friend ? personName(friend) : post.author_id === ownId ? ownName : 'Username pending';
+  const name = friend ? personName(friend) : post.author_id === ownId ? ownName : post.author_name ? `@${post.author_name}` : 'Username pending';
   const resharedFriend = socialPeople.find((person) => person.userId === post.reshared_author_id);
   const resharedName = post.reshared_author_id === ownId ? ownName : resharedFriend ? personName(resharedFriend) : 'Username pending';
   return (
