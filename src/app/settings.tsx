@@ -23,9 +23,8 @@ import {
   type FontSizePreference,
   setPageZoomPreference,
   setAppearancePreference,
-  setHybridThemeFamily,
-  setLegacyThemePreference,
-  useHybridThemeFamily,
+  chooseLegacyTheme,
+  chooseNewerTheme,
   useLegacyThemePreference,
   setPushNotificationsPreference,
   setAnswerBouncePreference,
@@ -49,12 +48,14 @@ import { EXPLORE_TEAM } from '@/data/explore';
 import { grantPowerup } from '@/data/learning/powerups';
 import { dayKey } from '@/data/learning/time';
 import { resetAllLearningProgress, useProgress } from '@/data/progress';
-import { legacyLevel, legacyLockText } from '@/data/legacy-theme-colors';
-import { LEGACY_THEMES, legacyColorsOf, type LegacyThemeDef } from '@/data/legacy-themes';
+import { legacyLevel, legacyLockText, legacyThemeById } from '@/data/legacy-theme-colors';
+import { LEGACY_THEMES, legacyColorsOf } from '@/data/legacy-themes';
 import { useAuth } from '@/hooks/use-auth';
 import { useExperience } from '@/hooks/use-experience';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { themeColorsFor, useTheme, useThemedStyles, useThemeFamily } from '@/hooks/use-theme';
+import { paletteGradient } from '@/components/experience/legacy-background';
+import { legacyAtmosphere } from '@/data/theme-portrayal';
 import { deleteMyAccount, FULL_ACCOUNT_DELETION } from '@/lib/account';
 import { updateCurrentProfile } from '@/lib/profiles';
 import { routes } from '@/lib/routes';
@@ -101,7 +102,7 @@ export default function SettingsScreen() {
   const desktop = isDesktopWidth(width);
   const appearance = useAppearancePreference();
   const experience = useExperience();
-  const hybridFamily = useHybridThemeFamily();
+  const themeFamily = useThemeFamily();
   const originalAutoHide = useOriginalAutoHide();
   const pageZoom = usePageZoomPreference();
   const fontSize = useFontSizePreference();
@@ -290,27 +291,18 @@ export default function SettingsScreen() {
       ) : null}
 
       <SettingsSection title="Appearance">
-        {/* The Originals: only the original app's themes, with its unlock rules.
-            Hybrid: both families. Originate: this app's themes. Each family's
-            choice is saved separately, so switching experience changes neither. */}
-        {experience === 'hybrid' ? (
-          <>
-            <Text style={styles.optionDescription}>Hybrid can wear the newer themes or the legacy themes.</Text>
-            <Text style={styles.themeFamily}>Newer themes</Text>
-          </>
-        ) : null}
-        {experience !== 'originals' ? (
+        {/* Every theme in every experience, as cards; each experience draws a
+            theme its own way, and the previews show it as this experience will. */}
+        <Text style={styles.optionDescription}>Every theme works in every experience — each experience draws it in its own style.</Text>
+        <Text style={styles.themeFamily}>Newer themes</Text>
         <View style={[styles.themeGrid, desktop && styles.themeGridDesktop]}>
           {APPEARANCE_OPTIONS.map((option) => {
-            const selected = appearance === option.value && (experience !== 'hybrid' || hybridFamily === 'originate');
+            const selected = themeFamily === 'newer' && appearance === option.value;
             const scheme = option.value === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : option.value;
             return (
               <Interactive
                 key={option.value}
-                onPress={() => {
-                  void setAppearancePreference(option.value);
-                  if (experience === 'hybrid') void setHybridThemeFamily('originate');
-                }}
+                onPress={() => void chooseNewerTheme(option.value)}
                 accessibilityRole="radio"
                 accessibilityState={{ checked: selected }}
                 accessibilityLabel={`${option.label} theme. ${option.description}`}
@@ -338,8 +330,7 @@ export default function SettingsScreen() {
             );
           })}
         </View>
-        ) : null}
-        {experience !== 'originate' ? <LegacyThemeGrid desktop={desktop} /> : null}
+        <LegacyThemeGrid desktop={desktop} />
       </SettingsSection>
 
       <SettingsSection title="Font size and zoom">
@@ -605,13 +596,28 @@ function PrivacySwitch({ label, value, onChange }: { label: string; value: boole
 }
 
 // A miniature of the theme: its page light, a card and its accent.
-function ThemeSwatch({ scheme, split }: { scheme: ThemeSwatchScheme; split?: boolean }) {
+// A theme's preview in the current experience's style: its page background
+// (Originate: the atmosphere light; The Originals and Hybrid: the original
+// gradient), a card, two text lines and the button colour.
+function ThemeSwatch({ scheme, split, legacyId }: { scheme?: ThemeSwatchScheme; split?: boolean; legacyId?: string }) {
   const styles = useThemedStyles(createStyles);
-  const render = (name: ThemeSwatchScheme) => {
-    const palette = Colors[name];
-    const field = ATMOSPHERE[name];
+  const experience = useExperience();
+  const render = (name: ThemeSwatchScheme | null) => {
+    const family = name ? 'newer' : 'legacy';
+    const palette = themeColorsFor(experience, name ?? 'dark', legacyId ?? 'dark', family);
+    let background: string;
+    let image: string;
+    if (experience === 'originate') {
+      const field = name ? ATMOSPHERE[name] : legacyAtmosphere(legacyThemeById(legacyId));
+      background = field.base;
+      image = `radial-gradient(120% 90% at 0% 0%, ${field.fieldA[0]}88, transparent 60%)`;
+    } else {
+      const wash = name ? paletteGradient(name) : (() => { const c = legacyColorsOf(legacyThemeById(legacyId)); return { colors: c.gradient, bg: c.bg }; })();
+      background = wash.bg;
+      image = `linear-gradient(160deg, ${wash.colors.join(', ')})`;
+    }
     return (
-      <View style={[styles.swatchHalf, { backgroundColor: field.base }, webStyle({ backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${field.fieldA[0]}55, transparent 60%)` })]}>
+      <View key={name ?? 'legacy'} style={[styles.swatchHalf, { backgroundColor: background }, webStyle({ backgroundImage: image })]}>
         <View style={[styles.swatchCard, { backgroundColor: palette.surface, borderColor: palette.hairline }]}>
           <View style={[styles.swatchLine, { backgroundColor: palette.text, opacity: 0.85 }]} />
           <View style={[styles.swatchLine, styles.swatchLineShort, { backgroundColor: palette.textTertiary }]} />
@@ -620,18 +626,7 @@ function ThemeSwatch({ scheme, split }: { scheme: ThemeSwatchScheme; split?: boo
       </View>
     );
   };
-  return (
-    <View style={styles.swatch}>
-      {split ? (
-        <>
-          {render('light')}
-          {render('dark')}
-        </>
-      ) : (
-        render(scheme)
-      )}
-    </View>
-  );
+  return <View style={styles.swatch}>{legacyId ? render(null) : split ? [render('light'), render('dark')] : render(scheme ?? 'dark')}</View>;
 }
 
 // The legacy (original app) themes, drawn as this app's theme cards. They keep
@@ -641,13 +636,11 @@ function ThemeSwatch({ scheme, split }: { scheme: ThemeSwatchScheme; split?: boo
 function LegacyThemeGrid({ desktop }: { desktop: boolean }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
-  const experience = useExperience();
-  const family = useHybridThemeFamily();
   const themeId = useLegacyThemePreference();
   const { isAdmin } = useIsAdmin();
   const unlockOf = useLegacyThemeUnlocks();
   const level = legacyLevel(useProgress().xp);
-  const inUse = experience === 'originals' || family === 'originals';
+  const inUse = useThemeFamily() === 'legacy';
   return (
     <>
       <Text style={styles.themeFamily}>Legacy themes</Text>
@@ -661,10 +654,7 @@ function LegacyThemeGrid({ desktop }: { desktop: boolean }) {
             <Interactive
               key={theme.id}
               disabled={!lock.unlocked}
-              onPress={() => {
-                void setLegacyThemePreference(theme.id);
-                if (experience === 'hybrid') void setHybridThemeFamily('originals');
-              }}
+              onPress={() => void chooseLegacyTheme(theme.id)}
               accessibilityRole="radio"
               accessibilityState={{ checked: selected, disabled: !lock.unlocked }}
               accessibilityLabel={`${theme.name} theme. ${detail}`}
@@ -676,7 +666,7 @@ function LegacyThemeGrid({ desktop }: { desktop: boolean }) {
                 pressed && styles.pressed,
               ]}
             >
-              <LegacyThemeSwatch theme={theme} />
+              <ThemeSwatch legacyId={theme.id} />
               <View style={styles.themeText}>
                 <View style={styles.themeTitleRow}>
                   <Text style={[styles.themeLabel, selected && styles.themeLabelSelected]}>{theme.name}</Text>
@@ -695,24 +685,6 @@ function LegacyThemeGrid({ desktop }: { desktop: boolean }) {
         })}
       </View>
     </>
-  );
-}
-
-// A legacy theme's preview, in the same shape as this app's theme previews:
-// its own gradient, a card in its panel colour, text lines and its button colour.
-function LegacyThemeSwatch({ theme }: { theme: LegacyThemeDef }) {
-  const styles = useThemedStyles(createStyles);
-  const c = legacyColorsOf(theme);
-  return (
-    <View style={styles.swatch}>
-      <View style={[styles.swatchHalf, { backgroundColor: c.bg }, webStyle({ backgroundImage: `linear-gradient(160deg, ${c.gradient.join(', ')})` })]}>
-        <View style={[styles.swatchCard, { backgroundColor: c.card, borderColor: c.border }]}>
-          <View style={[styles.swatchLine, { backgroundColor: c.text, opacity: 0.85 }]} />
-          <View style={[styles.swatchLine, styles.swatchLineShort, { backgroundColor: c.muted }]} />
-          <View style={[styles.swatchPill, { backgroundColor: c.primary }]} />
-        </View>
-      </View>
-    </View>
   );
 }
 

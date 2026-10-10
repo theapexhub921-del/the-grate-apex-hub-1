@@ -1,16 +1,14 @@
 import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
-import { ATMOSPHERE, type AtmosphereMood, MOODS } from '@/components/atmosphere/config';
+import { type AtmosphereMood, MOODS, useAtmospherePalette } from '@/components/atmosphere/config';
 import { PageMotifs } from '@/components/atmosphere/page-motifs';
-import { useResolvedColorScheme } from '@/hooks/use-theme';
 
 // Native atmosphere: the same tonal fields and glow as the web version,
 // drawn once as static SVG gradients. No blur, no animation, no grain —
 // phones get the depth without the cost.
 export function Atmosphere({ mood }: { mood: AtmosphereMood }) {
-  const scheme = useResolvedColorScheme();
-  const palette = ATMOSPHERE[scheme];
+  const { palette } = useAtmospherePalette();
   const levels = MOODS[mood];
 
   const fields = [

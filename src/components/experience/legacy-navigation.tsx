@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LEGACY_NAV, LegacyIcon } from '@/components/experience/legacy-icon';
 import { useLegacyPalette } from '@/components/experience/use-legacy-palette';
+import { useTheme, useUsesLegacyTheme } from '@/hooks/use-theme';
 import { LogoMark } from '@/components/logo-mark';
 import { activeNavPath, MOBILE_NAV_ITEMS, NAV_ITEMS } from '@/components/nav-items';
 import { NotificationBell } from '@/components/notifications';
@@ -39,6 +40,30 @@ export function useOriginalAutoHide() {
 /** Room the original app kept below phone content for the floating bar. */
 export const LEGACY_NAV_RESERVE = 96;
 
+/**
+ * The original navigation's colours, from the active theme: exactly the
+ * original app's for a legacy theme; the same roles in a newer theme's colours.
+ */
+function useOriginalNavColors() {
+  const colors = useTheme();
+  const legacy = useLegacyPalette();
+  const usesLegacy = useUsesLegacyTheme();
+  return {
+    border: colors.border,
+    bar: colors.tabBar,
+    side: colors.navSurface,
+    primary: colors.primary,
+    onPrimary: colors.onPrimary,
+    accent: colors.accent,
+    muted: colors.textTertiary,
+    silver: colors.textSecondary,
+    text: colors.text,
+    card: colors.surface,
+    // The raised Study button's ring when not selected.
+    ring: usesLegacy ? (legacy.light ? '#ffffff' : '#0a1fa0') : colors.background,
+  };
+}
+
 // Drives a 0..1 "shown" value: eases out when the nav appears, eases in when it hides.
 function useNavProgress(visible: boolean, native: boolean) {
   const [p] = useState(() => new Animated.Value(visible ? 1 : 0));
@@ -56,7 +81,7 @@ function useNavProgress(visible: boolean, native: boolean) {
 }
 
 export function LegacyFloatingBar({ onNavigate }: { onNavigate: (route: string) => void }) {
-  const C = useLegacyPalette();
+  const C = useOriginalNavColors();
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const active = activeNavPath(pathname);
@@ -87,7 +112,7 @@ export function LegacyFloatingBar({ onNavigate }: { onNavigate: (route: string) 
       >
         <View
           accessibilityRole="tablist"
-          style={[styles.bar, { borderColor: C.border, backgroundColor: C.light ? 'rgba(255,255,255,0.94)' : 'rgba(8,14,70,0.94)' }]}
+          style={[styles.bar, { borderColor: C.border, backgroundColor: C.bar }]}
         >
           {MOBILE_NAV_ITEMS.map((item) => {
             const focused = item.path === active;
@@ -103,7 +128,7 @@ export function LegacyFloatingBar({ onNavigate }: { onNavigate: (route: string) 
                     accessibilityRole="tab"
                     accessibilityState={{ selected: focused }}
                     accessibilityLabel={item.label}
-                    style={[styles.study, { backgroundColor: C.primary, borderColor: focused ? C.accent : C.light ? '#ffffff' : '#0a1fa0' }]}
+                    style={[styles.study, { backgroundColor: C.primary, borderColor: focused ? C.accent : C.ring }]}
                   >
                     <LegacyIcon name="book" size={26} color={C.onPrimary} />
                   </TouchableOpacity>
@@ -124,7 +149,7 @@ export function LegacyFloatingBar({ onNavigate }: { onNavigate: (route: string) 
 }
 
 export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => void }) {
-  const C = useLegacyPalette();
+  const C = useOriginalNavColors();
   const pathname = usePathname();
   const active = activeNavPath(pathname);
   const { user } = useAuth();
@@ -156,10 +181,9 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
     },
   } as object;
 
-  const side = C.light ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,40,0.38)';
 
   return (
-    <Animated.View {...hoverProps} style={[styles.sideShell, { backgroundColor: side, borderRightColor: C.border, width: p.interpolate({ inputRange: [0, 1], outputRange: [12, 250] }) }]}>
+    <Animated.View {...hoverProps} style={[styles.sideShell, { backgroundColor: C.side, borderRightColor: C.border, width: p.interpolate({ inputRange: [0, 1], outputRange: [12, 250] }) }]}>
       {/* Collapsed handle: fades in as the sidebar closes. */}
       <Animated.View pointerEvents="none" style={[styles.sideHandleWrap, { opacity: p.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }) }]}>
         <View style={[styles.sideHandle, { backgroundColor: C.muted }]} />

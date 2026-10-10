@@ -26,7 +26,7 @@ const AMBIENT = [
 ] as const;
 
 /** Hybrid with one of this app's palettes: a three-stop wash in that palette's own colours. */
-function paletteGradient(scheme: keyof typeof ATMOSPHERE) {
+export function paletteGradient(scheme: keyof typeof ATMOSPHERE) {
   const p = ATMOSPHERE[scheme];
   return {
     colors: [mixHex(p.fieldA[0], p.base, Math.min(0.55, p.fieldA[1] * 1.6)), mixHex(p.fieldB[0], p.base, Math.min(0.5, p.fieldB[1])), p.base],

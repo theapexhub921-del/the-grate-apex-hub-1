@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { LEGACY_THEMES } from '@/data/legacy-themes';
+import type { ThemeFamily } from '@/data/theme-portrayal';
 import { getTabBarModePreference, setTabBarModeFromAccount } from '@/data/navigation-settings';
 
 // App settings that belong to this device (not to an account).
@@ -61,11 +62,16 @@ type SettingsData = {
   answerBounceEnabled: boolean;
   /** The original app's theme (The Originals; Hybrid when its family is 'originals'). */
   legacyTheme: string;
-  /** Hybrid only: which family of themes colours it. */
-  hybridThemeFamily: HybridThemeFamily;
+  /**
+   * Which family the chosen theme is from: this app's newer themes (appearance)
+   * or the legacy themes (legacyTheme). null = not chosen yet: The Originals then
+   * uses the legacy theme, the other experiences the newer one.
+   */
+  themeFamily: ThemeFamily | null;
 };
 
-export type HybridThemeFamily = 'originate' | 'originals';
+export type { ThemeFamily };
+const isThemeFamily = (value: unknown): value is ThemeFamily => value === 'newer' || value === 'legacy';
 const isLegacyThemeId = (value: unknown): value is string => typeof value === 'string' && LEGACY_THEMES.some((theme) => theme.id === value);
 
 const STORAGE_KEY = 'grateapex_settings';
@@ -85,7 +91,7 @@ const defaultSettings: SettingsData = {
   shareOnlineStatus: false,
   answerBounceEnabled: true,
   legacyTheme: 'dark', // the original app's default
-  hybridThemeFamily: 'originate',
+  themeFamily: null,
 };
 
 type PrivacySettings = Pick<SettingsData, 'profileVisibility' | 'activityVisible' | 'messagingPermission' | 'friendRequestPermission' | 'discoverable' | 'shareOnlineStatus'>;
@@ -177,7 +183,8 @@ async function loadSettings() {
       shareOnlineStatus: data?.shareOnlineStatus === true,
       answerBounceEnabled: data?.answerBounceEnabled !== false,
       legacyTheme: isLegacyThemeId(data?.legacyTheme) ? data.legacyTheme : defaultSettings.legacyTheme,
-      hybridThemeFamily: data?.hybridThemeFamily === 'originals' ? 'originals' : 'originate',
+      // (Before 2026-10-10 only Hybrid had a family: 'originals' meant legacy.)
+      themeFamily: isThemeFamily(data?.themeFamily) ? data.themeFamily : data?.hybridThemeFamily === 'originals' ? 'legacy' : null,
     };
 
     notify();
@@ -209,7 +216,7 @@ async function saveSettings() {
           preferences: {
             appearance: settings.appearance,
             legacy_theme: settings.legacyTheme,
-            hybrid_theme_family: settings.hybridThemeFamily,
+            theme_family: settings.themeFamily,
             font_size: settings.fontSize,
             zoom: settings.pageZoom,
             navigation_auto_hide: (await getTabBarModePreference()) === 'autoHide',
@@ -254,10 +261,11 @@ export async function syncSettingsFromAccount(userId: string) {
       ...settings,
       appearance: isAppearance(data.appearance) ? data.appearance : settings.appearance,
       legacyTheme: isLegacyThemeId(data.legacy_theme) ? data.legacy_theme : settings.legacyTheme,
-      hybridThemeFamily:
-        data.hybrid_theme_family === 'originals' || data.hybrid_theme_family === 'originate'
-          ? data.hybrid_theme_family
-          : settings.hybridThemeFamily,
+      themeFamily: isThemeFamily(data.theme_family)
+        ? data.theme_family
+        : data.hybrid_theme_family === 'originals'
+          ? 'legacy'
+          : settings.themeFamily,
       fontSize: ['small', 'default', 'large', 'extra_large'].includes(data.font_size)
         ? (data.font_size as FontSizePreference)
         : settings.fontSize,
@@ -433,13 +441,31 @@ export async function setLegacyThemePreference(legacyTheme: string) {
   await saveSettings();
 }
 
-export function useHybridThemeFamily(): HybridThemeFamily {
-  return useSyncExternalStore(subscribe, () => settings.hybridThemeFamily, () => defaultSettings.hybridThemeFamily);
+/** The chosen theme family, or null when the learner hasn't picked a theme yet. */
+export function useThemeFamilyPreference(): ThemeFamily | null {
+  return useSyncExternalStore(subscribe, () => settings.themeFamily, () => defaultSettings.themeFamily);
 }
 
-export async function setHybridThemeFamily(hybridThemeFamily: HybridThemeFamily) {
+export async function setThemeFamilyPreference(themeFamily: ThemeFamily) {
   await ensureSettingsLoaded();
-  settings = { ...settings, hybridThemeFamily };
+  settings = { ...settings, themeFamily };
+  notify();
+  await saveSettings();
+}
+
+/** Picks one of this app's newer themes (any experience draws it its own way). */
+export async function chooseNewerTheme(appearance: AppearancePreference) {
+  await ensureSettingsLoaded();
+  settings = { ...settings, appearance, themeFamily: 'newer' };
+  notify();
+  await saveSettings();
+}
+
+/** Picks a legacy theme. The caller checks the original unlock rules first. */
+export async function chooseLegacyTheme(legacyTheme: string) {
+  if (!isLegacyThemeId(legacyTheme)) return;
+  await ensureSettingsLoaded();
+  settings = { ...settings, legacyTheme, themeFamily: 'legacy' };
   notify();
   await saveSettings();
 }

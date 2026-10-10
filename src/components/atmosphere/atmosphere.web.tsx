@@ -1,8 +1,7 @@
 import type { CSSProperties } from 'react';
 
-import { ATMOSPHERE, type AtmosphereMood, MOODS, rgba } from '@/components/atmosphere/config';
+import { type AtmosphereMood, MOODS, rgba, useAtmospherePalette } from '@/components/atmosphere/config';
 import { PageMotifs } from '@/components/atmosphere/page-motifs';
-import { useResolvedColorScheme } from '@/hooks/use-theme';
 
 import classes from './atmosphere.module.css';
 
@@ -10,8 +9,7 @@ import classes from './atmosphere.module.css';
 // almost nothing and never blocks input. Decorative only — hidden from
 // assistive technology.
 export function Atmosphere({ mood }: { mood: AtmosphereMood }) {
-  const scheme = useResolvedColorScheme();
-  const palette = ATMOSPHERE[scheme];
+  const { palette, light, key: scheme } = useAtmospherePalette();
   const levels = MOODS[mood];
 
   const vars = {
@@ -53,7 +51,7 @@ export function Atmosphere({ mood }: { mood: AtmosphereMood }) {
       <div className={`${classes.layer} ${classes.rays}`} />
       <div className={`${classes.layer} ${classes.grid}`} />
       <svg className={classes.doodles} viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMid slice" focusable="false">
-          <g fill="none" stroke={scheme === 'light' ? '#274BA8' : '#C9D9FF'} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" opacity={0.68}>
+          <g fill="none" stroke={light ? '#274BA8' : '#C9D9FF'} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" opacity={0.68}>
             <g transform="translate(92 188) rotate(-12)">
               <circle cx="52" cy="42" r="8" /><circle cx="103" cy="72" r="6" /><circle cx="22" cy="105" r="5" />
               <path d="m58 46 39 23M48 50l-23 49m30-50 14-39m-8 4 12-5" />

@@ -112,3 +112,31 @@ describe('background and glass', () => {
   });
 });
 
+
+describe('every theme in every experience, drawn the experience’s way', async () => {
+  const { effectiveThemeFamily, legacyAtmosphere, originalsFromNewer, originateFromLegacy } = await import('@/data/theme-portrayal');
+  it('without a choice, The Originals uses the legacy theme and the others the newer one', () => {
+    assert.equal(effectiveThemeFamily('originals', null), 'legacy');
+    assert.equal(effectiveThemeFamily('originate', null), 'newer');
+    assert.equal(effectiveThemeFamily('hybrid', null), 'newer');
+    assert.equal(effectiveThemeFamily('originals', 'newer'), 'newer');
+    assert.equal(effectiveThemeFamily('originate', 'legacy'), 'legacy');
+  });
+  it('Originate draws a legacy theme with solid cards in that theme’s colours', () => {
+    const lavender = theme('lavender');
+    const c = originateFromLegacy(lavender);
+    assert.match(c.surface, /^#[0-9a-f]{6}$/);
+    assert.match(c.surfaceElevated, /^#[0-9a-f]{6}$/);
+    assert.equal(c.primary, legacyThemeColors(lavender).primary);
+    assert.notEqual(c.shadow, 'transparent');
+    assert.equal(legacyAtmosphere(lavender).base, legacyThemeColors(lavender).background);
+  });
+  it('The Originals draws a newer theme flat, with glass panels', () => {
+    const colors = { primary: '#1677F2', accent: '#FDC00A', background: '#132A9B', surface: '#ffffff', border: '#cccccc' };
+    const c = originalsFromNewer(colors, false);
+    assert.equal(c.surface, 'rgba(255,255,255,0.06)');
+    assert.equal(c.shadow, 'transparent');
+    assert.equal(c.tabBar, 'rgba(19,42,155,0.94)');
+    assert.equal(c.navActive, '#FDC00A');
+  });
+});

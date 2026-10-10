@@ -4,7 +4,8 @@ import { ColorSchemeName, Colors, ThemeColors } from '@/constants/theme';
 import type { ExperienceId } from '@/data/experience';
 import { hybridGlass } from '@/data/experience-style';
 import { legacyThemeById, legacyThemeColors, originalsThemeColors } from '@/data/legacy-theme-colors';
-import { type HybridThemeFamily, useAppearancePreference, useHybridThemeFamily, useLegacyThemePreference } from '@/data/settings';
+import { useAppearancePreference, useLegacyThemePreference, useThemeFamilyPreference } from '@/data/settings';
+import { effectiveThemeFamily, originalsFromNewer, originateFromLegacy, type ThemeFamily } from '@/data/theme-portrayal';
 import { useExperience } from '@/hooks/use-experience';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
@@ -22,23 +23,26 @@ export function useResolvedColorScheme(): ColorSchemeName {
 }
 
 /**
- * Which colours an experience uses:
- *   The Originals — the original app's theme (its own 15 themes only);
- *   Originate     — this app's Appearance palette;
- *   Hybrid        — either family, as chosen in Appearance, with glass panels.
- * The two saved choices are independent: switching experience never changes them.
+ * The colours for a theme in an experience. Every theme (newer or legacy) is
+ * available in every experience, and each experience draws it its own way
+ * (data/theme-portrayal.ts). Switching experience never changes the theme.
  */
-export function themeColorsFor(experience: ExperienceId, scheme: ColorSchemeName, legacyTheme: string, family: HybridThemeFamily): ThemeColors {
-  if (experience === 'originals') return originalsThemeColors(legacyThemeById(legacyTheme));
-  if (experience === 'hybrid') return family === 'originals' ? legacyThemeColors(legacyThemeById(legacyTheme)) : hybridGlass(Colors[scheme]);
-  return Colors[scheme];
+export function themeColorsFor(experience: ExperienceId, scheme: ColorSchemeName, legacyTheme: string, chosen: ThemeFamily | null): ThemeColors {
+  const family = effectiveThemeFamily(experience, chosen);
+  const def = legacyThemeById(legacyTheme);
+  if (experience === 'originals') return family === 'legacy' ? originalsThemeColors(def) : originalsFromNewer(Colors[scheme], scheme === 'light');
+  if (experience === 'hybrid') return family === 'legacy' ? legacyThemeColors(def) : hybridGlass(Colors[scheme]);
+  return family === 'legacy' ? originateFromLegacy(def) : Colors[scheme];
 }
 
-/** True when the experience is coloured by an original-app theme. */
+/** The theme family in use for this part of the interface. */
+export function useThemeFamily(): ThemeFamily {
+  return effectiveThemeFamily(useExperience(), useThemeFamilyPreference());
+}
+
+/** True when a legacy theme colours the interface. */
 export function useUsesLegacyTheme() {
-  const experience = useExperience();
-  const family = useHybridThemeFamily();
-  return experience === 'originals' || (experience === 'hybrid' && family === 'originals');
+  return useThemeFamily() === 'legacy';
 }
 
 // The active GRATEAPEX color palette.
@@ -46,7 +50,7 @@ export function useTheme(): ThemeColors {
   const experience = useExperience();
   const scheme = useResolvedColorScheme();
   const legacyTheme = useLegacyThemePreference();
-  const family = useHybridThemeFamily();
+  const family = useThemeFamilyPreference();
   return themeColorsFor(experience, scheme, legacyTheme, family);
 }
 

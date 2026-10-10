@@ -1,6 +1,10 @@
 import { usePathname } from 'expo-router';
 
 import type { ColorSchemeName } from '@/constants/theme';
+import { legacyThemeById } from '@/data/legacy-theme-colors';
+import { useLegacyThemePreference } from '@/data/settings';
+import { legacyAtmosphere } from '@/data/theme-portrayal';
+import { useResolvedColorScheme, useUsesLegacyTheme } from '@/hooks/use-theme';
 
 // The GRATEAPEX page atmosphere: the layered light behind every screen.
 //
@@ -139,4 +143,18 @@ export function rgba([hex, opacity]: Tint, scale = 1) {
   const b = parseInt(value.slice(4, 6), 16);
   const a = Math.max(0, Math.min(1, opacity * scale));
   return `rgba(${r}, ${g}, ${b}, ${Number(a.toFixed(3))})`;
+}
+
+/**
+ * The atmosphere colours for the active theme: this app's palette for a newer
+ * theme, or the legacy theme's own colours (data/theme-portrayal.ts) when
+ * Originate wears a legacy theme.
+ */
+export function useAtmospherePalette(): { palette: AtmospherePalette; light: boolean; key: string } {
+  const scheme = useResolvedColorScheme();
+  const legacy = useUsesLegacyTheme();
+  const legacyId = useLegacyThemePreference();
+  if (!legacy) return { palette: ATMOSPHERE[scheme], light: scheme === 'light', key: scheme };
+  const def = legacyThemeById(legacyId);
+  return { palette: legacyAtmosphere(def), light: def.light, key: `legacy-${def.id}` };
 }
