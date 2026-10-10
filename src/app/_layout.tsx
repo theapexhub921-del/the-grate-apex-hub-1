@@ -10,6 +10,7 @@ import AppTabs from '@/components/app-tabs';
 import { LearningSync } from '@/components/learning/learning-sync';
 import { DeviceNotificationBridge } from '@/components/notifications';
 import { PageTitle } from '@/components/page-title';
+import { EXPERIENCES_ENABLED, needsExperience } from '@/data/experience';
 import { needsOnboarding, useOnboardingState } from '@/data/onboarding';
 import { useFontSizePreference, usePageZoomPreference } from '@/data/settings';
 import { applyWebFontScale } from '@/lib/web-font-scaling';
@@ -77,6 +78,17 @@ function AppGuard({ children }: { children: ReactNode }) {
       return;
     }
     if (onChooseUsername) {
+      router.replace('/');
+      return;
+    }
+
+    // The app experience (no default) — only while EXPERIENCES_ENABLED is on.
+    const onChooseExperience = first === 'choose-experience';
+    if (needsExperience(session.user.profile, session.user.profileLoaded)) {
+      if (!onChooseExperience) router.replace('/choose-experience' as Href);
+      return;
+    }
+    if (onChooseExperience && !EXPERIENCES_ENABLED) {
       router.replace('/');
       return;
     }

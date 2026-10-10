@@ -1,4 +1,6 @@
 import { Href, router } from 'expo-router';
+
+import { EXPERIENCE_INFO, EXPERIENCES_ENABLED, isExperience } from '@/data/experience';
 import { type ReactNode, useEffect, useState } from 'react';
 import { Linking, Platform, Share, StyleSheet, Switch, Text, TextInput, useWindowDimensions, View } from 'react-native';
 
@@ -264,6 +266,14 @@ export default function SettingsScreen() {
           <Button label="Save" onPress={() => void saveName()} disabled={!nameChanged} />
         </View>
       </SettingsSection>
+
+      {EXPERIENCES_ENABLED ? (
+        <SettingsSection title="Experience">
+          <Text style={styles.optionLabel}>{isExperience(user?.profile?.experience) ? EXPERIENCE_INFO[user.profile.experience].name : 'Not chosen yet'}</Text>
+          <Text style={styles.optionDescription}>Changes how the app looks and is laid out. Your account, progress, friends, messages, achievements, XP and theme stay as they are.</Text>
+          <Button label="Change experience" variant="secondary" size="sm" onPress={() => router.push('/choose-experience' as Href)} />
+        </SettingsSection>
+      ) : null}
 
       <SettingsSection title="Appearance">
         <View style={[styles.themeGrid, desktop && styles.themeGridDesktop]}>
