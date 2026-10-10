@@ -10,8 +10,10 @@ import { Icon } from '@/components/ui/icon';
 import { Card, Interactive } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
 import { VideoPlayer } from '@/components/ui/video-player';
+import { ReportSheet, type ReportTarget } from '@/components/social/report-sheet';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Sheet } from '@/components/ui/sheet';
-import { addPostComment, createCommunityPost, deleteCommunityPost, listCommunityFeed, listPostComments, reportCommunityContent, togglePostLike, type CommunityMedia, type CommunityPost } from '@/data/community';
+import { addPostComment, createCommunityPost, deleteCommunityPost, listCommunityFeed, listPostComments, togglePostLike, type CommunityMedia, type CommunityPost } from '@/data/community';
 import { personName, type SocialPerson, useSocial } from '@/data/social';
 import { useDisplayName } from '@/data/user';
 import { useAuth } from '@/hooks/use-auth';
@@ -20,6 +22,9 @@ import { MentionInput } from '@/components/social/mention-input';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 type PostComment = { id: string; author_id: string; author_name?: string | null; body: string; created_at: string };
+
+// Posts this learner chose "Not interested" for (this device only).
+const HIDDEN_KEY = 'grateapex_hidden_posts';
 
 export function CommunityPostsFeed() {
   const styles = useThemedStyles(createStyles);
@@ -38,6 +43,17 @@ export function CommunityPostsFeed() {
   const [comments, setComments] = useState<PostComment[]>([]);
   const [commentDraft, setCommentDraft] = useState('');
   const [notice, setNotice] = useState('');
+  const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
+  const [hiddenIds, setHiddenIds] = useState<readonly string[]>([]);
+  useEffect(() => {
+    void AsyncStorage.getItem(HIDDEN_KEY).then((saved) => { if (saved) setHiddenIds(JSON.parse(saved)); }).catch(() => {});
+  }, []);
+  const hidePost = (target: ReportTarget) => {
+    const next = [...new Set([...hiddenIds, target.id])].slice(-500);
+    setHiddenIds(next);
+    setSelectedPost((current) => (current?.id === target.id ? null : current));
+    void AsyncStorage.setItem(HIDDEN_KEY, JSON.stringify(next)).catch(() => {});
+  };
   const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const refresh = useCallback(async () => {
@@ -82,6 +98,19 @@ export function CommunityPostsFeed() {
       setNotice(resharedPostId ? 'Reposted to your feed.' : 'Your post is live for your friends.');
       await refresh();
     } catch (caught) { setError(getErrorMessage(caught, 'Could not publish this post.')); }
+    finally { setBusy(false); }
+  }
+
+  // Repost: shares the original post (a repost of a repost shares its original).
+  async function repost(post: CommunityPost) {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await createCommunityPost('', undefined, post.reshared_post_id ?? post.id);
+      setNotice('Reposted to the feed.');
+      await refresh();
+    } catch (caught) { setError(getErrorMessage(caught, 'Could not repost this post.')); }
     finally { setBusy(false); }
   }
 
@@ -140,9 +169,9 @@ export function CommunityPostsFeed() {
     finally { setBusy(false); }
   }
 
-  async function report(targetType: 'post' | 'comment' | 'user', id: string) {
-    try { await reportCommunityContent(targetType, id); setNotice('Thanks. Your report has been sent privately for review.'); }
-    catch (caught) { setError(getErrorMessage(caught, 'Could not send the report.')); }
+  // Report: opens the reasons sheet (components/social/report-sheet.tsx).
+  function report(targetType: 'post' | 'comment' | 'user', id: string, label: string = targetType) {
+    setReportTarget({ type: targetType, id, label });
   }
 
   async function deletePost(post: CommunityPost) {
@@ -184,9 +213,10 @@ export function CommunityPostsFeed() {
       {error ? <Card style={styles.errorCard}><Text style={styles.errorTitle}>Community feed issue</Text><Text style={styles.muted}>{error}</Text><Button label="Try again" size="sm" variant="secondary" onPress={() => void refresh()} /></Card> : null}
       {loading ? <Text style={styles.muted}>Loading your friends’ posts…</Text> : null}
       {!loading && !posts.length && !error ? <Card style={styles.empty}><Icon name="social" size={22} color={colors.primaryText} /><Text style={styles.emptyTitle}>Your feed is ready for your circle</Text><Text style={styles.muted}>Posts from people across GrAteApex Hub will appear here.</Text></Card> : null}
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} socialPeople={social.people} ownId={user?.id ?? social.userId} ownName={displayName || 'You'} onOpen={() => void openPost(post)} onLike={() => void like(post)} onComment={() => void openPost(post)} onReshare={() => void publish(post.id)} onShare={() => void sharePost(post)} onReport={() => void report('post', post.id)} onDelete={() => confirmDeletePost(post)} />
+      {posts.filter((post) => !hiddenIds.includes(post.id)).map((post) => (
+        <PostCard key={post.id} post={post} socialPeople={social.people} ownId={user?.id ?? social.userId} ownName={displayName || 'You'} onOpen={() => void openPost(post)} onLike={() => void like(post)} onComment={() => void openPost(post)} onReshare={() => void repost(post)} onShare={() => void sharePost(post)} onReport={() => report('post', post.id, `post by ${post.author_name ? `@${post.author_name}` : 'a learner'}`)} onDelete={() => confirmDeletePost(post)} />
       ))}
+      <ReportSheet target={reportTarget} reporter={displayName || 'a learner'} onClose={() => setReportTarget(null)} onHide={hidePost} onDone={(message) => { setReportTarget(null); setNotice(message); }} />
       <Sheet visible={composeOpen} onClose={() => setComposeOpen(false)} title="Create a post" subtitle="Share something with the GrAteApex Hub community.">
         <View style={styles.composeSheet}>
         <Text style={styles.muted}>Share how you’re feeling, what’s happening in your life, or anything you’d like your friends to know.</Text>
@@ -200,9 +230,9 @@ export function CommunityPostsFeed() {
       </Sheet>
       <Sheet visible={selectedPost !== null} onClose={() => setSelectedPost(null)} title="Post" subtitle={selectedPost ? `${selectedPost.comments} comments · ${selectedPost.reshares} reshares` : undefined} width={800}>
         <View style={styles.postDetailSheet}>
-          {selectedPost ? <PostCard post={selectedPost} socialPeople={social.people} ownId={user?.id ?? social.userId} ownName={displayName || 'You'} verticalActions onOpen={() => {}} onLike={() => void like(selectedPost)} onComment={() => void openPost(selectedPost)} onReshare={() => void publish(selectedPost.id)} onShare={() => void sharePost(selectedPost)} onReport={() => void report('post', selectedPost.id)} onDelete={() => confirmDeletePost(selectedPost)} /> : null}
+          {selectedPost ? <PostCard post={selectedPost} socialPeople={social.people} ownId={user?.id ?? social.userId} ownName={displayName || 'You'} verticalActions onOpen={() => {}} onLike={() => void like(selectedPost)} onComment={() => void openPost(selectedPost)} onReshare={() => void repost(selectedPost)} onShare={() => void sharePost(selectedPost)} onReport={() => report('post', selectedPost.id, `post by ${selectedPost.author_name ? `@${selectedPost.author_name}` : 'a learner'}`)} onDelete={() => confirmDeletePost(selectedPost)} /> : null}
           <View style={styles.commentSheet}>
-          {comments.map((comment) => { const author = social.people.find((person) => person.userId === comment.author_id); return <View key={comment.id} style={styles.comment}><View style={styles.commentHead}><Text style={styles.commentAuthor}>{comment.author_id === social.userId ? 'You' : author ? personName(author) : comment.author_name ? `@${comment.author_name}` : 'Username pending'}</Text><Button label="Report" variant="ghost" size="sm" onPress={() => void report('comment', comment.id)} /></View><Text style={styles.body}>{comment.body}</Text></View>; })}
+          {comments.map((comment) => { const author = social.people.find((person) => person.userId === comment.author_id); return <View key={comment.id} style={styles.comment}><View style={styles.commentHead}><Text style={styles.commentAuthor}>{comment.author_id === social.userId ? 'You' : author ? personName(author) : comment.author_name ? `@${comment.author_name}` : 'Username pending'}</Text><Button label="Report" variant="ghost" size="sm" onPress={() => report('comment', comment.id, `comment by ${comment.author_name ? `@${comment.author_name}` : 'a learner'}`)} /></View><Text style={styles.body}>{comment.body}</Text></View>; })}
           {!comments.length ? <Text style={styles.muted}>Be the first to comment.</Text> : null}
           <MentionInput people={social.people} value={commentDraft} onChangeText={setCommentDraft} maxLength={2000} placeholder="Add a comment…" placeholderTextColor={colors.textTertiary} accessibilityLabel="Write a comment" style={styles.input} />
           <Button label="Comment" size="sm" onPress={() => void sendComment()} loading={busy} disabled={!commentDraft.trim() || busy} />

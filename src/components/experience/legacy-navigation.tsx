@@ -197,7 +197,7 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
             <LogoMark height={30} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.brandName, { color: C.text }]}>GrAte Apex</Text>
+            <Text style={[styles.brandName, { color: C.text }]}>GrAte Apex Hub</Text>
           </View>
           <NotificationBell />
         </View>

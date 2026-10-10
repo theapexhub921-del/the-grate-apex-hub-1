@@ -144,9 +144,13 @@ async function myUsername(): Promise<{ uid: string; username: string }> {
 const iso = (value: any) => (value?.toDate ? value.toDate().toISOString() : typeof value === 'number' ? new Date(value).toISOString() : new Date(0).toISOString());
 
 // Old-app posts have a separate title; show it above the body when it isn't just the body's start.
+/** A plain repost has no words of its own; the shared rules still need 3+ characters, so it carries this. */
+export const REPOST_TEXT = 'Reposted';
+
 const postText = (d: Record<string, any>) => {
   const title = String(d.title ?? '').trim();
   const body = String(d.body ?? '').trim();
+  if (d.resharedPostId && body === REPOST_TEXT) return '';
   return title && !body.startsWith(title) ? `${title}\n\n${body}` : body;
 };
 
@@ -203,7 +207,7 @@ export async function listCommunityFeed(limitCount = 50): Promise<CommunityPost[
 }
 
 export async function createCommunityPost(body: string, media?: CommunityMedia, resharedPostId?: string | null): Promise<CommunityPost> {
-  const text = body.trim();
+  const text = body.trim() || (resharedPostId ? REPOST_TEXT : '');
   if (text.length < 3) throw new Error('Posts need at least 3 characters.');
   if (text.length > 2000) throw new Error('Posts can be up to 2,000 characters.');
   const me = await myUsername();

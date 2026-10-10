@@ -20,6 +20,10 @@ const post = await community.createCommunityPost('Krebs cycle summary\nCitrate â
 const stored = await peek(`posts/${post.id}`);
 check('post saved in the shared board format with the real username', stored?.authorUid === a.uid && stored.authorName === a.username && stored.title === 'Krebs cycle summary' && stored.replyCount === 0 && stored.board === 'general', stored);
 check('a too-short post is refused with a reason', /at least 3/.test((await failsWith(community.createCommunityPost('hi'))) ?? ''));
+const repost = await community.createCommunityPost('', undefined, post.id);
+check('a plain repost (no words) is accepted by the rules', Boolean(repost.id));
+const listedRepost = (await community.listCommunityFeed()).find((item) => item.id === repost.id);
+check('the repost shows the original and no placeholder text', listedRepost?.reshared_post_id === post.id && listedRepost?.body === '' && /Krebs/.test(String(listedRepost?.reshared_body)));
 const photo = await community.createCommunityPost('Lab practical diagram', { uri: 'file:///x.jpg', type: 'image', mimeType: 'image/jpeg', filename: 'x.jpg' });
 const photoDoc = await peek(`posts/${photo.id}`);
 check('a photo post is uploaded (stand-in, not the real Cloudinary) and saved with its Cloudinary address', uploads.length === 1 && photoDoc?.media?.length === 1 && photoDoc.media[0].t === 'image' && photoDoc.media[0].url.startsWith('https://res.cloudinary.com/'), photoDoc);

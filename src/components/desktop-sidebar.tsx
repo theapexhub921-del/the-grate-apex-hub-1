@@ -125,7 +125,7 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
       >
         <View style={styles.brandRow}>
           <LogoMark height={26} />
-          <Text style={styles.wordmark}>GrAteApex Hub</Text>
+          <Text style={styles.wordmark}>GrAte Apex Hub</Text>
         </View>
 
         <View style={styles.navList}>
