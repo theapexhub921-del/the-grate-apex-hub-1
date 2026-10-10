@@ -7,6 +7,7 @@ import { Platform, View } from 'react-native';
 import { AchievementWatcher } from '@/components/achievements/achievement-watcher';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
+import { AppUpdateWatcher } from '@/components/app-update-watcher';
 import { CoinGiftSync } from '@/components/coin-gift-sync';
 import { ExperienceSync } from '@/components/experience/experience-sync';
 import { LearningSync } from '@/components/learning/learning-sync';
@@ -177,6 +178,7 @@ export default function TabLayout() {
               <AppTabs />
               <LearningSync />
               <CoinGiftSync />
+              <AppUpdateWatcher />
               <AchievementWatcher />
               <DeviceNotificationBridge />
             </AppGuard>

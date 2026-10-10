@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grateapex-pwa-v4';
+const CACHE_NAME = 'grateapex-pwa-v5';
 const CACHE_PREFIX = 'grateapex-pwa-';
 const APP_SHELL = ['/', '/manifest.webmanifest', '/icons/grateapex-192.png', '/icons/grateapex-512.png'];
 const CACHEABLE_DESTINATIONS = new Set(['font', 'image', 'script', 'style']);
@@ -26,7 +26,9 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
 
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).catch(async () => (await caches.match(request)) || (await caches.match('/'))));
+    // Always the newest page from the network (bypassing the HTTP cache); the
+    // saved copy is only for offline use.
+    event.respondWith(fetch(request.url, { cache: 'no-store', credentials: 'same-origin' }).catch(async () => (await caches.match(request)) || (await caches.match('/'))));
     return;
   }
 
