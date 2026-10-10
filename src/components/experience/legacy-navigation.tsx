@@ -4,6 +4,7 @@ import { Animated, Easing, Platform, Pressable, StyleSheet, TouchableOpacity, Vi
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LEGACY_NAV, LegacyIcon } from '@/components/experience/legacy-icon';
+import { SidebarResizeHandle, useSidebarWidth } from '@/components/sidebar-resize';
 import { useLegacyPalette } from '@/components/experience/use-legacy-palette';
 import { useTheme, useUsesLegacyTheme } from '@/hooks/use-theme';
 import { LogoMark } from '@/components/logo-mark';
@@ -164,6 +165,7 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const visible = !autoHide || hovered;
+  const sideWidth = useSidebarWidth(250);
   const p = useNavProgress(visible, false); // width can't use the native driver
 
   useEffect(() => () => {
@@ -183,14 +185,14 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
 
 
   return (
-    <Animated.View {...hoverProps} style={[styles.sideShell, { backgroundColor: C.side, borderRightColor: C.border, width: p.interpolate({ inputRange: [0, 1], outputRange: [12, 250] }) }]}>
+    <Animated.View {...hoverProps} style={[styles.sideShell, { backgroundColor: C.side, borderRightColor: C.border, width: p.interpolate({ inputRange: [0, 1], outputRange: [12, sideWidth] }) }]}>
       {/* Collapsed handle: fades in as the sidebar closes. */}
       <Animated.View pointerEvents="none" style={[styles.sideHandleWrap, { opacity: p.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }) }]}>
         <View style={[styles.sideHandle, { backgroundColor: C.muted }]} />
       </Animated.View>
       <Animated.View
         pointerEvents={visible ? 'auto' : 'none'}
-        style={[styles.sideInner, { opacity: p, transform: [{ translateX: p.interpolate({ inputRange: [0, 1], outputRange: [-40, 0] }) }] }]}
+        style={[styles.sideInner, { width: sideWidth - 1, opacity: p, transform: [{ translateX: p.interpolate({ inputRange: [0, 1], outputRange: [-40, 0] }) }] }]}
       >
         <View style={styles.brand}>
           <View style={styles.brandLogo}>

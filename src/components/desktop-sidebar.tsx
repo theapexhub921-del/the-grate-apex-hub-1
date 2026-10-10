@@ -8,6 +8,7 @@ import { activeNavPath, NAV_ITEMS, NavIconView } from '@/components/nav-items';
 import { Avatar } from '@/components/ui/avatar';
 import { Icon } from '@/components/ui/icon';
 import { IconButton } from '@/components/ui/icon-button';
+import { SidebarResizeHandle, useSidebarWidth } from '@/components/sidebar-resize';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import { elevation, SIDEBAR_WIDTH, Type, type ThemeColors } from '@/constants/theme';
@@ -40,6 +41,7 @@ const FLOAT_INSET = 10;
 export function DesktopSidebar({ docked }: { docked: boolean }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  const railWidth = useSidebarWidth();
   const { height: viewportHeight } = useWindowDimensions();
   const pathname = usePathname();
   const active = activeNavPath(pathname);
@@ -79,7 +81,7 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
     if (docked || Platform.OS !== 'web' || typeof document === 'undefined') return;
     const onMove = (event: MouseEvent) => {
       if (event.clientX <= REVEAL_ZONE_PX) reveal();
-      else if (revealed && event.clientX <= SIDEBAR_WIDTH + FLOAT_INSET * 2) clearTimer();
+      else if (revealed && event.clientX <= railWidth + FLOAT_INSET * 2) clearTimer();
       else if (revealed && !timer.current) scheduleHide();
     };
     document.addEventListener('mousemove', onMove);
@@ -97,6 +99,7 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
 
   return (
     <>
+      {docked ? <SidebarResizeHandle /> : null}
       {!docked ? (
         // Edge handle: a hint that the rail exists, and a click target for
         // touch-screen laptops (which have no hover).
@@ -113,8 +116,9 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
       <View
         style={[
           styles.rail,
+          { width: railWidth },
           docked ? styles.railDocked : [styles.railFloating, elevation(colors, 3)],
-          !shown && styles.railHidden,
+          !shown && [styles.railHidden, { transform: [{ translateX: -(railWidth + FLOAT_INSET * 2) }] }],
           { pointerEvents: shown ? 'auto' : 'none' },
         ]}
         // Keyboard users: tabbing into the rail reveals it.
@@ -184,7 +188,7 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
                 {displayName ? `Doc. ${displayName}` : 'Doc.'}
               </Text>
               <Text style={styles.footerRank} numberOfLines={1}>
-                {rank ? rank.rank.name : 'Medical Student'}
+                {rank ? rank.rank.name : 'Fresher'}
               </Text>
             </View>
           </Pressable>

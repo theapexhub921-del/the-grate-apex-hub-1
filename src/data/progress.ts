@@ -104,8 +104,9 @@ function syncSubjectProgress() {
   });
 }
 
+// The original app's levels: 1 + every 150 XP (data/progression.ts).
 function levelFor(xp: number) {
-  return Math.floor(xp / 100) + 1;
+  return Math.floor(Math.max(0, xp) / 150) + 1;
 }
 
 const progress: ProgressData = {

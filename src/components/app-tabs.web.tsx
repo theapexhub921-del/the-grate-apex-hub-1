@@ -8,7 +8,7 @@ import { OnlinePresenceSync } from '@/components/online-presence-sync';
 import { useAtmosphereMood } from '@/components/atmosphere/config';
 import { DesktopSidebar } from '@/components/desktop-sidebar';
 import { LegacyBackground } from '@/components/experience/legacy-background';
-import { LEGACY_DESKTOP_MIN, LegacyFloatingBar, LegacySidebar } from '@/components/experience/legacy-navigation';
+import { LEGACY_DESKTOP_MIN, LegacyFloatingBar, LegacySidebar, useOriginalAutoHide } from '@/components/experience/legacy-navigation';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
 import { HomeGreetingWallpaper } from '@/components/social/home-greeting-wallpaper';
 import { NAV_ITEMS } from '@/components/nav-items';
@@ -16,7 +16,8 @@ import { PageTitle } from '@/components/page-title';
 import { Signature } from '@/components/signature';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
-import { DESKTOP_BREAKPOINT, SIDEBAR_WIDTH } from '@/constants/theme';
+import { DESKTOP_BREAKPOINT } from '@/constants/theme';
+import { SidebarResizeHandle, useSidebarWidth } from '@/components/sidebar-resize';
 import { useTabBarMode } from '@/data/navigation-settings';
 import { useExperience } from '@/hooks/use-experience';
 
@@ -40,6 +41,8 @@ export default function AppTabs() {
   const reduceMotion = useReducedMotion();
   const experience = useExperience();
   const originals = experience === 'originals';
+  const sidebarWidth = useSidebarWidth();
+  const originalAutoHide = useOriginalAutoHide();
 
   // Unauthenticated screens must not show the authenticated navigation.
   const isAuthRoute = ['login', 'onboarding', 'privacy', 'terms'].includes(segments[0] as string);
@@ -61,9 +64,10 @@ export default function AppTabs() {
 
       {useRail && !originals ? <DesktopSidebar docked={docked} /> : null}
 
-      <View style={[styles.content, originals && styles.row, { paddingLeft: docked ? SIDEBAR_WIDTH : 0 }]}>
+      <View style={[styles.content, originals && styles.row, { paddingLeft: docked ? sidebarWidth : 0 }]}>
         {/* The original app's sidebar takes its own space beside the page. */}
         {useRail && originals ? <LegacySidebar onNavigate={(route) => router.navigate(NAV_PATHS[route] as Href)} /> : null}
+        {useRail && originals && !originalAutoHide ? <SidebarResizeHandle fallback={250} /> : null}
         <View style={styles.tabs}>
         <Tabs
           backBehavior="history"

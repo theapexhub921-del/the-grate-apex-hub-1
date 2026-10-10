@@ -61,7 +61,7 @@ export function RankProgressCard({ lifetimeXp, style }: { lifetimeXp: number; st
       <View style={styles.divider} />
 
       {rank.isTopRank ? (
-        <Text style={styles.caption}>You have reached the highest rank — Consultant.</Text>
+        <Text style={styles.caption}>You have reached the highest rank — Immortal.</Text>
       ) : (
         <View style={styles.footer}>
           <Text style={styles.caption}>

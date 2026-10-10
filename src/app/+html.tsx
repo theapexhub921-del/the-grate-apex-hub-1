@@ -25,14 +25,14 @@ export default function Root({ children }: { children: React.ReactNode }) {
             and the social/preview metadata lives in the head. */}
         <meta
           name="description"
-          content="GrAte Apex Hub — a focused learning app for medical students. Work through lectures, test your understanding and track your progression."
+          content="GrAte Apex Hub — the learning and social app for medical students: every course in your class, practice and Apex Challenges, leagues, and a community to study with."
         />
 
         {/* Open Graph / social preview */}
         <meta property="og:title" content="GrAte Apex Hub" />
         <meta
           property="og:description"
-          content="A focused learning app for medical students."
+          content="The learning and social app for medical students."
         />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary" />

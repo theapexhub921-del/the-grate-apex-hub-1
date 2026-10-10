@@ -12,6 +12,7 @@ import { InlineNotice } from '@/components/ui/state-views';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import { publishedTopics } from '@/data/curriculum';
 import { getProgressSnapshot } from '@/data/progress';
+import { WeekTimetable } from '@/components/learning/week-timetable';
 import { createTimetableBlock, deleteTimetableBlock, listStudyPlans, listTimetableBlocks, saveStudyPlan, updateStudyPlanProgress, updateTimetableBlock, type StudyPlan, type TimetableBlock } from '@/data/planning';
 import { routes } from '@/lib/routes';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -155,6 +156,11 @@ export default function PlannerScreen() {
       ) : plan ? <InlineNotice tone="info" title="Your topics are not available yet" message="The plan is saved. Its lesson path will appear when those topics have published lessons." /> : null}
 
       <SectionHeader title="Personal timetable" subtitle="Add recurring class or study blocks. Your timetable is private to you." style={styles.sectionHeader} />
+      {entries.length ? (
+        <Card style={styles.weekCard}>
+          <WeekTimetable entries={entries} onSelect={(entry) => { setEditingId(entry.id); setTitle(entry.title ?? ''); setSubject(entry.subject ?? ''); setDay(DAYS[entry.weekday]); setStart(entry.start_time.slice(0,5)); setEnd(entry.end_time.slice(0,5)); }} />
+        </Card>
+      ) : null}
       <Card style={styles.sectionCard}>
         <TextInput value={title} onChangeText={setTitle} maxLength={60} placeholder="Class or study block" placeholderTextColor={colors.textTertiary} accessibilityLabel="Timetable item name" style={styles.input} />
         <TextInput value={subject} onChangeText={setSubject} maxLength={100} placeholder="Subject (optional)" placeholderTextColor={colors.textTertiary} accessibilityLabel="Timetable subject" style={styles.input} />
@@ -186,6 +192,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     sectionHeader: { marginTop: 28 },
     sectionCard: { gap: 13, marginTop: 10 },
+    weekCard: { marginTop: 10, padding: 14 },
     label: { ...Type.caption, fontWeight: '800', color: colors.textSecondary },
     heading: { ...Type.title3, color: colors.text },
     body: { ...Type.callout, color: colors.textSecondary },

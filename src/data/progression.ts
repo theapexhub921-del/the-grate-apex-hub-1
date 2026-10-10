@@ -3,7 +3,8 @@
 
 // Must match the level rule in progress.ts:
 // level = Math.floor(xp / 100) + 1
-export const XP_PER_LEVEL = 100;
+// The original app's levels (owner decision, 2026-10-10): 1 + every 150 XP.
+export const XP_PER_LEVEL = 150;
 
 export type LevelProgress = {
   level: number;

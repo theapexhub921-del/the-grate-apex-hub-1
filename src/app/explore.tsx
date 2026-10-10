@@ -263,7 +263,7 @@ function Journey() {
     <View style={styles.journey}>
       <SectionHeader
         title="The GrAte Apex Hub journey"
-        subtitle="Lifetime XP carries you from your first lecture to Consultant. Each stage takes more than the last."
+        subtitle="Lifetime XP carries you from Fresher to Immortal — the original GrAte Apex ranks. Every 150 XP is a level."
         style={styles.section}
       />
       {desktop ? (

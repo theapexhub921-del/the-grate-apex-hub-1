@@ -17,21 +17,26 @@ export const ULTIMATE_XP_TARGET = 1_000_000;
 
 // Planning targets used when the thresholds are calculated later.
 export const PROGRESSION_TARGETS = {
-  highlyActiveUserMonths: 3, // very active user → Consultant
-  idealDailyHourUserMonths: 6, // ~1 hour/day → Consultant
+  highlyActiveUserMonths: 3,
+  idealDailyHourUserMonths: 6,
 } as const;
 
+// The original app's ranks (owner decision, 2026-10-10), by level — level is
+// 1 + every 150 XP, so a rank's XP is (level − 1) × 150. Fresher to Immortal.
 export type RankId =
-  | 'medical-student'
-  | 'senior-medical-student'
-  | 'house-officer'
-  | 'medical-officer'
-  | 'senior-medical-officer'
-  | 'principal-medical-officer'
-  | 'resident'
-  | 'specialist'
-  | 'senior-specialist'
-  | 'consultant';
+  | 'fresher'
+  | 'riser'
+  | 'scholar'
+  | 'sharp'
+  | 'elite'
+  | 'apex-scholar'
+  | 'apex'
+  | 'master'
+  | 'grandmaster'
+  | 'endless'
+  | 'paragon'
+  | 'ultimate'
+  | 'immortal';
 
 export type Rank = {
   id: RankId; // stable ID — names can change, IDs should not
@@ -42,29 +47,22 @@ export type Rank = {
 
 // Provisional ladder, lowest to highest. Easy to rename/reorder here.
 //
-// THRESHOLDS (decided): the gaps GROW as the student progresses, so the
-// early ranks arrive quickly and the top of the ladder takes sustained
-// effort. These are a geometric curve (ratio ≈ 2.4) that ends exactly on
-// ULTIMATE_XP_TARGET (1,000,000) and satisfies the two planning targets:
-//
-//   - highly active learner  → Consultant in ~3 months (~11,100 XP/day)
-//   - ~1 hour/day learner    → Consultant in ~6 months (~5,600 XP/day)
-//
-// At the current awards (10 XP/lesson + 20 XP/quiz) the first promotion
-// lands within the first few days of real study. Change any number here
-// and the whole ladder re-derives, because ranks are always computed from
-// lifetime XP — nothing is stored per rank.
+// THRESHOLDS: the original app's ladder (a rank per level band; level = 1 + every
+// 150 XP). Ranks are always computed from lifetime XP — nothing is stored per rank.
 export const RANKS: readonly Rank[] = [
-  { id: 'medical-student', name: 'Medical Student', minXp: 0 },
-  { id: 'senior-medical-student', name: 'Senior Medical Student', minXp: 530 },
-  { id: 'house-officer', name: 'House Officer', minXp: 1_802 },
-  { id: 'medical-officer', name: 'Medical Officer', minXp: 4_856 },
-  { id: 'senior-medical-officer', name: 'Senior Medical Officer', minXp: 12_185 },
-  { id: 'principal-medical-officer', name: 'Principal Medical Officer', minXp: 29_774 },
-  { id: 'resident', name: 'Resident', minXp: 71_987 },
-  { id: 'specialist', name: 'Specialist', minXp: 173_298 },
-  { id: 'senior-specialist', name: 'Senior Specialist', minXp: 416_446 },
-  { id: 'consultant', name: 'Consultant', minXp: ULTIMATE_XP_TARGET },
+  { id: 'fresher', name: 'Fresher', minXp: 0 }, // level 1
+  { id: 'riser', name: 'Riser', minXp: 300 }, // level 3
+  { id: 'scholar', name: 'Scholar', minXp: 750 }, // level 6
+  { id: 'sharp', name: 'Sharp', minXp: 1350 }, // level 10
+  { id: 'elite', name: 'Elite', minXp: 2250 }, // level 16
+  { id: 'apex-scholar', name: 'Apex Scholar', minXp: 3600 }, // level 25
+  { id: 'apex', name: 'Apex', minXp: 5850 }, // level 40
+  { id: 'master', name: 'Master', minXp: 10350 }, // level 70
+  { id: 'grandmaster', name: 'Grandmaster', minXp: 14850 }, // level 100
+  { id: 'endless', name: 'Endless', minXp: 29850 }, // level 200
+  { id: 'paragon', name: 'Paragon', minXp: 44850 }, // level 300
+  { id: 'ultimate', name: 'Ultimate', minXp: 59850 }, // level 400
+  { id: 'immortal', name: 'Immortal', minXp: 74850 }, // level 500
 ];
 
 // True only when every threshold is decided and they strictly increase.

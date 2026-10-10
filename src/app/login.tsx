@@ -715,9 +715,9 @@ type LoginStyles = ReturnType<typeof createStyles>;
 // Desktop: the brand side of the split screen, on the shared atmosphere.
 function BrandPanel({ styles, colors }: { styles: LoginStyles; colors: ThemeColors }) {
   const points: { icon: IconName; title: string; text: string }[] = [
-    { icon: 'learn', title: 'Learn from your lectures', text: 'Lessons built only from the slides you are taught.' },
-    { icon: 'reinforce', title: 'Remember with spaced review', text: 'Each concept returns just before you would forget it.' },
-    { icon: 'challenge', title: 'Prove it in the Apex Challenge', text: 'A timed, whole-course test of mastery.' },
+    { icon: 'learn', title: 'Every course in your class', text: 'Lessons section by section, practice in four question types and spaced review that brings concepts back before you forget.' },
+    { icon: 'social', title: 'A community of students', text: 'Stories and posts, profiles, followers, study groups and messages with your classmates.' },
+    { icon: 'challenge', title: 'Compete and level up', text: 'Timed Apex Challenges, leagues, achievements, XP and themes you unlock as you grow.' },
   ];
   return (
     <View style={styles.brandPanel}>
@@ -728,7 +728,7 @@ function BrandPanel({ styles, colors }: { styles: LoginStyles; colors: ThemeColo
       <View style={styles.brandStatement}>
         <View style={styles.brandAccent} />
         <Text style={styles.brandMotto}>Learn together. You’ve got this.</Text>
-        <Text style={styles.brandSubjects}>ANATOMY · BIOCHEMISTRY · PHYSIOLOGY</Text>
+        <Text style={styles.brandSubjects}>LEARN · CONNECT · RISE TOGETHER</Text>
       </View>
       <View style={styles.points}>
         {points.map((point) => (

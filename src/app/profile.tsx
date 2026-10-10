@@ -99,7 +99,7 @@ export default function ProfileScreen() {
         <View style={styles.badges}>
           <View style={styles.rankBadge}>
             <Icon name="rank" size={14} color="#0A1F5C" strokeWidth={2.2} />
-            <Text style={styles.rankBadgeText}>{rank ? rank.rank.name : 'Medical Student'}</Text>
+            <Text style={styles.rankBadgeText}>{rank ? rank.rank.name : 'Fresher'}</Text>
           </View>
           <View style={styles.levelBadge}>
             <Icon name="level" size={13} color={colors.primaryText} />

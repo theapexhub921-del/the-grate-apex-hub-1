@@ -404,7 +404,7 @@ export function ProgressDemo({ done, onDone }: DemoProps) {
         </ProgressRing>
         <View style={styles.flex}>
           <Text style={styles.levelLabel}>CURRENT RANK · EXAMPLE</Text>
-          <Text style={styles.readTitle}>Medical Student</Text>
+          <Text style={styles.readTitle}>Fresher</Text>
           <View style={styles.xpLine}>
             <Icon name="xp" size={14} color={colors.accent} filled />
             <AnimatedNumber value={xp} style={styles.xpValue} />

@@ -37,7 +37,7 @@ export default function StudyWidgetScreen() {
 
       <Card style={styles.progressCard}>
         <Text style={styles.eyebrow}>YOUR PROGRESS</Text>
-        <Text style={styles.rank}>{rank?.rank.name ?? 'Medical Student'}</Text>
+        <Text style={styles.rank}>{rank?.rank.name ?? 'Fresher'}</Text>
         <View style={styles.metricGrid}>
           <View style={styles.metric}>
             <Text style={styles.metricValue}>{progress.streak}</Text>
