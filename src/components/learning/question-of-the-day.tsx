@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { type Href, router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -8,67 +7,74 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { findLesson, publishedTopics, getTopicQuestions } from '@/data/curriculum';
-import { type Answer, isAnswerCorrect, type Question } from '@/data/questions';
+import { findLesson } from '@/data/curriculum';
+import { pickQuestion, qotdDay, readCloudAnswer, readLocalAnswer, readTally, saveAnswer, type SaveResult, type Tally } from '@/data/qotd';
+import { type Answer, isAnswerCorrect } from '@/data/questions';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { routes } from '@/lib/routes';
 
 // Question of the Day (ported from the older Grate Apex Hub site).
 // One single-answer question per day from the published question banks —
-// the same question for every learner on a given day. Practice only: the
-// answer is remembered on this device for the day and never affects XP,
-// memory or review schedules.
-const STORAGE_KEY = 'grateapex_qotd';
-
-function dayKey(now: Date) {
-  return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-}
-
-function hash(text: string) {
-  let h = 2166136261;
-  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
-  return h >>> 0;
-}
-
-function pickQuestion(day: string): Question | null {
-  const pool = publishedTopics
-    .flatMap((topic) => getTopicQuestions(topic.id))
-    .filter((question) => question.type === 'choice' && question.usage !== 'learn' && question.options.length > 2);
-  if (pool.length === 0) return null;
-  return pool[hash(day) % pool.length];
-}
+// the same question for every learner on a given (UTC) day. Practice only: it
+// never affects XP, memory or review schedules. The answer is saved once per
+// day on the account (shared with the original app) together with this app's
+// class tally — see data/qotd.ts.
+type Status = 'loading' | 'open' | 'saved' | 'elsewhere' | 'not-saved' | 'local';
 
 export function QuestionOfTheDay() {
   const styles = useThemedStyles(createStyles);
-  const day = dayKey(new Date());
+  const day = qotdDay();
   const question = useMemo(() => pickQuestion(day), [day]);
   const [answer, setAnswer] = useState<Answer | undefined>(undefined);
   const [revealed, setRevealed] = useState(false);
+  const [status, setStatus] = useState<Status>('loading');
+  const [tally, setTally] = useState<Tally | null>(null);
 
   useEffect(() => {
     let alive = true;
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then((saved) => {
-        const parsed = saved ? (JSON.parse(saved) as { day: string; answer: Answer }) : null;
-        if (alive && parsed?.day === day) {
-          setAnswer(parsed.answer);
-          setRevealed(true);
+    (async () => {
+      const local = await readLocalAnswer(day);
+      let cloud: Awaited<ReturnType<typeof readCloudAnswer>> | undefined;
+      try {
+        cloud = await readCloudAnswer(day);
+      } catch {
+        cloud = undefined; // offline: fall back to what this device knows
+      }
+      if (!alive) return;
+      if (local && question && local.questionId === question.id) {
+        setAnswer(local.pick);
+        setRevealed(true);
+        if (local.synced || cloud) setStatus('saved');
+        else {
+          // Saved on this device only: try again (the rules count it once at most).
+          const result = await saveAnswer(day, question.id, local.pick, isAnswerCorrect(question, local.pick));
+          if (alive) setStatus(statusFor(result));
         }
-      })
-      .catch(() => undefined);
+      } else if (cloud) {
+        setRevealed(true);
+        setStatus('elsewhere');
+      } else {
+        setStatus('open');
+      }
+      readTally(day).then((value) => { if (alive) setTally(value); }).catch(() => undefined);
+    })();
     return () => {
       alive = false;
     };
-  }, [day]);
+  }, [day, question]);
 
   if (!question) return null;
   const entry = findLesson(question.lessonId);
 
-  function check() {
-    if (answer === undefined) return;
+  async function check() {
+    if (answer === undefined || typeof answer !== 'number' || !question) return;
     setRevealed(true);
-    void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ day, answer })).catch(() => undefined);
+    const result = await saveAnswer(day, question.id, answer, isAnswerCorrect(question, answer));
+    setStatus(statusFor(result));
+    readTally(day).then(setTally).catch(() => undefined);
   }
+
+  const share = tally && tally.total > 0 ? `${Math.round((tally.correct / tally.total) * 100)}% of ${tally.total} learner${tally.total === 1 ? '' : 's'} got this right today.` : null;
 
   return (
     <Card style={styles.card}>
@@ -77,10 +83,18 @@ export function QuestionOfTheDay() {
         <Pill label="Practice · not scored" />
       </View>
       {entry ? <Text style={styles.source}>{entry.topic.title} · {entry.lesson.title}</Text> : null}
-      <QuestionCard question={question} value={answer} onChange={setAnswer} revealed={revealed} shuffleSeed={day} compact />
+      {status === 'loading' ? <Text style={styles.source}>Checking today’s answer…</Text> : null}
+      <QuestionCard question={question} value={answer} onChange={status === 'open' ? setAnswer : () => undefined} revealed={revealed} shuffleSeed={day} compact />
       {revealed ? (
         <View style={styles.footer}>
-          <Text style={styles.result}>{isAnswerCorrect(question, answer) ? 'Correct — nice start to the day.' : 'Not this time — see why above.'}</Text>
+          {status === 'elsewhere' ? (
+            <Text style={styles.result}>You already answered today’s question — on another device or in the original app. Come back tomorrow.</Text>
+          ) : (
+            <Text style={styles.result}>{isAnswerCorrect(question, answer) ? 'Correct — nice start to the day.' : 'Not this time — see why above.'}</Text>
+          )}
+          {status === 'not-saved' ? <Text style={styles.note}>Your answer is saved on this device only. It will count once you’re back online.</Text> : null}
+          {status === 'local' ? <Text style={styles.note}>Sign in to add your answer to today’s class results.</Text> : null}
+          {share ? <Text style={styles.note}>{share}</Text> : null}
           {entry ? (
             <View style={styles.links}>
               <Button label="Open the lesson" size="sm" variant="secondary" onPress={() => router.push(routes.lesson(entry.lesson.id, { layer: 'read' }))} />
@@ -89,10 +103,17 @@ export function QuestionOfTheDay() {
           ) : null}
         </View>
       ) : (
-        <Button label="Check answer" size="sm" onPress={check} disabled={answer === undefined} />
+        <Button label="Check answer" size="sm" onPress={() => void check()} disabled={answer === undefined || status !== 'open'} />
       )}
     </Card>
   );
+}
+
+function statusFor(result: SaveResult): Status {
+  if (result === 'saved') return 'saved';
+  if (result === 'already-answered') return 'elsewhere';
+  if (result === 'signed-out') return 'local';
+  return 'not-saved';
 }
 
 function createStyles(colors: ThemeColors) {
@@ -104,5 +125,6 @@ function createStyles(colors: ThemeColors) {
     footer: { gap: 10 },
     links: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
     result: { fontSize: 14, fontWeight: '700', color: colors.text },
+    note: { fontSize: 13, lineHeight: 18, color: colors.textSecondary },
   });
 }
