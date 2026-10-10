@@ -252,19 +252,19 @@ function PostCard({ post, socialPeople, ownId, ownName, onOpen, onLike, onCommen
       {post.media_url && post.media_type === 'video' ? <VideoPlayer url={post.media_url} label="Video in community post" /> : null}
       {!verticalActions ? <Text style={styles.counts}>{post.reactions} likes · {post.comments} comments · {post.reshares} reshares</Text> : <Text style={styles.counts}>{post.reactions} likes</Text>}
       {!verticalActions ? <View style={styles.postActions}>
-        <Interactive onPress={onLike} accessibilityRole="button" accessibilityLabel={post.my_reaction ? 'Unlike post' : 'Like post'} style={styles.action}><Icon name="heart" size={17} color={post.my_reaction ? colors.primaryText : colors.textSecondary} filled={Boolean(post.my_reaction)} /><Text style={[styles.actionText, post.my_reaction && { color: colors.primaryText }]}>Like</Text></Interactive>
-        <Interactive onPress={onComment} accessibilityRole="button" accessibilityLabel={`Comment on post, ${post.comments} comments`} style={styles.action}><Icon name="mail" size={17} color={colors.textSecondary} /><Text style={styles.actionText}>Comment · {post.comments}</Text></Interactive>
-        <Interactive onPress={onReshare} accessibilityRole="button" accessibilityLabel={`Repost, ${post.reshares} reshares`} style={styles.action}><Icon name="connection" size={17} color={colors.textSecondary} /><Text style={styles.actionText}>Repost · {post.reshares}</Text></Interactive>
-        <Interactive onPress={onShare} accessibilityRole="button" accessibilityLabel="Share post" style={styles.action}><Icon name="share" size={17} color={colors.textSecondary} /><Text style={styles.actionText}>Share</Text></Interactive>
-        <Interactive onPress={onReport} accessibilityRole="button" accessibilityLabel="Report post" style={styles.action}><Icon name="warning" size={17} color={colors.textSecondary} /><Text style={styles.actionText}>Report</Text></Interactive>
+        <Interactive onPress={onLike} accessibilityRole="button" accessibilityLabel={post.my_reaction ? 'Unlike post' : 'Like post'} style={styles.action}><Icon name="heart" size={20} color={post.my_reaction ? colors.primaryText : colors.textSecondary} filled={Boolean(post.my_reaction)} /></Interactive>
+        <Interactive onPress={onComment} accessibilityRole="button" accessibilityLabel={`Comment on post, ${post.comments} comments`} style={styles.action}><Icon name="mail" size={20} color={colors.textSecondary} /></Interactive>
+        <Interactive onPress={onReshare} accessibilityRole="button" accessibilityLabel={`Repost, ${post.reshares} reshares`} style={styles.action}><Icon name="connection" size={20} color={colors.textSecondary} /></Interactive>
+        <Interactive onPress={onShare} accessibilityRole="button" accessibilityLabel="Share post" style={styles.action}><Icon name="share" size={20} color={colors.textSecondary} /></Interactive>
+        <Interactive onPress={onReport} accessibilityRole="button" accessibilityLabel="Report post" style={styles.action}><Icon name="warning" size={20} color={colors.textSecondary} /></Interactive>
       </View> : null}
       </View>
       {verticalActions ? <View style={styles.postActionsVertical}>
-        <Interactive onPress={onLike} accessibilityRole="button" accessibilityLabel={`${post.my_reaction ? 'Unlike' : 'Like'} post, ${post.reactions} likes`} style={styles.railAction}><Icon name="heart" size={21} color={post.my_reaction ? colors.primaryText : colors.textSecondary} filled={Boolean(post.my_reaction)} /><Text style={styles.railCount}>{post.reactions}</Text></Interactive>
-        <Interactive onPress={onComment} accessibilityRole="button" accessibilityLabel={`Comment, ${post.comments} comments`} style={styles.railAction}><Icon name="mail" size={21} color={colors.textSecondary} /><Text style={styles.railCount}>{post.comments}</Text></Interactive>
-        <Interactive onPress={onReshare} accessibilityRole="button" accessibilityLabel={`Repost, ${post.reshares} reshares`} style={styles.railAction}><Icon name="connection" size={21} color={colors.textSecondary} /><Text style={styles.railCount}>{post.reshares}</Text></Interactive>
-        <Interactive onPress={onShare} accessibilityRole="button" accessibilityLabel="Share post" style={styles.railAction}><Icon name="share" size={21} color={colors.textSecondary} /><Text style={styles.railLabel}>Share</Text></Interactive>
-        <Interactive onPress={onReport} accessibilityRole="button" accessibilityLabel="Report post" style={styles.railAction}><Icon name="warning" size={19} color={colors.textSecondary} /><Text style={styles.railLabel}>Report</Text></Interactive>
+        <Interactive onPress={onLike} accessibilityRole="button" accessibilityLabel={`${post.my_reaction ? 'Unlike' : 'Like'} post, ${post.reactions} likes`} style={styles.railAction}><Icon name="heart" size={21} color={post.my_reaction ? colors.primaryText : colors.textSecondary} filled={Boolean(post.my_reaction)} /></Interactive>
+        <Interactive onPress={onComment} accessibilityRole="button" accessibilityLabel={`Comment, ${post.comments} comments`} style={styles.railAction}><Icon name="mail" size={21} color={colors.textSecondary} /></Interactive>
+        <Interactive onPress={onReshare} accessibilityRole="button" accessibilityLabel={`Repost, ${post.reshares} reshares`} style={styles.railAction}><Icon name="connection" size={21} color={colors.textSecondary} /></Interactive>
+        <Interactive onPress={onShare} accessibilityRole="button" accessibilityLabel="Share post" style={styles.railAction}><Icon name="share" size={21} color={colors.textSecondary} /></Interactive>
+        <Interactive onPress={onReport} accessibilityRole="button" accessibilityLabel="Report post" style={styles.railAction}><Icon name="warning" size={19} color={colors.textSecondary} /></Interactive>
       </View> : null}
       </View>
     </Card>
@@ -298,11 +298,8 @@ function createStyles(colors: ThemeColors) {
     reshareBox: { gap: 9, borderWidth: 1, borderColor: colors.border, borderRadius: 14, padding: 12, backgroundColor: colors.surfaceMuted },
     postActions: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: 8, gap: 8 },
     postActionsVertical: { width: 62, alignItems: 'center', gap: 14, borderLeftWidth: 1, borderLeftColor: colors.divider, paddingLeft: 8, paddingTop: 8 },
-    railAction: { minWidth: 48, alignItems: 'center', justifyContent: 'center', gap: 3, paddingVertical: 3 },
-    railCount: { ...Type.caption, fontWeight: '800', color: colors.textSecondary },
-    railLabel: { ...Type.caption, color: colors.textSecondary },
-    action: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6, paddingVertical: 7 },
-    actionText: { ...Type.caption, fontWeight: '700', color: colors.textSecondary },
+    railAction: { minWidth: 48, minHeight: 44, alignItems: 'center', justifyContent: 'center', paddingVertical: 3 },
+    action: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', minHeight: 42, paddingVertical: 8 },
     composeSheet: { gap: 12 },
     postInput: { minHeight: 140, textAlignVertical: 'top', padding: 13, borderWidth: 1, borderColor: colors.borderStrong, borderRadius: 14, backgroundColor: colors.surfaceSunken, color: colors.text, fontSize: 15 },
     mediaSelected: { flexDirection: 'row', alignItems: 'center', gap: 8 },
