@@ -8,19 +8,64 @@ import {
 } from '@/data/learning-sync';
 import type { PowerupMultiplier } from '@/data/learning/xp-rules';
 
-export type PowerupSource = 'lesson' | 'quiz' | 'streak' | 'share';
+export type PowerupSource = 'lesson' | 'quiz' | 'streak' | 'share' | 'achievement';
 export type Powerup = {
   id: string;
   source: PowerupSource;
   sourceId: string;
   multiplier: Exclude<PowerupMultiplier, 1>;
   earnedAt: number;
+  /** 'single' (default): multiplies the next lesson or quiz. 'timed': once
+   *  activated, multiplies every lesson and quiz until it expires. */
+  kind?: 'single' | 'timed';
+  /** Timed boosts only; never more than MAX_POWERUP_SECONDS. */
+  durationSeconds?: number;
 };
+
+/** No power-up effect may last longer than one hour, under any circumstances. */
+export const MAX_POWERUP_SECONDS = 3600;
+
+/** The timed boosts an achievement level can award (one picked at random). */
+export const REWARD_POOL: readonly { multiplier: Exclude<PowerupMultiplier, 1>; durationSeconds: number }[] = [
+  { multiplier: 1.5, durationSeconds: 3600 },
+  { multiplier: 2, durationSeconds: 2700 },
+  { multiplier: 2.5, durationSeconds: 1800 },
+  { multiplier: 3, durationSeconds: 900 },
+];
+
+export type ActiveBoost = {
+  id: string;
+  multiplier: Exclude<PowerupMultiplier, 1>;
+  activatedAt: number;
+  durationSeconds: number;
+  /** Latest device time seen while active. If the clock ever goes back past it, the boost ends. */
+  seenAt: number;
+};
+
+const clampSeconds = (value: unknown) => Math.max(0, Math.min(MAX_POWERUP_SECONDS, Math.round(Number(value) || 0)));
+
+/**
+ * Milliseconds left on a boost. 0 when expired, when the device clock reads
+ * earlier than the activation, or when it went back after the boost was last
+ * seen — so changing the clock or reloading can never extend an effect.
+ */
+export function boostRemainingMs(active: ActiveBoost | null, now: number): number {
+  if (!active) return 0;
+  if (now < active.activatedAt || now < active.seenAt) return 0;
+  const end = active.activatedAt + clampSeconds(active.durationSeconds) * 1000;
+  return Math.max(0, end - now);
+}
+
+/** A reward pick; deterministic when a random source is given (tests). */
+export function pickReward(random: () => number = Math.random) {
+  return REWARD_POOL[Math.min(REWARD_POOL.length - 1, Math.floor(random() * REWARD_POOL.length))];
+}
 
 const STORAGE_KEY = 'grateapex_powerups';
 const EMPTY: readonly Powerup[] = [];
 let inventory: Powerup[] = [];
 let earnedKeys = new Set<string>();
+let active: ActiveBoost | null = null;
 let loadPromise: Promise<void> | null = null;
 const listeners = new Set<() => void>();
 
@@ -34,7 +79,7 @@ function ordered(items: Powerup[]) {
 
 async function save() {
   try {
-    await writeLearningCache(STORAGE_KEY, JSON.stringify({ inventory, earnedKeys: [...earnedKeys] }));
+    await writeLearningCache(STORAGE_KEY, JSON.stringify({ inventory, earnedKeys: [...earnedKeys], active }));
   } catch (error) {
     console.warn('Could not save power-ups:', error);
   }
@@ -50,7 +95,7 @@ async function load() {
     if (!saved) return;
     const parsed: unknown = JSON.parse(saved);
     if (!parsed || typeof parsed !== 'object') return;
-    const data = parsed as { inventory?: unknown; earnedKeys?: unknown };
+    const data = parsed as { inventory?: unknown; earnedKeys?: unknown; active?: unknown };
     inventory = Array.isArray(data.inventory)
       ? data.inventory.filter((item): item is Powerup => Boolean(item) && typeof item === 'object'
         && typeof (item as Powerup).id === 'string'
@@ -59,7 +104,12 @@ async function load() {
     earnedKeys = new Set(Array.isArray(data.earnedKeys)
       ? data.earnedKeys.filter((item): item is string => typeof item === 'string')
       : inventory.map((item) => `${item.source}:${item.sourceId}`));
-    inventory = ordered(inventory);
+    // Saved timed boosts can never be longer than the cap.
+    inventory = ordered(inventory.map((item) => (item.kind === 'timed' ? { ...item, durationSeconds: clampSeconds(item.durationSeconds) } : item)));
+    const savedActive = data.active as ActiveBoost | null | undefined;
+    active = savedActive && typeof savedActive === 'object' && boostRemainingMs(savedActive, Date.now()) > 0
+      ? { ...savedActive, durationSeconds: clampSeconds(savedActive.durationSeconds) }
+      : null;
     notify();
   } catch (error) {
     console.warn('Could not load power-ups:', error);
@@ -91,24 +141,90 @@ export async function resetPowerups() {
   await ensureLoaded();
   inventory = [];
   earnedKeys = new Set();
+  active = null;
   await save();
   notify();
 }
 
-export async function grantPowerup(source: PowerupSource, sourceId: string, multiplier: Exclude<PowerupMultiplier, 1> = 1.5) {
+export async function grantPowerup(
+  source: PowerupSource,
+  sourceId: string,
+  multiplier: Exclude<PowerupMultiplier, 1> = 1.5,
+  durationSeconds?: number
+) {
   await ensureLoaded();
   const key = `${source}:${sourceId}`;
   if (!sourceId || earnedKeys.has(key)) return false;
   earnedKeys.add(key);
-  inventory = ordered([...inventory, { id: key, source, sourceId, multiplier, earnedAt: Date.now() }]);
+  const item: Powerup = durationSeconds
+    ? { id: key, source, sourceId, multiplier, earnedAt: Date.now(), kind: 'timed', durationSeconds: clampSeconds(durationSeconds) }
+    : { id: key, source, sourceId, multiplier, earnedAt: Date.now() };
+  inventory = ordered([...inventory, item]);
   await save();
   notify();
   return true;
 }
 
+/**
+ * Award one random timed boost for an achievement level. The pick is made
+ * only here, once: the key (one per level) makes repeats a no-op, and the
+ * saved item keeps its multiplier, so reloading never rerolls it.
+ */
+export async function grantAchievementBoost(levelKey: string, random: () => number = Math.random) {
+  await ensureLoaded();
+  if (earnedKeys.has(`achievement:${levelKey}`)) return null;
+  const pick = pickReward(random);
+  const granted = await grantPowerup('achievement', levelKey, pick.multiplier, pick.durationSeconds);
+  return granted ? pick : null;
+}
+
+/** Start a timed boost from the inventory. One at a time: others wait (queued), so an effect is never extended. */
+export async function activatePowerup(id: string): Promise<ActiveBoost> {
+  await ensureLoaded();
+  const now = Date.now();
+  const left = boostRemainingMs(active, now);
+  if (left > 0) throw new Error(`A boost is already running (${Math.ceil(left / 60000)} min left). Your other boosts stay in your inventory.`);
+  const item = inventory.find((candidate) => candidate.id === id && candidate.kind === 'timed');
+  if (!item) throw new Error('That boost is not in your inventory.');
+  active = { id: item.id, multiplier: item.multiplier, activatedAt: now, durationSeconds: clampSeconds(item.durationSeconds), seenAt: now };
+  inventory = inventory.filter((candidate) => candidate.id !== id);
+  await save();
+  notify();
+  return active;
+}
+
+export function activeBoostNow(now = Date.now()): ActiveBoost | null {
+  return boostRemainingMs(active, now) > 0 ? active : null;
+}
+
+export function useActiveBoost(): ActiveBoost | null {
+  return useSyncExternalStore(
+    (listener) => {
+      listeners.add(listener);
+      void ensureLoaded();
+      return () => listeners.delete(listener);
+    },
+    () => active,
+    () => null
+  );
+}
+
 export async function consumePowerup(): Promise<Powerup | null> {
   await ensureLoaded();
-  const powerup = inventory[0];
+  // A running timed boost applies to every lesson and quiz until it expires.
+  const now = Date.now();
+  if (active && boostRemainingMs(active, now) > 0) {
+    active = { ...active, seenAt: now };
+    await save();
+    return { id: `${active.id}:active`, source: 'achievement', sourceId: active.id, multiplier: active.multiplier, earnedAt: active.activatedAt, kind: 'timed' };
+  }
+  if (active) {
+    active = null; // expired (or the clock went back): stop applying it
+    await save();
+    notify();
+  }
+  // Otherwise the strongest single-use power-up. Timed boosts wait for activation.
+  const powerup = inventory.find((item) => item.kind !== 'timed');
   if (!powerup) return null;
   inventory = inventory.filter((item) => item.id !== powerup.id);
   await save();
@@ -118,6 +234,7 @@ export async function consumePowerup(): Promise<Powerup | null> {
 
 export async function returnPowerup(powerup: Powerup) {
   await ensureLoaded();
+  if (powerup.id.endsWith(':active')) return; // a running boost was not used up
   if (inventory.some((item) => item.id === powerup.id)) return;
   inventory = ordered([powerup, ...inventory]);
   await save();
@@ -127,6 +244,7 @@ export async function returnPowerup(powerup: Powerup) {
 subscribeToLearningAuthChanges(() => {
   inventory = [];
   earnedKeys = new Set();
+  active = null;
   loadPromise = null;
   notify();
   void ensureLoaded();
