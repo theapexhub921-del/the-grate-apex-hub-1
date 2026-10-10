@@ -13,6 +13,9 @@ function candidates(base) {
 }
 
 export async function resolve(specifier, context, next) {
+  // Pure modules may import theme constants: a tiny React Native stand-in, and no CSS.
+  if (specifier === 'react-native') return { url: new URL('./stubs/react-native.mjs', import.meta.url).href, shortCircuit: true };
+  if (specifier.endsWith('.css')) return { url: 'data:text/javascript,export default {}', shortCircuit: true };
   if (specifier.startsWith('@/')) {
     for (const file of candidates(path.join(SRC, specifier.slice(2)))) {
       if (existsSync(file) && !file.endsWith(path.sep) && path.extname(file)) {

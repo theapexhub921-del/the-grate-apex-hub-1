@@ -11,7 +11,8 @@
 //                                                   app's shadows
 //
 // Pure (no React Native), for tests.
-import type { AtmospherePalette } from '@/components/atmosphere/config';
+import { ATMOSPHERE, type AtmospherePalette } from '@/components/atmosphere/palettes';
+import type { ColorSchemeName } from '@/constants/theme';
 import type { ThemeColors } from '@/constants/theme';
 import type { ExperienceId } from '@/data/experience';
 import { mixHex, withAlpha } from '@/data/experience-style';
@@ -64,7 +65,9 @@ const originateCache = new Map<string, ThemeColors>();
 export function originateFromLegacy(def: LegacyThemeDef): ThemeColors {
   const hit = originateCache.get(def.id);
   if (hit) return hit;
-  const c = legacyColorsOf(def);
+  const c0 = legacyColorsOf(def);
+  // Originate's page is one colour: a light theme starts from its lightest stop, a dark one from its darkest.
+  const c = { ...c0, bg: originateBase(def) };
   const base = legacyThemeColors(def);
   // Solid surfaces stepped up from the page colour (white on light themes, the ink on dark ones).
   const step = (amount: number) => (c.light ? mixHex('#ffffff', c.bg, amount) : mixHex(c.text, c.bg, amount));
@@ -105,9 +108,27 @@ export function originateFromLegacy(def: LegacyThemeDef): ThemeColors {
   return result;
 }
 
+/** Originate's single page colour for a legacy theme: the lightest stop for a light theme, the darkest for a dark one. */
+export function originateBase(def: LegacyThemeDef): string {
+  const c = legacyColorsOf(def);
+  const stops = [...c.gradient, c.bg];
+  const lum = (hex: string) => { const n = parseInt(hex.replace('#', ''), 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); };
+  return stops.reduce((best, stop) => ((c.light ? lum(stop) > lum(best) : lum(stop) < lum(best)) ? stop : best), stops[0]);
+}
+
+/** The original-style gradient wash for one of this app's palettes (The Originals, Hybrid). */
+export function paletteGradient(scheme: ColorSchemeName) {
+  const p = ATMOSPHERE[scheme];
+  return {
+    colors: [mixHex(p.fieldA[0], p.base, Math.min(0.55, p.fieldA[1] * 1.6)), mixHex(p.fieldB[0], p.base, Math.min(0.5, p.fieldB[1])), p.base],
+    bg: p.base,
+    light: scheme === 'light',
+  };
+}
+
 /** Originate's page atmosphere for a legacy theme, in that theme's own colours. */
 export function legacyAtmosphere(def: LegacyThemeDef): AtmospherePalette {
-  const c = legacyColorsOf(def);
+  const c = { ...legacyColorsOf(def), bg: originateBase(def) };
   const [first, second, third] = [c.gradient[0], c.gradient[Math.floor(c.gradient.length / 2)], c.gradient[c.gradient.length - 1]];
   return {
     base: c.bg,

@@ -3,12 +3,13 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useAchievementStore, useAchievements } from '@/data/achievements-store';
 import { ACHIEVEMENTS } from '@/data/achievements';
-import { legacyThemeById } from '@/data/legacy-theme-colors';
-import { useProgress } from '@/data/progress';
-import { setLegacyThemePreference, useLegacyThemePreference } from '@/data/settings';
-import { themeLock, type ThemeEntry, type ThemeLock } from '@/data/theme-catalog';
+import { DEFAULT_LEGACY_THEME, legacyThemeById } from '@/data/legacy-theme-colors';
+import { useProgress, waitForProgressSync } from '@/data/progress';
+import { chooseLegacyTheme, setLegacyThemePreference, useAppearancePreference, useLegacyThemePreference } from '@/data/settings';
+import { THEME_CATALOG, themeLock, type ThemeEntry, type ThemeLock } from '@/data/theme-catalog';
 import { useAuth } from '@/hooks/use-auth';
 import { setActiveExperience } from '@/hooks/use-experience';
+import { useThemeFamily } from '@/hooks/use-theme';
 import { db } from '@/lib/firebase';
 
 // Copies the account's experience choice to the interface, and keeps the
@@ -56,6 +57,36 @@ export function ExperienceSync() {
   useEffect(() => {
     if (checked && !isAdmin && legacyThemeById(legacyTheme).adminOnly) void setLegacyThemePreference('dark');
   }, [checked, isAdmin, legacyTheme]);
+
+  // Locked themes (owner rule): only Apex Legacy, System, Dark and Light are free.
+  // Once this learner's XP has loaded from the account, a theme their level has
+  // not unlocked falls back to Apex Legacy. Learners with enough XP keep theirs.
+  const uid = user?.uid ?? null;
+  const [xpReadyFor, setXpReadyFor] = useState<string | null>(null);
+  useEffect(() => {
+    if (!uid) return;
+    let live = true;
+    void waitForProgressSync().then(() => {
+      if (live) setXpReadyFor(uid);
+    });
+    return () => {
+      live = false;
+    };
+  }, [uid]);
+  const family = useThemeFamily();
+  const appearance = useAppearancePreference();
+  const lockOf = useThemeLocks();
+  const { ready: achievementsReady } = useAchievements();
+  useEffect(() => {
+    if (!uid || xpReadyFor !== uid) return;
+    const entry = THEME_CATALOG.find((item) => item.family === family && item.id === (family === 'newer' ? appearance : legacyTheme));
+    if (!entry) return;
+    const lock = lockOf(entry);
+    if (lock.unlocked) return;
+    if (lock.kind === 'achievement' && !achievementsReady) return; // not known yet
+    if (lock.kind === 'admin' && !checked) return;
+    void chooseLegacyTheme(DEFAULT_LEGACY_THEME);
+  }, [uid, xpReadyFor, family, appearance, legacyTheme, lockOf, achievementsReady, checked]);
 
   return null;
 }

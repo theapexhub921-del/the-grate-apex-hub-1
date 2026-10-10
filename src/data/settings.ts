@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { LEGACY_THEMES } from '@/data/legacy-themes';
+import { LEGACY_STYLE_THEMES } from '@/data/legacy-theme-colors';
 import type { ThemeFamily } from '@/data/theme-portrayal';
 import { getTabBarModePreference, setTabBarModeFromAccount } from '@/data/navigation-settings';
 
@@ -72,7 +72,7 @@ type SettingsData = {
 
 export type { ThemeFamily };
 const isThemeFamily = (value: unknown): value is ThemeFamily => value === 'newer' || value === 'legacy';
-const isLegacyThemeId = (value: unknown): value is string => typeof value === 'string' && LEGACY_THEMES.some((theme) => theme.id === value);
+const isLegacyThemeId = (value: unknown): value is string => typeof value === 'string' && LEGACY_STYLE_THEMES.some((theme) => theme.id === value);
 
 const STORAGE_KEY = 'grateapex_settings';
 

@@ -129,7 +129,9 @@ describe('every theme in every experience, drawn the experience’s way', async 
     assert.match(c.surfaceElevated, /^#[0-9a-f]{6}$/);
     assert.equal(c.primary, legacyThemeColors(lavender).primary);
     assert.notEqual(c.shadow, 'transparent');
-    assert.equal(legacyAtmosphere(lavender).base, legacyThemeColors(lavender).background);
+    // Originate pages are one colour: a light theme starts from its lightest stop (readable with dark text).
+    assert.equal(legacyAtmosphere(lavender).base, c.background);
+    assert.equal(c.background, '#e8e0fc');
   });
   it('The Originals draws a newer theme flat, with glass panels', () => {
     const colors = { primary: '#1677F2', accent: '#FDC00A', background: '#132A9B', surface: '#ffffff', border: '#cccccc' };

@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
 
-import { ColorSchemeName, Colors, ThemeColors } from '@/constants/theme';
-import type { ExperienceId } from '@/data/experience';
-import { hybridGlass } from '@/data/experience-style';
-import { legacyThemeById, legacyThemeColors, originalsThemeColors } from '@/data/legacy-theme-colors';
+import { ColorSchemeName, ThemeColors } from '@/constants/theme';
 import { useAppearancePreference, useLegacyThemePreference, useThemeFamilyPreference } from '@/data/settings';
-import { effectiveThemeFamily, originalsFromNewer, originateFromLegacy, type ThemeFamily } from '@/data/theme-portrayal';
+import { themeColorsFor } from '@/data/theme-colors';
+import { effectiveThemeFamily, type ThemeFamily } from '@/data/theme-portrayal';
 import { useExperience } from '@/hooks/use-experience';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
@@ -22,18 +20,8 @@ export function useResolvedColorScheme(): ColorSchemeName {
   return preference;
 }
 
-/**
- * The colours for a theme in an experience. Every theme (newer or legacy) is
- * available in every experience, and each experience draws it its own way
- * (data/theme-portrayal.ts). Switching experience never changes the theme.
- */
-export function themeColorsFor(experience: ExperienceId, scheme: ColorSchemeName, legacyTheme: string, chosen: ThemeFamily | null): ThemeColors {
-  const family = effectiveThemeFamily(experience, chosen);
-  const def = legacyThemeById(legacyTheme);
-  if (experience === 'originals') return family === 'legacy' ? originalsThemeColors(def) : originalsFromNewer(Colors[scheme], scheme === 'light');
-  if (experience === 'hybrid') return family === 'legacy' ? legacyThemeColors(def) : hybridGlass(Colors[scheme]);
-  return family === 'legacy' ? originateFromLegacy(def) : Colors[scheme];
-}
+/** The colours for a theme in an experience (data/theme-colors.ts): drawn the experience's way, made readable. */
+export { themeColorsFor };
 
 /** The theme family in use for this part of the interface. */
 export function useThemeFamily(): ThemeFamily {

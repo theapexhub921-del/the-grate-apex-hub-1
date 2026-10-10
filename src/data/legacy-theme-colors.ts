@@ -4,12 +4,36 @@
 // app's fixed shell colours (tab bar, sidebar). Nothing is blended with this
 // app's palettes. Pure, for tests.
 import type { ThemeColors } from '@/constants/theme';
+import { contrastRatio } from '@/data/contrast';
+import { EXTRA_THEMES } from '@/data/extra-themes';
 import { LEGACY_THEMES, legacyColorsOf, type LegacyThemeDef } from '@/data/legacy-themes';
+
+/** The original themes plus the two this app added, all drawn the same way. */
+export const LEGACY_STYLE_THEMES: readonly LegacyThemeDef[] = [...LEGACY_THEMES, ...EXTRA_THEMES];
 
 export const DEFAULT_LEGACY_THEME = 'dark'; // the original app's default
 
 export function legacyThemeById(id: string | null | undefined): LegacyThemeDef {
-  return LEGACY_THEMES.find((theme) => theme.id === id) ?? LEGACY_THEMES.find((theme) => theme.id === DEFAULT_LEGACY_THEME)!;
+  return LEGACY_STYLE_THEMES.find((theme) => theme.id === id) ?? LEGACY_THEMES.find((theme) => theme.id === DEFAULT_LEGACY_THEME)!;
+}
+
+/**
+ * A solid colour for raised surfaces (sheets, dialogs, menus) that reads well
+ * with the theme's text: its lightest (light theme) or darkest (dark theme)
+ * stop, deepened towards white/black until body text is comfortable (7:1).
+ */
+export function legacySolidSurface(def: LegacyThemeDef): string {
+  const c = legacyColorsOf(def);
+  const stops = [...c.gradient, c.bg];
+  const luma = (hex: string) => { const n = parseInt(hex.replace('#', ''), 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); };
+  let base = stops.reduce((best, stop) => ((c.light ? luma(stop) > luma(best) : luma(stop) < luma(best)) ? stop : best), stops[0]);
+  const target = c.light ? 255 : 0;
+  for (let step = 0; step < 20 && contrastRatio(def.ink, base) < 7; step++) {
+    const n = parseInt(base.replace('#', ''), 16);
+    const mix = (v: number) => Math.round(v + (target - v) * 0.15).toString(16).padStart(2, '0');
+    base = `#${mix((n >> 16) & 255)}${mix((n >> 8) & 255)}${mix(n & 255)}`;
+  }
+  return base;
 }
 
 const cache = new Map<string, ThemeColors>();
@@ -36,7 +60,7 @@ export function legacyThemeColors(def: LegacyThemeDef): ThemeColors {
     accentText: c.accent,
     background: c.bg,
     surface: c.card,
-    surfaceElevated: c.bg,
+    surfaceElevated: legacySolidSurface(def),
     surfaceMuted: c.card,
     surfaceSunken: c.card,
     track: c.border,

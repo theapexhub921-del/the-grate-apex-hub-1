@@ -1,16 +1,15 @@
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
-import { ATMOSPHERE } from '@/components/atmosphere/config';
 import { PageMotifs } from '@/components/atmosphere/page-motifs';
 import { Text } from '@/components/ui/text';
 import { webStyle } from '@/components/ui/web';
-import { legacyGradientAngle, mixHex } from '@/data/experience-style';
-import { legacyColorsOf } from '@/data/legacy-themes';
+import { legacyGradientAngle, withAlpha } from '@/data/experience-style';
+import { gradientPage } from '@/data/theme-colors';
 import { legacyThemeById } from '@/data/legacy-theme-colors';
 import { useLegacyThemePreference } from '@/data/settings';
 import { useExperience } from '@/hooks/use-experience';
-import { useResolvedColorScheme, useUsesLegacyTheme } from '@/hooks/use-theme';
+import { useResolvedColorScheme, useThemeFamily } from '@/hooks/use-theme';
 
 // The original app's background (old-reference/src/Background.tsx): the
 // theme's gradient, start {0.1, 0} → end {0.9, 1}, with six faint floating
@@ -25,25 +24,18 @@ const AMBIENT = [
   { e: '🧠', top: '55%', left: '10%' }, { e: '🦟', top: '70%', left: '80%' }, { e: '🧬', top: '86%', left: '14%' },
 ] as const;
 
-/** Hybrid with one of this app's palettes: a three-stop wash in that palette's own colours. */
-export function paletteGradient(scheme: keyof typeof ATMOSPHERE) {
-  const p = ATMOSPHERE[scheme];
-  return {
-    colors: [mixHex(p.fieldA[0], p.base, Math.min(0.55, p.fieldA[1] * 1.6)), mixHex(p.fieldB[0], p.base, Math.min(0.5, p.fieldB[1])), p.base],
-    bg: p.base,
-    light: scheme === 'light',
-  };
-}
-
 export function LegacyBackground({ lively = false }: { lively?: boolean }) {
   const experience = useExperience();
-  const usesLegacy = useUsesLegacyTheme();
+  const family = useThemeFamily();
   const legacyId = useLegacyThemePreference();
   const scheme = useResolvedColorScheme();
   const { width, height } = useWindowDimensions();
 
-  const legacy = legacyColorsOf(legacyThemeById(legacyId));
-  const { colors, bg, light } = usesLegacy ? { colors: legacy.gradient, bg: legacy.bg, light: legacy.light } : paletteGradient(scheme);
+  // The theme's gradient, plus a readability veil where its colours are too far apart for its text.
+  const page = gradientPage(scheme, legacyId, family);
+  const colors = page.stops;
+  const bg = page.bg;
+  const light = family === 'legacy' ? legacyThemeById(legacyId).light : scheme === 'light';
 
   return (
     <View pointerEvents="none" accessible={false} aria-hidden style={[StyleSheet.absoluteFill, styles.root, { backgroundColor: bg }]}>
@@ -66,6 +58,7 @@ export function LegacyBackground({ lively = false }: { lively?: boolean }) {
           <Rect x="0" y="0" width="100%" height="100%" fill="url(#legacy-bg)" />
         </Svg>
       )}
+      {page.scrim ? <View style={[StyleSheet.absoluteFill, { backgroundColor: withAlpha(page.scrim.color, page.scrim.alpha) }]} /> : null}
       {experience === 'originals' ? (
         <View style={StyleSheet.absoluteFill}>
           {AMBIENT.map((a) => (

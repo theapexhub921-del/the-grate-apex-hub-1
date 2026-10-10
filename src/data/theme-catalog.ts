@@ -7,8 +7,7 @@
 // Under the hood a theme is still one of this app's palettes ('newer') or one
 // of the original app's themes ('legacy'), so saved choices keep working.
 // Pure, for tests.
-import { legacyLevel } from '@/data/legacy-theme-colors';
-import { LEGACY_THEMES } from '@/data/legacy-themes';
+import { LEGACY_STYLE_THEMES, legacyLevel } from '@/data/legacy-theme-colors';
 import type { ThemeFamily } from '@/data/theme-portrayal';
 
 export type ThemeEntry = {
@@ -51,7 +50,7 @@ const rank = (entry: { level: number; ach?: string; adminOnly?: boolean }) => (e
 
 export const THEME_CATALOG: readonly ThemeEntry[] = [
   ...NEWER.map((entry) => ({ ...entry, key: `newer:${entry.id}`, family: 'newer' as const })),
-  ...LEGACY_THEMES.map((theme) => {
+  ...LEGACY_STYLE_THEMES.map((theme) => {
     const override = LEGACY_OVERRIDES[theme.id] ?? {};
     return {
       key: `legacy:${theme.id}`,
