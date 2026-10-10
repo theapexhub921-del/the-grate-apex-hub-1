@@ -5,6 +5,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getCountFromServer,
   getDoc,
   getDocs,
   limit,
@@ -425,6 +426,7 @@ export type PublicProfile = {
   totalXp: number | null;
   followers: number;
   following: number;
+  posts: number;
   /** I follow them / they follow me. */
   iFollow: boolean;
   followsMe: boolean;
@@ -433,7 +435,12 @@ export type PublicProfile = {
 /** A learner's profile with real follower and following counts (users, scores, follows — all readable when signed in). */
 export async function getPublicProfile(uid: string): Promise<PublicProfile> {
   const me = auth.currentUser?.uid ?? null;
-  const [people, followers, following] = await Promise.all([readPeople([uid]), followEdges(uid, 'followers'), followEdges(uid, 'following')]);
+  const [people, followers, following, posts] = await Promise.all([
+    readPeople([uid]),
+    followEdges(uid, 'followers'),
+    followEdges(uid, 'following'),
+    getCountFromServer(query(collection(db, 'posts'), where('authorUid', '==', uid))).then((snap) => snap.data().count).catch(() => 0),
+  ]);
   const data = people.get(uid);
   const profile = data?.profile ?? {};
   const score = data?.score ?? {};
@@ -450,6 +457,7 @@ export async function getPublicProfile(uid: string): Promise<PublicProfile> {
     totalXp: typeof score.xp === 'number' ? score.xp : null,
     followers: followers.length,
     following: following.length,
+    posts,
     iFollow: Boolean(me && followers.some((edge) => edge.uid === me)),
     followsMe: Boolean(me && following.some((edge) => edge.uid === me)),
   };

@@ -12,6 +12,7 @@ import { activeNavPath, MOBILE_NAV_ITEMS, NAV_ITEMS } from '@/components/nav-ite
 import { NotificationBell } from '@/components/notifications';
 import { showTabBar, useTabBarHidden } from '@/components/tab-bar-visibility';
 import { Avatar } from '@/components/ui/avatar';
+import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { Text } from '@/components/ui/text';
 import { webStyle } from '@/components/ui/web';
 import { legacyRank } from '@/data/legacy-theme-colors';
@@ -243,9 +244,12 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
             <Avatar uri={avatarUrl} name={displayName} size={38} />
           </View>
           <View style={[{ flex: 1 }, collapsed && styles.hidden]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
             <Text style={[styles.meName, { color: C.text }]} numberOfLines={1}>
               @{username}
             </Text>
+            <VerifiedBadge username={username} uid={user?.uid} size={13} />
+            </View>
             <Text style={[styles.meSub, { color: C.muted }]}>
               Lv {rank.level} · {rank.title}
               {progress.streak ? `  🔥${progress.streak}` : ''}

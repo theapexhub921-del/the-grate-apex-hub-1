@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { BackLink } from '@/components/learning/nav-bits';
 import { CommunityPostsFeed } from '@/components/social/community-posts-feed';
 import { Avatar } from '@/components/ui/avatar';
+import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
@@ -77,10 +78,12 @@ export default function PersonScreen() {
         <View style={styles.info}>
           <View style={styles.nameRow}>
             <Text style={styles.username}>{profile.username ?? name}</Text>
+            <VerifiedBadge username={profile.username} uid={profile.userId} size={20} />
             {friends ? <Pill label="Friends" tone="success" /> : profile.followsMe ? <Pill label="Follows you" tone="primary" /> : null}
           </View>
           <Text style={styles.display}>{name}</Text>
           <View style={styles.counts}>
+            <Count label="posts" value={profile.posts} />
             <Count label="followers" value={profile.followers} />
             <Count label="following" value={profile.following} />
             {profile.totalXp !== null ? <Count label="XP" value={profile.totalXp} /> : null}

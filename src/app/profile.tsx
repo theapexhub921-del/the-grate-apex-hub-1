@@ -5,6 +5,8 @@ import { Text } from '@/components/ui/text';
 
 import { PersonalGoalsCard } from '@/components/learning/personal-goals-card';
 import { RankProgressCard } from '@/components/rank-progress';
+import { useAuth } from '@/hooks/use-auth';
+import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { AchievementBadge } from '@/components/achievements/achievement-badge';
 import { ApexCoinWalletCard } from '@/components/apex-coin-wallet-card';
 import { AvatarPicker } from '@/components/avatar/avatar-picker';
@@ -22,7 +24,7 @@ import { useAchievements } from '@/data/achievements-store';
 import { useLearning } from '@/data/learning/use-learning';
 import { getRankProgress } from '@/data/ranks';
 import { useAvatarUrl, useDisplayName } from '@/data/user';
-import { getRecommendedFriends, personName, sendFriendRequest, useSocial, type SocialRecommendation } from '@/data/social';
+import { getRecommendedFriends, personName, sendFriendRequest, useSocial, type SocialRecommendation, getPublicProfile } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 type MenuItem = { icon: IconName; label: string; detail: string; href: Href };
@@ -64,6 +66,15 @@ export default function ProfileScreen() {
   // Milestones are derived from the learning record — earned, never given.
   // These six are this app's own, now with five levels each (data/achievements.ts).
   const achievementStates = useAchievements().states;
+  // Posts, followers and following — the same counts everyone sees on a profile.
+  const { user } = useAuth();
+  const [myCounts, setMyCounts] = useState<{ posts: number; followers: number; following: number } | null>(null);
+  useEffect(() => {
+    if (!user?.uid) return;
+    let live = true;
+    getPublicProfile(user.uid).then((p) => { if (live) setMyCounts({ posts: p.posts, followers: p.followers, following: p.following }); }).catch(() => {});
+    return () => { live = false; };
+  }, [user?.uid]);
   const levelsDone = achievementStates.reduce((sum, state) => sum + state.level, 0);
   // Badges on You: earned ones first (highest level), then the closest to their next level.
   const badgeStates = [...achievementStates].sort((x, y) => y.level - x.level || y.progress - x.progress).slice(0, 8);
@@ -90,9 +101,17 @@ export default function ProfileScreen() {
         </Interactive>
       </View>
       <View style={styles.identityText}>
-        <Text style={styles.name} numberOfLines={1}>
-          {displayName ? `Doc. ${displayName}` : 'Doc.'}
-        </Text>
+        <View style={styles.nameRow}>
+          <Text style={styles.name} numberOfLines={1}>
+            {displayName ? `Doc. ${displayName}` : 'Doc.'}
+          </Text>
+          <VerifiedBadge username={social.username} uid={user?.uid} size={20} />
+        </View>
+        {myCounts ? (
+          <Text style={styles.counts}>
+            <Text style={styles.countValue}>{myCounts.posts}</Text> posts · <Text style={styles.countValue}>{myCounts.followers}</Text> followers · <Text style={styles.countValue}>{myCounts.following}</Text> following
+          </Text>
+        ) : null}
         <Text style={styles.username}>
           {social.status === 'loading' ? 'Username: Loading…' : `Username: ${social.username ? `@${social.username}` : '—'}`}
         </Text>
@@ -328,6 +347,9 @@ function createStyles(colors: ThemeColors) {
     profileAvatar: { position: 'relative', alignItems: 'center', justifyContent: 'center' },
     changeAvatar: { position: 'absolute', right: -2, bottom: -2, width: 30, height: 30, borderRadius: 15, backgroundColor: colors.primary, borderWidth: 2, borderColor: colors.surfaceElevated, alignItems: 'center', justifyContent: 'center' },
     username: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },
+    nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    counts: { fontSize: 13.5, color: colors.textSecondary, marginTop: 2 },
+    countValue: { fontWeight: '800', color: colors.text },
     name: { ...Type.title1, color: colors.text },
     badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     rankBadge: {

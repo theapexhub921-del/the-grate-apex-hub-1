@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/avatar';
+import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { Interactive } from '@/components/ui/interactive';
 import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
@@ -43,7 +44,7 @@ export function FeedSideRail() {
         <Interactive onPress={() => router.push('/profile' as Href)} accessibilityRole="link" accessibilityLabel="Your profile" style={styles.meLink}>
           <Avatar uri={avatarUrl} name={displayName} size={46} ring="gold" />
           <View style={styles.flex}>
-            <Text style={styles.handle} numberOfLines={1}>{username ? username : displayName || 'You'}</Text>
+            <View style={styles.nameRow}><Text style={styles.handle} numberOfLines={1}>{username ? username : displayName || 'You'}</Text><VerifiedBadge username={username} uid={user?.uid} size={14} /></View>
             <Text style={styles.sub} numberOfLines={1}>{displayName}</Text>
           </View>
         </Interactive>
@@ -67,7 +68,7 @@ export function FeedSideRail() {
             <Interactive onPress={() => router.push(routes.profile(person.userId))} accessibilityRole="link" accessibilityLabel={`View ${personName(person)}'s profile`} style={styles.meLink}>
               <Avatar uri={person.avatarUrl} name={personName(person)} size={36} />
               <View style={styles.flex}>
-                <Text style={styles.personName} numberOfLines={1}>{person.username ?? personName(person)}</Text>
+                <View style={styles.nameRow}><Text style={styles.personName} numberOfLines={1}>{person.username ?? personName(person)}</Text><VerifiedBadge username={person.username} uid={person.userId} size={13} /></View>
                 <Text style={styles.sub} numberOfLines={1}>{person.reason ?? 'Suggested for you'}</Text>
               </View>
             </Interactive>
@@ -102,6 +103,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     rail: { width: 320, gap: 14, paddingTop: 8 },
     flex: { flex: 1, minWidth: 0 },
+    nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
     me: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     meLink: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, minWidth: 0 },
     handle: { ...Type.headline, fontSize: 14.5, color: colors.text },
