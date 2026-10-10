@@ -1,7 +1,8 @@
 import { LegalPage } from '@/components/legal-page';
+import { FULL_ACCOUNT_DELETION } from '@/lib/account';
 
 // GRATEAPEX privacy policy (public: /privacy). Keep it in step with what
-// the app actually stores — see supabase/migrations and data/social.ts.
+// the app actually stores — see firestore.rules, data/social.ts and lib/account.ts.
 export default function PrivacyScreen() {
   return (
     <LegalPage
@@ -16,7 +17,7 @@ export default function PrivacyScreen() {
             'If you continue with Google: your name, email address and profile picture link from your Google account. We never receive your Google password or any other Google data.',
             'Profile: your display name, username, avatar and your activity-sharing choice.',
             'Learning: lessons you complete, XP, quiz and question answers and scores, your review schedule and streak, and a timeline of learning events (for example, “lesson completed”).',
-            'Social: your friends, friend requests and notifications.',
+            'Social: who you follow and who follows you, your posts, comments, likes, stories, study groups, messages and notifications.',
           ],
         },
         {
@@ -38,13 +39,15 @@ export default function PrivacyScreen() {
         {
           title: 'Where your data is kept',
           paragraphs: [
-            'Your account and learning data are stored with Supabase, our database and authentication provider, and protected by access rules so each learner can only read their own private data. The web app is hosted by Vercel. Google is used only if you choose to sign in with Google.',
+            'Your account and learning data are stored with Google Firebase (Authentication and Cloud Firestore) and protected by access rules so each learner can only read their own private data. Photos and videos you share are stored with Cloudinary. The web app is hosted by Vercel. Google sign-in is used only if you choose it.',
           ],
         },
         {
           title: 'How long we keep it, and deleting it',
           paragraphs: [
-            'We keep your data while your account exists. You can permanently delete your account and all of its data at any time in Settings → Account → Delete account. You can also turn off activity sharing on the Friends page.',
+            FULL_ACCOUNT_DELETION
+              ? 'We keep your data while your account exists. You can permanently delete your account and all of its data at any time in Settings → Delete account. You can also turn off activity sharing on the Friends page.'
+              : 'We keep your data while your account exists. Settings → Delete account deletes your sign-in and your private learning progress straight away. Your public profile, username, leaderboard entry and what you shared (posts, comments, stories, messages) are removed by the GrAteApex Hub team on request: email theapexhub921@gmail.com before you delete. You can also turn off activity sharing on the Friends page.',
           ],
         },
         {

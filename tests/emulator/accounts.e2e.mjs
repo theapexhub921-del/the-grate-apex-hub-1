@@ -1,7 +1,7 @@
 // Accounts, usernames, display names and class selection: the app's real code
 // (lib/accounts.ts, lib/profiles.ts) against the emulator with the rules
 // DEPLOYED TODAY — none of this needs a rule change.
-import { auth, check, db, fbAuth, finish, freshUser, fs, loadRules, peek, projectId, rulesUnderTest, seed, signInAs } from './connect.mjs';
+import { auth, check, db, fbAuth, finish, freshUser, fs, loadRules, loginExists, peek, rulesUnderTest, seed, signInAs } from './connect.mjs';
 
 const accounts = await import('@/lib/accounts');
 const profiles = await import('@/lib/profiles');
@@ -12,12 +12,7 @@ await loadRules(rulesUnderTest());
 const PASSWORD = 'emulator-only-password';
 const stamp = Date.now().toString(36);
 const uname = (base) => `${base}_${stamp}`.slice(0, 20);
-async function accountExists(email) {
-  const response = await fetch(`http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:lookup`, {
-    method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer owner' }, body: JSON.stringify({ email: [email] }),
-  });
-  return Boolean((await response.json()).users?.length);
-}
+const accountExists = loginExists;
 async function failsWith(promise) {
   try { await promise; return null; } catch (error) { return error.message || String(error); }
 }
@@ -28,6 +23,7 @@ const amaraName = uname('amara');
 await accounts.registerWithEmail({ ...amara, username: amaraName, displayName: 'Amara K' });
 amara.uid = auth.currentUser.uid;
 let profile = await peek(`users/${amara.uid}`);
+check('register: the login exists (lookup works)', await loginExists(amara.email));
 check('register: profile with username and a separate display name', profile.username === amaraName && profile.displayName === 'Amara K' && profile.classLocked === false, profile);
 check('register: username reserved as { uid }', JSON.stringify(await peek(`usernames/${amaraName}`)) === JSON.stringify({ uid: amara.uid }));
 

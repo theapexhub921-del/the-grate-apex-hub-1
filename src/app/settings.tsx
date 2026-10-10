@@ -45,7 +45,7 @@ import { resetAllLearningProgress } from '@/data/progress';
 import { useAuth } from '@/hooks/use-auth';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { deleteMyAccount } from '@/lib/account';
+import { deleteMyAccount, FULL_ACCOUNT_DELETION } from '@/lib/account';
 import { routes } from '@/lib/routes';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -555,7 +555,7 @@ export default function SettingsScreen() {
       </SettingsSection>
 
       <Sheet visible={deleteOpen} onClose={() => { if (!deleting) { setDeleteOpen(false); setDeleteError(null); } }} title="Delete your account?" subtitle="This action cannot be undone." footer={<View style={styles.confirmActions}><Button label="Cancel" variant="secondary" onPress={() => { setDeleteOpen(false); setDeleteError(null); }} disabled={deleting} /><Button label="Delete account" variant="danger" onPress={() => void handleDeleteAccount()} loading={deleting} /> </View>}>
-        <Text style={styles.optionDescription}>Your profile, learning progress, XP, quiz and review history, friends and notifications will be permanently erased.</Text>
+        <Text style={styles.optionDescription}>{FULL_ACCOUNT_DELETION ? 'Your profile, learning progress, XP, quiz and review history, friends, posts, messages and notifications will be permanently erased.' : 'Your sign-in and your private learning progress will be deleted now. Your public profile, username, leaderboard entry and what you shared stay until the GrAteApex Hub team removes them — email theapexhub921@gmail.com first to ask for that.'}</Text>
         {deleteError ? <Text style={styles.signOutText}>{deleteError}</Text> : null}
       </Sheet>
 

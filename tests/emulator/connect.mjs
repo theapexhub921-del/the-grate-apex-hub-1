@@ -18,6 +18,17 @@ if (!auth.emulatorConfig || db._getSettings().host !== FIRESTORE) throw new Erro
 
 export { app, auth, db, fbAuth, fs };
 export const projectId = app.options.projectId;
+/** The Auth emulator keeps users under the emulators' own project, not the app's. */
+export const authProjectId = process.env.GCLOUD_PROJECT || 'demo-grateapex';
+
+/** Does a login with this email exist in the Auth emulator? */
+export async function loginExists(email) {
+  const response = await fetch(`http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/${authProjectId}/accounts:lookup`, {
+    method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer owner' }, body: JSON.stringify({ email: [email] }),
+  });
+  if (!response.ok) throw new Error(`Auth emulator lookup failed: ${response.status}`);
+  return Boolean((await response.json()).users?.length);
+}
 
 /**
  * The rules a check runs under: the rules deployed today (default), or the
