@@ -100,3 +100,20 @@ Rollback = write the logged "before" values back to the same field paths.
 - Risk #6: reset only the new app's own fields.
 - Long term: retire the original app or make it read-only once students have
   moved, so only one app writes these documents.
+
+## Tooling (built and tested on emulator fixtures only — never run on live data)
+
+| Step | Command | Writes? |
+|---|---|---|
+| 1 backup | `NODE_PATH=<folder with firebase-admin>/node_modules node scripts/legacy-progress/export-progress.cjs backup.json` | no (read only) |
+| 2 dry run | `node --import ./tests/register.mjs scripts/legacy-progress/dry-run.mjs backup.json plan.json` | no (no database at all) |
+| 4 apply | `… node scripts/legacy-progress/apply-repair.cjs plan.json log.jsonl --confirm --live` | yes — only listed field paths, after approval |
+| 5 rollback | `… node scripts/legacy-progress/apply-repair.cjs --rollback log.jsonl --confirm --live` | yes — restores logged values |
+
+The planner is `src/data/legacy-repair.ts` (unit tests in
+`tests/lesson-completions.test.mjs`). `tests/emulator/repair.e2e.mjs` runs the
+whole chain on fixtures in the emulator: export, dry run, refusal without
+`--confirm` / `--live`, apply (with an entry changed after the dry run being
+skipped), and rollback. `apply-repair.cjs` refuses any non-emulator target
+unless `--live` is given. Live use needs the owner's approval and a
+service-account key kept outside the repository.

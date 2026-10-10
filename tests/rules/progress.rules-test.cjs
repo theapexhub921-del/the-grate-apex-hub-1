@@ -8,7 +8,7 @@ const path = require('node:path');
 const { createRequire } = require('node:module');
 const { after, before, beforeEach, describe, it } = require('node:test');
 
-const ROOT = path.join(__dirname, '..', '..');
+const ROOT = path.resolve(process.cwd(), process.env.GRATEAPEX_ROOT || "../..");
 const PROPOSED = process.env.PROPOSED_RULES || path.join(ROOT, 'firestore.rules');
 const BASELINE = process.env.BASELINE_RULES || path.join(ROOT, 'tests', 'emulator', 'deployed-2026-10-09.rules');
 
