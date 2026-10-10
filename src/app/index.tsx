@@ -7,26 +7,16 @@ import { ApexCoinButton } from '@/components/apex-coin-button';
 import { LogoMark } from '@/components/logo-mark';
 import { SocialActivityFeed } from '@/components/social/supabase-social-feed';
 import { CommunityPostsFeed } from '@/components/social/community-posts-feed';
-import { ReviewCalendar } from '@/components/learning/review-calendar';
-import { RankProgressCard } from '@/components/rank-progress';
 import { NotificationBell } from '@/components/notifications';
 import { IconButton } from '@/components/ui/icon-button';
-import { Card } from '@/components/ui/interactive';
-import { Button } from '@/components/ui/button';
-import { Screen, SectionHeader } from '@/components/ui/screen';
+import { Screen } from '@/components/ui/screen';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { useLearning } from '@/data/learning/use-learning';
 import { useThemedStyles } from '@/hooks/use-theme';
 
-// Home is the social front door. Course progress, planning and review live in Learn.
+// Feed is the social front door: people's stories and posts. Course progress,
+// planning and review live in Study; rank and goals in You.
 export default function HomeScreen() {
   const styles = useThemedStyles(createStyles);
-  const { progress, memory, attempts, now } = useLearning();
-  const weekStart = new Date();
-  weekStart.setHours(0, 0, 0, 0);
-  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
-  const lessonsThisWeek = Object.values(progress.lessonCompletedAt).filter((at) => at >= weekStart.getTime()).length;
-  const reviewsThisWeek = attempts.filter((attempt) => attempt.attemptedAt >= weekStart.getTime()).length;
 
   return (
     <Screen width="content">
@@ -49,22 +39,12 @@ export default function HomeScreen() {
         <Text style={styles.subtitle}>Study alongside fellow learners, share your progress and cheer each other on.</Text>
       </AnimatedContent>
 
+      {/* Feed is people's posts: stories and community posts only. Rank is in
+          You, "Your week" in Study, personal goals in Study and You. */}
       <View style={styles.socialFeed}>
-        <SocialActivityFeed>
+        <SocialActivityFeed showActivity={false}>
           <CommunityPostsFeed />
         </SocialActivityFeed>
-      </View>
-
-      <View style={styles.progressRail}>
-        <RankProgressCard lifetimeXp={progress.xp} />
-        <Card style={styles.goalCard}>
-          <SectionHeader title="Personal goals" subtitle="Keep a study target in sight." style={styles.calendarHeading} />
-          <Button label="View goals" variant="secondary" onPress={() => router.push('/goals')} />
-        </Card>
-        <Card style={styles.calendarCard}>
-          <SectionHeader title="Your week" subtitle={`${lessonsThisWeek} lessons · ${reviewsThisWeek} reviews`} style={styles.calendarHeading} />
-          <ReviewCalendar memory={memory} attempts={attempts} now={now} />
-        </Card>
       </View>
 
       <Text style={styles.motto}>Reach the Apex of GrAteness</Text>
@@ -85,10 +65,6 @@ function createStyles(colors: ThemeColors) {
     subtitle: { ...Type.callout, color: colors.textSecondary, marginTop: 4 },
     feedColumn: { width: '100%', maxWidth: 760, alignSelf: 'center' },
     socialFeed: { width: '100%' },
-    progressRail: { gap: 12, marginTop: 18 },
-    calendarCard: { gap: 12 },
-    goalCard: { gap: 12 },
-    calendarHeading: { marginBottom: 0 },
     motto: { textAlign: 'center', ...Type.overline, letterSpacing: 1.6, color: colors.textTertiary, marginTop: 28 },
   });
 }

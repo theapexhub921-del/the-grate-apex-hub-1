@@ -184,7 +184,9 @@ async function loadSettings() {
       answerBounceEnabled: data?.answerBounceEnabled !== false,
       legacyTheme: isLegacyThemeId(data?.legacyTheme) ? data.legacyTheme : defaultSettings.legacyTheme,
       // (Before 2026-10-10 only Hybrid had a family: 'originals' meant legacy.)
-      themeFamily: isThemeFamily(data?.themeFamily) ? data.themeFamily : data?.hybridThemeFamily === 'originals' ? 'legacy' : null,
+      // A brand-new install starts on Apex Legacy, one of the four free themes;
+      // an existing device keeps the theme it already uses.
+      themeFamily: isThemeFamily(data?.themeFamily) ? data.themeFamily : data?.hybridThemeFamily === 'originals' ? 'legacy' : saved ? null : 'legacy',
     };
 
     notify();
@@ -265,7 +267,9 @@ export async function syncSettingsFromAccount(userId: string) {
         ? data.theme_family
         : data.hybrid_theme_family === 'originals'
           ? 'legacy'
-          : settings.themeFamily,
+          : typeof data.appearance === 'string'
+            ? null // an account from before theme families: keep its appearance
+            : settings.themeFamily,
       fontSize: ['small', 'default', 'large', 'extra_large'].includes(data.font_size)
         ? (data.font_size as FontSizePreference)
         : settings.fontSize,

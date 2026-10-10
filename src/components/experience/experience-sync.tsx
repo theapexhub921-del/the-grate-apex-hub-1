@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useAchievementStore, useAchievements } from '@/data/achievements-store';
 import { ACHIEVEMENTS } from '@/data/achievements';
-import { legacyThemeById, legacyThemeUnlock, type LegacyUnlock } from '@/data/legacy-theme-colors';
-import type { LegacyThemeDef } from '@/data/legacy-themes';
+import { legacyThemeById } from '@/data/legacy-theme-colors';
 import { useProgress } from '@/data/progress';
 import { setLegacyThemePreference, useLegacyThemePreference } from '@/data/settings';
+import { themeLock, type ThemeEntry, type ThemeLock } from '@/data/theme-catalog';
 import { useAuth } from '@/hooks/use-auth';
 import { setActiveExperience } from '@/hooks/use-experience';
 import { db } from '@/lib/firebase';
@@ -39,31 +39,6 @@ export function useIsAdmin() {
   return { isAdmin: current && state.admin, checked: current && state.checked };
 }
 
-/** The original app's unlock rule for each original theme, for the signed-in learner. */
-export function useLegacyThemeUnlocks() {
-  const progress = useProgress();
-  const { states } = useAchievements();
-  const { recorded } = useAchievementStore();
-  const { isAdmin } = useIsAdmin();
-
-  return useCallback(
-    (def: LegacyThemeDef): LegacyUnlock => {
-      const levels: Record<string, number> = { ...recorded };
-      for (const state of states) levels[state.def.id] = Math.max(levels[state.def.id] ?? 0, state.level);
-      return legacyThemeUnlock(def, {
-        xp: progress.xp,
-        achievementLevels: levels,
-        isAdmin,
-        achievement: (id) => {
-          const found = ACHIEVEMENTS.find((item) => item.id === id);
-          return found ? { name: found.name, desc: found.goal(found.levels[0]) } : undefined;
-        },
-      });
-    },
-    [progress.xp, states, recorded, isAdmin]
-  );
-}
-
 export function ExperienceSync() {
   const { user, loading } = useAuth();
   const profileLoaded = user?.profileLoaded ?? false;
@@ -83,4 +58,28 @@ export function ExperienceSync() {
   }, [checked, isAdmin, legacyTheme]);
 
   return null;
+}
+
+/** Which Appearance themes are open to the signed-in learner (data/theme-catalog.ts). */
+export function useThemeLocks() {
+  const progress = useProgress();
+  const { states } = useAchievements();
+  const { recorded } = useAchievementStore();
+  const { isAdmin } = useIsAdmin();
+  return useCallback(
+    (entry: ThemeEntry): ThemeLock => {
+      const levels: Record<string, number> = { ...recorded };
+      for (const state of states) levels[state.def.id] = Math.max(levels[state.def.id] ?? 0, state.level);
+      return themeLock(entry, {
+        xp: progress.xp,
+        achievementLevels: levels,
+        isAdmin,
+        achievement: (id) => {
+          const found = ACHIEVEMENTS.find((item) => item.id === id);
+          return found ? { name: found.name, desc: found.goal(found.levels[0]) } : undefined;
+        },
+      });
+    },
+    [progress.xp, states, recorded, isAdmin]
+  );
 }

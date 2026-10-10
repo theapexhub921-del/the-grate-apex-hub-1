@@ -8,6 +8,7 @@ import { ClassAccessCard } from '@/components/learning/class-access-card';
 import { LearningWelcomeAtmosphere } from '@/components/learning/learning-welcome-atmosphere';
 import { MemoryDistribution } from '@/components/learning/memory-ui';
 import { NextActionHero, NextActionList } from '@/components/learning/next-action-card';
+import { PersonalGoalsCard } from '@/components/learning/personal-goals-card';
 import { ReviewCalendar } from '@/components/learning/review-calendar';
 import { RankProgressCard } from '@/components/rank-progress';
 import { TopicCard } from '@/components/learning/topic-card';
@@ -47,6 +48,11 @@ export default function LearnScreen() {
   const viewingOwnClass = sameClassSelection(viewing, ownSelection);
   const [browseOpen, setBrowseOpen] = useState(Boolean(querySelection && !viewingOwnClass));
   const { progress, inputs, memory, attempts, now } = useLearning();
+  const weekStart = new Date(now);
+  weekStart.setHours(0, 0, 0, 0);
+  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+  const lessonsThisWeek = Object.values(progress.lessonCompletedAt).filter((at) => at >= weekStart.getTime()).length;
+  const reviewsThisWeek = attempts.filter((attempt) => attempt.attemptedAt >= weekStart.getTime()).length;
   const actions = useMemo(() => getNextActions(inputs), [inputs]);
   const overall = useMemo(() => curriculumProgress(inputs), [inputs]);
   const recent = overall.topics
@@ -162,10 +168,11 @@ export default function LearnScreen() {
   const side = (
     <View style={styles.column}>
       <RankProgressCard lifetimeXp={progress.xp} />
+      <PersonalGoalsCard />
       <Card style={styles.calendarCard}>
         <SectionHeader
-          title="Review calendar"
-          subtitle="Your upcoming spaced-review plan."
+          title="Your week"
+          subtitle={`${lessonsThisWeek} lessons · ${reviewsThisWeek} reviews this week · your spaced-review plan`}
           style={styles.calendarHeading}
         />
         <ReviewCalendar memory={memory} attempts={attempts} now={now} />

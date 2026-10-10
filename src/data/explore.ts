@@ -315,10 +315,12 @@ const announcements: readonly ExploreAnnouncement[] = [
 ];
 
 export const EXPLORE_GUIDE: readonly ExploreGuideEntry[] = [
-  { title: 'Feed', detail: 'Your next learning action, progress and a social view of classmates.', status: 'available' },
+  { title: 'Feed', detail: 'Stories and posts from people: photos, videos and study moments that you can like, comment on and reshare.', status: 'available' },
   { title: 'Study', detail: 'Follow the course structure, study lessons, answer quizzes and revisit concepts through spaced review.', status: 'available' },
   { title: 'Connect', detail: 'Find classmates, manage friend requests, use study groups, text-first conferences, messages and the friend feed. Live voice calls are a separate planned feature.', status: 'available' },
   { title: 'You', detail: 'Show your name and avatar alongside your learning identity and achievements.', status: 'available' },
+  { title: 'Experiences and themes', detail: 'Choose The Originals, Originate or Hybrid, and any newer or legacy theme. Each experience draws a theme its own way; legacy themes unlock as you level up.', status: 'available' },
+  { title: 'Apex Coin gifts', detail: 'Send Apex Coins to friends who follow you back — coins only, never XP. Switches on once the database rules are updated.', status: 'coming-soon' },
   { title: 'Settings', detail: 'Choose your theme, text size, web zoom, navigation, notification preferences and privacy choices. These controls are available in the app.', status: 'available' },
   { title: 'XP and ranks', detail: 'Earn XP from learning tasks and follow your progress through the rank ladder.', status: 'available' },
   { title: 'Learning power-ups', detail: 'Earn XP boosts from completed lessons, quizzes, streak milestones and one successful app share per day; the strongest stored boost applies to your next lesson or quiz. Achievement levels give timed boosts that you activate, each lasting at most an hour.', status: 'available' },

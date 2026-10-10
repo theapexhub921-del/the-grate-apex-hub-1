@@ -5,6 +5,7 @@ import { Text } from '@/components/ui/text';
 
 import { Icon } from '@/components/ui/icon';
 import { ExploreFeatureGroups } from '@/components/explore/feature-groups';
+import { FeatureGuideSimulator } from '@/components/explore/feature-guide-simulator';
 import { OrganisationSimulator } from '@/components/explore/organisation-simulator';
 import { PwaInstallCard } from '@/components/pwa-install-card';
 import { Card, Interactive } from '@/components/ui/interactive';
@@ -17,7 +18,7 @@ import { getRankProgress, LEAGUE_RULES, RANKS } from '@/data/ranks';
 import { CONTACT_EMAIL, openContactEmail } from '@/lib/contact';
 import { routes } from '@/lib/routes';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { EXPLORE_GUIDE, EXPLORE_TEAM, getExploreAnnouncements, getItemsByCategory, type ExploreAnnouncement, type ExploreItem } from '@/data/explore';
+import { EXPLORE_TEAM, getExploreAnnouncements, getItemsByCategory, type ExploreAnnouncement, type ExploreItem } from '@/data/explore';
 import { ABOUT_US } from '@/data/about';
 import { useWeeklyExploreSession } from '@/data/weekly-explore';
 
@@ -64,12 +65,6 @@ function DiscoveryCard({ item }: { item: ExploreItem }) {
       </Interactive>
     </Card>
   );
-}
-
-function GuideEntryCard({ item }: { item: (typeof EXPLORE_GUIDE)[number] }) {
-  const styles = useThemedStyles(createStyles);
-  const label = item.status === 'available' ? 'Available' : item.status === 'limited' ? 'In progress' : 'Coming soon';
-  return <Card style={styles.guideEntry}><View style={styles.guideEntryHead}><Text style={styles.featureTitle}>{item.title}</Text><Pill label={label} tone={item.status === 'available' ? 'primary' : 'neutral'} /></View><Text style={styles.featureDescription}>{item.detail}</Text></Card>;
 }
 
 function AnnouncementCard({ item }: { item: ExploreAnnouncement }) {
@@ -127,7 +122,8 @@ export default function ExploreScreen() {
       <SectionHeader title="Explore by theme" subtitle="Related features are grouped together. Open a theme for details, or try a short interactive walkthrough." style={styles.section} />
       <ExploreFeatureGroups />
       <SectionHeader title="GrAteApex Hub feature guide" subtitle="A plain-language guide to the app, its systems and the features you can explore." style={styles.section} />
-      <View style={styles.featureGrid}>{EXPLORE_GUIDE.map((item) => <GuideEntryCard key={item.title} item={item} />)}</View>
+      {/* A guided tour of every feature (owner request: a simulation, not a wall of cards). */}
+      <FeatureGuideSimulator />
       <SectionHeader title="What's New" subtitle="Dated product updates, kept separate from medical research." style={styles.section} />
       <View style={styles.featureGrid}>{getExploreAnnouncements().map((item) => <AnnouncementCard key={item.id} item={item} />)}</View>
 
@@ -307,8 +303,6 @@ function createStyles(colors: ThemeColors) {
     researchCaveat: { fontSize: 11, lineHeight: 16, color: colors.textTertiary },
     sourceLink: { flexDirection: 'row', alignItems: 'center', gap: 7, alignSelf: 'flex-start', paddingVertical: 4 },
     sourceText: { fontSize: 12, lineHeight: 17, color: colors.primaryText, flexShrink: 1, fontWeight: '700' },
-    guideEntry: { flexBasis: '31%', flexGrow: 1, minWidth: 250, gap: 8, padding: 15 },
-    guideEntryHead: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 7 },
 
     journey: { marginTop: 6 },
     journeyRow: { flexDirection: 'row', gap: 16, alignItems: 'flex-start' },

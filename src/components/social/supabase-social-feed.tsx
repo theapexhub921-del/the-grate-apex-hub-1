@@ -3,7 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import type { ReactNode } from 'react';
 import { useEffect, useId, useMemo, useState } from 'react';
-import { Alert, Linking, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { Alert, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '@/components/ui/text';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/interactive';
 import { SectionHeader } from '@/components/ui/screen';
+import { VideoPlayer } from '@/components/ui/video-player';
 import { Sheet } from '@/components/ui/sheet';
 import { findLesson, getTopic } from '@/data/curriculum';
 import { createCommunityStory, deleteCommunityStory, listLiveStories, type CommunityMedia, type CommunityStory } from '@/data/community';
@@ -22,7 +23,7 @@ import { type ThemeColors, Type } from '@/constants/theme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 /** Feed built only from friend profiles and activity. */
-export function SocialActivityFeed({ children }: { children?: ReactNode }) {
+export function SocialActivityFeed({ children, showActivity = true }: { children?: ReactNode; showActivity?: boolean }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const social = useSocial();
@@ -225,9 +226,9 @@ export function SocialActivityFeed({ children }: { children?: ReactNode }) {
 
       {children}
 
-      <SectionHeader title="From your people" subtitle="Recent study activity shared by your actual friends." style={styles.feedHeader} />
+      {showActivity ? <SectionHeader title="From your people" subtitle="Recent study activity shared by your actual friends." style={styles.feedHeader} /> : null}
 
-      {social.status === 'error' ? (
+      {!showActivity ? null : social.status === 'error' ? (
         <Card style={styles.card}>
           <Text style={styles.errorTitle}>Couldn’t load your social feed</Text>
           <Text style={styles.muted}>{social.error ?? 'Check your connection and try again.'}</Text>
@@ -290,7 +291,7 @@ export function SocialActivityFeed({ children }: { children?: ReactNode }) {
             </View>
             <View style={styles.storyModalBody}>
               {selectedStory.media_url && selectedStory.media_type === 'image' ? <Image source={{ uri: selectedStory.media_url }} contentFit="contain" style={styles.storyImage} accessibilityLabel="Story photo" /> : null}
-              {selectedStory.media_url && selectedStory.media_type === 'video' ? <Button label="Play story video" variant="secondary" icon={<Icon name="play" size={16} color={colors.primaryText} filled />} onPress={() => void Linking.openURL(selectedStory.media_url!).catch(() => setStoryError('Could not open this story video.'))} /> : null}
+              {selectedStory.media_url && selectedStory.media_type === 'video' ? <VideoPlayer url={selectedStory.media_url} height={420} autoPlay label="Story video" /> : null}
               {selectedStory.body ? <Text style={styles.storyText}>{selectedStory.body}</Text> : null}
             </View>
             <View style={styles.storyPager}><Button label="Previous" size="sm" variant="secondary" onPress={() => stepStory(-1)} disabled={storyIndex === 0} /><Text style={styles.storyModalTime}>{storyIndex + 1} of {storySequence.length}</Text><Button label={storyIndex + 1 === storySequence.length ? 'Done' : 'Next'} size="sm" onPress={() => stepStory(1)} /></View>

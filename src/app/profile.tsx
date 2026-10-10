@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
+import { PersonalGoalsCard } from '@/components/learning/personal-goals-card';
 import { RankProgressCard } from '@/components/rank-progress';
 import { ApexCoinWalletCard } from '@/components/apex-coin-wallet-card';
 import { AvatarPicker } from '@/components/avatar/avatar-picker';
@@ -248,6 +249,7 @@ export default function ProfileScreen() {
           side={
             <View style={styles.column}>
               <RankProgressCard lifetimeXp={progress.xp} />
+              <PersonalGoalsCard />
               {socialConnections}
               {recommendationsCard}
               {menu}
@@ -257,6 +259,7 @@ export default function ProfileScreen() {
       ) : (
         <View style={styles.column}>
           <RankProgressCard lifetimeXp={progress.xp} />
+          <PersonalGoalsCard />
           {statGrid}
           {achievementsCard}
           {socialConnections}

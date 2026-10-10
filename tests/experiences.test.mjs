@@ -140,3 +140,32 @@ describe('every theme in every experience, drawn the experience’s way', async 
     assert.equal(c.navActive, '#FDC00A');
   });
 });
+
+describe('Appearance: one list of themes (owner rules, 2026-10-10)', async () => {
+  const { THEME_CATALOG, themeLock, themeLockText } = await import('@/data/theme-catalog');
+  const base = { xp: 0, achievementLevels: {}, isAdmin: false };
+  it('only Apex Legacy, System, Dark and Light are free', () => {
+    const free = THEME_CATALOG.filter((entry) => themeLock(entry, base).unlocked).map((entry) => entry.name).sort();
+    assert.deepEqual(free, ['Apex Legacy', 'Dark', 'Light', 'System']);
+  });
+  it('every name is different (look-alikes renamed)', () => {
+    const names = THEME_CATALOG.map((entry) => entry.name);
+    assert.equal(new Set(names).size, names.length);
+    for (const name of ['Apex Legacy', 'Apex Redefined', 'Blossom', 'Rosewood', 'Blackout', 'Obsidian']) assert.ok(names.includes(name), name);
+  });
+  it('every other theme unlocks with XP (and Christmas/Valentine need their achievement; brat is admins-only)', () => {
+    for (const entry of THEME_CATALOG) {
+      if (themeLock(entry, base).unlocked) continue;
+      const rich = themeLock(entry, { xp: 1_000_000, achievementLevels: { xmas: 1, val: 1 }, isAdmin: true });
+      assert.equal(rich.unlocked, true, entry.name);
+    }
+    const apex = THEME_CATALOG.find((entry) => entry.key === 'newer:apex');
+    assert.equal(themeLockText(themeLock(apex, base)), 'Unlocks at Level 2 (150 XP)');
+    assert.equal(themeLock(apex, { ...base, xp: 150 }).unlocked, true);
+    assert.equal(themeLock(THEME_CATALOG.find((entry) => entry.id === 'brat'), { ...base, xp: 1_000_000 }).unlocked, false);
+  });
+  it('the free themes come first, Apex Legacy at the top', () => {
+    assert.equal(THEME_CATALOG[0].name, 'Apex Legacy');
+    assert.deepEqual(THEME_CATALOG.slice(0, 4).map((entry) => entry.level), [1, 1, 1, 1]);
+  });
+});

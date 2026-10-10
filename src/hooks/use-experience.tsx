@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, type ReactNode, useContext, useSyncExternalStore } from 'react';
 
-import { EXPERIENCES_ENABLED, type ExperienceId, isExperience } from '@/data/experience';
+import { DEFAULT_EXPERIENCE, EXPERIENCES_ENABLED, type ExperienceId, isExperience } from '@/data/experience';
 
 // The experience the interface is drawn in (The Originals, Originate, Hybrid).
 //
@@ -11,8 +11,7 @@ import { EXPERIENCES_ENABLED, type ExperienceId, isExperience } from '@/data/exp
 // from the first frame instead of a flash of another one.
 //
 // Until a choice is known (signed out, or not chosen yet) the interface is
-// drawn as Originate — this is what the app looked like before experiences;
-// it is not a saved default.
+// drawn as The Originals, the default experience (owner decision, 2026-10-10).
 
 const DEVICE_KEY = 'grateapex_experience';
 
@@ -66,7 +65,8 @@ export function useExperience(): ExperienceId {
   const preview = useContext(PreviewContext);
   const saved = useSyncExternalStore(subscribe, () => active, () => null);
   if (preview) return preview;
-  return EXPERIENCES_ENABLED && saved ? saved : 'originate';
+  if (!EXPERIENCES_ENABLED) return 'originate';
+  return saved ?? DEFAULT_EXPERIENCE;
 }
 
 /** True while drawing a preview (previews must not open sheets, navigate, etc.). */

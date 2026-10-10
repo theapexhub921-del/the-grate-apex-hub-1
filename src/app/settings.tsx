@@ -7,7 +7,7 @@ import { Text, TextInput } from '@/components/ui/text';
 
 import { ATMOSPHERE } from '@/components/atmosphere/config';
 import { useOriginalAutoHide } from '@/components/experience/legacy-navigation';
-import { useIsAdmin, useLegacyThemeUnlocks } from '@/components/experience/experience-sync';
+import { useIsAdmin, useThemeLocks } from '@/components/experience/experience-sync';
 import { BackLink } from '@/components/learning/nav-bits';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -16,13 +16,12 @@ import { Sheet } from '@/components/ui/sheet';
 import { PageHeader, Screen } from '@/components/ui/screen';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
-import { Colors, elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
+import { elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
 import { setTabBarMode, type TabBarMode, useTabBarMode } from '@/data/navigation-settings';
 import {
   type AppearancePreference,
   type FontSizePreference,
   setPageZoomPreference,
-  setAppearancePreference,
   chooseLegacyTheme,
   chooseNewerTheme,
   useLegacyThemePreference,
@@ -31,7 +30,6 @@ import {
   setNotificationPreference,
   usePageZoomPreference,
   useAppearancePreference,
-  APPEARANCE_OPTIONS,
   usePushNotificationsPreference,
   useAnswerBouncePreference,
   useNotificationPreferences,
@@ -48,8 +46,9 @@ import { EXPLORE_TEAM } from '@/data/explore';
 import { grantPowerup } from '@/data/learning/powerups';
 import { dayKey } from '@/data/learning/time';
 import { resetAllLearningProgress, useProgress } from '@/data/progress';
-import { legacyLevel, legacyLockText, legacyThemeById } from '@/data/legacy-theme-colors';
-import { LEGACY_THEMES, legacyColorsOf } from '@/data/legacy-themes';
+import { legacyLevel, legacyThemeById } from '@/data/legacy-theme-colors';
+import { THEME_CATALOG, themeLockText } from '@/data/theme-catalog';
+import { legacyColorsOf } from '@/data/legacy-themes';
 import { useAuth } from '@/hooks/use-auth';
 import { useExperience } from '@/hooks/use-experience';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -100,9 +99,7 @@ export default function SettingsScreen() {
   const colors = useTheme();
   const { width } = useWindowDimensions();
   const desktop = isDesktopWidth(width);
-  const appearance = useAppearancePreference();
   const experience = useExperience();
-  const themeFamily = useThemeFamily();
   const originalAutoHide = useOriginalAutoHide();
   const pageZoom = usePageZoomPreference();
   const fontSize = useFontSizePreference();
@@ -291,46 +288,7 @@ export default function SettingsScreen() {
       ) : null}
 
       <SettingsSection title="Appearance">
-        {/* Every theme in every experience, as cards; each experience draws a
-            theme its own way, and the previews show it as this experience will. */}
-        <Text style={styles.optionDescription}>Every theme works in every experience — each experience draws it in its own style.</Text>
-        <Text style={styles.themeFamily}>Newer themes</Text>
-        <View style={[styles.themeGrid, desktop && styles.themeGridDesktop]}>
-          {APPEARANCE_OPTIONS.map((option) => {
-            const selected = themeFamily === 'newer' && appearance === option.value;
-            const scheme = option.value === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : option.value;
-            return (
-              <Interactive
-                key={option.value}
-                onPress={() => void chooseNewerTheme(option.value)}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: selected }}
-                accessibilityLabel={`${option.label} theme. ${option.description}`}
-                style={({ hovered, pressed }) => [
-                  styles.themeCard,
-                  desktop ? styles.themeCardDesktop : styles.themeCardMobile,
-                  hovered && styles.themeCardHover,
-                  selected && styles.themeCardSelected,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <ThemeSwatch scheme={scheme} split={option.value === 'system'} />
-                <View style={styles.themeText}>
-                  <View style={styles.themeTitleRow}>
-                    <Text style={[styles.themeLabel, selected && styles.themeLabelSelected]}>{option.label}</Text>
-                    {selected ? (
-                      <View style={styles.check}>
-                        <Icon name="check" size={11} color={colors.onPrimary} strokeWidth={3} />
-                      </View>
-                    ) : null}
-                  </View>
-                  <Text style={styles.themeDescription}>{option.description}</Text>
-                </View>
-              </Interactive>
-            );
-          })}
-        </View>
-        <LegacyThemeGrid desktop={desktop} />
+        <ThemeGrid desktop={desktop} systemScheme={systemScheme === 'dark' ? 'dark' : 'light'} />
       </SettingsSection>
 
       <SettingsSection title="Font size and zoom">
@@ -629,35 +587,33 @@ function ThemeSwatch({ scheme, split, legacyId }: { scheme?: ThemeSwatchScheme; 
   return <View style={styles.swatch}>{legacyId ? render(null) : split ? [render('light'), render('dark')] : render(scheme ?? 'dark')}</View>;
 }
 
-// The legacy (original app) themes, drawn as this app's theme cards. They keep
-// the original unlock rules: levels (original level = 1 + every 150 XP), the
-// Christmas and Valentine achievements, and admins-only for brat (hidden from
-// everyone else).
-function LegacyThemeGrid({ desktop }: { desktop: boolean }) {
+// Every theme in one grid (data/theme-catalog.ts): four are free, the rest
+// unlock with XP. Each preview is drawn the way the current experience draws it.
+function ThemeGrid({ desktop, systemScheme }: { desktop: boolean; systemScheme: 'light' | 'dark' }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
-  const themeId = useLegacyThemePreference();
+  const appearance = useAppearancePreference();
+  const legacyTheme = useLegacyThemePreference();
+  const family = useThemeFamily();
   const { isAdmin } = useIsAdmin();
-  const unlockOf = useLegacyThemeUnlocks();
+  const lockOf = useThemeLocks();
   const level = legacyLevel(useProgress().xp);
-  const inUse = useThemeFamily() === 'legacy';
   return (
     <>
-      <Text style={styles.themeFamily}>Legacy themes</Text>
-      <Text style={[styles.optionDescription, styles.legacyLevel]}>You&apos;re Level {level}. Keep studying to unlock more.</Text>
+      <Text style={[styles.optionDescription, styles.legacyLevel]}>You&apos;re Level {level}. Earn XP to unlock more themes — every theme works in every experience.</Text>
       <View style={[styles.themeGrid, desktop && styles.themeGridDesktop]}>
-        {LEGACY_THEMES.filter((theme) => !theme.adminOnly || isAdmin).map((theme) => {
-          const lock = unlockOf(theme);
-          const selected = inUse && themeId === theme.id;
-          const detail = lock.unlocked ? theme.desc : legacyLockText(lock, false);
+        {THEME_CATALOG.filter((entry) => !entry.adminOnly || isAdmin).map((entry) => {
+          const lock = lockOf(entry);
+          const selected = entry.family === family && (entry.family === 'newer' ? appearance === entry.id : legacyTheme === entry.id);
+          const detail = lock.unlocked ? entry.description : themeLockText(lock);
           return (
             <Interactive
-              key={theme.id}
+              key={entry.key}
               disabled={!lock.unlocked}
-              onPress={() => void chooseLegacyTheme(theme.id)}
+              onPress={() => void (entry.family === 'newer' ? chooseNewerTheme(entry.id as AppearancePreference) : chooseLegacyTheme(entry.id))}
               accessibilityRole="radio"
               accessibilityState={{ checked: selected, disabled: !lock.unlocked }}
-              accessibilityLabel={`${theme.name} theme. ${detail}`}
+              accessibilityLabel={`${entry.name} theme. ${detail}`}
               style={({ hovered, pressed }) => [
                 styles.themeCard,
                 desktop ? styles.themeCardDesktop : styles.themeCardMobile,
@@ -666,10 +622,14 @@ function LegacyThemeGrid({ desktop }: { desktop: boolean }) {
                 pressed && styles.pressed,
               ]}
             >
-              <ThemeSwatch legacyId={theme.id} />
+              {entry.family === 'newer' ? (
+                <ThemeSwatch scheme={entry.id === 'system' ? systemScheme : (entry.id as ThemeSwatchScheme)} split={entry.id === 'system'} />
+              ) : (
+                <ThemeSwatch legacyId={entry.id} />
+              )}
               <View style={styles.themeText}>
                 <View style={styles.themeTitleRow}>
-                  <Text style={[styles.themeLabel, selected && styles.themeLabelSelected]}>{theme.name}</Text>
+                  <Text style={[styles.themeLabel, selected && styles.themeLabelSelected]}>{entry.name}</Text>
                   {selected ? (
                     <View style={styles.check}>
                       <Icon name="check" size={11} color={colors.onPrimary} strokeWidth={3} />

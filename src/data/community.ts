@@ -177,6 +177,8 @@ export async function listCommunityFeed(limitCount = 50): Promise<CommunityPost[
     const d = item.data();
     const original = typeof d.resharedPostId === 'string' ? originals.get(d.resharedPostId) : undefined;
     const media = Array.isArray(d.media) ? d.media[0] : null;
+    // A reshare shows the original post's photo or video.
+    const originalMedia = original && Array.isArray(original.media) ? original.media[0] : null;
     return {
       id: item.id,
       author_id: String(d.authorUid ?? ''),
@@ -189,8 +191,8 @@ export async function listCommunityFeed(limitCount = 50): Promise<CommunityPost[
       reshared_post_id: typeof d.resharedPostId === 'string' ? d.resharedPostId : null,
       reshared_author_id: original?.authorUid ?? null,
       reshared_body: original ? postText(original) : null,
-      reshared_media_url: null,
-      reshared_media_type: null,
+      reshared_media_url: safeUrl(originalMedia?.url) ? (originalMedia.t === 'image' ? optimized(originalMedia.url) : originalMedia.url) : null,
+      reshared_media_type: originalMedia?.t === 'video' ? 'video' : originalMedia?.t === 'image' ? 'image' : null,
       created_at: iso(d.createdAt),
       reactions: Number(d.likeCount) || 0,
       comments: Number(d.replyCount) || 0,

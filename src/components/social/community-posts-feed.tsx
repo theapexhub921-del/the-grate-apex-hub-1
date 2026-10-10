@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Linking, Platform, Share, StyleSheet, View } from 'react-native';
+import { Alert, Platform, Share, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 import { Avatar } from '@/components/ui/avatar';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Card, Interactive } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
+import { VideoPlayer } from '@/components/ui/video-player';
 import { Sheet } from '@/components/ui/sheet';
 import { addPostComment, createCommunityPost, deleteCommunityPost, listCommunityFeed, listPostComments, reportCommunityContent, togglePostLike, type CommunityMedia, type CommunityPost } from '@/data/community';
 import { personName, type SocialPerson, useSocial } from '@/data/social';
@@ -244,11 +245,11 @@ function PostCard({ post, socialPeople, ownId, ownName, onOpen, onLike, onCommen
           <Text style={styles.muted}>Original post by {resharedName}</Text>
           {post.reshared_body ? <Text style={styles.body}>{post.reshared_body}</Text> : null}
           {post.reshared_media_url && post.reshared_media_type === 'image' ? <Image source={{ uri: post.reshared_media_url }} contentFit="cover" style={styles.image} accessibilityLabel="Reshared photo" /> : null}
-          {post.reshared_media_url && post.reshared_media_type === 'video' ? <Interactive onPress={() => void Linking.openURL(post.reshared_media_url!).catch(() => {})} style={styles.video}><Icon name="play" size={22} color={colors.onPrimary} filled /><Text style={styles.videoText}>Open reshared video</Text></Interactive> : null}
+          {post.reshared_media_url && post.reshared_media_type === 'video' ? <VideoPlayer url={post.reshared_media_url} height={260} label="Reshared video" /> : null}
         </View>
       ) : null}
       {post.media_url && post.media_type === 'image' ? <Interactive onPress={onOpen} accessibilityRole="button" accessibilityLabel="Open photo post"><Image source={{ uri: post.media_url }} contentFit="cover" style={styles.image} accessibilityLabel="Photo in community post" /></Interactive> : null}
-      {post.media_url && post.media_type === 'video' ? <Interactive onPress={() => void Linking.openURL(post.media_url!).catch(() => {})} accessibilityRole="link" accessibilityLabel="Open video" style={styles.video}><Icon name="play" size={26} color={colors.onPrimary} filled /><Text style={styles.videoText}>Open video</Text></Interactive> : null}
+      {post.media_url && post.media_type === 'video' ? <VideoPlayer url={post.media_url} label="Video in community post" /> : null}
       {!verticalActions ? <Text style={styles.counts}>{post.reactions} likes · {post.comments} comments · {post.reshares} reshares</Text> : <Text style={styles.counts}>{post.reactions} likes</Text>}
       {!verticalActions ? <View style={styles.postActions}>
         <Interactive onPress={onLike} accessibilityRole="button" accessibilityLabel={post.my_reaction ? 'Unlike post' : 'Like post'} style={styles.action}><Icon name="heart" size={17} color={post.my_reaction ? colors.primaryText : colors.textSecondary} filled={Boolean(post.my_reaction)} /><Text style={[styles.actionText, post.my_reaction && { color: colors.primaryText }]}>Like</Text></Interactive>

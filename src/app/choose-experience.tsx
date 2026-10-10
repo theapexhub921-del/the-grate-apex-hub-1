@@ -9,10 +9,11 @@ import { FloatingTabBar } from '@/components/floating-tab-bar';
 import { SubjectGlyph } from '@/components/learning/glyphs';
 import { Button } from '@/components/ui/button';
 import { Card, Interactive } from '@/components/ui/interactive';
+import { Pill } from '@/components/ui/pill';
 import { PageHeader, Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { Radius, type ThemeColors, Type } from '@/constants/theme';
-import { EXPERIENCE_INFO, EXPERIENCES, type ExperienceId, isExperience, saveExperience } from '@/data/experience';
+import { DEFAULT_EXPERIENCE, EXPERIENCE_INFO, EXPERIENCES, type ExperienceId, isExperience, saveExperience } from '@/data/experience';
 import { useAuth } from '@/hooks/use-auth';
 import { ExperiencePreview } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -28,7 +29,7 @@ export default function ChooseExperienceScreen() {
   const styles = useThemedStyles(createStyles);
   const { user } = useAuth();
   const saved = isExperience(user?.profile?.experience) ? user?.profile?.experience : null;
-  const [choice, setChoice] = useState<ExperienceId | null>(saved ?? null);
+  const [choice, setChoice] = useState<ExperienceId | null>(saved ?? DEFAULT_EXPERIENCE);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,7 +68,10 @@ export default function ChooseExperienceScreen() {
             >
               <Card style={[styles.option, selected ? styles.selected : null]}>
                 <ExperienceSample experience={id} />
-                <Text style={styles.name}>{EXPERIENCE_INFO[id].name}</Text>
+                <View style={styles.nameRow}>
+                  <Text style={styles.name}>{EXPERIENCE_INFO[id].name}</Text>
+                  {id === DEFAULT_EXPERIENCE ? <Pill label="Default" tone="gold" /> : null}
+                </View>
                 <Text style={styles.summary}>{EXPERIENCE_INFO[id].summary}</Text>
               </Card>
             </Interactive>
@@ -137,6 +141,7 @@ function createStyles(colors: ThemeColors) {
     optionWrap: { flexGrow: 1, flexBasis: 300, minWidth: 260 },
     option: { gap: 4, borderWidth: 2, borderColor: 'transparent', borderRadius: Radius.lg, flex: 1 },
     selected: { borderColor: colors.primary },
+    nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     name: { ...Type.headline, color: colors.text },
     summary: { fontSize: 13.5, lineHeight: 19, color: colors.textSecondary },
     error: { fontSize: 13, color: colors.error },

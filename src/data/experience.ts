@@ -23,6 +23,9 @@ export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: stri
   },
 };
 
+/** The default experience: shown until a learner chooses, and preselected in the chooser. */
+export const DEFAULT_EXPERIENCE: ExperienceId = 'originals';
+
 export function isExperience(value: unknown): value is ExperienceId {
   return typeof value === 'string' && (EXPERIENCES as readonly string[]).includes(value);
 }
