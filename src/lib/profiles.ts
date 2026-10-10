@@ -1,6 +1,7 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
+import { safeUrl } from '@/lib/media-urls';
 
 export type Profile = {
   id: string;
@@ -38,7 +39,8 @@ export async function getProfileById(userId: string): Promise<ProfileResponse> {
       id: userId,
       // The separate display name, else the username (the original app has only usernames).
       display_name: d.displayName || d.display_name || d.username || null,
-      avatar_url: d.avatar_url || d.avatarUrl || null,
+      // This app's avatar, else the original app's Cloudinary profile photo.
+      avatar_url: d.avatar_url || d.avatarUrl || d.photo || null,
       created_at: d.createdAt ? (d.createdAt.toDate ? d.createdAt.toDate().toISOString() : String(d.createdAt)) : new Date().toISOString(),
       ...d,
     };
@@ -79,6 +81,9 @@ export async function updateProfile(
     const firestoreUpdates: Record<string, any> = { ...rest };
     delete firestoreUpdates.username;
     if (displayName !== undefined) firestoreUpdates.displayName = displayName;
+    // A Cloudinary photo is also the original app's profile photo (`photo`, which
+    // the rules require to be a Cloudinary address). Presets/initials leave it alone.
+    if (typeof updates.avatar_url === 'string' && safeUrl(updates.avatar_url)) firestoreUpdates.photo = updates.avatar_url;
 
     await setDoc(userDocRef, firestoreUpdates, { merge: true });
 

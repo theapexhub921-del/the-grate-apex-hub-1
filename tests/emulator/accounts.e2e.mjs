@@ -100,6 +100,17 @@ const result = await profiles.updateCurrentProfile({ display_name: 'Amara Kwarte
 profile = await peek(`users/${amara.uid}`);
 check('display name saved separately; username unchanged', !result.error && profile.displayName === 'Amara Kwarteng' && profile.username === amaraName, { result, profile });
 
+// L. Profile photos on Cloudinary are shared with the original app (users.photo).
+const photoUrl = 'https://res.cloudinary.com/test/image/upload/v1/avatar.jpg';
+await profiles.updateCurrentProfile({ avatar_url: photoUrl });
+profile = await peek(`users/` + amara.uid);
+check('a Cloudinary profile photo is saved for both apps (avatar_url and photo)', profile.avatar_url === photoUrl && profile.photo === photoUrl, profile);
+await profiles.updateCurrentProfile({ avatar_url: 'preset:female-1' });
+profile = await peek(`users/` + amara.uid);
+check('choosing an illustrated avatar keeps the original app photo', profile.avatar_url === 'preset:female-1' && profile.photo === photoUrl, profile);
+await seed(`users/` + kofi.uid, { username: newName, hall: 'HB1', semester: 1, classLocked: true, photo: 'https://res.cloudinary.com/test/image/upload/v1/kofi.jpg', usernameChangedAt: 1 });
+check('an original-app photo shows in this app', (await profiles.getProfileById(kofi.uid)).data?.avatar_url === 'https://res.cloudinary.com/test/image/upload/v1/kofi.jpg');
+
 // K. What production does today is refused by these rules (for the record).
 let denied = false;
 try { await fs.setDoc(fs.doc(db, 'users', amara.uid), { username: 'Amara Kwarteng' }, { merge: true }); } catch (error) { denied = error.code === 'permission-denied'; }

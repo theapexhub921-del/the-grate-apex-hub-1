@@ -1,12 +1,14 @@
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 
+import { uploadMedia } from '@/lib/media';
+
 // The learner's own profile photo.
 //
 // The picked image is cropped to a centred square and shrunk to 256 px
-// JPEG, then kept as a small data URI (≈20–40 KB) in the profile's
-// `avatar_url` — no separate file storage is needed, and it syncs with
-// the rest of the profile.
+// JPEG, then uploaded to the original app's Cloudinary account, as the
+// original app does (lib/media.ts), so both apps show the same photo. If the
+// upload can't be done (offline), it is kept as a small data URI instead.
 
 const SIZE = 256;
 
@@ -46,7 +48,14 @@ export async function pickAvatarPhoto(): Promise<AvatarUploadResult> {
     const image = await context.renderAsync();
     const saved = await image.saveAsync({ format: SaveFormat.JPEG, compress: 0.74, base64: true });
     if (!saved.base64) return { status: 'error', message: 'The photo could not be prepared.' };
-    return { status: 'ok', uri: `data:image/jpeg;base64,${saved.base64}` };
+    const dataUri = `data:image/jpeg;base64,${saved.base64}`;
+    try {
+      const uploaded = await uploadMedia({ uri: saved.uri || dataUri, type: 'image', mimeType: 'image/jpeg', filename: 'avatar.jpg' });
+      return { status: 'ok', uri: uploaded.url };
+    } catch (problem) {
+      console.warn('Avatar upload failed; keeping the photo in the profile instead:', problem);
+      return { status: 'ok', uri: dataUri };
+    }
   } catch (problem) {
     console.warn('Avatar photo failed:', problem);
     return { status: 'error', message: 'That photo could not be used. Try a JPG or PNG image.' };
