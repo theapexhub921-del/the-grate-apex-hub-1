@@ -85,6 +85,9 @@ export default function ConferencesScreen() {
   return <Screen width="wide">
     <BackLink fallback="/social" />
     <PageHeader title="Table Conferences" subtitle="Schedule a text-first study session with friends. Voice and video can connect here later." />
+    {/* The deployed rules keep `calls` for the original app's voice calls, so scheduled
+        sessions need their own collection and rule before they can be saved. */}
+    <InlineNotice tone="info" title="Coming soon" message="Scheduled study sessions are being rebuilt on the shared database. You can’t schedule one yet." />
     {error ? <InlineNotice tone="error" title="Conference update" message={error} /> : null}
     <View style={styles.columns}>
       <View style={styles.main}>
@@ -104,7 +107,7 @@ export default function ConferencesScreen() {
             const active = invitees.includes(friend.userId);
             return <Interactive key={friend.userId} onPress={() => setInvitees((old) => active ? old.filter((id) => id !== friend.userId) : [...old, friend.userId])} accessibilityRole="checkbox" accessibilityState={{ checked: active }} style={[styles.friendChoice, active && styles.friendChoiceActive]}><Avatar uri={friend.avatarUrl} name={personName(friend)} size={28} /><Text style={styles.friendName}>{personName(friend)}</Text></Interactive>;
           })}</View>
-          <Button label="Schedule conference" loading={busy} disabled={!name.trim() || !topic.trim()} onPress={() => void create()} />
+          <Button label="Scheduling coming soon" loading={busy} disabled onPress={() => void create()} />
         </Card>
         <SectionHeader title="Upcoming and recent" subtitle="Only conferences you host, are invited to, or can access through a group appear here." style={styles.section} />
         {conferences.length ? conferences.map((conf) => <Interactive key={conf.id} onPress={() => void open(conf)} accessibilityRole="button" style={styles.confRow}>

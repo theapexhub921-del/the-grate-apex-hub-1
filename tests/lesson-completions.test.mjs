@@ -121,3 +121,15 @@ describe('friends and suggestions (original app logic)', () => {
     assert.equal(rankSuggestions({ me: { uid: 'me' }, following: [], followers: [{ uid: 'x', username: null }], secondDegree: [], top: many }).length, 8);
   });
 });
+
+const { weekStart } = await import('@/data/learning/time');
+describe('weekly challenge week', () => {
+  it('weeks start on Monday at midnight (device time)', () => {
+    const wednesday = new Date(2026, 9, 7, 15, 30).getTime(); // Wed 7 Oct 2026
+    const monday = new Date(weekStart(wednesday));
+    assert.equal(monday.getDay(), 1);
+    assert.equal(monday.getDate(), 5);
+    assert.equal(monday.getHours(), 0);
+    assert.equal(new Date(weekStart(new Date(2026, 9, 11, 23, 0).getTime())).getDate(), 5); // Sunday → same week
+  });
+});

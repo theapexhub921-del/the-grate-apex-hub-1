@@ -8,6 +8,8 @@ import {
   query,
 } from 'firebase/firestore';
 
+import { weekStart } from '@/data/learning/time';
+import { getProgressSnapshot, preloadProgress } from '@/data/progress';
 import { getRankProgress, RANKS } from '@/data/ranks';
 import { auth, db } from '@/lib/firebase';
 
@@ -39,42 +41,29 @@ export type FriendBattleResults = {
   opponent: FriendBattleScore | null;
 };
 
+/**
+ * This calendar week's challenge: lessons of this app completed since Monday
+ * (from the learner's real progress). There is no trusted freeze balance yet,
+ * so the reward is shown as coming soon (claimWeeklyChallengeReward).
+ */
 export async function loadWeeklyChallengeStatus(): Promise<WeeklyChallengeStatus> {
-  const user = auth.currentUser;
-  const currentWeek = new Date().toISOString().split('T')[0];
-  if (!user) {
-    return {
-      week_start: currentWeek,
-      lessons_completed: 0,
-      lesson_target: 5,
-      freeze_balance: 0,
-      reward_claimed: false,
-    };
-  }
-
-  try {
-    const snap = await getDoc(doc(db, 'progress', user.uid));
-    const d = snap.data() || {};
-    return {
-      week_start: currentWeek,
-      lessons_completed: Object.keys(d.lessons || {}).length,
-      lesson_target: 5,
-      freeze_balance: 0,
-      reward_claimed: false,
-    };
-  } catch {
-    return {
-      week_start: currentWeek,
-      lessons_completed: 0,
-      lesson_target: 5,
-      freeze_balance: 0,
-      reward_claimed: false,
-    };
-  }
+  await preloadProgress();
+  const start = weekStart();
+  const { lessonCompletedAt } = getProgressSnapshot();
+  const thisWeek = auth.currentUser ? Object.values(lessonCompletedAt).filter((time) => time >= start).length : 0;
+  const monday = new Date(start);
+  return {
+    week_start: `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`,
+    lessons_completed: thisWeek,
+    lesson_target: 5,
+    freeze_balance: 0,
+    reward_claimed: false,
+  };
 }
 
-export async function claimWeeklyChallengeReward() {
-  return { available: 50, week_start: new Date().toISOString().split('T')[0] };
+/** Not connected yet: there is no trusted freeze balance to add to. */
+export async function claimWeeklyChallengeReward(): Promise<never> {
+  throw new Error('The streak-freeze reward is coming soon.');
 }
 
 /**

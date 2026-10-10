@@ -84,3 +84,11 @@ export function formatDuration(seconds: number) {
   if (minutes === 0) return `${rest}s`;
   return `${minutes}:${String(rest).padStart(2, '0')}`;
 }
+
+/** Monday 00:00 (device time) of the week containing `now`. */
+export function weekStart(now = Date.now()) {
+  const day = new Date(now);
+  day.setHours(0, 0, 0, 0);
+  day.setDate(day.getDate() - ((day.getDay() + 6) % 7));
+  return day.getTime();
+}

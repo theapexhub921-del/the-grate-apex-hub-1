@@ -35,7 +35,6 @@ export function WeeklyChallengeCard() {
   }
 
   const complete = Boolean(status && status.lessons_completed >= status.lesson_target);
-  const full = Boolean(status && status.freeze_balance >= 2);
   return (
     <Card style={styles.card}>
       <View style={styles.headingRow}>
@@ -43,11 +42,11 @@ export function WeeklyChallengeCard() {
         {status ? <Pill label={`${Math.min(status.lessons_completed, status.lesson_target)}/${status.lesson_target}`} tone={complete ? 'success' : 'neutral'} /> : null}
       </View>
       {status ? <View style={styles.track}><View style={[styles.trackFill, { width: `${Math.min(100, Math.round(status.lessons_completed / status.lesson_target * 100))}%` }]} /></View> : null}
-      <Text style={styles.muted}>Complete it to earn 1 streak freeze. You can store up to 2.</Text>
+      <Text style={styles.muted}>Lessons completed this week. The streak-freeze reward is coming soon.</Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {status?.reward_claimed ? <Text style={styles.success}>This week’s reward has been claimed. Freeze balance: {status.freeze_balance}.</Text> : null}
       {status && !status.reward_claimed && complete ? (
-        <Button label={full ? 'Use a freeze before claiming another' : 'Claim 1 streak freeze'} onPress={() => void claim()} disabled={busy || full} loading={busy} />
+        <Button label="Freeze reward coming soon" onPress={() => void claim()} disabled loading={busy} />
       ) : null}
     </Card>
   );
@@ -161,7 +160,7 @@ export function FriendBattlesCard({ friends }: { friends: readonly SocialPerson[
         <View style={styles.chips}>
           {publishedTopics.slice(0, 8).map((topic) => <Interactive key={topic.id} onPress={() => setTopicId(topic.id)} accessibilityState={{ selected: topic.id === topicId }} style={[styles.chip, topic.id === topicId && styles.chipSelected]}><Text style={styles.chipText}>{topic.title}</Text></Interactive>)}
         </View>
-        <Button label="Send challenge" onPress={() => void challengeFriend()} loading={busy} disabled={!friendId || !topicId || busy} />
+        <Button label="Battles coming soon" onPress={() => void challengeFriend()} loading={busy} disabled />
       </> : <Text style={styles.muted}>Add a friend to start a topic battle.</Text>}
       {notice ? <Text style={styles.success}>{notice}</Text> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -186,7 +185,7 @@ export function FriendBattlesCard({ friends }: { friends: readonly SocialPerson[
           </View>;
         })}
       </View> : null}
-      <Text style={styles.muted}>The selected topic is your shared study focus. Server-recorded XP from all learning activities counts during the seven-day round.</Text>
+      <Text style={styles.muted}>Coming soon: battles need a server referee so neither player can change the result. That part is still being built.</Text>
     </Card>
   );
 }
