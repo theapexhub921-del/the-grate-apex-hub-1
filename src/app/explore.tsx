@@ -97,7 +97,21 @@ export default function ExploreScreen() {
     <Screen width="wide">
       <PageHeader eyebrow="The GrAte Apex Hub guide" title="Explore" subtitle="A friendly guide to studying, connecting and growing with GrAte Apex Hub." />
 
-      <View style={styles.introGrid}>
+      {/* Discovery first (owner request): concepts, connections and research; the
+          welcome and the simulations follow. */}
+
+      {weeklySession ? <SectionHeader title={`${upcoming ? 'Next week' : 'This week'} · ${weeklySession.title}`} subtitle={`${weeklySession.summary} Begins ${weekLabel}.`} style={styles.section} /> : null}
+
+      <SectionHeader title="Medical concepts" subtitle="A quick way into useful ideas that sit across the curriculum." style={styles.firstSection} />
+      <View style={styles.featureGrid}>{[...getItemsByCategory('concept'), ...weeklyItems.filter((item) => item.category === 'concept')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
+
+      <SectionHeader title="Connections" subtitle="Follow a mechanism from foundational science to what it can mean in a clinical setting." style={styles.section} />
+      <View style={styles.featureGrid}>{[...getItemsByCategory('connection'), ...weeklyItems.filter((item) => item.category === 'connection')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
+
+      <SectionHeader title="Emerging research" subtitle="Peer-reviewed findings, dated and labelled by study design. Research here is supplemental and does not replace course material." style={styles.section} />
+      <View style={styles.featureGrid}>{[...getItemsByCategory('research'), ...weeklyItems.filter((item) => item.category === 'research')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
+
+      <View style={[styles.introGrid, styles.section]}>
         <Card style={styles.introCard}>
           <View style={styles.introBrand}><Icon name="sparkle" size={22} color={colors.accentText} /><Text style={styles.introLabel}>WELCOME TO GrAte Apex Hub</Text></View>
           <Text style={styles.introTitle}>Learn your way. Rise together.</Text>
@@ -127,17 +141,6 @@ export default function ExploreScreen() {
         {/* "How GrAte Apex Hub is organised": a tap-through simulation (owner request). */}
         <OrganisationSimulator />
       </View>
-
-      {weeklySession ? <SectionHeader title={`${upcoming ? 'Next week' : 'This week'} · ${weeklySession.title}`} subtitle={`${weeklySession.summary} Begins ${weekLabel}.`} style={styles.section} /> : null}
-
-      <SectionHeader title="Medical concepts" subtitle="A quick way into useful ideas that sit across the curriculum." style={styles.section} />
-      <View style={styles.featureGrid}>{[...getItemsByCategory('concept'), ...weeklyItems.filter((item) => item.category === 'concept')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
-
-      <SectionHeader title="Connections" subtitle="Follow a mechanism from foundational science to what it can mean in a clinical setting." style={styles.section} />
-      <View style={styles.featureGrid}>{[...getItemsByCategory('connection'), ...weeklyItems.filter((item) => item.category === 'connection')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
-
-      <SectionHeader title="Emerging research" subtitle="Peer-reviewed findings, dated and labelled by study design. Research here is supplemental and does not replace course material." style={styles.section} />
-      <View style={styles.featureGrid}>{[...getItemsByCategory('research'), ...weeklyItems.filter((item) => item.category === 'research')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
 
       <PwaInstallCard />
       <SectionHeader title="Explore by theme" subtitle="Related features are grouped together. Open a theme for details, or try a short interactive walkthrough." style={styles.section} />
@@ -285,6 +288,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     flex: { flex: 1, minWidth: 0 },
     section: { marginTop: 34 },
+    firstSection: { marginTop: 4 },
     introGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, alignItems: 'stretch' },
     startGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 4 },
     startTile: { flexBasis: '47%', flexGrow: 1, minWidth: 200, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceMuted },
