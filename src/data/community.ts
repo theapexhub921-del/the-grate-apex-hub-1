@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -12,6 +13,7 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
   writeBatch,
 } from 'firebase/firestore';
 
@@ -313,106 +315,163 @@ export async function listPostComments(postId: string) {
     });
 }
 
+// ─── Study groups (shared with the original app) ─────────────────────────
+// groups/{gid} = { ownerUid, memberUids, members: { uid: username }, name,
+// description, createdAt }. Only members can see a group. It starts with its
+// creator; the owner adds one mutual friend at a time; a member can leave.
+// Messages: groups/{gid}/messages = { authorUid, authorName, text, createdAt }.
+
+function toGroup(id: string, d: Record<string, any>, me: string | null): StudyGroup {
+  const members: string[] = Array.isArray(d.memberUids) ? d.memberUids : [];
+  return {
+    id,
+    owner_id: String(d.ownerUid ?? ''),
+    title: String(d.name ?? ''),
+    description: String(d.description ?? ''),
+    visibility: 'private', // the shared rules: only members can see a group
+    created_at: iso(d.createdAt),
+    is_member: me ? members.includes(me) : false,
+    membership_status: 'active',
+    membership_role: me && d.ownerUid === me ? 'owner' : 'member',
+  };
+}
+
+/** The groups I belong to (the only ones the rules let me see). */
 export async function listOpenStudyGroups(): Promise<StudyGroup[]> {
-  try {
-    const snap = await getDocs(collection(db, 'groups'));
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as StudyGroup);
-  } catch {
-    return [];
-  }
+  const me = await signedInUserId();
+  const snap = await getDocs(query(collection(db, 'groups'), where('memberUids', 'array-contains', me), limit(100)));
+  return snap.docs.map((item) => toGroup(item.id, item.data(), me));
 }
 
 export async function listVisibleStudyGroups(): Promise<StudyGroup[]> {
   return listOpenStudyGroups();
 }
 
-export async function createStudyGroup(input: {
-  title: string;
-  description?: string;
-  visibility?: StudyGroup['visibility'];
-}): Promise<string> {
-  const ownerId = await signedInUserId();
-  const id = `group_${Date.now()}`;
-  const group: StudyGroup = {
-    id,
-    owner_id: ownerId,
-    title: input.title,
-    description: input.description ?? '',
-    visibility: input.visibility ?? 'friends',
-    created_at: new Date().toISOString(),
-    is_member: true,
-  };
-  await setDoc(doc(db, 'groups', id), group);
-  return id;
+export async function createStudyGroup(input: { title: string; description?: string; visibility?: StudyGroup['visibility'] }): Promise<string> {
+  const name = input.title.trim();
+  const description = (input.description ?? '').trim();
+  if (name.length < 2 || name.length > 40) throw new Error('Group names are 2–40 characters.');
+  if (description.length > 200) throw new Error('Descriptions can be up to 200 characters.');
+  const me = await myUsername();
+  const ref = doc(collection(db, 'groups'));
+  await setDoc(ref, { ownerUid: me.uid, memberUids: [me.uid], members: { [me.uid]: me.username }, name, description, createdAt: serverTimestamp() });
+  return ref.id;
 }
 
+/** Groups can't be joined by asking: the owner adds members (shared rules). */
 export async function joinStudyGroup(groupId: string): Promise<boolean> {
-  const userId = await signedInUserId();
-  await setDoc(
-    doc(db, 'groups', groupId, 'members', userId),
-    { status: 'active', role: 'member' },
-    { merge: true }
-  );
-  return true;
+  void groupId;
+  throw new Error('Ask the group’s owner to add you. Owners can add friends who follow each other.');
 }
 
-export async function inviteFriendToGroup(groupId: string, friendId: string) {}
-export async function respondToGroupInvite(membershipId: string, accept: boolean) {}
-
-export async function listGroupDiscussion(groupId: string): Promise<GroupDiscussionPost[]> {
+/** The owner adds a friend (you must follow each other). */
+export async function inviteFriendToGroup(groupId: string, friendId: string) {
+  const me = await signedInUserId();
+  const ref = doc(db, 'groups', groupId);
+  const group = await getDoc(ref);
+  const data = group.data();
+  if (!data) throw new Error('This group could not be found.');
+  if (data.ownerUid !== me) throw new Error('Only the group’s owner can add members.');
+  const members: string[] = Array.isArray(data.memberUids) ? data.memberUids : [];
+  if (members.includes(friendId)) return;
+  if (members.length >= 20) throw new Error('A group can have up to 20 members.');
+  const friendName = (await getDoc(doc(db, 'users', friendId))).data()?.username ?? null;
   try {
-    const snap = await getDocs(collection(db, 'groups', groupId, 'discussions'));
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as GroupDiscussionPost);
-  } catch {
-    return [];
+    await updateDoc(ref, { memberUids: [...members, friendId], [`members.${friendId}`]: friendName });
+  } catch (error) {
+    if ((error as { code?: string }).code === 'permission-denied') throw new Error('You can add friends who follow you back.');
+    throw error;
   }
 }
 
-export async function postToGroupDiscussion(groupId: string, body: string): Promise<GroupDiscussionPost> {
-  const authorId = await signedInUserId();
-  const id = `post_${Date.now()}`;
-  const item: GroupDiscussionPost = {
-    id,
-    group_id: groupId,
-    author_id: authorId,
-    author_name: auth.currentUser?.displayName || 'Student',
-    body: body.trim(),
-    created_at: new Date().toISOString(),
-  };
-  await setDoc(doc(db, 'groups', groupId, 'discussions', id), item);
-  return item;
+/** There are no invitations in the shared model: members are added directly. */
+export async function respondToGroupInvite(membershipId: string, accept: boolean) {
+  void membershipId;
+  void accept;
 }
 
+/** A member (not the owner) leaves, with the "left the group" notice the original app shows. */
+export async function leaveStudyGroup(groupId: string) {
+  const me = await myUsername();
+  const ref = doc(db, 'groups', groupId);
+  const data = (await getDoc(ref)).data();
+  if (!data) return;
+  if (data.ownerUid === me.uid) throw new Error('Owners can’t leave their own group.');
+  const batch = writeBatch(db);
+  batch.set(doc(collection(db, 'groups', groupId, 'messages')), { text: `@${me.username} left the group`, system: true, authorUid: me.uid, authorName: me.username, createdAt: serverTimestamp() });
+  batch.update(ref, { memberUids: (data.memberUids as string[]).filter((uid) => uid !== me.uid), [`members.${me.uid}`]: deleteField() });
+  await batch.commit();
+}
+
+export async function listGroupDiscussion(groupId: string): Promise<GroupDiscussionPost[]> {
+  const snap = await getDocs(query(collection(db, 'groups', groupId, 'messages'), orderBy('createdAt', 'asc'), limit(200)));
+  return snap.docs.map((item) => {
+    const d = item.data();
+    return { id: item.id, group_id: groupId, author_id: String(d.authorUid ?? ''), author_name: d.authorName ?? null, body: String(d.text ?? ''), created_at: iso(d.createdAt) };
+  });
+}
+
+export async function postToGroupDiscussion(groupId: string, body: string): Promise<GroupDiscussionPost> {
+  const text = body.trim();
+  if (text.length < 1) throw new Error('Write a message first.');
+  if (text.length > 500) throw new Error('Messages can be up to 500 characters.');
+  const me = await myUsername();
+  const ref = doc(collection(db, 'groups', groupId, 'messages'));
+  await setDoc(ref, { authorUid: me.uid, authorName: me.username, text, createdAt: serverTimestamp() });
+  return { id: ref.id, group_id: groupId, author_id: me.uid, author_name: me.username, body: text, created_at: new Date().toISOString() };
+}
+
+// ─── Direct messages (shared with the original app) ──────────────────────
+// chats/{a_b} (the two uids sorted, joined with "_") = { members, names,
+// lastText, lastAt, lastFrom, seen }; messages = { from, text, createdAt }.
+// Only friends (who follow each other) can start or keep chatting.
+
+/** The conversation id with a friend; the chat document is created the first time. */
 export async function getOrCreateFriendConversation(friendId: string): Promise<string> {
-  const userId = await signedInUserId();
-  const id = [userId, friendId].sort().join('_');
+  const me = await myUsername();
+  const members = [me.uid, friendId].sort();
+  const id = members.join('_');
+  const ref = doc(db, 'chats', id);
+  if ((await getDoc(ref)).exists()) return id;
+  try {
+    await setDoc(ref, { members, names: { [me.uid]: me.username }, lastText: '', lastAt: serverTimestamp(), lastFrom: me.uid, seen: { [me.uid]: serverTimestamp() } });
+  } catch (error) {
+    if ((error as { code?: string }).code === 'permission-denied') throw new Error('You can message friends who follow you back.');
+    throw error;
+  }
   return id;
 }
 
 export async function listConversationMessages(conversationId: string): Promise<CommunityMessage[]> {
-  try {
-    const snap = await getDocs(collection(db, 'chats', conversationId, 'messages'));
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as CommunityMessage);
-  } catch {
-    return [];
-  }
+  const snap = await getDocs(query(collection(db, 'chats', conversationId, 'messages'), orderBy('createdAt', 'asc'), limit(200)));
+  return snap.docs.map((item) => {
+    const d = item.data();
+    return { id: item.id, conversation_id: conversationId, sender_id: String(d.from ?? ''), body: String(d.text ?? ''), created_at: iso(d.createdAt) };
+  });
 }
 
 export async function sendCommunityMessage(conversationId: string, body: string): Promise<CommunityMessage> {
-  const senderId = await signedInUserId();
-  const id = `msg_${Date.now()}`;
-  const msg: CommunityMessage = {
-    id,
-    conversation_id: conversationId,
-    sender_id: senderId,
-    body: body.trim(),
-    created_at: new Date().toISOString(),
-  };
-  await setDoc(doc(db, 'chats', conversationId, 'messages', id), msg);
-  return msg;
+  const text = body.trim();
+  if (text.length < 1) throw new Error('Write a message first.');
+  if (text.length > 500) throw new Error('Messages can be up to 500 characters.');
+  const me = await signedInUserId();
+  const ref = doc(collection(db, 'chats', conversationId, 'messages'));
+  const batch = writeBatch(db);
+  batch.set(ref, { from: me, text, createdAt: serverTimestamp() });
+  batch.update(doc(db, 'chats', conversationId), { lastText: text.slice(0, 120), lastAt: serverTimestamp(), lastFrom: me, [`seen.${me}`]: serverTimestamp() });
+  try {
+    await batch.commit();
+  } catch (error) {
+    if ((error as { code?: string }).code === 'permission-denied') throw new Error('Messages can only be sent between friends who follow each other.');
+    throw error;
+  }
+  return { id: ref.id, conversation_id: conversationId, sender_id: me, body: text, created_at: new Date().toISOString() };
 }
 
-export async function deleteCommunityMessage(messageId: string) {}
+/** Only the sender can delete their own message. */
+export async function deleteCommunityMessage(conversationId: string, messageId: string) {
+  await deleteDoc(doc(db, 'chats', conversationId, 'messages', messageId));
+}
 
 export async function listFriendChallenges(): Promise<FriendChallenge[]> {
   try {

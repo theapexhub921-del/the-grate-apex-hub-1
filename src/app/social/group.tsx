@@ -77,15 +77,15 @@ export default function StudyGroupScreen() {
       <PageHeader title="Group discussion" subtitle="Share assignment questions, notes and explanations with your study group." />
       {canManage && friends.length ? (
         <Card style={styles.inviteCard}>
-          <Text style={styles.author}>Invite friends to your group</Text>
-          {friends.map((friend) => <View key={friend.userId} style={styles.inviteRow}><Text style={styles.body}>{personName(friend)}</Text><Button label="Invite" size="sm" variant="secondary" onPress={() => void invite(friend.userId)} loading={busy} /></View>)}
+          <Text style={styles.author}>Add friends to your group</Text>
+          {friends.map((friend) => <View key={friend.userId} style={styles.inviteRow}><Text style={styles.body}>{personName(friend)}</Text><Button label="Add" size="sm" variant="secondary" onPress={() => void invite(friend.userId)} loading={busy} accessibilityLabel={`Add ${personName(friend)} to the group`} /></View>)}
         </Card>
       ) : null}
       <Card style={styles.composer}>
         <MentionInput people={social.people} value={draft} onChangeText={setDraft} maxLength={5000} multiline placeholder="Start a group discussion…" placeholderTextColor={colors.textTertiary} accessibilityLabel="Write a group discussion post" style={styles.input} />
         <Button label="Post to group" onPress={() => void send()} loading={busy} disabled={!draft.trim() || busy || !groupId} />
       </Card>
-      {error ? <InlineNotice tone="warning" title="Discussion unavailable" message={`${error} Make sure you are a member of this group and the community database migration is applied.`} /> : null}
+      {error ? <InlineNotice tone="warning" title="Discussion unavailable" message={`${error} Only members can see a group’s discussion.`} /> : null}
       {loading ? <LoadingState label="Loading discussion" /> : null}
       {!loading && !posts.length && !error ? (
         <Card style={styles.empty}><Text style={styles.body}>No messages yet. Start with an assignment question or a topic you want to revise together.</Text></Card>

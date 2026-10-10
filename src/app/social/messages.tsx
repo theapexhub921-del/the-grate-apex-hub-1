@@ -44,7 +44,7 @@ export default function MessagesScreen() {
           <Button label="Find classmates" variant="secondary" onPress={() => router.push('/social/friends')} />
         </Card>
       ) : null}
-      <Text style={styles.notice}>Text messages are available when the community database migration has been applied. Photo and video sharing and voice calls are not connected yet.</Text>
+      <Text style={styles.notice}>Text messages work between friends who follow each other. Photo and video sharing and voice calls are not connected yet.</Text>
     </Screen>
   );
 }

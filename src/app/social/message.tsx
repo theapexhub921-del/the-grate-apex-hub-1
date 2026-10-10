@@ -81,13 +81,13 @@ export default function DirectMessageScreen() {
   }
 
   async function removeMessage() {
-    if (!deleteTarget || busy) return;
+    if (!deleteTarget || !conversationId || busy) return;
     setBusy(true);
     setError(null);
     try {
-      await deleteCommunityMessage(deleteTarget.id);
+      await deleteCommunityMessage(conversationId, deleteTarget.id);
       setDeleteTarget(null);
-      if (conversationId) await refresh(conversationId);
+      await refresh(conversationId);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not delete this message.');
     } finally {
@@ -99,7 +99,7 @@ export default function DirectMessageScreen() {
     <Screen width="prose">
       <BackLink fallback={'/social/messages' as never} />
       <PageHeader title={name ? `Chat with ${name}` : 'Direct message'} subtitle="Text conversation with your friend." />
-      {error ? <InlineNotice tone="warning" title="Conversation unavailable" message={`${error} Direct messages need the community database migration and an accepted friendship.`} /> : null}
+      {error ? <InlineNotice tone="warning" title="Conversation unavailable" message={`${error} Direct messages work between friends who follow each other.`} /> : null}
       {loading ? <LoadingState label="Loading conversation" /> : null}
       <ScrollView ref={messagesRef} style={styles.messages} contentContainerStyle={styles.messageList} onContentSizeChange={() => messagesRef.current?.scrollToEnd({ animated: true })}>
         {messages.map((message) => {

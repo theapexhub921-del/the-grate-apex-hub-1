@@ -13,19 +13,12 @@ import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import { createStudyGroup, joinStudyGroup, listVisibleStudyGroups, respondToGroupInvite, type StudyGroup } from '@/data/community';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
-const VISIBILITIES = [
-  { value: 'friends', label: 'Friends' },
-  { value: 'private', label: 'Private' },
-  { value: 'open', label: 'Open' },
-] as const;
-
 export default function StudyGroupsScreen() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const [groups, setGroups] = useState<StudyGroup[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [visibility, setVisibility] = useState<StudyGroup['visibility']>('friends');
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +41,7 @@ export default function StudyGroupsScreen() {
     setBusy(true);
     setError(null);
     try {
-      const id = await createStudyGroup({ title, description, visibility });
+      const id = await createStudyGroup({ title, description });
       setTitle('');
       setDescription('');
       await refresh();
@@ -94,34 +87,30 @@ export default function StudyGroupsScreen() {
 
       <Card style={styles.form}>
         <Text style={styles.heading}>Create a group</Text>
-        <TextInput value={title} onChangeText={setTitle} maxLength={80} placeholder="Group name" placeholderTextColor={colors.textTertiary} accessibilityLabel="Study group name" style={styles.input} />
-        <TextInput value={description} onChangeText={setDescription} maxLength={1000} multiline placeholder="What will your group study? (optional)" placeholderTextColor={colors.textTertiary} accessibilityLabel="Study group description" style={[styles.input, styles.multiline]} />
-        <Text style={styles.label}>Who can find it?</Text>
-        <View style={styles.visibilityRow}>
-          {VISIBILITIES.map((item) => (
-            <Button key={item.value} label={item.label} variant={visibility === item.value ? 'primary' : 'secondary'} size="sm" onPress={() => setVisibility(item.value)} />
-          ))}
-        </View>
+        <TextInput value={title} onChangeText={setTitle} maxLength={40} placeholder="Group name" placeholderTextColor={colors.textTertiary} accessibilityLabel="Study group name" style={styles.input} />
+        <TextInput value={description} onChangeText={setDescription} maxLength={200} multiline placeholder="What will your group study? (optional)" placeholderTextColor={colors.textTertiary} accessibilityLabel="Study group description" style={[styles.input, styles.multiline]} />
+        {/* Shared rules: groups are private to their members; the owner adds friends who follow each other. */}
+        <Text style={styles.label}>Groups are private: only members can see them. After creating it, add friends who follow you back.</Text>
         <Button label="Create group" onPress={() => void create()} loading={busy} disabled={title.trim().length < 2 || busy} />
       </Card>
 
       <View style={styles.listHeading}>
-        <Text style={styles.heading}>Groups you can see</Text>
+        <Text style={styles.heading}>Your groups</Text>
         <Button label="Refresh" variant="ghost" size="sm" onPress={() => void refresh()} />
       </View>
       {loading ? <LoadingState label="Loading study groups" /> : null}
-      {error ? <InlineNotice tone="warning" title="Study groups unavailable" message={`${error} The community database migration must be applied for groups to work.`} /> : null}
+      {error ? <InlineNotice tone="warning" title="Study groups unavailable" message={error} /> : null}
       {!loading && !groups.length && !error ? (
         <Card style={styles.empty}>
           <Icon name="social" size={24} color={colors.primaryText} />
-          <Text style={styles.body}>No groups are visible yet. Start a private study room or make an open group for classmates.</Text>
+          <Text style={styles.body}>You are not in a group yet. Start one, then add friends who follow you back.</Text>
         </Card>
       ) : null}
       {groups.map((group) => (
         <Card key={group.id} style={styles.groupCard}>
           <View style={styles.groupTitleRow}>
             <Text style={styles.groupTitle}>{group.title}</Text>
-            <Pill label={group.visibility} />
+            <Pill label={group.membership_role === 'owner' ? 'Owner' : 'Member'} />
           </View>
           {group.description ? <Text style={styles.body}>{group.description}</Text> : null}
           <View style={styles.actions}>
