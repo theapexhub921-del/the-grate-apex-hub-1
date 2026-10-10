@@ -33,7 +33,7 @@ export default function GoalsScreen() {
       await refreshProgressGoals({ lessonsCompleted: progress.lessonsCompleted, xp: progress.xp, streak: progress.streak });
       setGoals(await listPersonalGoals());
       setError('');
-    } catch (e) { setError(e instanceof Error ? e.message : 'Could not sync your goals.'); }
+    } catch (e) { setError(e instanceof Error ? e.message : 'Could not load your goals.'); }
     finally { setBusy(false); }
   }
 
@@ -69,7 +69,7 @@ export default function GoalsScreen() {
       </View>
       <Button label="Save goal" onPress={() => void addGoal()} disabled={!title.trim()} />
     </Card>
-    <SectionHeader title="Your goals" subtitle="Progress is private to you." style={styles.section} />
+    <SectionHeader title="Your goals" subtitle="Private to you and saved on this device." style={styles.section} />
     {busy ? <Text style={styles.muted}>Loading goals…</Text> : goals.length ? goals.map((goal) => {
       const current = goal.goal_type === 'lessons' || goal.goal_type === 'xp' || goal.goal_type === 'streak' ? goal.current : Number(goal.current);
       const pct = Math.min(100, Math.round(current / Number(goal.target) * 100));

@@ -1,14 +1,12 @@
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-} from 'firebase/firestore';
+import { auth } from '@/lib/firebase';
+import { readLearningCache, writeLearningCache } from '@/data/learning-sync';
 
-import { auth, db } from '@/lib/firebase';
+// Study plans, timetable and personal goals.
+//
+// Saved on this device for the signed-in learner (account-scoped cache). The
+// deployed Firestore rules have no place for planner data yet (the earlier
+// users/{uid}/studyPlans, timetableBlocks and goals paths are refused), so
+// nothing here pretends to sync. Cloud sync needs an owner-only rule first.
 
 export type StudyPlan = {
   id: string;
@@ -52,22 +50,52 @@ export type PersonalGoal = {
   updated_at: string;
 };
 
+type Kind = 'studyPlans' | 'timetableBlocks' | 'goals';
+const KEYS: Record<Kind, string> = {
+  studyPlans: 'grateapex_planner_plans',
+  timetableBlocks: 'grateapex_planner_timetable',
+  goals: 'grateapex_planner_goals',
+};
+
 async function currentUserId() {
   const user = auth.currentUser;
-  if (!user) throw new Error('Sign in to sync your study planning.');
+  if (!user) throw new Error('Sign in to use study planning.');
   return user.uid;
 }
 
-export async function listStudyPlans(): Promise<StudyPlan[]> {
+async function readAll<T>(kind: Kind): Promise<T[]> {
+  await currentUserId();
   try {
-    const userId = await currentUserId();
-    const snap = await getDocs(collection(db, 'users', userId, 'studyPlans'));
-    return snap.docs
-      .map((d) => ({ id: d.id, ...d.data() }) as StudyPlan)
-      .filter((p) => p.status !== 'archived');
+    const saved = await readLearningCache(KEYS[kind]);
+    const parsed = saved ? JSON.parse(saved) : [];
+    return Array.isArray(parsed) ? (parsed as T[]) : [];
   } catch {
     return [];
   }
+}
+
+async function writeAll<T>(kind: Kind, items: T[]) {
+  await currentUserId();
+  try {
+    await writeLearningCache(KEYS[kind], JSON.stringify(items));
+  } catch {
+    throw new Error('Your planner could not be saved on this device.');
+  }
+}
+
+async function upsert<T extends { id: string }>(kind: Kind, item: T) {
+  const items = await readAll<T>(kind);
+  await writeAll(kind, [...items.filter((existing) => existing.id !== item.id), item]);
+  return item;
+}
+
+async function remove(kind: Kind, id: string) {
+  const items = await readAll<{ id: string }>(kind);
+  await writeAll(kind, items.filter((existing) => existing.id !== id));
+}
+
+export async function listStudyPlans(): Promise<StudyPlan[]> {
+  return (await readAll<StudyPlan>('studyPlans').catch(() => [] as StudyPlan[])).filter((plan) => plan.status !== 'archived');
 }
 
 export async function saveStudyPlan(
@@ -78,28 +106,26 @@ export async function saveStudyPlan(
   const userId = await currentUserId();
   const id = 'id' in input && input.id ? input.id : `plan_${Date.now()}`;
   const now = new Date().toISOString();
+  const existing = (await readAll<StudyPlan>('studyPlans')).find((plan) => plan.id === id);
   const plan: StudyPlan = {
     id,
     user_id: userId,
     title: input.title,
     topic_ids: input.topic_ids,
     duration_days: input.duration_days,
-    starts_at: now.slice(0, 10),
+    starts_at: existing?.starts_at ?? now.slice(0, 10),
     status: input.status,
     goal: input.goal,
-    progress_lesson_ids: [],
-    created_at: now,
+    progress_lesson_ids: existing?.progress_lesson_ids ?? [],
+    created_at: existing?.created_at ?? now,
     updated_at: now,
   };
-
-  await setDoc(doc(db, 'users', userId, 'studyPlans', id), plan, { merge: true });
-  return plan;
+  return upsert('studyPlans', plan);
 }
 
 export async function updateStudyPlanProgress(lessonIds: string[]) {
   try {
-    const userId = await currentUserId();
-    const plans = await listStudyPlans();
+    const plans = await readAll<StudyPlan>('studyPlans');
     const active = plans.find((p) => p.status === 'active');
     if (!active) return;
 
@@ -108,8 +134,8 @@ export async function updateStudyPlanProgress(lessonIds: string[]) {
       (topicId: string) => publishedTopics.find((t) => t.id === topicId)?.lessons.map((l) => l.id) ?? []
     );
     const completed = [...new Set(lessonIds.filter((id) => path.includes(id)))];
-
-    await updateDoc(doc(db, 'users', userId, 'studyPlans', active.id), {
+    await upsert('studyPlans', {
+      ...active,
       progress_lesson_ids: completed,
       status: path.length > 0 && completed.length >= path.length ? 'completed' : 'active',
       updated_at: new Date().toISOString(),
@@ -118,123 +144,60 @@ export async function updateStudyPlanProgress(lessonIds: string[]) {
 }
 
 export async function listTimetableBlocks(): Promise<TimetableBlock[]> {
-  try {
-    const userId = await currentUserId();
-    const snap = await getDocs(collection(db, 'users', userId, 'timetableBlocks'));
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as TimetableBlock);
-  } catch {
-    return [];
-  }
+  return readAll<TimetableBlock>('timetableBlocks').catch(() => [] as TimetableBlock[]);
 }
 
-export async function createTimetableBlock(
-  input: Omit<TimetableBlock, 'id' | 'user_id' | 'created_at'>
-): Promise<TimetableBlock> {
+export async function createTimetableBlock(input: Omit<TimetableBlock, 'id' | 'user_id' | 'created_at'>): Promise<TimetableBlock> {
   const userId = await currentUserId();
-  const id = `block_${Date.now()}`;
-  const block: TimetableBlock = {
-    id,
-    user_id: userId,
-    ...input,
-    created_at: new Date().toISOString(),
-  };
-
-  await setDoc(doc(db, 'users', userId, 'timetableBlocks', id), block);
-  return block;
+  return upsert('timetableBlocks', { id: `block_${Date.now()}`, user_id: userId, ...input, created_at: new Date().toISOString() });
 }
 
 export async function deleteTimetableBlock(id: string) {
-  const userId = await currentUserId();
-  await deleteDoc(doc(db, 'users', userId, 'timetableBlocks', id));
+  await remove('timetableBlocks', id);
 }
 
 export async function updateTimetableBlock(
   id: string,
   input: Partial<Omit<TimetableBlock, 'id' | 'user_id' | 'created_at'>>
 ): Promise<TimetableBlock> {
-  const userId = await currentUserId();
-  await updateDoc(doc(db, 'users', userId, 'timetableBlocks', id), {
-    ...input,
-  });
-  return {
-    id,
-    user_id: userId,
-    weekday: input.weekday ?? 0,
-    start_time: input.start_time ?? '',
-    end_time: input.end_time ?? '',
-    subject: input.subject ?? '',
-    title: input.title ?? '',
-    created_at: new Date().toISOString(),
-    ...input,
-  } as TimetableBlock;
+  const existing = (await readAll<TimetableBlock>('timetableBlocks')).find((block) => block.id === id);
+  if (!existing) throw new Error('That timetable entry no longer exists.');
+  return upsert('timetableBlocks', { ...existing, ...input });
 }
 
 export async function listPersonalGoals(): Promise<PersonalGoal[]> {
-  try {
-    const userId = await currentUserId();
-    const snap = await getDocs(collection(db, 'users', userId, 'goals'));
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as PersonalGoal);
-  } catch {
-    return [];
-  }
+  return readAll<PersonalGoal>('goals').catch(() => [] as PersonalGoal[]);
 }
 
-export async function createPersonalGoal(
-  input: Pick<PersonalGoal, 'title' | 'goal_type' | 'target' | 'deadline'>
-): Promise<PersonalGoal> {
+export async function createPersonalGoal(input: Pick<PersonalGoal, 'title' | 'goal_type' | 'target' | 'deadline'>): Promise<PersonalGoal> {
   const userId = await currentUserId();
-  const id = `goal_${Date.now()}`;
   const now = new Date().toISOString();
-  const goal: PersonalGoal = {
-    id,
-    user_id: userId,
-    ...input,
-    current: 0,
-    completed_at: null,
-    created_at: now,
-    updated_at: now,
-  };
-
-  await setDoc(doc(db, 'users', userId, 'goals', id), goal);
-  return goal;
+  return upsert('goals', { id: `goal_${Date.now()}`, user_id: userId, ...input, current: 0, completed_at: null, created_at: now, updated_at: now });
 }
 
 export async function deletePersonalGoal(id: string) {
-  const userId = await currentUserId();
-  await deleteDoc(doc(db, 'users', userId, 'goals', id));
+  await remove('goals', id);
 }
 
 export async function updatePersonalGoal(id: string, current: number) {
-  const userId = await currentUserId();
-  await updateDoc(doc(db, 'users', userId, 'goals', id), {
-    current,
-    completed_at: current > 0 ? new Date().toISOString() : null,
-    updated_at: new Date().toISOString(),
-  });
+  const existing = (await readAll<PersonalGoal>('goals')).find((goal) => goal.id === id);
+  if (!existing) return;
+  const now = new Date().toISOString();
+  await upsert('goals', { ...existing, current, completed_at: current >= existing.target ? now : null, updated_at: now });
 }
 
 export async function refreshProgressGoals(progress: { lessonsCompleted: number; xp: number; streak: number }) {
   try {
-    const userId = await currentUserId();
-    const snap = await getDocs(collection(db, 'users', userId, 'goals'));
-    const supported: Record<string, number> = {
-      lessons: progress.lessonsCompleted,
-      xp: progress.xp,
-      streak: progress.streak,
-    };
-
-    for (const d of snap.docs) {
-      const g = d.data();
-      if (g.goal_type in supported) {
-        const current = Math.max(0, supported[g.goal_type]);
-        if (Number(g.current) !== current) {
-          await updateDoc(d.ref, {
-            current,
-            completed_at: current >= Number(g.target) ? new Date().toISOString() : null,
-            updated_at: new Date().toISOString(),
-          });
-        }
-      }
-    }
+    const supported: Record<string, number> = { lessons: progress.lessonsCompleted, xp: progress.xp, streak: progress.streak };
+    const goals = await readAll<PersonalGoal>('goals');
+    let changed = false;
+    const next = goals.map((goal) => {
+      if (!(goal.goal_type in supported)) return goal;
+      const current = Math.max(0, supported[goal.goal_type]);
+      if (Number(goal.current) === current) return goal;
+      changed = true;
+      return { ...goal, current, completed_at: current >= Number(goal.target) ? new Date().toISOString() : null, updated_at: new Date().toISOString() };
+    });
+    if (changed) await writeAll('goals', next);
   } catch {}
 }
