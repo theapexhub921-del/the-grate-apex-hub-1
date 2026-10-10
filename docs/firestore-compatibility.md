@@ -50,10 +50,16 @@ writing, and only lessons of this app's curriculum are synced
 (`learning-sync.ts`, `progress.ts`).
 
 Repair of documents already changed (needs approval; nothing has been run):
-an overwritten entry looks like `{ completedAt: n, xp: 0 }` with a small `n`
-(a section count, not a timestamp — real timestamps are above 10¹²) under a
-lesson id that is not in this app's curriculum. It can be turned back into `n`.
-This needs an admin export first and the owner's approval.
+an overwritten entry is `{ completedAt: n, xp: 0 }` under a lesson id that is
+not in this app's curriculum (reproduced against the live rules with a test
+account on 2026-10-10). A small `n` is the original section count. A count of
+0 was saved as the sync time (`0 || Date.now()`), so `n` above 10¹² under a
+non-curriculum id means 0. The id, not the value alone, identifies a damaged
+entry. This needs an admin export first and the owner's approval.
+
+The original app merges copies with `Math.max(old, new)`; for an object that
+gives `NaN`, so a student who still uses the old app after the new one rewrote
+an entry ends up with `NaN` there (a number, which this app now leaves alone).
 
 Other `progress` notes: `days` (old: date → questions answered) is read as the
 streak (it is really the number of days ever studied). "Reset learning

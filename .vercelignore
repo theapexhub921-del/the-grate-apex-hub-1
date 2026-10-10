@@ -9,6 +9,9 @@
 # Lecture material (several GB). The app does not import it at build time.
 content/
 
+# The original app, kept locally for reference during the merger. Never deployed.
+old-reference/
+
 # Local build output and caches (Vercel makes its own).
 node_modules/
 dist/
