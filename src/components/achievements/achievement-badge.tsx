@@ -60,9 +60,9 @@ function createStyles(colors: ThemeColors) {
     pressed: { transform: [{ scale: 0.96 }] },
     tile: { alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(255,255,255,0.35)' },
     complete: { borderColor: '#FDC00A', borderWidth: 3 },
-    emoji: { marginTop: -8 },
+    emoji: { marginTop: -8, zIndex: 1 },
     emojiLocked: { opacity: 0.45, ...webStyle({ filter: 'grayscale(1)' }) } as TextStyle,
-    ribbon: { position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, backgroundColor: '#FFFFFF' },
+    ribbon: { position: 'absolute', zIndex: 2, flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, backgroundColor: '#FFFFFF' },
     ribbonText: { fontSize: 9, fontWeight: '800', letterSpacing: 0.6 },
     name: { fontSize: 11.5, lineHeight: 14, fontWeight: '700', color: colors.text, textAlign: 'center' },
   });

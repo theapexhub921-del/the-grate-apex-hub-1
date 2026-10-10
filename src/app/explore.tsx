@@ -73,6 +73,14 @@ function AnnouncementCard({ item }: { item: ExploreAnnouncement }) {
   return <Card style={styles.announcementCard}><View style={styles.announcementHeader}><Icon name="sparkle" size={18} color="#0A1F5C" /><Pill label={`${new Date(`${item.publishedAt}T00:00:00`).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })} · ${label}`} tone="gold" /></View><Text style={styles.featureTitle}>{item.title}</Text><Text style={styles.featureDescription}>{item.summary}</Text></Card>;
 }
 
+// The four first steps, under the welcome (links to the real places).
+const START_HERE: readonly { icon: 'learn' | 'home' | 'social' | 'sparkle'; label: string; detail: string; href: string }[] = [
+  { icon: 'learn', label: 'Study a lesson', detail: 'Pick up your class curriculum', href: '/learn' },
+  { icon: 'home', label: 'Share a post', detail: 'Stories, photos and videos', href: '/' },
+  { icon: 'social', label: 'Find classmates', detail: 'Follow people and make friends', href: '/social/friends' },
+  { icon: 'sparkle', label: 'Make it yours', detail: 'Experience and theme', href: '/settings' },
+];
+
 export default function ExploreScreen() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
@@ -94,6 +102,19 @@ export default function ExploreScreen() {
           <View style={styles.introBrand}><Icon name="sparkle" size={22} color={colors.accentText} /><Text style={styles.introLabel}>WELCOME TO GrAteApex Hub</Text></View>
           <Text style={styles.introTitle}>Learn your way. Rise together.</Text>
           <Text style={styles.introBody}>Bring your lecture material into focused lessons, practise with fresh questions, and return to concepts when they are due. Feed is your social space for Stories and community posts. Explore explains every feature, shares updates and shows what is coming next.</Text>
+          {/* Start here: fills the card to the simulation's height with the four first steps. */}
+          <View style={styles.startGrid}>
+            {START_HERE.map((item) => (
+              <Interactive key={item.label} onPress={() => router.push(item.href as never)} accessibilityRole="link" style={({ hovered }) => [styles.startTile, hovered && styles.startTileHover]}>
+                <View style={styles.startIcon}><Icon name={item.icon} size={18} color={colors.primaryText} /></View>
+                <View style={styles.flex}>
+                  <Text style={styles.startLabel}>{item.label}</Text>
+                  <Text style={styles.startDetail}>{item.detail}</Text>
+                </View>
+                <Icon name="chevronRight" size={16} color={colors.textTertiary} />
+              </Interactive>
+            ))}
+          </View>
           <View style={styles.introActions}>
             <Interactive onPress={() => router.push(routes.onboarding({ replay: true }))} accessibilityRole="button" style={styles.guideLink}>
               <Icon name="learn" size={16} color={colors.primaryText} /><Text style={styles.guideLinkText}>Replay the full introduction</Text>
@@ -264,8 +285,14 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     flex: { flex: 1, minWidth: 0 },
     section: { marginTop: 34 },
-    introGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, alignItems: 'flex-start' },
-    introCard: { flex: 1.35, minWidth: 300, gap: 12, padding: 24 },
+    introGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, alignItems: 'stretch' },
+    startGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 4 },
+    startTile: { flexBasis: '47%', flexGrow: 1, minWidth: 200, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceMuted },
+    startTileHover: { borderColor: colors.primaryBorder },
+    startIcon: { width: 34, height: 34, borderRadius: 11, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySubtle },
+    startLabel: { fontSize: 14, fontWeight: '800', color: colors.text },
+    startDetail: { fontSize: 12, lineHeight: 16, color: colors.textSecondary, marginTop: 1 },
+    introCard: { flex: 1.35, minWidth: 300, gap: 12, padding: 24, justifyContent: 'space-between' },
     introBrand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     introLabel: { ...Type.overline, color: colors.accentText },
     introTitle: { ...Type.title1, color: colors.text },
