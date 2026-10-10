@@ -11,7 +11,30 @@ ID mapping. Anything this app writes lands in the same documents the old app use
 Firestore refuses anything a rule does not allow, including every collection
 the rules do not mention.
 
-## Where the current app disagrees with the rules
+## Status on `merge/legacy-integration` (2026-10-10)
+
+The table further down describes the **live production build** (`grateapex.vercel.app`).
+On the merger branch every row is fixed, except where noted:
+
+| Area | Now |
+|---|---|
+| users/{uid}, usernames | Sign-up reserves a username and creates the profile in one batch; display name is its own field; renames follow the 30-day rule; class saved as hall + semester + lock (lib/accounts.ts) |
+| progress/{uid} | Shared lessons map never written; completions in progress/{uid}/completions (**new rule**), with the protected map as fallback |
+| Quiz attempts | progress/{uid}/attempts (**new rule**); never scores/{attemptId} |
+| scores/{uid}, league | Summary written with the real username; league reads scores |
+| follows | follower/followee format; existing relationships restored without migration |
+| posts / likes / replies | Board format, counters in the same batch; photos and videos via the original app's Cloudinary |
+| groups, chats | Rule shapes; private groups, owner adds mutual friends; DMs between mutual friends |
+| stories, qotd | users/{uid}/stories (24 h) and users/{uid}/qotd + this app's tally |
+| Planner | users/{uid}/planner/{kind} (**new rule**), device copy as fallback |
+| Reports | supportTickets (admins read them) |
+| Account deletion | Full deletion needs server/account-deletion.mjs (not deployed); until then the app deletes the login and progress and says so |
+| **Still refused / not built** | Table Conferences (`calls` belongs to the original app's voice calls), friend battles (`battles` is server-only), weekly freeze reward, explore_weekly_sessions — shown as "coming soon" |
+| **Trust gaps (no rule change made)** | users/{uid}.coins and progress/{uid}.xp are client-writable, as in the original app — server-side XP/coins would be needed to make them tamper-proof |
+
+**Rules to paste:** the whole of `firestore.rules`. Compared with the deployed rules it only **adds** three owner-only blocks (attempts, completions, planner) — 0 existing lines changed (`git diff 1d7b6f2 -- firestore.rules`). Verified: 53 emulator rules tests, and every app emulator check passes under both the deployed and the proposed rules. Safe to paste before any new release: neither the live new app nor the original app uses these paths yet. Rollback: paste the previous rules back (Firebase console keeps the history; a copy is in `tests/emulator/deployed-2026-10-09.rules`).
+
+## Where the live production build disagrees with the rules
 
 | Path | What this app does | What the rules require | Result |
 |---|---|---|---|
