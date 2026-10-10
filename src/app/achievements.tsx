@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
+import { AchievementBadge } from '@/components/achievements/achievement-badge';
 import { Button } from '@/components/ui/button';
+import { Sheet } from '@/components/ui/sheet';
 import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
@@ -23,6 +25,7 @@ const GROUP_ORDER: AchievementGroup[] = ['GRATEAPEX', 'Questions', 'Streaks', 'L
 export default function AchievementsScreen() {
   const styles = useThemedStyles(createStyles);
   const { states, ready } = useAchievements();
+  const [open, setOpen] = useState<AchievementState | null>(null);
   const completed = states.reduce((sum, state) => sum + state.level, 0);
   const groups = useMemo(() => GROUP_ORDER.map((group) => ({ group, items: states.filter((state) => state.def.group === group) })), [states]);
 
@@ -37,11 +40,14 @@ export default function AchievementsScreen() {
       {groups.map(({ group, items }) => (
         <View key={group} style={styles.section}>
           <SectionHeader title={group === 'GRATEAPEX' ? 'GrAteApex Hub' : group} subtitle={`${items.reduce((n, s) => n + s.level, 0)} of ${items.length * 5} levels`} />
-          <View style={styles.list}>
-            {items.map((state) => <AchievementRow key={state.def.id} state={state} />)}
+          <View style={styles.badges}>
+            {items.map((state) => <AchievementBadge key={state.def.id} state={state} onPress={() => setOpen(state)} />)}
           </View>
         </View>
       ))}
+      <Sheet visible={Boolean(open)} onClose={() => setOpen(null)} title={open?.def.name ?? ''} subtitle={open ? `${open.def.group === 'GRATEAPEX' ? 'GrAteApex Hub' : open.def.group} · level ${open.level} of 5` : undefined}>
+        {open ? <AchievementRow state={open} /> : null}
+      </Sheet>
     </Screen>
   );
 }
@@ -134,6 +140,7 @@ function createStyles(colors: ThemeColors) {
     page: { paddingBottom: 140, gap: 8 },
     section: { marginTop: 18, gap: 10 },
     list: { gap: 10 },
+    badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, rowGap: 18 },
     row: { gap: 10, padding: 14 },
     rowTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
     mark: { width: 34, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceSunken },

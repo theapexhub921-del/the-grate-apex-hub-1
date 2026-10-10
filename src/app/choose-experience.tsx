@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Atmosphere } from '@/components/atmosphere/atmosphere';
 import { LegacyBackground } from '@/components/experience/legacy-background';
@@ -31,6 +31,8 @@ export default function ChooseExperienceScreen() {
   const saved = isExperience(user?.profile?.experience) ? user?.profile?.experience : null;
   const [choice, setChoice] = useState<ExperienceId | null>(saved ?? DEFAULT_EXPERIENCE);
   const [saving, setSaving] = useState(false);
+  // One roomy card per experience: preview beside its description on wide screens.
+  const wide = useWindowDimensions().width >= 760;
   const [error, setError] = useState<string | null>(null);
 
   async function confirm() {
@@ -48,7 +50,7 @@ export default function ChooseExperienceScreen() {
   }
 
   return (
-    <Screen width="wide" contentStyle={styles.page}>
+    <Screen width="content" contentStyle={styles.page}>
       <PageHeader
         eyebrow="Your app"
         title="Choose your experience"
@@ -66,13 +68,18 @@ export default function ChooseExperienceScreen() {
               accessibilityLabel={`${EXPERIENCE_INFO[id].name}: ${EXPERIENCE_INFO[id].summary}`}
               style={styles.optionWrap}
             >
-              <Card style={[styles.option, selected ? styles.selected : null]}>
-                <ExperienceSample experience={id} />
+              <Card style={[styles.option, wide && styles.optionWide, selected ? styles.selected : null]}>
+                <View style={wide ? styles.sampleWide : null}>
+                  <ExperienceSample experience={id} />
+                </View>
+                <View style={[styles.copy, wide && styles.copyWide]}>
                 <View style={styles.nameRow}>
                   <Text style={styles.name}>{EXPERIENCE_INFO[id].name}</Text>
                   {id === DEFAULT_EXPERIENCE ? <Pill label="Default" tone="gold" /> : null}
                 </View>
                 <Text style={styles.summary}>{EXPERIENCE_INFO[id].summary}</Text>
+                {selected ? <Text style={styles.chosen}>Selected</Text> : null}
+                </View>
               </Card>
             </Interactive>
           );
@@ -137,13 +144,18 @@ function createSampleStyles(colors: ThemeColors) {
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     page: { paddingBottom: 120, gap: 14 },
-    list: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
-    optionWrap: { flexGrow: 1, flexBasis: 300, minWidth: 260 },
+    list: { gap: 14 },
+    optionWrap: { width: '100%' },
+    optionWide: { flexDirection: 'row', alignItems: 'center', gap: 22 },
+    sampleWide: { width: 380 },
+    copy: { gap: 6 },
+    copyWide: { flex: 1, minWidth: 0 },
+    chosen: { ...Type.overline, color: colors.primaryText, marginTop: 6 },
     option: { gap: 4, borderWidth: 2, borderColor: 'transparent', borderRadius: Radius.lg, flex: 1 },
     selected: { borderColor: colors.primary },
     nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    name: { ...Type.headline, color: colors.text },
-    summary: { fontSize: 13.5, lineHeight: 19, color: colors.textSecondary },
+    name: { ...Type.title3, color: colors.text },
+    summary: { fontSize: 14.5, lineHeight: 22, color: colors.textSecondary },
     error: { fontSize: 13, color: colors.error },
   });
 }

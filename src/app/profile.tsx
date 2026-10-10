@@ -5,6 +5,7 @@ import { Text } from '@/components/ui/text';
 
 import { PersonalGoalsCard } from '@/components/learning/personal-goals-card';
 import { RankProgressCard } from '@/components/rank-progress';
+import { AchievementBadge } from '@/components/achievements/achievement-badge';
 import { ApexCoinWalletCard } from '@/components/apex-coin-wallet-card';
 import { AvatarPicker } from '@/components/avatar/avatar-picker';
 import { AnimatedNumber } from '@/components/ui/animated-number';
@@ -64,15 +65,8 @@ export default function ProfileScreen() {
   // These six are this app's own, now with five levels each (data/achievements.ts).
   const achievementStates = useAchievements().states;
   const levelsDone = achievementStates.reduce((sum, state) => sum + state.level, 0);
-  const ICONS: Record<string, IconName> = { 'first-lesson': 'lesson', 'quiz-ace': 'xp', 'topic-complete': 'course', 'first-mastery': 'mastery', 'consistent-reviewer': 'reinforce', 'apex-contender': 'challenge' };
-  const achievements: { icon: IconName; title: string; detail: string; earned: boolean }[] = achievementStates
-    .filter((state) => state.def.group === 'GRATEAPEX')
-    .map((state) => ({
-      icon: ICONS[state.def.id] ?? 'xp',
-      title: state.level > 0 ? `${state.def.name} · L${state.level}` : state.def.name,
-      detail: state.next !== null ? state.def.goal(state.next) : 'All five levels complete',
-      earned: state.level > 0,
-    }));
+  // Badges on You: earned ones first (highest level), then the closest to their next level.
+  const badgeStates = [...achievementStates].sort((x, y) => y.level - x.level || y.progress - x.progress).slice(0, 8);
 
   const stats: { icon: IconName; value: number; label: string }[] = [
     { icon: 'xp', value: progress.xp, label: 'Lifetime XP' },
@@ -186,21 +180,12 @@ export default function ProfileScreen() {
           {levelsDone} of {achievementStates.length * 5} levels
         </Text>
       </View>
-      <View style={styles.achievementGrid}>
-        {achievements.map((item) => (
-          <View key={item.title} style={[styles.achievement, !item.earned && styles.achievementLocked]} accessibilityLabel={`${item.title}: ${item.detail}. ${item.earned ? 'Earned' : 'Not yet earned'}`}>
-            <View style={[styles.achievementMark, item.earned ? styles.achievementMarkEarned : null]}>
-              <Icon name={item.earned ? item.icon : 'lock'} size={18} color={item.earned ? '#0A1F5C' : colors.textTertiary} filled={item.earned && (item.icon === 'xp')} />
-            </View>
-            <Text style={styles.achievementTitle} numberOfLines={1}>
-              {item.title}
-            </Text>
-            <Text style={styles.achievementDetail} numberOfLines={2}>
-              {item.detail}
-            </Text>
-          </View>
+      <View style={styles.badgeGrid}>
+        {badgeStates.map((state) => (
+          <AchievementBadge key={state.def.id} state={state} size={64} onPress={() => router.push('/achievements' as Href)} />
         ))}
       </View>
+      <Button label="View all achievements" variant="secondary" size="sm" onPress={() => router.push('/achievements' as Href)} />
     </Card>
   );
 
@@ -395,6 +380,7 @@ function createStyles(colors: ThemeColors) {
     cardHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
     cardTitle: { ...Type.title3, color: colors.text },
     cardMeta: { fontSize: 12, fontWeight: '700', color: colors.textTertiary },
+    badgeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, rowGap: 14, marginBottom: 12 },
     achievementGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
     achievement: { width: '31%', flexGrow: 1, minWidth: 96, alignItems: 'center', gap: 4, padding: 12, borderRadius: 14, backgroundColor: colors.surfaceMuted },
     achievementLocked: { opacity: 0.6 },
