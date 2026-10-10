@@ -13,7 +13,8 @@ import { Icon, type IconName } from '@/components/ui/icon';
 import { Card, PressableCard } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
 import { Columns, PageHeader, Screen } from '@/components/ui/screen';
-import { WeeklyChallengeCard, WeeklyLeagueCard } from '@/components/social/connect-challenges';
+import { WeeklyChallengeCard } from '@/components/social/connect-challenges';
+import { LeagueCard } from '@/components/social/league-card';
 import { BattlesCard } from '@/components/social/battles-card';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { addDays, startOfDay } from '@/data/learning/time';
@@ -222,7 +223,7 @@ export default function SocialScreen() {
             {week}
             {activityCard}
             <WeeklyChallengeCard />
-            <WeeklyLeagueCard />
+            <LeagueCard />
             <BattlesCard />
           </View>
         }

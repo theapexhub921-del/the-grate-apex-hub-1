@@ -4,7 +4,7 @@ import { Animated, Easing, Platform, Pressable, StyleSheet, TouchableOpacity, Vi
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LEGACY_NAV, LegacyIcon } from '@/components/experience/legacy-icon';
-import { SidebarResizeHandle, useSidebarWidth } from '@/components/sidebar-resize';
+import { useSidebarWidth } from '@/components/sidebar-resize';
 import { useLegacyPalette } from '@/components/experience/use-legacy-palette';
 import { useTheme, useUsesLegacyTheme } from '@/hooks/use-theme';
 import { LogoMark } from '@/components/logo-mark';
@@ -28,6 +28,8 @@ import { useAuth } from '@/hooks/use-auth';
 
 /** The original app's desktop width (src/responsive.ts). */
 export const LEGACY_DESKTOP_MIN = 1200;
+/** The slim rail's width (auto-hide). */
+const SLIM_WIDTH = 76;
 /**
  * The original app's own navigation setting (users/{uid}.autoHideNav; off unless
  * the student turned it on), so The Originals behaves as it did — including for
@@ -53,6 +55,8 @@ function useOriginalNavColors() {
     border: colors.border,
     bar: colors.tabBar,
     side: colors.navSurface,
+    // Solid behind the widened rail, so the page under it doesn't show through.
+    solid: colors.surfaceElevated,
     primary: colors.primary,
     onPrimary: colors.onPrimary,
     accent: colors.accent,
@@ -165,6 +169,7 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const visible = !autoHide || hovered;
+  const collapsed = autoHide && !hovered;
   const sideWidth = useSidebarWidth(250);
   const p = useNavProgress(visible, false); // width can't use the native driver
 
@@ -179,29 +184,29 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
     },
     onMouseLeave: () => {
       if (hideTimer.current) clearTimeout(hideTimer.current);
-      hideTimer.current = setTimeout(() => setHovered(false), 500);
+      hideTimer.current = setTimeout(() => setHovered(false), 180);
     },
   } as object;
 
 
   return (
-    <Animated.View {...hoverProps} style={[styles.sideShell, { backgroundColor: C.side, borderRightColor: C.border, width: p.interpolate({ inputRange: [0, 1], outputRange: [12, sideWidth] }) }]}>
-      {/* Collapsed handle: fades in as the sidebar closes. */}
-      <Animated.View pointerEvents="none" style={[styles.sideHandleWrap, { opacity: p.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }) }]}>
-        <View style={[styles.sideHandle, { backgroundColor: C.muted }]} />
-      </Animated.View>
-      <Animated.View
-        pointerEvents={visible ? 'auto' : 'none'}
-        style={[styles.sideInner, { width: sideWidth - 1, opacity: p, transform: [{ translateX: p.interpolate({ inputRange: [0, 1], outputRange: [-40, 0] }) }] }]}
-      >
+    // Auto-hide (Instagram-style): a slim emoji rail that widens over the page
+    // while the pointer is on it. Always visible: the full sidebar beside the page.
+    <View style={{ width: autoHide ? SLIM_WIDTH : sideWidth, height: '100%', zIndex: 20 }}>
+    <Animated.View {...hoverProps} style={[styles.sideShell, { backgroundColor: autoHide && visible ? C.solid : C.side, borderRightColor: C.border, width: autoHide ? p.interpolate({ inputRange: [0, 1], outputRange: [SLIM_WIDTH, sideWidth] }) : sideWidth }, autoHide && styles.overlay]}>
+      <View style={[styles.sideInner, { width: '100%' }, collapsed && styles.sideInnerSlim]}>
         <View style={styles.brand}>
           <View style={styles.brandLogo}>
             <LogoMark height={30} />
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.brandName, { color: C.text }]}>GrAte Apex Hub</Text>
-          </View>
-          <NotificationBell />
+          {collapsed ? null : (
+            <>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.brandName, { color: C.text }]}>GrAte Apex Hub</Text>
+              </View>
+              <NotificationBell />
+            </>
+          )}
         </View>
         <View style={{ marginTop: 18 }} accessibilityRole="tablist">
           {NAV_ITEMS.map((item) => {
@@ -227,17 +232,17 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
                 ]}
               >
                 <Text style={styles.itemIcon}>{LEGACY_NAV[item.path].emoji}</Text>
-                <Text style={[styles.itemLabel, { color: focused ? C.accent : C.silver }]}>{item.label}</Text>
+                {collapsed ? null : <Text style={[styles.itemLabel, { color: focused ? C.accent : C.silver }]}>{item.label}</Text>}
               </Pressable>
             );
           })}
         </View>
         <View style={{ flex: 1 }} />
-        <View style={[styles.me, { backgroundColor: C.card, borderColor: C.border }]}>
-          <View style={{ marginRight: 10 }}>
+        <View style={[styles.me, { backgroundColor: C.card, borderColor: C.border }, collapsed && styles.meSlim]}>
+          <View style={{ marginRight: collapsed ? 0 : 10 }}>
             <Avatar uri={avatarUrl} name={displayName} size={38} />
           </View>
-          <View style={{ flex: 1 }}>
+          <View style={[{ flex: 1 }, collapsed && styles.hidden]}>
             <Text style={[styles.meName, { color: C.text }]} numberOfLines={1}>
               @{username}
             </Text>
@@ -247,8 +252,9 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
             </Text>
           </View>
         </View>
-      </Animated.View>
+      </View>
     </Animated.View>
+    </View>
   );
 }
 
@@ -265,6 +271,10 @@ const styles = StyleSheet.create({
   sideShell: { overflow: 'hidden', borderRightWidth: 1, height: '100%', zIndex: 2 },
   sideHandleWrap: { position: 'absolute', left: 3, top: 0, bottom: 0, justifyContent: 'center' },
   sideHandle: { width: 6, height: 40, borderRadius: 3, opacity: 0.3 },
+  overlay: { position: 'absolute', left: 0, top: 0, bottom: 0, ...webStyle({ boxShadow: '0px 10px 40px rgba(0,0,0,0.25)' }) },
+  sideInnerSlim: { paddingHorizontal: 10, alignItems: 'center' },
+  meSlim: { padding: 6, justifyContent: 'center' },
+  hidden: { display: 'none' },
   sideInner: { width: 249, flex: 1, paddingHorizontal: 16, paddingVertical: 22 },
   brand: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6 },
   brandLogo: { marginRight: 12 },
