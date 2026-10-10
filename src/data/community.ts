@@ -18,6 +18,7 @@ import {
 } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
+import { cleanMedia, optimized, safeUrl, uploadMedia } from '@/lib/media';
 
 export type CommunityMedia = {
   uri: string;
@@ -30,6 +31,7 @@ export type CommunityMedia = {
 export type CommunityStory = {
   id: string;
   author_id: string;
+  author_name?: string | null;
   body: string | null;
   media_path: string | null;
   media_url?: string | null;
@@ -121,27 +123,7 @@ async function signedInUserId(): Promise<string> {
   return user.uid;
 }
 
-export async function listLiveStories(): Promise<CommunityStory[]> {
-  return [];
-}
 
-export async function createCommunityStory(body: string, media?: CommunityMedia): Promise<CommunityStory> {
-  const authorId = await signedInUserId();
-  const id = `story_${Date.now()}`;
-  const now = new Date().toISOString();
-  return {
-    id,
-    author_id: authorId,
-    body: body.trim() || null,
-    media_path: null,
-    media_url: media?.uri ?? null,
-    media_type: media?.type ?? null,
-    created_at: now,
-    expires_at: new Date(Date.now() + 86400000).toISOString(),
-  };
-}
-
-export async function deleteCommunityStory(storyId: string, mediaPath: string | null) {}
 
 // ─── Posts (shared discussion board with the original app) ───────────────
 // posts/{id} = { board, title, body, authorUid, authorName, replyCount,
@@ -203,7 +185,7 @@ export async function listCommunityFeed(limitCount = 50): Promise<CommunityPost[
       body: postText(d),
       media_path: null,
       media_type: media?.t === 'video' ? 'video' : media?.t === 'image' ? 'image' : null,
-      media_url: typeof media?.url === 'string' ? media.url : null,
+      media_url: safeUrl(media?.url) ? (media.t === 'image' ? optimized(media.url) : media.url) : null,
       reshared_post_id: typeof d.resharedPostId === 'string' ? d.resharedPostId : null,
       reshared_author_id: original?.authorUid ?? null,
       reshared_body: original ? postText(original) : null,
@@ -219,11 +201,13 @@ export async function listCommunityFeed(limitCount = 50): Promise<CommunityPost[
 }
 
 export async function createCommunityPost(body: string, media?: CommunityMedia, resharedPostId?: string | null): Promise<CommunityPost> {
-  if (media) throw new Error('Photos and videos in posts aren’t available yet. Post text only for now.');
   const text = body.trim();
   if (text.length < 3) throw new Error('Posts need at least 3 characters.');
   if (text.length > 2000) throw new Error('Posts can be up to 2,000 characters.');
   const me = await myUsername();
+  // Uploaded to the original app's Cloudinary account first (lib/media.ts);
+  // nothing is posted if the upload fails.
+  const uploaded = media ? cleanMedia([await uploadMedia(media)]) : [];
   // The shared board needs a title (3–120 characters): the first line.
   const firstLine = text.split('\n')[0].trim();
   const title = (firstLine.length >= 3 ? firstLine : text).slice(0, 120);
@@ -239,9 +223,11 @@ export async function createCommunityPost(body: string, media?: CommunityMedia, 
     createdAt: serverTimestamp(),
     lastActivityAt: serverTimestamp(),
     ...(resharedPostId ? { resharedPostId } : {}),
+    ...(uploaded.length ? { media: uploaded } : {}),
   });
   return {
-    id: ref.id, author_id: me.uid, author_name: me.username, body: text, media_path: null, media_type: null, media_url: null,
+    id: ref.id, author_id: me.uid, author_name: me.username, body: text, media_path: null,
+    media_type: uploaded[0]?.t ?? null, media_url: uploaded[0]?.url ?? null,
     reshared_post_id: resharedPostId ?? null, created_at: new Date().toISOString(), reactions: 0, comments: 0, reshares: 0, my_reaction: null,
   };
 }
@@ -337,6 +323,82 @@ function toGroup(id: string, d: Record<string, any>, me: string | null): StudyGr
 }
 
 /** The groups I belong to (the only ones the rules let me see). */
+// ─── Stories (shared with the original app) ──────────────────────────────
+// users/{uid}/stories/{id} = { username, kind: 'media' | 'text', media?, text?,
+// bg?, createdAt } — live for 24 hours. Media is uploaded to the original
+// app's Cloudinary account first (lib/media.ts). Like the original app, your
+// own expired stories are removed when stories load; the file itself stays in
+// Cloudinary (an unsigned preset can't delete).
+
+export const STORY_MS = 24 * 60 * 60 * 1000;
+const storyTime = (value: any) => (value?.toMillis ? value.toMillis() : typeof value === 'number' ? value : 0);
+
+function toStory(uid: string, id: string, d: Record<string, any>): CommunityStory {
+  const at = storyTime(d.createdAt) || Date.now();
+  const media = d.media && safeUrl(d.media.url) ? d.media : null;
+  return {
+    id,
+    author_id: uid,
+    author_name: typeof d.username === 'string' ? d.username : null,
+    body: typeof d.text === 'string' ? d.text : null,
+    media_path: null,
+    media_url: media ? (media.t === 'image' ? optimized(media.url) : media.url) : null,
+    media_type: media ? (media.t === 'video' ? 'video' : 'image') : null,
+    created_at: new Date(at).toISOString(),
+    expires_at: new Date(at + STORY_MS).toISOString(),
+  };
+}
+
+/** Live stories from me and the people I follow, oldest first per person. */
+export async function listLiveStories(): Promise<CommunityStory[]> {
+  const me = await signedInUserId();
+  const [following, blocked] = await Promise.all([
+    getDocs(query(collection(db, 'follows'), where('follower', '==', me), limit(50))).then((snap) => snap.docs.map((item) => String(item.data().followee))),
+    blockedLearners(),
+  ]);
+  const people = [me, ...following.filter((uid) => uid !== me && !blocked.has(uid))];
+  const now = Date.now();
+  const lists = await Promise.all(
+    people.map(async (uid) => {
+      const snap = await getDocs(query(collection(db, 'users', uid, 'stories'), orderBy('createdAt', 'desc'), limit(15))).catch(() => null);
+      if (!snap) return [];
+      // Decide once per story, by time (snap.docs makes new objects on every read).
+      const docs = snap.docs;
+      const isLive = (item: (typeof docs)[number]) => now - storyTime(item.data().createdAt) < STORY_MS;
+      if (uid === me) {
+        docs.filter((item) => !isLive(item)).forEach((item) => void deleteDoc(item.ref).catch(() => undefined));
+      }
+      return docs.filter(isLive).map((item) => toStory(uid, item.id, item.data()));
+    })
+  );
+  return lists.flat().sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
+}
+
+export async function createCommunityStory(body: string, media?: CommunityMedia): Promise<CommunityStory> {
+  const text = body.trim();
+  if (!media && text.length < 1) throw new Error('Add text, a photo or a video.');
+  if (text.length > 200) throw new Error('Story text can be up to 200 characters.');
+  const me = await myUsername();
+  const uploaded = media ? cleanMedia([await uploadMedia(media)])[0] : null;
+  if (media && !uploaded) throw new Error('Upload failed.');
+  const ref = doc(collection(db, 'users', me.uid, 'stories'));
+  await setDoc(ref, {
+    username: me.username,
+    kind: uploaded ? 'media' : 'text',
+    ...(uploaded ? { media: uploaded } : {}),
+    ...(text ? { text } : {}),
+    createdAt: serverTimestamp(),
+  });
+  return toStory(me.uid, ref.id, { username: me.username, media: uploaded, text: text || undefined, createdAt: Date.now() });
+}
+
+/** Removes my story from the app (the file stays in Cloudinary). */
+export async function deleteCommunityStory(storyId: string, mediaPath: string | null) {
+  void mediaPath;
+  const me = await signedInUserId();
+  await deleteDoc(doc(db, 'users', me, 'stories', storyId));
+}
+
 export async function listOpenStudyGroups(): Promise<StudyGroup[]> {
   const me = await signedInUserId();
   const snap = await getDocs(query(collection(db, 'groups'), where('memberUids', 'array-contains', me), limit(100)));

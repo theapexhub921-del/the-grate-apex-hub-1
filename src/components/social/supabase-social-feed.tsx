@@ -303,7 +303,8 @@ export function SocialActivityFeed({ children }: { children?: ReactNode }) {
 function storyAuthorName(story: CommunityStory, people: readonly SocialPerson[], userId: string | null, displayName: string | null) {
   const friend = people.find((person) => person.userId === story.author_id);
   if (friend) return personName(friend);
-  return story.author_id === userId ? displayName || 'Your story' : 'Username pending';
+  if (story.author_id === userId) return displayName || 'Your story';
+  return story.author_name ? `@${story.author_name}` : 'Username pending';
 }
 
 function StoryAvatar({ uri, name, hasStory }: { uri?: string | null; name: string; hasStory: boolean }) {
