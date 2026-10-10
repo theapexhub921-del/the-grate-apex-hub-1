@@ -63,6 +63,14 @@ const ICONS = {
   heart: ({ color, filled, sw }) => (
     <Path d="M20.4 8.8c0 4.5-8.4 10.4-8.4 10.4S3.6 13.3 3.6 8.8a4.3 4.3 0 0 1 8.4-1.2 4.3 4.3 0 0 1 8.4 1.2Z" {...stroke(color, sw)} fill={filled ? color : 'none'} />
   ),
+  // Two arrows chasing each other in a loop (repost).
+  repost: ({ color, sw }) => (
+    <Path d="M16.6 3.4 19.8 6.6 16.6 9.8M4.2 11.2V9.6a3 3 0 0 1 3-3h12.6M7.4 20.6 4.2 17.4 7.4 14.2M19.8 12.8v1.6a3 3 0 0 1-3 3H4.2" {...stroke(color, sw)} />
+  ),
+  // A round speech bubble with its tail at the bottom right (comments).
+  comment: ({ color, filled, sw }) => (
+    <Path d="M3.2 11.6a8.4 8.4 0 1 1 15.5 4.5l1.5 4.4-4.5-1.4A8.4 8.4 0 0 1 3.2 11.6z" {...stroke(color, sw)} fill={filled ? color : 'none'} />
+  ),
   share: ({ color, filled, sw }) => (
     <>
       <Path d="m8.6 12.1 6.8-4.2M8.6 12.1l6.8 4.2" {...stroke(color, sw)} />

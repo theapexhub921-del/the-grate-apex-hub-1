@@ -1,0 +1,178 @@
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+
+import { BackLink } from '@/components/learning/nav-bits';
+import { LegacyCourseTile } from '@/components/learning/legacy-course-tile';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import { Card, Interactive, PressableCard } from '@/components/ui/interactive';
+import { Pill } from '@/components/ui/pill';
+import { ProgressBar } from '@/components/ui/progress-bar';
+import { Screen, SectionHeader } from '@/components/ui/screen';
+import { ErrorScreen, LoadingState } from '@/components/ui/state-views';
+import { Text } from '@/components/ui/text';
+import { Type, type ThemeColors } from '@/constants/theme';
+import { legacyCourse, loadLegacyBank, loadLegacyLessons, loadLegacySectionProgress, type LegacyBank, type LegacyLessonMeta, plainText } from '@/data/legacy-study';
+import { useProgress } from '@/data/progress';
+import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { param, routes } from '@/lib/routes';
+
+// /learn/hb-course?course=<id> — one of the original app's HB1 courses, in
+// this app's layout: its lessons as a path in order, each with its sections,
+// reading time and practice questions, plus the course's question sets and an
+// Apex Challenge.
+export default function LegacyCourseScreen() {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  const params = useLocalSearchParams<{ course?: string | string[] }>();
+  const course = legacyCourse(param(params.course));
+  const progress = useProgress();
+  const [lessons, setLessons] = useState<LegacyLessonMeta[] | null>(null);
+  const [bank, setBank] = useState<LegacyBank | null>(null);
+  const [sectionsRead, setSectionsRead] = useState<Record<string, number>>({});
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!course) return;
+    let live = true;
+    Promise.all([loadLegacyLessons(course.id), loadLegacySectionProgress()])
+      .then(([list, read]) => { if (live) { setLessons(list); setSectionsRead(read); } })
+      .catch((problem) => { if (live) setError(problem instanceof Error ? problem.message : 'This course could not be loaded.'); });
+    loadLegacyBank(course.id).then((value) => { if (live) setBank(value); }).catch(() => {});
+    return () => { live = false; };
+  }, [course]);
+
+  const completed = useMemo(() => new Set(progress.completedLessons), [progress.completedLessons]);
+  if (!course) return <ErrorScreen title="Course not found" message="Open a course from Study." primary={{ label: 'Back to Study', onPress: () => router.replace(routes.learn()) }} />;
+  if (error) return <ErrorScreen title="Course unavailable" message={error} primary={{ label: 'Back to Study', onPress: () => router.replace(routes.learn()) }} />;
+  if (!lessons) return <LoadingState label="Loading lessons…" />;
+
+  const done = lessons.filter((lesson) => completed.has(lesson.id)).length;
+  const totalQuestions = bank ? bank.sets.reduce((sum, set) => sum + set.questions.length, 0) : null;
+
+  return (
+    <Screen width="content">
+      <BackLink fallback={routes.learn()} />
+      <Card style={styles.header}>
+        <LegacyCourseTile course={course} size={64} />
+        <View style={styles.headerText}>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>{course.name}</Text>
+            <Pill label={`${course.classId} · Semester ${course.semester}`} tone="primary" />
+          </View>
+          <Text style={styles.desc}>{course.desc}</Text>
+          <View style={styles.progressRow}>
+            <ProgressBar value={lessons.length ? done / lessons.length : 0} height={6} style={styles.flex} label={`${course.name} lessons completed`} />
+            <Text style={styles.meta}>{done}/{lessons.length} lessons{totalQuestions !== null ? ` · ${totalQuestions.toLocaleString()} questions` : ''}</Text>
+          </View>
+          <View style={styles.actions}>
+            <Button label="Practice the course" size="sm" onPress={() => router.push(routes.legacyPractice({ course: course.id }))} />
+            <Button label="Apex Challenge" size="sm" variant="gold" trailing="⚡" onPress={() => router.push(routes.legacyPractice({ course: course.id, apex: true }))} />
+          </View>
+        </View>
+      </Card>
+
+      <SectionHeader title="Lessons" subtitle={`${lessons.length} lessons in order · ${done} completed`} style={styles.section} />
+      <View style={styles.path}>
+        {lessons.map((lesson, index) => {
+          const read = Math.min(sectionsRead[lesson.id] ?? 0, lesson.sections.length);
+          const isDone = completed.has(lesson.id) || (lesson.sections.length > 0 && read >= lesson.sections.length);
+          const started = read > 0;
+          const questions = lesson.qids?.length ?? lesson.qcount ?? 0;
+          const last = index === lessons.length - 1;
+          return (
+            <View key={lesson.id} style={styles.pathRow}>
+              <View style={styles.rail}>
+                <View style={[styles.node, isDone ? styles.nodeDone : started ? styles.nodeActive : null]}>
+                  {isDone ? <Icon name="check" size={14} color={colors.onPrimary} strokeWidth={2.6} /> : <Text style={[styles.nodeText, started && { color: colors.primaryText }]}>{index + 1}</Text>}
+                </View>
+                {!last ? <View style={[styles.line, isDone && styles.lineDone]} /> : null}
+              </View>
+              <View style={styles.pathCard}>
+                {started && !isDone ? <Text style={styles.kicker}>IN PROGRESS</Text> : null}
+                <PressableCard onPress={() => router.push(routes.legacyLesson(lesson.id))} accessibilityLabel={`${lesson.title}. ${isDone ? 'Completed' : started ? 'In progress' : 'Not started'}`} style={styles.lessonCard}>
+                  <View style={styles.lessonTop}>
+                    <View style={styles.lessonIcon}><Text style={styles.lessonEmoji}>{lesson.icon || course.icon}</Text></View>
+                    <View style={styles.flex}>
+                      <Text style={styles.lessonTitle}>{lesson.title}</Text>
+                      <Pill label={isDone ? 'Completed' : started ? 'In progress' : 'Not started'} tone={isDone ? 'success' : started ? 'primary' : 'neutral'} />
+                    </View>
+                  </View>
+                  {lesson.summary ? <Text style={styles.summary} numberOfLines={3}>{plainText(lesson.summary)}</Text> : null}
+                  <View style={styles.progressRow}>
+                    <ProgressBar value={lesson.sections.length ? read / lesson.sections.length : 0} height={5} style={styles.flex} label={`${lesson.title} sections read`} />
+                    <Text style={styles.meta}>{read}/{lesson.sections.length} sections</Text>
+                  </View>
+                  <View style={styles.lessonFoot}>
+                    <Text style={styles.metaSoft}>{lesson.sections.length} sections · ~{lesson.minutes} min</Text>
+                    {questions > 0 ? (
+                      <Interactive onPress={() => router.push(routes.legacyPractice({ course: course.id, lesson: lesson.id }))} accessibilityRole="button" style={styles.practice}>
+                        <Icon name="edit" size={14} color={colors.accentText} />
+                        <Text style={styles.practiceText}>Practice · {questions} questions</Text>
+                      </Interactive>
+                    ) : null}
+                  </View>
+                </PressableCard>
+              </View>
+            </View>
+          );
+        })}
+      </View>
+
+      {bank ? (
+        <>
+          <SectionHeader title="Question sets" subtitle="The course’s quizzes and past questions, as in the original app." style={styles.section} />
+          <View style={styles.sets}>
+            {bank.sets.map((set) => (
+              <Interactive key={set.id} onPress={() => router.push(routes.legacyPractice({ course: course.id, set: set.id }))} accessibilityRole="button" style={({ hovered }) => [styles.set, hovered && styles.setHover]}>
+                <Text style={styles.setName}>{set.name}</Text>
+                <Text style={styles.metaSoft}>{set.questions.length} questions</Text>
+              </Interactive>
+            ))}
+          </View>
+        </>
+      ) : null}
+    </Screen>
+  );
+}
+
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    flex: { flex: 1, minWidth: 0 },
+    header: { flexDirection: 'row', flexWrap: 'wrap', gap: 18, padding: 20, marginTop: 8 },
+    headerText: { flex: 1, minWidth: 240, gap: 8 },
+    titleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10 },
+    title: { ...Type.title1, color: colors.text },
+    desc: { fontSize: 14, lineHeight: 21, color: colors.textSecondary },
+    progressRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    meta: { fontSize: 12.5, fontWeight: '700', color: colors.textSecondary },
+    metaSoft: { fontSize: 12.5, color: colors.textTertiary },
+    actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 4 },
+    section: { marginTop: 28 },
+    path: { gap: 0 },
+    pathRow: { flexDirection: 'row', gap: 14 },
+    rail: { width: 34, alignItems: 'center' },
+    node: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: colors.borderStrong, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', marginTop: 18 },
+    nodeActive: { borderColor: colors.primary },
+    nodeDone: { backgroundColor: colors.primary, borderColor: colors.primary },
+    nodeText: { fontSize: 13, fontWeight: '800', color: colors.textSecondary },
+    line: { flex: 1, width: 2, backgroundColor: colors.border, marginTop: 4 },
+    lineDone: { backgroundColor: colors.primary },
+    pathCard: { flex: 1, minWidth: 0, paddingBottom: 14, gap: 6 },
+    kicker: { ...Type.overline, color: colors.primaryText, marginTop: 4 },
+    lessonCard: { gap: 10 },
+    lessonTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+    lessonIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: colors.surfaceMuted, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+    lessonEmoji: { fontSize: 24 },
+    lessonTitle: { ...Type.title3, color: colors.text, marginBottom: 4 },
+    summary: { fontSize: 13.5, lineHeight: 20, color: colors.textSecondary },
+    lessonFoot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 },
+    practice: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999, backgroundColor: colors.accentSubtle },
+    practiceText: { fontSize: 12.5, fontWeight: '800', color: colors.accentText },
+    sets: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+    set: { minWidth: 160, flexGrow: 1, flexBasis: '30%', padding: 14, borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, gap: 4 },
+    setHover: { borderColor: colors.primaryBorder },
+    setName: { fontSize: 14.5, fontWeight: '800', color: colors.text },
+  });
+}

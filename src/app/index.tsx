@@ -24,8 +24,7 @@ export default function HomeScreen() {
       <View style={[styles.feedColumn, wide && styles.feedColumnWide]}>
       <View style={styles.header}>
         <View style={styles.brand}>
-          <LogoMark height={28} />
-          <Text style={styles.wordmark}>GrAte Apex Hub</Text>
+          <LogoMark height={30} />
         </View>
         <View style={styles.headerActions}>
           <NotificationBell />
@@ -57,7 +56,6 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 },
     brand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    wordmark: { fontSize: 20, fontWeight: '800', letterSpacing: 0.9, color: colors.logoLetters },
     headerActions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     feedColumn: { width: '100%', maxWidth: 760, alignSelf: 'center' },
     feedColumnWide: { maxWidth: 1040 },

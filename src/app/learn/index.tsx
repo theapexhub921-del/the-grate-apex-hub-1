@@ -5,6 +5,8 @@ import { Text } from '@/components/ui/text';
 
 import { SubjectGlyph } from '@/components/learning/glyphs';
 import { ClassAccessCard } from '@/components/learning/class-access-card';
+import { LegacyCourseList } from '@/components/learning/legacy-course-list';
+import { legacyCoursesForClass } from '@/data/legacy-study';
 import { LearningWelcomeAtmosphere } from '@/components/learning/learning-welcome-atmosphere';
 import { MemoryDistribution } from '@/components/learning/memory-ui';
 import { NextActionHero, NextActionList } from '@/components/learning/next-action-card';
@@ -67,6 +69,7 @@ export default function LearnScreen() {
   const requiredLevel = blockedSelection && ownSelection ? firstIncompleteClassBefore(blockedSelection, ownSelection, inputs.completedAt) : null;
   const offeredIds = viewing ? subjectsForClass(viewing) : [];
   const offeredSubjects = subjects.filter((subject) => offeredIds.includes(subject.id));
+  const legacyCourses = legacyCoursesForClass(viewing);
   const welcomeBadge = viewingOwnClass
     ? <Pill label="My curriculum" tone="primary" />
     : viewing ? <Pill label="Read-only preview" tone="neutral" /> : null;
@@ -310,6 +313,9 @@ export default function LearnScreen() {
         <ClassAccessCard target={blockedSelection} current={requiredLevel?.selection ?? ownSelection} lessonsComplete={requiredLevel?.completed ?? currentCompletion.completed} lessonsTotal={requiredLevel?.total ?? currentCompletion.total} trialUsed={trial.used} trialExpiresAt={trial.active ? trial.expiresAt : undefined} onStartTrial={() => { if (blockedSelection) { setRequestedFuture(null); router.replace(routes.learnEnvironment(blockedSelection)); } }} onBack={() => { setRequestedFuture(null); showEnvironment(ownSelection); }} />
       ) : offeredSubjects.length > 0 ? (
         <Columns main={main} side={side} sideWidth={360} />
+      ) : viewing && legacyCourses.length > 0 ? (
+        // HB1: the original app's courses for this class and semester.
+        <Columns main={<LegacyCourseList courses={legacyCourses} selection={viewing} />} side={side} sideWidth={360} />
       ) : (
         <Card tone="insight" style={styles.comingSoon}>
           <View style={styles.comingIcon}><Icon name="book" size={22} color={colors.primaryText} /></View>

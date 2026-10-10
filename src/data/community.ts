@@ -118,6 +118,8 @@ export type StreakFreezeBalance = {
 };
 
 async function signedInUserId(): Promise<string> {
+  // After a page reload the signed-in user is restored a moment later: wait for it.
+  await auth.authStateReady();
   const user = auth.currentUser;
   if (!user) throw new Error('Sign in to use community features.');
   return user.uid;
@@ -156,6 +158,7 @@ const postText = (d: Record<string, any>) => {
 
 /** Learners hidden on this device. The shared rules have no block list, so blocking is per device. */
 export async function blockedLearners(): Promise<Set<string>> {
+  await auth.authStateReady();
   try {
     const uid = auth.currentUser?.uid;
     const saved = uid ? await AsyncStorage.getItem(`${BLOCKED_KEY}:${uid}`) : null;
@@ -166,6 +169,7 @@ export async function blockedLearners(): Promise<Set<string>> {
 }
 
 export async function listCommunityFeed(limitCount = 50): Promise<CommunityPost[]> {
+  await auth.authStateReady();
   const userId = auth.currentUser?.uid ?? null;
   const [snap, blocked] = await Promise.all([getDocs(query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(limitCount))), blockedLearners()]);
   const rows = snap.docs.filter((item) => !blocked.has(String(item.data().authorUid)));
@@ -369,6 +373,7 @@ function toStory(uid: string, id: string, d: Record<string, any>): CommunityStor
 
 /** Live stories from me and the people I follow, oldest first per person. */
 export async function listLiveStories(): Promise<CommunityStory[]> {
+  await auth.authStateReady();
   const me = await signedInUserId();
   const [following, blocked] = await Promise.all([
     getDocs(query(collection(db, 'follows'), where('follower', '==', me), limit(50))).then((snap) => snap.docs.map((item) => String(item.data().followee))),

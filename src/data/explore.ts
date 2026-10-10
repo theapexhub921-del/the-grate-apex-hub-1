@@ -316,6 +316,9 @@ const announcements: readonly ExploreAnnouncement[] = [
 
 export const EXPLORE_GUIDE: readonly ExploreGuideEntry[] = [
   { title: 'Feed', detail: 'Stories and posts from people: photos, videos and study moments that you can like, comment on and reshare.', status: 'available' },
+  { title: 'HB1 courses', detail: 'All 13 HB1 Semester 1 and Semester 2 courses from the original app: lessons read one section at a time with tappable key words, figures and study aids, then practice from the original question banks.', status: 'available' },
+  { title: 'Practice question types', detail: 'Multiple choice, type the answer, true or false and matching rounds, plus timed Apex Challenges for every course.', status: 'available' },
+  { title: 'Profiles and follows', detail: 'Tap anyone to see their profile, followers, following and posts. Follow them, follow back, and message once you follow each other.', status: 'available' },
   { title: 'Study', detail: 'Follow the course structure, study lessons, answer quizzes and revisit concepts through spaced review.', status: 'available' },
   { title: 'Connect', detail: 'Find classmates, manage friend requests, use study groups, text-first conferences, messages and the friend feed. Live voice calls are a separate planned feature.', status: 'available' },
   { title: 'You', detail: 'Show your name and avatar alongside your learning identity and achievements.', status: 'available' },

@@ -1,3 +1,4 @@
+import { isLegacyLessonId } from '@/data/legacy-ids';
 // Where this app keeps lesson completions in the cloud, and how it reads them.
 //
 // progress/{uid} is shared with the original GRATEAPEX app, which saves the
@@ -42,15 +43,18 @@ export function readCompletions(
     if (!current) rows.set(lessonId, { lessonId, completedAt });
     else if (completedAt !== null && (current.completedAt === null || completedAt < current.completedAt)) current.completedAt = completedAt;
   };
+  // The shared map is the original app's: an original lesson id there is its
+  // section count (or damaged), never a completion made here.
   for (const [lessonId, value] of appLessonEntries(legacyLessons)) {
+    if (isLegacyLessonId(lessonId)) continue;
     add(lessonId, toTime((value as { completedAt?: unknown } | null)?.completedAt));
   }
   if (Array.isArray(legacyLessons)) {
     for (const item of legacyLessons) {
-      if (typeof item === 'string') add(item, null);
+      if (typeof item === 'string') { if (!isLegacyLessonId(item)) add(item, null); }
       else if (item && typeof item === 'object') {
         const id = (item as { lessonId?: unknown; id?: unknown }).lessonId ?? (item as { id?: unknown }).id;
-        if (typeof id === 'string') add(id, toTime((item as { completedAt?: unknown }).completedAt));
+        if (typeof id === 'string' && !isLegacyLessonId(id)) add(id, toTime((item as { completedAt?: unknown }).completedAt));
       }
     }
   }

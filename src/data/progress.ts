@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 
 import { findLesson, getSubjectTopics } from '@/data/curriculum';
+import { isLegacyLessonId } from '@/data/legacy-ids';
 import type { SubjectId } from '@/data/lesson-types';
 import {
   getAuthenticatedLearningUserId,
@@ -208,7 +209,7 @@ function cloudStats() {
 // Only lessons of this app's curriculum are synced: the cloud document is
 // shared with the original app, whose lesson entries must stay untouched.
 function cloudLessonRows() {
-  return progress.completedLessons.filter((lessonId) => findLesson(lessonId)).map((lessonId) => ({
+  return progress.completedLessons.filter((lessonId) => findLesson(lessonId) || isLegacyLessonId(lessonId)).map((lessonId) => ({
     lessonId,
     xp: progress.xpLedger.find((entry) => entry.key === `lesson:${lessonId}`)?.amount ?? findLesson(lessonId)?.lesson.xp ?? 0,
     completedAt: progress.lessonCompletedAt[lessonId],
@@ -234,7 +235,9 @@ async function syncProgressWithSupabase(hasLocalProgress: boolean) {
         : progress.streak;
 
   for (const row of remote.completedLessons) {
-    if (!findLesson(row.lessonId)) continue; // not a lesson of this app
+    // A lesson of this app, or an original-app lesson finished here (those come
+    // only from the completions record — see readCompletions).
+    if (!findLesson(row.lessonId) && !isLegacyLessonId(row.lessonId)) continue;
     if (!progress.completedLessons.includes(row.lessonId)) progress.completedLessons.push(row.lessonId);
     const local = progress.lessonCompletedAt[row.lessonId];
     if (row.completedAt && (!local || row.completedAt < local)) {
@@ -466,7 +469,7 @@ export async function applyStreakRecovery(at = Date.now(), restoredStreak?: numb
   void saveCloudProgress([], cloudStats());
 }
 
-export async function completeLesson(lessonId: string, _subject: Subject, xp: number, at = Date.now()) {
+export async function completeLesson(lessonId: string, _subject: Subject, xp: number, at = Date.now(), title?: string) {
   await ensureProgressLoaded();
 
   // Prevent duplicate XP
@@ -483,7 +486,7 @@ export async function completeLesson(lessonId: string, _subject: Subject, xp: nu
     progress.xp += xp;
     progress.level = levelFor(progress.xp);
     progress.awardedKeys.push(key);
-    const label = findLesson(lessonId)?.lesson.title ?? 'Lesson';
+    const label = findLesson(lessonId)?.lesson.title ?? title ?? 'Lesson';
     progress.xpLedger = [
       { key, sourceType: 'lesson' as const, sourceId: lessonId, amount: xp, label: `Lesson completed · ${label}`, at },
       ...progress.xpLedger,

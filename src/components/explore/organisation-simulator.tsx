@@ -20,9 +20,9 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 type TabInfo = { title: string; detail: string };
 
 const TABS: Record<string, TabInfo> = {
-  '/': { title: 'Feed', detail: 'Post Stories, photos, videos and study moments. Like, comment on and reshare friends’ posts.' },
+  '/': { title: 'Feed', detail: 'Stories and posts from everyone. Like, comment, repost, and tap a name to open their profile and follow them.' },
   '/social': { title: 'Connect', detail: 'Find classmates, create study groups, discuss assignments and message accepted friends.' },
-  '/learn': { title: 'Study', detail: 'Follow lecture topics, build an optional study plan and use the review calendar.' },
+  '/learn': { title: 'Study', detail: 'Your class’s courses — lessons section by section, practice in four question types, Apex Challenges, your week and your goals.' },
   '/explore': { title: 'Explore', detail: 'Learn what each feature does, see announcements and discover what’s being built.' },
   '/profile': { title: 'You', detail: 'Your profile, achievements, progress and settings — including the experience and theme you chose.' },
 };

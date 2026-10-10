@@ -23,6 +23,7 @@ import {
   streakFromDays,
 } from '@/data/lesson-completions';
 import { mergeAppLessons } from '@/data/legacy-lessons';
+import { isLegacyLessonId } from '@/data/legacy-ids';
 import { auth, db } from '@/lib/firebase';
 
 const LEGACY_CACHE_OWNER_KEY = 'grateapex_learning_cache_owner';
@@ -346,7 +347,8 @@ export async function saveCloudProgress(
     // The completions rule is not deployed yet: keep the earlier, protected
     // behaviour (this app's objects in the shared map; numbers never replaced).
     const snap = await getDoc(progressDocRef);
-    await setDoc(progressDocRef, { lessons: mergeAppLessons(snap.data()?.lessons, completedLessons) }, { merge: true });
+    // Never the original app's own lessons: that map holds its section counts.
+    await setDoc(progressDocRef, { lessons: mergeAppLessons(snap.data()?.lessons, completedLessons.filter((lesson) => !isLegacyLessonId(lesson.lessonId))) }, { merge: true });
   } catch (error) {
     console.warn('Could not save learning progress to Firestore:', error);
   }

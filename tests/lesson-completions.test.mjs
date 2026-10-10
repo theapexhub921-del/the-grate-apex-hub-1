@@ -133,3 +133,22 @@ describe('weekly challenge week', () => {
     assert.equal(new Date(weekStart(new Date(2026, 9, 11, 23, 0).getTime())).getDate(), 5); // Sunday → same week
   });
 });
+
+describe('original-app lessons (HB1 courses studied here)', async () => {
+  const { readCompletions } = await import('@/data/lesson-completions');
+  const { isLegacyLessonId } = await import('@/data/legacy-ids');
+  it('recognises original lesson ids only', () => {
+    assert.equal(isLegacyLessonId('biochemistry-03'), true);
+    assert.equal(isLegacyLessonId('anatomy-10'), true);
+    assert.equal(isLegacyLessonId('fatty-acid-biosynthesis-1'), false);
+    assert.equal(isLegacyLessonId('biochemistry'), false);
+  });
+  it('never reads the shared map’s original-lesson entries as completions (section counts or damaged objects)', () => {
+    const rows = readCompletions([], { 'biochemistry-03': 5, 'anatomy-02': { completedAt: 7, xp: 0 } });
+    assert.deepEqual(rows.map((row) => row.lessonId), []);
+  });
+  it('reads an original lesson finished here from the completions record', () => {
+    const rows = readCompletions([{ id: 'anatomy-02', data: { completedAt: 1791591792619, xp: 25 } }], { 'anatomy-02': 4 });
+    assert.deepEqual(rows.map((row) => row.lessonId), ['anatomy-02']);
+  });
+});

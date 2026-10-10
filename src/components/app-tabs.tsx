@@ -80,6 +80,9 @@ export default function AppTabs() {
           <Tabs.Screen name="widget" options={{ href: null }} />
         <Tabs.Screen name="social/friends" options={{ href: null }} />
           <Tabs.Screen name="social/person" options={{ href: null }} />
+          <Tabs.Screen name="learn/hb-course" options={{ href: null }} />
+          <Tabs.Screen name="learn/hb-lesson" options={{ href: null }} />
+          <Tabs.Screen name="learn/hb-practice" options={{ href: null }} />
         <Tabs.Screen name="explore/discovery" options={{ href: null }} />
         <Tabs.Screen name="learn/anatomy" options={{ href: null }} />
         <Tabs.Screen name="learn/biochemistry" options={{ href: null }} />
