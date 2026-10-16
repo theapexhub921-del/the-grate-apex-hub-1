@@ -168,7 +168,6 @@ export function StreakWidgetCompact({ onPress, style }: CompactProps) {
   const reduced = useReducedMotion();
 
   const flameScale = useSharedValue(1);
-  const glowOpacity = useSharedValue(0.5);
   const cardScale = useSharedValue(0.92);
 
   useEffect(() => {
@@ -178,15 +177,10 @@ export function StreakWidgetCompact({ onPress, style }: CompactProps) {
       withTiming(1.1, { duration: 900, easing: Easing.inOut(Easing.sin) }),
       withTiming(0.94, { duration: 900, easing: Easing.inOut(Easing.sin) })
     ), -1, true);
-    glowOpacity.value = withRepeat(withSequence(
-      withTiming(0.75, { duration: 1000 }),
-      withTiming(0.3, { duration: 1000 })
-    ), -1, true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const flameStyle = useAnimatedStyle(() => ({ transform: [{ scale: flameScale.value }] }));
-  const glowStyle = useAnimatedStyle(() => ({ opacity: glowOpacity.value }));
   const cardAnim = useAnimatedStyle(() => ({ transform: [{ scale: cardScale.value }] }));
 
   const status = getStreakStatus(progress.streak, progress.lastActivityDate, new Date(), progress.streakFreezes);
@@ -211,8 +205,7 @@ export function StreakWidgetCompact({ onPress, style }: CompactProps) {
         style={({ pressed }) => [{ opacity: pressed ? 0.88 : 1 }]}
       >
         {/* A round badge: the flame over the day count (the label is read out, not shown). */}
-        <View style={[styles.card, isLapsed && styles.cardLapsed]}>
-          {hasStreak && <Animated.View style={[styles.glow, glowStyle]} />}
+        <View style={[styles.card, !hasStreak && styles.cardLapsed]}>
           {hasStreak ? (
             <Animated.View style={flameStyle}>
               <FlameSvg size={22} />
@@ -222,7 +215,7 @@ export function StreakWidgetCompact({ onPress, style }: CompactProps) {
               <FlameSvg size={22} />
             </View>
           )}
-          <Text style={[styles.count, isLapsed && styles.countLapsed]} numberOfLines={1}>
+          <Text style={[styles.count, !hasStreak && styles.countLapsed]} numberOfLines={1}>
             {progress.streak}
           </Text>
         </View>
@@ -372,44 +365,35 @@ function createStatTileStyles(colors: ThemeColors) {
 // ── Compact styles ─────────────────────────────────────────────────────────────
 
 function createCompactStyles(colors: ThemeColors) {
-  const cardBg = colors.surface === '#FFFEFC' ? '#0D1526' : colors.surface;
+  // Drawn from the active theme's own colours, so the badge sits naturally in
+  // every theme: the theme's reward tint and gold edge while the streak is
+  // alive, its quiet surface and border once it has lapsed.
   return StyleSheet.create({
     wrapper: {
       alignSelf: 'flex-start',
     },
     card: {
-      backgroundColor: cardBg,
+      backgroundColor: colors.accentSubtle,
       width: 58,
       height: 58,
       borderRadius: 29,
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 0,
       borderWidth: 1.5,
-      borderColor: 'rgba(253,192,10,0.45)',
+      borderColor: colors.accent,
       overflow: 'hidden',
-      ...(Platform.OS === 'web'
-        ? ({ boxShadow: '0 4px 14px rgba(0,0,0,0.22), 0 0 18px rgba(255,138,0,0.14)' } as object)
-        : {
-            shadowColor: '#FF8800',
-            shadowOffset: { width: 0, height: 3 },
-            shadowOpacity: 0.2,
-            shadowRadius: 8,
-            elevation: 4,
-          }),
     },
     cardLapsed: {
+      backgroundColor: colors.surfaceMuted,
       borderColor: colors.border,
-      ...(Platform.OS === 'web'
-        ? ({ boxShadow: '0 4px 14px rgba(0,0,0,0.18)' } as object)
-        : {}),
     },
     glow: {
       position: 'absolute',
       width: 58,
       height: 58,
       borderRadius: 29,
-      backgroundColor: 'rgba(255,140,0,0.16)',
+      backgroundColor: colors.accent,
+      opacity: 0.12,
     },
     left: {
       flexDirection: 'row',
@@ -422,10 +406,10 @@ function createCompactStyles(colors: ThemeColors) {
       ...Type.numeral,
       fontSize: 15,
       fontWeight: '800',
-      color: '#FFFFFF',
+      color: colors.accentText,
       lineHeight: 17,
     },
-    countLapsed: { color: colors.textSecondary },
+    countLapsed: { color: colors.textTertiary },
     right: { minWidth: 0, gap: 1 },
     dayLabel: {
       ...Type.overline,
