@@ -332,6 +332,141 @@
       border-radius: 4px;
     }
 
+    /* On-screen view controls: turn / move arrows, zoom, reset. Press and hold to keep going. */
+    #nav {
+      --nb: 40px;
+      right: 12px;
+      top: 12px;
+      padding: 8px;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    #nav .navhead {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    #navBody {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #nav.min #navBody {
+      display: none;
+    }
+
+    #nav.min .navhead svg {
+      transform: rotate(180deg);
+    }
+
+    #nav .seg {
+      display: flex;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #nav .seg button {
+      border: 0;
+      padding: 6px 12px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #nav .seg button[aria-pressed="true"] {
+      background: var(--accent);
+      color: #0b1214;
+    }
+
+    #nav .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, var(--nb));
+      gap: 4px;
+    }
+
+    #nav .zoomrow {
+      display: flex;
+      gap: 4px;
+    }
+
+    #nav .nb,
+    #nav .nt {
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      cursor: pointer;
+      touch-action: none;
+      padding: 0;
+    }
+
+    #nav .nb {
+      width: var(--nb);
+      height: var(--nb);
+      border-radius: 10px;
+    }
+
+    #nav .zoomrow .nb {
+      width: calc(var(--nb) * 1.5 + 2px);
+    }
+
+    #nav .nt {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+    }
+
+    #nav .nb:hover,
+    #nav .nt:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    #nav .nb.down {
+      background: var(--accent);
+      color: #0b1214;
+    }
+
+    @media (pointer: coarse) {
+      #nav {
+        --nb: 44px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      #nav {
+        --nb: 38px;
+        right: 8px;
+        top: auto;
+        bottom: calc(40vh + 16px);
+      }
+    }
+
+    @media (max-width: 640px) and (pointer: coarse) {
+      #nav {
+        --nb: 42px;
+      }
+    }
+
     @media (max-width: 640px) {
       #panel {
         left: 8px;
@@ -361,7 +496,7 @@
 
 <body>
   <canvas id="c" tabindex="0"
-    aria-label="3D anatomy model. Drag to rotate, scroll or pinch to zoom, tap a structure to select it."></canvas>
+    aria-label="3D anatomy model. Drag to rotate, scroll or pinch to zoom, tap a structure to select it. Arrow keys turn the model, Shift and arrow keys move it, plus and minus zoom. The View buttons do the same."></canvas>
 
   <aside id="panel" class="card">
     <input id="q" type="search" placeholder="Search loaded structures" autocomplete="off"
@@ -416,6 +551,76 @@
       <button class="btn" id="clear">Deselect</button>
     </div>
   </section>
+
+  <div id="nav" class="card" role="group" aria-label="View controls">
+    <div class="navhead">
+      <span>View</span>
+      <button id="navToggle" class="nt" type="button" aria-expanded="true" aria-controls="navBody"
+        aria-label="Hide view controls" title="Hide view controls">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 15l6-6 6 6" />
+        </svg>
+      </button>
+    </div>
+    <div id="navBody">
+      <div class="seg" role="group" aria-label="What the arrows do">
+        <button type="button" data-mode="rotate" aria-pressed="true">Rotate</button>
+        <button type="button" data-mode="move" aria-pressed="false">Move</button>
+      </div>
+      <div class="dpad">
+        <span></span>
+        <button class="nb" type="button" data-act="Up" aria-label="Turn up" title="Turn up">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 15l6-6 6 6" />
+          </svg>
+        </button>
+        <span></span>
+        <button class="nb" type="button" data-act="Left" aria-label="Turn left" title="Turn left">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 6l-6 6 6 6" />
+          </svg>
+        </button>
+        <button class="nb" type="button" data-act="reset" aria-label="Reset view" title="Reset view (Home)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+          </svg>
+        </button>
+        <button class="nb" type="button" data-act="Right" aria-label="Turn right" title="Turn right">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </button>
+        <span></span>
+        <button class="nb" type="button" data-act="Down" aria-label="Turn down" title="Turn down">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+        <span></span>
+      </div>
+      <div class="zoomrow">
+        <button class="nb" type="button" data-act="zoomOut" aria-label="Zoom out" title="Zoom out (-)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14" />
+          </svg>
+        </button>
+        <button class="nb" type="button" data-act="zoomIn" aria-label="Zoom in" title="Zoom in (+)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <div id="tip"></div>
   <div id="notice" role="alert"></div>
@@ -860,6 +1065,7 @@ bool inRegion(vec3 p) {
     const lamp = new THREE.DirectionalLight(0xffffff, 0.25); lamp.position.set(0, 0, 3); camera.add(lamp);        // headlamp so cavities and close-ups stay lit
 
     let dirty = true;
+    let navHeld = false;   // true while an on-screen button or key is moving the camera
 
     /* ---------- ambient occlusion (screen-space) ---------- */
     const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
@@ -893,7 +1099,7 @@ bool inRegion(vec3 p) {
 
     (function loop() {
       requestAnimationFrame(loop);
-      const moved = controls.update();
+      const moved = controls.update() || navHeld;
       if (moved) lastMove = performance.now();
       if (moved || dirty) {
         // plain MSAA render while the camera is moving, AO-refined render once it settles
@@ -1563,6 +1769,141 @@ bool inRegion(vec3 p) {
     document.addEventListener('message', onHostMessage); // Android WebView
 
     addEventListener('keydown', e => { if (e.key === 'Escape') { deselect(); showAll(); } if (e.key === 'Home') resetView(); });
+
+    /* ---------- on-screen view controls (buttons + keyboard) ---------- */
+    // Mouse and touch still work as before (drag = rotate, wheel / pinch = zoom, right-drag or two fingers = move).
+    // These add the same moves as buttons and keys. Press and hold a button to keep going.
+    //   Keys: arrows turn, Shift+arrows move, + and - zoom, Home resets.
+    {
+      const nav = document.getElementById('nav');
+      const held = new Map();       // what is pressed (a button or a key) -> the move it makes
+      const since = new Map();      // when it was pressed, so even a quick tap moves a visible amount
+      let mode = 'rotate', last = 0, raf = 0;
+      const off = new THREE.Vector3(), sph = new THREE.Spherical(), side = new THREE.Vector3(), lift = new THREE.Vector3();
+      const TURN = 1.4, ZOOM = 1.6, MOVE = 0.7, MIN_PRESS = 160;   // radians/s, zoom rate/s, share of the distance/s, ms
+
+      function apply(act, dt) {
+        off.copy(camera.position).sub(controls.target);
+        if (act === 'zoomIn' || act === 'zoomOut') {
+          const len = THREE.MathUtils.clamp(off.length() * Math.exp((act === 'zoomIn' ? -1 : 1) * ZOOM * dt), controls.minDistance, controls.maxDistance);
+          camera.position.copy(controls.target).add(off.setLength(len));
+          return;
+        }
+        if (act.startsWith('turn')) {   // the model turns the way the arrow points, like dragging it
+          const a = TURN * dt;
+          sph.setFromVector3(off);
+          if (act === 'turnLeft') sph.theta += a;
+          if (act === 'turnRight') sph.theta -= a;
+          if (act === 'turnUp') sph.phi += a;
+          if (act === 'turnDown') sph.phi -= a;
+          sph.phi = THREE.MathUtils.clamp(sph.phi, 0.02, Math.PI - 0.02);
+          camera.position.copy(controls.target).add(off.setFromSpherical(sph));
+          return;
+        }
+        // move: the model slides the way the arrow points, so the camera slides the other way
+        camera.updateMatrixWorld();
+        side.setFromMatrixColumn(camera.matrix, 0);
+        lift.setFromMatrixColumn(camera.matrix, 1);
+        const d = off.length() * MOVE * dt;
+        const delta = new THREE.Vector3();
+        if (act === 'moveLeft') delta.copy(side).multiplyScalar(d);
+        if (act === 'moveRight') delta.copy(side).multiplyScalar(-d);
+        if (act === 'moveUp') delta.copy(lift).multiplyScalar(-d);
+        if (act === 'moveDown') delta.copy(lift).multiplyScalar(d);
+        camera.position.add(delta);
+        controls.target.add(delta);
+      }
+
+      function tick(now) {
+        if (!held.size) { raf = 0; navHeld = false; dirty = true; return; }
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+        navHeld = true;
+        for (const act of new Set(held.values())) apply(act, dt);
+        raf = requestAnimationFrame(tick);
+      }
+      function press(id, act) {
+        if (held.has(id)) return;
+        held.set(id, act);
+        since.set(id, performance.now());
+        if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
+      }
+      function release(id) {
+        if (!held.has(id)) return;
+        const wait = MIN_PRESS - (performance.now() - since.get(id));
+        const drop = () => { held.delete(id); since.delete(id); };
+        if (wait > 0) setTimeout(drop, wait); else drop();
+      }
+
+      // buttons
+      const actFor = btn => {
+        const a = btn.dataset.act;
+        return (a === 'zoomIn' || a === 'zoomOut') ? a : (mode === 'rotate' ? 'turn' : 'move') + a;
+      };
+      for (const btn of nav.querySelectorAll('.nb')) {
+        if (btn.dataset.act === 'reset') { btn.addEventListener('click', resetView); continue; }
+        btn.addEventListener('pointerdown', e => {
+          e.preventDefault();
+          try { btn.setPointerCapture(e.pointerId); } catch { }
+          btn.classList.add('down');
+          press(btn, actFor(btn));
+        });
+        const up = () => { btn.classList.remove('down'); release(btn); };
+        btn.addEventListener('pointerup', up);
+        btn.addEventListener('pointercancel', up);
+        btn.addEventListener('click', e => {   // Enter or Space on a focused button (no pointer involved)
+          if (e.detail !== 0) return;
+          press(btn, actFor(btn));
+          setTimeout(() => release(btn), MIN_PRESS);
+        });
+      }
+      nav.addEventListener('contextmenu', e => e.preventDefault());
+
+      // Rotate / Move switch: changes what the four arrows do, and what their labels say
+      const word = { Up: 'up', Down: 'down', Left: 'left', Right: 'right' };
+      function setMode(m) {
+        mode = m;
+        for (const b of nav.querySelectorAll('.seg button')) b.setAttribute('aria-pressed', String(b.dataset.mode === m));
+        for (const b of nav.querySelectorAll('.dpad .nb')) {
+          if (!word[b.dataset.act]) continue;
+          const label = (m === 'rotate' ? 'Turn ' : 'Move ') + word[b.dataset.act];
+          b.setAttribute('aria-label', label);
+          b.title = label;
+        }
+      }
+      for (const b of nav.querySelectorAll('.seg button')) b.addEventListener('click', () => setMode(b.dataset.mode));
+
+      // hide / show the whole pad (it can be in the way on a small screen)
+      const toggle = document.getElementById('navToggle');
+      toggle.addEventListener('click', () => {
+        const hide = !nav.classList.contains('min');
+        nav.classList.toggle('min', hide);
+        toggle.setAttribute('aria-expanded', String(!hide));
+        const label = hide ? 'Show view controls' : 'Hide view controls';
+        toggle.setAttribute('aria-label', label);
+        toggle.title = label;
+      });
+
+      // keyboard (ignored while typing in the search box or using a slider)
+      const ARROW = { ArrowLeft: 'Left', ArrowRight: 'Right', ArrowUp: 'Up', ArrowDown: 'Down' };
+      addEventListener('keydown', e => {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        const t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+        let act = null;
+        if (ARROW[e.key]) act = (e.shiftKey ? 'move' : 'turn') + ARROW[e.key];
+        else if (e.key === '+' || e.key === '=') act = 'zoomIn';
+        else if (e.key === '-' || e.key === '_') act = 'zoomOut';
+        if (!act) return;
+        e.preventDefault();
+        press('key:' + e.key, act);
+      });
+      addEventListener('keyup', e => {
+        if (e.key === 'Shift') { for (const id of [...held.keys()]) if (typeof id === 'string') release(id); return; }
+        release('key:' + e.key);
+      });
+      addEventListener('blur', () => { for (const id of [...held.keys()]) release(id); });
+    }
 
     /* ---------- start ---------- */
     for (const s of SYSTEMS) if (s.on) setSystem(s, true);
