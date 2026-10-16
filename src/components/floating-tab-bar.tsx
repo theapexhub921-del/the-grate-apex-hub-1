@@ -1,6 +1,6 @@
 import { usePathname } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { type LayoutChangeEvent, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { type LayoutChangeEvent, Platform, Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
 import { Text } from '@/components/ui/text';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,6 +12,7 @@ import { webStyle } from '@/components/ui/web';
 import { MOTION, SPRING } from '@/constants/motion';
 import { elevation, TAB_BAR_HEIGHT, TAB_BAR_INSET, type ThemeColors } from '@/constants/theme';
 import { useTabBarMode } from '@/data/navigation-settings';
+import { originateFill, originateGlow, withAlpha } from '@/data/experience-style';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -40,7 +41,11 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
   const hidden = mode === 'autoHide' && scrolledAway;
 
   const active = activeNavPath(pathname);
-  const hybrid = useExperience() === 'hybrid';
+  const experience = useExperience();
+  const hybrid = experience === 'hybrid';
+  // Originate: a lit selection pill with a small glowing marker, and a
+  // gradient Study button with a soft halo in the main colour.
+  const originate = experience === 'originate';
   const activeIndex = MOBILE_NAV_ITEMS.findIndex((item) => item.path === active);
   const learnIndex = MOBILE_NAV_ITEMS.findIndex((item) => item.path === '/learn');
 
@@ -81,7 +86,11 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
         onLayout={(event: LayoutChangeEvent) => setBarWidth(event.nativeEvent.layout.width)}
         accessibilityRole="tablist"
       >
-        {itemWidth > 0 && activeIndex !== learnIndex ? <Animated.View style={[styles.pill, { width: itemWidth }, pillStyle]} /> : null}
+        {itemWidth > 0 && activeIndex !== learnIndex ? (
+          <Animated.View style={[styles.pill, originate && styles.pillOriginate, { width: itemWidth }, pillStyle]}>
+            {originate ? <View style={styles.pillMarker} /> : null}
+          </Animated.View>
+        ) : null}
         {MOBILE_NAV_ITEMS.map((item, index) => {
           const selected = item.path === active;
           const isLearn = index === learnIndex;
@@ -100,7 +109,7 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
                   <LegacyIcon name="book" size={26} color={colors.onPrimary} />
                 </View>
               ) : isLearn ? (
-                <View style={[styles.learnIcon, elevation(colors, 3)]}>
+                <View style={[styles.learnIcon, elevation(colors, 3), originate && styles.learnOriginate]}>
                   <NavIconView icon={item.icon} color={colors.onPrimary} size={26} active />
                 </View>
               ) : <NavIconView icon={item.icon} color={selected ? colors.navActive : colors.navInactive} size={22} active={selected} />}
@@ -169,6 +178,24 @@ function createStyles(colors: ThemeColors) {
       justifyContent: 'center',
     },
     learnLabel: { paddingTop: 0 },
+    learnOriginate: {
+      boxShadow: `0px 4px 10px ${colors.shadow}, ${originateGlow(colors.primary, 0.45, 22, 8)}`,
+      ...webStyle({ backgroundImage: originateFill(colors.primary) }),
+    } as ViewStyle,
+    pillOriginate: {
+      alignItems: 'center',
+      boxShadow: `inset 0px 0px 0px 1px ${withAlpha(colors.navActive, 0.16)}`,
+      ...webStyle({ backgroundImage: `linear-gradient(180deg, ${withAlpha(colors.navActive, 0.1)}, rgba(255,255,255,0))` }),
+    } as ViewStyle,
+    pillMarker: {
+      position: 'absolute',
+      top: -1,
+      width: 16,
+      height: 3,
+      borderRadius: 2,
+      backgroundColor: colors.navActive,
+      boxShadow: originateGlow(colors.navActive, 0.6, 8, 0),
+    } as ViewStyle,
     learnHybrid: { width: 62, height: 62, borderRadius: 31, top: -24 },
     itemPressed: { transform: [{ scale: 0.94 }] },
     label: { fontSize: 10.5, fontWeight: '700', color: colors.navInactive, letterSpacing: 0.2 },

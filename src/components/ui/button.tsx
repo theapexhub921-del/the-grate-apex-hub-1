@@ -7,6 +7,7 @@ import { Interactive } from '@/components/ui/interactive';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import type { ThemeColors } from '@/constants/theme';
+import { originateFill, originateGlow } from '@/data/experience-style';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -82,6 +83,13 @@ export function Button({
         originals && inactive && styles.pillOff,
       ]
     : null;
+  // Originate: main actions are a soft diagonal gradient of their colour with
+  // the top sheen, and glow in that colour on hover (the Apex button keeps its own).
+  const originateColor = experience === 'originate' && !inactive ? (variant === 'primary' ? colors.primary : variant === 'gold' ? colors.accent : variant === 'danger' ? colors.error : null) : null;
+  const originateStyle = originateColor ? ({ backgroundColor: originateColor, ...webStyle({ backgroundImage: `${SHEEN}, ${originateFill(originateColor)}` }) } as ViewStyle) : null;
+  const originateHover = originateColor
+    ? ({ boxShadow: `inset 0px 1px 0px rgba(255, 255, 255, 0.28), 0px 2px 4px ${colors.shadow}, ${originateGlow(originateColor, 0.42, 26, 10)}` } as ViewStyle)
+    : null;
   const legacyLabel = originals && !filled ? { color: inactive ? colors.textTertiary : colors.textSecondary } : null;
 
   return (
@@ -96,10 +104,12 @@ export function Button({
         styles[size],
         styles[variant],
         filled && !inactive && styles.filled,
+        originateStyle,
         inactive && !originals && (filled ? styles.disabledFilled : styles.disabledPlain),
         fullWidth && styles.fullWidth,
         hovered && !inactive && !originals && styles[`${variant}Hover` as const],
         hovered && filled && !inactive && !originals && styles.lift,
+        hovered && originateHover,
         pillStyle,
         // The original's TouchableOpacity: a press only dims the button.
         pressed && (originals ? styles.pillPressed : styles.pressed),

@@ -173,3 +173,23 @@ describe('Appearance: one list of themes (owner rules, 2026-10-10)', async () =>
     assert.deepEqual(THEME_CATALOG.slice(0, 4).map((entry) => entry.level), [1, 1, 1, 1]);
   });
 });
+
+describe('Originate makeover (2026-10-16)', async () => {
+  const { originateFill, originateGlow, originateLight } = await import('@/data/experience-style');
+  const { EXPERIENCE_CHOICE_ORDER, EXPERIENCES, RECOMMENDED_EXPERIENCE, EXPERIENCE_INFO } = await import('@/data/experience');
+  it('gradient fills start a little lighter and end on the colour itself', () => {
+    assert.equal(originateLight('#000000', 0.5), '#808080');
+    assert.equal(originateLight('rgba(0,0,0,0.5)'), 'rgba(0,0,0,0.5)');
+    const fill = originateFill('#1677F2');
+    assert.match(fill, /^linear-gradient\(135deg, #[0-9a-f]{6} 0%, #1677F2 64%\)$/);
+  });
+  it('glows are a soft shadow in the colour', () => {
+    assert.equal(originateGlow('#FDC00A', 0.5, 20, 6), '0px 6px 20px rgba(253,192,10,0.5)');
+  });
+  it('the chooser lists Originate first and keeps all three experiences', () => {
+    assert.equal(RECOMMENDED_EXPERIENCE, 'originate');
+    assert.equal(EXPERIENCE_CHOICE_ORDER[0], 'originate');
+    assert.deepEqual([...EXPERIENCE_CHOICE_ORDER].sort(), [...EXPERIENCES].sort());
+    assert.ok(EXPERIENCE_INFO.originate.highlights?.length);
+  });
+});

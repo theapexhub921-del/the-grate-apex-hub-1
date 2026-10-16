@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 import { type AtmosphereMood, MOODS, rgba, useAtmospherePalette } from '@/components/atmosphere/config';
 import { PageMotifs } from '@/components/atmosphere/page-motifs';
@@ -28,12 +28,64 @@ const DNA = (() => {
   return { strands: strand(1) + strand(-1), rungs: rungs.join('') };
 })();
 
+// The pointer light (Originate, 2026-10-16): a soft pool of the theme's light
+// that follows the mouse, so the page feels alive without moving anything.
+// Strongest on Home and Explore, faint on quiet pages, off in lessons and
+// quizzes (focus), on touch screens and under reduced motion.
+const SPOTLIGHT: Record<AtmosphereMood, number> = { lively: 1, expressive: 1, auth: 1, calm: 0.6, quiet: 0.45, focus: 0 };
+
+function usePointerLight(enabled: boolean) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(false);
+  useEffect(() => {
+    const root = ref.current;
+    if (!enabled || !root || typeof window === 'undefined' || !window.matchMedia) return;
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!fine.matches || calm.matches) return;
+    let frame = 0;
+    let on = false;
+    let x = 0;
+    let y = 0;
+    const paint = () => {
+      frame = 0;
+      const box = root.getBoundingClientRect();
+      root.style.setProperty('--spot-x', `${Math.round(x - box.left)}px`);
+      root.style.setProperty('--spot-y', `${Math.round(y - box.top)}px`);
+    };
+    const onMove = (event: PointerEvent) => {
+      x = event.clientX;
+      y = event.clientY;
+      if (!frame) frame = window.requestAnimationFrame(paint);
+      if (!on) {
+        on = true;
+        setActive(true);
+      }
+    };
+    const onLeave = () => {
+      on = false;
+      setActive(false);
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    document.documentElement.addEventListener('pointerleave', onLeave);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      document.documentElement.removeEventListener('pointerleave', onLeave);
+      if (frame) window.cancelAnimationFrame(frame);
+      setActive(false);
+    };
+  }, [enabled]);
+  return { ref, active: enabled && active };
+}
+
 // Web atmosphere: pure CSS layers (no WebGL, no canvas), so it costs
 // almost nothing and never blocks input. Decorative only — hidden from
 // assistive technology.
 export function Atmosphere({ mood }: { mood: AtmosphereMood }) {
   const { palette, light, key: scheme } = useAtmospherePalette();
   const levels = MOODS[mood];
+  const spot = SPOTLIGHT[mood];
+  const pointer = usePointerLight(spot > 0);
 
   const vars = {
     '--atm-base': palette.base,
@@ -55,10 +107,13 @@ export function Atmosphere({ mood }: { mood: AtmosphereMood }) {
     '--o-gold': levels.gold,
     '--o-grain': palette.grain * levels.grain,
     '--o-vignette': levels.vignette,
+    '--atm-spot': rgba(palette.auroraA, light ? 1.1 : 0.85),
+    '--o-spot': spot,
   } as CSSProperties;
 
   return (
     <div
+      ref={pointer.ref}
       aria-hidden="true"
       className={`${classes.root} ${levels.animate ? classes.animate : ''}`}
       style={vars}
@@ -71,6 +126,7 @@ export function Atmosphere({ mood }: { mood: AtmosphereMood }) {
         <div className={`${classes.blob} ${classes.blobB}`} />
         <div className={`${classes.blob} ${classes.blobC}`} />
       </div>
+      <div className={`${classes.layer} ${classes.spot} ${pointer.active ? classes.spotOn : ''}`} />
       <div className={`${classes.layer} ${classes.rays}`} />
       <div className={`${classes.layer} ${classes.grid}`} />
       <svg className={classes.doodles} viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMid slice" focusable="false">

@@ -299,6 +299,10 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * The page background is the shell's atmosphere layer (`src/components/atmosphere/`). It has a mood per route: Home is lively, Learn is calm, quiz and lesson are focus, Profile and Settings are quiet.
 * Screens are transparent, so build pages with `Screen` from `src/components/ui/screen.tsx`. Do not give screens an opaque page background.
 
+### Originate finish (2026-10-16)
+
+* Originate is the recommended experience (listed first and preselected in `/choose-experience`). Its extra polish — lit cards, gradient buttons with a hover glow, page fade-in, eyebrow mark, pointer light in the atmosphere, lit tab-bar pill and glowing rail edge — only applies when `useExperience() === 'originate'`, so The Originals and Hybrid look exactly as before. Details: `docs/experiences-architecture.md`.
+
 ### Primitives (`src/components/ui/`)
 
 * `Card` / `PressableCard` (with tones), `Button`, `IconButton`

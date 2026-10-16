@@ -106,6 +106,28 @@ export function mixHex(top: string, base: string, amount: number) {
   return `#${a.map((v, i) => Math.round(b[i] + (v - b[i]) * t).toString(16).padStart(2, '0')).join('')}`;
 }
 
+// ── Originate ───────────────────────────────────────────────────────
+//
+// Originate's finish (2026-10-16 makeover): main actions are a soft diagonal
+// gradient of their own colour (a lighter top-left into the solid colour),
+// they glow in that colour on hover, and surfaces carry a faint top light.
+// Pure helpers so the tests can check them.
+
+/** A lighter companion of a '#RRGGBB' colour (other formats unchanged). */
+export function originateLight(color: string, amount = 0.14) {
+  return /^#[0-9a-f]{6}$/i.test(color.trim()) ? mixHex('#ffffff', color.trim(), amount) : color;
+}
+
+/** The gradient fill for an Originate main action in `color`. */
+export function originateFill(color: string, angle = 135) {
+  return `linear-gradient(${angle}deg, ${originateLight(color)} 0%, ${color} 64%)`;
+}
+
+/** A soft coloured glow under a surface (CSS box-shadow). */
+export function originateGlow(color: string, strength = 0.38, blur = 26, y = 10) {
+  return `0px ${y}px ${blur}px ${withAlpha(color, strength)}`;
+}
+
 /**
  * The CSS angle expo-linear-gradient uses on the web for the original
  * background's start {x: 0.1, y: 0} → end {x: 0.9, y: 1} over a w × h area,

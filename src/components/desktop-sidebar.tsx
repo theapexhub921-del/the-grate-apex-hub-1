@@ -1,6 +1,6 @@
 import { router, usePathname } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, useWindowDimensions, View, type ViewStyle } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 import { LogoMark } from '@/components/logo-mark';
@@ -17,6 +17,8 @@ import { useNow } from '@/data/learning/use-learning';
 import { useProgress } from '@/data/progress';
 import { getRankProgress } from '@/data/ranks';
 import { useAvatarUrl, useDisplayName } from '@/data/user';
+import { originateGlow, withAlpha } from '@/data/experience-style';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 /**
@@ -47,6 +49,8 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
   const { height: viewportHeight } = useWindowDimensions();
   const pathname = usePathname();
   const active = activeNavPath(pathname);
+  // Originate: the active row is lit from its gold edge, which glows.
+  const originate = useExperience() === 'originate';
   const railHeight = Math.max(0, viewportHeight - (docked ? 0 : FLOAT_INSET * 2));
   const navIconSize = Math.min(24, railHeight / (NAV_ITEMS.length * 2));
 
@@ -170,9 +174,9 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
                 accessibilityLabel={item.accessibilityLabel}
                 accessibilityState={{ selected }}
                 tabIndex={shown ? 0 : -1}
-                style={[styles.navItem, isHovered && styles.navItemHovered, selected && styles.navItemActive]}
+                style={[styles.navItem, isHovered && styles.navItemHovered, selected && styles.navItemActive, selected && originate && styles.navItemActiveOriginate]}
               >
-                {selected ? <View style={styles.activeBar} /> : null}
+                {selected ? <View style={[styles.activeBar, originate && styles.activeBarOriginate]} /> : null}
                 <NavIconView icon={item.icon} color={selected ? colors.navActive : isHovered ? colors.text : colors.navInactive} size={navIconSize} active={selected} />
                 {collapsed ? null : (
                   <Text style={[styles.navLabel, (selected || isHovered) && styles.navLabelActive]} numberOfLines={1}>
@@ -356,6 +360,10 @@ function createStyles(colors: ThemeColors) {
       borderBottomRightRadius: 3,
       backgroundColor: colors.accent,
     },
+    navItemActiveOriginate: webStyle({
+      backgroundImage: `linear-gradient(90deg, ${withAlpha(colors.accent, 0.18)}, ${withAlpha(colors.accent, 0)} 80%)`,
+    }),
+    activeBarOriginate: { width: 4, top: 8, bottom: 8, boxShadow: originateGlow(colors.accent, 0.75, 12, 0) } as ViewStyle,
     navLabel: { fontSize: 14, fontWeight: '600', color: colors.navInactive },
     navLabelActive: { color: colors.text, fontWeight: '700' },
     today: {

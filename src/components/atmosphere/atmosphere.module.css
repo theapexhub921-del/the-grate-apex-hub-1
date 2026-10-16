@@ -89,6 +89,18 @@
   to { transform: translate3d(-5vmax, 3vmax, 0) scale(1.06); }
 }
 
+/* The pointer light: a soft pool of the theme's light under the mouse
+   (position set by atmosphere.web.tsx; hidden until the pointer moves). */
+.spot {
+  opacity: 0;
+  transition: opacity 900ms ease;
+  background: radial-gradient(560px circle at var(--spot-x, 50%) var(--spot-y, 20%), var(--atm-spot), transparent 62%);
+}
+
+.spotOn {
+  opacity: var(--o-spot);
+}
+
 /* Light rays from the top-right, fading out by mid-page. */
 .rays {
   opacity: var(--o-rays);
@@ -192,6 +204,12 @@
 
   .grid {
     background-size: 44px 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none) {
+  .spot {
+    display: none;
   }
 }
 

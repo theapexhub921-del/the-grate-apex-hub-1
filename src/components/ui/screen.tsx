@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode } from 'react';
+import { forwardRef, type ReactNode, useEffect } from 'react';
 import {
   ScrollView,
   type StyleProp,
@@ -7,6 +7,7 @@ import {
   View,
   type ViewStyle,
 } from 'react-native';
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from 'react-native-reanimated';
 import { Text } from '@/components/ui/text';
 
 import { useTabBarScroll } from '@/components/tab-bar-visibility';
@@ -19,6 +20,8 @@ import {
   Type,
   type ThemeColors,
 } from '@/constants/theme';
+import { MOTION, MOTION_EASING } from '@/constants/motion';
+import { webStyle } from '@/components/ui/web';
 import { useExperience } from '@/hooks/use-experience';
 import { useThemedStyles } from '@/hooks/use-theme';
 
@@ -46,23 +49,34 @@ export const Screen = forwardRef<
   const styles = useThemedStyles(createStyles);
   const { width: windowWidth } = useWindowDimensions();
   const tabBarScroll = useTabBarScroll();
+  // Originate: each page arrives with a short fade (opacity only, so nothing
+  // fixed inside the page moves; skipped under reduced motion).
+  const reduceMotion = useReducedMotion();
+  const fadeIn = useExperience() === 'originate' && !reduceMotion;
+  const shown = useSharedValue(fadeIn ? 0 : 1);
+  useEffect(() => {
+    shown.value = withTiming(1, { duration: fadeIn ? MOTION.significant - 100 : 0, easing: MOTION_EASING.entrance });
+  }, [fadeIn, shown]);
+  const fade = useAnimatedStyle(() => ({ opacity: shown.value }));
   return (
-    <ScrollView
-      {...tabBarScroll}
-      ref={ref}
-      style={[styles.scroll, background ? { backgroundColor: background } : null]}
-      contentContainerStyle={[
-        styles.container,
-        pageContainer(windowWidth, WIDTHS[width]),
-        isDesktopWidth(windowWidth) && styles.containerDesktop,
-        contentStyle,
-      ]}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-    >
-      {children}
-      <View style={styles.bottomSpace} />
-    </ScrollView>
+    <Animated.View style={[styles.fill, fade]}>
+      <ScrollView
+        {...tabBarScroll}
+        ref={ref}
+        style={[styles.scroll, background ? { backgroundColor: background } : null]}
+        contentContainerStyle={[
+          styles.container,
+          pageContainer(windowWidth, WIDTHS[width]),
+          isDesktopWidth(windowWidth) && styles.containerDesktop,
+          contentStyle,
+        ]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {children}
+        <View style={styles.bottomSpace} />
+      </ScrollView>
+    </Animated.View>
   );
 });
 
@@ -85,11 +99,18 @@ export function PageHeader({
   // Hybrid: the original 30pt title over this app's eyebrow and subtitle.
   const experience = useExperience();
   const originals = experience === 'originals';
-  const legacyTitle = experience !== 'originate';
+  const originate = experience === 'originate';
+  const legacyTitle = !originate;
   return (
     <View style={[styles.pageHeader, originals && styles.legacyHeader, style]}>
       <View style={styles.sectionText}>
-        {eyebrow && !originals ? <Text style={styles.eyebrow}>{eyebrow.toUpperCase()}</Text> : null}
+        {eyebrow && originate ? (
+          // Originate: the eyebrow leads with a small gold-to-blue mark.
+          <View style={styles.eyebrowRow}>
+            <View style={styles.eyebrowMark} />
+            <Text style={[styles.eyebrow, styles.eyebrowOriginate]}>{eyebrow.toUpperCase()}</Text>
+          </View>
+        ) : eyebrow && !originals ? <Text style={styles.eyebrow}>{eyebrow.toUpperCase()}</Text> : null}
         <Text style={[styles.pageTitle, legacyTitle && styles.legacyTitle]} accessibilityRole="header">
           {title}
         </Text>
@@ -167,6 +188,7 @@ export function Columns({
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
+    fill: { flex: 1 },
     scroll: { flex: 1, backgroundColor: 'transparent' },
     container: { paddingTop: 24, paddingBottom: 24 },
     containerDesktop: { paddingTop: 36 },
@@ -192,6 +214,15 @@ function createStyles(colors: ThemeColors) {
     sectionTitle: { ...Type.title3, color: colors.text },
     sectionSubtitle: { fontSize: 13, color: colors.textSecondary, marginTop: 2, lineHeight: 18 },
     eyebrow: { ...Type.overline, color: colors.textTertiary, marginBottom: 6 },
+    eyebrowRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+    eyebrowMark: {
+      width: 18,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: colors.accent,
+      ...webStyle({ backgroundImage: `linear-gradient(90deg, ${colors.accent}, ${colors.primary})` }),
+    },
+    eyebrowOriginate: { color: colors.primaryText, marginBottom: 0 },
     legacyHeader: { alignItems: 'flex-start', marginBottom: 16 },
     legacyTitle: { fontFamily: undefined, fontSize: 30, lineHeight: undefined, fontWeight: '800', letterSpacing: -0.5 },
     legacySubtitle: { fontSize: undefined, color: colors.textTertiary, marginTop: 4, lineHeight: 20 },

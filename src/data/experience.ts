@@ -11,19 +11,29 @@ export const EXPERIENCES_ENABLED = true;
 export const EXPERIENCES = ['originals', 'originate', 'hybrid'] as const;
 export type ExperienceId = (typeof EXPERIENCES)[number];
 
-export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: string }> = {
+export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: string; highlights?: readonly string[] }> = {
   originals: {
     name: 'The Originals',
     summary: 'The original GrAte Apex Hub, as it was: its colours, emoji, fonts, glass panels, gradient background and navigation — with every new feature inside it.',
   },
-  originate: { name: 'Originate', summary: 'The new GrAte Apex Hub design: its themes, layouts, icons, atmosphere and motion.' },
+  originate: {
+    name: 'Originate',
+    summary: 'The newest GrAte Apex Hub design, refined: living light behind every page, softly lit cards, glowing gradient buttons and smooth page entrances — calm and readable in lessons and quizzes.',
+    highlights: ['On computers, a soft light follows your pointer', 'Lit cards and gradient buttons that glow on hover', 'Pages fade in smoothly; lessons and quizzes stay calm'],
+  },
   hybrid: {
     name: 'Hybrid',
     summary: 'The best of both: the new layouts, navigation and icons, with the original gradient background, glass panels, pill buttons and headings.',
   },
 };
 
-/** The default experience: shown until a learner chooses, and preselected in the chooser. */
+/** The experience the chooser recommends (2026-10-16 Originate makeover): listed first, preselected, with a "Recommended" badge. */
+export const RECOMMENDED_EXPERIENCE: ExperienceId = 'originate';
+
+/** The chooser's order: the recommended experience first, then the others as defined. */
+export const EXPERIENCE_CHOICE_ORDER: readonly ExperienceId[] = [RECOMMENDED_EXPERIENCE, ...EXPERIENCES.filter((id) => id !== RECOMMENDED_EXPERIENCE)];
+
+/** The default experience: how the interface is drawn until a learner chooses. */
 export const DEFAULT_EXPERIENCE: ExperienceId = 'originals';
 
 export function isExperience(value: unknown): value is ExperienceId {

@@ -13,6 +13,7 @@ import { useKeyboardModality, webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import { elevation, Radius, type ThemeColors } from '@/constants/theme';
 import { type ExperienceId } from '@/data/experience';
+import { originateGlow, withAlpha } from '@/data/experience-style';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -151,6 +152,7 @@ export function PressableCard({
   const styles = useThemedStyles(createStyles);
   const experience = useExperience();
   const originals = experience === 'originals';
+  const originate = experience === 'originate';
   return (
     <Interactive
       onPress={onPress}
@@ -165,7 +167,7 @@ export function PressableCard({
         experienceCard(styles, experience, tone),
         // The original app's Hover: gold border and a 1px lift; a press dims it.
         hovered && (originals ? styles.legacyHovered : styles.hovered),
-        hovered && lift && !originals && styles.lifted,
+        hovered && lift && !originals && (originate ? styles.originateLifted : styles.lifted),
         pressed && (originals ? styles.legacyPressed : styles.pressed),
         style,
       ]}
@@ -181,8 +183,11 @@ type CardStyles = ReturnType<typeof createStyles>;
 // (ui.tsx: card colour, 1px border, radius 22, no shadow); tones keep their
 // meaning through the border only. Hybrid: the same glass, blurred, on this
 // app's elevation.
+// Originate: a slightly rounder card; resting and raised cards carry a faint
+// top light (web), so they read as lit from above by the atmosphere. Tinted,
+// quiet and outline tones stay flat so their colour keeps its meaning.
 function experienceCard(styles: CardStyles, experience: ExperienceId, tone: CardTone) {
-  if (experience === 'originate') return null;
+  if (experience === 'originate') return [styles.originate, tone === 'surface' || tone === 'elevated' ? styles.originateLit : null];
   if (experience === 'hybrid') return styles.hybridGlass;
   return [styles.legacyPanel, tone === 'primary' || tone === 'insight' ? styles.legacyPrimary : tone === 'reward' ? styles.legacyReward : tone === 'outline' ? styles.legacyOutline : null];
 }
@@ -209,6 +214,15 @@ function createStyles(colors: ThemeColors) {
     hovered: { borderColor: colors.primaryBorder },
     lifted: { transform: [{ translateY: -2 }], ...elevation(colors, 2) },
     pressed: { transform: [{ translateY: 0 }, { scale: 0.99 }] },
+
+    originate: { borderRadius: 22 },
+    originateLit: webStyle({ backgroundImage: `linear-gradient(180deg, ${colors.highlight} 0%, rgba(255,255,255,0) 46%)` }),
+    // Hover: a lift with a soft glow in the theme's main colour.
+    originateLifted: {
+      transform: [{ translateY: -3 }],
+      boxShadow: `inset 0px 1px 0px ${colors.highlight}, 0px 2px 6px ${colors.shadow}, 0px 18px 40px ${colors.shadowStrong}, ${originateGlow(colors.primary, 0.16, 34, 12)}`,
+      borderColor: withAlpha(colors.primary, 0.45),
+    } as ViewStyle,
 
     legacyPanel: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 22, boxShadow: 'none' } as ViewStyle,
     legacyPrimary: { borderColor: colors.primary },
