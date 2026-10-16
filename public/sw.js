@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grateapex-pwa-v8';
+const CACHE_NAME = 'grateapex-pwa-v9';
 // Study material kept for offline revision (question banks, lecture diagrams, and what
 // Settings → Offline study saves: src/lib/offline-study.ts). A different prefix from
 // CACHE_PREFIX on purpose: an app update must never delete what a learner saved.
