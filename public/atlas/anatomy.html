@@ -254,6 +254,28 @@
       font-weight: 700;
     }
 
+    /* single-organ buttons */
+    .organs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+    .organ {
+      min-height: 48px;
+      padding: 0 8px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--well);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+    }
+
+    .organ:hover { border-color: var(--cobalt); }
+    .organ:active { transform: scale(0.96); }
+    .organ[aria-pressed="true"] { background: var(--cobalt); border-color: var(--cobalt); color: var(--on-cobalt); }
+
+    .organstatus { margin: 8px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+
     /* rows (systems, colour-coding, display toggles) */
     .sys {
       display: grid;
@@ -557,6 +579,7 @@
       #nav .seg button { padding: 9px 12px; }
       #nav .nt { width: 36px; height: 36px; }
       #results button { padding: 12px 10px; }
+      .organ { min-height: 52px; }
     }
 
     /* ---------- phones (portrait / narrow): the menu is a bottom sheet ---------- */
@@ -745,6 +768,18 @@
     <div class="pscroll">
       <ul id="results"></ul>
       <button id="reveal" class="btn">Show everything again</button>
+
+      <details class="sec" open>
+        <summary>Single organs</summary>
+        <div class="body">
+          <div id="organs" class="organs" role="group" aria-label="Show one organ on its own">
+            <button class="organ" type="button" data-organ="brain" aria-pressed="false">Brain</button>
+            <button class="organ" type="button" data-organ="heart" aria-pressed="false">Heart</button>
+            <button class="organ" type="button" data-organ="lungs" aria-pressed="false">Lungs</button>
+          </div>
+          <p id="organStatus" class="organstatus" role="status">Pick one or more. Everything else is hidden.</p>
+        </div>
+      </details>
 
       <details class="sec" open>
         <summary>Sex</summary>
@@ -995,6 +1030,9 @@
       }
       handle.addEventListener('pointerup', end);
       handle.addEventListener('pointercancel', function () { startY = null; });
+
+      // choosing an organ tucks the sheet away so the organ is in view
+      window.addEventListener('atlas-organs', function () { if (isSheet()) setSheet('peek'); });
 
       // typing in the search box needs the list open
       q.addEventListener('focus', function () { if (isSheet()) setSheet('half'); });
@@ -1844,6 +1882,7 @@ bool inRegion(vec3 p) {
       revealBtn.classList.toggle('show', isolated || hidden.size > 0 || region !== 0 || peelLevel !== 0);
     }
     function showAll() {
+      organsClear();
       for (const { mesh } of index) if (mesh) mesh.visible = true;
       hidden.clear(); isolated = false; isoPins = []; setPeel(0); updateReveal(); refreshPins();
       if (region) setRegion(0);
@@ -1851,6 +1890,7 @@ bool inRegion(vec3 p) {
     }
     function isolate() {
       if (!selected) return;
+      organsClear();
       const keep = new Set(selectedParts);
       for (const { mesh } of index) if (mesh) mesh.visible = keep.has(mesh);
       isolated = true; computeIsoPins(); buildIsoPoints(); updateReveal(); refreshPins();
@@ -1871,6 +1911,84 @@ bool inRegion(vec3 p) {
     document.getElementById('hide').onclick = hideSelected;
     document.getElementById('clear').onclick = deselect;
     revealBtn.onclick = showAll;
+
+    /* ---------- single organs: Brain, Heart, Lungs (pick one or several) ---------- */
+    // Each organ is one whole group in its model file (Brain.g, Heart.g, Lungs.g). Choosing an organ loads that file if it
+    // is not loaded yet, hides everything else and flies the camera to it. Choosing several shows them together.
+    // "Show everything again" (or Escape) brings the whole body back.
+    const ORGANS = [
+      { id: 'brain', label: 'Brain', sys: 'nervous', node: /^Brain\.g$/ },
+      { id: 'heart', label: 'Heart', sys: 'cardiovascular', node: /^Heart\.g$/ },
+      { id: 'lungs', label: 'Lungs', sys: 'visceral', node: /^Lungs\.g$/ },
+    ];
+    const organsActive = new Set();
+    const organBtns = new Map(ORGANS.map(o => [o.id, document.querySelector('#organs [data-organ="' + o.id + '"]')]));
+    const organStatus = document.getElementById('organStatus');
+    let organsKeep = false, organsRun = 0;
+
+    function inOrgan(mesh, def) {
+      const sys = mesh.userData.system;
+      if (!sys || sys.id !== def.sys) return false;
+      for (let n = mesh; n; n = n.parent) if (n.userData && def.node.test(n.userData.name || '')) return true;
+      return false;
+    }
+    function syncOrganUI(msg) {
+      for (const [id, b] of organBtns) if (b) b.setAttribute('aria-pressed', String(organsActive.has(id)));
+      const names = ORGANS.filter(o => organsActive.has(o.id)).map(o => o.label);
+      organStatus.textContent = msg || (names.length ? 'Showing: ' + names.join(' + ') + '. Tap a part to see its name.' : 'Pick one or more. Everything else is hidden.');
+    }
+    function organsClear() {   // called whenever something else changes what is shown
+      if (organsKeep || !organsActive.size) return;
+      organsActive.clear(); organsRun++; syncOrganUI();
+    }
+    function fitMeshes(list) {
+      const box = new THREE.Box3();
+      for (const m of list) box.expandByObject(m);
+      if (box.isEmpty()) return;
+      const c = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3()).length() || 0.05;
+      const dist = Math.max(size / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * 1.5, 0.12);
+      flyTo(c.clone().add(new THREE.Vector3(0, 0.04, 1).normalize().multiplyScalar(dist)), c);   // looked at from the front
+    }
+    async function applyOrgans() {
+      const run = ++organsRun;
+      const defs = ORGANS.filter(o => organsActive.has(o.id));
+      if (!defs.length) { organsKeep = true; showAll(); organsKeep = false; syncOrganUI(); return; }
+      syncOrganUI('Loading\u2026');
+      for (const def of defs) {
+        const s = SYSTEMS.find(x => x.id === def.sys);
+        if (s && (!s.group || !s.input.checked)) { s.input.checked = true; await setSystem(s, true); }
+        if (run !== organsRun) return;   // the choice changed while loading
+      }
+      deselect();
+      organsKeep = true; showAll(); organsKeep = false;
+      const keep = [];
+      for (const e of index) {
+        if (!e.mesh) continue;
+        const on = defs.some(d => inOrgan(e.mesh, d));
+        e.mesh.visible = on;
+        if (on) keep.push(e.mesh);
+      }
+      if (!keep.length) {
+        organsKeep = true; showAll(); organsKeep = false;
+        organsActive.clear(); syncOrganUI("Couldn't show that organ. Check the model files loaded.");
+        return;
+      }
+      isolated = true;
+      const prev = selectedParts; selectedParts = keep; computeIsoPins(); buildIsoPoints(); selectedParts = prev;
+      updateReveal(); refreshPins(); dirty = true;
+      fitMeshes(keep);
+      syncOrganUI();
+      window.dispatchEvent(new CustomEvent('atlas-organs'));
+    }
+    for (const o of ORGANS) {
+      const b = organBtns.get(o.id);
+      if (!b) continue;
+      b.addEventListener('click', () => {
+        if (organsActive.has(o.id)) organsActive.delete(o.id); else organsActive.add(o.id);
+        applyOrgans();
+      });
+    }
 
     /* ---------- picking ---------- */
     const ray = new THREE.Raycaster();
