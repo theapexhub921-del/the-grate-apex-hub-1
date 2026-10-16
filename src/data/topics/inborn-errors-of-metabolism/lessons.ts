@@ -24,6 +24,7 @@ const lesson1: Draft = {
   chunks: [
     {
       title: 'Garrod’s hypothesis',
+      figure: 'inborn-errors-of-metabolism:garrod-hypothesis',
       kind: 'overview',
       paragraphs: [
         'In the early 1900s, Garrod studied alkaptonuria and hypothesised that a defective enzyme leads to an “inborn error in metabolism”. The slide sums the idea up as one gene → one enzyme (page 3).',
@@ -311,6 +312,7 @@ const lesson4: Draft = {
     },
     {
       title: 'Galactosaemia',
+      figure: 'inborn-errors-of-metabolism:galactosaemia',
       kind: 'clinical',
       paragraphs: [
         'Lactase splits lactose into glucose and galactose. Galactokinase makes galactose-1-phosphate, and galactose-1-phosphate uridyl transferase (GALT) converts it, with UDP-glucose, into glucose-1-phosphate and UDP-galactose (page 21 figure). In galactosaemia GALT is defective (page 19).',

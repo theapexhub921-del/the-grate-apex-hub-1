@@ -1,5 +1,7 @@
 // Tappable lecture diagrams (data/figures/).
-//   FigureExplorer  in a lesson's reading section. "Explore": tap a numbered
+//   FigureExplorer  in a lesson's reading section: a compact card (small
+//                   preview + "Explore diagram"), so diagrams never take over the
+//                   lesson. The interactive diagram opens in a sheet. "Explore": tap a numbered
 //                   pin to see what it is. "Test yourself": the slide's own
 //                   labels are covered; pick a pin, say the name to yourself,
 //                   then reveal it.
@@ -10,7 +12,9 @@ import { useState, type ReactNode } from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
+import { Sheet } from '@/components/ui/sheet';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Text } from '@/components/ui/text';
 import { elevation, Paper, Radius, Type, type ThemeColors } from '@/constants/theme';
@@ -26,13 +30,17 @@ const pct = (fraction: number) => `${fraction * 100}%` as const;
 
 // Tall diagrams are kept short enough to see the picture and its panel together.
 const MAX_HEIGHT = 480;
+// In a quiz question the diagram stays modest beside the question and its options.
+const QUESTION_MAX_HEIGHT = 280;
+// The preview card in a lesson.
+const PREVIEW_HEIGHT = 120;
 
 /** The picture at its own shape, with covers and pins drawn over it. */
-function Canvas({ figure, children, label }: { figure: LessonFigure; children?: ReactNode; label: string }) {
+function Canvas({ figure, children, label, maxHeight = MAX_HEIGHT }: { figure: LessonFigure; children?: ReactNode; label: string; maxHeight?: number }) {
   const styles = useThemedStyles(createStyles);
   const aspectRatio = figure.width / figure.height;
   return (
-    <View style={[styles.canvas, { aspectRatio, maxWidth: Math.min(760, MAX_HEIGHT * aspectRatio) }]}>
+    <View style={[styles.canvas, { aspectRatio, maxWidth: Math.min(760, maxHeight * aspectRatio) }]}>
       <Image source={{ uri: figureUri(figure.src) }} style={StyleSheet.absoluteFill} contentFit="contain" accessibilityLabel={label} transition={150} />
       {children}
     </View>
@@ -87,13 +95,47 @@ function Pin({ spot, number, tone, onPress, label }: { spot: FigureSpot; number:
   );
 }
 
+/** In a lesson: a compact preview card; the interactive diagram opens in a sheet. */
 export function FigureExplorer({ figureId }: { figureId: string }) {
   const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  const [open, setOpen] = useState(false);
   const figure = getFigure(figureId);
+  if (!figure) return null;
+  const aspectRatio = figure.width / figure.height;
+  return (
+    <>
+      <Interactive
+        onPress={() => setOpen(true)}
+        accessibilityRole="button"
+        accessibilityLabel={`Lecture diagram: ${figure.title}. Opens the interactive diagram.`}
+        style={({ hovered }) => [styles.previewCard, hovered && styles.previewHover]}
+      >
+        <View style={[styles.previewImage, { width: Math.min(220, PREVIEW_HEIGHT * aspectRatio) }]}>
+          <Image source={{ uri: figureUri(figure.src) }} style={StyleSheet.absoluteFill} contentFit="contain" accessibilityIgnoresInvertColors transition={150} />
+        </View>
+        <View style={styles.previewText}>
+          <Text style={styles.kicker}>LECTURE DIAGRAM</Text>
+          <Text style={styles.previewTitle} numberOfLines={2}>{figure.title}</Text>
+          <Text style={styles.muted} numberOfLines={1}>{figure.spots.length} labelled parts · explore or test yourself</Text>
+          <View style={styles.previewGo}>
+            <Icon name="sparkle" size={14} color={colors.primaryText} />
+            <Text style={styles.previewGoText}>Explore diagram</Text>
+          </View>
+        </View>
+      </Interactive>
+      <Sheet visible={open} onClose={() => setOpen(false)} title={figure.title} subtitle="Lecture diagram" width={860}>
+        <FigureExplorerBody figure={figure} />
+      </Sheet>
+    </>
+  );
+}
+
+function FigureExplorerBody({ figure }: { figure: LessonFigure }) {
+  const styles = useThemedStyles(createStyles);
   const [mode, setMode] = useState<'explore' | 'test'>('explore');
   const [selected, setSelected] = useState<string | null>(null);
   const [shown, setShown] = useState<readonly string[]>([]);
-  if (!figure) return null;
 
   const testing = mode === 'test';
   const index = figure.spots.findIndex((spot) => spot.id === selected);
@@ -118,7 +160,6 @@ export function FigureExplorer({ figureId }: { figureId: string }) {
           style={styles.modes}
         />
       </View>
-      <Text style={styles.title}>{figure.title}</Text>
       <Canvas figure={figure} label={`${figure.title} — lecture diagram`}>
         {testing ? figure.spots.filter((item) => !isShown(item.id)).map((item) => <Covers key={item.id} spot={item} />) : null}
         {figure.spots.map((item, i) => (
@@ -172,7 +213,7 @@ export function QuestionFigure({ figure: ref, revealed }: { figure: { id: string
   const target = getSpot(figure, ref.spot);
   return (
     <View style={styles.questionFigure}>
-      <Canvas figure={figure} label={`${figure.title} — lecture diagram${target ? ', one part marked' : ''}`}>
+      <Canvas figure={figure} maxHeight={QUESTION_MAX_HEIGHT} label={`${figure.title} — lecture diagram${target ? ', one part marked' : ''}`}>
         {figure.spots.filter((spot) => !(revealed && spot.id === target?.id)).map((spot) => <Covers key={spot.id} spot={spot} />)}
         {target ? <Pin spot={target} number="?" tone="target" label="The marked part" /> : null}
       </Canvas>
@@ -211,5 +252,12 @@ function createStyles(colors: ThemeColors) {
     muted: { ...Type.caption, color: colors.textTertiary },
     caption: { ...Type.caption, color: colors.textTertiary },
     questionFigure: { marginVertical: 4 },
+    previewCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 10, marginVertical: 6, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+    previewHover: { borderColor: colors.primaryBorder },
+    previewImage: { height: PREVIEW_HEIGHT, maxWidth: '45%', borderRadius: Radius.sm, overflow: 'hidden', backgroundColor: Paper },
+    previewText: { flex: 1, minWidth: 0, gap: 3 },
+    previewTitle: { ...Type.headline, color: colors.text },
+    previewGo: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+    previewGoText: { fontSize: 13.5, fontWeight: '800', color: colors.primaryText },
   });
 }

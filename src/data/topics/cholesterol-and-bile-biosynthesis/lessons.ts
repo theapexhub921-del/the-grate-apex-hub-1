@@ -41,6 +41,7 @@ const lesson1: Draft = {
     },
     {
       title: 'The steroid nucleus',
+      figure: 'cholesterol-and-bile-biosynthesis:cholesterol-structure',
       kind: 'structure',
       paragraphs: [
         'The four-ring nucleus of cholesterol is the cyclopentanoperhydrophenanthrene ring. The structure on slide 4 shows three six-membered rings (A, B and C) fused to one five-membered ring (D).',
@@ -151,6 +152,7 @@ const lesson2: Draft = {
   chunks: [
     {
       title: 'The pathway in five stages',
+      figure: 'cholesterol-and-bile-biosynthesis:cholesterol-summary',
       kind: 'overview',
       paragraphs: ['The lecture divides cholesterol synthesis into five stages (slide 7):'],
       steps: [

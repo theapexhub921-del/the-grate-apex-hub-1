@@ -16,7 +16,8 @@
 // - Options are shuffled at quiz time (correct option written first).
 //
 // IDs: qN-xx, N = lesson.
-import { fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { fill, match, mcq, multi, order, type QuestionDraft, spotQuestion, tf } from '@/data/topics/build';
+import { haemBreakdown, leadPoisoning } from '@/data/figures/heme-metabolism';
 import type { ConceptId } from '@/data/topics/heme-metabolism/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -834,4 +835,16 @@ const lesson7: Q[] = [
   }),
 ];
 
-export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4, ...lesson5, ...lesson6, ...lesson7];
+
+// ─── Lecture diagrams (data/figures/) ───────────────────────────────
+// "What is the marked part?" — the slide's own labels are covered.
+const diagrams: Q[] = [
+  spotQuestion('fig-haem-oxygenase', 'haem-oxygenase', haemBreakdown, 'heme-oxygenase', ['biliverdin-reductase', 'ugt', 'cyp-reductase']),
+  spotQuestion('fig-haem-co', 'haem-oxygenase', haemBreakdown, 'co', ['iron', 'biliverdin', 'bilirubin']),
+  spotQuestion('fig-haem-biliverdin', 'biliverdin-to-bilirubin', haemBreakdown, 'biliverdin', ['bilirubin', 'heme', 'bmg-bdg']),
+  spotQuestion('fig-haem-ugt', 'bilirubin-conjugation', haemBreakdown, 'ugt', ['biliverdin-reductase', 'heme-oxygenase', 'cyp-reductase']),
+  spotQuestion('fig-lead-ala-dehydratase', 'lead-poisoning', leadPoisoning, 'ala-dehydratase', ['ferrochelatase', 'pbg', 'protoporphyrin']),
+  spotQuestion('fig-lead-ferrochelatase', 'lead-poisoning', leadPoisoning, 'ferrochelatase', ['ala-dehydratase', 'protoporphyrin', 'heme']),
+];
+
+export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4, ...lesson5, ...lesson6, ...lesson7, ...diagrams];

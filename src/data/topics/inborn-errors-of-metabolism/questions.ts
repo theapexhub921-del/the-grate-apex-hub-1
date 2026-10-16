@@ -5,7 +5,8 @@
 // enzyme”, or the glucose-6-phosphatase item on the UK screening list
 // (see discrepancies). Options are shuffled at quiz time. IDs: qN-xx,
 // N = lesson.
-import { fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { fill, match, mcq, multi, order, type QuestionDraft, spotQuestion, tf } from '@/data/topics/build';
+import { galactosaemia as galactosaemiaFigure, garrodHypothesis } from '@/data/figures/inborn-errors-of-metabolism';
 import type { ConceptId } from '@/data/topics/inborn-errors-of-metabolism/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -667,4 +668,15 @@ const lesson6: Q[] = [
   }),
 ];
 
-export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4, ...lesson5, ...lesson6];
+
+// ─── Lecture diagrams (data/figures/) ───────────────────────────────
+// "What is the marked part?" — the slide's own labels are covered.
+const diagrams: Q[] = [
+  spotQuestion('fig-garrod-d', 'garrod-hypothesis', garrodHypothesis, 'd', ['b', 'c', 'a']),
+  spotQuestion('fig-garrod-c', 'metabolic-block', garrodHypothesis, 'c', ['d', 'b', 'a']),
+  spotQuestion('fig-gal-galt', 'galactosaemia', galactosaemiaFigure, 'galt', ['galk', 'gale', 'lactase']),
+  spotQuestion('fig-gal-galk', 'galactosaemia', galactosaemiaFigure, 'galk', ['galt', 'gale', 'lactase']),
+  spotQuestion('fig-gal-gal-1p', 'galactosaemia', galactosaemiaFigure, 'gal-1p', ['udpgal', 'udpglc', 'galactose']),
+];
+
+export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4, ...lesson5, ...lesson6, ...diagrams];

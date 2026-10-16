@@ -66,6 +66,7 @@ const lesson1: Draft = {
     },
     {
       title: 'Cells of connective tissue',
+      figure: 'collagen-synthesis:connective-tissue',
       kind: 'definitions',
       terms: [
         { term: 'Fibroblasts', meaning: 'The most common connective tissue cell. They secrete ground substance (hyaluronan + protein = GAGs) and the fibre proteins collagen and elastin. Specialised types include chondrocytes (cartilage) and osteocytes (bone).' },
@@ -202,6 +203,7 @@ const lesson3: Draft = {
   chunks: [
     {
       title: 'Overview of collagen synthesis',
+      figure: 'collagen-synthesis:collagen-formation',
       kind: 'pathway',
       paragraphs: ['Slide 33’s figure shows seven steps:'],
       steps: [

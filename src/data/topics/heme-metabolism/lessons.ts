@@ -468,6 +468,7 @@ const lesson5: Draft = {
     },
     {
       title: 'Lead poisoning',
+      figure: 'heme-metabolism:lead-poisoning',
       kind: 'clinical',
       paragraphs: [
         'Lead inhibits ALA dehydrase (porphobilinogen synthase) most strongly, and ferrochelatase (haem synthase) (slides 35–36). PBG synthase’s zinc-binding sites, which include cysteine sulphur ligands, can bind Pb²⁺ instead (slide 37).',
@@ -532,6 +533,7 @@ const lesson6: Draft = {
     },
     {
       title: 'Haem oxygenase',
+      figure: 'heme-metabolism:haem-breakdown',
       kind: 'mechanism',
       paragraphs: ['The first enzyme of haem breakdown is unusual in several ways (slide 3):'],
       steps: [

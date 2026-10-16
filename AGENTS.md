@@ -139,6 +139,9 @@ Database changes go in `supabase/migrations/` (the live project is `dkmossrgptfg
 
 Lecture diagrams (tappable images) are in `src/data/figures/` (one file per topic, registered in `index.ts`); the pictures are slide crops in `public/figures/<topic>/`. A reading section shows one with `figure: '<id>'` ("Explore" / "Test yourself", `src/components/learning/figure-view.tsx`); `spotQuestion()` in `src/data/topics/build.ts` makes "what is the marked part?" quiz questions (labels covered, never in Apex). `tests/figures.test.mjs` checks every image and reference.
 
+* In a lesson a diagram is a compact preview card ("Explore diagram"); the interactive diagram opens in a sheet, so diagrams never take over the reading (owner's request). Quiz diagrams are capped at 280 px tall.
+* Topics with diagrams: Cardiovascular Physiology, Upper Limb, and all eight Biochemistry topics (2026-10-16). HB2 lessons show them too (block `lfig` in `hb2-study.ts`).
+
 Progress functionality is currently in:
 
 `src/data/progress.ts`

@@ -4,7 +4,8 @@
 // labelled Guyton points). Not asked: which angiotensin stimulates the zona
 // glomerulosa (sources differ). Options are shuffled at quiz time.
 // IDs: qN-xx, N = lesson.
-import { fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { fill, match, mcq, multi, order, type QuestionDraft, spotQuestion, tf } from '@/data/topics/build';
+import { hpaAxis } from '@/data/figures/hormones-endocrine-biochemistry';
 import type { ConceptId } from '@/data/topics/hormones-endocrine-biochemistry/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -316,4 +317,13 @@ const lesson3: Q[] = [
   }),
 ];
 
-export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3];
+
+// ─── Lecture diagrams (data/figures/) ───────────────────────────────
+// "What is the marked part?" — the slide's own labels are covered.
+const diagrams: Q[] = [
+  spotQuestion('fig-hpa-crf', 'hpa-axis', hpaAxis, 'crf', ['acth', 'cortisol', 'hypothalamus']),
+  spotQuestion('fig-hpa-pituitary', 'hpa-axis', hpaAxis, 'anterior-pituitary', ['hypothalamus', 'adrenal-cortex', 'cortisol']),
+  spotQuestion('fig-hpa-acth', 'hpa-axis', hpaAxis, 'acth', ['crf', 'cortisol', 'adrenal-cortex']),
+];
+
+export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...diagrams];

@@ -7,11 +7,30 @@
 // is the lecture's own diagram. To add one: crop the slide into
 // public/figures/<topic>/, describe its spots in the topic file, list it
 // below, then set `figure` on a reading section and/or questions.
+import { figures as bloodCoagulation } from '@/data/figures/blood-coagulation-and-fibrinolysis';
 import { figures as cardiovascular } from '@/data/figures/cardiovascular-physiology';
+import { figures as cholesterol } from '@/data/figures/cholesterol-and-bile-biosynthesis';
+import { figures as collagen } from '@/data/figures/collagen-synthesis';
+import { figures as fattyAcids } from '@/data/figures/fatty-acid-biosynthesis';
+import { figures as haem } from '@/data/figures/heme-metabolism';
+import { figures as hormones } from '@/data/figures/hormones-endocrine-biochemistry';
+import { figures as inbornErrors } from '@/data/figures/inborn-errors-of-metabolism';
+import { figures as oxygenCarriers } from '@/data/figures/oxygen-carriers';
 import { figures as upperLimb } from '@/data/figures/upper-limb';
 import type { FigureSpot, LessonFigure } from '@/data/lesson-types';
 
-export const allFigures: LessonFigure[] = [...cardiovascular, ...upperLimb];
+export const allFigures: LessonFigure[] = [
+  ...cardiovascular,
+  ...upperLimb,
+  ...fattyAcids,
+  ...cholesterol,
+  ...haem,
+  ...oxygenCarriers,
+  ...bloodCoagulation,
+  ...hormones,
+  ...collagen,
+  ...inbornErrors,
+];
 
 const byId = new Map(allFigures.map((figure) => [figure.id, figure]));
 

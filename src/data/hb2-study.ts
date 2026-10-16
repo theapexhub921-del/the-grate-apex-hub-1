@@ -56,7 +56,8 @@ type Block =
   | { k: 'table'; head: string[]; rows: { c: string[] }[] }
   | { k: 'term'; name: string; def: string }
   | { k: 'box'; title: string; tone?: string; blocks: Block[] }
-  | { k: 'step'; n: string; title: string; tone?: string; blocks?: Block[] };
+  | { k: 'step'; n: string; title: string; tone?: string; blocks?: Block[] }
+  | { k: 'lfig'; id: string };
 export type LocalSection = { id: string; title: string; kicker?: string; blocks: Block[] };
 export type LocalExtras = { facts?: { h: string; lines: string[] }[] };
 
@@ -68,6 +69,7 @@ function sectionOf(chunk: LessonChunk, index: number, lesson: Lesson): LocalSect
     blocks.push({ k: 'box', title: 'What you’ll learn', tone: 'recall', blocks: [{ k: 'ul', items: lesson.objectives.map(escape) }] });
   }
   for (const paragraph of chunk.paragraphs ?? []) blocks.push({ k: 'p', x: richWithTerms(paragraph, terms, used) });
+  if (chunk.figure) blocks.push({ k: 'lfig', id: chunk.figure });
   chunk.steps?.forEach((step, n) => {
     blocks.push({ k: 'step', n: String(n + 1), title: richWithTerms(step.label, terms, used), blocks: step.detail ? [{ k: 'p', x: richWithTerms(step.detail, terms, used) }] : undefined });
   });

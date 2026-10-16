@@ -12,7 +12,8 @@
 // - Options are shuffled at quiz time (correct option written first).
 //
 // IDs: qN-xx, N = lesson.
-import { fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { fill, match, mcq, multi, order, type QuestionDraft, spotQuestion, tf } from '@/data/topics/build';
+import { haemoglobin, oxygenBindingSite } from '@/data/figures/oxygen-carriers';
 import type { ConceptId } from '@/data/topics/oxygen-carriers/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -471,4 +472,15 @@ const lesson4: Q[] = [
   }),
 ];
 
-export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4];
+
+// ─── Lecture diagrams (data/figures/) ───────────────────────────────
+// "What is the marked part?" — the slide's own labels are covered.
+const diagrams: Q[] = [
+  spotQuestion('fig-site-his-f8', 'proximal-distal-histidine', oxygenBindingSite, 'his-f8', ['his-e7', 'fe', 'heme-plane']),
+  spotQuestion('fig-site-his-e7', 'proximal-distal-histidine', oxygenBindingSite, 'his-e7', ['his-f8', 'o2', 'fe']),
+  spotQuestion('fig-site-o2', 'haem-iron', oxygenBindingSite, 'o2', ['fe', 'his-e7', 'heme-plane']),
+  spotQuestion('fig-hb-alpha', 'haemoglobin-structure', haemoglobin, 'alpha-1', ['beta-1', 'haem']),
+  spotQuestion('fig-hb-beta', 'haemoglobin-structure', haemoglobin, 'beta-1', ['alpha-1', 'haem']),
+];
+
+export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4, ...diagrams];

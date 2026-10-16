@@ -256,6 +256,7 @@ const lesson3: Draft = {
     },
     {
       title: 'Feedback control: the HPA axis',
+      figure: 'hormones-endocrine-biochemistry:hpa-axis',
       kind: 'regulation',
       paragraphs: [
         'Blood glucocorticoid levels are controlled by feedback between the hypothalamus, the pituitary and the adrenal cortex (slides 25–26). When cortisol falls, the hypothalamus secretes CRF, which stimulates the anterior pituitary to release ACTH, which stimulates the adrenal cortex to make cortisol (and corticosterone).',

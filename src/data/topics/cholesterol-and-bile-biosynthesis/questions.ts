@@ -15,7 +15,8 @@
 //   first (mcq/multi helpers).
 //
 // IDs: qN-xx, N = lesson.
-import { fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { fill, match, mcq, multi, order, type QuestionDraft, spotQuestion, tf } from '@/data/topics/build';
+import { cholesterolStructure, cholesterolSummary } from '@/data/figures/cholesterol-and-bile-biosynthesis';
 import type { ConceptId } from '@/data/topics/cholesterol-and-bile-biosynthesis/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -624,4 +625,17 @@ const lesson5: Q[] = [
   }),
 ];
 
-export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4, ...lesson5];
+
+// ─── Lecture diagrams (data/figures/) ───────────────────────────────
+// "What is the marked part?" — the slide's own labels are covered.
+const diagrams: Q[] = [
+  spotQuestion('fig-chol-ring-d', 'steroid-nucleus', cholesterolStructure, 'ring-d', ['ring-a', 'ring-b', 'ring-c']),
+  spotQuestion('fig-chol-oh', 'cholesterol-landmarks', cholesterolStructure, 'oh-c3', ['double-bond', 'side-chain', 'ring-d']),
+  spotQuestion('fig-chol-double-bond', 'cholesterol-landmarks', cholesterolStructure, 'double-bond', ['oh-c3', 'side-chain', 'ring-a']),
+  spotQuestion('fig-chol-hmgr', 'hmg-coa-reductase-step', cholesterolSummary, 'hmgr', ['hmg-coa', 'mevalonate', 'squalene']),
+  spotQuestion('fig-chol-ipp', 'mevalonate-to-ipp', cholesterolSummary, 'ipp', ['gpp', 'fpp', 'mevalonate']),
+  spotQuestion('fig-chol-fpp', 'prenyl-condensation', cholesterolSummary, 'fpp', ['gpp', 'ipp', 'squalene']),
+  spotQuestion('fig-chol-lanosterol', 'squalene-to-cholesterol', cholesterolSummary, 'lanosterol', ['squalene', 'cholesterol', 'fpp']),
+];
+
+export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4, ...lesson5, ...diagrams];

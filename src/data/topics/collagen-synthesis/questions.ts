@@ -5,7 +5,8 @@
 // formula, or how the “spastic paralysis” of slide 69 relates to collagen
 // (see discrepancies). Options are shuffled at quiz time. IDs: qN-xx,
 // N = lesson. Lessons 4–6 are in more-questions.ts.
-import { fill, match, mcq, multi, tf, type QuestionDraft } from '@/data/topics/build';
+import { fill, match, mcq, multi, type QuestionDraft, spotQuestion, tf } from '@/data/topics/build';
+import { collagenFormation, connectiveTissue } from '@/data/figures/collagen-synthesis';
 import { moreQuestions } from '@/data/topics/collagen-synthesis/more-questions';
 import type { ConceptId } from '@/data/topics/collagen-synthesis/sources';
 
@@ -312,4 +313,17 @@ const lesson3: Q[] = [
   }),
 ];
 
-export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...moreQuestions];
+
+// ─── Lecture diagrams (data/figures/) ───────────────────────────────
+// "What is the marked part?" — the slide's own labels are covered.
+const diagrams: Q[] = [
+  spotQuestion('fig-coll-step-2', 'synthesis-overview', collagenFormation, 'step-2', ['step-1', 'step-3', 'step-5']),
+  spotQuestion('fig-coll-step-5', 'procollagen-processing', collagenFormation, 'step-5', ['step-6', 'step-7', 'step-4']),
+  spotQuestion('fig-coll-step-7', 'collagen-crosslinks', collagenFormation, 'step-7', ['step-6', 'step-5', 'step-3']),
+  spotQuestion('fig-coll-tropocollagen', 'fibre-formation', collagenFormation, 'tropocollagen', ['procollagen', 'collagen-fiber', 'mature']),
+  spotQuestion('fig-ct-fibroblast', 'connective-tissue-cells', connectiveTissue, 'fibroblast', ['macrophage', 'mast-cell', 'capillary']),
+  spotQuestion('fig-ct-basal-lamina', 'matrix-adhesion', connectiveTissue, 'basal-lamina', ['epithelium', 'collagen-fiber', 'elastic-fiber']),
+  spotQuestion('fig-ct-elastic', 'elastin-distribution', connectiveTissue, 'elastic-fiber', ['collagen-fiber', 'basal-lamina', 'capillary']),
+];
+
+export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...moreQuestions, ...diagrams];

@@ -52,6 +52,7 @@ const lesson1: Draft = {
     },
     {
       title: 'Three pathways',
+      figure: 'blood-coagulation-and-fibrinolysis:three-pathways',
       kind: 'pathway',
       paragraphs: [
         'The intrinsic pathway starts when factor XII (Hageman factor) contacts an abnormal surface. XIIa — with kallikrein and kininogen — activates XI; XIa activates IX (Christmas factor); IXa, with VIIIa, phospholipid and Ca²⁺, activates X. Factor VIII enhances this step about a thousand-fold (slides 8–9, 55).',
@@ -135,6 +136,7 @@ const lesson2: Draft = {
   chunks: [
     {
       title: 'Platelets',
+      figure: 'blood-coagulation-and-fibrinolysis:platelet',
       kind: 'structure',
       paragraphs: [
         'Platelets (thrombocytes) are disk-shaped cells about 1 × 3 microns. They lack nuclei but contain mitochondria, other organelles and dense bodies. There is about one platelet for every 20 red cells, and platelets descend from megakaryocytes (slide 14).',

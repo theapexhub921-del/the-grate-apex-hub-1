@@ -738,6 +738,7 @@ const lesson8: Draft = {
     },
     {
       title: 'Around the cycle',
+      figure: 'fatty-acid-biosynthesis:pyruvate-malate-cycle',
       paragraphs: ['Following the slides and the lecture’s pathway diagram (slide 17), starting with glucose:'],
       steps: [
         { label: 'Cytosol: glucose → pyruvate', detail: 'Glycolysis. Pyruvate enters the mitochondria.' },

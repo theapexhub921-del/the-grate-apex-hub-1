@@ -112,6 +112,7 @@ const lesson2: Draft = {
   chunks: [
     {
       title: 'Two histidines',
+      figure: 'oxygen-carriers:oxygen-binding-site',
       kind: 'structure',
       paragraphs: [
         'The two polar residues inside myoglobin are histidines (slide 16). The iron is bonded directly to histidine F8 — the proximal histidine — at the fifth coordination position; the iron sits about 0.3 Å out of the haem plane, on the F8 side (slide 17).',
@@ -208,6 +209,7 @@ const lesson3: Draft = {
   chunks: [
     {
       title: 'Haemoglobin A',
+      figure: 'oxygen-carriers:haemoglobin',
       kind: 'structure',
       paragraphs: [
         'Normal adult haemoglobin A (α₂β₂) is a spherical molecule about 55 Å across, made of four polypeptide chains packed together. Its haems sit in crevices near the outside of the molecule, far apart from each other, and each α chain is in contact with both β chains (slide 24).',

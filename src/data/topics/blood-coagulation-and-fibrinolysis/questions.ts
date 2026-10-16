@@ -5,7 +5,8 @@
 // site of plasminogen synthesis (lecture-only claim), and the speaker notes.
 // Options are shuffled at quiz time (correct option written first).
 // IDs: qN-xx, N = lesson.
-import { fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { fill, match, mcq, multi, order, type QuestionDraft, spotQuestion, tf } from '@/data/topics/build';
+import { platelet, threePathways } from '@/data/figures/blood-coagulation-and-fibrinolysis';
 import { ref, type ConceptId } from '@/data/topics/blood-coagulation-and-fibrinolysis/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -438,4 +439,16 @@ const lesson4: Q[] = [
   }),
 ];
 
-export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4];
+
+// ─── Lecture diagrams (data/figures/) ───────────────────────────────
+// "What is the marked part?" — the slide's own labels are covered.
+const diagrams: Q[] = [
+  spotQuestion('fig-path-intrinsic', 'intrinsic-extrinsic', threePathways, 'intrinsic', ['extrinsic', 'common', 'fibrin-clot']),
+  spotQuestion('fig-path-extrinsic', 'intrinsic-extrinsic', threePathways, 'extrinsic', ['intrinsic', 'common', 'fibrin-clot']),
+  spotQuestion('fig-path-common', 'intrinsic-extrinsic', threePathways, 'common', ['intrinsic', 'extrinsic', 'fibrin-clot']),
+  spotQuestion('fig-plt-dense', 'platelets', platelet, 'dense-granule', ['alpha-granule', 'lysosomal', 'mitochondrion']),
+  spotQuestion('fig-plt-alpha', 'platelets', platelet, 'alpha-granule', ['dense-granule', 'lysosomal', 'glycogen']),
+  spotQuestion('fig-plt-ocs', 'platelets', platelet, 'ocs', ['dts', 'microtubules', 'mitochondrion']),
+];
+
+export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4, ...diagrams];

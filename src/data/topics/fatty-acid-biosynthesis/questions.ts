@@ -19,7 +19,8 @@
 //
 // IDs: qN-xx = written for the bank; iN-xx = moved here from the old
 // learn-by-answering layer (IDs kept so answer history still counts).
-import type { QuestionDraft } from '@/data/topics/build';
+import { spotQuestion, type QuestionDraft } from '@/data/topics/build';
+import { pyruvateMalateCycle } from '@/data/figures/fatty-acid-biosynthesis';
 import type { ConceptId } from '@/data/topics/fatty-acid-biosynthesis/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -1414,6 +1415,16 @@ const lesson8: Q[] = [
   },
 ];
 
+
+// ─── Lecture diagrams (data/figures/) ───────────────────────────────
+// "What is the marked part?" — the slide's own labels are covered.
+const diagrams: Q[] = [
+  spotQuestion('fig-pmc-atp-citrate-lyase', 'citrate-cleavage', pyruvateMalateCycle, 'atp-citrate-lyase', ['malic-enzyme', 'malate-dh', 'citrate-synthase']),
+  spotQuestion('fig-pmc-malic-enzyme', 'malic-enzyme', pyruvateMalateCycle, 'malic-enzyme', ['malate-dh', 'atp-citrate-lyase', 'pyruvate-carboxylase']),
+  spotQuestion('fig-pmc-pyruvate-carboxylase', 'cycle-return', pyruvateMalateCycle, 'pyruvate-carboxylase', ['pdh', 'citrate-synthase', 'malic-enzyme']),
+  spotQuestion('fig-pmc-citrate-synthase', 'citrate-export', pyruvateMalateCycle, 'citrate-synthase', ['pyruvate-carboxylase', 'atp-citrate-lyase', 'malate-dh']),
+];
+
 export const questions: Q[] = [
   ...lesson1,
   ...lesson2,
@@ -1423,4 +1434,5 @@ export const questions: Q[] = [
   ...lesson6,
   ...lesson7,
   ...lesson8,
+  ...diagrams
 ];

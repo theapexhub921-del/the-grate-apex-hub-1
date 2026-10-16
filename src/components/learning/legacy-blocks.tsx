@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { FigureExplorer } from '@/components/learning/figure-view';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { SvgXml } from 'react-native-svg';
@@ -214,6 +215,8 @@ export function LegacyBlocks({ blocks }: { blocks: readonly Block[] }) {
             );
           case 'fig':
             return <Figure key={i} block={b} />;
+          case 'lfig':
+            return <FigureExplorer key={i} figureId={b.id} />;
           default:
             return null;
         }
