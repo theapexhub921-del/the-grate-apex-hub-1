@@ -75,15 +75,12 @@ Build every learn-flow link with `src/lib/routes.ts` (it never produces `undefin
 
 ## Authentication and onboarding
 
-Everything uses the existing Supabase auth (`src/lib/supabase.ts`, `src/hooks/use-auth.tsx`). Do not add a second auth system.
+Everything uses Firebase Auth (`src/lib/firebase.ts`, `src/lib/firebase-auth.ts`, `src/hooks/use-auth.tsx`). Do not add a second auth system.
 
-* **Create account:** `supabase.auth.signUp`, with the learner's name in the user metadata.
-  * If email confirmation is on in Supabase, the learner sees "Check your email" (with a resend option).
-  * If it is off, they are signed in straight away.
+* **Create account:** Firebase Auth `createUserWithEmailAndPassword`, with the learner's name saved to their user profile.
 * **Continue with Google:** `src/lib/google-auth.ts`.
-  * On the web it first checks that the Google provider is switched on, then leaves for Google and returns to `/login`.
+  * On the web it handles Google sign-in via Firebase popup/redirect.
   * On phones it uses `expo-web-browser`.
-  * A cancelled or failed Google sign-in is explained on the sign-in page, never as an expired reset link.
 * **Route guard:** `AppGuard` in `src/app/_layout.tsx`.
   * Signed-out users go to `/login`.
   * Password-recovery links stay on `/login`.
@@ -126,16 +123,14 @@ The learning engine is in `src/data/learning/`:
 
 Question history and quiz attempts are in `src/data/question-history.ts` and `src/data/quiz-history.ts`.
 
-Social (real friends) is in `src/data/social.ts`, backed by `supabase/migrations/20261005000000_social.sql`:
+Social (real friends) is in `src/data/social.ts`, backed by Firestore:
 
-* Usernames, learner search, friend requests (one row per pair in `friendships`) and social notifications (`notifications`, shown in the bell).
-* Every action goes through a `SECURITY DEFINER` function that uses `auth.uid()`; clients cannot read other learners' rows or write friendships, notifications or XP directly.
-* XP awards are capped at 150 per event on the server, and `user_learning_stats.total_xp` can only change through the XP functions.
-* The store refreshes over Supabase Realtime and clears on sign-out.
+* Usernames, learner search, friend requests, and social notifications.
+* Realtime sync through Firestore snapshot listeners.
 
 "Stump a friend" (`src/data/stumps.ts`, `src/components/social/stump-card.tsx`): from quiz results, a multiple-choice question is shared to the feed as a post with `stump: { qid, note }`; friends answer on the card (answers are hidden `replies` with `stump: { pick, ok }`, saved to question history as practice, no XP). Only the sharer sees who got it right or wrong; others see only their own result. Works with the deployed Firestore rules unchanged.
 
-Database changes go in `supabase/migrations/` (the live project is `dkmossrgptfgutkqefws`); apply them only with the owner's approval.
+Database changes use Firestore rules in `firestore.rules`. Deploy them only with the owner's approval.
 
 Lecture diagrams (tappable images) are in `src/data/figures/` (one file per topic, registered in `index.ts`); the pictures are slide crops in `public/figures/<topic>/`. A reading section shows one with `figure: '<id>'` ("Explore" / "Test yourself", `src/components/learning/figure-view.tsx`); `spotQuestion()` in `src/data/topics/build.ts` makes "what is the marked part?" quiz questions (labels covered, never in Apex). `tests/figures.test.mjs` checks every image and reference.
 
@@ -185,7 +180,7 @@ XP itself is never transferable; Apex Coins and XP boosts are, between friends (
 
 ## Stories (Instagram-style)
 
-Stories live in `users/{uid}/stories` (rules already allow them; nothing to deploy). The data is in `src/data/community.ts` (`listLiveStories`, `createCommunityStory`, `STORY_BACKGROUNDS`), the strip of rings and the composer are in `src/components/social/supabase-social-feed.tsx`, and the full-screen viewer is `src/components/social/story-viewer.tsx`.
+Stories live in `users/{uid}/stories` (rules already allow them; nothing to deploy). The data is in `src/data/community.ts` (`listLiveStories`, `createCommunityStory`, `STORY_BACKGROUNDS`), the strip of rings and the composer are in `src/components/social/social-activity-feed.tsx`, and the full-screen viewer is `src/components/social/story-viewer.tsx`.
 
 * Tap right / left for next / previous, hold to pause, swipe sideways to change person, swipe down to close; it carries on to the next person; arrow keys, Space and Esc work on the web.
 * A photo's timer waits until it has loaded. Web videos drive their own progress bar; on phones a video shows its still frame for 15 seconds.

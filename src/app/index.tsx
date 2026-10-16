@@ -5,7 +5,7 @@ import { Text } from '@/components/ui/text';
 import { ApexCoinButton } from '@/components/apex-coin-button';
 import { ContinueWhereYouLeftOff } from '@/components/learning/quiz-in-progress-card';
 import { LogoMark } from '@/components/logo-mark';
-import { SocialActivityFeed } from '@/components/social/supabase-social-feed';
+import { SocialActivityFeed } from '@/components/social/social-activity-feed';
 import { CommunityPostsFeed } from '@/components/social/community-posts-feed';
 import { FeedSideRail } from '@/components/social/feed-side-rail';
 import { NotificationBell } from '@/components/notifications';

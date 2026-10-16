@@ -374,5 +374,3 @@ function createStyles(colors: ThemeColors) {
     errorText: { ...Type.caption, color: colors.error },
   });
 }
-
-export const SupabaseSocialFeed = SocialActivityFeed;

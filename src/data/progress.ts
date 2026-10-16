@@ -28,7 +28,7 @@ import { grantPowerup } from '@/data/learning/powerups';
 import { triggerStreakCelebration } from '@/components/streak-celebration';
 
 // XP, level, streak and completed lessons — persisted with AsyncStorage
-// (account-scoped) and synced to Supabase.
+// (account-scoped) and synced with cloud progress.
 //
 // Lesson completion:
 //   1. prevents duplicate XP for an already completed lesson
@@ -40,9 +40,8 @@ import { triggerStreakCelebration } from '@/components/streak-celebration';
 //
 // XP is kept with a small ledger of recent awards so every reward is
 // one-off per source and the results screen can show what was earned or
-// lost. Penalties (negative XP) cannot be stored by the current Supabase
-// schema; they stay queued locally (`pendingPenalty`) until the
-// migration in supabase/migrations adds the adjustment function.
+// lost. Penalties (negative XP) stay queued locally (`pendingPenalty`)
+// until synced.
 
 type Subject = SubjectId;
 
@@ -182,8 +181,8 @@ async function loadProgress() {
     }
 
     // Hydration and upload are background work: local progress remains
-    // usable immediately if Supabase is slow or unavailable.
-    const sync = syncProgressWithSupabase(hasLocalProgress);
+    // usable immediately if cloud sync is slow or unavailable.
+    const sync = syncProgressWithCloud(hasLocalProgress);
     progressSyncPromise = sync;
     void sync.then(
       () => { if (progressSyncPromise === sync) progressSyncPromise = null; },
@@ -191,7 +190,7 @@ async function loadProgress() {
     );
   } catch (error) {
     console.log('Could not load progress:', error);
-    const sync = syncProgressWithSupabase(false);
+    const sync = syncProgressWithCloud(false);
     progressSyncPromise = sync;
     void sync.then(
       () => { if (progressSyncPromise === sync) progressSyncPromise = null; },
@@ -218,7 +217,7 @@ function cloudLessonRows() {
   }));
 }
 
-async function syncProgressWithSupabase(hasLocalProgress: boolean) {
+async function syncProgressWithCloud(hasLocalProgress: boolean) {
   const requestedUserId = await getAuthenticatedLearningUserId();
   if (!requestedUserId) return;
   const remote = await loadCloudProgress();
@@ -248,8 +247,6 @@ async function syncProgressWithSupabase(hasLocalProgress: boolean) {
   }
   progress.lessonsCompleted = progress.completedLessons.length;
 
-  // Supabase cannot hold penalties yet, so its total is higher by the
-  // pending penalty; subtract it before taking the larger total.
   const remoteXp = Math.max(0, (remote.stats?.total_xp ?? 0) - progress.pendingPenalty);
   progress.xp = Math.max(progress.xp, remoteXp);
   progress.level = levelFor(progress.xp);
@@ -305,7 +302,7 @@ async function repairStreakFromHistory() {
 /** Retry the local-first progress sync after a connection is restored. */
 export async function syncLearningProgress() {
   await ensureProgressLoaded();
-  await syncProgressWithSupabase(true);
+  await syncProgressWithCloud(true);
 }
 
 async function flushPendingPenalty() {

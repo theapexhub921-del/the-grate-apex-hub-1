@@ -7,7 +7,7 @@ import { getCurrentProfile, updateCurrentProfile } from '@/lib/profiles';
 
 // The student's display name and avatar.
 //
-// Supabase is the persistent source of truth for authenticated users.
+// The cloud profile is the persistent source of truth for authenticated users.
 // AsyncStorage ('grateapex_user') is used as a fast local cache for startup
 // and offline fallback.
 
@@ -48,13 +48,13 @@ export async function getAvatarUrl(): Promise<string | null> {
 }
 
 /**
- * Synchronizes the local user cache with the authenticated Supabase profile.
- * - If Supabase has a profile with display_name, uses it.
- * - If Supabase has a profile with no display_name yet, but a local display_name
- *   exists, migrates that local display_name to Supabase.
+ * Synchronizes the local user cache with the authenticated profile.
+ * - If the profile has display_name, uses it.
+ * - If the profile has no display_name yet, but a local display_name
+ *   exists, migrates that local display_name to the profile.
  * - Preserves local cache if unauthenticated, offline, or on request failure.
  */
-export async function syncProfileWithSupabase(): Promise<void> {
+export async function syncProfileWithCloud(): Promise<void> {
   if (syncPromise) return syncPromise;
 
   syncPromise = (async () => {
@@ -68,7 +68,7 @@ export async function syncProfileWithSupabase(): Promise<void> {
       let resolvedName = profile.display_name?.trim() || null;
       const resolvedAvatar = profile.avatar_url?.trim() || null;
 
-      // Safe migration: user has a local name, but Supabase profile has no name yet.
+      // Safe migration: user has a local name, but profile has no name yet.
       if (!resolvedName && cachedName) {
         resolvedName = cachedName;
         void updateCurrentProfile({ display_name: resolvedName });
@@ -87,7 +87,7 @@ export async function syncProfileWithSupabase(): Promise<void> {
       );
     } catch (err) {
       // Keep local state on network/backend failure
-      console.warn('Failed to sync user profile with Supabase:', err);
+      console.warn('Failed to sync user profile:', err);
     } finally {
       syncPromise = null;
     }
@@ -95,6 +95,8 @@ export async function syncProfileWithSupabase(): Promise<void> {
 
   return syncPromise;
 }
+
+export const syncProfileWithSupabase = syncProfileWithCloud;
 
 function ensureLoaded() {
   if (!loadPromise) {
@@ -140,16 +142,16 @@ export async function setDisplayName(name: string) {
     })
   );
 
-  // 2. Persist to Supabase if authenticated
+  // 2. Persist to cloud if authenticated
   try {
     const { error } = await updateCurrentProfile({
       display_name: cachedName,
     });
     if (error) {
-      console.warn('Could not persist display name to Supabase:', error.message);
+      console.warn('Could not persist display name:', error.message);
     }
   } catch (err) {
-    console.warn('Network error saving display name to Supabase:', err);
+    console.warn('Network error saving display name:', err);
   }
 }
 
@@ -167,16 +169,16 @@ export async function setAvatarUrl(url: string | null) {
     })
   );
 
-  // 2. Persist to Supabase if authenticated
+  // 2. Persist to cloud if authenticated
   try {
     const { error } = await updateCurrentProfile({
       avatar_url: cachedAvatar,
     });
     if (error) {
-      console.warn('Could not persist avatar URL to Supabase:', error.message);
+      console.warn('Could not persist avatar URL:', error.message);
     }
   } catch (err) {
-    console.warn('Network error saving avatar URL to Supabase:', err);
+    console.warn('Network error saving avatar URL:', err);
   }
 }
 

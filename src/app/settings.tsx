@@ -199,12 +199,7 @@ export default function SettingsScreen() {
       setResetProgressOpen(false);
       setResetProgressDone(true);
     } catch (error) {
-      const code = typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
-      if (code === 'PGRST202' || code === '42883') {
-        setResetProgressError('Apply Supabase migration 20261007100000_reset_learning_progress.sql, then try again.');
-      } else {
-        setResetProgressError(error instanceof Error ? error.message : 'Could not reset progress. Please try again.');
-      }
+      setResetProgressError(error instanceof Error ? error.message : 'Could not reset progress. Please try again.');
     } finally {
       setResettingProgress(false);
     }

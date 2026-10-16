@@ -40,7 +40,7 @@ Lecture material lives in `content/<SUBJECT>/` and serves as the single source o
 
 - **Streak & Progression**:
   - Daily streak tracking with animated breathing flame widgets, celebration modals, and milestone boosts.
-  - Persistent progress with AsyncStorage and Supabase sync (XP, levels, masteries, streak freezes, and coin recovery).
+  - Persistent progress with AsyncStorage and cloud sync (XP, levels, masteries, streak freezes, and coin recovery).
 
 - **Social & Collaborative Study**:
   - Real learner profiles, friend connections, and activity feeds.
@@ -104,20 +104,19 @@ GRATEAPEX/
 │   ├── data/                    # Curriculum models, learning engine, progress stores
 │   │   ├── topics/              # Topic content definitions (lessons, questions, diagrams)
 │   │   └── learning/            # Spaced repetition, memory, selection, XP rules
-│   └── lib/                     # Supabase client, routing utilities, AI study API
-└── supabase/
-    └── migrations/              # SQL migrations for auth, stats, and social tables
+│   └── lib/                     # Firebase client, routing utilities, AI study API
 ```
 
 ---
 
 ## 🔒 Environment & Configuration
 
-Supabase and API configurations are read from `.env` in the project root:
+Firebase and API configurations are read from `.env` in the project root:
 
 ```env
-EXPO_PUBLIC_SUPABASE_URL=...
-EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+EXPO_PUBLIC_FIREBASE_API_KEY=...
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
 ```
 
 *Never commit `.env` or paste secret API keys directly into client source code.*
