@@ -13,6 +13,7 @@ import { IconButton } from '@/components/ui/icon-button';
 import { Screen } from '@/components/ui/screen';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { useThemedStyles } from '@/hooks/use-theme';
+import { StreakWidgetCompact } from '@/components/streak-widget';
 
 // Feed is the social front door: people's stories and posts. Course progress,
 // planning and review live in Study; rank and goals in You.
@@ -35,6 +36,8 @@ export default function HomeScreen() {
       </View>
 
       <ContinueWhereYouLeftOff />
+
+      <StreakWidgetCompact />
 
       {/* Feed is people's posts: stories and community posts only. Rank is in
           You, "Your week" in Study, personal goals in Study and You. */}

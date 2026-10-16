@@ -25,6 +25,7 @@ import type { XpBreakdown } from '@/data/learning/xp-rules';
 import { getStreakStatus } from '@/data/progression';
 import { recordStreakActivityWithFreeze } from '@/data/community';
 import { grantPowerup } from '@/data/learning/powerups';
+import { triggerStreakCelebration } from '@/components/streak-celebration';
 
 // XP, level, streak and completed lessons — persisted with AsyncStorage
 // (account-scoped) and synced to Supabase.
@@ -375,12 +376,15 @@ export function useProgress() {
 // Any study activity today keeps (or starts) the streak. Local dates.
 async function updateStreak(now = Date.now()) {
   const previous = progress.streak;
+  const prevDate = progress.lastActivityDate;
   try {
     const serverStreak = await recordStreakActivityWithFreeze(now);
     if (serverStreak > 0) {
+      const grew = serverStreak > previous || !prevDate || prevDate !== dayKey(now);
       progress.streak = serverStreak;
       progress.lastActivityDate = dayKey(now);
       await awardStreakPowerups(previous, progress.streak);
+      if (grew) triggerStreakCelebration({ streak: progress.streak, isNew: serverStreak > previous });
       return;
     }
   } catch {
@@ -390,6 +394,7 @@ async function updateStreak(now = Date.now()) {
   if (!progress.lastActivityDate) {
     progress.streak = 1;
     progress.lastActivityDate = today;
+    triggerStreakCelebration({ streak: 1, isNew: true });
     return;
   }
   if (progress.lastActivityDate === today) return;
@@ -400,9 +405,11 @@ async function updateStreak(now = Date.now()) {
   yesterday.setHours(0, 0, 0, 0);
   yesterday.setDate(yesterday.getDate() - 1);
 
-  progress.streak = last === yesterday.getTime() ? progress.streak + 1 : 1;
+  const newStreak = last === yesterday.getTime() ? progress.streak + 1 : 1;
+  progress.streak = newStreak;
   progress.lastActivityDate = today;
   await awardStreakPowerups(previous, progress.streak);
+  triggerStreakCelebration({ streak: progress.streak, isNew: true });
 }
 
 const STREAK_POWERUPS = [

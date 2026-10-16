@@ -16,6 +16,7 @@ import { ExperienceSync } from '@/components/experience/experience-sync';
 import { LearningSync } from '@/components/learning/learning-sync';
 import { DeviceNotificationBridge } from '@/components/notifications';
 import { PageTitle } from '@/components/page-title';
+import { StreakCelebrationWatcher } from '@/components/streak-celebration-watcher';
 import { EXPERIENCES_ENABLED, needsExperience } from '@/data/experience';
 import { needsOnboarding, useOnboardingState } from '@/data/onboarding';
 import { useFontSizePreference, usePageZoomPreference } from '@/data/settings';
@@ -187,6 +188,7 @@ export default function TabLayout() {
               <NotificationPrompt />
               <AchievementWatcher />
               <DeviceNotificationBridge />
+              <StreakCelebrationWatcher />
             </AppGuard>
           ) : (
             // Pre-rendered web HTML: just the shell and the page title, so

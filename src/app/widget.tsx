@@ -12,6 +12,7 @@ import { useProgress } from '@/data/progress';
 import { getRankProgress } from '@/data/ranks';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { routes } from '@/lib/routes';
+import { StreakWidgetFull } from '@/components/streak-widget';
 
 export default function StudyWidgetScreen() {
   const styles = useThemedStyles(createStyles);
@@ -37,14 +38,13 @@ export default function StudyWidgetScreen() {
         </View>
       </View>
 
+      {/* Animated streak widget */}
+      <StreakWidgetFull />
+
       <Card style={styles.progressCard}>
         <Text style={styles.eyebrow}>YOUR PROGRESS</Text>
         <Text style={styles.rank}>{rank?.rank.name ?? 'Fresher'}</Text>
         <View style={styles.metricGrid}>
-          <View style={styles.metric}>
-            <Text style={styles.metricValue}>{progress.streak}</Text>
-            <Text style={styles.metricLabel}>DAY STREAK</Text>
-          </View>
           <View style={styles.metric}>
             <Text style={styles.metricValue}>{progress.xp.toLocaleString()}</Text>
             <Text style={styles.metricLabel}>TOTAL XP</Text>
@@ -56,7 +56,7 @@ export default function StudyWidgetScreen() {
         </View>
         <View style={styles.levelRow}>
           <Text style={styles.levelLabel}>Level {progress.level}</Text>
-          <Text style={styles.levelHint}>{progress.streak > 0 ? 'Keep your learning streak going.' : 'Start a study streak today.'}</Text>
+          <Text style={styles.levelHint}>{progress.xp.toLocaleString()} total XP</Text>
         </View>
       </Card>
 
