@@ -49,14 +49,17 @@ type ListRowProps = {
   accessibilityLabel?: string;
   /** Replaces the chevron (e.g. a switch); pass null for none. */
   trailing?: ReactNode | null;
+  /** A picture at the start of the row (a course's image). */
+  leading?: ReactNode;
 };
 
 /** One row: title, optional detail, a short value on the right and a chevron when it opens something. */
-export function ListRow({ title, detail, meta, metaTone = 'default', progress, progressLabel, onPress, disabled, disabledReason, accessibilityLabel, trailing }: ListRowProps) {
+export function ListRow({ title, detail, meta, metaTone = 'default', progress, progressLabel, onPress, disabled, disabledReason, accessibilityLabel, trailing, leading }: ListRowProps) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const body = (
     <>
+      {leading}
       <View style={styles.text}>
         <Text style={[styles.title, disabled && styles.titleOff]} numberOfLines={1}>
           {title}

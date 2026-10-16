@@ -84,6 +84,16 @@ action; a question being answered). Otherwise use:
 Never put a card inside a card. "Coming soon" features are a line of text in
 the list they belong to, not a card of their own.
 
+Owner's choices that override the general rules above (2026-10-16):
+
+- Study keeps every section The Originals has: courses (with their
+  pictures), question of the day, the practise-and-plan tiles, "Your learning
+  this week", current rank, personal goals and the week calendar. They are
+  drawn as flat bordered cards; tiles show their icon on its own, without a
+  tinted square.
+- Courses keep their original pictures (bone, lungs, test tube…) — the one
+  place emoji appear.
+
 ## Icons
 
 One family: the GRATEAPEX line icons (`src/components/ui/icon.tsx`), 1.8px
@@ -139,6 +149,7 @@ action within thumb reach, and nothing that only works on hover.
   `src/components/ui/text.tsx`.
 - Primitives that switch to these rules in Originate: `Card`, `PressableCard`,
   `Button`, `IconButton`, `Pill`, `SegmentedControl`, `Sheet`, `PageHeader`,
-  `SectionHeader`, `TileGrid`, `ListRow` (new), state views.
-- Shell: `components/atmosphere/` (plain page), `floating-tab-bar.tsx`
-  (docked bar), `desktop-sidebar.tsx` (flat rail).
+  `SectionHeader`, `TileGrid`, `List` / `ListRow` (new), state views.
+- Shell: `components/atmosphere/` (plain page) and `floating-tab-bar.tsx`
+  (docked bar on phones and tablets). The desktop sidebar keeps its own design
+  and is not restyled (owner's choice).

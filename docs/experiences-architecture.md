@@ -16,9 +16,8 @@ What each one is (owner's definition):
   (`docs/design-system.md`, adopted 2026-10-16): IBM Plex Sans with Source
   Serif 4 for lesson text, a restrained palette, plain page backgrounds, flat
   bordered cards only where grouping helps, lists as rows, one primary action
-  per screen, and a docked tab bar on phones. It is the **recommended**
-  experience (listed first and preselected in the chooser;
-  `RECOMMENDED_EXPERIENCE` in `src/data/experience.ts`).
+  per screen, and a docked tab bar on phones (Study stays a raised round
+  button). The desktop sidebar is unchanged (owner's choice).
 - **Hybrid** — one blended interface: this app's layouts, navigation, icons and
   motion with the original gradient background (with this app's drawn motifs),
   frosted glass panels, gradient pill buttons for main actions, the original

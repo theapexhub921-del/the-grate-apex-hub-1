@@ -34,8 +34,8 @@ export function LegacyCourseList({ courses, selection, headerRight }: { courses:
   }, []);
   const completed = useMemo(() => new Set(progress.completedLessons), [progress.completedLessons]);
 
-  // Originate: one row per course — name, what it covers, lessons done and a
-  // thin progress line. No emoji tiles (docs/design-system.md).
+  // Originate: one row per course — its picture, name, what it covers, lessons
+  // done and a thin progress line.
   if (originate) {
     const needsList = courses.some((course) => !course.subject);
     return (
@@ -50,6 +50,7 @@ export function LegacyCourseList({ courses, selection, headerRight }: { courses:
             return (
               <ListRow
                 key={course.id}
+                leading={<LegacyCourseTile course={course} size={44} />}
                 title={course.name}
                 detail={course.desc}
                 meta={loading ? 'Loading' : own.length ? `${done} of ${own.length} lessons` : 'No lessons yet'}

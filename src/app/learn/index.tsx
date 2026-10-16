@@ -22,7 +22,6 @@ import { TopicCard } from '@/components/learning/topic-card';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Card, Interactive, PressableCard } from '@/components/ui/interactive';
-import { List, ListRow } from '@/components/ui/list';
 import { Pill } from '@/components/ui/pill';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { Columns, PageHeader, Screen, SectionHeader } from '@/components/ui/screen';
@@ -32,7 +31,6 @@ import { contentTopics } from '@/data/content-catalog';
 import { getNextActions } from '@/data/learning/next-action';
 import { curriculumProgress, subjectProgress } from '@/data/learning/progress-model';
 import { useLearning } from '@/data/learning/use-learning';
-import { getRankProgress } from '@/data/ranks';
 import { useDisplayName } from '@/data/user';
 import { getSubjectStatus, getSubjectStatusLabel, subjects } from '@/data/subjects';
 import { useAuth } from '@/hooks/use-auth';
@@ -311,7 +309,11 @@ export default function LearnScreen() {
   );
   const studyHub = (
     <View style={styles.column}>
-      <Columns main={<LegacyCourseList courses={legacyCourses} selection={viewing as ClassSelection} />} side={<QuestionOfTheDay />} sideWidth={440} />
+      <Columns
+        main={<LegacyCourseList courses={legacyCourses} selection={viewing as ClassSelection} headerRight={originate && !browseOpen ? <Button label="Other classes" variant="ghost" size="sm" onPress={() => setBrowseOpen(true)} /> : undefined} />}
+        side={<QuestionOfTheDay />}
+        sideWidth={440}
+      />
       <SectionHeader title="Practise and plan" subtitle="Ways to practise beyond the lessons, and your week." style={styles.hubSection} />
       <TileGrid columns={4} tiles={studyTiles} />
       <SectionHeader title="Your progress" subtitle="Your rank, this week and your goals." style={styles.hubSection} />
@@ -374,12 +376,12 @@ export default function LearnScreen() {
     </Card>
   ) : null;
 
-  // Originate (docs/design-system.md): one heading, one primary action (the
-  // engine's next step), then the courses and practice tools as lists. Rank,
-  // this week and goals are one line each; their detail lives on Progress.
+  // Originate (docs/design-system.md): one heading and one primary action (the
+  // engine's next step), then the same Study sections as The Originals —
+  // courses, question of the day, practise and plan, your progress and your
+  // week — drawn in Originate's style.
   if (originate && viewing && !blockedSelection && legacyCourses.length > 0) {
     const next = viewingOwnClass && actions[0]?.kind !== 'explore-learn' ? actions[0] : undefined;
-    const rank = getRankProgress(progress.xp);
     const name = displayName?.trim();
     const streakText = progress.streak > 0 ? `${progress.streak}-day streak` : 'No streak yet';
     return (
@@ -407,37 +409,7 @@ export default function LearnScreen() {
 
         {browsePanel ? <View style={styles.oBrowse}>{browsePanel}</View> : null}
 
-        <Columns
-          sideWidth={380}
-          gap={40}
-          main={(
-            <View style={styles.oColumn}>
-              <LegacyCourseList
-                courses={legacyCourses}
-                selection={viewing as ClassSelection}
-                headerRight={browseOpen ? null : <Button label="Other classes" variant="ghost" size="sm" onPress={() => setBrowseOpen(true)} />}
-              />
-              <View>
-                <SectionHeader title="Practise" subtitle="Beyond the lessons." />
-                <TileGrid tiles={studyTiles} />
-              </View>
-            </View>
-          )}
-          side={(
-            <View style={styles.oColumn}>
-              <QuestionOfTheDay />
-              <View>
-                <SectionHeader title="Progress" />
-                <List>
-                  <ListRow title="Rank" detail={rank ? rank.rank.name : undefined} meta={`${progress.xp.toLocaleString()} XP`} onPress={() => router.push(routes.progress())} />
-                  <ListRow title="This week" meta={`${lessonsThisWeek} lesson${lessonsThisWeek === 1 ? '' : 's'} · ${reviewsThisWeek} review${reviewsThisWeek === 1 ? '' : 's'}`} onPress={() => router.push(routes.progress())} />
-                  <ListRow title="Personal goals" onPress={() => router.push('/goals' as never)} />
-                </List>
-              </View>
-              {reviewCalendar}
-            </View>
-          )}
-        />
+        {studyHub}
       </Screen>
     );
   }
@@ -561,7 +533,6 @@ function createStyles(colors: ThemeColors) {
     oHeader: { marginBottom: 0 },
     oActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 },
     oBrowse: { marginBottom: 28 },
-    oColumn: { gap: 32 },
     oChoice: { borderRadius: 8, borderWidth: 1, borderColor: colors.border, backgroundColor: 'transparent' },
     reviewTitle: { ...Type.title2, fontSize: 20, color: colors.text },
     reviewText: { fontSize: 13, lineHeight: 19, color: colors.textSecondary },

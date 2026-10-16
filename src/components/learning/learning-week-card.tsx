@@ -10,6 +10,7 @@ import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { addDays, startOfDay } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // Study → "Your learning this week": lessons, answers, XP and streak for the
@@ -95,8 +96,9 @@ function Stat({ icon, value, label }: { icon: IconName; value: number; label: st
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const gold = icon === 'xp' || icon === 'streak';
+  const originate = useExperience() === 'originate';
   return (
-    <View style={styles.stat}>
+    <View style={[styles.stat, originate && styles.statFlat]}>
       <Icon name={icon} size={15} color={gold ? colors.accentText : colors.primaryText} filled={gold} />
       <AnimatedNumber value={value} style={styles.value} />
       <Text style={styles.statLabel} numberOfLines={1}>{label}</Text>
@@ -112,6 +114,7 @@ function createStyles(colors: ThemeColors) {
     note: { fontSize: 12.5, lineHeight: 18, color: colors.textSecondary },
     stats: { flexDirection: 'row', gap: 8 },
     stat: { flex: 1, minWidth: 0, gap: 4, paddingVertical: 10, paddingHorizontal: 8, borderRadius: 14, backgroundColor: colors.surfaceMuted },
+    statFlat: { borderRadius: 8 },
     value: { ...Type.numeral, fontSize: 20, color: colors.text },
     statLabel: { fontSize: 11, fontWeight: '700', color: colors.textSecondary },
     chart: { height: 116, gap: 6 },

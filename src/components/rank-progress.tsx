@@ -3,10 +3,12 @@ import { Text } from '@/components/ui/text';
 
 import { AnimatedNumber } from '@/components/ui/animated-number';
 import { Icon } from '@/components/ui/icon';
+import { Card } from '@/components/ui/interactive';
 import { ProgressRing } from '@/components/ui/progress-ring';
 import { elevation, Radius, Type, type ThemeColors } from '@/constants/theme';
 import { getLevelProgress } from '@/data/progression';
 import { getRankProgress } from '@/data/ranks';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 /**
@@ -24,6 +26,8 @@ export function RankProgressCard({ lifetimeXp, style }: { lifetimeXp: number; st
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const rank = getRankProgress(lifetimeXp);
+  // Originate draws it as its standard card (flat, one border).
+  const originate = useExperience() === 'originate';
 
   if (!rank) {
     return null;
@@ -32,8 +36,8 @@ export function RankProgressCard({ lifetimeXp, style }: { lifetimeXp: number; st
   const level = getLevelProgress(lifetimeXp);
   const percent = rank.percentToNextRank ?? 100;
 
-  return (
-    <View style={[styles.card, style]}>
+  const body = (
+    <>
       <View style={styles.row}>
         <ProgressRing
           value={percent / 100}
@@ -72,8 +76,9 @@ export function RankProgressCard({ lifetimeXp, style }: { lifetimeXp: number; st
           </Text>
         </View>
       )}
-    </View>
+    </>
   );
+  return originate ? <Card style={[styles.cardGap, style]}>{body}</Card> : <View style={[styles.card, style]}>{body}</View>;
 }
 
 function createStyles(colors: ThemeColors) {
@@ -87,6 +92,7 @@ function createStyles(colors: ThemeColors) {
       gap: 14,
       ...elevation(colors, 1),
     },
+    cardGap: { gap: 14 },
     row: { flexDirection: 'row', alignItems: 'center', gap: 16 },
     text: { flex: 1, minWidth: 0 },
     eyebrow: { ...Type.overline, color: colors.textTertiary, marginBottom: 3 },

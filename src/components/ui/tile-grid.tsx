@@ -2,7 +2,6 @@ import { StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/icon';
 import { PressableCard } from '@/components/ui/interactive';
-import { List, ListRow } from '@/components/ui/list';
 import { Pill } from '@/components/ui/pill';
 import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
@@ -20,25 +19,14 @@ const rows = <T,>(items: readonly T[], size: number) => Array.from({ length: Mat
  * screens show fewer.
  */
 export function TileGrid({ tiles, columns = 2 }: { tiles: readonly Tile[]; columns?: number }) {
-  // Originate: the same tools as a list of rows (docs/design-system.md: lists
-  // of the same kind of thing are rows, not cards; no decorative icons).
-  const originate = useExperience() === 'originate';
-  if (originate) return <TileList tiles={tiles} />;
   return <TileCards tiles={tiles} columns={columns} />;
-}
-
-function TileList({ tiles }: { tiles: readonly Tile[] }) {
-  return (
-    <List>
-      {tiles.filter((tile) => !tile.hidden).map((tile) => (
-        <ListRow key={tile.id} title={tile.title} detail={tile.detail} meta={tile.badge} metaTone={tile.badge ? 'attention' : 'default'} onPress={tile.onPress} disabled={tile.disabled} disabledReason={tile.disabled ? tile.detail : undefined} />
-      ))}
-    </List>
-  );
 }
 
 function TileCards({ tiles, columns }: { tiles: readonly Tile[]; columns: number }) {
   const styles = useThemedStyles(createStyles);
+  // Originate: the same tiles as flat bordered cards; the icon sits on its own
+  // in the brand colour instead of in a tinted square.
+  const originate = useExperience() === 'originate';
   const colors = useTheme();
   const { width } = useWindowDimensions();
   const perRow = width < 640 ? 1 : width < 1100 ? Math.min(2, columns) : columns;
@@ -49,7 +37,7 @@ function TileCards({ tiles, columns }: { tiles: readonly Tile[]; columns: number
         <View key={r} style={styles.row}>
           {row.map((tile) => (
             <PressableCard key={tile.id} onPress={tile.onPress} disabled={tile.disabled} accessibilityLabel={`${tile.title}. ${tile.detail}`} style={[styles.tile, tile.disabled && styles.off]}>
-              <View style={styles.icon}><Icon name={tile.icon} size={20} color={colors.accentText} /></View>
+              <View style={[styles.icon, originate && styles.iconPlain]}><Icon name={tile.icon} size={20} color={originate ? colors.primaryText : colors.accentText} /></View>
               <View style={styles.text}>
                 <View style={styles.head}>
                   <Text style={styles.title} numberOfLines={1}>{tile.title}</Text>
@@ -74,6 +62,7 @@ function createStyles(colors: ThemeColors) {
     off: { opacity: 0.6 },
     gap: { flex: 1 },
     icon: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSubtle },
+    iconPlain: { width: 24, height: 24, backgroundColor: 'transparent', alignItems: 'flex-start' },
     text: { flex: 1, minWidth: 0, gap: 3 },
     head: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     title: { ...Type.headline, color: colors.text, flexShrink: 1 },

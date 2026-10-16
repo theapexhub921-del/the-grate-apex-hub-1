@@ -16,23 +16,14 @@ export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: stri
     name: 'The Originals',
     summary: 'The original GrAte Apex Hub, as it was: its colours, emoji, fonts, glass panels, gradient background and navigation — with every new feature inside it.',
   },
-  originate: {
-    name: 'Originate',
-    summary: 'The current GrAte Apex Hub design: plain pages, lists you can scan quickly, one clear next step on each screen, and a bottom tab bar on phones.',
-  },
+  originate: { name: 'Originate', summary: 'The new GrAte Apex Hub design: its themes, layouts, icons and sidebar, in a clean, simple style.' },
   hybrid: {
     name: 'Hybrid',
     summary: 'The best of both: the new layouts, navigation and icons, with the original gradient background, glass panels, pill buttons and headings.',
   },
 };
 
-/** The experience the chooser recommends: listed first, preselected, with a "Recommended" tag. */
-export const RECOMMENDED_EXPERIENCE: ExperienceId = 'originate';
-
-/** The chooser's order: the recommended experience first, then the others as defined. */
-export const EXPERIENCE_CHOICE_ORDER: readonly ExperienceId[] = [RECOMMENDED_EXPERIENCE, ...EXPERIENCES.filter((id) => id !== RECOMMENDED_EXPERIENCE)];
-
-/** The default experience: how the interface is drawn until a learner chooses. */
+/** The default experience: shown until a learner chooses, and preselected in the chooser. */
 export const DEFAULT_EXPERIENCE: ExperienceId = 'originals';
 
 export function isExperience(value: unknown): value is ExperienceId {

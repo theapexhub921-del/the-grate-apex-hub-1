@@ -17,7 +17,6 @@ import { useNow } from '@/data/learning/use-learning';
 import { useProgress } from '@/data/progress';
 import { getRankProgress } from '@/data/ranks';
 import { useAvatarUrl, useDisplayName } from '@/data/user';
-import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 /**
@@ -48,9 +47,6 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
   const { height: viewportHeight } = useWindowDimensions();
   const pathname = usePathname();
   const active = activeNavPath(pathname);
-  // Originate (docs/design-system.md): a flat rail on the page colour with one
-  // border; the active row is a quiet fill with the label in the brand colour.
-  const originate = useExperience() === 'originate';
   const railHeight = Math.max(0, viewportHeight - (docked ? 0 : FLOAT_INSET * 2));
   const navIconSize = Math.min(24, railHeight / (NAV_ITEMS.length * 2));
 
@@ -132,7 +128,6 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
           { width: collapsed ? COLLAPSED_WIDTH : railWidth },
           docked ? styles.railDocked : styles.railFloating,
           docked && (collapsed ? styles.railDockedCollapsed : styles.railDockedExpanded),
-          originate && (docked ? styles.railOriginateDocked : styles.railOriginateFloating),
           !docked && !shown && styles.railHidden,
           !docked && shown && elevation(colors, 3),
           collapsed && styles.railCollapsed,
@@ -177,10 +172,10 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
                 tabIndex={shown ? 0 : -1}
                 style={[styles.navItem, isHovered && styles.navItemHovered, selected && styles.navItemActive]}
               >
-                {selected && !originate ? <View style={styles.activeBar} /> : null}
+                {selected ? <View style={styles.activeBar} /> : null}
                 <NavIconView icon={item.icon} color={selected ? colors.navActive : isHovered ? colors.text : colors.navInactive} size={navIconSize} active={selected} />
                 {collapsed ? null : (
-                  <Text style={[styles.navLabel, (selected || isHovered) && styles.navLabelActive, selected && originate && styles.navLabelOriginate]} numberOfLines={1}>
+                  <Text style={[styles.navLabel, (selected || isHovered) && styles.navLabelActive]} numberOfLines={1}>
                     {item.label}
                   </Text>
                 )}
@@ -191,13 +186,13 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
 
         {/* Today at a glance: real streak and XP. */}
         <View style={[styles.today, collapsed && styles.hiddenBlock]}>
-          <View style={[styles.todayItem, originate && styles.todayPlain]}>
+          <View style={styles.todayItem}>
             <Icon name="streak" size={16} color={progress.streak > 0 ? colors.accent : colors.textTertiary} filled={progress.streak > 0} />
             <Text style={styles.todayText}>
               {progress.streak} day{progress.streak === 1 ? '' : 's'}
             </Text>
           </View>
-          <View style={[styles.todayItem, originate && styles.todayPlain]}>
+          <View style={styles.todayItem}>
             <Icon name="xp" size={16} color={colors.accent} filled />
             <Text style={styles.todayText}>{xpToday >= 0 ? `+${xpToday}` : xpToday} XP today</Text>
           </View>
@@ -361,22 +356,6 @@ function createStyles(colors: ThemeColors) {
       borderBottomRightRadius: 3,
       backgroundColor: colors.accent,
     },
-    railOriginateDocked: {
-      backgroundColor: colors.background,
-      borderRightWidth: 1,
-      borderRightColor: colors.border,
-      borderTopRightRadius: 0,
-      borderBottomRightRadius: 0,
-      ...webStyle({ backdropFilter: 'none', WebkitBackdropFilter: 'none' }),
-    },
-    railOriginateFloating: {
-      backgroundColor: colors.surface,
-      borderColor: colors.border,
-      borderRadius: 14,
-      ...webStyle({ backdropFilter: 'none', WebkitBackdropFilter: 'none' }),
-    },
-    navLabelOriginate: { color: colors.navActive },
-    todayPlain: { backgroundColor: 'transparent', paddingHorizontal: 4 },
     navLabel: { fontSize: 14, fontWeight: '600', color: colors.navInactive },
     navLabelActive: { color: colors.text, fontWeight: '700' },
     today: {
