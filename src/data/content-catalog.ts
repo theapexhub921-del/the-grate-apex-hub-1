@@ -1617,7 +1617,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Endocrinology",
     sourceFileIds: ["endo-calcium-metabolism", "endo-thyroid-hormones-proper-1", "endo-adrenals-4", "endo-endocrinology-lecture-proper-1a-3", "endo-insulin"],
-    status: "source-only",
+    status: "published",
     emoji: "🦋",
     outline: [
       { title: "Endocrinology (introduction)", points: [], sourceRefs: [{ sourceId: "endo-endocrinology-lecture-proper-1a-3" }] },

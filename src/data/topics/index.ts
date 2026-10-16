@@ -10,6 +10,7 @@ import { cardiovascularPhysiology } from '@/data/topics/cardiovascular-physiolog
 import { centralNervousSystem } from '@/data/topics/central-nervous-system';
 import { cholesterolAndBileBiosynthesis } from '@/data/topics/cholesterol-and-bile-biosynthesis';
 import { collagenAndElastin } from '@/data/topics/collagen-synthesis';
+import { endocrinology } from '@/data/topics/endocrinology';
 import { fattyAcidBiosynthesis } from '@/data/topics/fatty-acid-biosynthesis';
 import { hemeMetabolism } from '@/data/topics/heme-metabolism';
 import { hormones } from '@/data/topics/hormones-endocrine-biochemistry';
@@ -17,4 +18,4 @@ import { inbornErrors } from '@/data/topics/inborn-errors-of-metabolism';
 import { oxygenCarriers } from '@/data/topics/oxygen-carriers';
 import { upperLimb } from '@/data/topics/upper-limb';
 
-export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, centralNervousSystem, upperLimb];
+export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, centralNervousSystem, endocrinology, upperLimb];
