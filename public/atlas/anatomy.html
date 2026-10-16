@@ -254,6 +254,8 @@
       font-weight: 700;
     }
 
+    [hidden] { display: none !important; }
+
     /* single-organ buttons */
     .organs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
@@ -778,6 +780,8 @@
             <button class="organ" type="button" data-organ="heart" aria-pressed="false">Heart</button>
             <button class="organ" type="button" data-organ="lungs" aria-pressed="false">Lungs</button>
           </div>
+          <label class="sys" id="vesselsRow" hidden><input type="checkbox" id="heartVessels" checked><span class="swatch"
+              style="--c:#c22d3a;--b:#2f6fd6"></span><span>Include great vessels</span><span class="stat">+ coronaries</span></label>
           <p id="organStatus" class="organstatus" role="status">Pick one or more. Everything else is hidden.</p>
         </div>
       </details>
@@ -1932,23 +1936,40 @@ bool inRegion(vec3 p) {
     // "Show everything again" (or Escape) brings the whole body back.
     const ORGANS = [
       { id: 'brain', label: 'Brain', sys: 'nervous', node: /^Brain\.g$/ },
-      { id: 'heart', label: 'Heart', sys: 'cardiovascular', node: /^Heart\.g$/ },
+      {
+        id: 'heart', label: 'Heart', sys: 'cardiovascular', node: /^Heart\.g$/,
+        // "Include great vessels" adds what the usual heart diagrams show: aorta (ascending, arch, its branch stubs, a stretch of the
+        // descending part), pulmonary trunk and arteries, pulmonary veins, venae cavae, coronary arteries and cardiac veins. The model
+        // gives every vessel its own short stem mesh ("..._1") apart from its long branches, so only the stems are taken: stubs, not trees.
+        extra: {
+          groups: /^(Ascending aorta|Aortic arch|Pulmonary trunk|Arteries of heart\.g|Cardiac veins\.g)$/,
+          stems: /^(Thoracic_aorta_1|(Left|Right)_common_carotid_artery_1|(Left|Right)_subclavian_artery_1|Superior_vena_cava_1|(Left|Right)_brachiocephalic_vein_1|Inferior_vena_cava_\(thoracic_part\)_1|(Left|Right)_pulmonary_artery_1|(Left|Right)_(superior|inferior)_pulmonary_vein_1)$/,
+        },
+      },
       { id: 'lungs', label: 'Lungs', sys: 'visceral', node: /^Lungs\.g$/ },
     ];
     const organsActive = new Set();
     const organBtns = new Map(ORGANS.map(o => [o.id, document.querySelector('#organs [data-organ="' + o.id + '"]')]));
     const organStatus = document.getElementById('organStatus');
+    const vesselsEl = document.getElementById('heartVessels');
+    const vesselsRow = document.getElementById('vesselsRow');
     let organsKeep = false, organsRun = 0;
 
     function inOrgan(mesh, def) {
       const sys = mesh.userData.system;
       if (!sys || sys.id !== def.sys) return false;
-      for (let n = mesh; n; n = n.parent) if (n.userData && def.node.test(n.userData.name || '')) return true;
+      const extra = def.extra && vesselsEl.checked ? def.extra : null;
+      if (extra && extra.stems.test(mesh.name || '')) return true;
+      for (let n = mesh; n; n = n.parent) {
+        const nm = n.userData && n.userData.name;
+        if (nm && (def.node.test(nm) || (extra && extra.groups.test(nm)))) return true;
+      }
       return false;
     }
     function syncOrganUI(msg) {
       for (const [id, b] of organBtns) if (b) b.setAttribute('aria-pressed', String(organsActive.has(id)));
-      const names = ORGANS.filter(o => organsActive.has(o.id)).map(o => o.label);
+      vesselsRow.hidden = !organsActive.has('heart');
+      const names = ORGANS.filter(o => organsActive.has(o.id)).map(o => o.id === 'heart' && vesselsEl.checked ? 'Heart + great vessels' : o.label);
       organStatus.textContent = msg || (names.length ? 'Showing: ' + names.join(' + ') + '. Tap a part to see its name.' : 'Pick one or more. Everything else is hidden.');
     }
     function organsClear() {   // called whenever something else changes what is shown
@@ -1995,6 +2016,7 @@ bool inRegion(vec3 p) {
       syncOrganUI();
       window.dispatchEvent(new CustomEvent('atlas-organs'));
     }
+    vesselsEl.addEventListener('change', () => { if (organsActive.has('heart')) applyOrgans(); });
     for (const o of ORGANS) {
       const b = organBtns.get(o.id);
       if (!b) continue;
