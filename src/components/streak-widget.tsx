@@ -4,7 +4,7 @@
 // animation style: dark card, warm orange glow, animated flame.
 
 import { useEffect } from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Text } from '@/components/ui/text';
 import Animated, {
   Easing,
@@ -20,15 +20,16 @@ import Svg, { Path, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { router } from 'expo-router';
 
 import { MOTION, SPRING } from '@/constants/motion';
-import { Type, type ThemeColors } from '@/constants/theme';
+import { Radius, elevation, Type, type ThemeColors } from '@/constants/theme';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { useProgress } from '@/data/progress';
 import { getStreakStatus } from '@/data/progression';
 import { routes } from '@/lib/routes';
+import { triggerStreakCelebration } from '@/components/streak-celebration';
 
 // ── Flame SVG (shared with modal but smaller) ─────────────────────────────────
 
-function FlameSvg({ size }: { size: number }) {
+export function FlameSvg({ size }: { size: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 120 120">
       <Defs>
@@ -75,11 +76,93 @@ function getStatusText(streak: number, status: ReturnType<typeof getStreakStatus
   return `${streak} days in a row`;
 }
 
-// ── Compact widget (home screen) ───────────────────────────────────────────────
+// ── Streak stat tile (matches StatTile layout on My Progress page) ──────────────
 
-type CompactProps = { onPress?: () => void };
+export type StreakStatTileProps = {
+  style?: StyleProp<ViewStyle>;
+  onPress?: () => void;
+};
 
-export function StreakWidgetCompact({ onPress }: CompactProps) {
+export function StreakStatTile({ style, onPress }: StreakStatTileProps) {
+  const styles = useThemedStyles(createStatTileStyles);
+  const progress = useProgress();
+  const reduced = useReducedMotion();
+
+  const flameScale = useSharedValue(1);
+
+  useEffect(() => {
+    if (reduced) return;
+    flameScale.value = withRepeat(
+      withSequence(
+        withTiming(1.12, { duration: 900, easing: Easing.inOut(Easing.sin) }),
+        withTiming(0.94, { duration: 900, easing: Easing.inOut(Easing.sin) })
+      ),
+      -1,
+      true
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const flameStyle = useAnimatedStyle(() => ({ transform: [{ scale: flameScale.value }] }));
+
+  const status = getStreakStatus(progress.streak, progress.lastActivityDate);
+  const isLapsed = status === 'lapsed';
+  const hasStreak = progress.streak > 0 && !isLapsed;
+  const label = getStatusText(progress.streak, status);
+
+  function handlePress() {
+    if (onPress) {
+      onPress();
+    } else {
+      triggerStreakCelebration({ streak: progress.streak, isNew: false });
+    }
+  }
+
+  return (
+    <Pressable
+      onPress={handlePress}
+      accessibilityRole="button"
+      accessibilityLabel={`Streak: ${progress.streak} days. ${label}.`}
+      style={({ pressed }) => [
+        styles.stat,
+        hasStreak && styles.statActive,
+        isLapsed && styles.statLapsed,
+        pressed && styles.statPressed,
+        style,
+      ]}
+    >
+      <View style={styles.valueRow}>
+        <View style={styles.flameWrap}>
+          {hasStreak ? (
+            <Animated.View style={flameStyle}>
+              <FlameSvg size={22} />
+            </Animated.View>
+          ) : (
+            <View style={styles.coldFlame}>
+              <FlameSvg size={22} />
+            </View>
+          )}
+        </View>
+        <Text style={[styles.statValue, isLapsed && styles.statValueLapsed]} numberOfLines={1}>
+          {progress.streak}
+        </Text>
+      </View>
+      <Text style={[styles.statLabel, hasStreak && styles.statLabelActive]}>day streak</Text>
+      <Text style={[styles.statHint, hasStreak && styles.statHintActive]} numberOfLines={1}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+// ── Compact widget (for header areas like Learn page) ─────────────────────────
+
+type CompactProps = {
+  onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+};
+
+export function StreakWidgetCompact({ onPress, style }: CompactProps) {
   const styles = useThemedStyles(createCompactStyles);
   const progress = useProgress();
   const reduced = useReducedMotion();
@@ -112,12 +195,15 @@ export function StreakWidgetCompact({ onPress }: CompactProps) {
   const label = getStatusText(progress.streak, status);
 
   function handlePress() {
-    onPress?.();
-    router.push(routes.learn());
+    if (onPress) {
+      onPress();
+    } else {
+      router.push(routes.progress());
+    }
   }
 
   return (
-    <Animated.View style={cardAnim}>
+    <Animated.View style={[cardAnim, styles.wrapper, style]}>
       <Pressable
         onPress={handlePress}
         accessibilityRole="button"
@@ -135,11 +221,11 @@ export function StreakWidgetCompact({ onPress }: CompactProps) {
             <View style={styles.flameWrap}>
               {hasStreak ? (
                 <Animated.View style={flameStyle}>
-                  <FlameSvg size={38} />
+                  <FlameSvg size={28} />
                 </Animated.View>
               ) : (
                 <View style={styles.coldFlame}>
-                  <FlameSvg size={38} />
+                  <FlameSvg size={28} />
                 </View>
               )}
             </View>
@@ -151,9 +237,9 @@ export function StreakWidgetCompact({ onPress }: CompactProps) {
           {/* Right: label + status */}
           <View style={styles.right}>
             <Text style={[styles.dayLabel, isLapsed && styles.dayLabelLapsed]}>
-              {progress.streak === 1 ? 'DAY STREAK' : 'DAY STREAK'}
+              DAY STREAK
             </Text>
-            <Text style={[styles.statusText, isLapsed && styles.statusTextLapsed]} numberOfLines={2}>
+            <Text style={[styles.statusText, isLapsed && styles.statusTextLapsed]} numberOfLines={1}>
               {label}
             </Text>
           </View>
@@ -232,30 +318,105 @@ export function StreakWidgetFull() {
   );
 }
 
+// ── Stat tile styles (matches StatTile on My Progress) ─────────────────────────
+
+function createStatTileStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    stat: {
+      flex: 1,
+      minWidth: 120,
+      backgroundColor: colors.surface,
+      borderRadius: Radius.md,
+      paddingVertical: 14,
+      paddingHorizontal: 14,
+      borderWidth: 1,
+      borderColor: colors.hairline,
+      ...elevation(colors, 1),
+    },
+    statActive: {
+      borderColor: 'rgba(255, 167, 38, 0.45)',
+      backgroundColor: colors.surface,
+      ...(Platform.OS === 'web'
+        ? ({ boxShadow: '0 2px 14px rgba(255,140,0,0.12)' } as object)
+        : {}),
+    },
+    statLapsed: {
+      borderColor: colors.border,
+      opacity: 0.8,
+    },
+    statPressed: {
+      transform: [{ scale: 0.98 }],
+    },
+    valueRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    flameWrap: {
+      width: 22,
+      height: 22,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    coldFlame: {
+      opacity: 0.28,
+    },
+    statValue: {
+      ...Type.numeral,
+      fontSize: 22,
+      color: colors.text,
+      lineHeight: 26,
+    },
+    statValueLapsed: {
+      color: colors.textSecondary,
+    },
+    statLabel: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    statLabelActive: {
+      color: '#FFA726',
+    },
+    statHint: {
+      fontSize: 11,
+      color: colors.textTertiary,
+      marginTop: 2,
+    },
+    statHintActive: {
+      color: colors.textSecondary,
+    },
+  });
+}
+
 // ── Compact styles ─────────────────────────────────────────────────────────────
 
 function createCompactStyles(colors: ThemeColors) {
   const cardBg = colors.surface === '#FFFEFC' ? '#0D1526' : colors.surface;
   return StyleSheet.create({
+    wrapper: {
+      alignSelf: 'flex-start',
+    },
     card: {
       backgroundColor: cardBg,
-      borderRadius: 20,
-      paddingVertical: 14,
-      paddingHorizontal: 16,
+      borderRadius: 18,
+      paddingVertical: 8,
+      paddingHorizontal: 14,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 14,
+      gap: 10,
       borderWidth: 1,
-      borderColor: 'rgba(253,192,10,0.2)',
+      borderColor: 'rgba(253,192,10,0.25)',
       overflow: 'hidden',
       ...(Platform.OS === 'web'
-        ? ({ boxShadow: '0 4px 24px rgba(0,0,0,0.25), 0 0 30px rgba(255,138,0,0.1)' } as object)
+        ? ({ boxShadow: '0 4px 20px rgba(0,0,0,0.25), 0 0 24px rgba(255,138,0,0.12)' } as object)
         : {
             shadowColor: '#FF8800',
-            shadowOffset: { width: 0, height: 4 },
+            shadowOffset: { width: 0, height: 3 },
             shadowOpacity: 0.2,
-            shadowRadius: 12,
-            elevation: 6,
+            shadowRadius: 10,
+            elevation: 5,
           }),
     },
     cardLapsed: {
@@ -266,47 +427,48 @@ function createCompactStyles(colors: ThemeColors) {
     },
     glow: {
       position: 'absolute',
-      width: 100,
-      height: 100,
-      borderRadius: 50,
+      width: 80,
+      height: 80,
+      borderRadius: 40,
       backgroundColor: 'rgba(255,140,0,0.18)',
       left: -10,
-      top: -20,
+      top: -15,
     },
     left: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 6,
     },
-    flameWrap: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },
+    flameWrap: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
     coldFlame: { opacity: 0.28 },
     count: {
       ...Type.numeral,
-      fontSize: 28,
+      fontSize: 22,
       fontWeight: '900',
       color: '#FFFFFF',
-      lineHeight: 32,
+      lineHeight: 24,
     },
     countLapsed: { color: colors.textSecondary },
-    right: { flex: 1, gap: 2 },
+    right: { minWidth: 0, gap: 1 },
     dayLabel: {
       ...Type.overline,
       color: '#FFA726',
-      letterSpacing: 2.5,
+      letterSpacing: 2,
       fontSize: 9,
     },
     dayLabelLapsed: { color: colors.textTertiary },
     statusText: {
-      fontSize: 12.5,
+      fontSize: 12,
       fontWeight: '500',
-      color: 'rgba(255,255,255,0.62)',
-      lineHeight: 17,
+      color: 'rgba(255,255,255,0.72)',
+      lineHeight: 15,
     },
     statusTextLapsed: { color: colors.textSecondary },
     dot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
+      width: 7,
+      height: 7,
+      borderRadius: 3.5,
+      marginLeft: 2,
     },
     dotActive: { backgroundColor: '#FFA726' },
     dotInactive: { backgroundColor: colors.textDisabled },

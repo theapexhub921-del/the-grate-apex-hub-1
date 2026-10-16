@@ -8,6 +8,7 @@ import { applyStreakRecovery } from '@/data/progress';
 import { buyStreakRecoveryWithCoins, readApexCoinBalance, readStreakRecoveryOffer, type StreakRecoveryOffer } from '@/data/apex-coins';
 import { getStreakFreezeBalance } from '@/data/community';
 import { StatTile, BackLink } from '@/components/learning/nav-bits';
+import { StreakStatTile } from '@/components/streak-widget';
 import { LevelProgressCard } from '@/components/level-progress';
 import { SubjectGlyph, TopicGlyph } from '@/components/learning/glyphs';
 import { RankProgressCard } from '@/components/rank-progress';
@@ -106,7 +107,7 @@ export default function ProgressScreen() {
       </View>
       <View style={styles.statRow}>
         <StatTile value={overall.counts.mastered} label="concepts mastered" />
-        <StatTile value={progress.streak} label="day streak" />
+        <StreakStatTile />
         <StatTile value={`${consistency.activeDays}/${consistency.days}`} label="review days" hint="last two weeks" />
       </View>
 

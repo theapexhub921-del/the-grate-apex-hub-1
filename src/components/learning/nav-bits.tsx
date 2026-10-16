@@ -12,7 +12,7 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // "← Back": returns to the previous page, or the given parent when the
 // page was opened directly.
-export function BackLink({ fallback, label = 'Back' }: { fallback: Href; label?: string }) {
+export function BackLink({ fallback, label = 'Back', style }: { fallback: Href; label?: string; style?: StyleProp<ViewStyle> }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const { goBack } = useBackNavigation();
@@ -20,7 +20,7 @@ export function BackLink({ fallback, label = 'Back' }: { fallback: Href; label?:
     <Interactive
       onPress={() => goBack(fallback)}
       accessibilityLabel={label}
-      style={({ hovered, pressed }) => [styles.back, hovered && styles.backHover, pressed && styles.backPressed]}
+      style={({ hovered, pressed }) => [styles.back, hovered && styles.backHover, pressed && styles.backPressed, style]}
     >
       <Icon name="chevronLeft" size={16} color={colors.textSecondary} strokeWidth={2.2} />
       <Text style={styles.backText}>{label}</Text>

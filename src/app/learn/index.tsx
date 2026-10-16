@@ -1,4 +1,5 @@
 import { BackLink } from '@/components/learning/nav-bits';
+import { StreakWidgetCompact } from '@/components/streak-widget';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -324,7 +325,10 @@ export default function LearnScreen() {
 
   return (
     <Screen width="wide">
-      <BackLink fallback={'/' as never} />
+      <View style={styles.topRow}>
+        <BackLink fallback={'/' as never} style={styles.noMargin} />
+        <StreakWidgetCompact onPress={() => router.push(routes.progress())} />
+      </View>
       <LearningWelcomeAtmosphere>
         <PageHeader
           eyebrow={viewing ? `${viewingOwnClass ? 'My class' : 'Browsing'} · ${viewing.classId} · Semester ${viewing.semester}` : 'Your curriculum'}
@@ -435,6 +439,15 @@ function createStyles(colors: ThemeColors) {
     calendarCard: { gap: 12 },
     calendarHeading: { marginBottom: 0 },
     welcomeHeader: { marginBottom: 0 },
+    topRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+      marginBottom: 16,
+      flexWrap: 'wrap',
+    },
+    noMargin: { marginBottom: 0 },
     mobileWelcomeBadge: { alignSelf: 'flex-start', marginTop: 10 },
     browseArea: { marginTop: -8, marginBottom: 18 },
     browseActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 },
