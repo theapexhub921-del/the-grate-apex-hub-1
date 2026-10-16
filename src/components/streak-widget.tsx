@@ -210,42 +210,21 @@ export function StreakWidgetCompact({ onPress, style }: CompactProps) {
         accessibilityLabel={`Streak: ${progress.streak} days. ${label}.`}
         style={({ pressed }) => [{ opacity: pressed ? 0.88 : 1 }]}
       >
+        {/* A round badge: the flame over the day count (the label is read out, not shown). */}
         <View style={[styles.card, isLapsed && styles.cardLapsed]}>
-          {/* Glow */}
-          {hasStreak && (
-            <Animated.View style={[styles.glow, glowStyle]} />
-          )}
-
-          {/* Left: flame + count */}
-          <View style={styles.left}>
-            <View style={styles.flameWrap}>
-              {hasStreak ? (
-                <Animated.View style={flameStyle}>
-                  <FlameSvg size={28} />
-                </Animated.View>
-              ) : (
-                <View style={styles.coldFlame}>
-                  <FlameSvg size={28} />
-                </View>
-              )}
+          {hasStreak && <Animated.View style={[styles.glow, glowStyle]} />}
+          {hasStreak ? (
+            <Animated.View style={flameStyle}>
+              <FlameSvg size={22} />
+            </Animated.View>
+          ) : (
+            <View style={styles.coldFlame}>
+              <FlameSvg size={22} />
             </View>
-            <Text style={[styles.count, isLapsed && styles.countLapsed]}>
-              {progress.streak}
-            </Text>
-          </View>
-
-          {/* Right: label + status */}
-          <View style={styles.right}>
-            <Text style={[styles.dayLabel, isLapsed && styles.dayLabelLapsed]}>
-              DAY STREAK
-            </Text>
-            <Text style={[styles.statusText, isLapsed && styles.statusTextLapsed]} numberOfLines={1}>
-              {label}
-            </Text>
-          </View>
-
-          {/* Status dot */}
-          <View style={[styles.dot, hasStreak ? styles.dotActive : styles.dotInactive]} />
+          )}
+          <Text style={[styles.count, isLapsed && styles.countLapsed]} numberOfLines={1}>
+            {progress.streak}
+          </Text>
         </View>
       </Pressable>
     </Animated.View>
@@ -400,23 +379,23 @@ function createCompactStyles(colors: ThemeColors) {
     },
     card: {
       backgroundColor: cardBg,
-      borderRadius: 18,
-      paddingVertical: 8,
-      paddingHorizontal: 14,
-      flexDirection: 'row',
+      width: 58,
+      height: 58,
+      borderRadius: 29,
       alignItems: 'center',
-      gap: 10,
-      borderWidth: 1,
-      borderColor: 'rgba(253,192,10,0.25)',
+      justifyContent: 'center',
+      gap: 0,
+      borderWidth: 1.5,
+      borderColor: 'rgba(253,192,10,0.45)',
       overflow: 'hidden',
       ...(Platform.OS === 'web'
-        ? ({ boxShadow: '0 4px 20px rgba(0,0,0,0.25), 0 0 24px rgba(255,138,0,0.12)' } as object)
+        ? ({ boxShadow: '0 4px 14px rgba(0,0,0,0.22), 0 0 18px rgba(255,138,0,0.14)' } as object)
         : {
             shadowColor: '#FF8800',
             shadowOffset: { width: 0, height: 3 },
             shadowOpacity: 0.2,
-            shadowRadius: 10,
-            elevation: 5,
+            shadowRadius: 8,
+            elevation: 4,
           }),
     },
     cardLapsed: {
@@ -427,12 +406,10 @@ function createCompactStyles(colors: ThemeColors) {
     },
     glow: {
       position: 'absolute',
-      width: 80,
-      height: 80,
-      borderRadius: 40,
-      backgroundColor: 'rgba(255,140,0,0.18)',
-      left: -10,
-      top: -15,
+      width: 58,
+      height: 58,
+      borderRadius: 29,
+      backgroundColor: 'rgba(255,140,0,0.16)',
     },
     left: {
       flexDirection: 'row',
@@ -443,10 +420,10 @@ function createCompactStyles(colors: ThemeColors) {
     coldFlame: { opacity: 0.28 },
     count: {
       ...Type.numeral,
-      fontSize: 22,
-      fontWeight: '900',
+      fontSize: 15,
+      fontWeight: '800',
       color: '#FFFFFF',
-      lineHeight: 24,
+      lineHeight: 17,
     },
     countLapsed: { color: colors.textSecondary },
     right: { minWidth: 0, gap: 1 },

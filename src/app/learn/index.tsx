@@ -385,9 +385,6 @@ export default function LearnScreen() {
     const name = displayName?.trim();
     return (
       <Screen width="wide">
-        <View style={styles.oStreakRow}>
-          <StreakWidgetCompact onPress={() => router.push(routes.progress())} />
-        </View>
         <View style={styles.oTop}>
           <PageHeader
             eyebrow={`${viewing.classId} · Semester ${viewing.semester}${viewingOwnClass ? '' : ' · preview'}`}
@@ -397,6 +394,7 @@ export default function LearnScreen() {
                 ? next ? next.title : 'You are up to date. Pick a course to keep going.'
                 : `You are previewing ${viewing.classId}, Semester ${viewing.semester}. Your own class does not change.`
             }
+            right={<StreakWidgetCompact onPress={() => router.push(routes.progress())} />}
             style={styles.oHeader}
           />
           <View style={styles.oActions}>
@@ -530,7 +528,6 @@ function createStyles(colors: ThemeColors) {
     reviewHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     reviewIcon: { width: 34, height: 34, borderRadius: 11, backgroundColor: colors.primarySubtle, alignItems: 'center', justifyContent: 'center' },
     kicker: { ...Type.overline, color: colors.textTertiary },
-    oStreakRow: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 12 },
     oTop: { marginBottom: 28, gap: 16 },
     oHeader: { marginBottom: 0 },
     oActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 },
