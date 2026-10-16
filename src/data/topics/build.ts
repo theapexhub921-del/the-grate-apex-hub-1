@@ -19,6 +19,8 @@ import type {
   Lesson,
   LessonFigure,
   RecallPrompt,
+  SimulationPrediction,
+  SimulationStep,
   SourceReference,
   Topic,
 } from '@/data/lesson-types';
@@ -54,7 +56,16 @@ export type RecallDraft<K extends string = string> = Omit<
 export type InteractiveDraft<K extends string = string> =
   | Extract<InteractiveStep, { type: 'learn' }>
   | { type: 'ask'; question: QuestionDraft<K>; reveal?: string[] }
-  | { type: 'recall'; recall: RecallDraft<K> };
+  | { type: 'recall'; recall: RecallDraft<K> }
+  | SimulationDraft<K>;
+
+export type SimulationPredictionDraft<K extends string = string> = Omit<SimulationPrediction, 'question'> & {
+  question: QuestionDraft<K>;
+};
+
+export type SimulationDraft<K extends string = string> = Omit<SimulationStep, 'predictions'> & {
+  predictions: SimulationPredictionDraft<K>[];
+};
 
 export type LessonDraft<K extends string = string> = Omit<Lesson, 'concepts' | 'interactive'> & {
   interactive?: InteractiveDraft<K>[];
@@ -266,6 +277,12 @@ export function recall<K extends string>(
   return { type: 'recall', recall: { id, conceptId, prompt, answer, sourceRefs } };
 }
 
+// A simulation step (data/simulations/): predictions first, then the
+// learner explores the model. See SimulationStep in lesson-types.ts.
+export function simulate<K extends string>(draft: Omit<SimulationDraft<K>, 'type'>): InteractiveDraft<K> {
+  return { type: 'simulate', ...draft };
+}
+
 // True/false, written as a statement. Kept in True/False order.
 export function tf<K extends string>(draft: {
   id: string;
@@ -405,13 +422,25 @@ export function buildTopic<K extends string>(draft: TopicDraft<K>): BuiltTopic {
         recalls.push(built);
         return { type: 'recall', recall: built };
       }
+      if (step.type === 'simulate') {
+        return {
+          ...step,
+          sourceRefs: step.sourceRefs && withExports(step.sourceRefs),
+          predictions: step.predictions.map((prediction) => ({
+            ...prediction,
+            question: toQuestion(prediction.question, lesson.id, 'learn'),
+          })),
+        };
+      }
       return { ...step, sourceRefs: step.sourceRefs && withExports(step.sourceRefs) };
     }),
   }));
 
   const quizQuestions = questionDrafts.map((question) => toQuestion(question));
   const learnQuestions = builtLessons.flatMap((lesson) =>
-    (lesson.interactive ?? []).flatMap((step) => (step.type === 'ask' ? [step.question] : []))
+    (lesson.interactive ?? []).flatMap((step) =>
+      step.type === 'ask' ? [step.question] : step.type === 'simulate' ? step.predictions.map((p) => p.question) : []
+    )
   );
   const questions = [...quizQuestions, ...learnQuestions];
 

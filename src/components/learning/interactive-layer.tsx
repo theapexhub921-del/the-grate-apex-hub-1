@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
 
+import { SimulationStepView } from '@/components/learning/simulations/simulation-step';
 import { PathwaySteps } from '@/components/pathway-steps';
 import { QuestionCard } from '@/components/question-card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,7 @@ import type { ThemeColors } from '@/constants/theme';
 import type { InteractiveStep, Lesson } from '@/data/lesson-types';
 import { recordAnswer, recordRecall } from '@/data/learning/actions';
 import { type LessonSession, saveLessonSession } from '@/data/learning/lesson-sessions';
-import { type Answer, isAnswerComplete, isAnswerCorrect } from '@/data/questions';
+import { type Answer, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useThemedStyles } from '@/hooks/use-theme';
 
@@ -22,7 +23,8 @@ import { useThemedStyles } from '@/hooks/use-theme';
 // One step at a time. 'learn' cards teach a small piece; 'ask' steps make
 // the learner retrieve / predict / reason BEFORE the explanation is shown;
 // 'recall' steps ask for open recall, then a self-check against the model
-// answer. A checkpoint missed on the first try comes back once at the end
+// answer; 'simulate' steps ask for predictions (checkpoints), then let the
+// learner explore a model (components/learning/simulations/). A checkpoint missed on the first try comes back once at the end
 // (spaced retrieval inside the lesson), and every answer feeds the memory
 // model, so missed concepts return in Review. Progress is saved after
 // every step, so leaving half-way never loses the learner's place.
@@ -43,6 +45,7 @@ export function InteractiveLayer({
   const [revealed, setRevealed] = useState(false);
   const [recallShown, setRecallShown] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [simReady, setSimReady] = useState(false);
 
   const { queue, position } = session;
   const finished = position >= queue.length;
@@ -54,7 +57,21 @@ export function InteractiveLayer({
     setAnswer(undefined);
     setRevealed(false);
     setRecallShown(false);
+    setSimReady(false);
     saveLessonSession({ ...session, ...patch, position: session.position + 1 });
+  }
+
+  // A prediction in a simulation step: a first-try checkpoint (no retry
+  // queue — the simulation itself shows the answer).
+  async function predicted(question: Question, value: Answer) {
+    const correct = isAnswerCorrect(question, value);
+    await recordAnswer(question, value, 'interactive', sessionId);
+    saveLessonSession({
+      ...session,
+      checkpoints: session.checkpoints + 1,
+      firstTryCorrect: session.firstTryCorrect + (correct ? 1 : 0),
+      missed: correct || session.missed.includes(question.concept) ? session.missed : [...session.missed, question.concept],
+    });
   }
 
   async function check() {
@@ -103,6 +120,7 @@ export function InteractiveLayer({
           else if (revealed) advance();
         } else if (step.type === 'learn') advance();
         else if (step.type === 'recall' && !recallShown) setRecallShown(true);
+        else if (step.type === 'simulate' && simReady) advance();
       },
     },
     !finished,
@@ -110,7 +128,10 @@ export function InteractiveLayer({
   );
 
   if (finished) {
-    const checkpoints = steps.filter((item) => item.type === 'ask').length;
+    const checkpoints = steps.reduce(
+      (count, item) => count + (item.type === 'ask' ? 1 : item.type === 'simulate' ? item.predictions.length : 0),
+      0
+    );
     return (
       <Card style={styles.summary}>
         <Text style={styles.kicker}>INTERACTIVE LESSON COMPLETE</Text>
@@ -203,6 +224,15 @@ export function InteractiveLayer({
           </>
         ) : null}
 
+        {step?.type === 'simulate' && entry ? (
+          <SimulationStepView
+            step={step}
+            shuffleSeed={`${lesson.id}:${entry.step}`}
+            onPredict={predicted}
+            onPredictionsDone={() => setSimReady(true)}
+          />
+        ) : null}
+
         {step?.type === 'recall' ? (
           <Card style={styles.learnCard}>
             <Text style={styles.kicker}>RECALL · FROM MEMORY</Text>
@@ -239,6 +269,15 @@ export function InteractiveLayer({
           ) : (
             <Button label="Check" onPress={() => void check()} disabled={!canCheck || busy} shortcut={isWeb ? 'Enter' : undefined} />
           )
+        ) : null}
+        {step?.type === 'simulate' ? (
+          <Button
+            label={simReady ? 'Continue' : 'Answer the predictions to continue'}
+            trailing={simReady ? '→' : undefined}
+            onPress={() => advance()}
+            disabled={!simReady}
+            shortcut={isWeb && simReady ? 'Enter' : undefined}
+          />
         ) : null}
         {step?.type === 'recall' && !recallShown ? (
           <Button label="Show the model answer" onPress={() => setRecallShown(true)} shortcut={isWeb ? 'Enter' : undefined} />
