@@ -22,11 +22,11 @@ import { Platform, type TextStyle, type ViewStyle } from 'react-native';
 
 const light = {
   // ── Brand ──────────────────────────────────────────────────────────
-  primary: '#1677F2', // bright, friendly cobalt for filled buttons and active states
-  primaryPressed: '#0D5FCC',
-  primaryText: '#0B57B8', // readable blue text/links on the page background
-  primarySubtle: '#EAF2FF', // light blue background (selected / info)
-  primaryBorder: '#B8D0FA',
+  primary: '#1245C4', // the logo blue: filled buttons, links and selection
+  primaryPressed: '#0E389F',
+  primaryText: '#1245C4', // readable blue text/links on the page background
+  primarySubtle: '#EDF1FB', // light blue background (selected / info)
+  primaryBorder: '#C3CFEE',
   onPrimary: '#FFFFFF', // text/icons on primary
   onPrimaryMuted: '#BFD0F5', // quieter text on primary
   secondary: '#0B1E5B', // deep navy — strong secondary emphasis
@@ -38,24 +38,24 @@ const light = {
   accentText: '#7A5A00',
 
   // ── Surfaces ───────────────────────────────────────────────────────
-  background: '#F6F6F2', // a soft, warm paper tint
-  surface: '#FFFEFC',
+  background: '#F4F5F7', // a cool, neutral page
+  surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
-  surfaceMuted: '#F1F3F8', // quiet fills inside cards
-  surfaceSunken: '#EBEFF7', // inputs and wells
-  track: '#E3E8F3', // empty part of progress bars
+  surfaceMuted: '#EFF1F4', // quiet fills inside groups
+  surfaceSunken: '#ECEEF2', // inputs and wells
+  track: '#E2E5EA', // empty part of progress bars
 
   // ── Text (deep navy instead of pure black, to sit with the logo blue) ─
-  text: '#0F1833',
-  textSecondary: '#4E5873',
-  textTertiary: '#737D96',
-  textDisabled: '#A9B0C0',
+  text: '#131A2B',
+  textSecondary: '#4B5468',
+  textTertiary: '#6B7385',
+  textDisabled: '#A6ACB8',
 
   // ── Lines ──────────────────────────────────────────────────────────
-  border: '#DDE3EE',
-  borderStrong: '#C6CFE1',
-  divider: '#EDF0F6',
-  hairline: 'rgba(15, 24, 51, 0.06)', // 1px outlines on elevated surfaces
+  border: '#DCE0E7',
+  borderStrong: '#C3C9D4',
+  divider: '#E6E9EE',
+  hairline: 'rgba(19, 26, 43, 0.08)', // 1px outlines on elevated surfaces
   highlight: 'rgba(255, 255, 255, 0.95)', // inner top light of a surface
 
   // ── Status (meaning, not decoration) ───────────────────────────────
@@ -71,9 +71,9 @@ const light = {
   warningStrong: '#9A5A20',
   warningSubtle: '#FFF3E6',
   warningBorder: '#F0C9A0',
-  info: '#1677F2',
-  infoSubtle: '#EAF0FC',
-  infoText: '#0B57B8',
+  info: '#1245C4',
+  infoSubtle: '#EDF1FB',
+  infoText: '#1245C4',
 
   // ── Navigation ─────────────────────────────────────────────────────
   // Legacy bar tokens (still read by older components)
@@ -84,9 +84,9 @@ const light = {
   // Floating bar / rail
   navSurface: 'rgba(255, 255, 255, 0.88)',
   navBorder: 'rgba(15, 30, 80, 0.10)',
-  navActive: '#0B57B8',
-  navActiveSubtle: '#E6EDFC',
-  navInactive: '#66708A',
+  navActive: '#1245C4',
+  navActiveSubtle: '#EDF1FB',
+  navInactive: '#5F6779',
 
   // "+XP" moment
   rewardBackground: '#0B1E5B',
@@ -97,13 +97,13 @@ const light = {
 
   // Memory states (learning engine) — meaning, not decoration
   stateNew: '#B7C1D6',
-  stateLearning: '#1677F2',
+  stateLearning: '#1245C4',
   stateStruggling: '#C62828',
   stateRemembered: '#1F8A4C',
   stateMastered: '#D99A00',
 
   // Keyboard focus ring
-  focusRing: '#3D8BFF',
+  focusRing: '#1245C4',
 
   // Depth
   shadow: 'rgba(16, 30, 80, 0.10)',

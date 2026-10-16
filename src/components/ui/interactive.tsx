@@ -13,7 +13,7 @@ import { useKeyboardModality, webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import { elevation, Radius, type ThemeColors } from '@/constants/theme';
 import { type ExperienceId } from '@/data/experience';
-import { originateGlow, withAlpha } from '@/data/experience-style';
+import { ORadius, OSpace } from '@/constants/originate';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -166,9 +166,9 @@ export function PressableCard({
         styles.pressable,
         experienceCard(styles, experience, tone),
         // The original app's Hover: gold border and a 1px lift; a press dims it.
-        hovered && (originals ? styles.legacyHovered : styles.hovered),
-        hovered && lift && !originals && (originate ? styles.originateLifted : styles.lifted),
-        pressed && (originals ? styles.legacyPressed : styles.pressed),
+        hovered && (originals ? styles.legacyHovered : originate ? styles.originateHovered : styles.hovered),
+        hovered && lift && !originals && !originate && styles.lifted,
+        pressed && (originals ? styles.legacyPressed : originate ? styles.originatePressed : styles.pressed),
         style,
       ]}
     >
@@ -183,11 +183,11 @@ type CardStyles = ReturnType<typeof createStyles>;
 // (ui.tsx: card colour, 1px border, radius 22, no shadow); tones keep their
 // meaning through the border only. Hybrid: the same glass, blurred, on this
 // app's elevation.
-// Originate: a slightly rounder card; resting and raised cards carry a faint
-// top light (web), so they read as lit from above by the atmosphere. Tinted,
-// quiet and outline tones stay flat so their colour keeps its meaning.
+// Originate (docs/design-system.md): a flat surface with one 1px border,
+// radius 12, no shadow. Tinted tones keep their fill; hover only darkens the
+// border and a press dims the card — no lift.
 function experienceCard(styles: CardStyles, experience: ExperienceId, tone: CardTone) {
-  if (experience === 'originate') return [styles.originate, tone === 'surface' || tone === 'elevated' ? styles.originateLit : null];
+  if (experience === 'originate') return [styles.originate, styles[`o_${tone}` as const]];
   if (experience === 'hybrid') return styles.hybridGlass;
   return [styles.legacyPanel, tone === 'primary' || tone === 'insight' ? styles.legacyPrimary : tone === 'reward' ? styles.legacyReward : tone === 'outline' ? styles.legacyOutline : null];
 }
@@ -215,14 +215,16 @@ function createStyles(colors: ThemeColors) {
     lifted: { transform: [{ translateY: -2 }], ...elevation(colors, 2) },
     pressed: { transform: [{ translateY: 0 }, { scale: 0.99 }] },
 
-    originate: { borderRadius: 22 },
-    originateLit: webStyle({ backgroundImage: `linear-gradient(180deg, ${colors.highlight} 0%, rgba(255,255,255,0) 46%)` }),
-    // Hover: a lift with a soft glow in the theme's main colour.
-    originateLifted: {
-      transform: [{ translateY: -3 }],
-      boxShadow: `inset 0px 1px 0px ${colors.highlight}, 0px 2px 6px ${colors.shadow}, 0px 18px 40px ${colors.shadowStrong}, ${originateGlow(colors.primary, 0.16, 34, 12)}`,
-      borderColor: withAlpha(colors.primary, 0.45),
-    } as ViewStyle,
+    originate: { borderRadius: ORadius.card, padding: OSpace.lg, borderColor: colors.border, boxShadow: 'none' } as ViewStyle,
+    o_surface: {},
+    o_elevated: { backgroundColor: colors.surface },
+    o_muted: { backgroundColor: colors.surfaceMuted, borderColor: 'transparent' },
+    o_primary: { backgroundColor: colors.primarySubtle, borderColor: colors.primaryBorder },
+    o_insight: { backgroundColor: colors.infoSubtle, borderColor: 'transparent' },
+    o_reward: { backgroundColor: colors.accentSubtle, borderColor: 'transparent' },
+    o_outline: { backgroundColor: 'transparent', borderColor: colors.border, borderStyle: 'solid' },
+    originateHovered: { borderColor: colors.borderStrong },
+    originatePressed: { opacity: 0.88 },
 
     legacyPanel: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 22, boxShadow: 'none' } as ViewStyle,
     legacyPrimary: { borderColor: colors.primary },

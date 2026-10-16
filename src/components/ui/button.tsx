@@ -7,7 +7,7 @@ import { Interactive } from '@/components/ui/interactive';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import type { ThemeColors } from '@/constants/theme';
-import { originateFill, originateGlow } from '@/data/experience-style';
+import { OControl, ORadius } from '@/constants/originate';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -83,13 +83,9 @@ export function Button({
         originals && inactive && styles.pillOff,
       ]
     : null;
-  // Originate: main actions are a soft diagonal gradient of their colour with
-  // the top sheen, and glow in that colour on hover (the Apex button keeps its own).
-  const originateColor = experience === 'originate' && !inactive ? (variant === 'primary' ? colors.primary : variant === 'gold' ? colors.accent : variant === 'danger' ? colors.error : null) : null;
-  const originateStyle = originateColor ? ({ backgroundColor: originateColor, ...webStyle({ backgroundImage: `${SHEEN}, ${originateFill(originateColor)}` }) } as ViewStyle) : null;
-  const originateHover = originateColor
-    ? ({ boxShadow: `inset 0px 1px 0px rgba(255, 255, 255, 0.28), 0px 2px 4px ${colors.shadow}, ${originateGlow(originateColor, 0.42, 26, 10)}` } as ViewStyle)
-    : null;
+  // Originate (docs/design-system.md): solid fills, radius 8, no sheen,
+  // shadow or lift. Hover darkens the fill (or border); a press dims it.
+  const originate = experience === 'originate';
   const legacyLabel = originals && !filled ? { color: inactive ? colors.textTertiary : colors.textSecondary } : null;
 
   return (
@@ -103,22 +99,25 @@ export function Button({
         styles.base,
         styles[size],
         styles[variant],
-        filled && !inactive && styles.filled,
-        originateStyle,
+        filled && !inactive && !originate && styles.filled,
+        originate && styles.o_base,
+        originate && styles[`o_${size}` as const],
+        originate && variant === 'secondary' && styles.o_secondary,
         inactive && !originals && (filled ? styles.disabledFilled : styles.disabledPlain),
         fullWidth && styles.fullWidth,
         hovered && !inactive && !originals && styles[`${variant}Hover` as const],
-        hovered && filled && !inactive && !originals && styles.lift,
-        hovered && originateHover,
+        hovered && !inactive && originate && variant === 'secondary' && styles.o_secondaryHover,
+        hovered && !inactive && originate && (variant === 'gold' || variant === 'apex' || variant === 'danger') && styles.o_filledHover,
+        hovered && filled && !inactive && !originals && !originate && styles.lift,
         pillStyle,
         // The original's TouchableOpacity: a press only dims the button.
-        pressed && (originals ? styles.pillPressed : styles.pressed),
+        pressed && (originals ? styles.pillPressed : originate ? styles.o_pressed : styles.pressed),
         style,
       ]}
     >
       <View style={styles.content}>
         {loading ? <ActivityIndicator size="small" color={textColor} /> : icon}
-        <Text style={[styles.label, styles[`${size}Label` as const], { color: labelColor }, originals && styles.pillLabel, legacyLabel]} numberOfLines={2}>
+        <Text style={[styles.label, styles[`${size}Label` as const], { color: labelColor }, originals && styles.pillLabel, originate && styles.o_label, legacyLabel]} numberOfLines={2}>
           {label}
         </Text>
         {trailingIcon && !loading ? <Icon name={trailingIcon} size={iconSize} color={labelColor} strokeWidth={2.1} /> : null}
@@ -198,6 +197,15 @@ function createStyles(colors: ThemeColors) {
     },
     kbdText: { fontSize: 10, fontWeight: '700' },
 
+    o_base: { borderRadius: ORadius.control, boxShadow: 'none', ...webStyle({ backgroundImage: 'none' }) } as ViewStyle,
+    o_sm: { minHeight: OControl.sm, paddingHorizontal: 12, paddingVertical: 6 },
+    o_md: { minHeight: OControl.md, paddingHorizontal: 16, paddingVertical: 9 },
+    o_lg: { minHeight: OControl.lg, paddingHorizontal: 20, paddingVertical: 12 },
+    o_secondary: { backgroundColor: 'transparent', borderColor: colors.borderStrong, boxShadow: 'none' } as ViewStyle,
+    o_secondaryHover: { backgroundColor: colors.surfaceMuted, borderColor: colors.borderStrong },
+    o_filledHover: { boxShadow: 'none', opacity: 1, ...webStyle({ filter: 'brightness(0.95)' }) } as ViewStyle,
+    o_pressed: { opacity: 0.85 },
+    o_label: { fontWeight: '600', letterSpacing: 0 },
     pill: { borderRadius: 999 },
     pill_sm: { minHeight: 0, paddingVertical: 9, paddingHorizontal: 16 },
     pill_md: { minHeight: 0, paddingVertical: 15, paddingHorizontal: 22 },

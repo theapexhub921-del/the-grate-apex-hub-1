@@ -5,10 +5,12 @@ import Svg, { Circle, Defs, RadialGradient, Rect, Stop } from 'react-native-svg'
 
 import { Button } from '@/components/ui/button';
 import { Icon, type IconName } from '@/components/ui/icon';
-import { Interactive } from '@/components/ui/interactive';
+import { Card, Interactive } from '@/components/ui/interactive';
+import { List, ListRow } from '@/components/ui/list';
 import { webStyle } from '@/components/ui/web';
 import { elevation, Radius, Type, type ThemeColors } from '@/constants/theme';
 import type { NextAction } from '@/data/learning/next-action';
+import { useExperience } from '@/hooks/use-experience';
 import { useResolvedColorScheme, useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 const KIND_LABEL: Record<NextAction['kind'], string> = {
@@ -38,6 +40,25 @@ const KIND_ICON: Record<NextAction['kind'], IconName> = {
 // The one thing to do next, derived from learning state. Always the
 // brightest surface on the page.
 export function NextActionHero({ action }: { action: NextAction }) {
+  const originate = useExperience() === 'originate';
+  if (originate) return <NextActionPlain action={action} />;
+  return <NextActionGlow action={action} />;
+}
+
+// Originate: a bordered block with the step, why, and one primary button.
+function NextActionPlain({ action }: { action: NextAction }) {
+  const styles = useThemedStyles(createStyles);
+  return (
+    <Card style={styles.plain}>
+      <Text style={styles.plainKind}>{KIND_LABEL[action.kind]}</Text>
+      <Text style={styles.plainTitle}>{action.title}</Text>
+      <Text style={styles.plainDetail}>{action.detail}</Text>
+      <Button label={action.cta} onPress={() => router.push(action.href)} style={styles.plainButton} />
+    </Card>
+  );
+}
+
+function NextActionGlow({ action }: { action: NextAction }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const scheme = useResolvedColorScheme();
@@ -78,7 +99,15 @@ export function NextActionHero({ action }: { action: NextAction }) {
 export function NextActionList({ actions }: { actions: NextAction[] }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  const originate = useExperience() === 'originate';
   if (actions.length === 0) return null;
+  if (originate) {
+    return (
+      <List>
+        {actions.map((action) => <ListRow key={action.id} title={action.title} detail={action.detail} onPress={() => router.push(action.href)} />)}
+      </List>
+    );
+  }
   return (
     <View style={[styles.list, elevation(colors, 1)]}>
       {actions.map((action, index) => (
@@ -113,6 +142,11 @@ export function NextActionList({ actions }: { actions: NextAction[] }) {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
+    plain: { gap: 4 },
+    plainKind: { fontSize: 13, fontWeight: '500', color: colors.textSecondary },
+    plainTitle: { ...Type.title3, color: colors.text },
+    plainDetail: { ...Type.callout, color: colors.textSecondary, maxWidth: 560 },
+    plainButton: { marginTop: 12, alignSelf: 'flex-start' },
     hero: {
       borderRadius: Radius.xl,
       padding: 24,

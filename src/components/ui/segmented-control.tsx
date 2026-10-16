@@ -5,7 +5,9 @@ import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSprin
 
 import { Interactive } from '@/components/ui/interactive';
 import { SPRING } from '@/constants/motion';
+import { ORadius } from '@/constants/originate';
 import { elevation, type ThemeColors } from '@/constants/theme';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // Equal-width segments with a thumb that springs to the selection.
@@ -25,6 +27,8 @@ export function SegmentedControl<T extends string>({
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const reduceMotion = useReducedMotion();
+  // Originate: radius 8 track, a bordered (not shadowed) thumb.
+  const originate = useExperience() === 'originate';
   const [width, setWidth] = useState(0);
   const index = Math.max(0, options.findIndex((option) => option.value === value));
   const segment = width > 0 ? (width - 6) / options.length : 0;
@@ -38,12 +42,12 @@ export function SegmentedControl<T extends string>({
 
   return (
     <View
-      style={[styles.track, style]}
+      style={[styles.track, originate && styles.trackOriginate, style]}
       onLayout={(event: LayoutChangeEvent) => setWidth(event.nativeEvent.layout.width)}
       accessibilityRole="tablist"
       accessibilityLabel={label}
     >
-      {segment > 0 ? <Animated.View style={[styles.thumb, elevation(colors, 1), { width: segment }, thumb]} /> : null}
+      {segment > 0 ? <Animated.View style={[styles.thumb, originate ? styles.thumbOriginate : elevation(colors, 1), { width: segment }, thumb]} /> : null}
       {options.map((option) => {
         const selected = option.value === value;
         return (
@@ -84,6 +88,8 @@ function createStyles(colors: ThemeColors) {
       borderRadius: 9,
       backgroundColor: colors.surfaceElevated,
     },
+    trackOriginate: { borderRadius: ORadius.control, borderColor: colors.border, backgroundColor: colors.surfaceMuted },
+    thumbOriginate: { borderRadius: ORadius.control - 2, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
     segment: { flex: 1, minHeight: 34, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
     label: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },
     labelSelected: { color: colors.text },

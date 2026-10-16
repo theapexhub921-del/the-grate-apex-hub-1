@@ -5,13 +5,19 @@ import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, w
 
 import { Button } from '@/components/ui/button';
 import { Icon, type IconName } from '@/components/ui/icon';
+import { ORadius, OSpace } from '@/constants/originate';
 import { elevation, Radius, Type, type ThemeColors } from '@/constants/theme';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 type Action = { label: string; onPress: () => void };
 
 // Every important learning operation has a real empty / loading / error
 // state, drawn with the GRATEAPEX icon set (no emoji).
+//
+// Originate (docs/design-system.md): states are plain text where the content
+// would be — what will appear, or what went wrong, and the one action that
+// fixes it. No medallion icons, no shadowed boxes.
 
 // A medallion behind a state icon: a soft ring of the brand colour.
 function StateMark({ icon, tone = 'primary' }: { icon: IconName; tone?: 'primary' | 'warning' | 'error' | 'success' }) {
@@ -40,7 +46,17 @@ export function EmptyState({
   style?: StyleProp<ViewStyle>;
 }) {
   const styles = useThemedStyles(createStyles);
+  const originate = useExperience() === 'originate';
   const name: IconName = isIconName(icon) ? icon : 'sparkle';
+  if (originate) {
+    return (
+      <View style={[styles.plain, style]}>
+        <Text style={styles.plainTitle}>{title}</Text>
+        {message ? <Text style={styles.plainMessage}>{message}</Text> : null}
+        {action ? <Button label={action.label} onPress={action.onPress} variant="secondary" size="sm" style={styles.plainAction} /> : null}
+      </View>
+    );
+  }
   return (
     <View style={[styles.box, style]}>
       <StateMark icon={name} />
@@ -64,13 +80,14 @@ export function ErrorScreen({
   secondary?: Action;
 }) {
   const styles = useThemedStyles(createStyles);
+  const originate = useExperience() === 'originate';
   return (
     <View style={styles.screen} accessibilityRole="alert">
-      <View style={styles.errorCard}>
-        <StateMark icon="explore" tone="warning" />
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.message}>{message}</Text>
-        <View style={styles.actions}>
+      <View style={[styles.errorCard, originate && styles.errorPlain]}>
+        {originate ? null : <StateMark icon="explore" tone="warning" />}
+        <Text style={[styles.title, originate && styles.left]}>{title}</Text>
+        <Text style={[styles.message, originate && styles.left]}>{message}</Text>
+        <View style={[styles.actions, originate && styles.actionsLeft]}>
           <Button label={primary.label} onPress={primary.onPress} />
           {secondary ? <Button label={secondary.label} onPress={secondary.onPress} variant="secondary" /> : null}
         </View>
@@ -82,6 +99,24 @@ export function ErrorScreen({
 // Loading: a skeleton of the page's shape, not a lone spinner.
 export function LoadingState({ label = 'Loading…' }: { label?: string }) {
   const styles = useThemedStyles(createStyles);
+  const originate = useExperience() === 'originate';
+  if (originate) {
+    // A heading and a list of rows: the shape most pages have.
+    return (
+      <View style={styles.loading} accessibilityLiveRegion="polite" accessibilityLabel={label}>
+        <Skeleton width="40%" height={26} radius={6} />
+        <Skeleton width="65%" height={14} radius={4} />
+        <View style={styles.loadingRows}>
+          {[0, 1, 2, 3].map((row) => (
+            <View key={row} style={styles.loadingRowLine}>
+              <Skeleton width={row % 2 ? '55%' : '70%'} height={15} radius={4} />
+              <Skeleton width={row % 2 ? '80%' : '45%'} height={12} radius={4} />
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  }
   return (
     <View style={styles.loading} accessibilityLiveRegion="polite" accessibilityLabel={label}>
       <Skeleton width="45%" height={28} radius={10} />
@@ -137,13 +172,14 @@ export function InlineNotice({
 }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  const originate = useExperience() === 'originate';
   const icon: IconName = tone === 'success' ? 'check' : tone === 'info' ? 'info' : 'warning';
   const iconColor = tone === 'success' ? colors.successText : tone === 'warning' ? colors.warningStrong : tone === 'error' ? colors.error : colors.primaryText;
   return (
-    <View style={[styles.notice, styles[tone]]} accessibilityRole={tone === 'error' ? 'alert' : undefined}>
+    <View style={[styles.notice, styles[tone], originate && styles.noticeOriginate]} accessibilityRole={tone === 'error' ? 'alert' : undefined}>
       <Icon name={icon} size={18} color={iconColor} style={styles.noticeIcon} />
       <View style={styles.flex}>
-        {title ? <Text style={[styles.noticeTitle, styles[`${tone}Text` as const]]}>{title}</Text> : null}
+        {title ? <Text style={[styles.noticeTitle, styles[`${tone}Text` as const], originate && styles.noticeTitleOriginate]}>{title}</Text> : null}
         <Text style={styles.noticeText}>{message}</Text>
       </View>
     </View>
@@ -161,6 +197,17 @@ function isIconName(value: string): value is IconName {
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     flex: { flex: 1, minWidth: 0 },
+    left: { textAlign: 'left' },
+    actionsLeft: { justifyContent: 'flex-start' },
+    plain: { alignItems: 'flex-start', paddingVertical: OSpace.xl, gap: OSpace.xs },
+    plainTitle: { ...Type.headline, color: colors.text },
+    plainMessage: { ...Type.callout, color: colors.textSecondary, maxWidth: 520 },
+    plainAction: { marginTop: OSpace.md },
+    errorPlain: { alignItems: 'flex-start', borderRadius: ORadius.card, borderColor: colors.border, backgroundColor: colors.surface, boxShadow: 'none', padding: OSpace.xl } as ViewStyle,
+    loadingRows: { marginTop: OSpace.xl, borderTopWidth: 1, borderColor: colors.divider },
+    loadingRowLine: { gap: OSpace.sm, paddingVertical: OSpace.lg, borderBottomWidth: 1, borderColor: colors.divider },
+    noticeOriginate: { borderRadius: ORadius.control, borderWidth: 0, padding: OSpace.md },
+    noticeTitleOriginate: { fontSize: 14, lineHeight: 20, fontWeight: '600', letterSpacing: 0, marginBottom: 2 },
     mark: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
     box: {
       alignItems: 'center',

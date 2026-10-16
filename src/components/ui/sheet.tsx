@@ -6,7 +6,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { IconButton } from '@/components/ui/icon-button';
 import { MOTION, SPRING } from '@/constants/motion';
+import { ORadius } from '@/constants/originate';
 import { elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 /**
@@ -37,6 +39,7 @@ export function Sheet({
   const insets = useSafeAreaInsets();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const desktop = isDesktopWidth(windowWidth);
+  const originate = useExperience() === 'originate';
   const reduceMotion = useReducedMotion();
   const [mounted, setMounted] = useState(visible);
   const progress = useSharedValue(0);
@@ -76,6 +79,7 @@ export function Sheet({
             styles.panel,
             elevation(colors, 3),
             desktop ? [styles.panelDesktop, { width: Math.min(width, windowWidth - 48), maxHeight: windowHeight - 80 }] : [styles.panelMobile, { maxHeight: windowHeight * 0.9, paddingBottom: insets.bottom + 8 }],
+            originate && (desktop ? styles.originateDesktop : styles.originateMobile),
             panelStyle,
           ]}
         >
@@ -107,6 +111,8 @@ function createStyles(colors: ThemeColors) {
     panel: { backgroundColor: colors.surfaceElevated, borderWidth: 1, borderColor: colors.hairline, overflow: 'hidden' },
     panelDesktop: { borderRadius: Radius.xl },
     panelMobile: { width: '100%', borderTopLeftRadius: 28, borderTopRightRadius: 28, borderBottomWidth: 0 },
+    originateDesktop: { borderRadius: ORadius.overlay, borderColor: colors.border },
+    originateMobile: { borderTopLeftRadius: ORadius.overlay, borderTopRightRadius: ORadius.overlay, borderColor: colors.border },
     handle: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: colors.borderStrong, marginTop: 10 },
     header: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingHorizontal: 22, paddingTop: 16, paddingBottom: 6 },
     headerText: { flex: 1, minWidth: 0, paddingTop: 4 },

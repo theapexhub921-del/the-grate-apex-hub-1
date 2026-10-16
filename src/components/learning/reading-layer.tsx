@@ -5,9 +5,10 @@ import { FigureExplorer } from '@/components/learning/figure-view';
 import { PathwaySteps } from '@/components/pathway-steps';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Card } from '@/components/ui/interactive';
-import type { ThemeColors } from '@/constants/theme';
+import { Fonts, type ThemeColors } from '@/constants/theme';
 import type { Lesson, LessonChunk, LessonChunkKind, LessonNote } from '@/data/lesson-types';
 import { describeSourceRefs, describeTextbookRefs } from '@/data/source-labels';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // Layer 2 of a lesson: the structured reading / revision summary, built
@@ -91,6 +92,7 @@ export function ReadingLayer({ lesson }: { lesson: Lesson }) {
 function ReadingSection({ chunk, index, total }: { chunk: LessonChunk; index: number; total: number }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  const serif = useExperience() === 'originate' ? styles.serif : null;
   const lectureSource = chunk.sourceRefs ? describeSourceRefs(chunk.sourceRefs) : '';
   const textbookSource = chunk.sourceRefs ? describeTextbookRefs(chunk.sourceRefs) : '';
 
@@ -108,7 +110,7 @@ function ReadingSection({ chunk, index, total }: { chunk: LessonChunk; index: nu
       </Text>
 
       {chunk.paragraphs?.map((paragraph, i) => (
-        <Text key={i} style={styles.paragraph}>
+        <Text key={i} style={[styles.paragraph, serif]}>
           {paragraph}
         </Text>
       ))}
@@ -200,6 +202,8 @@ function createStyles(colors: ThemeColors) {
     sectionKicker: { fontSize: 11, fontWeight: '800', letterSpacing: 1.1, color: colors.textTertiary },
     sectionTitle: { fontSize: 21, fontWeight: '800', lineHeight: 28, color: colors.text, marginBottom: 10 },
     paragraph: { fontSize: 16, lineHeight: 26, color: colors.textSecondary, marginBottom: 12 },
+    // Originate: lesson text in Source Serif, in the main text colour.
+    serif: { fontFamily: Fonts.serif, fontSize: 17, lineHeight: 28, color: colors.text },
     terms: { gap: 10, marginBottom: 10 },
     term: { borderLeftWidth: 3, borderLeftColor: colors.primary, paddingLeft: 12 },
     termName: { fontSize: 15, fontWeight: '800', color: colors.text },

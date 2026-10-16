@@ -1,10 +1,12 @@
 import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { LegacyCourseTile } from '@/components/learning/legacy-course-tile';
 import { Icon } from '@/components/ui/icon';
 import { PressableCard } from '@/components/ui/interactive';
+import { List, ListRow } from '@/components/ui/list';
+import { InlineNotice } from '@/components/ui/state-views';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { SectionHeader } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
@@ -13,21 +15,56 @@ import type { ClassSelection } from '@/data/class-curriculum';
 import { type LegacyCourse, type LegacyLessonMeta, loadLegacyLessonList } from '@/data/legacy-study';
 import { hb2Lessons } from '@/data/hb2-study';
 import { useProgress } from '@/data/progress';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { routes } from '@/lib/routes';
 
 /** A class's original courses on Study, in this app's card style. */
-export function LegacyCourseList({ courses, selection }: { courses: readonly LegacyCourse[]; selection: ClassSelection }) {
+export function LegacyCourseList({ courses, selection, headerRight }: { courses: readonly LegacyCourse[]; selection: ClassSelection; headerRight?: ReactNode }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const progress = useProgress();
+  const originate = useExperience() === 'originate';
   const [lessons, setLessons] = useState<LegacyLessonMeta[] | null>(null);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
     let live = true;
-    loadLegacyLessonList().then((list) => { if (live) setLessons(list); }).catch(() => { if (live) setLessons([]); });
+    loadLegacyLessonList().then((list) => { if (live) setLessons(list); }).catch(() => { if (live) { setLessons([]); setFailed(true); } });
     return () => { live = false; };
   }, []);
   const completed = useMemo(() => new Set(progress.completedLessons), [progress.completedLessons]);
+
+  // Originate: one row per course — name, what it covers, lessons done and a
+  // thin progress line. No emoji tiles (docs/design-system.md).
+  if (originate) {
+    const needsList = courses.some((course) => !course.subject);
+    return (
+      <View style={styles.column}>
+        <SectionHeader title="Courses" subtitle={`${selection.classId}, Semester ${selection.semester}`} right={headerRight} style={styles.oHeader} />
+        {failed && needsList ? <InlineNotice tone="warning" message="Some lessons could not be loaded. Check your connection, then reopen Study." /> : null}
+        <List accessibilityLabel="Courses">
+          {courses.map((course) => {
+            const own = course.subject ? hb2Lessons(course.id) : (lessons ?? []).filter((lesson) => lesson.course === course.id);
+            const loading = !course.subject && lessons === null;
+            const done = own.filter((lesson) => completed.has(lesson.id)).length;
+            return (
+              <ListRow
+                key={course.id}
+                title={course.name}
+                detail={course.desc}
+                meta={loading ? 'Loading' : own.length ? `${done} of ${own.length} lessons` : 'No lessons yet'}
+                metaTone={loading || !own.length ? 'muted' : 'default'}
+                progress={!loading && own.length ? done / own.length : undefined}
+                progressLabel={`${course.name}: ${done} of ${own.length} lessons completed`}
+                onPress={() => router.push(routes.legacyCourse(course.id))}
+                accessibilityLabel={`${course.name}. ${loading ? 'Loading lessons' : `${done} of ${own.length} lessons completed`}`}
+              />
+            );
+          })}
+        </List>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.column}>
@@ -62,6 +99,7 @@ function createStyles(colors: ThemeColors) {
     flex: { flex: 1, minWidth: 0 },
     column: { gap: 12 },
     header: { marginTop: 6 },
+    oHeader: { marginBottom: 4 },
     grid: { gap: 12 },
     card: { flexDirection: 'row', alignItems: 'center', gap: 14 },
     info: { flex: 1, minWidth: 0, gap: 4 },

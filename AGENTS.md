@@ -306,12 +306,14 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 
 ### Atmosphere
 
-* The page background is the shell's atmosphere layer (`src/components/atmosphere/`). It has a mood per route: Home is lively, Learn is calm, quiz and lesson are focus, Profile and Settings are quiet.
+* The page background is the shell's atmosphere layer (`src/components/atmosphere/`). In Originate it is one plain colour from the theme (the per-route moods no longer change the look); The Originals and Hybrid draw the original gradient instead.
 * Screens are transparent, so build pages with `Screen` from `src/components/ui/screen.tsx`. Do not give screens an opaque page background.
 
-### Originate finish (2026-10-16)
+### Originate design system (2026-10-16)
 
-* Originate is the recommended experience (listed first and preselected in `/choose-experience`). Its extra polish — lit cards, gradient buttons with a hover glow, page fade-in, eyebrow mark, pointer light in the atmosphere, lit tab-bar pill and glowing rail edge — only applies when `useExperience() === 'originate'`, so The Originals and Hybrid look exactly as before. Details: `docs/experiences-architecture.md`.
+* Originate follows `docs/design-system.md` — read it before changing any Originate screen. In short: IBM Plex Sans (Source Serif 4 for lesson text), weights 400/500/600, sentence-case labels, a plain page colour (no atmosphere effects), cards only when grouping helps (radius 12, 1px border, no shadow), lists as `List` / `ListRow` (`src/components/ui/list.tsx`), one primary button per screen, a docked tab bar on phones, and only motion that answers an action.
+* The rules live in the primitives and switch on `useExperience() === 'originate'`, so The Originals and Hybrid look exactly as before. The type rules are applied to every `Text` by `src/components/ui/text.tsx` (`src/data/originate-type.ts`); shape and spacing values are in `src/constants/originate.ts`.
+* Originate is the recommended experience (listed first and preselected in `/choose-experience`).
 
 ### Primitives (`src/components/ui/`)
 
@@ -320,6 +322,7 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * `Pill`, `SegmentedControl`, `Sheet` (a bottom sheet on phones, a dialog on desktop)
 * `Avatar` / `AvatarStack`
 * `EmptyState`, `ErrorScreen`, `LoadingState` (skeletons), `InlineNotice`
+* `List` / `ListRow` for lists of the same kind of thing
 * Reuse these instead of styling one-off rows, cards or buttons.
 
 ### Icons and glyphs

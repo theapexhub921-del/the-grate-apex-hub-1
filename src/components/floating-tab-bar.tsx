@@ -1,6 +1,6 @@
 import { usePathname } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { type LayoutChangeEvent, Platform, Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
+import { type LayoutChangeEvent, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,7 +12,6 @@ import { webStyle } from '@/components/ui/web';
 import { MOTION, SPRING } from '@/constants/motion';
 import { elevation, TAB_BAR_HEIGHT, TAB_BAR_INSET, type ThemeColors } from '@/constants/theme';
 import { useTabBarMode } from '@/data/navigation-settings';
-import { originateFill, originateGlow, withAlpha } from '@/data/experience-style';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -22,8 +21,14 @@ const MAX_BAR_WIDTH = 520;
 // floating elements (the OrigiNate signature, toasts) can sit above it.
 export function useTabBarClearance() {
   const insets = useSafeAreaInsets();
-  return insets.bottom + TAB_BAR_INSET + TAB_BAR_HEIGHT;
+  const docked = useExperience() === 'originate';
+  return insets.bottom + (docked ? DOCKED_HEIGHT : TAB_BAR_INSET + TAB_BAR_HEIGHT);
 }
+
+// Originate's phone navigation (docs/design-system.md): a bar docked to the
+// bottom edge, five equal tabs, the active one in the brand colour. No
+// floating capsule, no raised button, no sliding pill.
+const DOCKED_HEIGHT = 58;
 
 /**
  * The mobile navigation: a floating bar in the thumb zone with a sliding
@@ -31,6 +36,58 @@ export function useTabBarClearance() {
  * slides away while reading when "Auto-hide" is selected in Settings.
  */
 export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => void }) {
+  const docked = useExperience() === 'originate';
+  if (docked) return <DockedTabBar onNavigate={onNavigate} />;
+  return <FloatingBar onNavigate={onNavigate} />;
+}
+
+function DockedTabBar({ onNavigate }: { onNavigate: (route: string) => void }) {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  const insets = useSafeAreaInsets();
+  const pathname = usePathname();
+  const reduceMotion = useReducedMotion();
+  const mode = useTabBarMode();
+  const scrolledAway = useTabBarHidden();
+  const hidden = mode === 'autoHide' && scrolledAway;
+  const active = activeNavPath(pathname);
+  const offset = useSharedValue(0);
+
+  useEffect(() => {
+    offset.value = withTiming(hidden ? DOCKED_HEIGHT + insets.bottom + 2 : 0, { duration: reduceMotion ? 0 : MOTION.standard });
+  }, [hidden, insets.bottom, offset, reduceMotion]);
+  const barStyle = useAnimatedStyle(() => ({ transform: [{ translateY: offset.value }] }));
+
+  return (
+    <Animated.View
+      pointerEvents={hidden ? 'none' : 'auto'}
+      style={[styles.docked, { paddingBottom: insets.bottom, height: DOCKED_HEIGHT + insets.bottom }, barStyle]}
+      accessibilityRole="tablist"
+    >
+      {MOBILE_NAV_ITEMS.map((item) => {
+        const selected = item.path === active;
+        const tint = selected ? colors.navActive : colors.navInactive;
+        return (
+          <Pressable
+            key={item.route}
+            onPress={() => onNavigate(item.route)}
+            accessibilityRole="tab"
+            accessibilityState={{ selected }}
+            accessibilityLabel={item.accessibilityLabel}
+            style={({ pressed }) => [styles.dockedItem, pressed && styles.dockedPressed]}
+          >
+            <NavIconView icon={item.icon} color={tint} size={22} active={selected} />
+            <Text style={[styles.dockedLabel, { color: tint }, selected && styles.dockedLabelActive]} numberOfLines={1}>
+              {item.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </Animated.View>
+  );
+}
+
+function FloatingBar({ onNavigate }: { onNavigate: (route: string) => void }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const insets = useSafeAreaInsets();
@@ -41,11 +98,7 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
   const hidden = mode === 'autoHide' && scrolledAway;
 
   const active = activeNavPath(pathname);
-  const experience = useExperience();
-  const hybrid = experience === 'hybrid';
-  // Originate: a lit selection pill with a small glowing marker, and a
-  // gradient Study button with a soft halo in the main colour.
-  const originate = experience === 'originate';
+  const hybrid = useExperience() === 'hybrid';
   const activeIndex = MOBILE_NAV_ITEMS.findIndex((item) => item.path === active);
   const learnIndex = MOBILE_NAV_ITEMS.findIndex((item) => item.path === '/learn');
 
@@ -86,11 +139,7 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
         onLayout={(event: LayoutChangeEvent) => setBarWidth(event.nativeEvent.layout.width)}
         accessibilityRole="tablist"
       >
-        {itemWidth > 0 && activeIndex !== learnIndex ? (
-          <Animated.View style={[styles.pill, originate && styles.pillOriginate, { width: itemWidth }, pillStyle]}>
-            {originate ? <View style={styles.pillMarker} /> : null}
-          </Animated.View>
-        ) : null}
+        {itemWidth > 0 && activeIndex !== learnIndex ? <Animated.View style={[styles.pill, { width: itemWidth }, pillStyle]} /> : null}
         {MOBILE_NAV_ITEMS.map((item, index) => {
           const selected = item.path === active;
           const isLearn = index === learnIndex;
@@ -109,7 +158,7 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
                   <LegacyIcon name="book" size={26} color={colors.onPrimary} />
                 </View>
               ) : isLearn ? (
-                <View style={[styles.learnIcon, elevation(colors, 3), originate && styles.learnOriginate]}>
+                <View style={[styles.learnIcon, elevation(colors, 3)]}>
                   <NavIconView icon={item.icon} color={colors.onPrimary} size={26} active />
                 </View>
               ) : <NavIconView icon={item.icon} color={selected ? colors.navActive : colors.navInactive} size={22} active={selected} />}
@@ -126,6 +175,28 @@ export function FloatingTabBar({ onNavigate }: { onNavigate: (route: string) => 
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
+    docked: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 40,
+      flexDirection: 'row',
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    dockedItem: {
+      flex: 1,
+      height: DOCKED_HEIGHT,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 3,
+      ...webStyle({ cursor: 'pointer', outlineStyle: 'none', WebkitTapHighlightColor: 'transparent' }),
+    },
+    dockedPressed: { opacity: 0.6 },
+    dockedLabel: { fontSize: 11, fontWeight: '500' },
+    dockedLabelActive: { fontWeight: '600' },
     wrap: {
       position: 'absolute',
       left: TAB_BAR_INSET,
@@ -178,24 +249,6 @@ function createStyles(colors: ThemeColors) {
       justifyContent: 'center',
     },
     learnLabel: { paddingTop: 0 },
-    learnOriginate: {
-      boxShadow: `0px 4px 10px ${colors.shadow}, ${originateGlow(colors.primary, 0.45, 22, 8)}`,
-      ...webStyle({ backgroundImage: originateFill(colors.primary) }),
-    } as ViewStyle,
-    pillOriginate: {
-      alignItems: 'center',
-      boxShadow: `inset 0px 0px 0px 1px ${withAlpha(colors.navActive, 0.16)}`,
-      ...webStyle({ backgroundImage: `linear-gradient(180deg, ${withAlpha(colors.navActive, 0.1)}, rgba(255,255,255,0))` }),
-    } as ViewStyle,
-    pillMarker: {
-      position: 'absolute',
-      top: -1,
-      width: 16,
-      height: 3,
-      borderRadius: 2,
-      backgroundColor: colors.navActive,
-      boxShadow: originateGlow(colors.navActive, 0.6, 8, 0),
-    } as ViewStyle,
     learnHybrid: { width: 62, height: 62, borderRadius: 31, top: -24 },
     itemPressed: { transform: [{ scale: 0.94 }] },
     label: { fontSize: 10.5, fontWeight: '700', color: colors.navInactive, letterSpacing: 0.2 },

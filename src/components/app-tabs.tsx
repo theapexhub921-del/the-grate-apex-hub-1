@@ -40,7 +40,7 @@ export default function AppTabs() {
     <View style={styles.shell}>
       <OnlinePresenceSync />
       {experience === 'originate' ? <Atmosphere mood={mood} /> : <LegacyBackground lively={mood === 'lively' || mood === 'expressive'} />}
-      {(segments[0] as string | undefined) === 'index' && experience !== 'originals' ? <HomeGreetingWallpaper /> : null}
+      {(segments[0] as string | undefined) === 'index' && experience === 'hybrid' ? <HomeGreetingWallpaper /> : null}
       <Tabs
         // Back (incl. Android back button) returns to the page you came from.
         backBehavior="history"

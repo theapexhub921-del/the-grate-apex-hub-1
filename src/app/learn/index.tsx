@@ -22,6 +22,7 @@ import { TopicCard } from '@/components/learning/topic-card';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Card, Interactive, PressableCard } from '@/components/ui/interactive';
+import { List, ListRow } from '@/components/ui/list';
 import { Pill } from '@/components/ui/pill';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { Columns, PageHeader, Screen, SectionHeader } from '@/components/ui/screen';
@@ -31,9 +32,11 @@ import { contentTopics } from '@/data/content-catalog';
 import { getNextActions } from '@/data/learning/next-action';
 import { curriculumProgress, subjectProgress } from '@/data/learning/progress-model';
 import { useLearning } from '@/data/learning/use-learning';
+import { getRankProgress } from '@/data/ranks';
 import { useDisplayName } from '@/data/user';
 import { getSubjectStatus, getSubjectStatusLabel, subjects } from '@/data/subjects';
 import { useAuth } from '@/hooks/use-auth';
+import { useExperience } from '@/hooks/use-experience';
 import { useGreeting } from '@/hooks/use-greeting';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { param, routes } from '@/lib/routes';
@@ -45,6 +48,7 @@ export default function LearnScreen() {
   const colors = useTheme();
   const { width } = useWindowDimensions();
   const compactWelcome = width < 900;
+  const originate = useExperience() === 'originate';
   const { user } = useAuth();
   const { greeting } = useGreeting();
   const displayName = useDisplayName();
@@ -323,6 +327,121 @@ export default function LearnScreen() {
     </View>
   );
 
+  const browsePanel = viewing && browseOpen ? (
+    <Card style={styles.browseCard}>
+      <SectionHeader
+        title="Browse classes"
+        subtitle="Choose a class and semester to preview its subjects. This will not change your selection."
+        style={styles.browseHeading}
+        right={(
+          <View style={styles.browseHeaderActions}>
+            <Button label={originate ? 'Close' : 'My class'} variant="ghost" size="sm" onPress={() => (originate ? setBrowseOpen(false) : showEnvironment(ownSelection ?? viewing))} />
+          </View>
+        )}
+      />
+      <View style={styles.classChoices} accessibilityRole="radiogroup" accessibilityLabel="Browse class curricula">
+        {CLASS_IDS.map((classId) => {
+          const selected = classId === viewing.classId;
+          return (
+            <Interactive
+              key={classId}
+              onPress={() => showEnvironment({ classId, semester: viewing.semester })}
+              accessibilityRole="radio"
+              accessibilityState={{ selected }}
+              style={[styles.classChoice, originate && styles.oChoice, selected && styles.classChoiceSelected]}
+            >
+              <Text style={[styles.classChoiceText, selected && styles.classChoiceTextSelected]}>{classId}</Text>
+            </Interactive>
+          );
+        })}
+      </View>
+      <View style={styles.semesterChoices} accessibilityRole="radiogroup" accessibilityLabel="Browse semesters">
+        {([1, 2] as const).map((semester) => {
+          const selected = semester === viewing.semester;
+          return (
+            <Interactive
+              key={semester}
+              onPress={() => showEnvironment({ classId: viewing.classId, semester })}
+              accessibilityRole="radio"
+              accessibilityState={{ selected }}
+              style={[styles.semesterChoice, originate && styles.oChoice, selected && styles.classChoiceSelected]}
+            >
+              <Text style={[styles.classChoiceText, selected && styles.classChoiceTextSelected]}>Semester {semester}</Text>
+            </Interactive>
+          );
+        })}
+      </View>
+    </Card>
+  ) : null;
+
+  // Originate (docs/design-system.md): one heading, one primary action (the
+  // engine's next step), then the courses and practice tools as lists. Rank,
+  // this week and goals are one line each; their detail lives on Progress.
+  if (originate && viewing && !blockedSelection && legacyCourses.length > 0) {
+    const next = viewingOwnClass && actions[0]?.kind !== 'explore-learn' ? actions[0] : undefined;
+    const rank = getRankProgress(progress.xp);
+    const name = displayName?.trim();
+    const streakText = progress.streak > 0 ? `${progress.streak}-day streak` : 'No streak yet';
+    return (
+      <Screen width="wide">
+        <View style={styles.oTop}>
+          <PageHeader
+            eyebrow={`${viewing.classId} · Semester ${viewing.semester}${viewingOwnClass ? '' : ' · preview'}`}
+            title={name ? `${greeting}, ${name}` : greeting}
+            subtitle={
+              viewingOwnClass
+                ? next ? next.title : 'You are up to date. Pick a course to keep going.'
+                : `You are previewing ${viewing.classId}, Semester ${viewing.semester}. Your own class does not change.`
+            }
+            style={styles.oHeader}
+          />
+          <View style={styles.oActions}>
+            {viewingOwnClass ? (
+              next ? <Button label={next.cta} onPress={() => router.push(next.href)} /> : null
+            ) : (
+              <Button label="Back to my class" onPress={() => showEnvironment(ownSelection ?? viewing)} />
+            )}
+            <Button label={streakText} variant="ghost" onPress={() => router.push(routes.progress())} accessibilityHint="Opens your progress" />
+          </View>
+        </View>
+
+        {browsePanel ? <View style={styles.oBrowse}>{browsePanel}</View> : null}
+
+        <Columns
+          sideWidth={380}
+          gap={40}
+          main={(
+            <View style={styles.oColumn}>
+              <LegacyCourseList
+                courses={legacyCourses}
+                selection={viewing as ClassSelection}
+                headerRight={browseOpen ? null : <Button label="Other classes" variant="ghost" size="sm" onPress={() => setBrowseOpen(true)} />}
+              />
+              <View>
+                <SectionHeader title="Practise" subtitle="Beyond the lessons." />
+                <TileGrid tiles={studyTiles} />
+              </View>
+            </View>
+          )}
+          side={(
+            <View style={styles.oColumn}>
+              <QuestionOfTheDay />
+              <View>
+                <SectionHeader title="Progress" />
+                <List>
+                  <ListRow title="Rank" detail={rank ? rank.rank.name : undefined} meta={`${progress.xp.toLocaleString()} XP`} onPress={() => router.push(routes.progress())} />
+                  <ListRow title="This week" meta={`${lessonsThisWeek} lesson${lessonsThisWeek === 1 ? '' : 's'} · ${reviewsThisWeek} review${reviewsThisWeek === 1 ? '' : 's'}`} onPress={() => router.push(routes.progress())} />
+                  <ListRow title="Personal goals" onPress={() => router.push('/goals' as never)} />
+                </List>
+              </View>
+              {reviewCalendar}
+            </View>
+          )}
+        />
+      </Screen>
+    );
+  }
+
   return (
     <Screen width="wide">
       <View style={styles.topRow}>
@@ -353,50 +472,7 @@ export default function LearnScreen() {
               <Button label="Browse other classes" variant="secondary" trailing="chevronDown" onPress={() => setBrowseOpen(true)} />
             </View>
           ) : (
-            <Card style={styles.browseCard}>
-              <SectionHeader
-                title="Browse classes"
-                subtitle="Choose a class and semester to preview its subjects. This will not change your selection."
-                style={styles.browseHeading}
-                right={(
-                  <View style={styles.browseHeaderActions}>
-                    <Button label="My class" variant="ghost" size="sm" onPress={() => showEnvironment(ownSelection ?? viewing)} />
-                  </View>
-                )}
-              />
-              <View style={styles.classChoices} accessibilityRole="radiogroup" accessibilityLabel="Browse class curricula">
-                {CLASS_IDS.map((classId) => {
-                  const selected = classId === viewing.classId;
-                  return (
-                    <Interactive
-                      key={classId}
-                      onPress={() => showEnvironment({ classId, semester: viewing.semester })}
-                      accessibilityRole="radio"
-                      accessibilityState={{ selected }}
-                      style={[styles.classChoice, selected && styles.classChoiceSelected]}
-                    >
-                      <Text style={[styles.classChoiceText, selected && styles.classChoiceTextSelected]}>{classId}</Text>
-                    </Interactive>
-                  );
-                })}
-              </View>
-              <View style={styles.semesterChoices} accessibilityRole="radiogroup" accessibilityLabel="Browse semesters">
-                {([1, 2] as const).map((semester) => {
-                  const selected = semester === viewing.semester;
-                  return (
-                    <Interactive
-                      key={semester}
-                      onPress={() => showEnvironment({ classId: viewing.classId, semester })}
-                      accessibilityRole="radio"
-                      accessibilityState={{ selected }}
-                      style={[styles.semesterChoice, selected && styles.classChoiceSelected]}
-                    >
-                      <Text style={[styles.classChoiceText, selected && styles.classChoiceTextSelected]}>Semester {semester}</Text>
-                    </Interactive>
-                  );
-                })}
-              </View>
-            </Card>
+            browsePanel
           )}
         </View>
       ) : null}
@@ -481,6 +557,12 @@ function createStyles(colors: ThemeColors) {
     reviewHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     reviewIcon: { width: 34, height: 34, borderRadius: 11, backgroundColor: colors.primarySubtle, alignItems: 'center', justifyContent: 'center' },
     kicker: { ...Type.overline, color: colors.textTertiary },
+    oTop: { marginBottom: 28, gap: 16 },
+    oHeader: { marginBottom: 0 },
+    oActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 },
+    oBrowse: { marginBottom: 28 },
+    oColumn: { gap: 32 },
+    oChoice: { borderRadius: 8, borderWidth: 1, borderColor: colors.border, backgroundColor: 'transparent' },
     reviewTitle: { ...Type.title2, fontSize: 20, color: colors.text },
     reviewText: { fontSize: 13, lineHeight: 19, color: colors.textSecondary },
   });

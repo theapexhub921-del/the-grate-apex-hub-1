@@ -36,7 +36,7 @@ export const ATMOSPHERE: Record<ColorSchemeName, AtmospherePalette> = {
     grainBlend: 'overlay',
   },
   light: {
-    base: '#F6F6F2',
+    base: '#F4F5F7',
     fieldA: ['#1677F2', 0.1],
     fieldB: ['#7EB2FF', 0.11],
     fieldC: ['#E0E8F8', 0.8],

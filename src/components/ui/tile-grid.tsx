@@ -2,9 +2,11 @@ import { StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/icon';
 import { PressableCard } from '@/components/ui/interactive';
+import { List, ListRow } from '@/components/ui/list';
 import { Pill } from '@/components/ui/pill';
 import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 export type Tile = { id: string; icon: IconName; title: string; detail: string; badge?: string; onPress: () => void; disabled?: boolean; hidden?: boolean };
@@ -18,6 +20,24 @@ const rows = <T,>(items: readonly T[], size: number) => Array.from({ length: Mat
  * screens show fewer.
  */
 export function TileGrid({ tiles, columns = 2 }: { tiles: readonly Tile[]; columns?: number }) {
+  // Originate: the same tools as a list of rows (docs/design-system.md: lists
+  // of the same kind of thing are rows, not cards; no decorative icons).
+  const originate = useExperience() === 'originate';
+  if (originate) return <TileList tiles={tiles} />;
+  return <TileCards tiles={tiles} columns={columns} />;
+}
+
+function TileList({ tiles }: { tiles: readonly Tile[] }) {
+  return (
+    <List>
+      {tiles.filter((tile) => !tile.hidden).map((tile) => (
+        <ListRow key={tile.id} title={tile.title} detail={tile.detail} meta={tile.badge} metaTone={tile.badge ? 'attention' : 'default'} onPress={tile.onPress} disabled={tile.disabled} disabledReason={tile.disabled ? tile.detail : undefined} />
+      ))}
+    </List>
+  );
+}
+
+function TileCards({ tiles, columns }: { tiles: readonly Tile[]; columns: number }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const { width } = useWindowDimensions();

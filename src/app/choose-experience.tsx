@@ -13,7 +13,6 @@ import { Pill } from '@/components/ui/pill';
 import { PageHeader, Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { Radius, type ThemeColors, Type } from '@/constants/theme';
-import { Icon } from '@/components/ui/icon';
 import { EXPERIENCE_CHOICE_ORDER, EXPERIENCE_INFO, type ExperienceId, isExperience, RECOMMENDED_EXPERIENCE, saveExperience } from '@/data/experience';
 import { useAuth } from '@/hooks/use-auth';
 import { ExperiencePreview } from '@/hooks/use-experience';
@@ -28,7 +27,6 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 // icon and navigation), in the learner's own themes.
 export default function ChooseExperienceScreen() {
   const styles = useThemedStyles(createStyles);
-  const colors = useTheme();
   const { user } = useAuth();
   const saved = isExperience(user?.profile?.experience) ? user?.profile?.experience : null;
   const [choice, setChoice] = useState<ExperienceId | null>(saved ?? RECOMMENDED_EXPERIENCE);
@@ -81,16 +79,6 @@ export default function ChooseExperienceScreen() {
                   {id === RECOMMENDED_EXPERIENCE ? <Pill label="Recommended" tone="primary" /> : null}
                 </View>
                 <Text style={styles.summary}>{info.summary}</Text>
-                {info.highlights?.length ? (
-                  <View style={styles.highlights}>
-                    {info.highlights.map((line) => (
-                      <View key={line} style={styles.highlight}>
-                        <Icon name="check" size={14} color={colors.primaryText} strokeWidth={2.6} />
-                        <Text style={styles.highlightText}>{line}</Text>
-                      </View>
-                    ))}
-                  </View>
-                ) : null}
                 {selected ? <Text style={styles.chosen}>Selected</Text> : null}
                 </View>
               </Card>
@@ -122,7 +110,7 @@ function SampleScreen({ experience }: { experience: ExperienceId }) {
   const styles = useThemedStyles(createSampleStyles);
   return (
     <View style={[styles.frame, { borderColor: colors.border }]} pointerEvents="none" aria-hidden>
-      {experience === 'originate' ? <Atmosphere mood="lively" /> : <LegacyBackground />}
+      {experience === 'originate' ? <Atmosphere mood="calm" /> : <LegacyBackground />}
       <View style={styles.content}>
         <PageHeader title="Study" subtitle="Pick up where you left off." style={styles.header} />
         <Card style={styles.card}>
@@ -169,9 +157,6 @@ function createStyles(colors: ThemeColors) {
     nameRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 },
     name: { ...Type.title3, color: colors.text },
     summary: { fontSize: 14.5, lineHeight: 22, color: colors.textSecondary },
-    highlights: { gap: 6, marginTop: 6 },
-    highlight: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
-    highlightText: { flex: 1, minWidth: 0, fontSize: 13.5, lineHeight: 19, color: colors.text },
     error: { fontSize: 13, color: colors.error },
   });
 }

@@ -7,8 +7,9 @@ import { SvgXml } from 'react-native-svg';
 import { Icon } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
 import { Text } from '@/components/ui/text';
-import { Type, type ThemeColors } from '@/constants/theme';
+import { Fonts, Type, type ThemeColors } from '@/constants/theme';
 import { type Block, loadLegacyImage, parseRich, type Run } from '@/data/legacy-study';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // The original app's lesson blocks (old-reference/src/screens/LessonBlocks.tsx),
@@ -107,13 +108,15 @@ function tone(colors: ThemeColors, name?: string) {
 
 export function LegacyBlocks({ blocks }: { blocks: readonly Block[] }) {
   const styles = useThemedStyles(createStyles);
+  // Originate: lesson text is set in Source Serif, like a textbook (docs/design-system.md).
+  const serif = useExperience() === 'originate' ? styles.serif : null;
   const colors = useTheme();
   return (
     <>
       {blocks.map((b, i) => {
         switch (b.k) {
           case 'p':
-            return <Rich key={i} x={b.x} style={b.lede ? styles.lede : styles.p} />;
+            return <Rich key={i} x={b.x} style={serif ? [b.lede ? styles.lede : styles.p, serif] : b.lede ? styles.lede : styles.p} />;
           case 'h':
             return <Rich key={i} x={b.x} style={b.l === 3 ? styles.h3 : styles.h4} />;
           case 'ul':
@@ -122,7 +125,7 @@ export function LegacyBlocks({ blocks }: { blocks: readonly Block[] }) {
                 {b.items.map((item, j) => (
                   <View key={j} style={styles.li}>
                     <Text style={styles.bullet}>{b.ol ? `${j + 1}.` : item.startsWith('– ') ? '' : '•'}</Text>
-                    <Rich x={item} style={[styles.p, styles.liText]} />
+                    <Rich x={item} style={serif ? [styles.p, styles.liText, serif] : [styles.p, styles.liText]} />
                   </View>
                 ))}
               </View>
@@ -229,6 +232,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     flex: { flex: 1, minWidth: 0 },
     p: { ...Type.body, fontSize: 15.5, lineHeight: 25, color: colors.text, marginBottom: 12 },
+    serif: { fontFamily: Fonts.serif, fontSize: 17, lineHeight: 28 },
     lede: { fontSize: 17, lineHeight: 27, color: colors.text, marginBottom: 14, fontWeight: '600' },
     h3: { ...Type.title3, color: colors.text, marginTop: 8, marginBottom: 8 },
     h4: { fontSize: 15.5, fontWeight: '700', color: colors.primaryText, marginTop: 6, marginBottom: 6 },

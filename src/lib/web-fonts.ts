@@ -1,10 +1,13 @@
 import { Platform } from 'react-native';
 
-// Loads the GRATEAPEX display face (Manrope) on the web without ever
-// blocking the first paint: the stylesheet is added after start-up, text
-// renders immediately in the system font, then swaps (font-display: swap).
-// If the font cannot be reached, everything stays readable in the fallback.
-const HREF = 'https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800;900&display=swap';
+// Loads this app's faces on the web without ever blocking the first paint:
+// the stylesheet is added after start-up, text renders immediately in the
+// system font, then swaps (font-display: swap). If the fonts cannot be
+// reached, everything stays readable in the fallback.
+//   IBM Plex Sans + Source Serif 4 — Originate (docs/design-system.md)
+//   Nunito Sans — the display face Hybrid's lighter headings still use
+const HREF =
+  'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Nunito+Sans:wght@600;700;800;900&display=swap';
 
 let requested = false;
 

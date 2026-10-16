@@ -13,6 +13,7 @@ import { pickQuestion, qotdDay, readCloudAnswer, readLocalAnswer, readTally, sav
 import { type Answer, isAnswerCorrect } from '@/data/questions';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { routes } from '@/lib/routes';
+import { useExperience } from '@/hooks/use-experience';
 import { setPendingXpReward } from '@/components/xp-toast';
 import { XP_RULES } from '@/data/learning/xp-rules';
 import { awardXp } from '@/data/progress';
@@ -27,6 +28,7 @@ type Status = 'loading' | 'open' | 'saved' | 'elsewhere' | 'not-saved' | 'local'
 
 export function QuestionOfTheDay() {
   const styles = useThemedStyles(createStyles);
+  const experience = useExperience();
   const day = qotdDay();
   const question = useMemo(() => pickQuestion(day), [day]);
   const [answer, setAnswer] = useState<Answer | undefined>(undefined);
@@ -70,6 +72,7 @@ export function QuestionOfTheDay() {
 
   if (!question) return null;
   const entry = findLesson(question.lessonId);
+  const originate = experience === 'originate';
 
   async function check() {
     if (answer === undefined || typeof answer !== 'number' || !question) return;
@@ -116,7 +119,8 @@ export function QuestionOfTheDay() {
           ) : null}
         </View>
       ) : (
-        <Button label="Check answer" size="sm" onPress={() => void check()} disabled={answer === undefined || status !== 'open'} />
+        // Originate: secondary, so the page's own next step stays the one primary button.
+        <Button label="Check answer" size="sm" variant={originate ? 'secondary' : 'primary'} onPress={() => void check()} disabled={answer === undefined || status !== 'open'} />
       )}
     </Card>
   );

@@ -11,10 +11,15 @@ import Animated, {
 
 import { Icon } from '@/components/ui/icon';
 import { Radius, type ThemeColors } from '@/constants/theme';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
-/** Gentle social-learning line art behind the Learn welcome message. */
+/** Gentle social-learning line art behind the Learn welcome message (not in Originate: a plain heading there). */
 export function LearningWelcomeAtmosphere({ children }: PropsWithChildren) {
+  return useExperience() === 'originate' ? <View>{children}</View> : <WelcomeArt>{children}</WelcomeArt>;
+}
+
+function WelcomeArt({ children }: PropsWithChildren) {
   const colors = useTheme();
   const styles = useThemedStyles(createStyles);
   const { width } = useWindowDimensions();

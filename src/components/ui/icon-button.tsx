@@ -5,7 +5,9 @@ import { Icon, type IconName } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
+import { ORadius } from '@/constants/originate';
 import type { ThemeColors } from '@/constants/theme';
+import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // A round icon-only button (settings, notifications, close…).
@@ -29,16 +31,19 @@ export function IconButton({
 }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  // Originate: a rounded square (radius 8), and a press dims instead of shrinking.
+  const originate = useExperience() === 'originate';
   return (
     <Interactive
       onPress={onPress}
       accessibilityLabel={badge ? `${label}, ${badge} new` : label}
       style={({ hovered, pressed }) => [
         styles.base,
-        { width: size, height: size, borderRadius: size / 2 },
+        { width: size, height: size, borderRadius: originate ? ORadius.control : size / 2 },
         tone === 'surface' && styles.surface,
+        tone === 'surface' && originate && styles.surfaceOriginate,
         hovered && styles.hovered,
-        pressed && styles.pressed,
+        pressed && (originate ? styles.pressedOriginate : styles.pressed),
         style,
       ]}
     >
@@ -66,6 +71,8 @@ function createStyles(colors: ThemeColors) {
     surface: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.hairline },
     hovered: { backgroundColor: colors.surfaceMuted },
     pressed: { transform: [{ scale: 0.94 }] },
+    surfaceOriginate: { borderColor: colors.border },
+    pressedOriginate: { opacity: 0.75 },
     badge: {
       position: 'absolute',
       top: 2,

@@ -11,15 +11,14 @@ export const EXPERIENCES_ENABLED = true;
 export const EXPERIENCES = ['originals', 'originate', 'hybrid'] as const;
 export type ExperienceId = (typeof EXPERIENCES)[number];
 
-export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: string; highlights?: readonly string[] }> = {
+export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: string }> = {
   originals: {
     name: 'The Originals',
     summary: 'The original GrAte Apex Hub, as it was: its colours, emoji, fonts, glass panels, gradient background and navigation — with every new feature inside it.',
   },
   originate: {
     name: 'Originate',
-    summary: 'The newest GrAte Apex Hub design, refined: living light behind every page, softly lit cards, glowing gradient buttons and smooth page entrances — calm and readable in lessons and quizzes.',
-    highlights: ['On computers, a soft light follows your pointer', 'Lit cards and gradient buttons that glow on hover', 'Pages fade in smoothly; lessons and quizzes stay calm'],
+    summary: 'The current GrAte Apex Hub design: plain pages, lists you can scan quickly, one clear next step on each screen, and a bottom tab bar on phones.',
   },
   hybrid: {
     name: 'Hybrid',
@@ -27,7 +26,7 @@ export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: stri
   },
 };
 
-/** The experience the chooser recommends (2026-10-16 Originate makeover): listed first, preselected, with a "Recommended" badge. */
+/** The experience the chooser recommends: listed first, preselected, with a "Recommended" tag. */
 export const RECOMMENDED_EXPERIENCE: ExperienceId = 'originate';
 
 /** The chooser's order: the recommended experience first, then the others as defined. */

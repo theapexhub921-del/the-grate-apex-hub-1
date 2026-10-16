@@ -12,21 +12,13 @@ What each one is (owner's definition):
   background with floating science emoji, floating pill bar (phones) and 250px
   emoji sidebar (desktop ≥ 1200px, auto-hide from the original `autoHideNav`
   setting). The logo is the new GA mark (owner request).
-- **Originate** — this app's own design. Since the 2026-10-16 makeover it is the
-  **recommended** experience (listed first and preselected in the chooser;
-  `RECOMMENDED_EXPERIENCE` in `src/data/experience.ts`). Originate-only finish:
-  - cards: radius 22, a faint top light on resting/raised cards, a lift with a
-    soft glow in the main colour on hover (`components/ui/interactive.tsx`);
-  - buttons: main actions are a diagonal gradient of their colour and glow on
-    hover (`components/ui/button.tsx`; helpers `originateFill` / `originateGlow`
-    in `src/data/experience-style.ts`);
-  - pages fade in (opacity only, skipped under reduced motion) and page eyebrows
-    lead with a small gold-to-blue mark (`components/ui/screen.tsx`);
-  - the atmosphere has a pointer light that follows the mouse on computers —
-    strong on Home/Explore, faint on quiet pages, off in lessons and quizzes,
-    on touch screens and under reduced motion (`components/atmosphere/`);
-  - navigation: a lit selection pill with a glowing marker and a gradient Study
-    button (floating bar); a glowing gold edge on the active rail row (sidebar).
+- **Originate** — this app's own design, built on the Originate design system
+  (`docs/design-system.md`, adopted 2026-10-16): IBM Plex Sans with Source
+  Serif 4 for lesson text, a restrained palette, plain page backgrounds, flat
+  bordered cards only where grouping helps, lists as rows, one primary action
+  per screen, and a docked tab bar on phones. It is the **recommended**
+  experience (listed first and preselected in the chooser;
+  `RECOMMENDED_EXPERIENCE` in `src/data/experience.ts`).
 - **Hybrid** — one blended interface: this app's layouts, navigation, icons and
   motion with the original gradient background (with this app's drawn motifs),
   frosted glass panels, gradient pill buttons for main actions, the original

@@ -174,22 +174,33 @@ describe('Appearance: one list of themes (owner rules, 2026-10-10)', async () =>
   });
 });
 
-describe('Originate makeover (2026-10-16)', async () => {
-  const { originateFill, originateGlow, originateLight } = await import('@/data/experience-style');
-  const { EXPERIENCE_CHOICE_ORDER, EXPERIENCES, RECOMMENDED_EXPERIENCE, EXPERIENCE_INFO } = await import('@/data/experience');
-  it('gradient fills start a little lighter and end on the colour itself', () => {
-    assert.equal(originateLight('#000000', 0.5), '#808080');
-    assert.equal(originateLight('rgba(0,0,0,0.5)'), 'rgba(0,0,0,0.5)');
-    const fill = originateFill('#1677F2');
-    assert.match(fill, /^linear-gradient\(135deg, #[0-9a-f]{6} 0%, #1677F2 64%\)$/);
+describe('Originate type rules (docs/design-system.md)', async () => {
+  const { isLabelStyle, originateFamily, originateWeight, sentenceCaseLabel, ORIGINATE_SANS, ORIGINATE_SERIF } = await import('@/data/originate-type');
+  it('draws heavy weights as 600 and keeps 400/500', () => {
+    assert.equal(originateWeight('900'), '600');
+    assert.equal(originateWeight('800'), '600');
+    assert.equal(originateWeight('bold'), '600');
+    assert.equal(originateWeight(500), '500');
+    assert.equal(originateWeight('400'), '400');
+    assert.equal(originateWeight(undefined), undefined);
   });
-  it('glows are a soft shadow in the colour', () => {
-    assert.equal(originateGlow('#FDC00A', 0.5, 20, 6), '0px 6px 20px rgba(253,192,10,0.5)');
+  it('recognises the small tracked label style', () => {
+    assert.equal(isLabelStyle({ fontSize: 11, letterSpacing: 1.2 }), true);
+    assert.equal(isLabelStyle({ fontSize: 16, letterSpacing: 1.2 }), false);
+    assert.equal(isLabelStyle({ fontSize: 11 }), false);
   });
-  it('the chooser lists Originate first and keeps all three experiences', () => {
-    assert.equal(RECOMMENDED_EXPERIENCE, 'originate');
-    assert.equal(EXPERIENCE_CHOICE_ORDER[0], 'originate');
-    assert.deepEqual([...EXPERIENCE_CHOICE_ORDER].sort(), [...EXPERIENCES].sort());
-    assert.ok(EXPERIENCE_INFO.originate.highlights?.length);
+  it('turns all-caps labels into sentence case and keeps acronyms', () => {
+    assert.equal(sentenceCaseLabel('SPACED REVIEW'), 'Spaced review');
+    assert.equal(sentenceCaseLabel('APEX CHALLENGE · FATTY ACID BIOSYNTHESIS'), 'Apex challenge · Fatty acid biosynthesis');
+    assert.equal(sentenceCaseLabel('XP BATTLE · HB2'), 'XP battle · HB2');
+    assert.equal(sentenceCaseLabel('Already sentence case'), 'Already sentence case');
+    assert.equal(sentenceCaseLabel('12 DUE'), '12 due');
+  });
+  it('uses Plex Sans for the interface and Source Serif for reading', () => {
+    assert.equal(originateFamily(undefined), ORIGINATE_SANS);
+    assert.equal(originateFamily('var(--font-heading)'), ORIGINATE_SANS);
+    assert.equal(originateFamily('var(--font-serif)'), ORIGINATE_SERIF);
+    assert.equal(originateFamily('Poppins, ui-sans-serif, system-ui, sans-serif'), ORIGINATE_SANS);
+    assert.equal(originateFamily('var(--font-mono)'), 'var(--font-mono)');
   });
 });
