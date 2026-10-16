@@ -286,12 +286,13 @@
       margin: 0 -8px;
       border-radius: var(--r-sm);
       cursor: pointer;
+      position: relative;   /* the hidden checkbox must sit inside its row, or focusing it scrolls the whole panel */
       transition: background 0.12s;
     }
 
     .sys.sub { margin-left: 14px; }
     .sys:hover { background: var(--cobalt-2); }
-    .sys input { position: absolute; opacity: 0; pointer-events: none; }
+    .sys input { position: absolute; left: 0; top: 0; width: 20px; height: 20px; margin: 0; opacity: 0; pointer-events: none; }
 
     .swatch {
       width: 20px;
@@ -1012,6 +1013,7 @@
         body.classList.toggle('panel-closed', closed);
         if (closed) panel.setAttribute('inert', ''); else panel.removeAttribute('inert');
       }
+      panel.addEventListener('scroll', function () { panel.scrollTop = 0; panel.scrollLeft = 0; });
       closeBtn.addEventListener('click', function () { setClosed(true); });
       openBtn.addEventListener('click', function () { setClosed(false); });
       setSheet('half');
@@ -1407,7 +1409,15 @@ bool inRegion(vec3 p) {
     // facing the camera fade. Bones get a higher floor so the skeleton stays readable through soft tissue.
     const XRAY_BONE = new Set(['skeletal', 'attachments', 'sinuses']);
     let xrayOn = false;
+    // 0 = nothing selected (every structure is a soft see-through shell); 1 = something is selected (the rest fades right back,
+    // so the selected structure is the one solid thing). One shared value, so no materials need swapping when the selection changes.
+    const xrayFocus = { value: 0 };
     const xrayCache = new Map();
+    const baseMat = m => {   // the material a part has when it is not selected
+      const mat = m.userData.mat || m.userData.system.mat;
+      return xrayOn ? xrayMat(mat, XRAY_BONE.has(m.userData.system.id)) : mat;
+    };
+    function syncXrayFocus() { xrayFocus.value = selectedParts.length ? 1 : 0; dirty = true; }
     function xrayMat(src, bone) {
       const key = src.uuid + (bone ? ':b' : ':s');
       let m = xrayCache.get(key);
@@ -1417,12 +1427,14 @@ bool inRegion(vec3 p) {
         m.transparent = true; m.depthWrite = false; m.side = THREE.DoubleSide;
         m.onBeforeCompile = sh => {
           regionHook(sh);
+          sh.uniforms.uXFocus = xrayFocus;
+          sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uXFocus;');
           sh.fragmentShader = sh.fragmentShader.replace('#include <opaque_fragment>', `#include <opaque_fragment>
             float xFr = 1.0 - abs(dot(normalize(normal), normalize(vViewPosition)));
-            float xA = ${bone ? 'mix(0.45, 1.0, pow(xFr, 1.4))' : 'mix(0.04, 0.8, pow(xFr, 2.2))'};
+            float xA = ${bone ? 'mix(mix(0.45, 1.0, pow(xFr, 1.4)), mix(0.07, 0.40, pow(xFr, 1.6)), uXFocus)' : 'mix(mix(0.04, 0.8, pow(xFr, 2.2)), mix(0.015, 0.30, pow(xFr, 2.0)), uXFocus)'};
             gl_FragColor = vec4(mix(gl_FragColor.rgb, vec3(0.62, 0.86, 1.0), ${bone ? '0.15' : '0.45'}) * ${bone ? '1.0' : '0.9'}, xA);`);
         };
-        m.customProgramCacheKey = () => 'region-xray-' + (bone ? 'bone' : 'soft');
+        m.customProgramCacheKey = () => 'region-xray2-' + (bone ? 'bone' : 'soft');
         xrayCache.set(key, m);
       }
       return m;
@@ -1430,9 +1442,9 @@ bool inRegion(vec3 p) {
     function setXray(on) {
       xrayOn = !!on;
       for (const { mesh } of index) {
-        if (mesh) mesh.material = xrayOn ? xrayMat(mesh.userData.mat, XRAY_BONE.has(mesh.userData.system.id)) : mesh.userData.mat;
+        if (mesh) mesh.material = selectedParts.includes(mesh) ? pickMat : baseMat(mesh);   // the selected part stays solid
       }
-      dirty = true;
+      syncXrayFocus();
       post({ type: 'xray', on: xrayOn });
     }
 
@@ -1714,7 +1726,7 @@ bool inRegion(vec3 p) {
         const u = e.mesh.userData;
         const m = mode === 'natural' ? u.naturalMat : mode === 'coded' ? u.paintMat : u.plainMat;
         u.mat = m;
-        if (!selectedParts.includes(e.mesh)) e.mesh.material = m;
+        if (!selectedParts.includes(e.mesh)) e.mesh.material = xrayOn ? xrayMat(m, XRAY_BONE.has(s.id)) : m;
       }
       if (s.codeInput) s.codeInput.checked = mode === 'coded';
       if (s.naturalInput) s.naturalInput.checked = mode === 'natural';
@@ -1837,7 +1849,7 @@ bool inRegion(vec3 p) {
     const revealBtn = document.getElementById('reveal');
     let selected = null, selectedPin = null, selectedParts = [];
     function restoreSelection() {
-      for (const m of selectedParts) m.material = m.userData.mat || m.userData.system.mat;
+      for (const m of selectedParts) m.material = baseMat(m);
       selectedParts = [];
     }
 
@@ -1845,12 +1857,13 @@ bool inRegion(vec3 p) {
       restoreSelection();
       selected = mesh;
       selectedPin = null; info.classList.remove('pin');
-      if (!mesh) { info.classList.remove('open'); refreshPins(); return; }
+      if (!mesh) { info.classList.remove('open'); syncXrayFocus(); refreshPins(); return; }
       const s = mesh.userData.system;
       if (isPeeled(s)) unpeelFor(s);
       if (s.group && !s.group.visible) { s.input.checked = true; s.group.visible = true; }
       selectedParts = partsOf(mesh);
       for (const m of selectedParts) m.material = pickMat;
+      syncXrayFocus();
       const { name, side, note } = mesh.userData.label;
       nameEl.textContent = name;
       let onto = '';
@@ -1866,6 +1879,7 @@ bool inRegion(vec3 p) {
       if (s.group && !s.group.visible) { s.input.checked = true; s.group.visible = true; }
       const r = s.pinData[i];
       selectedPin = { s, i };
+      syncXrayFocus();
       const side = r[1] === 'R' ? 'Right' : r[1] === 'L' ? 'Left' : '';
       pinHi.geometry.attributes.position.setXYZ(0, r[2], r[3], r[4]);
       pinHi.geometry.attributes.position.needsUpdate = true;
