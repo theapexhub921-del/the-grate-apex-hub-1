@@ -1596,7 +1596,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Central Nervous System",
     sourceFileIds: ["cns-cns-first-lecture-explained", "cns-sensory-physiology-study-guide", "cns-brain-study-guide", "cns-cns-notes-sensory-first-lecture", "cns-cns-notes-spinal-cord", "cns-cns-notes-brain", "cns-basal-ganglia", "cns-seconsory-continued-5", "cns-cns-notes-motor-1-proper", "cns-cns-notes-cerebelum", "cns-cnn-notes-sensory-second-lecture"],
-    status: "source-only",
+    status: "published",
     emoji: "🧠",
     outline: [
       { title: "Sensory Physiology (first lecture)", points: [], sourceRefs: [{ sourceId: "cns-cns-notes-sensory-first-lecture" }] },

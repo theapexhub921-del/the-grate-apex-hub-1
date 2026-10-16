@@ -1,14 +1,23 @@
 // Every lesson simulation, by id. Models only (pure, testable); the
 // drawings are in components/learning/simulations/.
 import type { SimulationId } from '@/data/lesson-types';
+import { basalGanglia } from '@/data/simulations/basal-ganglia';
 import { baroreflex } from '@/data/simulations/baroreflex';
+import { brainLesion } from '@/data/simulations/brain-lesion';
 import { cardiacCycle } from '@/data/simulations/cardiac-cycle';
+import { cerebellarReach } from '@/data/simulations/cerebellar-reach';
 import { capillaryStarling } from '@/data/simulations/capillary-starling';
 import { cerebralFlow } from '@/data/simulations/cerebral-flow';
+import { dorsalHorn } from '@/data/simulations/dorsal-horn';
 import { ecg } from '@/data/simulations/ecg';
+import { motorLesion } from '@/data/simulations/motor-lesion';
+import { painGate } from '@/data/simulations/pain-gate';
 import { pvLoop } from '@/data/simulations/pv-loop';
+import { receptorAdaptation } from '@/data/simulations/receptor-adaptation';
+import { sensoryTracts } from '@/data/simulations/sensory-tracts';
 import { shock } from '@/data/simulations/shock';
 import { soundsJvp } from '@/data/simulations/sounds-jvp';
+import { stretchReflex } from '@/data/simulations/stretch-reflex';
 import type { SimDefinition, SimValues } from '@/data/simulations/types';
 import { vesselFlow } from '@/data/simulations/vessel-flow';
 
@@ -22,6 +31,16 @@ export const SIMULATIONS: Record<SimulationId, SimDefinition> = {
   shock,
   'cerebral-flow': cerebralFlow,
   ecg,
+  // Central Nervous System
+  'receptor-adaptation': receptorAdaptation,
+  'stretch-reflex': stretchReflex,
+  'sensory-tracts': sensoryTracts,
+  'pain-gate': painGate,
+  'dorsal-horn': dorsalHorn,
+  'motor-lesion': motorLesion,
+  'cerebellar-reach': cerebellarReach,
+  'basal-ganglia': basalGanglia,
+  'brain-lesion': brainLesion,
 };
 
 export function getSimulation(id: SimulationId): SimDefinition | undefined {
