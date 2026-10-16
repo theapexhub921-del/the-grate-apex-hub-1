@@ -32,6 +32,10 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+  // Game builds (public/game-builds) are left entirely to the browser: never cached
+  // (updates always show) and never re-served, because the host redirects play.html
+  // to /play and a redirected reply from here would be refused for a page load.
+  if (new URL(request.url).pathname.startsWith('/game-builds/')) return;
 
   if (request.mode === 'navigate') {
     // Always the newest page from the network (bypassing the HTTP cache); the
@@ -54,10 +58,6 @@ self.addEventListener('fetch', (event) => {
   }
 
   const url = new URL(request.url);
-
-  // Game builds (public/game-builds) always come from the network, so a new
-  // version of a game is never hidden behind an old cached copy.
-  if (url.pathname.startsWith('/game-builds/')) return;
 
   // Question banks: show the saved copy straight away (the network can be slow or absent),
   // and refresh it in the background (a cheap "has it changed?" check) for next time.

@@ -11,6 +11,7 @@ import { isDesktopWidth, type ThemeColors } from '@/constants/theme';
 import { getStudyGame, LIVE_SITE } from '@/data/games';
 import { useDisplayName } from '@/data/user';
 import { useResolvedColorScheme, useThemedStyles } from '@/hooks/use-theme';
+import { isLocalPreview } from '@/lib/local-preview';
 
 const EXPLORE_HREF = '/explore' as Href;
 const game = getStudyGame('med-term-scramble')!;
@@ -24,7 +25,10 @@ export default function MedTermScrambleScreen() {
   const name = useDisplayName();
   const { width } = useWindowDimensions();
   const query = new URLSearchParams({ theme: scheme === 'dark' ? 'dark' : 'light', ...(name ? { name } : {}) }).toString();
-  const src = `${game.buildPath}?${query}`;
+  // The live site serves play.html as /play (clean URLs), so ask for /play there
+  // and skip the redirect; `npm run web` only knows the real file name.
+  const page = isLocalPreview() ? game.buildPath : game.buildPath.replace(/\.html$/, '');
+  const src = `${page}?${query}`;
 
   if (Platform.OS === 'web') {
     return (
