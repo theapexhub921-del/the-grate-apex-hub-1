@@ -374,6 +374,65 @@
       transform: rotate(180deg);
     }
 
+    #nav .navbtns {
+      display: flex;
+      gap: 4px;
+    }
+
+    #hint {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(340px, calc(100% - 32px));
+      padding: 14px 16px;
+      z-index: 7;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s, visibility 0.25s;
+    }
+
+    #hint.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #hint h2 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    #hint ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 13px;
+    }
+
+    #hint li {
+      margin: 3px 0;
+    }
+
+    #hint .hint-touch {
+      display: none;
+    }
+
+    @media (pointer: coarse) {
+      #hint .hint-mouse {
+        display: none;
+      }
+
+      #hint .hint-touch {
+        display: block;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #hint {
+        transition: none;
+      }
+    }
+
     #nav .seg {
       display: flex;
       border: 1px solid var(--line);
@@ -555,13 +614,18 @@
   <div id="nav" class="card" role="group" aria-label="View controls">
     <div class="navhead">
       <span>View</span>
-      <button id="navToggle" class="nt" type="button" aria-expanded="true" aria-controls="navBody"
-        aria-label="Hide view controls" title="Hide view controls">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4"
-          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M6 15l6-6 6 6" />
-        </svg>
-      </button>
+      <span class="navbtns">
+        <button id="navHelp" class="nt" type="button" aria-label="How to move around" title="How to move around">
+          <span aria-hidden="true" style="font-weight:700;font-size:14px;line-height:1">?</span>
+        </button>
+        <button id="navToggle" class="nt" type="button" aria-expanded="true" aria-controls="navBody"
+          aria-label="Hide view controls" title="Hide view controls">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 15l6-6 6 6" />
+          </svg>
+        </button>
+      </span>
     </div>
     <div id="navBody">
       <div class="seg" role="group" aria-label="What the arrows do">
@@ -620,6 +684,23 @@
         </button>
       </div>
     </div>
+  </div>
+
+  <div id="hint" class="card" role="status">
+    <h2>Moving around without the buttons</h2>
+    <ul class="hint-mouse">
+      <li>Drag to turn the model</li>
+      <li>Scroll to zoom toward the pointer</li>
+      <li>Right-drag, or Shift + drag, to move it</li>
+      <li>Double-click a structure to zoom to it; double-click empty space to reset</li>
+      <li>Arrow keys turn, Shift + arrows move, + and - zoom</li>
+    </ul>
+    <ul class="hint-touch">
+      <li>Drag with one finger to turn the model</li>
+      <li>Pinch to zoom toward your fingers</li>
+      <li>Drag with two fingers to move it</li>
+      <li>Double-tap a structure to zoom to it; double-tap empty space to reset</li>
+    </ul>
   </div>
 
   <div id="tip"></div>
@@ -1050,6 +1131,7 @@ bool inRegion(vec3 p) {
     controls.screenSpacePanning = true;
     controls.minDistance = 0.05;
     controls.maxDistance = 8;
+    controls.zoomToCursor = true;   // scroll or pinch zooms toward the point you are pointing at
 
     { // soft studio reflections: gives organs a moist, rounded look instead of flat clay
       const pm = new THREE.PMREMGenerator(renderer);
@@ -1542,7 +1624,7 @@ bool inRegion(vec3 p) {
       return hit ? { mesh: hit.object } : null;
     }
 
-    let down = null;
+    let down = null, lastTap = null;
     canvas.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now() }; });
     canvas.addEventListener('pointerup', e => {
       if (!down) return;
@@ -1552,6 +1634,15 @@ bool inRegion(vec3 p) {
       if (moved < 6 && quick) {
         const h = pickAt(e.clientX, e.clientY);
         if (h && h.pin) selectPin(h.pin.s, h.pin.i); else select(h ? h.mesh : null);
+        // double-click / double-tap: zoom to the structure under the pointer, or reset the view on empty space
+        const now = performance.now();
+        const dbl = e.button === 0 && lastTap && now - lastTap.t < 320 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 28;
+        lastTap = dbl || e.button !== 0 ? null : { x: e.clientX, y: e.clientY, t: now };
+        if (dbl) {
+          if (h && h.pin) { const r = h.pin.s.pinData[h.pin.i]; focusPoint(new THREE.Vector3(r[2], r[3], r[4])); }
+          else if (h) focusOn(h.mesh);
+          else resetView();
+        }
       }
     });
 
@@ -1883,6 +1974,16 @@ bool inRegion(vec3 p) {
         toggle.setAttribute('aria-label', label);
         toggle.title = label;
       });
+
+      // "How to move around" tip: shown briefly on opening, and again from the ? button.
+      // It goes away when you touch the model, or after a few seconds.
+      const hint = document.getElementById('hint');
+      let hintTimer = 0;
+      const hideHint = () => { clearTimeout(hintTimer); hint.classList.remove('show'); };
+      const showHint = () => { clearTimeout(hintTimer); hint.classList.add('show'); hintTimer = setTimeout(hideHint, 9000); };
+      document.getElementById('navHelp').addEventListener('click', () => (hint.classList.contains('show') ? hideHint() : showHint()));
+      canvas.addEventListener('pointerdown', hideHint);
+      setTimeout(showHint, 1200);
 
       // keyboard (ignored while typing in the search box or using a slider)
       const ARROW = { ArrowLeft: 'Left', ArrowRight: 'Right', ArrowUp: 'Up', ArrowDown: 'Down' };
