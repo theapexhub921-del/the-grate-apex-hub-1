@@ -26,3 +26,8 @@ supabase/.temp/
 .kilo/
 .qodo/
 dist-mobile-fix/
+
+# Game source projects (the web builds in public/game-builds are deployed)
+games/
+# Joined game file: Vercel rebuilds it from the parts
+public/game-builds/*/index.wasm

@@ -55,6 +55,10 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
 
+  // Game builds (public/game-builds) always come from the network, so a new
+  // version of a game is never hidden behind an old cached copy.
+  if (url.pathname.startsWith('/game-builds/')) return;
+
   // Question banks: show the saved copy straight away (the network can be slow or absent),
   // and refresh it in the background (a cheap "has it changed?" check) for next time.
   // A request that explicitly asks for a fresh copy (Settings → Offline study) goes to the network.
