@@ -383,9 +383,11 @@ export default function LearnScreen() {
   if (originate && viewing && !blockedSelection && legacyCourses.length > 0) {
     const next = viewingOwnClass && actions[0]?.kind !== 'explore-learn' ? actions[0] : undefined;
     const name = displayName?.trim();
-    const streakText = progress.streak > 0 ? `${progress.streak}-day streak` : 'No streak yet';
     return (
       <Screen width="wide">
+        <View style={styles.oStreakRow}>
+          <StreakWidgetCompact onPress={() => router.push(routes.progress())} />
+        </View>
         <View style={styles.oTop}>
           <PageHeader
             eyebrow={`${viewing.classId} · Semester ${viewing.semester}${viewingOwnClass ? '' : ' · preview'}`}
@@ -403,7 +405,6 @@ export default function LearnScreen() {
             ) : (
               <Button label="Back to my class" onPress={() => showEnvironment(ownSelection ?? viewing)} />
             )}
-            <Button label={streakText} variant="ghost" onPress={() => router.push(routes.progress())} accessibilityHint="Opens your progress" />
           </View>
         </View>
 
@@ -529,6 +530,7 @@ function createStyles(colors: ThemeColors) {
     reviewHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     reviewIcon: { width: 34, height: 34, borderRadius: 11, backgroundColor: colors.primarySubtle, alignItems: 'center', justifyContent: 'center' },
     kicker: { ...Type.overline, color: colors.textTertiary },
+    oStreakRow: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 12 },
     oTop: { marginBottom: 28, gap: 16 },
     oHeader: { marginBottom: 0 },
     oActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 },
