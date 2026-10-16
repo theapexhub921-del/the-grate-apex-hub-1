@@ -15,6 +15,7 @@ import {
   updateDoc,
   where,
   writeBatch,
+  limitToLast,
 } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
@@ -169,12 +170,6 @@ export type FriendChallenge = {
   created_at: string;
   starts_at: string | null;
   ends_at: string | null;
-};
-
-export type StreakFreezeBalance = {
-  user_id: string;
-  available: number;
-  updated_at: string;
 };
 
 async function signedInUserId(): Promise<string> {
@@ -721,7 +716,7 @@ export async function leaveStudyGroup(groupId: string) {
 }
 
 export async function listGroupDiscussion(groupId: string): Promise<GroupDiscussionPost[]> {
-  const snap = await getDocs(query(collection(db, 'groups', groupId, 'messages'), orderBy('createdAt', 'asc'), limit(200)));
+  const snap = await getDocs(query(collection(db, 'groups', groupId, 'messages'), orderBy('createdAt', 'asc'), limitToLast(200)));
   return snap.docs.map((item) => {
     const d = item.data();
     return { id: item.id, group_id: groupId, author_id: String(d.authorUid ?? ''), author_name: d.authorName ?? null, body: String(d.text ?? ''), created_at: iso(d.createdAt) };
@@ -760,7 +755,7 @@ export async function getOrCreateFriendConversation(friendId: string): Promise<s
 }
 
 export async function listConversationMessages(conversationId: string): Promise<CommunityMessage[]> {
-  const snap = await getDocs(query(collection(db, 'chats', conversationId, 'messages'), orderBy('createdAt', 'asc'), limit(200)));
+  const snap = await getDocs(query(collection(db, 'chats', conversationId, 'messages'), orderBy('createdAt', 'asc'), limitToLast(200)));
   return snap.docs.map((item) => {
     const d = item.data();
     const audio = d.audio && typeof d.audio.url === 'string' ? { url: d.audio.url as string, seconds: Number(d.audio.d) || 0 } : null;
@@ -876,23 +871,7 @@ export async function respondToFriendChallenge(challengeId: string, accept: bool
   });
 }
 
-export async function readStreakFreezeBalance(): Promise<StreakFreezeBalance | null> {
-  return {
-    user_id: auth.currentUser?.uid || '',
-    available: 0,
-    updated_at: new Date().toISOString(),
-  };
-}
-
-export async function getStreakFreezeBalance(): Promise<{ available: number }> {
-  return { available: 0 };
-}
-
-// There is no server streak on Firebase yet. 0 means "no server answer", so
-// progress.ts counts the streak itself from the learner's study days.
-export async function recordStreakActivityWithFreeze(_at: number): Promise<number> {
-  return 0;
-}
+// Streak freezes and restores live in data/progress.ts (rules: data/learning/streak-rules.ts).
 
 // ─── Read receipts and presence (sent ✓ · delivered ✓✓ · read ✓✓ blue) ─────
 // The chat document's `seen` map (the original app's read receipts) says when

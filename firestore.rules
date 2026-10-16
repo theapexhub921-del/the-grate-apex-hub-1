@@ -263,7 +263,7 @@ service cloud.firestore {
         && request.resource.data.xp is number
         && request.resource.data.xp >= 0
         && request.resource.data.xp <= 1000000
-        && request.resource.data.keys().hasOnly(['username','xp','level','title','streak',
+        && request.resource.data.keys().hasOnly(['username','xp','level','title','streak','streakDay','streakFreezes',
              'answered','accuracy','hall','semester','courseXp','updatedAt']);
       allow delete: if false;
     }
@@ -589,6 +589,19 @@ service cloud.firestore {
       return exists(/databases/$(database)/documents/follows/$(a + '_' + b))
         && exists(/databases/$(database)/documents/follows/$(b + '_' + a));
     }
+    // Friend streaks (src/data/friend-streak-store.ts): the days a freeze or restore
+    // covered, shared by the two friends. The id is the chat id (the two uids, sorted).
+    match /friendStreaks/{cid} {
+      allow read: if request.auth != null && request.auth.uid in cid.split('_');
+      allow create, update: if request.auth != null && request.auth.uid in cid.split('_')
+        && cid.split('_').size() == 2
+        && request.resource.data.keys().hasOnly(['covered', 'updatedAt'])
+        && request.resource.data.covered is list
+        && request.resource.data.covered.size() <= 400
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
     match /chats/{cid} {
       allow read: if resource == null || request.auth.uid in resource.data.members; // a missing chat holds nothing, so it may be looked up
       allow create: if request.auth.uid in request.resource.data.members

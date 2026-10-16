@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
@@ -9,46 +9,35 @@ import { Card, Interactive } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
 import { SectionHeader } from '@/components/ui/screen';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
-import { claimWeeklyChallengeReward, loadFriendBattleResults, loadWeeklyChallengeStatus, loadWeeklyLeague, type FriendBattleResults, type WeeklyChallengeStatus, type WeeklyLeagueEntry } from '@/data/connect-features';
+import { loadFriendBattleResults, loadWeeklyLeague, type FriendBattleResults, type WeeklyLeagueEntry } from '@/data/connect-features';
+import { FREEZE_LESSONS } from '@/data/learning/streak-rules';
+import { streakProtection, useProgress } from '@/data/progress';
 import { createFriendChallenge, listFriendChallenges, respondToFriendChallenge, type FriendChallenge } from '@/data/community';
 import { publishedTopics, getTopic } from '@/data/curriculum';
 import { type SocialPerson, personName, useSocial } from '@/data/social';
 import { useThemedStyles } from '@/hooks/use-theme';
 
+// Five lessons in a week earn a streak freeze, added automatically (data/progress.ts).
 export function WeeklyChallengeCard() {
   const styles = useThemedStyles(createStyles);
-  const [status, setStatus] = useState<WeeklyChallengeStatus | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  const refresh = useCallback(async () => {
-    try { setStatus(await loadWeeklyChallengeStatus()); setError(null); }
-    catch (caught) { setError(caught instanceof Error ? caught.message : 'Weekly challenge is not available.'); }
-  }, []);
-  useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
-
-  async function claim() {
-    setBusy(true);
-    setError(null);
-    try { await claimWeeklyChallengeReward(); await refresh(); }
-    catch (caught) { setError(caught instanceof Error ? caught.message : 'Could not claim your freeze.'); }
-    finally { setBusy(false); }
-  }
-
-  const complete = Boolean(status && status.lessons_completed >= status.lesson_target);
+  const progress = useProgress();
+  const protection = useMemo(() => streakProtection(), [progress.lessonsCompleted, progress.streakFreezes, progress.freezeWeeks]); // eslint-disable-line react-hooks/exhaustive-deps
+  const done = Math.min(protection.lessonsThisWeek, FREEZE_LESSONS);
+  const complete = protection.freezeEarnedThisWeek || done >= FREEZE_LESSONS;
   return (
     <Card style={styles.card}>
       <View style={styles.headingRow}>
-        <SectionHeader title="Weekly challenge" subtitle="Complete five lessons by the end of the week." style={styles.noMargin} />
-        {status ? <Pill label={`${Math.min(status.lessons_completed, status.lesson_target)}/${status.lesson_target}`} tone={complete ? 'success' : 'neutral'} /> : null}
+        <SectionHeader title="Weekly challenge" subtitle={`Complete ${FREEZE_LESSONS} lessons this week (Monday to Sunday) to earn a streak freeze.`} style={styles.noMargin} />
+        <Pill label={`${done}/${FREEZE_LESSONS}`} tone={complete ? 'success' : 'neutral'} />
       </View>
-      {status ? <View style={styles.track}><View style={[styles.trackFill, { width: `${Math.min(100, Math.round(status.lessons_completed / status.lesson_target * 100))}%` }]} /></View> : null}
-      <Text style={styles.muted}>Lessons completed this week. The streak-freeze reward is coming soon.</Text>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      {status?.reward_claimed ? <Text style={styles.success}>This week’s reward has been claimed. Freeze balance: {status.freeze_balance}.</Text> : null}
-      {status && !status.reward_claimed && complete ? (
-        <Button label="Freeze reward coming soon" onPress={() => void claim()} disabled loading={busy} />
-      ) : null}
+      <View style={styles.track}><View style={[styles.trackFill, { width: `${Math.round((done / FREEZE_LESSONS) * 100)}%` }]} /></View>
+      {protection.freezeEarnedThisWeek ? (
+        <Text style={styles.success}>This week’s freeze is yours. Freezes: {protection.freezes} of {protection.maxFreezes}.</Text>
+      ) : protection.freezes >= protection.maxFreezes ? (
+        <Text style={styles.muted}>Your freeze store is full ({protection.freezes} of {protection.maxFreezes}). Use one before you can earn another.</Text>
+      ) : (
+        <Text style={styles.muted}>Freezes: {protection.freezes} of {protection.maxFreezes}. A freeze covers one missed day of your streak, automatically.</Text>
+      )}
     </Card>
   );
 }

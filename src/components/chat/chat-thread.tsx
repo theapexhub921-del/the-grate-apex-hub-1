@@ -23,7 +23,9 @@ import { Radius, ReadReceiptBlues, Type, type ThemeColors } from '@/constants/th
 import { hideMessage, isHidden, isStarred, previewOf, REACTIONS, reactToMessage, type ReplyRef, sendChatMessage, setTyping, toggleStar, togglePin, uploadChatDocument, useChatPrefs } from '@/data/chat';
 import { contrastRatio } from '@/data/contrast';
 import { deleteCommunityMessage, getOrCreateFriendConversation, listConversationMessages, loadConversationMeta, markConversationSeen, messageStatus, sendVoiceNote, VOICE_NOTE_MAX_SECONDS, type CommunityMessage, type ConversationMeta, type MessageStatus } from '@/data/community';
-import { friendStreak } from '@/data/friend-streaks';
+import { FriendStreakNotice } from '@/components/chat/friend-streak-notice';
+import type { FriendStreakStatus } from '@/data/friend-streaks';
+import { loadFriendStreak } from '@/data/friend-streak-store';
 import { usePrivacyPreferences } from '@/data/settings';
 import { personName, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
@@ -127,7 +129,16 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
   const shown = search.trim() ? visible.filter((message) => message.body.toLowerCase().includes(search.trim().toLowerCase())) : visible;
   const pinnedId = chatId ? prefs.pinned[chatId] : undefined;
   const pinned = pinnedId ? visible.find((message) => message.id === pinnedId) : undefined;
-  const streak = user && !isGroup ? friendStreak(messages, user.id, friendId) : 0;
+  // Friend streak: from the chat's recent days (not just the messages on screen), reloaded when a message arrives.
+  const [streakInfo, setStreakInfo] = useState<FriendStreakStatus | null>(null);
+  const [streakTick, setStreakTick] = useState(0);
+  useEffect(() => {
+    if (isGroup || !friendId || !user) return;
+    let live = true;
+    void loadFriendStreak(friendId, { fresh: true }).then((status) => { if (live) setStreakInfo(status); });
+    return () => { live = false; };
+  }, [isGroup, friendId, user, messages.length, streakTick]);
+  const streak = streakInfo?.streak ?? 0;
   const typing = Boolean(meta?.otherTyping && now() - meta.otherTyping < 7000);
   const presence = isGroup ? `${group?.memberUids.length ?? 0} members${group?.description ? ` · ${group.description}` : ''}` : typing ? 'typing…' : meta?.otherOnline ? 'Active now' : meta?.otherLastSeen ? `Active ${ago(meta.otherLastSeen)}` : 'Messages with your friend';
   const last = visible[visible.length - 1];
@@ -278,13 +289,19 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
           <View style={styles.nameRow}>
             <Text style={styles.headName} numberOfLines={1}>{title}</Text>
             {isGroup ? null : <VerifiedBadge username={friend?.username} uid={friendId} size={15} />}
-            {streak > 0 ? <Text style={styles.streak} accessibilityLabel={`${streak}-day friend streak`}>🔥 {streak}</Text> : null}
+            {streak > 0 ? (
+              <View style={styles.streakBadge} accessibilityLabel={`${streak}-day friend streak`}>
+                <Icon name="streak" size={14} color={colors.accentText} filled />
+                <Text style={styles.streak}>{streak}</Text>
+              </View>
+            ) : null}
           </View>
           <Text style={[styles.presence, typing && styles.typing]} numberOfLines={1}>{presence}</Text>
         </View>
         <Interactive onPress={() => { setSearching((value) => !value); setSearch(''); }} accessibilityRole="button" accessibilityLabel="Search in this chat" style={styles.headButton}><Icon name="search" size={20} color={colors.text} /></Interactive>
         <Interactive onPress={() => (isGroup ? setGroupInfo(true) : openProfileCard(friendId))} accessibilityRole="button" accessibilityLabel={isGroup ? 'Group info' : `${title}'s profile`} style={styles.headButton}><Icon name="info" size={20} color={colors.text} /></Interactive>
       </View>
+      {!isGroup ? <FriendStreakNotice status={streakInfo} friendId={friendId} friendName={title} onChanged={() => setStreakTick((n) => n + 1)} /> : null}
       {searching ? <TextInput value={search} onChangeText={setSearch} placeholder="Search messages" placeholderTextColor={colors.textTertiary} accessibilityLabel="Search messages" style={styles.search} autoFocus /> : null}
       {pinned ? (
         <Interactive onPress={() => togglePin(chatId!, pinned.id)} accessibilityLabel="Pinned message. Tap to unpin" style={styles.pinned}>
@@ -576,6 +593,7 @@ function createStyles(colors: ThemeColors) {
     nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     headName: { ...Type.headline, color: colors.text, flexShrink: 1 },
     streak: { fontSize: 13, fontWeight: '800', color: colors.accentText },
+    streakBadge: { flexDirection: 'row', alignItems: 'center', gap: 2 },
     presence: { fontSize: 12.5, color: colors.textSecondary },
     typing: { color: colors.successText, fontWeight: '700' },
     headButton: { padding: 8, borderRadius: 999 },

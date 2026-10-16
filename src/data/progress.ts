@@ -22,10 +22,19 @@ import { ensureQuestionHistoryLoaded, getQuestionHistory, resetQuestionHistory }
 import { ensureQuizHistoryLoaded, resetQuizHistory } from '@/data/quiz-history';
 import { dayKey } from '@/data/learning/time';
 import type { XpBreakdown } from '@/data/learning/xp-rules';
-import { getStreakStatus } from '@/data/progression';
-import { recordStreakActivityWithFreeze } from '@/data/community';
 import { grantPowerup } from '@/data/learning/powerups';
 import { triggerStreakCelebration } from '@/components/streak-celebration';
+import {
+  applyActivity,
+  canRestore,
+  currentStreak,
+  freezeEarned,
+  type LostStreak,
+  MAX_FREEZES,
+  missedDays,
+  restoredState,
+  weekKeyOf,
+} from '@/data/learning/streak-rules';
 
 // XP, level, streak and completed lessons — persisted with AsyncStorage
 // (account-scoped) and synced with cloud progress.
@@ -70,6 +79,10 @@ export type ProgressData = {
   xpLedger: XpEntry[]; // newest first
   awardedKeys: string[]; // every reward key ever given (milestones, quizzes…)
   pendingPenalty: number; // negative XP not yet stored in Supabase (≥ 0)
+  // Streak protection (rules: data/learning/streak-rules.ts).
+  streakFreezes: number; // 0..MAX_FREEZES, used automatically for missed days
+  freezeWeeks: string[]; // weeks (Monday keys) that already earned a freeze
+  lostStreak: LostStreak | null; // the last streak that ended, while it can be restored
 
   subjects: {
     anatomy: { progress: number };
@@ -120,6 +133,9 @@ const progress: ProgressData = {
   xpLedger: [],
   awardedKeys: [],
   pendingPenalty: 0,
+  streakFreezes: 0,
+  freezeWeeks: [],
+  lostStreak: null,
   subjects: {
     anatomy: { progress: 0 },
     biochemistry: { progress: 0 },
@@ -176,6 +192,10 @@ async function loadProgress() {
       progress.xpLedger = Array.isArray(data.xpLedger) ? data.xpLedger.slice(0, LEDGER_LIMIT) : [];
       progress.awardedKeys = Array.isArray(data.awardedKeys) ? data.awardedKeys : progress.xpLedger.map((entry) => entry.key);
       progress.pendingPenalty = Math.max(0, Number(data.pendingPenalty) || 0);
+      progress.streakFreezes = clampFreezes(data.streakFreezes);
+      progress.freezeWeeks = Array.isArray(data.freezeWeeks) ? data.freezeWeeks.filter((week: unknown): week is string => typeof week === 'string').slice(-30) : [];
+      progress.lostStreak = parseLost(data.lostStreak);
+      noteLapse();
       syncSubjectProgress();
       notify();
     }
@@ -202,9 +222,39 @@ async function loadProgress() {
 function cloudStats() {
   return {
     total_xp: progress.xp,
-    current_streak: progress.streak,
+    current_streak: shownStreak(),
     last_activity_date: progress.lastActivityDate,
+    streak_freezes: progress.streakFreezes,
+    freeze_weeks: progress.freezeWeeks,
+    lost_streak: progress.lostStreak,
   };
+}
+
+const clampFreezes = (value: unknown) => Math.max(0, Math.min(MAX_FREEZES, Math.floor(Number(value) || 0)));
+
+function parseLost(value: unknown): LostStreak | null {
+  if (!value || typeof value !== 'object') return null;
+  const { streak, on } = value as { streak?: unknown; on?: unknown };
+  return typeof streak === 'number' && streak > 0 && typeof on === 'string' ? { streak: Math.floor(streak), on } : null;
+}
+
+/** The streak to show (0 once a missed day can't be covered by a freeze). */
+function shownStreak(now = Date.now()) {
+  return currentStreak({ streak: progress.streak, lastActivityDate: progress.lastActivityDate, freezes: progress.streakFreezes }, dayKey(now));
+}
+
+/**
+ * A whole missed day that no freeze covers ends the streak at midnight: keep it
+ * as `lostStreak` (it can be restored for a few days) and show 0 from now on.
+ */
+function noteLapse(now = Date.now()) {
+  if (progress.streak <= 0 || !progress.lastActivityDate) return false;
+  if (missedDays(progress.lastActivityDate, dayKey(now)) <= progress.streakFreezes) return false;
+  if (!progress.lostStreak || progress.lostStreak.streak < progress.streak || progress.lostStreak.on < progress.lastActivityDate) {
+    progress.lostStreak = { streak: progress.streak, on: dayKey(now) };
+  }
+  progress.streak = 0;
+  return true;
 }
 
 // Only lessons of this app's curriculum are synced: the cloud document is
@@ -252,8 +302,16 @@ async function syncProgressWithCloud(hasLocalProgress: boolean) {
   progress.level = levelFor(progress.xp);
   progress.streak = streak;
   progress.lastActivityDate = activityDate;
+  if (remote.streak) {
+    if (useRemoteActivity) progress.streakFreezes = clampFreezes(remote.streak.freezes);
+    progress.freezeWeeks = [...new Set([...progress.freezeWeeks, ...remote.streak.freezeWeeks])].sort().slice(-30);
+    const remoteLost = parseLost(remote.streak.lost);
+    if (remoteLost && (!progress.lostStreak || remoteLost.on > progress.lostStreak.on)) progress.lostStreak = remoteLost;
+    if (remote.streak.lost === null && useRemoteActivity) progress.lostStreak = null;
+  }
   syncSubjectProgress();
   const repaired = await repairStreakFromHistory();
+  noteLapse();
   await saveProgress();
   notify();
 
@@ -342,6 +400,8 @@ function subscribe(listener: () => void) {
 function createSnapshot(): ProgressData {
   return {
     ...progress,
+    streak: shownStreak(),
+    freezeWeeks: [...progress.freezeWeeks],
     completedLessons: [...progress.completedLessons],
     lessonCompletedAt: { ...progress.lessonCompletedAt },
     xpLedger: [...progress.xpLedger],
@@ -371,42 +431,39 @@ export function useProgress() {
 }
 
 // Any study activity today keeps (or starts) the streak. Local dates.
+// Rules (freezes, lost streaks): data/learning/streak-rules.ts.
 async function updateStreak(now = Date.now()) {
+  noteLapse(now);
   const previous = progress.streak;
   const prevDate = progress.lastActivityDate;
-  try {
-    const serverStreak = await recordStreakActivityWithFreeze(now);
-    if (serverStreak > 0) {
-      const grew = serverStreak > previous || !prevDate || prevDate !== dayKey(now);
-      progress.streak = serverStreak;
-      progress.lastActivityDate = dayKey(now);
-      await awardStreakPowerups(previous, progress.streak);
-      if (grew) triggerStreakCelebration({ streak: progress.streak, isNew: serverStreak > previous });
-      return;
-    }
-  } catch {
-    // Keep offline learning usable; the existing local streak calculation is the fallback.
-  }
-  const today = dayKey(now);
-  if (!progress.lastActivityDate) {
-    progress.streak = 1;
-    progress.lastActivityDate = today;
-    triggerStreakCelebration({ streak: 1, isNew: true });
-    return;
-  }
-  if (progress.lastActivityDate === today) return;
+  const result = applyActivity({ streak: progress.streak, lastActivityDate: progress.lastActivityDate, freezes: progress.streakFreezes }, dayKey(now));
+  progress.streak = result.state.streak;
+  progress.lastActivityDate = result.state.lastActivityDate;
+  progress.streakFreezes = result.state.freezes;
+  if (result.lost) progress.lostStreak = result.lost;
+  if (progress.streak > previous) await awardStreakPowerups(previous, progress.streak);
+  // A new day on the streak: celebrate it (components/streak-celebration.tsx).
+  if (prevDate !== progress.lastActivityDate) triggerStreakCelebration({ streak: progress.streak, isNew: progress.streak > previous });
+}
 
-  const [y, m, d] = progress.lastActivityDate.split('-').map(Number);
-  const last = new Date(y, (m ?? 1) - 1, d ?? 1).getTime();
-  const yesterday = new Date(now);
-  yesterday.setHours(0, 0, 0, 0);
-  yesterday.setDate(yesterday.getDate() - 1);
+/** A freeze for every week with FREEZE_LESSONS completed lessons (up to MAX_FREEZES stored). */
+function checkFreezeEarned(at: number) {
+  const week = weekKeyOf(at);
+  if (!freezeEarned(Object.values(progress.lessonCompletedAt), week, progress.freezeWeeks, progress.streakFreezes)) return false;
+  progress.streakFreezes = Math.min(MAX_FREEZES, progress.streakFreezes + 1);
+  progress.freezeWeeks = [...progress.freezeWeeks, week].slice(-30);
+  return true;
+}
 
-  const newStreak = last === yesterday.getTime() ? progress.streak + 1 : 1;
-  progress.streak = newStreak;
-  progress.lastActivityDate = today;
-  await awardStreakPowerups(previous, progress.streak);
-  triggerStreakCelebration({ streak: progress.streak, isNew: true });
+/** Any learning activity that earned no new XP (a retaken quiz, a re-read lesson): it still keeps the streak. */
+async function recordActivity() {
+  const before = `${progress.streak}|${progress.lastActivityDate}|${progress.streakFreezes}`;
+  await updateStreak();
+  if (before !== `${progress.streak}|${progress.lastActivityDate}|${progress.streakFreezes}`) {
+    await saveProgress();
+    notify();
+    void saveCloudProgress([], cloudStats());
+  }
 }
 
 const STREAK_POWERUPS = [
@@ -454,7 +511,11 @@ export async function awardXp(input: {
 }): Promise<number> {
   await ensureProgressLoaded();
   const key = `${input.sourceType}:${input.sourceId}`;
-  if (progress.awardedKeys.includes(key)) return 0;
+  if (progress.awardedKeys.includes(key)) {
+    // No second reward, but the learning still counts for the streak.
+    if (input.countsAsActivity !== false) await recordActivity();
+    return 0;
+  }
 
   const net = typeof input.amount === 'number' ? Math.round(input.amount) : input.amount.net;
   const before = progress.xp;
@@ -482,41 +543,71 @@ export async function awardXp(input: {
 }
 
 // Records study activity for the streak without any XP (e.g. a review
-// session whose reward was already given).
+// session whose reward was already given, or a flashcard session).
 export async function markStudyActivity() {
   await ensureProgressLoaded();
-  const before = progress.lastActivityDate;
-  await updateStreak();
-  if (before !== progress.lastActivityDate) {
-    await saveProgress();
-    notify();
-  }
+  await recordActivity();
 }
 
-/** Continue a lapsed streak after the server has atomically charged the coin cost. */
-export async function applyStreakRecovery(at = Date.now(), restoredStreak?: number) {
+/** Streak protection, for the screens. */
+export function streakProtection(now = Date.now()) {
+  return {
+    freezes: progress.streakFreezes,
+    maxFreezes: MAX_FREEZES,
+    lost: progress.lostStreak,
+    canRestore: canRestore(progress.lostStreak, dayKey(now)),
+    lessonsThisWeek: Object.values(progress.lessonCompletedAt).filter((at) => weekKeyOf(at) === weekKeyOf(now)).length,
+    freezeEarnedThisWeek: progress.freezeWeeks.includes(weekKeyOf(now)),
+  };
+}
+
+/**
+ * Puts a lost streak back, after the coins have been taken (data/apex-coins.ts).
+ * If the learner has studied since, the old streak carries on through today.
+ */
+export async function restoreLostStreak(at = Date.now()) {
   await ensureProgressLoaded();
-  if (restoredStreak === undefined && (progress.streak <= 0 || getStreakStatus(progress.streak, progress.lastActivityDate, new Date(at)) !== 'lapsed')) {
-    throw new Error('There is no lapsed streak to recover.');
-  }
-  if (restoredStreak !== undefined) progress.streak = Math.max(1, Math.floor(restoredStreak));
-  progress.lastActivityDate = dayKey(at);
+  const today = dayKey(at);
+  if (!progress.lostStreak || !canRestore(progress.lostStreak, today)) throw new Error('There is no lost streak to restore.');
+  const restored = restoredState({ streak: progress.streak, lastActivityDate: progress.lastActivityDate, freezes: progress.streakFreezes }, progress.lostStreak, today);
+  const previous = progress.streak;
+  progress.streak = restored.streak;
+  progress.lastActivityDate = restored.lastActivityDate;
+  progress.lostStreak = null;
+  await awardStreakPowerups(previous, progress.streak);
   await saveProgress();
   notify();
   void saveCloudProgress([], cloudStats());
+  return progress.streak;
+}
+
+/** Spends freezes (e.g. to protect a friend streak). False when there are not enough. */
+export async function spendStreakFreezes(count: number) {
+  await ensureProgressLoaded();
+  const n = Math.max(1, Math.floor(count));
+  if (progress.streakFreezes < n) return false;
+  progress.streakFreezes -= n;
+  await saveProgress();
+  notify();
+  void saveCloudProgress([], cloudStats());
+  return true;
 }
 
 export async function completeLesson(lessonId: string, _subject: Subject, xp: number, at = Date.now(), title?: string) {
   await ensureProgressLoaded();
 
-  // Prevent duplicate XP
-  if (progress.completedLessons.includes(lessonId)) return false;
+  // Prevent duplicate XP (doing a lesson again still counts for the streak)
+  if (progress.completedLessons.includes(lessonId)) {
+    await recordActivity();
+    return false;
+  }
 
   progress.completedLessons.push(lessonId);
   progress.lessonCompletedAt[lessonId] = at;
   progress.lessonsCompleted = progress.completedLessons.length;
   syncSubjectProgress();
   await updateStreak(at);
+  checkFreezeEarned(at);
 
   const key = `lesson:${lessonId}`;
   if (!progress.awardedKeys.includes(key)) {
@@ -547,6 +638,9 @@ function resetProgress() {
   progress.xpLedger = [];
   progress.awardedKeys = [];
   progress.pendingPenalty = 0;
+  progress.streakFreezes = 0;
+  progress.freezeWeeks = [];
+  progress.lostStreak = null;
   SUBJECTS.forEach((subject) => {
     progress.subjects[subject].progress = 0;
   });

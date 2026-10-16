@@ -1,5 +1,6 @@
 import { BackLink } from '@/components/learning/nav-bits';
 import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
@@ -19,7 +20,9 @@ import { Type, type ThemeColors } from '@/constants/theme';
 import { addDays, startOfDay } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
 import { findLesson, getTopic } from '@/data/curriculum';
-import { type FriendActivity, personName, useSocial } from '@/data/social';
+import { type FriendActivity, personName, type SocialPerson, useSocial } from '@/data/social';
+import { loadFriendStreak } from '@/data/friend-streak-store';
+import { RESTORE_COST } from '@/data/learning/streak-rules';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // The voice tutor remains the only Connect feature still in development.
@@ -39,6 +42,41 @@ const QUICK_ACTIONS: { label: string; detail: string; icon: IconName; href: stri
 
 // Social — the academic community. Your own week is real; classmate
 // features wait for real connections (nothing here is a fake person).
+// Friend streaks: days in a row you and each friend both messaged (data/friend-streaks.ts).
+function FriendStreaksCard({ friends }: { friends: SocialPerson[] }) {
+  const styles = useThemedStyles(createStyles);
+  const [streaks, setStreaks] = useState<Record<string, number>>({});
+  const ids = friends.slice(0, 12).map((friend) => friend.userId).join(',');
+  useEffect(() => {
+    let live = true;
+    const list = ids ? ids.split(',') : [];
+    void Promise.all(list.map(async (uid) => [uid, (await loadFriendStreak(uid).catch(() => null))?.streak ?? 0] as const)).then((pairs) => {
+      if (live) setStreaks(Object.fromEntries(pairs));
+    });
+    return () => { live = false; };
+  }, [ids]);
+  const ordered = [...friends.slice(0, 12)].sort((a, b) => (streaks[b.userId] ?? 0) - (streaks[a.userId] ?? 0));
+  return (
+    <Card style={styles.card}>
+      <View style={styles.cardHeader}>
+        <Text style={styles.cardTitle}>Friend streaks</Text>
+        <Pill label="Real stats" tone="success" />
+      </View>
+      {ordered.length ? ordered.map((friend) => {
+        const streak = streaks[friend.userId] ?? 0;
+        return (
+          <View key={friend.userId} style={styles.friendStreakRow}>
+            <PersonAvatar uid={friend.userId} uri={friend.avatarUrl} name={personName(friend)} size={36} ring={streak ? 'gold' : 'subtle'} />
+            <PersonLink uid={friend.userId} label={personName(friend)} style={styles.boardNameBox}><Text style={styles.boardName} numberOfLines={1}>{personName(friend)}</Text></PersonLink>
+            <Text style={styles.boardXp}>{streak} day{streak === 1 ? '' : 's'}</Text>
+          </View>
+        );
+      }) : <Text style={styles.note}>Add friends and message each other to start a friend streak.</Text>}
+      <Text style={styles.note}>A friend streak grows each day you both send each other a message. A missed day ends it at midnight, unless you cover it with a streak freeze or restore it for {RESTORE_COST} Apex Coins (open the chat).</Text>
+    </Card>
+  );
+}
+
 export default function SocialScreen() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
@@ -114,22 +152,7 @@ export default function SocialScreen() {
     </PressableCard>
   );
 
-  const friendStreaks = (
-    <Card style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>Friend streaks</Text>
-        <Pill label="Real stats" tone="success" />
-      </View>
-      {friends.length ? friends.map((friend) => (
-        <View key={friend.userId} style={styles.friendStreakRow}>
-          <PersonAvatar uid={friend.userId} uri={friend.avatarUrl} name={personName(friend)} size={36} ring={friend.streak ? 'gold' : 'subtle'} />
-          <PersonLink uid={friend.userId} label={personName(friend)} style={styles.boardNameBox}><Text style={styles.boardName} numberOfLines={1}>{personName(friend)}</Text></PersonLink>
-          <Text style={styles.boardXp}>{friend.streak ?? 0} days</Text>
-        </View>
-      )) : <Text style={styles.note}>Connect with classmates to see their current learning streaks here.</Text>}
-      <Text style={styles.note}>An earned freeze protects one missed day. A lapsed streak can be restored for 100 Apex Coins.</Text>
-    </Card>
-  );
+  const friendStreaks = <FriendStreaksCard friends={friends} />;
 
   const soon = (
     <Card style={styles.card} tone="outline">

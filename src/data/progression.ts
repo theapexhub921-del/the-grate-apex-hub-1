@@ -1,5 +1,6 @@
 // Presentation helpers for XP, levels and streaks.
 // They only READ existing progress data — they never change it.
+import { dayKeyOf, streakStatus } from '@/data/learning/streak-rules';
 
 // Must match the level rule in progress.ts:
 // level = Math.floor(xp / 100) + 1
@@ -30,37 +31,21 @@ export function getLevelProgress(xp: number): LevelProgress {
   };
 }
 
-// Same date format the streak logic in progress.ts uses (YYYY-MM-DD).
-function dayKey(date: Date) {
-  return date.toISOString().split('T')[0];
-}
-
 export type StreakStatus =
   | 'none' // no streak yet
-  | 'activeToday' // a lesson was completed today
-  | 'continueToday' // last lesson was yesterday: keep it going
-  | 'lapsed'; // a day was missed: the next lesson starts a new streak
+  | 'activeToday' // studied today
+  | 'continueToday' // last studied yesterday (or a freeze covers the missed days): keep it going
+  | 'lapsed'; // a day was missed with no freeze: the next study starts a new streak
 
+/** Uses the streak rules (data/learning/streak-rules.ts); a day covered by a freeze is not lapsed. */
 export function getStreakStatus(
   streak: number,
   lastActivityDate: string | null,
-  now: Date = new Date()
+  now: Date = new Date(),
+  freezes = 0
 ): StreakStatus {
-  if (!lastActivityDate || streak <= 0) {
-    return 'none';
-  }
-
-  if (lastActivityDate === dayKey(now)) {
-    return 'activeToday';
-  }
-
-  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-
-  if (lastActivityDate === dayKey(yesterday)) {
-    return 'continueToday';
-  }
-
-  return 'lapsed';
+  const status = streakStatus({ streak, lastActivityDate, freezes }, dayKeyOf(now.getTime()));
+  return status === 'frozen' ? 'continueToday' : status;
 }
 
 // One short, honest encouragement line based on real progress data.

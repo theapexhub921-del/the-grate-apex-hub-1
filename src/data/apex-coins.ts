@@ -1,11 +1,12 @@
 import { collection, doc, getDoc, getDocs, limit, query, runTransaction, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
+import { canRestore, RESTORE_COST } from '@/data/learning/streak-rules';
 import { dayKey } from '@/data/learning/time';
+import { restoreLostStreak, streakProtection } from '@/data/progress';
 import { announceGift } from '@/lib/web-push';
 
 export type ApexCoinReward = 'apex_challenge' | 'topic_completion';
-export type StreakRecoveryOffer = { id: string; lost_streak: number; lost_on: string };
 
 export async function readApexCoinBalance(): Promise<number> {
   const user = auth.currentUser;
@@ -99,19 +100,44 @@ export async function awardApexCoins(reward: ApexCoinReward, sourceId: string): 
   return current + added;
 }
 
-export async function buyStreakRecoveryWithCoins(at = Date.now()) {
+/** Takes `amount` coins in one transaction; refuses (nothing taken) when the balance is too low. Returns the new balance. */
+export async function spendApexCoins(amount: number): Promise<number> {
   const user = auth.currentUser;
-  if (!user) return { balance: 0, streak: 0 };
+  if (!user) throw new Error('Sign in to use Apex Coins.');
   const userRef = doc(db, 'users', user.uid);
-  const snap = await getDoc(userRef);
-  const current = Number(snap.data()?.coins ?? 0);
-  const price = 20;
-  if (current < price) throw new Error('You need 20 coins to recover your streak.');
-
-  await updateDoc(userRef, { coins: current - price });
-  return { balance: current - price, streak: 1 };
+  return runTransaction(db, async (tx) => {
+    const snap = await tx.get(userRef);
+    const current = Number(snap.data()?.coins ?? 0);
+    if (current < amount) throw new Error(`You need ${amount} Apex Coins for this. You have ${current}.`);
+    tx.update(userRef, { coins: current - amount });
+    return current - amount;
+  });
 }
 
-export async function readStreakRecoveryOffer(): Promise<StreakRecoveryOffer | null> {
-  return null;
+/** Gives coins back (e.g. when a paid action could not be completed). */
+export async function refundApexCoins(amount: number) {
+  const user = auth.currentUser;
+  if (!user) return;
+  const userRef = doc(db, 'users', user.uid);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(userRef);
+    tx.update(userRef, { coins: Number(snap.data()?.coins ?? 0) + amount });
+  }).catch(() => undefined);
+}
+
+/**
+ * Restores the learner's lost streak for RESTORE_COST coins (data/learning/streak-rules.ts).
+ * The coins are taken first; if the streak can't be restored they are given back.
+ */
+export async function restoreStreakWithCoins(at = Date.now()) {
+  const today = dayKey(at);
+  if (!canRestore(streakProtection(at).lost, today)) throw new Error('There is no lost streak to restore right now.');
+  const balance = await spendApexCoins(RESTORE_COST);
+  try {
+    const streak = await restoreLostStreak(at);
+    return { balance, streak };
+  } catch (error) {
+    await refundApexCoins(RESTORE_COST);
+    throw error;
+  }
 }

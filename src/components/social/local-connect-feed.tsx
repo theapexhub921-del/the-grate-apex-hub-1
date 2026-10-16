@@ -193,7 +193,7 @@ export function LocalConnectFeed({ compact = false }: { compact?: boolean }) {
           </View>
         ) : null}
         <View style={styles.inline}>
-          <Text style={styles.hint}>Nothing is sent to Supabase or saved.</Text>
+          <Text style={styles.hint}>Nothing is sent or saved.</Text>
           <Button label="Post" size="sm" disabled={!draft.trim() || (kind === 'poll' && options.filter((item) => item.trim()).length < 2)} onPress={publish} />
         </View>
       </Card>

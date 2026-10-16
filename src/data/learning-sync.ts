@@ -32,13 +32,28 @@ export type CloudLearningStats = {
   total_xp: number;
   current_streak: number;
   last_activity_date: string | null;
+  // Streak protection (data/learning/streak-rules.ts), when the app knows it.
+  streak_freezes?: number;
+  freeze_weeks?: string[];
+  lost_streak?: { streak: number; on: string } | null;
 };
+
+/** The streak fields worth saving next to the XP (progress/{uid}). */
+function streakFields(stats: CloudLearningStats) {
+  const fields: Record<string, unknown> = {};
+  if (stats.streak_freezes !== undefined) fields.streakFreezes = stats.streak_freezes;
+  if (stats.freeze_weeks !== undefined) fields.freezeWeeks = stats.freeze_weeks;
+  if (stats.lost_streak !== undefined) fields.lostStreak = stats.lost_streak;
+  return fields;
+}
 
 export type CloudLessonRow = { lessonId: string; completedAt: number | null };
 
 export type CloudProgress = {
   stats: CloudLearningStats | null;
   completedLessons: CloudLessonRow[];
+  /** Saved streak protection; absent on accounts that never saved it. */
+  streak?: { freezes: number; freezeWeeks: string[]; lost: unknown };
 };
 
 export type AttemptMode =
@@ -189,9 +204,13 @@ export async function loadCloudProgress(): Promise<CloudProgress | null> {
     // app's daily activity (not the number of days ever studied).
     const streak = typeof d.streak === 'number' ? d.streak : streakFromDays(d.days);
 
-    const lastActivity = d.savedAt?.toDate
-      ? d.savedAt.toDate().toISOString().split('T')[0]
-      : (d.lastActivityDate ?? null);
+    // The day the learner last studied. (savedAt is only when progress was last
+    // saved — opening the app also saves — so it is a fallback for old documents.)
+    const lastActivity = typeof d.lastActivityDate === 'string'
+      ? d.lastActivityDate
+      : d.savedAt?.toDate
+        ? d.savedAt.toDate().toISOString().split('T')[0]
+        : null;
 
     // Completions subcollection + earlier object entries in the shared map
     // (lesson-completions.ts); the original app's numbers are never read.
@@ -208,6 +227,13 @@ export async function loadCloudProgress(): Promise<CloudProgress | null> {
         last_activity_date: lastActivity,
       },
       completedLessons,
+      streak: 'streakFreezes' in d || 'freezeWeeks' in d || 'lostStreak' in d
+        ? {
+            freezes: Number(d.streakFreezes) || 0,
+            freezeWeeks: Array.isArray(d.freezeWeeks) ? d.freezeWeeks.filter((week: unknown): week is string => typeof week === 'string') : [],
+            lost: d.lostStreak ?? null,
+          }
+        : undefined,
     };
   } catch (error) {
     console.warn('Could not load learning progress from Firestore:', error);
@@ -286,7 +312,7 @@ export async function resetCloudLearningProgress() {
  * the original app's answered/accuracy/courseXp stay as they are); the rules
  * require the real username. Skipped until the learner has a username.
  */
-async function saveLeaderboardSummary(userId: string, totalXp: number) {
+async function saveLeaderboardSummary(userId: string, totalXp: number, stats?: CloudLearningStats) {
   try {
     const profile = (await getDoc(doc(db, 'users', userId))).data();
     const username = profile?.username;
@@ -298,6 +324,8 @@ async function saveLeaderboardSummary(userId: string, totalXp: number) {
         xp: Math.min(1_000_000, Math.max(0, Math.round(totalXp))),
         hall: typeof profile?.hall === 'string' ? profile.hall : '',
         semester: profile?.semester === 2 ? 2 : 1,
+        // Friends see this streak; streakDay (the last study day) lets them tell when it has lapsed.
+        ...(stats ? { streak: Math.max(0, Math.floor(stats.current_streak)), streakDay: stats.last_activity_date ?? '', streakFreezes: stats.streak_freezes ?? 0 } : {}),
         updatedAt: Date.now(),
       },
       { merge: true }
@@ -314,7 +342,7 @@ export async function saveCloudProgress(
   const userId = await getUserId();
   if (!userId) return;
   const progressDocRef = doc(db, 'progress', userId);
-  void saveLeaderboardSummary(userId, stats.total_xp);
+  void saveLeaderboardSummary(userId, stats.total_xp, stats);
 
   try {
     // Only this app's own fields, merged: the shared `lessons` map is not written.
@@ -324,6 +352,7 @@ export async function saveCloudProgress(
         xp: stats.total_xp,
         streak: stats.current_streak,
         lastActivityDate: stats.last_activity_date,
+        ...streakFields(stats),
         savedAt: serverTimestamp(),
         updatedAt: Date.now(),
       },
@@ -372,6 +401,7 @@ export async function saveCloudXpEvent(
         xp: stats.total_xp,
         streak: stats.current_streak,
         lastActivityDate: stats.last_activity_date,
+        ...streakFields(stats),
         savedAt: serverTimestamp(),
         updatedAt: Date.now(),
       },

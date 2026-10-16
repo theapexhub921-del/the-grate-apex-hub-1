@@ -12,8 +12,8 @@ import { Sheet } from '@/components/ui/sheet';
 import { Text, TextInput } from '@/components/ui/text';
 import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { listConversationMessages, listMyConversations, type ConversationSummary } from '@/data/community';
-import { friendStreak } from '@/data/friend-streaks';
+import { listMyConversations, type ConversationSummary } from '@/data/community';
+import { loadFriendStreak } from '@/data/friend-streak-store';
 import { personName, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -58,8 +58,8 @@ export function ChatList({ activeId, onOpen, onOpenGroup }: { activeId?: string 
       for (const chat of list.slice(0, 12)) {
         const hit = streaks.get(chat.id);
         if (hit && Date.now() - hit.at < 10 * 60_000) continue;
-        const messages = await listConversationMessages(chat.id).catch(() => []);
-        streaks.set(chat.id, { at: Date.now(), value: user ? friendStreak(messages, user.id, chat.otherId) : 0 });
+        const status = user && chat.otherId ? await loadFriendStreak(chat.otherId).catch(() => null) : null;
+        streaks.set(chat.id, { at: Date.now(), value: status?.streak ?? 0 });
         if (live) setTick((n) => n + 1);
       }
     };
@@ -134,7 +134,12 @@ export function ChatList({ activeId, onOpen, onOpenGroup }: { activeId?: string 
                 <View style={styles.nameRow}>
                   <Text style={[styles.name, chat.unread && styles.bold]} numberOfLines={1}>{label}</Text>
                   <VerifiedBadge username={person?.username ?? chat.otherName} uid={chat.otherId} size={13} />
-                  {streak > 0 ? <Text style={styles.streak}>🔥{streak}</Text> : null}
+                  {streak > 0 ? (
+                    <View style={styles.streakBadge} accessibilityLabel={`${streak}-day friend streak`}>
+                      <Icon name="streak" size={12} color={colors.accentText} filled />
+                      <Text style={styles.streak}>{streak}</Text>
+                    </View>
+                  ) : null}
                 </View>
                 <Text style={[styles.preview, chat.unread && styles.previewUnread]} numberOfLines={1}>{chat.lastFromMe ? 'You: ' : ''}{chat.lastText} · {when(chat.lastAt)}</Text>
               </View>
@@ -190,6 +195,7 @@ function createStyles(colors: ThemeColors) {
     name: { fontSize: 14.5, fontWeight: '600', color: colors.text, flexShrink: 1 },
     bold: { fontWeight: '800' },
     streak: { fontSize: 12, fontWeight: '800', color: colors.accentText },
+    streakBadge: { flexDirection: 'row', alignItems: 'center', gap: 2 },
     preview: { fontSize: 12.5, color: colors.textSecondary },
     previewUnread: { color: colors.text, fontWeight: '700' },
     dot: { width: 9, height: 9, borderRadius: 5, backgroundColor: colors.primary },

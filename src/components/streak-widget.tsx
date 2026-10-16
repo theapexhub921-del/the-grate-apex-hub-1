@@ -105,7 +105,7 @@ export function StreakStatTile({ style, onPress }: StreakStatTileProps) {
 
   const flameStyle = useAnimatedStyle(() => ({ transform: [{ scale: flameScale.value }] }));
 
-  const status = getStreakStatus(progress.streak, progress.lastActivityDate);
+  const status = getStreakStatus(progress.streak, progress.lastActivityDate, new Date(), progress.streakFreezes);
   const isLapsed = status === 'lapsed';
   const hasStreak = progress.streak > 0 && !isLapsed;
   const label = getStatusText(progress.streak, status);
@@ -189,7 +189,7 @@ export function StreakWidgetCompact({ onPress, style }: CompactProps) {
   const glowStyle = useAnimatedStyle(() => ({ opacity: glowOpacity.value }));
   const cardAnim = useAnimatedStyle(() => ({ transform: [{ scale: cardScale.value }] }));
 
-  const status = getStreakStatus(progress.streak, progress.lastActivityDate);
+  const status = getStreakStatus(progress.streak, progress.lastActivityDate, new Date(), progress.streakFreezes);
   const isLapsed = status === 'lapsed';
   const hasStreak = progress.streak > 0 && !isLapsed;
   const label = getStatusText(progress.streak, status);
@@ -283,7 +283,7 @@ export function StreakWidgetFull() {
   const flameStyle = useAnimatedStyle(() => ({ transform: [{ scale: flameScale.value }] }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: glowOpacity.value, transform: [{ scale: glowScale.value }] }));
 
-  const status = getStreakStatus(progress.streak, progress.lastActivityDate);
+  const status = getStreakStatus(progress.streak, progress.lastActivityDate, new Date(), progress.streakFreezes);
   const isLapsed = status === 'lapsed';
   const hasStreak = progress.streak > 0 && !isLapsed;
   const label = getStatusText(progress.streak, status);

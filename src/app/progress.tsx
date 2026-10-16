@@ -4,9 +4,9 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 import { MemoryDistribution } from '@/components/learning/memory-ui';
-import { applyStreakRecovery } from '@/data/progress';
-import { buyStreakRecoveryWithCoins, readApexCoinBalance, readStreakRecoveryOffer, type StreakRecoveryOffer } from '@/data/apex-coins';
-import { getStreakFreezeBalance } from '@/data/community';
+import { streakProtection } from '@/data/progress';
+import { readApexCoinBalance, restoreStreakWithCoins } from '@/data/apex-coins';
+import { FREEZE_LESSONS, RESTORE_COST, RESTORE_DAYS } from '@/data/learning/streak-rules';
 import { StatTile, BackLink } from '@/components/learning/nav-bits';
 import { StreakStatTile } from '@/components/streak-widget';
 import { LevelProgressCard } from '@/components/level-progress';
@@ -23,7 +23,6 @@ import { findLesson, getTopic } from '@/data/curriculum';
 import { reviewConsistency } from '@/data/learning/calendar';
 import { curriculumProgress, subjectProgress, TOPIC_STATUS_LABEL } from '@/data/learning/progress-model';
 import { describeAgo } from '@/data/learning/time';
-import { getStreakStatus } from '@/data/progression';
 import { useLearning } from '@/data/learning/use-learning';
 import { formatXp } from '@/data/learning/xp-rules';
 import { usePowerups } from '@/data/learning/powerups';
@@ -60,37 +59,32 @@ export default function ProgressScreen() {
   const timedBoosts = powerups.filter((powerup) => powerup.kind === 'timed');
   const [showAll, setShowAll] = useState(false);
   const [coinBalance, setCoinBalance] = useState<number | null>(null);
-  const [freezeBalance, setFreezeBalance] = useState<number | null>(null);
-  const [recoveryOffer, setRecoveryOffer] = useState<StreakRecoveryOffer | null>(null);
   const [recoveringStreak, setRecoveringStreak] = useState(false);
   const [coinError, setCoinError] = useState<string | null>(null);
   const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null);
   const overall = useMemo(() => curriculumProgress(inputs), [inputs]);
   const consistency = useMemo(() => reviewConsistency(attempts, now), [attempts, now]);
   const visible = showAll ? quizzes : quizzes.slice(0, RECENT_LIMIT);
-  const streakLapsed = getStreakStatus(progress.streak, progress.lastActivityDate, new Date(now)) === 'lapsed';
-  const canRecoverStreak = streakLapsed || Boolean(recoveryOffer);
+  // Freezes, this week's lessons and any restorable streak (progress.streak* fields are in the snapshot).
+  const protection = useMemo(() => streakProtection(now), [now, progress.streakFreezes, progress.lostStreak, progress.freezeWeeks, progress.lessonsCompleted]); // eslint-disable-line react-hooks/exhaustive-deps
+  const canRecoverStreak = protection.canRestore;
 
   useEffect(() => {
     let active = true;
-    Promise.all([readApexCoinBalance(), readStreakRecoveryOffer(), getStreakFreezeBalance()]).then(([balance, offer, freezes]) => {
-      if (active) { setCoinBalance(balance); setRecoveryOffer(offer); setFreezeBalance(freezes.available); }
-    }).catch(() => { if (active) { setCoinBalance(null); setRecoveryOffer(null); } });
+    readApexCoinBalance().then((balance) => { if (active) setCoinBalance(balance); }).catch(() => { if (active) setCoinBalance(null); });
     return () => { active = false; };
   }, []);
 
   async function recoverStreak() {
-    if (recoveringStreak || !canRecoverStreak || (coinBalance ?? 0) < 100) return;
+    if (recoveringStreak || !canRecoverStreak || (coinBalance ?? 0) < RESTORE_COST) return;
     const recoveryAt = Date.now();
     setRecoveringStreak(true);
     setCoinError(null);
     setRecoveryNotice(null);
     try {
-      const recovery = await buyStreakRecoveryWithCoins(recoveryAt);
-      await applyStreakRecovery(recoveryAt, recovery.streak);
+      const recovery = await restoreStreakWithCoins(recoveryAt);
       setCoinBalance(recovery.balance);
-      setRecoveryOffer(null);
-      setRecoveryNotice('Your streak is restored. Complete a study activity today to keep it going.');
+      setRecoveryNotice(`Your ${recovery.streak}-day streak is back. Study today to keep it going.`);
     } catch (caught) {
       setCoinError(caught instanceof Error ? caught.message : 'Could not recover this streak.');
     } finally {
@@ -195,14 +189,22 @@ export default function ProgressScreen() {
       <Card style={styles.card}>
         <SectionHeader title="Apex Coins" subtitle={coinBalance === null ? 'Balance unavailable' : `${coinBalance.toLocaleString()} coins`} style={styles.noMargin} />
         <Text style={styles.meta}>Earn 5 coins for completing an Apex Challenge and 10 coins when you complete every lesson in a topic.</Text>
-        <Text style={styles.meta}>Streak freezes: {freezeBalance === null ? 'balance unavailable' : freezeBalance}. Complete five lessons in a week to earn one; up to two can be stored. One is used automatically to cover a single missed day.</Text>
+        <Text style={styles.meta}>
+          Streak freezes: {protection.freezes} of {protection.maxFreezes}. Study (a lesson, quiz, review or practice) every day to keep your streak: a whole day with none ends it at midnight. A freeze covers one missed day and is used automatically.
+        </Text>
+        <Text style={styles.meta}>
+          {protection.freezeEarnedThisWeek
+            ? 'This week’s freeze is earned.'
+            : protection.freezes >= protection.maxFreezes
+              ? 'Your freeze store is full.'
+              : `Complete ${FREEZE_LESSONS} lessons this week to earn a freeze: ${Math.min(protection.lessonsThisWeek, FREEZE_LESSONS)} of ${FREEZE_LESSONS} so far.`}
+        </Text>
         {coinError ? <Text style={styles.error}>{coinError}</Text> : null}
         {recoveryNotice ? <Text style={styles.success}>{recoveryNotice}</Text> : null}
-        {canRecoverStreak ? (
+        {canRecoverStreak && protection.lost ? (
           <>
-            <Text style={styles.meta}>Recover your {recoveryOffer?.lost_streak ?? progress.streak}-day streak for 100 Apex Coins.</Text>
-            <Button label={coinBalance !== null && coinBalance >= 100 ? 'Recover streak · 100 coins' : 'Earn 100 coins to recover'} onPress={() => void recoverStreak()} loading={recoveringStreak} disabled={coinBalance === null || coinBalance < 100 || recoveringStreak} />
-            {coinBalance !== null && coinBalance < 100 ? <Text style={styles.muted}>A paid recovery option is not available yet.</Text> : null}
+            <Text style={styles.meta}>Your {protection.lost.streak}-day streak ended. You can restore it for {RESTORE_COST} Apex Coins within {RESTORE_DAYS} days.</Text>
+            <Button label={coinBalance !== null && coinBalance >= RESTORE_COST ? `Restore my ${protection.lost.streak}-day streak · ${RESTORE_COST} coins` : `You need ${RESTORE_COST} coins to restore`} onPress={() => void recoverStreak()} loading={recoveringStreak} disabled={coinBalance === null || coinBalance < RESTORE_COST || recoveringStreak} />
           </>
         ) : null}
       </Card>

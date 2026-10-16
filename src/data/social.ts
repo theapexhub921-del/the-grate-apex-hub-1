@@ -1,4 +1,5 @@
 import type { Href } from 'expo-router';
+import { currentStreak, dayKeyOf } from '@/data/learning/streak-rules';
 import { useEffect, useSyncExternalStore } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -165,6 +166,13 @@ async function readPeople(uids: string[]): Promise<Map<string, PersonData>> {
   return people;
 }
 
+/** A friend's learning streak as it stands today: 0 once they have missed a day no freeze covers. */
+function friendStudyStreak(score: Record<string, any>): number | null {
+  if (typeof score.streak !== 'number') return null;
+  if (typeof score.streakDay !== 'string' || !score.streakDay) return score.streak;
+  return currentStreak({ streak: score.streak, lastActivityDate: score.streakDay, freezes: Number(score.streakFreezes) || 0 }, dayKeyOf(Date.now()));
+}
+
 function toPerson(uid: string, relationship: Relationship, friendshipId: string | null, since: number | null, fallbackName: string | null, data?: PersonData): SocialPerson {
   const profile = data?.profile ?? {};
   const score = data?.score ?? {};
@@ -178,7 +186,7 @@ function toPerson(uid: string, relationship: Relationship, friendshipId: string 
     relationship,
     totalXp: typeof score.xp === 'number' ? score.xp : null,
     weeklyXp: null, // not stored by either app
-    streak: typeof score.streak === 'number' ? score.streak : null,
+    streak: friendStudyStreak(score),
     since,
     isOnline: profile.isOnline === true,
   };

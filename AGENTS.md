@@ -178,6 +178,16 @@ XP itself is never transferable; Apex Coins and XP boosts are, between friends (
 * **Arrival:** `src/components/coin-gift-sync.tsx` (in `_layout.tsx`) collects both every few minutes and shows "Gifts from friends"; `api/push.mjs` kind `gift` alerts the friend's devices.
 * The `boostTransfers` rules are in `firestore.rules`: deploy the rules after changing them.
 
+## Streaks (learning and friend), freezes and restores
+
+Rules in one pure, tested module: `src/data/learning/streak-rules.ts` (`tests/streak-rules.test.mjs`).
+
+* **Learning streak** (`src/data/progress.ts`): any learning activity keeps it — a lesson (even one done before), any quiz, review, practice, Apex, battle, question of the day, or a flashcard session (`markStudyActivity`). A whole calendar day with none ends it at midnight: the shown streak becomes 0 and the old one is kept as `lostStreak`.
+* **Freezes:** 5 lessons completed in a week (Monday–Sunday) earn one, up to 2 stored (`streakFreezes`, `freezeWeeks`). One is used automatically for each missed day.
+* **Restore:** within 3 days of losing it, for 100 Apex Coins (`restoreStreakWithCoins` in `apex-coins.ts`; coins are given back if it fails). The old streak continues, including any study done since.
+* Saved with the progress (`progress/{uid}`: `streak`, `lastActivityDate`, `streakFreezes`, `freezeWeeks`, `lostStreak`) and on `scores/{uid}` (`streak`, `streakDay`, `streakFreezes`) so friends see it lapse.
+* **Friend streaks** (`src/data/friend-streaks.ts` rules, `src/data/friend-streak-store.ts` loading): days on which both friends messaged each other, from the chat's last 400 days. A missed day can be covered by either friend with freezes (one per day) or 100 coins; covered days are shared in `friendStreaks/{chatId}`. Shown in the chat header, the chats list and Social → Friend streaks; the chat shows "at risk" and "restore" notes (`components/chat/friend-streak-notice.tsx`).
+
 ## Stories (Instagram-style)
 
 Stories live in `users/{uid}/stories` (rules already allow them; nothing to deploy). The data is in `src/data/community.ts` (`listLiveStories`, `createCommunityStory`, `STORY_BACKGROUNDS`), the strip of rings and the composer are in `src/components/social/social-activity-feed.tsx`, and the full-screen viewer is `src/components/social/story-viewer.tsx`.
