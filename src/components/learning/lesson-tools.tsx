@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { AiExplain } from '@/components/learning/ai-explain';
 import { Rich } from '@/components/learning/legacy-blocks';
 import { Button } from '@/components/ui/button';
 import { Icon, type IconName } from '@/components/ui/icon';
@@ -9,6 +10,7 @@ import { Card, Interactive, PressableCard } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
 import { Text, TextInput } from '@/components/ui/text';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
+import type { AiLessonText } from '@/data/ai-context';
 import { cardCounts, type CardState, type Flashcard, nextLabel, rateCard, type Rating, studyQueue } from '@/data/flashcards';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -110,6 +112,8 @@ export function StepsPanel({ steps }: { steps: { title: string; items: readonly 
 // ── Flashcards ──────────────────────────────────────────────────────
 
 const STORE = 'grateapex_flashcards';
+// Card text can hold the original mini-markup (<b>, <term …>): the AI gets plain words.
+const plain = (value: string) => value.replace(/<[^>]+>/g, '').trim();
 // Event-time helpers (kept outside the component: rendering itself stays pure).
 const timeNow = () => Date.now();
 const shuffled = <T,>(list: readonly T[]) => [...list].sort(() => Math.random() - 0.5);
@@ -132,7 +136,7 @@ const TERM_LABELS: FlashcardLabels = {
   hint: 'Say the meaning out loud, then tap to flip.',
 };
 
-export function FlashcardsPanel({ cards, labels = TERM_LABELS }: { cards: readonly Flashcard[]; labels?: FlashcardLabels }) {
+export function FlashcardsPanel({ cards, labels = TERM_LABELS, aiLesson }: { cards: readonly Flashcard[]; labels?: FlashcardLabels; /** Shows "Ask AI about this card" once a card is flipped. */ aiLesson?: AiLessonText | null }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const [states, setStates] = useState<Record<string, CardState>>({});
@@ -216,6 +220,9 @@ export function FlashcardsPanel({ cards, labels = TERM_LABELS }: { cards: readon
           <Text style={session.flipped ? styles.cardBack : styles.cardFront}>{session.flipped ? card.back : card.front}</Text>
           {!session.flipped ? <Text style={styles.cardHint}>{labels.hint}</Text> : null}
         </PressableCard>
+        {session.flipped && aiLesson ? (
+          <AiExplain key={`${card.id}:${session.index}`} item={{ kind: 'card', prompt: plain(card.front), correct: plain(card.back) }} getLesson={() => Promise.resolve(aiLesson)} />
+        ) : null}
         {session.flipped ? (
           scheduled ? (
             <View style={styles.ratings}>

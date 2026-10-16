@@ -10,6 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { AiExplain } from '@/components/learning/ai-explain';
 import { QuestionFigure } from '@/components/learning/figure-view';
 import { Icon } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
@@ -19,6 +20,8 @@ import { SPRING } from '@/constants/motion';
 import { elevation, Type, type ThemeColors } from '@/constants/theme';
 import { difficultyLabel } from '@/data/lesson-types';
 import { useAnswerBouncePreference } from '@/data/settings';
+import { aiLessonForQuestion, courseNameForQuestion } from '@/data/ai-context';
+import type { ExplainItem } from '@/lib/ai-study-api';
 import {
   type Answer,
   correctAnswerText,
@@ -88,6 +91,21 @@ function answerText(question: Question, value: Answer | undefined): string | nul
     default:
       return null;
   }
+}
+
+/** What "Explain with AI" is told about a question and the learner's answer. */
+export function explainItem(question: Question, value: Answer | undefined): ExplainItem {
+  const correct = isAnswerCorrect(question, value);
+  const picked = correct ? null : answerText(question, value) ?? (value === undefined ? 'No answer (skipped or ran out of time)' : 'A different answer');
+  return {
+    kind: 'question',
+    prompt: question.prompt,
+    options: question.type === 'choice' || question.type === 'multi' ? question.options : question.type === 'match' ? question.pairs.map((pair) => pair.left) : undefined,
+    correct: correctAnswerText(question),
+    picked,
+    explanation: question.explanation,
+    course: courseNameForQuestion(question),
+  };
 }
 
 export function QuestionCard({
@@ -253,6 +271,8 @@ export function QuestionCard({
             <Text style={styles.conceptText}>Concept tested: {question.concept}</Text>
             {!correct && reviewNote ? <Text style={styles.reviewNote}>{reviewNote}</Text> : null}
           </View>
+
+          {!correct ? <AiExplain key={question.id} item={explainItem(question, value)} getLesson={() => aiLessonForQuestion(question)} /> : null}
         </View>
       )}
 

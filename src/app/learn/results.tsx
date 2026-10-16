@@ -5,6 +5,9 @@ import { Text } from '@/components/ui/text';
 
 import { MemoryStateBadge } from '@/components/learning/memory-ui';
 import { QuestionFigure } from '@/components/learning/figure-view';
+import { AiExplain } from '@/components/learning/ai-explain';
+import { explainItem } from '@/components/question-card';
+import { aiLessonForQuestion } from '@/data/ai-context';
 import { StumpComposer } from '@/components/social/stump-card';
 import { Breadcrumbs, StatTile, BackLink } from '@/components/learning/nav-bits';
 import { Button } from '@/components/ui/button';
@@ -462,6 +465,7 @@ function QuestionReview({ row, index, onStump }: { row: Row; index: number; onSt
         {correctAnswerText(row.question)}
       </Text>
       {row.question.explanation ? <Text style={styles.reviewExplanation}>{row.question.explanation}</Text> : null}
+      <AiExplain item={{ ...explainItem(row.question, row.answer), ...(row.correct ? { picked: null } : {}) }} getLesson={() => aiLessonForQuestion(row.question)} />
       {onStump ? <Button label="Stump a friend" size="sm" variant="ghost" onPress={onStump} style={styles.stumpButton} accessibilityLabel="Share this question to the feed for friends to answer" /> : null}
     </Card>
   );

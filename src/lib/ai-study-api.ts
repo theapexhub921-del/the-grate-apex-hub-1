@@ -36,7 +36,24 @@ export async function makeLessonCards(lesson: { title: string; text: string }, c
   return data.cards;
 }
 
-export type LessonQuestion = { question: string; options: string[]; answer: number; explanation: string };
+/** A quiz question (or flashcard) the learner wants explained. `picked` is set when they got it wrong. */
+export type ExplainItem = {
+  kind: 'question' | 'card';
+  prompt: string;
+  options?: string[];
+  correct: string;
+  picked?: string | null;
+  explanation?: string;
+  course?: string;
+};
+
+/** "Explain with AI": why the right answer is right, from the lecture text when there is some. */
+export async function explainWithAi(lesson: { title: string; text: string } | null, item: ExplainItem, question: string | null, history: readonly ChatTurn[]): Promise<string> {
+  const data = await call<{ answer: string }>({ mode: 'explain', lesson: lesson ?? undefined, item, question: question ?? undefined, history: history.slice(-8) });
+  return data.answer;
+}
+
+export type LessonQuestion ={ question: string; options: string[]; answer: number; explanation: string };
 
 export async function makeLessonQuestions(lesson: { title: string; text: string }, count: number, avoid: readonly string[]): Promise<LessonQuestion[]> {
   const data = await call<{ questions: LessonQuestion[] }>({ mode: 'questions', lesson, count, avoid });

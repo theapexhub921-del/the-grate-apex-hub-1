@@ -1,15 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 
+import { useTabBarClearance } from '@/components/floating-tab-bar';
 import { type FlashcardLabels, FlashcardsPanel } from '@/components/learning/lesson-tools';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Card, Interactive } from '@/components/ui/interactive';
 import { SegmentedControl } from '@/components/ui/segmented-control';
+import { Sheet } from '@/components/ui/sheet';
 import { InlineNotice } from '@/components/ui/state-views';
 import { Text, TextInput } from '@/components/ui/text';
-import { Radius, Type, type ThemeColors } from '@/constants/theme';
+import { elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
 import { AI_CARDS_KEY, aiCards, mergeCards, parseSavedCards } from '@/data/ai-study';
 import type { Flashcard } from '@/data/flashcards';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -31,7 +33,7 @@ const problemText = (problem: unknown) => (problem instanceof AiError ? problem.
 
 // ── Ask AI ──────────────────────────────────────────────────────────
 
-export function AskAiPanel({ lesson }: { lesson: AiLesson }) {
+export function AskAiPanel({ lesson, focus, embedded = false }: { lesson: AiLesson; /** The section being read, offered as a first question. */ focus?: string; /** Inside the "Ask AI" sheet: the sheet shows the title. */ embedded?: boolean }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const [turns, setTurns] = useState<ChatTurn[]>([]);
@@ -67,12 +69,12 @@ export function AskAiPanel({ lesson }: { lesson: AiLesson }) {
 
   return (
     <View style={styles.panel}>
-      <Text style={styles.panelTitle}>Ask AI</Text>
+      {embedded ? null : <Text style={styles.panelTitle}>Ask AI</Text>}
       <Text style={styles.panelText}>Ask anything about “{lesson.title}”. The answers come from this lesson first. AI can make mistakes, so check important details against your lecture notes.</Text>
 
       {turns.length === 0 ? (
         <View style={styles.chips}>
-          {SUGGESTIONS.map((suggestion) => (
+          {(focus ? [`Explain “${focus}” in simple words`, ...SUGGESTIONS] : SUGGESTIONS).map((suggestion) => (
             <Interactive key={suggestion} onPress={() => void send(suggestion)} disabled={busy} accessibilityRole="button" style={({ hovered }) => [styles.chip, hovered && styles.chipHover]}>
               <Icon name="sparkle" size={14} color={colors.primaryText} />
               <Text style={styles.chipText}>{suggestion}</Text>
@@ -117,6 +119,37 @@ export function AskAiPanel({ lesson }: { lesson: AiLesson }) {
       </View>
       {turns.length > 0 ? <Button label="Clear conversation" variant="ghost" size="sm" onPress={() => { setTurns([]); setError(null); }} disabled={busy} /> : null}
     </View>
+  );
+}
+
+// ── "Ask AI" while reading ──────────────────────────────────────────
+// A floating button over the reading page: opens Ask AI in a sheet, so the
+// learner can ask about what they are reading without leaving the page.
+// Place it in a full-screen container (position: absolute, bottom right).
+
+export function AskAiFab({ lesson, focus }: { lesson: AiLesson | null; focus?: string }) {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  const { width } = useWindowDimensions();
+  const clearance = useTabBarClearance();
+  const [open, setOpen] = useState(false);
+  if (!lesson) return null;
+  const bottom = isDesktopWidth(width) ? 28 : clearance + 14;
+  return (
+    <>
+      <Interactive
+        onPress={() => setOpen(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Ask AI about what you are reading"
+        style={({ hovered, pressed }) => [styles.fab, { bottom }, elevation(colors, 3), hovered && styles.fabHover, pressed && styles.fabPressed]}
+      >
+        <Icon name="sparkle" size={18} color={colors.onPrimary} />
+        <Text style={styles.fabText}>Ask AI</Text>
+      </Interactive>
+      <Sheet visible={open} onClose={() => setOpen(false)} title="Ask AI" subtitle={focus ? `While reading: ${focus}` : lesson.title} width={640}>
+        <AskAiPanel lesson={lesson} focus={focus} embedded />
+      </Sheet>
+    </>
   );
 }
 
@@ -218,7 +251,7 @@ export function AiFlashcardsPanel({ lesson }: { lesson: AiLesson }) {
 
   return (
     <View style={styles.panel}>
-      <FlashcardsPanel cards={cards} labels={AI_LABELS} />
+      <FlashcardsPanel cards={cards} labels={AI_LABELS} aiLesson={lesson} />
       <Card tone="muted" style={styles.more}>
         <Text style={styles.moreTitle}>{cards.length} AI card{cards.length === 1 ? '' : 's'} for this lesson</Text>
         {picker}
@@ -386,5 +419,9 @@ function createStyles(colors: ThemeColors) {
     feedback: { fontSize: 14, lineHeight: 21, fontWeight: '600' },
     feedbackRight: { color: colors.success },
     feedbackWrong: { color: colors.error },
+    fab: { position: 'absolute', right: 20, flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 18, borderRadius: 999, backgroundColor: colors.primary, zIndex: 20 },
+    fabHover: { opacity: 0.92 },
+    fabPressed: { transform: [{ scale: 0.97 }] },
+    fabText: { fontSize: 15, fontWeight: '800', color: colors.onPrimary },
   });
 }

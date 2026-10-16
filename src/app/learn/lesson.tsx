@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
-import { AiFlashcardsPanel, AiQuestionsPanel, AskAiPanel } from '@/components/learning/ai-study';
+import { AiFlashcardsPanel, AiQuestionsPanel, AskAiFab, AskAiPanel } from '@/components/learning/ai-study';
 import { InteractiveLayer } from '@/components/learning/interactive-layer';
 import { ClassAccessCard } from '@/components/learning/class-access-card';
 import { QuizInProgressCard } from '@/components/learning/quiz-in-progress-card';
@@ -443,6 +443,7 @@ function LessonPlayer({
 
         <Columns main={main} side={outline} sideWidth={320} />
       </Screen>
+      {view === 'read' && !ai ? <AskAiFab lesson={aiLesson} /> : null}
       <XpToast reward={xpReward} onHide={() => setXpReward(null)} />
     </View>
   );

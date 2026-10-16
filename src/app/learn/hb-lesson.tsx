@@ -7,7 +7,7 @@ import { QuizInProgressCard } from '@/components/learning/quiz-in-progress-card'
 import { LegacyBlocks, Rich, TermContext } from '@/components/learning/legacy-blocks';
 import { BackLink } from '@/components/learning/nav-bits';
 import { AidsPanel, FlashcardsPanel, GlossaryPanel, LessonToolTabs, StepsPanel, type ToolTab, type ToolTabInfo } from '@/components/learning/lesson-tools';
-import { AiFlashcardsPanel, AiQuestionsPanel, AskAiPanel } from '@/components/learning/ai-study';
+import { AiFlashcardsPanel, AiQuestionsPanel, AskAiFab, AskAiPanel } from '@/components/learning/ai-study';
 import { legacyToText } from '@/data/ai-study';
 import { cardsFor, glossaryOf } from '@/data/flashcards';
 import { Button } from '@/components/ui/button';
@@ -190,7 +190,7 @@ export default function LegacyLessonScreen() {
     ...(questions > 0 && course ? [{ id: 'practice' as const, label: `Practice (${questions})`, icon: 'edit' as const }] : []),
   ];
   const panel =
-    tab === 'cards' ? <FlashcardsPanel cards={cards} />
+    tab === 'cards' ? <FlashcardsPanel cards={cards} aiLesson={aiLesson} />
     : tab === 'glossary' ? <GlossaryPanel glossary={glossary} />
     : tab === 'ask' && aiLesson ? <AskAiPanel lesson={aiLesson} />
     : tab === 'aicards' && aiLesson ? <AiFlashcardsPanel lesson={aiLesson} />
@@ -201,6 +201,7 @@ export default function LegacyLessonScreen() {
     : reader;
 
   return (
+    <View style={styles.screen}>
     <Screen ref={scroll} width="wide">
       <BackLink fallback={course ? routes.legacyCourse(course.id) : routes.learn()} />
       <View style={styles.head}>
@@ -248,6 +249,8 @@ export default function LegacyLessonScreen() {
         <Text style={styles.termMeaning}>{term ? plainText(term.meaning) : ''}</Text>
       </Sheet>
     </Screen>
+    {tab === 'read' && !finished ? <AskAiFab lesson={aiLesson} focus={section ? plainText(section.title) : undefined} /> : null}
+    </View>
   );
 }
 
@@ -286,6 +289,7 @@ function StudyAids({ body }: { body: LegacyLessonBody }) {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
+    screen: { flex: 1 },
     flex: { flex: 1, minWidth: 0 },
     head: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 8, marginBottom: 16, flexWrap: 'wrap' },
     icon: { fontSize: 38 },
