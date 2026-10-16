@@ -255,7 +255,7 @@
     }
 
     #reveal {
-      margin-top: 12px;
+      margin-top: 8px;
       display: none;
     }
 
@@ -561,6 +561,7 @@
     <input id="q" type="search" placeholder="Search loaded structures" autocomplete="off"
       aria-label="Search loaded structures">
     <ul id="results"></ul>
+    <button id="reveal" class="btn">Show everything again</button>
     <h3>Sex</h3>
     <div id="pelvis" class="chips" role="group" aria-label="Pelvis: male or female">
       <button class="chip" type="button" data-mode="male" aria-pressed="true">Male</button>
@@ -583,7 +584,6 @@
         style="--c:#ffffff"></span><span>Landmark pins</span><span class="stat">on isolate</span></label>
     <label class="sys"><input type="checkbox" id="aoOn" checked><span class="swatch"
         style="--c:#8a96a3"></span><span>Ambient occlusion</span><span class="stat">depth</span></label>
-    <button id="reveal" class="btn">Show everything again</button>
     <details id="credit">
       <summary>Credits and licence</summary>
       <p>Anatomy models: the <a data-ext href="https://github.com/LluisV/Z-Anatomy">Z-Anatomy</a> project, licensed
@@ -1303,7 +1303,8 @@ bool inRegion(vec3 p) {
       s.stat = row.querySelector('.stat');
       s.input.addEventListener('change', () => setSystem(s, s.input.checked));
       systemsEl.appendChild(row);
-      if (s.hidden) row.style.display = 'none';
+      s.row = row;
+      if (s.hidden || s.id === 'breasts') row.style.display = 'none';   // breasts only show in the list once Female is chosen (see setPelvis)
     }
 
     // ontology IDs for the female reproductive structures (from the HuBMAP crosswalk)
@@ -1793,6 +1794,8 @@ bool inRegion(vec3 p) {
     async function setPelvis(mode) {
       pelvisMode = mode;
       pelvisBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+      const breasts = SYSTEMS.find(x => x.id === 'breasts');
+      if (breasts && breasts.row) breasts.row.style.display = mode === 'female' ? '' : 'none';
       for (const id of ['femur']) {   // the female sacrum ('pelvis') is no longer shown
         const fem = SYSTEMS.find(x => x.id === id);
         fem.input.checked = mode === 'female';
