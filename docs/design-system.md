@@ -126,8 +126,9 @@ are verbs. Errors say what happened and how to fix it, without apologising.
 
 ## Phones
 
-Phones are designed, not shrunk: a docked bottom tab bar (five equal tabs,
-active tab in blue), full-width rows instead of grids of cards, the primary
+Phones are designed, not shrunk: a docked bottom tab bar (five tabs, active
+tab in blue, with Study as a raised round button in the middle — the owner's
+choice, since studying is the app's main job), full-width rows instead of grids of cards, the primary
 action within thumb reach, and nothing that only works on hover.
 
 ## Where it lives in code

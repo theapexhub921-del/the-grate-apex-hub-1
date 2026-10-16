@@ -66,6 +66,7 @@ function DockedTabBar({ onNavigate }: { onNavigate: (route: string) => void }) {
     >
       {MOBILE_NAV_ITEMS.map((item) => {
         const selected = item.path === active;
+        const isStudy = item.path === '/learn';
         const tint = selected ? colors.navActive : colors.navInactive;
         return (
           <Pressable
@@ -74,9 +75,16 @@ function DockedTabBar({ onNavigate }: { onNavigate: (route: string) => void }) {
             accessibilityRole="tab"
             accessibilityState={{ selected }}
             accessibilityLabel={item.accessibilityLabel}
-            style={({ pressed }) => [styles.dockedItem, pressed && styles.dockedPressed]}
+            style={({ pressed }) => [styles.dockedItem, isStudy && styles.dockedStudyItem, pressed && styles.dockedPressed]}
           >
-            <NavIconView icon={item.icon} color={tint} size={22} active={selected} />
+            {isStudy ? (
+              // Study keeps its raised round button (owner's choice, 2026-10-16).
+              <View style={[styles.dockedStudy, elevation(colors, 2)]}>
+                <NavIconView icon={item.icon} color={colors.onPrimary} size={24} active />
+              </View>
+            ) : (
+              <NavIconView icon={item.icon} color={tint} size={22} active={selected} />
+            )}
             <Text style={[styles.dockedLabel, { color: tint }, selected && styles.dockedLabelActive]} numberOfLines={1}>
               {item.label}
             </Text>
@@ -195,6 +203,19 @@ function createStyles(colors: ThemeColors) {
       ...webStyle({ cursor: 'pointer', outlineStyle: 'none', WebkitTapHighlightColor: 'transparent' }),
     },
     dockedPressed: { opacity: 0.6 },
+    dockedStudyItem: { overflow: 'visible', justifyContent: 'flex-end', paddingBottom: 7 },
+    dockedStudy: {
+      position: 'absolute',
+      top: -20,
+      width: 54,
+      height: 54,
+      borderRadius: 27,
+      borderWidth: 4,
+      borderColor: colors.surface,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
     dockedLabel: { fontSize: 11, fontWeight: '500' },
     dockedLabelActive: { fontWeight: '600' },
     wrap: {
