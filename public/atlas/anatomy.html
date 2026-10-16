@@ -6,33 +6,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Anatomy atlas</title>
   <style>
+    /* GRATEAPEX anatomy atlas.
+       Every colour comes from a variable. The app hands over its theme (see the bridge script below), so the
+       atlas follows light / dark and the learner's accent. The values here are the dark fallback. */
     :root {
-      --bg-top: #1b2128;
-      --bg-bottom: #0e1115;
-      --panel: rgba(22, 27, 33, 0.86);
-      --line: rgba(255, 255, 255, 0.1);
-      --text: #e8ecef;
-      --muted: #9aa5af;
-      --accent: #3ad1c0;
-      --danger: #ff8a80;
+      color-scheme: dark;
+      --stage-a: #1d242c;
+      --stage-b: #0d1014;
+      --paper: #1b2129;
+      --card: #151a20;
+      --well: #0e1216;
+      --raise: #28313c;
+      --glass: rgba(21, 26, 32, 0.78);
+      --line: rgba(255, 255, 255, 0.09);
+      --ink: #eaeef2;
+      --ink-2: #b5c0ca;
+      --muted: #8896a3;
+      --on-ink: #0d1014;
+      --cobalt: #3ad1c0;
+      --cobalt-2: rgba(58, 209, 192, 0.16);
+      --on-cobalt: #06201d;
+      --focus: #3ad1c0;
+      --bad: #ff8a80;
+      --bad-bg: #3a1d1b;
+      --shadow-c: rgba(0, 0, 0, 0.4);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 16px 40px rgba(0, 0, 0, 0.35);
+      --r-lg: 18px;
+      --r-md: 12px;
+      --r-sm: 9px;
+      --gap: 12px;
+      --panel-w: 316px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html,
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+
     body {
-      margin: 0;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    body {
-      font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      color: var(--text);
-      background: radial-gradient(ellipse at 50% 30%, var(--bg-top), var(--bg-bottom) 75%);
+      font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--ink);
+      background: radial-gradient(ellipse at 50% 28%, var(--stage-a), var(--stage-b) 78%);
       -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
     }
 
     #c {
@@ -45,303 +60,352 @@
       outline: none;
     }
 
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+    /* ---------- shared surface ---------- */
     .card {
       position: fixed;
-      background: var(--panel);
+      background: var(--glass);
       border: 1px solid var(--line);
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px) saturate(1.2);
+      -webkit-backdrop-filter: blur(16px) saturate(1.2);
     }
 
+    button { font: inherit; color: inherit; }
+
+    /* ---------- left panel ---------- */
     #panel {
-      left: 12px;
-      top: 12px;
-      width: 280px;
-      max-height: calc(100% - 24px);
-      overflow: auto;
-      padding: 12px;
-    }
-
-    #info {
-      right: 12px;
-      bottom: 12px;
-      width: 280px;
-      padding: 14px;
-      display: none;
-    }
-
-    #info.open {
-      display: block;
-    }
-
-    input[type="search"] {
-      width: 100%;
-      padding: 9px 11px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text);
-      font: inherit;
-    }
-
-    input[type="search"]::placeholder {
-      color: var(--muted);
-    }
-
-    :focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
-
-    #results {
-      list-style: none;
-      margin: 6px 0 0;
-      padding: 0;
-    }
-
-    #results button {
-      width: 100%;
-      text-align: left;
-      padding: 7px 8px;
-      border: 0;
-      border-radius: 6px;
-      background: none;
-      color: var(--text);
-      font: inherit;
-      cursor: pointer;
+      left: var(--gap);
+      top: var(--gap);
+      bottom: var(--gap);
+      width: var(--panel-w);
       display: flex;
-      justify-content: space-between;
-      gap: 8px;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.28s cubic-bezier(.2, .8, .2, 1), opacity 0.2s;
+      z-index: 3;
     }
 
-    #results button:hover {
-      background: rgba(255, 255, 255, 0.07);
-    }
-
-    #results small {
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    h3 {
-      margin: 14px 0 6px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-    }
-
-    .sys {
-      display: grid;
-      grid-template-columns: 18px 1fr auto;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 4px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .sys.sub {
-      margin-left: 16px;
-    }
-
-    .sys:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .sys input {
-      position: absolute;
+    #panel.closed {
+      transform: translateX(calc(-100% - var(--gap) - 8px));
       opacity: 0;
       pointer-events: none;
     }
 
+    .phead {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 14px 10px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+
+    .brand .mark {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: var(--cobalt);
+      color: var(--on-cobalt);
+    }
+
+    .brand b { display: block; font-size: 15px; line-height: 1.15; letter-spacing: -0.01em; }
+    .brand small { display: block; color: var(--muted); font-size: 12px; }
+
+    .iconbtn {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--raise);
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .iconbtn:hover { background: var(--cobalt-2); }
+    .iconbtn:active { transform: scale(0.94); }
+
+    .searchwrap { position: relative; padding: 0 14px 10px; flex: none; }
+
+    .searchwrap svg {
+      position: absolute;
+      left: 26px;
+      top: 11px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    input[type="search"] {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px 0 36px;
+      border-radius: var(--r-md);
+      border: 1px solid var(--line);
+      background: var(--well);
+      color: var(--ink);
+      font: inherit;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input[type="search"]::placeholder { color: var(--muted); }
+    input[type="search"]:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px var(--cobalt-2); }
+
+    .pscroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 0 14px 12px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line) transparent;
+    }
+
+    #results { list-style: none; margin: 0 0 6px; padding: 0; }
+
+    #results li:empty { display: none; }
+
+    #results button {
+      width: 100%;
+      text-align: left;
+      padding: 9px 10px;
+      border: 0;
+      border-radius: var(--r-sm);
+      background: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    #results button:hover, #results button:focus-visible { background: var(--cobalt-2); }
+    #results button span { font-weight: 600; }
+    #results button small { color: var(--muted); font-size: 12px; }
+
+    /* sections */
+    .sec { border-top: 1px solid var(--line); }
+    .sec:first-of-type { border-top: 0; }
+
+    .sec > summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 2px;
+      cursor: pointer;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .sec > summary::-webkit-details-marker { display: none; }
+
+    .sec > summary::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.2s;
+      opacity: 0.7;
+    }
+
+    .sec[open] > summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .sec > summary:hover { color: var(--ink-2); }
+    .sec .body { padding: 0 0 12px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .chip {
+      min-height: 34px;
+      padding: 0 13px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--well);
+      color: var(--ink-2);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .chip:hover { border-color: var(--cobalt); color: var(--ink); }
+
+    .chip[aria-pressed="true"] {
+      background: var(--cobalt);
+      border-color: var(--cobalt);
+      color: var(--on-cobalt);
+      font-weight: 700;
+    }
+
+    /* rows (systems, colour-coding, display toggles) */
+    .sys {
+      display: grid;
+      grid-template-columns: 20px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 8px;
+      margin: 0 -8px;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .sys.sub { margin-left: 14px; }
+    .sys:hover { background: var(--cobalt-2); }
+    .sys input { position: absolute; opacity: 0; pointer-events: none; }
+
     .swatch {
-      width: 16px;
-      height: 16px;
-      border-radius: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 7px;
       border: 2px solid var(--line);
       background: transparent;
+      transition: background 0.15s, border-color 0.15s, transform 0.12s;
     }
 
-    .sys input:checked+.swatch {
-      background: var(--c);
-      border-color: var(--b, var(--c));
-    }
-
-    .sys input:focus-visible+.swatch {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
+    .sys input:checked + .swatch { background: var(--c); border-color: var(--b, var(--c)); }
+    .sys:active .swatch { transform: scale(0.92); }
+    .sys input:focus-visible + .swatch { outline: 2px solid var(--focus); outline-offset: 2px; }
 
     .sys .stat {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11.5px;
       font-variant-numeric: tabular-nums;
     }
 
-    .sys .stat.err {
-      color: var(--danger);
-    }
+    .sys .stat.err { color: var(--bad); font-weight: 600; }
 
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .chip {
-      padding: 5px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text);
-      font: inherit;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .chip:hover {
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    .chip[aria-pressed="true"] {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #06201d;
-      font-weight: 600;
-    }
-
-    #name {
-      margin: 0;
-      font-size: 17px;
-      line-height: 1.25;
-      font-weight: 600;
-    }
-
-    #meta {
-      margin: 2px 0 12px;
-      color: var(--muted);
-    }
-
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    button.btn {
-      padding: 7px 11px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text);
-      font: inherit;
-      cursor: pointer;
-    }
-
-    button.btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    button.primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #06201d;
-      font-weight: 600;
-    }
-
-    button.primary:hover {
-      background: #5fe0d1;
-    }
-
-    #reveal {
-      margin-top: 8px;
-      display: none;
-    }
-
-    #reveal.show {
-      display: inline-block;
-    }
-
-    #info.pin #isolate,
-    #info.pin #hide {
-      display: none;
-    }
-
-    #credit {
-      margin: 14px 0 0;
-      color: var(--muted);
-      font-size: 11.5px;
-      line-height: 1.45;
-    }
-
-    #credit summary {
-      cursor: pointer;
-      color: var(--text);
-    }
-
-    #credit p {
-      margin: 6px 0 0;
-    }
-
-    #credit a {
-      color: var(--accent);
-    }
-
+    /* peel slider */
     #peel {
       width: 100%;
-      margin: 4px 0 2px;
-      accent-color: var(--accent);
+      margin: 6px 0 2px;
+      accent-color: var(--cobalt);
+      height: 28px;
     }
 
     #peelLabel {
-      color: var(--muted);
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--well);
+      border: 1px solid var(--line);
+      color: var(--ink-2);
       font-size: 12px;
     }
 
-    #tip {
-      position: fixed;
-      pointer-events: none;
-      display: none;
-      z-index: 5;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12.5px;
-      background: rgba(10, 13, 16, 0.92);
+    /* buttons */
+    button.btn {
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: var(--r-sm);
       border: 1px solid var(--line);
+      background: var(--raise);
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
     }
 
-    #notice {
+    button.btn:hover { background: var(--cobalt-2); }
+    button.btn:active { transform: scale(0.97); }
+
+    button.primary { background: var(--cobalt); border-color: var(--cobalt); color: var(--on-cobalt); }
+    button.primary:hover { background: var(--cobalt); filter: brightness(1.1); }
+
+    #reveal { display: none; width: 100%; margin: 0 0 10px; }
+    #reveal.show { display: block; }
+
+    /* credits */
+    #credit { margin: 4px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.5; }
+    #credit summary { cursor: pointer; color: var(--ink-2); padding: 8px 0; }
+    #credit p { margin: 6px 0 0; }
+    #credit a { color: var(--cobalt); }
+
+    /* ---------- reopen-panel button (shown when the panel is closed) ---------- */
+    #openPanel {
       position: fixed;
-      left: 50%;
-      top: 14px;
-      transform: translateX(-50%);
-      max-width: min(560px, calc(100% - 24px));
-      padding: 10px 14px;
-      border-radius: 10px;
-      background: #3a1d1b;
-      border: 1px solid #7a3b36;
-      color: #ffd9d4;
+      left: var(--gap);
+      top: var(--gap);
+      z-index: 3;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
       display: none;
-      z-index: 6;
+      place-items: center;
+      padding: 0;
+      cursor: pointer;
+      color: var(--ink);
+      background: var(--glass);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
 
-    #notice code {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 1px 5px;
-      border-radius: 4px;
+    #openPanel.show { display: grid; }
+
+    /* ---------- selected-structure card ---------- */
+    #info {
+      left: calc(var(--panel-w) + var(--gap) * 2 + (100% - var(--panel-w) - var(--gap) * 2) / 2);
+      transform: translateX(-50%) translateY(18px);
+      bottom: var(--gap);
+      width: min(440px, calc(100% - var(--panel-w) - var(--gap) * 5));
+      padding: 16px 16px 14px 20px;
+      opacity: 0;
+      visibility: hidden;
+      overflow: hidden;
+      z-index: 3;
+      transition: opacity 0.2s, transform 0.28s cubic-bezier(.2, .8, .2, 1), visibility 0.2s;
     }
 
-    /* On-screen view controls: turn / move arrows, zoom, reset. Press and hold to keep going. */
+    body.panel-closed #info { left: 50%; width: min(440px, calc(100% - var(--gap) * 2)); }
+
+    #info::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      background: var(--cobalt);
+    }
+
+    #info.open { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+    #name { margin: 0; font-size: 18px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em; }
+    #meta { margin: 3px 0 14px; color: var(--muted); font-size: 12.5px; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    #info.pin #isolate, #info.pin #hide { display: none; }
+
+    /* ---------- view controls (dock) ---------- */
     #nav {
       --nb: 40px;
-      right: 12px;
-      top: 12px;
-      padding: 8px;
+      right: var(--gap);
+      top: var(--gap);
+      padding: 10px;
       z-index: 4;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
       user-select: none;
       -webkit-user-select: none;
@@ -354,37 +418,77 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+      padding-left: 4px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    #navBody { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+    #nav.min #navBody { display: none; }
+    #nav.min .navhead svg { transform: rotate(180deg); }
+    #nav .navbtns { display: flex; gap: 4px; }
+
+    #nav .seg {
+      display: flex;
+      padding: 3px;
+      gap: 2px;
+      width: 100%;
+      background: var(--well);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+    }
+
+    #nav .seg button {
+      flex: 1;
+      border: 0;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: none;
+      color: var(--muted);
+      font-size: 12.5px;
       font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
     }
 
-    #navBody {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      align-items: center;
+    #nav .seg button[aria-pressed="true"] {
+      background: var(--raise);
+      color: var(--ink);
+      box-shadow: 0 1px 3px var(--shadow-c);
     }
 
-    #nav.min #navBody {
-      display: none;
+    #nav .dpad { display: grid; grid-template-columns: repeat(3, var(--nb)); gap: 4px; }
+    #nav .zoomrow { display: flex; gap: 4px; }
+
+    #nav .nb, #nav .nt {
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: var(--raise);
+      color: var(--ink);
+      cursor: pointer;
+      touch-action: none;
+      padding: 0;
+      transition: background 0.12s, transform 0.1s;
     }
 
-    #nav.min .navhead svg {
-      transform: rotate(180deg);
-    }
+    #nav .nb { width: var(--nb); height: var(--nb); border-radius: 12px; }
+    #nav .zoomrow .nb { width: calc(var(--nb) * 1.5 + 2px); }
+    #nav .nt { width: 28px; height: 28px; border-radius: 9px; }
+    #nav .nb:hover, #nav .nt:hover { background: var(--cobalt-2); }
+    #nav .nb:active { transform: scale(0.94); }
+    #nav .nb.down { background: var(--cobalt); border-color: var(--cobalt); color: var(--on-cobalt); }
 
-    #nav .navbtns {
-      display: flex;
-      gap: 4px;
-    }
-
+    /* ---------- hint, tooltip, notice ---------- */
     #hint {
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: min(340px, calc(100% - 32px));
-      padding: 14px 16px;
+      width: min(360px, calc(100% - 32px));
+      padding: 18px 20px;
       z-index: 7;
       pointer-events: none;
       opacity: 0;
@@ -392,157 +496,199 @@
       transition: opacity 0.25s, visibility 0.25s;
     }
 
-    #hint.show {
-      opacity: 1;
-      visibility: visible;
-    }
+    #hint.show { opacity: 1; visibility: visible; }
+    #hint h2 { margin: 0 0 8px; font-size: 14px; font-weight: 700; }
+    #hint ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--ink-2); }
+    #hint li { margin: 4px 0; }
+    #hint .hint-touch { display: none; }
 
-    #hint h2 {
-      margin: 0 0 6px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    #hint ul {
-      margin: 0;
-      padding-left: 18px;
-      font-size: 13px;
-    }
-
-    #hint li {
-      margin: 3px 0;
-    }
-
-    #hint .hint-touch {
+    #tip {
+      position: fixed;
+      pointer-events: none;
       display: none;
+      z-index: 5;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--on-ink);
+      background: var(--ink);
+      box-shadow: var(--shadow);
     }
+
+    #notice {
+      position: fixed;
+      left: 50%;
+      top: 14px;
+      transform: translateX(-50%);
+      max-width: min(560px, calc(100% - 24px));
+      padding: 11px 15px;
+      border-radius: var(--r-md);
+      background: var(--bad-bg);
+      border: 1px solid var(--bad);
+      color: var(--ink);
+      display: none;
+      z-index: 6;
+    }
+
+    #notice code { background: var(--glass); padding: 1px 5px; border-radius: 4px; }
 
     @media (pointer: coarse) {
-      #hint .hint-mouse {
-        display: none;
-      }
-
-      #hint .hint-touch {
-        display: block;
-      }
+      #hint .hint-mouse { display: none; }
+      #hint .hint-touch { display: block; }
+      #nav { --nb: 44px; }
+      .chip { min-height: 38px; }
+      .sys { padding: 10px 8px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      #hint {
-        transition: none;
-      }
+      #hint, #panel, #info { transition: none; }
     }
 
-    #nav .seg {
-      display: flex;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    #nav .seg button {
-      border: 0;
-      padding: 6px 12px;
-      background: none;
-      color: var(--muted);
-      font: inherit;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    #nav .seg button[aria-pressed="true"] {
-      background: var(--accent);
-      color: #0b1214;
-    }
-
-    #nav .dpad {
-      display: grid;
-      grid-template-columns: repeat(3, var(--nb));
-      gap: 4px;
-    }
-
-    #nav .zoomrow {
-      display: flex;
-      gap: 4px;
-    }
-
-    #nav .nb,
-    #nav .nt {
-      display: grid;
-      place-items: center;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text);
-      cursor: pointer;
-      touch-action: none;
-      padding: 0;
-    }
-
-    #nav .nb {
-      width: var(--nb);
-      height: var(--nb);
-      border-radius: 10px;
-    }
-
-    #nav .zoomrow .nb {
-      width: calc(var(--nb) * 1.5 + 2px);
-    }
-
-    #nav .nt {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-    }
-
-    #nav .nb:hover,
-    #nav .nt:hover {
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    #nav .nb.down {
-      background: var(--accent);
-      color: #0b1214;
-    }
+    /* ---------- touch: bigger targets, no iOS zoom-on-focus ---------- */
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
     @media (pointer: coarse) {
-      #nav {
-        --nb: 44px;
-      }
+      input[type="search"] { font-size: 16px; height: 46px; }
+      .searchwrap svg { top: 14px; }
+      button.btn { min-height: 44px; }
+      .iconbtn { width: 40px; height: 40px; }
+      #peel { height: 44px; }
+      #nav .seg button { padding: 9px 12px; }
+      #nav .nt { width: 36px; height: 36px; }
+      #results button { padding: 12px 10px; }
     }
 
-    @media (max-width: 640px) {
-      #nav {
-        --nb: 38px;
-        right: 8px;
+    /* ---------- phones (portrait / narrow): the menu is a bottom sheet ---------- */
+    .handle { display: none; }
+
+    @media (max-width: 760px) {
+      :root {
+        --gap: 8px;
+        --peek-h: 156px;
+        --half-h: min(48vh, 440px);
+        --sab: env(safe-area-inset-bottom, 0px);
+        --sat: env(safe-area-inset-top, 0px);
+      }
+
+      @supports (height: 1dvh) { :root { --half-h: min(48dvh, 440px); } }
+
+      #panel {
+        left: var(--gap);
+        right: var(--gap);
         top: auto;
-        bottom: calc(40vh + 16px);
+        bottom: calc(var(--gap) + var(--sab));
+        width: auto;
+        height: var(--half-h);
+        border-radius: 22px;
+        transition: height 0.26s cubic-bezier(.2, .8, .2, 1), transform 0.28s cubic-bezier(.2, .8, .2, 1), opacity 0.2s;
       }
-    }
 
-    @media (max-width: 640px) and (pointer: coarse) {
+      #panel.peek { height: var(--peek-h); }
+      #panel.peek .pscroll { display: none; }
+      #panel.closed { transform: translateY(calc(100% + var(--gap) + var(--sab) + 12px)); }
+
+      .handle {
+        display: block;
+        flex: none;
+        width: 100%;
+        height: 26px;
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: grab;
+        touch-action: none;
+        position: relative;
+      }
+
+      .handle::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 11px;
+        width: 40px;
+        height: 5px;
+        margin-left: -20px;
+        border-radius: 3px;
+        background: var(--muted);
+        opacity: 0.55;
+      }
+
+      .phead { padding-top: 2px; }
+      .pscroll { padding-bottom: calc(14px + var(--sab)); }
+
+      #openPanel {
+        top: auto;
+        left: var(--gap);
+        bottom: calc(var(--gap) + var(--sab));
+        width: 48px;
+        height: 48px;
+      }
+
       #nav {
         --nb: 42px;
+        right: var(--gap);
+        top: calc(var(--gap) + var(--sat));
       }
+
+      /* the selected-structure card sits just above the sheet (thumb reach); it waits while the sheet is fully open */
+      #info, body.panel-closed #info {
+        left: var(--gap);
+        right: var(--gap);
+        top: auto;
+        width: auto;
+        max-width: none;
+        bottom: calc(var(--peek-h) + var(--gap) * 2 + var(--sab));
+        transform: translateY(14px);
+        border-radius: 18px;
+      }
+
+      body.panel-closed #info { bottom: calc(var(--gap) + var(--sab) + 56px); left: calc(var(--gap) * 2 + 48px); }
+      #info.open { transform: translateY(0); }
+      body.sheet-half #info.open { opacity: 0; visibility: hidden; pointer-events: none; }
+
+      #info .row .btn { flex: 1 1 auto; }
+      #name { font-size: 17px; }
+      #hint { top: 38%; }
     }
 
-    @media (max-width: 640px) {
+    /* ---------- landscape phones: a side menu instead of a bottom sheet ---------- */
+    @media (max-height: 520px) and (orientation: landscape) {
+      :root { --gap: 8px; --panel-w: 272px; }
+
       #panel {
-        left: 8px;
-        right: 8px;
-        top: auto;
-        bottom: 8px;
-        width: auto;
-        max-height: 40vh;
+        left: var(--gap);
+        right: auto;
+        top: var(--gap);
+        bottom: var(--gap);
+        width: var(--panel-w);
+        height: auto;
+        border-radius: var(--r-lg);
       }
 
+      #panel.peek { height: auto; }
+      #panel.peek .pscroll { display: block; }
+      #panel.closed { transform: translateX(calc(-100% - var(--gap) - 8px)); }
+      .handle { display: none; }
+      .phead { padding-top: 10px; }
+      .pscroll { padding-bottom: 10px; }
+
+      #openPanel { top: var(--gap); bottom: auto; width: 44px; height: 44px; }
+
+      #nav { --nb: 38px; top: var(--gap); right: var(--gap); }
+
       #info {
-        left: 8px;
-        right: 8px;
-        top: 8px;
-        bottom: auto;
-        width: auto;
+        left: calc(var(--panel-w) + var(--gap) * 2 + (100% - var(--panel-w) - var(--gap) * 2) / 2);
+        right: auto;
+        top: auto;
+        bottom: var(--gap);
+        width: min(420px, calc(100% - var(--panel-w) - var(--gap) * 5));
+        transform: translateX(-50%) translateY(14px);
       }
+
+      body.panel-closed #info { left: 50%; width: min(420px, calc(100% - var(--gap) * 2)); bottom: var(--gap); }
+      #info.open, body.sheet-half #info.open { opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+      #hint { top: 50%; }
     }
   </style>
   <script type="importmap">
@@ -557,47 +703,116 @@
   <canvas id="c" tabindex="0"
     aria-label="3D anatomy model. Drag to rotate, scroll or pinch to zoom, tap a structure to select it. Arrow keys turn the model, Shift and arrow keys move it, plus and minus zoom. The View buttons do the same."></canvas>
 
-  <aside id="panel" class="card">
-    <input id="q" type="search" placeholder="Search loaded structures" autocomplete="off"
-      aria-label="Search loaded structures">
-    <ul id="results"></ul>
-    <button id="reveal" class="btn">Show everything again</button>
-    <h3>Sex</h3>
-    <div id="pelvis" class="chips" role="group" aria-label="Pelvis: male or female">
-      <button class="chip" type="button" data-mode="male" aria-pressed="true">Male</button>
-      <button class="chip" type="button" data-mode="female" aria-pressed="false">Female</button>
+  <button id="openPanel" type="button" aria-label="Open the atlas menu" title="Open the atlas menu">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"
+      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 7h16M4 12h16M4 17h10" />
+    </svg>
+  </button>
+
+  <aside id="panel" class="card" aria-label="Atlas menu">
+    <button id="sheetHandle" class="handle" type="button" aria-label="Expand or collapse the menu"
+      aria-expanded="true"></button>
+    <div class="phead">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="4.5" r="2" />
+            <path d="M12 8v6M7 10.5l5-2.5 5 2.5M12 14l-3.5 7M12 14l3.5 7" />
+          </svg>
+        </span>
+        <span><b>Anatomy atlas</b><small>3D reference</small></span>
+      </div>
+      <button id="closePanel" class="iconbtn" type="button" aria-label="Hide the menu" title="Hide the menu">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 6l-6 6 6 6" />
+        </svg>
+      </button>
     </div>
-    <h3>Regions</h3>
-    <div id="regions" class="chips" role="group" aria-label="Body regions"></div>
-    <h3>Body systems</h3>
-    <div id="systems"></div>
-    <h3>Peel layers</h3>
-    <input id="peel" type="range" min="0" max="6" step="1" value="0" aria-label="Peel layers from the outside in"
-      aria-describedby="peelLabel">
-    <div id="peelLabel">All layers shown</div>
-    <h3>Colour-code</h3>
-    <div id="coding"></div>
-    <h3>Display</h3>
-    <label class="sys"><input type="checkbox" id="xray"><span class="swatch" style="--c:#7fd6ff"></span><span>X-ray
-        mode</span><span class="stat">see-through</span></label>
-    <label class="sys"><input type="checkbox" id="pinsOn" checked><span class="swatch"
-        style="--c:#ffffff"></span><span>Landmark pins</span><span class="stat">on isolate</span></label>
-    <label class="sys"><input type="checkbox" id="aoOn" checked><span class="swatch"
-        style="--c:#8a96a3"></span><span>Ambient occlusion</span><span class="stat">depth</span></label>
-    <details id="credit">
-      <summary>Credits and licence</summary>
-      <p>Anatomy models: the <a data-ext href="https://github.com/LluisV/Z-Anatomy">Z-Anatomy</a> project, licensed
-        <a data-ext href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Z-Anatomy is derived from
-        BodyParts3D.
-      </p>
-      <p>Changes made to the models: converted from FBX to glTF (GLB) and compressed with Meshopt; label and leader-line
-        helper meshes and unused texture coordinates removed; a lighter copy for phones simplified to about half the
-        triangles; landmark ownership data added. Colours and lighting are applied by this viewer. The modified models
-        are shared under the same CC BY-SA 4.0 licence.</p>
-      <p>Vagina and ligaments, female reproductive organs, breasts: HuBMAP Human Reference
-        Atlas 3D reference objects (Visible Human
-        Female, National Library of Medicine), licensed CC BY 4.0. Positioned and renamed for this viewer.</p>
-    </details>
+
+    <div class="searchwrap">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <path d="M20 20l-3.5-3.5" />
+      </svg>
+      <input id="q" type="search" placeholder="Search structures" autocomplete="off"
+        aria-label="Search loaded structures">
+    </div>
+
+    <div class="pscroll">
+      <ul id="results"></ul>
+      <button id="reveal" class="btn">Show everything again</button>
+
+      <details class="sec" open>
+        <summary>Sex</summary>
+        <div class="body">
+          <div id="pelvis" class="chips" role="group" aria-label="Pelvis: male or female">
+            <button class="chip" type="button" data-mode="male" aria-pressed="true">Male</button>
+            <button class="chip" type="button" data-mode="female" aria-pressed="false">Female</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec" open>
+        <summary>Regions</summary>
+        <div class="body">
+          <div id="regions" class="chips" role="group" aria-label="Body regions"></div>
+        </div>
+      </details>
+
+      <details class="sec" open>
+        <summary>Body systems</summary>
+        <div class="body">
+          <div id="systems"></div>
+        </div>
+      </details>
+
+      <details class="sec" open>
+        <summary>Peel layers</summary>
+        <div class="body">
+          <input id="peel" type="range" min="0" max="6" step="1" value="0"
+            aria-label="Peel layers from the outside in" aria-describedby="peelLabel">
+          <div id="peelLabel">All layers shown</div>
+        </div>
+      </details>
+
+      <details class="sec">
+        <summary>Colour-code</summary>
+        <div class="body">
+          <div id="coding"></div>
+        </div>
+      </details>
+
+      <details class="sec" open>
+        <summary>Display</summary>
+        <div class="body">
+          <label class="sys"><input type="checkbox" id="xray"><span class="swatch" style="--c:#7fd6ff"></span><span>X-ray
+              mode</span><span class="stat">see-through</span></label>
+          <label class="sys"><input type="checkbox" id="pinsOn" checked><span class="swatch"
+              style="--c:#ffffff;--b:#8896a3"></span><span>Landmark pins</span><span class="stat">on isolate</span></label>
+          <label class="sys"><input type="checkbox" id="aoOn" checked><span class="swatch"
+              style="--c:#8a96a3"></span><span>Ambient occlusion</span><span class="stat">depth</span></label>
+        </div>
+      </details>
+
+      <details id="credit">
+        <summary>Credits and licence</summary>
+        <p>Anatomy models: the <a data-ext href="https://github.com/LluisV/Z-Anatomy">Z-Anatomy</a> project, licensed
+          <a data-ext href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Z-Anatomy is derived from
+          BodyParts3D.
+        </p>
+        <p>Changes made to the models: converted from FBX to glTF (GLB) and compressed with Meshopt; label and leader-line
+          helper meshes and unused texture coordinates removed; a lighter copy for phones simplified to about half the
+          triangles; landmark ownership data added. Colours and lighting are applied by this viewer. The modified models
+          are shared under the same CC BY-SA 4.0 licence.</p>
+        <p>Vagina and ligaments, female reproductive organs, breasts: HuBMAP Human Reference
+          Atlas 3D reference objects (Visible Human
+          Female, National Library of Medicine), licensed CC BY 4.0. Positioned and renamed for this viewer.</p>
+      </details>
+    </div>
   </aside>
 
   <section id="info" class="card" aria-live="polite">
@@ -610,7 +825,6 @@
       <button class="btn" id="clear">Deselect</button>
     </div>
   </section>
-
   <div id="nav" class="card" role="group" aria-label="View controls">
     <div class="navhead">
       <span>View</span>
@@ -708,14 +922,19 @@
 
   <script>
     // GRATEAPEX theme bridge: the app hands this page its colours (in the address as #theme=..., and again by
-    // postMessage when the learner changes theme). The viewer keeps its dark panels; the stage behind the
-    // model and the accent colour follow the app.
+    // postMessage when the learner changes theme). Every "--name" it sends is a CSS variable on this page, so the
+    // whole atlas (stage, panels, buttons, accent) follows the app's light / dark theme and accent colour.
     (function () {
-      var MAP = { '--stage-a': '--bg-top', '--stage-b': '--bg-bottom', '--cobalt': '--accent', '--bad': '--danger' };
       function apply(vars) {
         if (!vars) return;
         var root = document.documentElement;
-        for (var key in MAP) if (vars[key]) root.style.setProperty(MAP[key], vars[key]);
+        for (var key in vars) {
+          if (key.indexOf('--') === 0 && vars[key]) root.style.setProperty(key, vars[key]);
+        }
+        if (vars.__scheme === 'light' || vars.__scheme === 'dark') {
+          root.style.setProperty('color-scheme', vars.__scheme);
+          root.setAttribute('data-scheme', vars.__scheme);
+        }
       }
       try {
         var m = /[#&]theme=([^&]*)/.exec(location.hash);
@@ -726,6 +945,73 @@
         var d = event.data;
         if (d && d.type === 'grateapex-theme') apply(d.vars);
       });
+    })();
+  </script>
+  <script>
+    // Menu panel. Wide screens: a side panel with Hide / Show. Phones: a bottom sheet with two heights
+    // (half open, or just the search bar showing) that you drag or tap. Selecting a structure tucks the sheet
+    // down so the model stays visible; the view controls start folded on small screens.
+    (function () {
+      var body = document.body;
+      var panel = document.getElementById('panel');
+      var openBtn = document.getElementById('openPanel');
+      var closeBtn = document.getElementById('closePanel');
+      var handle = document.getElementById('sheetHandle');
+      var info = document.getElementById('info');
+      var q = document.getElementById('q');
+      var nav = document.getElementById('nav');
+      var sheet = window.matchMedia('(max-width: 760px)');
+      var side = window.matchMedia('(max-height: 520px) and (orientation: landscape)');
+      var isSheet = function () { return sheet.matches && !side.matches; };
+
+      function setSheet(state) {   // 'half' | 'peek'
+        var peek = state === 'peek';
+        panel.classList.toggle('peek', peek);
+        body.classList.toggle('sheet-peek', peek);
+        body.classList.toggle('sheet-half', !peek);
+        handle.setAttribute('aria-expanded', String(!peek));
+      }
+      function setClosed(closed) {
+        panel.classList.toggle('closed', closed);
+        openBtn.classList.toggle('show', closed);
+        body.classList.toggle('panel-closed', closed);
+        if (closed) panel.setAttribute('inert', ''); else panel.removeAttribute('inert');
+      }
+      closeBtn.addEventListener('click', function () { setClosed(true); });
+      openBtn.addEventListener('click', function () { setClosed(false); });
+      setSheet('half');
+
+      // drag the handle up or down, or just tap it
+      var startY = null, moved = 0;
+      handle.addEventListener('pointerdown', function (e) { startY = e.clientY; moved = 0; handle.setPointerCapture(e.pointerId); });
+      handle.addEventListener('pointermove', function (e) { if (startY !== null) moved = e.clientY - startY; });
+      function end() {
+        if (startY === null) return;
+        var open = !panel.classList.contains('peek');
+        if (moved < -28) setSheet('half');
+        else if (moved > 28) setSheet('peek');
+        else setSheet(open ? 'peek' : 'half');
+        startY = null;
+      }
+      handle.addEventListener('pointerup', end);
+      handle.addEventListener('pointercancel', function () { startY = null; });
+
+      // typing in the search box needs the list open
+      q.addEventListener('focus', function () { if (isSheet()) setSheet('half'); });
+
+      // choosing a structure (tap on the model or a search result) tucks the sheet away
+      new MutationObserver(function () {
+        if (isSheet() && info.classList.contains('open')) setSheet('peek');
+      }).observe(info, { attributes: true, attributeFilter: ['class'] });
+
+      // view controls start folded on small screens (the toggle button still opens them)
+      if (sheet.matches || side.matches) {
+        nav.classList.add('min');
+        var t = document.getElementById('navToggle');
+        t.setAttribute('aria-expanded', 'false');
+        t.setAttribute('aria-label', 'Show view controls');
+        t.title = 'Show view controls';
+      }
     })();
   </script>
   <script type="module">
