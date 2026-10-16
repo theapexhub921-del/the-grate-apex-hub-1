@@ -1,6 +1,6 @@
 import type { ThemeColors } from '@/constants/theme';
 
-// The 3D atlas is a standalone web page (public/atlas/skeleton.html). It styles itself
+// The 3D atlas is a standalone web page (public/atlas/anatomy.html). It styles itself
 // with CSS variables, so "obeying the app's theme" means handing it the app's colours.
 // This is the one place that says which app colour fills which atlas variable.
 //
@@ -65,10 +65,10 @@ export function atlasThemeVars(colors: ThemeColors): AtlasThemeVars {
 }
 
 // The atlas page lives in public/, so on the web it is served from the app's own address.
-export const ATLAS_PAGE = '/atlas/skeleton.html';
+export const ATLAS_PAGE = '/atlas/anatomy.html';
 // The deployed site (Vercel "clean URLs") redirects the .html address to this one, so phones
 // open this one directly and skip the redirect.
-export const ATLAS_PAGE_DEPLOYED = '/atlas/skeleton';
+export const ATLAS_PAGE_DEPLOYED = '/atlas/anatomy';
 
 export function atlasHash(vars: AtlasThemeVars): string {
   return `#theme=${encodeURIComponent(JSON.stringify(vars))}`;
