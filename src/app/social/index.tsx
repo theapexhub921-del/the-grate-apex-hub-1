@@ -13,6 +13,7 @@ import { Columns, PageHeader, Screen } from '@/components/ui/screen';
 import { WeeklyChallengeCard } from '@/components/social/connect-challenges';
 import { LeagueCard } from '@/components/social/league-card';
 import { BattlesCard } from '@/components/social/battles-card';
+import { StudyGamesCard } from '@/components/social/study-games-card';
 import { RecentMessagesCard } from '@/components/social/recent-messages-card';
 import { FollowRequestsCard } from '@/components/social/follow-requests-card';
 import { LearningWeekCard } from '@/components/learning/learning-week-card';
@@ -198,6 +199,7 @@ export default function SocialScreen() {
             <LearningWeekCard />
             <LeagueCard />
             <BattlesCard />
+            <StudyGamesCard />
           </View>
         }
         side={
