@@ -4,6 +4,7 @@ import { type NativeScrollEvent, type NativeSyntheticEvent, ScrollView, StyleShe
 
 import { Icon } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
+import { webStyle } from '@/components/ui/web';
 import { VideoPlayer } from '@/components/ui/video-player';
 import { type ThemeColors } from '@/constants/theme';
 import { type CommunityPost, type PostMedia } from '@/data/community';
@@ -58,16 +59,28 @@ export function MediaCarousel({ items, height, fit = 'cover', rounded = true, on
       />
     );
 
+  const wrapped = (item: PostMedia, at: number) =>
+    onPress && item.type === 'image' ? <Interactive onPress={onPress} accessibilityRole="button" accessibilityLabel="Open post">{slide(item, at)}</Interactive> : slide(item, at);
+
   return (
     <View style={styles.wrap} onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
       <View style={[styles.frame, rounded && styles.rounded, { height: frame }]}>
-        <ScrollView ref={scroller} horizontal pagingEnabled showsHorizontalScrollIndicator={false} onScroll={onScroll} scrollEventThrottle={32} scrollEnabled={items.length > 1}>
-          {items.map((item, at) => (
-            <View key={`${item.url}-${at}`} style={{ width: width || 1, height: frame }}>
-              {onPress && item.type === 'image' ? <Interactive onPress={onPress} accessibilityRole="button" accessibilityLabel="Open post">{slide(item, at)}</Interactive> : slide(item, at)}
-            </View>
-          ))}
-        </ScrollView>
+        {items.length > 1 ? (
+          // Several photos: swipe sideways between them. touch-action keeps an
+          // up-or-down swipe that starts on a photo scrolling the page (web).
+          <ScrollView ref={scroller} horizontal pagingEnabled showsHorizontalScrollIndicator={false} onScroll={onScroll} scrollEventThrottle={32} style={styles.pager}>
+            {items.map((item, at) => (
+              <View key={`${item.url}-${at}`} style={{ width: width || 1, height: frame }}>
+                {wrapped(item, at)}
+              </View>
+            ))}
+          </ScrollView>
+        ) : (
+          // One photo or video: no sideways scroller at all. A scroller that
+          // cannot scroll blocks every touch on the web, so the feed could not
+          // be scrolled from a single photo or video.
+          <View style={{ width: '100%', height: frame }}>{wrapped(items[0], 0)}</View>
+        )}
         {items.length > 1 && index > 0 ? (
           <Interactive onPress={() => go(index - 1)} accessibilityRole="button" accessibilityLabel="Previous photo" style={[styles.arrow, styles.left]}>
             <Icon name="chevronLeft" size={16} color={colors.text} strokeWidth={2.4} />
@@ -93,6 +106,7 @@ function createStyles(colors: ThemeColors) {
     wrap: { width: '100%', gap: 8 },
     frame: { width: '100%', overflow: 'hidden', backgroundColor: colors.surfaceMuted },
     rounded: { borderRadius: 14 },
+    pager: webStyle({ touchAction: 'pan-x pan-y' }),
     image: { width: '100%' },
     arrow: { position: 'absolute', top: '50%', marginTop: -15, width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceElevated, opacity: 0.92 },
     left: { left: 10 },

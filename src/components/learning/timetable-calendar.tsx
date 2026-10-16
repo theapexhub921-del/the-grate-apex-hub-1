@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native'
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Card, Interactive } from '@/components/ui/interactive';
+import { List, ListRow } from '@/components/ui/list';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Text } from '@/components/ui/text';
@@ -50,6 +51,7 @@ export function TimetableCalendar({ entries, name, onAdd, onSelect }: {
   const colors = useTheme();
   const { width } = useWindowDimensions();
   const wide = width >= 1100;
+  const compact = width < 700;
   const [now, setNow] = useState(() => new Date());
   const [view, setView] = useState<View3>(width < 700 ? 'day' : 'week');
   const [anchor, setAnchor] = useState(() => dayStart(new Date()));
@@ -228,6 +230,95 @@ export function TimetableCalendar({ entries, name, onAdd, onSelect }: {
     </View>
   );
 
+  // Phones and narrow windows: the same timetable as a list you can read at a
+  // glance — the day's blocks in time order, the week day by day, or the month
+  // with a dot for each block — instead of a wide hour grid.
+  if (compact) {
+    const viewedDays = view === 'week' ? Array.from({ length: 7 }, (_, i) => addDays(monday, i)) : [anchor];
+    const blockRow = (entry: TimetableBlock) => (
+      <ListRow
+        key={entry.id}
+        leading={<View style={[styles.phoneBar, { backgroundColor: tintOf(entry).edge }]} />}
+        title={entry.title}
+        detail={entry.subject || undefined}
+        meta={`${entry.start_time.slice(0, 5)}–${entry.end_time.slice(0, 5)}`}
+        onPress={() => onSelect(entry)}
+        accessibilityLabel={`${entry.title}, ${entry.start_time.slice(0, 5)} to ${entry.end_time.slice(0, 5)}${entry.subject ? `, ${entry.subject}` : ''}. Edit`}
+      />
+    );
+    const showingToday = view === 'day' ? sameDay(anchor, now) : view === 'week' ? mondayOf(now).getTime() === monday.getTime() : anchor.getMonth() === now.getMonth() && anchor.getFullYear() === now.getFullYear();
+    return (
+      <Card style={styles.phoneCard}>
+        <View style={styles.phoneHead}>
+          <View style={styles.flex}>
+            <Text style={styles.phoneTitle}>Timetable</Text>
+            <Text style={styles.agendaTime}>Classes and study blocks that repeat every week.</Text>
+          </View>
+          <Button label="Add" size="sm" icon={<Icon name="plus" size={15} color={colors.onPrimary} />} onPress={() => onAdd({ weekday: weekdayOf(view === 'day' ? anchor : now), start: '09:00' })} />
+        </View>
+        <View style={styles.phoneNav}>
+          <Interactive onPress={() => step(-1)} accessibilityRole="button" accessibilityLabel={`Previous ${view}`} style={styles.navButton}><Icon name="chevronLeft" size={16} color={colors.text} /></Interactive>
+          <View style={styles.phoneRange}>
+            <Text style={styles.range} numberOfLines={1}>{range}</Text>
+            {!showingToday ? (
+              <Interactive onPress={() => setAnchor(dayStart(new Date()))} accessibilityRole="button" accessibilityLabel="Go to today">
+                <Text style={styles.todayLink}>Back to today</Text>
+              </Interactive>
+            ) : null}
+          </View>
+          <Interactive onPress={() => step(1)} accessibilityRole="button" accessibilityLabel={`Next ${view}`} style={styles.navButton}><Icon name="chevronRight" size={16} color={colors.text} /></Interactive>
+        </View>
+        <SegmentedControl label="Calendar view" options={[{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }, { value: 'month', label: 'Month' }]} value={view} onChange={(value) => setView(value as View3)} />
+
+        {view === 'month' ? (
+          <>
+            <PhoneMonth anchor={anchor} entries={entries} now={now} tintOf={tintOf} onPick={(date) => { setAnchor(date); setView('day'); }} />
+            <Text style={styles.agendaTime}>A dot is a class or study block. Tap a day to see it.</Text>
+          </>
+        ) : view === 'day' ? (
+          blocksOn(entries, anchor).length ? (
+            <List accessibilityLabel={`Blocks on ${range}`}>{blocksOn(entries, anchor).map(blockRow)}</List>
+          ) : (
+            <View style={styles.phoneEmpty}>
+              <Text style={styles.agendaTitle}>Nothing planned for {anchor.toLocaleDateString(undefined, { weekday: 'long' })}.</Text>
+              <Text style={styles.agendaTime}>Tap Add to put a class or study block on this day. It repeats every week.</Text>
+            </View>
+          )
+        ) : (
+          <View style={styles.phoneWeek}>
+            {viewedDays.map((date) => {
+              const blocks = blocksOn(entries, date);
+              const isToday = sameDay(date, now);
+              return (
+                <View key={date.toISOString()} style={styles.phoneDay}>
+                  <View style={styles.phoneDayHead}>
+                    <Text style={[styles.phoneDayName, isToday && styles.dayNameToday]}>
+                      {date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' })}{isToday ? ' · Today' : ''}
+                    </Text>
+                    {!blocks.length ? <Text style={styles.agendaTime}>Free</Text> : null}
+                  </View>
+                  {blocks.length ? <List>{blocks.map(blockRow)}</List> : null}
+                </View>
+              );
+            })}
+          </View>
+        )}
+
+        {totalHours > 0 ? (
+          <View style={styles.phoneSummary}>
+            <Text style={styles.panelTitle}>This week: {totalHours % 1 ? totalHours.toFixed(1) : totalHours} hours planned</Text>
+            {weekHours.slice(0, 5).map(([subject, value]) => (
+              <View key={subject} style={styles.subjectRow}>
+                <View style={styles.subjectHead}><Text style={styles.agendaTitle} numberOfLines={1}>{subject}</Text><Text style={styles.agendaTime}>{value % 1 ? value.toFixed(1) : value} h</Text></View>
+                <ProgressBar value={totalHours ? value / totalHours : 0} height={5} label={`${subject} hours`} />
+              </View>
+            ))}
+          </View>
+        ) : null}
+      </Card>
+    );
+  }
+
   return (
     <Card style={styles.card}>
       {toolbar}
@@ -266,6 +357,36 @@ function MiniMonth({ anchor, now, entries, onPick }: { anchor: Date; now: Date; 
             <Interactive key={date.toISOString()} onPress={() => onPick(dayStart(date))} accessibilityLabel={date.toDateString()} style={[styles.miniCell, inWeek && styles.miniWeek, isToday && styles.miniToday]}>
               <Text style={[styles.miniDay, !inMonth && styles.miniOut, isToday && styles.miniTodayText]}>{date.getDate()}</Text>
               {busy ? <View style={[styles.miniDot, isToday && styles.miniDotToday]} /> : null}
+            </Interactive>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+/** The month on a phone: each day shows its date and a dot per block (up to three). */
+function PhoneMonth({ anchor, entries, now, tintOf, onPick }: { anchor: Date; entries: readonly TimetableBlock[]; now: Date; tintOf: (entry: TimetableBlock) => { bg: string; edge: string; text: string }; onPick: (date: Date) => void }) {
+  const styles = useThemedStyles(createStyles);
+  const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
+  const start = mondayOf(first);
+  const cells = Array.from({ length: 42 }, (_, i) => addDays(start, i));
+  return (
+    <View>
+      <View style={styles.monthHead}>{DAYS.map((day) => <Text key={day} style={styles.monthLabel}>{day.slice(0, 2)}</Text>)}</View>
+      <View style={styles.miniGrid}>
+        {cells.map((date) => {
+          const blocks = blocksOn(entries, date);
+          const inMonth = date.getMonth() === first.getMonth();
+          const isToday = sameDay(date, now);
+          return (
+            <Interactive key={date.toISOString()} onPress={() => onPick(dayStart(date))} accessibilityRole="button" accessibilityLabel={`${date.toDateString()}, ${blocks.length} block${blocks.length === 1 ? '' : 's'}`} style={styles.phoneMonthCell}>
+              <View style={[styles.monthDate, isToday && styles.dateChipToday]}>
+                <Text style={[styles.monthDateText, !inMonth && styles.miniOut, isToday && styles.dateTextToday]}>{date.getDate()}</Text>
+              </View>
+              <View style={styles.phoneDots}>
+                {blocks.slice(0, 3).map((entry) => <View key={entry.id} style={[styles.phoneDot, { backgroundColor: tintOf(entry).edge }]} />)}
+              </View>
             </Interactive>
           );
         })}
@@ -373,6 +494,22 @@ function createStyles(colors: ThemeColors) {
     monthOut: { opacity: 0.45 },
     monthDate: { alignSelf: 'flex-start', minWidth: 24, height: 24, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
     monthDateText: { fontSize: 13, fontWeight: '800', color: colors.text },
+    phoneCard: { gap: 14, padding: 16 },
+    phoneHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+    phoneTitle: { ...Type.title3, color: colors.text },
+    phoneNav: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    phoneRange: { flex: 1, minWidth: 0, alignItems: 'center', gap: 2 },
+    todayLink: { fontSize: 12.5, fontWeight: '600', color: colors.primaryText },
+    phoneBar: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
+    phoneEmpty: { gap: 4, paddingVertical: 16 },
+    phoneWeek: { gap: 14 },
+    phoneDay: { gap: 4 },
+    phoneDayHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+    phoneDayName: { fontSize: 13.5, fontWeight: '700', color: colors.textSecondary },
+    phoneSummary: { gap: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.divider },
+    phoneMonthCell: { width: `${100 / 7}%`, alignItems: 'center', paddingVertical: 4, gap: 3, minHeight: 46 },
+    phoneDots: { flexDirection: 'row', gap: 3, height: 6 },
+    phoneDot: { width: 6, height: 6, borderRadius: 3 },
     monthChip: { fontSize: 10.5, fontWeight: '700', paddingVertical: 2, paddingHorizontal: 5, borderRadius: 6, overflow: 'hidden' },
   });
 }
