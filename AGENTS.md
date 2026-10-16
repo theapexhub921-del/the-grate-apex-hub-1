@@ -160,6 +160,10 @@ Every lesson has an "Ask AI" tab (questions answered from the lesson's own text)
 * `src/lib/ai-study-api.ts` calls it; `src/data/ai-study.ts` turns a lesson into plain text and handles saved cards (kept on the device, key `grateapex_ai_cards:<lesson id>`); `src/components/learning/ai-study.tsx` holds the two panels.
 * `expo start` does not run `api/`, so the AI shows a friendly "runs on the live app" message in a local preview. To try it locally use `vercel dev`, or set `EXPO_PUBLIC_API_BASE` to the live site.
 * `tests/ai-study.test.mjs` checks every lesson produces text for the AI.
+* **AI while studying** (`src/components/learning/ai-explain.tsx`, `api/ai.mjs` mode `explain`):
+  * Every wrong answer in a quiz, review, HB practice or past paper (`QuestionCard`) has "Explain my mistake with AI"; the results page has "Explain with AI" on every answer. It explains from the lesson's lecture text (`src/data/ai-context.ts` finds it from the question's `lessonId`), with follow-up questions.
+  * The Read page of both lesson screens has a floating "Ask AI" button (`AskAiFab` in `ai-study.tsx`) that opens Ask AI in a sheet without leaving the page.
+  * Flashcards (term cards and AI cards) show "Ask AI about this card" once flipped.
 
 ## Study chat (general AI chat, outside lessons)
 
