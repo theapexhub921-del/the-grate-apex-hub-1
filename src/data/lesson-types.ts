@@ -273,6 +273,9 @@ export type LessonConfusion = {
 //            explanation; `reveal` adds teaching after the answer
 //   recall — open recall: the learner retrieves from memory, then
 //            compares with the model answer and rates themselves
+//   simulate — an interactive model (data/simulations/): predict first,
+//            then explore it and try a challenge. Each prediction is a
+//            normal checkpoint question, recorded like an 'ask' answer.
 export type InteractiveStep =
   | {
       type: 'learn';
@@ -284,7 +287,49 @@ export type InteractiveStep =
       sourceRefs?: SourceReference[];
     }
   | { type: 'ask'; question: Question; reveal?: string[] }
-  | { type: 'recall'; recall: RecallPrompt };
+  | { type: 'recall'; recall: RecallPrompt }
+  | SimulationStep;
+
+// ─── Simulations ─────────────────────────────────────────────────────
+// The models live in data/simulations/ (one file each); the drawings in
+// components/learning/simulations/.
+export type SimulationId =
+  | 'cardiac-cycle'
+  | 'sounds-jvp'
+  | 'pv-loop'
+  | 'vessel-flow'
+  | 'capillary-starling'
+  | 'baroreflex'
+  | 'shock'
+  | 'cerebral-flow'
+  | 'ecg';
+
+// What the model must show after a prediction is run (checked by
+// tests/simulations.test.mjs, so a prediction's answer always matches
+// what the learner then sees).
+export type SimulationExpectation = {
+  readout: string;
+  change?: 'up' | 'down' | 'same';
+  equals?: number;
+  tolerance?: number; // for 'same' and 'equals' (default: 0.5% / exact)
+};
+
+export type SimulationPrediction = {
+  question: Question; // answered first, as a checkpoint
+  from?: Record<string, number>; // control values before the change (default: the model's start)
+  set: Record<string, number>; // the change the model then runs
+  watch: string; // the readout shown as "before → after"
+  expect: SimulationExpectation[];
+};
+
+export type SimulationStep = {
+  type: 'simulate';
+  sim: SimulationId;
+  title: string;
+  intro: string;
+  predictions: SimulationPrediction[];
+  sourceRefs?: SourceReference[];
+};
 
 export type RecallPrompt = {
   id: string; // `${topicId}:${id}` once built — unique like question IDs

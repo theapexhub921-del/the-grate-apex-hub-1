@@ -3,6 +3,7 @@
 // only clarifies points within their scope, always labelled.
 import type { LessonDraft } from '@/data/topics/build';
 import { interactive, readingExtras } from '@/data/topics/cardiovascular-physiology/interactive';
+import { withSimulation } from '@/data/topics/cardiovascular-physiology/simulations';
 import { c1, c2, c3, c4, c5, GUYTON, type ConceptId } from '@/data/topics/cardiovascular-physiology/sources';
 
 type Draft = LessonDraft<ConceptId>;
@@ -1079,5 +1080,5 @@ const lesson9: Draft = {
 export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7, lesson8, lesson9].map((lesson) => ({
   ...lesson,
   ...readingExtras[lesson.id],
-  interactive: interactive[lesson.id],
+  interactive: withSimulation(lesson.id, interactive[lesson.id]),
 }));

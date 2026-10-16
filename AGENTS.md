@@ -149,6 +149,18 @@ Learning remarks are currently in:
 
 `src/data/remarks.ts`
 
+## Lesson simulations (interactive models)
+
+The interactive layer has a fourth step type, `simulate` (`SimulationStep` in `src/data/lesson-types.ts`). Each Cardiovascular Physiology lesson has one, placed just before its final recall prompt.
+
+* **Models** (pure, testable): `src/data/simulations/<id>.ts`, registered in `src/data/simulations/index.ts`. A model takes control values and returns readouts, plus anything its drawing needs. Each lists its controls, readouts, Explore situations and Challenges, and a `modelNote` saying what is simplified and where the numbers come from (lecture slides; any textbook value is labelled).
+* **Drawings**: `src/components/learning/simulations/graphics/<id>.tsx` (react-native-svg, theme colours only), chosen in `graphics/index.tsx`.
+* **The step**: `src/components/learning/simulations/simulation-step.tsx` — Predict (a normal checkpoint question, answered before the model runs the change), then Explore and Challenge, which unlock once the predictions are answered. Continue is enabled after the predictions. Predictions are recorded like `ask` checkpoints (memory, Review, first-try count).
+* **Content**: each topic's predictions and step text, e.g. `src/data/topics/cardiovascular-physiology/simulations.ts` (`simulate()` helper in `build.ts`; added to the lessons by `withSimulation` in `lessons.ts`).
+* **Sliders**: `slider.web.tsx` (a real range input on the web) and `slider.tsx` (drag on phones).
+* **Checks**: `tests/simulations.test.mjs` — every prediction's marked answer must match what the model shows, every scenario stays in range, and every challenge is unsolved at its start and solvable with its unlocked controls.
+* Adding a simulation: write the model, its drawing, register both, then add a `simulate()` step with predictions to the topic. Bump the topic's `contentVersion` when steps are added, so half-finished lesson sessions restart cleanly.
+
 ## Ask AI and AI Flashcards (every lesson)
 
 Every lesson has an "Ask AI" tab (questions answered from the lesson's own text) and an "AI Flashcards" tab (question-and-answer cards the AI writes from the lesson, studied with the same spaced repetition as the normal flashcards). Both are on `src/app/learn/lesson.tsx` and `src/app/learn/hb-lesson.tsx`.
