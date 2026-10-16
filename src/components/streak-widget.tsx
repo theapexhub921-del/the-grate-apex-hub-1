@@ -204,15 +204,15 @@ export function StreakWidgetCompact({ onPress, style }: CompactProps) {
         accessibilityLabel={`Streak: ${progress.streak} days. ${label}.`}
         style={({ pressed }) => [{ opacity: pressed ? 0.88 : 1 }]}
       >
-        {/* A round badge: the flame over the day count (the label is read out, not shown). */}
+        {/* The flame over the day count, with nothing around it (the label is read out, not shown). */}
         <View style={[styles.card, !hasStreak && styles.cardLapsed]}>
           {hasStreak ? (
             <Animated.View style={flameStyle}>
-              <FlameSvg size={22} />
+              <FlameSvg size={26} />
             </Animated.View>
           ) : (
             <View style={styles.coldFlame}>
-              <FlameSvg size={22} />
+              <FlameSvg size={26} />
             </View>
           )}
           <Text style={[styles.count, !hasStreak && styles.countLapsed]} numberOfLines={1}>
@@ -365,28 +365,21 @@ function createStatTileStyles(colors: ThemeColors) {
 // ── Compact styles ─────────────────────────────────────────────────────────────
 
 function createCompactStyles(colors: ThemeColors) {
-  // Drawn from the active theme's own colours, so the badge sits naturally in
-  // every theme: the theme's reward tint and gold edge while the streak is
-  // alive, its quiet surface and border once it has lapsed.
+  // No ring and no filled circle: just the flame over the day count, in the
+  // theme's own reward text colour (muted once the streak has lapsed), so it
+  // sits naturally on every theme's page.
   return StyleSheet.create({
     wrapper: {
       alignSelf: 'flex-start',
     },
     card: {
-      backgroundColor: colors.accentSubtle,
-      width: 58,
-      height: 58,
-      borderRadius: 29,
+      minWidth: 48,
+      minHeight: 48,
+      paddingHorizontal: 4,
       alignItems: 'center',
       justifyContent: 'center',
-      borderWidth: 1.5,
-      borderColor: colors.accent,
-      overflow: 'hidden',
     },
-    cardLapsed: {
-      backgroundColor: colors.surfaceMuted,
-      borderColor: colors.border,
-    },
+    cardLapsed: {},
     glow: {
       position: 'absolute',
       width: 58,
@@ -404,10 +397,10 @@ function createCompactStyles(colors: ThemeColors) {
     coldFlame: { opacity: 0.28 },
     count: {
       ...Type.numeral,
-      fontSize: 15,
+      fontSize: 16,
       fontWeight: '800',
       color: colors.accentText,
-      lineHeight: 17,
+      lineHeight: 18,
     },
     countLapsed: { color: colors.textTertiary },
     right: { minWidth: 0, gap: 1 },
