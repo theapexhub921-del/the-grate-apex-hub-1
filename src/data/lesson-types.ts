@@ -302,7 +302,17 @@ export type SimulationId =
   | 'baroreflex'
   | 'shock'
   | 'cerebral-flow'
-  | 'ecg';
+  | 'ecg'
+  // Central Nervous System
+  | 'receptor-adaptation'
+  | 'stretch-reflex'
+  | 'sensory-tracts'
+  | 'pain-gate'
+  | 'dorsal-horn'
+  | 'motor-lesion'
+  | 'cerebellar-reach'
+  | 'basal-ganglia'
+  | 'brain-lesion';
 
 // What the model must show after a prediction is run (checked by
 // tests/simulations.test.mjs, so a prediction's answer always matches
