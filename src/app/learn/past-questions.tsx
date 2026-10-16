@@ -13,7 +13,7 @@ import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { readClassSelection } from '@/data/class-curriculum';
 import { HB2_COURSES, type LocalCourse } from '@/data/hb2-study';
-import { LEGACY_COURSES, type LegacyCourse, legacyCoursesForClass, loadCourseSets } from '@/data/legacy-study';
+import { LEGACY_COURSES, type LegacyCourse, loadCourseSets } from '@/data/legacy-study';
 import { setKind } from '@/data/practice-modes';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -47,11 +47,10 @@ export default function PastQuestionsScreen() {
       // the supplementary bank files (hb2-biochemistry.json, hb2-physiology.json).
       courses = [...HB2_COURSES];
     } else {
+      // HB1 tabs show only HB1 courses. (HB2 courses used to be added here for HB2
+      // learners, which made the HB2 past papers appear under both HB1 semesters.)
       const semester = tab === 'hb1s2' ? 2 : 1;
-      const ownCourses = own ? legacyCoursesForClass(own) : [];
-      courses = ownCourses.some((course) => course.classId === 'HB2')
-        ? [...ownCourses, ...LEGACY_COURSES.filter((course) => course.semester === semester)]
-        : LEGACY_COURSES.filter((course) => course.semester === semester);
+      courses = LEGACY_COURSES.filter((course) => course.classId === 'HB1' && course.semester === semester);
     }
     queueMicrotask(() => { if (live) setList(null); });
     Promise.all(
