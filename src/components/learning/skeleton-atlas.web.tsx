@@ -4,7 +4,7 @@ import { useWindowDimensions } from 'react-native';
 import { ATLAS_PAGE, atlasHash, atlasThemeVars } from '@/lib/atlas-theme';
 import { useTheme } from '@/hooks/use-theme';
 
-// The 3D skeleton atlas (web): the standalone viewer in public/atlas/skeleton.html, shown
+// The 3D anatomy atlas (web): the standalone viewer in public/atlas/anatomy.html, shown
 // inside the page and painted with the app's current theme. When the theme changes the
 // viewer is re-coloured in place, so what the learner is looking at is not reloaded.
 //
@@ -112,7 +112,7 @@ export function SkeletonAtlas() {
   return (
     <div ref={shell} style={shellStyle}>
       <div style={bar}>
-        <span style={{ color: colors.text, fontSize: 14, fontWeight: 700 }}>Skeleton atlas</span>
+        <span style={{ color: colors.text, fontSize: 14, fontWeight: 700 }}>Anatomy atlas</span>
         <button
           type="button"
           style={button}
@@ -125,7 +125,7 @@ export function SkeletonAtlas() {
       <iframe
         ref={frame}
         src={src}
-        title="3D skeleton atlas"
+        title="3D anatomy atlas"
         onLoad={send}
         allow="fullscreen"
         style={{ flex: 1, minHeight: 0, width: '100%', border: 0, display: 'block' }}
