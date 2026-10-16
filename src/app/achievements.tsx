@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 import { AchievementBadge } from '@/components/achievements/achievement-badge';
+import { GiftBoostSheet } from '@/components/gift-boost-sheet';
 import { Button } from '@/components/ui/button';
 import { Sheet } from '@/components/ui/sheet';
 import { Icon } from '@/components/ui/icon';
@@ -14,6 +15,7 @@ import { PageHeader, Screen, SectionHeader } from '@/components/ui/screen';
 import { Radius, type ThemeColors, Type } from '@/constants/theme';
 import { type AchievementGroup, type AchievementState } from '@/data/achievements';
 import { useAchievements } from '@/data/achievements-store';
+import { describeGiftBoost } from '@/data/boost-gifts';
 import { activatePowerup, boostRemainingMs, describeBoost, usePowerups, useActiveBoost } from '@/data/learning/powerups';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -86,12 +88,15 @@ function AchievementRow({ state }: { state: AchievementState }) {
 
 function BoostPanel() {
   const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
   const inventory = usePowerups();
   const active = useActiveBoost();
   const [now, setNow] = useState(() => Date.now());
   const [error, setError] = useState<string | null>(null);
+  const [gift, setGift] = useState<{ id: string | null } | null>(null);
   const remaining = boostRemainingMs(active, now);
   const timed = inventory.filter((item) => item.kind === 'timed');
+  const single = inventory.filter((item) => item.kind !== 'timed');
 
   useEffect(() => {
     if (!active) return;
@@ -124,13 +129,22 @@ function BoostPanel() {
           <Text style={styles.countdown}>{`${minutes}:${String(seconds).padStart(2, '0')} left`}</Text>
         </View>
       ) : null}
-      {timed.length === 0 ? <Text style={styles.muted}>Complete an achievement level to earn a boost.</Text> : null}
+      {timed.length === 0 && single.length === 0 ? <Text style={styles.muted}>Complete an achievement level to earn a boost. Friends can also gift you theirs.</Text> : null}
       {timed.map((item) => (
         <View key={item.id} style={styles.boostRow}>
-          <Text style={styles.boostText}>{describeBoost(item)}</Text>
+          <Text style={styles.boostText}>{describeBoost(item)}{item.source === 'gift' ? ' · gift' : ''}</Text>
+          <Button label="Gift" size="sm" variant="ghost" onPress={() => setGift({ id: item.id })} accessibilityLabel={`Gift ${describeBoost(item)} to a friend`} />
           <Button label="Activate" size="sm" disabled={remaining > 0} onPress={() => void activate(item.id)} accessibilityLabel={`Activate ${describeBoost(item)}`} />
         </View>
       ))}
+      {single.map((item) => (
+        <View key={item.id} style={styles.boostRow}>
+          <Text style={styles.boostText}>{describeGiftBoost(item)}{item.source === 'gift' ? ' · gift' : ''}</Text>
+          <Button label="Gift" size="sm" variant="ghost" onPress={() => setGift({ id: item.id })} accessibilityLabel={`Gift ${describeGiftBoost(item)} to a friend`} />
+        </View>
+      ))}
+      {inventory.length > 0 ? <Button label="Gift a boost to a friend" variant="secondary" size="sm" icon={<Icon name="sparkle" size={15} color={colors.text} />} onPress={() => setGift({ id: null })} style={styles.giftButton} /> : null}
+      <GiftBoostSheet visible={gift !== null} boostId={gift?.id ?? null} onClose={() => setGift(null)} />
       {remaining > 0 && timed.length > 0 ? <Text style={styles.muted}>One boost at a time: the others wait here until this one ends.</Text> : null}
       {error ? <Text style={styles.error} accessibilityRole="alert">{error}</Text> : null}
     </Card>
@@ -164,5 +178,6 @@ function createStyles(colors: ThemeColors) {
     boostText: { flex: 1, fontSize: 14, color: colors.text },
     muted: { fontSize: 13, lineHeight: 18, color: colors.textSecondary },
     error: { fontSize: 13, color: colors.error },
+    giftButton: { alignSelf: 'flex-start' },
   });
 }

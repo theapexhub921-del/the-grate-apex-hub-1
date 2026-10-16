@@ -9,7 +9,7 @@ import {
 import { type ActiveBoost, boostRemainingMs, clampSeconds, pickReward } from '@/data/learning/boosts';
 import type { PowerupMultiplier } from '@/data/learning/xp-rules';
 
-export type PowerupSource = 'lesson' | 'quiz' | 'streak' | 'share' | 'achievement';
+export type PowerupSource = 'lesson' | 'quiz' | 'streak' | 'share' | 'achievement' | 'gift';
 export type Powerup = {
   id: string;
   source: PowerupSource;
@@ -156,6 +156,17 @@ export async function activatePowerup(id: string): Promise<ActiveBoost> {
   await save();
   notify();
   return active;
+}
+
+/** Takes a boost out of the inventory (to gift it to a friend). Null when it is not there. */
+export async function takePowerup(id: string): Promise<Powerup | null> {
+  await ensureLoaded();
+  const item = inventory.find((candidate) => candidate.id === id) ?? null;
+  if (!item) return null;
+  inventory = inventory.filter((candidate) => candidate.id !== id);
+  await save();
+  notify();
+  return item;
 }
 
 /** The inventory, outside React (emulator checks). */

@@ -7,6 +7,7 @@
 //   { kind: 'battle', battle, to }           "challenged you to a battle"
 //   { kind: 'test' }                         a test push to the caller's own devices (returns each device's status)
 //   { kind: 'battle-result', battle, to }    the other player played / declined / finished a battle
+//   { kind: 'gift', type: 'coins'|'boost', gift, to }  "sent you Apex Coins / an XP boost"
 //
 // Sends a push to the recipient's phones and computers, so it
 // arrives even when GrAte Apex Hub is closed. Nothing is trusted from the
@@ -206,6 +207,29 @@ export default async function handler(req, res) {
     const message = battleResultMessage({ recipientIsChallenger: !senderIsChallenger, senderName: username, course: entry.course?.name, challenger, opponent, declined });
     if (!message) return res.status(200).json({ sent: 0 });
     const sent = await deliver(other, 'battles', { ...message, tag: `battle:${battleId}`, href });
+    return res.status(200).json({ sent });
+  }
+
+  if (kind === 'gift') {
+    // A gift the sender just made: their own coinTransfers / boostTransfers document, naming `to`, still waiting.
+    const type = body.type === 'boost' ? 'boost' : 'coins';
+    const giftId = String(body.gift ?? '');
+    const to = String(body.to ?? '');
+    if (!/^[A-Za-z0-9_]{6,200}$/.test(giftId) || !USER_ID.test(to) || to === sender) return res.status(400).json({ error: 'Bad request.' });
+    if (tooSoon(`${sender}:gift:${giftId}`, 60_000)) return res.status(429).json({ error: 'Slow down.' });
+    const gift = await readWithTime(`${type === 'boost' ? 'boostTransfers' : 'coinTransfers'}/${giftId}`, token);
+    if (!gift || gift.from !== sender || gift.to !== to || gift.status !== 'pending' || !(Date.now() - gift.__created < FRESH)) return res.status(409).json({ error: 'No new gift to announce.' });
+    const [recipient, profile] = await Promise.all([read(`users/${to}`, token), read(`users/${sender}`, token)]);
+    const username = typeof profile?.username === 'string' ? `@${profile.username}` : 'A friend';
+    const what = type === 'boost'
+      ? `a ×${Number(gift.multiplier) || 1.5} XP boost`
+      : `${Math.max(1, Math.round(Number(gift.amount) || 0)).toLocaleString('en')} Apex Coins`;
+    const sent = await deliver(recipient, 'socialEngagement', {
+      title: `${username} sent you ${what}`,
+      body: type === 'boost' ? 'Open GrAte Apex Hub to add it to your boosts.' : 'Open GrAte Apex Hub to collect them.',
+      tag: `gift:${giftId}`,
+      href: type === 'boost' ? '/achievements' : '/profile',
+    });
     return res.status(200).json({ sent });
   }
 

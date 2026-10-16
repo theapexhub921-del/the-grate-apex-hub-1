@@ -2,6 +2,7 @@ import { collection, doc, getDoc, getDocs, limit, query, runTransaction, serverT
 
 import { auth, db } from '@/lib/firebase';
 import { dayKey } from '@/data/learning/time';
+import { announceGift } from '@/lib/web-push';
 
 export type ApexCoinReward = 'apex_challenge' | 'topic_completion';
 export type StreakRecoveryOffer = { id: string; lost_streak: number; lost_on: string };
@@ -37,7 +38,7 @@ export async function sendApexCoins(recipientId: string, amount: number): Promis
   const userRef = doc(db, 'users', user.uid);
   const giftRef = doc(collection(db, 'coinTransfers'));
   try {
-    return await runTransaction(db, async (tx) => {
+    const balance = await runTransaction(db, async (tx) => {
       const snap = await tx.get(userRef);
       const current = Number(snap.data()?.coins ?? 0);
       if (current < amount) throw new Error('Insufficient coins.');
@@ -45,6 +46,8 @@ export async function sendApexCoins(recipientId: string, amount: number): Promis
       tx.set(giftRef, { from: user.uid, to: recipientId, amount, status: 'pending', createdAt: serverTimestamp() });
       return current - amount;
     });
+    void announceGift('coins', giftRef.id, recipientId);
+    return balance;
   } catch (error) {
     if ((error as { code?: string })?.code === 'permission-denied') {
       throw new Error('Coin gifts are not switched on yet. Your coins were not taken.');
@@ -58,7 +61,7 @@ export async function sendApexCoins(recipientId: string, amount: number): Promis
  * one transaction (the gift is marked claimed in the same step, so it can
  * never be counted twice). Returns the coins received.
  */
-export async function claimIncomingCoins(): Promise<number> {
+export async function claimIncomingCoins(onGift?: (gift: { from: string; amount: number }) => void): Promise<number> {
   const user = auth.currentUser;
   if (!user) return 0;
   let received = 0;
@@ -66,16 +69,18 @@ export async function claimIncomingCoins(): Promise<number> {
     const waiting = await getDocs(query(collection(db, 'coinTransfers'), where('to', '==', user.uid), where('status', '==', 'pending'), limit(25)));
     const userRef = doc(db, 'users', user.uid);
     for (const gift of waiting.docs) {
-      received += await runTransaction(db, async (tx) => {
+      const amount = await runTransaction(db, async (tx) => {
         const giftSnap = await tx.get(gift.ref);
         const userSnap = await tx.get(userRef);
         const data = giftSnap.data();
         if (!data || data.status !== 'pending' || data.to !== user.uid) return 0;
-        const amount = Number(data.amount);
-        tx.update(userRef, { coins: Number(userSnap.data()?.coins ?? 0) + amount });
+        const value = Number(data.amount);
+        tx.update(userRef, { coins: Number(userSnap.data()?.coins ?? 0) + value });
         tx.update(gift.ref, { status: 'claimed', claimedAt: serverTimestamp() });
-        return amount;
+        return value;
       });
+      received += amount;
+      if (amount > 0) onGift?.({ from: String(gift.data().from ?? ''), amount });
     }
   } catch {
     // Not switched on yet, or offline: gifts stay waiting and are claimed later.

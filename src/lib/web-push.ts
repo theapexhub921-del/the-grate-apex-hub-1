@@ -132,6 +132,11 @@ export async function announceBattleResult(battleId: string, to: string) {
   await announce({ kind: 'battle-result', battle: battleId, to });
 }
 
+/** I just gifted Apex Coins or an XP boost to `to` (their phone is alerted). */
+export async function announceGift(type: 'coins' | 'boost', giftId: string, to: string) {
+  await announce({ kind: 'gift', type, gift: giftId, to });
+}
+
 /** A like or a comment/reply on someone's post: { kind: 'like', post, to } or { kind: 'comment', post, comment, to }. */
 export async function announceInteraction(body: Record<string, string>) {
   await announce(body);

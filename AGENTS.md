@@ -171,6 +171,15 @@ Every lesson has an "Ask AI" tab (questions answered from the lesson's own text)
 
 * Providers, tried in order: any OpenAI-compatible service (`CHAT_API_KEY`, optional `CHAT_API_BASE` default Groq, optional `CHAT_MODEL`), then Gemini (`GEMINI_API_KEY`, optional `GEMINI_CHAT_MODEL`). If the first is rate-limited or down, the next answers. Set at least one key in Vercel, then redeploy.
 
+## Gifts between friends (coins and XP boosts)
+
+XP itself is never transferable; Apex Coins and XP boosts are, between friends (each follows the other).
+
+* **Coins:** `sendApexCoins` / `claimIncomingCoins` in `src/data/apex-coins.ts`, Firestore `coinTransfers` (from the Apex Coins card on Profile).
+* **Boosts:** `src/data/boost-gifts.ts`, Firestore `boostTransfers`. The boost leaves the sender's inventory (`takePowerup` in `powerups.ts`) and arrives as a `gift` power-up (timed or single-use, same multiplier and duration). Document id `<from>_<to>_<day>_<n>` lets the rules allow at most 3 boosts per friend per day. Gift from Achievements → Boosts, or "Gift a boost instead" on the coins sheet (`src/components/gift-boost-sheet.tsx`).
+* **Arrival:** `src/components/coin-gift-sync.tsx` (in `_layout.tsx`) collects both every few minutes and shows "Gifts from friends"; `api/push.mjs` kind `gift` alerts the friend's devices.
+* The `boostTransfers` rules are in `firestore.rules`: deploy the rules after changing them.
+
 ## Stories (Instagram-style)
 
 Stories live in `users/{uid}/stories` (rules already allow them; nothing to deploy). The data is in `src/data/community.ts` (`listLiveStories`, `createCommunityStory`, `STORY_BACKGROUNDS`), the strip of rings and the composer are in `src/components/social/supabase-social-feed.tsx`, and the full-screen viewer is `src/components/social/story-viewer.tsx`.
