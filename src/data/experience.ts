@@ -1,4 +1,5 @@
-// The learner's app experience: The Originals, Originate or Hybrid
+// The learner's app experience: Legacy (id 'originals', formerly named
+// "The Originals"), Originate or Hybrid
 // (docs/experiences-architecture.md). An interface choice only — it never
 // changes data, and it is independent of Appearance (themes).
 //
@@ -13,7 +14,7 @@ export type ExperienceId = (typeof EXPERIENCES)[number];
 
 export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: string }> = {
   originals: {
-    name: 'The Originals',
+    name: 'Legacy',
     summary: 'The original GrAte Apex Hub, as it was: its colours, emoji, fonts, glass panels, gradient background and navigation — with every new feature inside it.',
   },
   originate: { name: 'Originate', summary: 'The new GrAte Apex Hub design: its themes, layouts, icons and sidebar, in a clean, simple style.' },
