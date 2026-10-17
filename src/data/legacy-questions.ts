@@ -2,7 +2,7 @@
 // no Firebase), so the tests can check them. Used by data/legacy-study.ts.
 import type { Question } from '@/data/questions';
 
-export type BankQuestion = { id: string; q: string; o: string[]; a: number; e: string; t: string; p?: string[]; kind?: 'input'; ans?: string };
+export type BankQuestion = { id: string; q: string; o: string[]; a: number; e: string; t: string; p?: string[]; kind?: 'input'; ans?: string; img?: string };
 
 // ── Rich text (the original mini-markup: <b> <i> <sub> <sup> <term d="…">) ──
 
@@ -65,11 +65,13 @@ type Base = { course: string; lessonId?: string; concept: string };
 
 /** The original question, unchanged in meaning: multiple choice, or type-the-answer. */
 export function toQuestion(q: BankQuestion, base: Base): Question {
-  const common = { id: `legacy:${base.course}:${q.id}`, prompt: plainText(q.q), concept: base.concept || q.t || 'General', explanation: q.e ? plainText(q.e) : undefined, topicId: base.course, lessonId: base.lessonId, usage: 'quiz' as const, reviewEligible: false };
+  const common = { id: `legacy:${base.course}:${q.id}`, prompt: plainText(q.q), concept: base.concept || q.t || 'General', explanation: q.e ? plainText(q.e) : undefined, topicId: base.course, lessonId: base.lessonId, usage: 'quiz' as const, reviewEligible: false, image: q.img };
   if (q.kind === 'input' || !q.o?.length || q.a < 0) return { ...common, type: 'type', accept: [String(q.ans ?? '')] };
   const options = q.o.map(plainText);
   const trueFalse = options.length === 2 && /^true$/i.test(options[0]) && /^false$/i.test(options[1]);
-  return { ...common, type: 'choice', options, answer: q.a, fixedOrder: trueFalse || options.some((option) => ORDER_WORDS.test(option)) };
+  // Letters naming the parts of a diagram (A, B, C…) stay in order.
+  const letters = options.every((option) => /^[A-E]$/.test(option));
+  return { ...common, type: 'choice', options, answer: q.a, fixedOrder: trueFalse || letters || options.some((option) => ORDER_WORDS.test(option)) };
 }
 
 const short = (text: string) => text.length <= 28 && text.split(/\s+/).length <= 4 && !ORDER_WORDS.test(text) && !/^(true|false|yes|no)$/i.test(text);
@@ -89,7 +91,8 @@ export function buildPractice(source: readonly (BankQuestion & { setName?: strin
     const concept = q.t || q.setName || 'General';
     const original = toQuestion(q, { ...base, concept });
     const roll = random();
-    if (original.type === 'choice' && q.o.length >= 3 && !/\bexcept\b|\bnot\b/i.test(q.q)) {
+    // A question about a picture is asked as written (a matching round or typed answer would drop the picture).
+    if (original.type === 'choice' && !q.img && q.o.length >= 3 &&!/\bexcept\b|\bnot\b/i.test(q.q)) {
       const answer = plainText(q.o[q.a]);
       if (roll < 0.15 && short(answer) && !/which of the following/i.test(q.q)) {
         out.push({ ...original, id: `${original.id}:type`, type: 'type', accept: [answer], label: 'Type the answer' } as Question);

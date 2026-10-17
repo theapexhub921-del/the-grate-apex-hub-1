@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 import { MemoryStateBadge } from '@/components/learning/memory-ui';
-import { QuestionFigure } from '@/components/learning/figure-view';
+import { QuestionFigure, QuestionImage } from '@/components/learning/figure-view';
 import { AiExplain } from '@/components/learning/ai-explain';
 import { explainItem } from '@/components/question-card';
 import { aiLessonForQuestion } from '@/data/ai-context';
@@ -454,6 +454,7 @@ function QuestionReview({ row, index, onStump }: { row: Row; index: number; onSt
       </Text>
       <Text style={styles.reviewPrompt}>{row.question.prompt}</Text>
       {row.question.figure ? <QuestionFigure figure={row.question.figure} revealed /> : null}
+      {row.question.image ? <QuestionImage src={row.question.image} /> : null}
       {!row.correct ? (
         <Text style={styles.reviewLine}>
           <Text style={styles.reviewLabel}>Your answer: </Text>

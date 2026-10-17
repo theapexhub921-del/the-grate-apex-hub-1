@@ -11,7 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { AiExplain } from '@/components/learning/ai-explain';
-import { QuestionFigure } from '@/components/learning/figure-view';
+import { QuestionFigure, QuestionImage } from '@/components/learning/figure-view';
 import { Icon } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
@@ -175,6 +175,7 @@ export function QuestionCard({
       </Text>
 
       {question.figure ? <QuestionFigure figure={question.figure} revealed={revealed} /> : null}
+      {question.image ? <QuestionImage src={question.image} /> : null}
 
       {showMeta && !compact ? (
         <View style={styles.meta}>
