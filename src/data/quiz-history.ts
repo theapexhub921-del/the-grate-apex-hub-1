@@ -21,6 +21,7 @@ export type AttemptKind = 'lesson' | 'topic' | 'practice' | 'review' | 'apex' | 
 
 export type CustomQuizSettings = {
   lessonIds: string[];
+  pastTopicIds?: string[]; // topics whose HB2 past questions are included (data/past-questions.ts)
   size: number;
   feedback: 'instant' | 'submit';
   secondsPerQuestion?: number;
@@ -125,11 +126,13 @@ function normalizeCustomQuiz(value: unknown): CustomQuizSettings | undefined {
   if (!value || typeof value !== 'object') return undefined;
   const settings = value as Partial<CustomQuizSettings>;
   const lessonIds = Array.isArray(settings.lessonIds) ? settings.lessonIds.filter((id): id is string => typeof id === 'string') : [];
-  if (!lessonIds.length || !Number.isInteger(settings.size) || !settings.size || settings.size < 1 || settings.size > 50) return undefined;
+  const pastTopicIds = Array.isArray(settings.pastTopicIds) ? settings.pastTopicIds.filter((id): id is string => typeof id === 'string') : [];
+  if ((!lessonIds.length && !pastTopicIds.length) || !Number.isInteger(settings.size) || !settings.size || settings.size < 1 || settings.size > 50) return undefined;
   if (settings.feedback !== 'instant' && settings.feedback !== 'submit') return undefined;
   const secondsPerQuestion = settings.secondsPerQuestion;
   return {
     lessonIds,
+    ...(pastTopicIds.length ? { pastTopicIds } : {}),
     size: settings.size,
     feedback: settings.feedback,
     secondsPerQuestion:

@@ -2,7 +2,7 @@
 // no Firebase), so the tests can check them. Used by data/legacy-study.ts.
 import type { Question } from '@/data/questions';
 
-export type BankQuestion = { id: string; q: string; o: string[]; a: number; e: string; t: string; p?: string[]; kind?: 'input'; ans?: string; img?: string };
+export type BankQuestion = { id: string; q: string; o: string[]; a: number; e: string; t: string; p?: string[]; kind?: 'input'; ans?: string; img?: string; tp?: string };
 
 // ── Rich text (the original mini-markup: <b> <i> <sub> <sup> <term d="…">) ──
 

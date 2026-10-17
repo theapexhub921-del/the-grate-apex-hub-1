@@ -102,11 +102,12 @@ export const routes = {
 
   customQuizBuilder: () => '/learn/custom-quiz' as Href,
 
-  customQuiz: (options: { lessonIds: string[]; size: number; feedback: 'instant' | 'submit'; secondsPerQuestion?: number }) =>
-    options.lessonIds.length > 0
+  customQuiz: (options: { lessonIds: string[]; pastTopicIds?: string[]; size: number; feedback: 'instant' | 'submit'; secondsPerQuestion?: number }) =>
+    options.lessonIds.length > 0 || (options.pastTopicIds?.length ?? 0) > 0
       ? (`/learn/quiz${query({
           custom: 1,
-          lessons: options.lessonIds.join(','),
+          lessons: options.lessonIds.join(',') || undefined,
+          past: options.pastTopicIds?.join(',') || undefined,
           size: options.size,
           feedback: options.feedback,
           seconds: options.secondsPerQuestion,
