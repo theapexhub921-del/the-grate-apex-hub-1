@@ -256,6 +256,8 @@
 
     [hidden] { display: none !important; }
 
+    .boot { margin: 2px 0 10px; padding: 9px 12px; border-radius: var(--r-sm); background: var(--well); border: 1px solid var(--line); color: var(--ink-2); font-size: 12.5px; }
+
     /* single-organ buttons */
     .organs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
@@ -719,8 +721,8 @@
   </style>
   <script type="importmap">
 { "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    "three": "./vendor/three/build/three.module.min.js",
+    "three/addons/": "./vendor/three/examples/jsm/"
 } }
 </script>
 </head>
@@ -769,6 +771,7 @@
     </div>
 
     <div class="pscroll">
+      <p id="boot" class="boot" role="status">Loading the 3D atlas&hellip;</p>
       <ul id="results"></ul>
       <button id="reveal" class="btn">Show everything again</button>
 
@@ -985,6 +988,30 @@
         var d = event.data;
         if (d && d.type === 'grateapex-theme') apply(d.vars);
       });
+    })();
+  </script>
+  <script>
+    // Loading watchdog: if the 3D engine cannot start (slow or broken connection, blocked file) say so on screen
+    // instead of leaving an empty menu. The viewer sets window.__atlasReady when it has started.
+    (function () {
+      var note = document.getElementById('notice');
+      var boot = document.getElementById('boot');
+      function fail(msg) {
+        if (window.__atlasReady) return;
+        note.style.display = 'block';
+        note.textContent = msg;
+        if (boot) boot.textContent = 'The atlas did not finish loading.';
+      }
+      window.addEventListener('error', function (e) {
+        fail('The atlas could not start' + (e && e.message ? ': ' + e.message : '') + '. Check your connection and reload the page.');
+      }, true);
+      window.addEventListener('unhandledrejection', function (e) {
+        fail('The atlas could not start' + (e && e.reason && e.reason.message ? ': ' + e.reason.message : '') + '. Check your connection and reload the page.');
+      });
+      setTimeout(function () {
+        if (!window.__atlasReady && boot) boot.textContent = 'Still loading. This can take a minute on a slow connection.';
+      }, 8000);
+      setTimeout(function () { fail('The atlas is taking too long to load. Check your connection and reload the page.'); }, 45000);
     })();
   </script>
   <script>
@@ -2452,6 +2479,9 @@ bool inRegion(vec3 p) {
     /* ---------- start ---------- */
     for (const s of SYSTEMS) if (s.on) setSystem(s, true);
     post({ type: 'ready' });
+  
+    window.__atlasReady = true;
+    { const boot = document.getElementById('boot'); if (boot) boot.remove(); }
   </script>
 </body>
 
