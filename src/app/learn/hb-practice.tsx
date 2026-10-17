@@ -126,7 +126,8 @@ export default function LegacyPracticeScreen() {
         if (chosen.length) source = chosen;
       }
       if (before) source = source.filter((q) => !before.has(`legacy:${course.id}:${q.id}`));
-      if (apex) source = source.filter((q) => q.kind !== 'input' && q.o?.length > 1 && q.a >= 0);
+      // Apex: no diagram questions (10 seconds is too short to read a picture).
+      if (apex) source = source.filter((q) => q.kind !== 'input' && q.o?.length > 1 && q.a >= 0 && !q.img);
       if (source.length === 0) return fail(reviewIds ? 'Nothing to review here right now — well done.' : 'There are no questions here yet.');
       setTitle(modeTitle(practice, course.name, { lesson: lesson?.title, set: set?.name }));
       const size = take(source.length);

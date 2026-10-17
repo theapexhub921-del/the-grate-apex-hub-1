@@ -50,6 +50,9 @@ type QuestionBase = {
   // A lecture diagram shown with the question, its printed labels hidden
   // and `spot` (if set) marked — "What is the highlighted structure?"
   figure?: { id: string; spot?: string };
+  // A plain picture shown with the question, e.g. a past paper's labelled
+  // diagram (path under public/, like /figures/hb2-histology-past/f1.jpg).
+  image?: string;
 };
 
 export type ChoiceQuestion = QuestionBase & {

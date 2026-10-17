@@ -8,6 +8,7 @@ import { SkeletonAtlas } from '@/components/learning/skeleton-atlas';
 import { LegacyCourseTile } from '@/components/learning/legacy-course-tile';
 import { CoursePracticeModes } from '@/components/learning/course-practice-modes';
 import { Button } from '@/components/ui/button';
+import { CardGrid } from '@/components/ui/card-grid';
 import { Icon } from '@/components/ui/icon';
 import { Card, Interactive, PressableCard } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
@@ -216,14 +217,14 @@ export default function LegacyCourseScreen() {
       {sets?.length ? (
         <>
           <SectionHeader title="Question sets" subtitle={course.subject ? 'Practise each topic’s questions in mixed types.' : 'The course’s quizzes and past questions, as in the original app.'} style={styles.section} />
-          <View style={styles.sets}>
+          <CardGrid minItemWidth={180} maxColumns={3} gap={10}>
             {sets.map((set) => (
               <Interactive key={set.id} onPress={() => { const saved = findPractice(drafts, course.id, set.id); router.push(saved ? resumeHref(saved) : routes.legacyPractice({ course: course.id, set: set.id })); }} accessibilityRole="button" style={({ hovered }) => [styles.set, hovered && styles.setHover]}>
                 <Text style={styles.setName}>{set.name}</Text>
                 <Text style={styles.metaSoft}>{findPractice(drafts, course.id, set.id) ? `Resume · ${resumeLabel(findPractice(drafts, course.id, set.id)!)}` : `${set.count} questions`}</Text>
               </Interactive>
             ))}
-          </View>
+          </CardGrid>
         </>
       ) : null}
         </>
@@ -282,8 +283,7 @@ function createStyles(colors: ThemeColors) {
     chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, width: '100%' },
     answerChip: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: '100%', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999, backgroundColor: colors.primarySubtle, borderWidth: 1, borderColor: colors.primaryBorder },
     answerText: { flexShrink: 1, fontSize: 12.5, fontWeight: '800', color: colors.primaryText },
-    sets: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-    set: { minWidth: 160, flexGrow: 1, flexBasis: '30%', padding: 14, borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, gap: 4 },
+    set: { flexGrow: 1, padding: 14, borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, gap: 4 },
     setHover: { borderColor: colors.primaryBorder },
     setName: { fontSize: 14.5, fontWeight: '800', color: colors.text },
   });

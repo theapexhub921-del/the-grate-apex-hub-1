@@ -17,6 +17,7 @@ import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import { DESKTOP_BREAKPOINT } from '@/constants/theme';
 import { SidebarResizeHandle, useSidebarWidth } from '@/components/sidebar-resize';
+import { useTabBarLocked } from '@/components/tab-bar-visibility';
 import { useTabBarMode } from '@/data/navigation-settings';
 import { useExperience } from '@/hooks/use-experience';
 
@@ -42,6 +43,7 @@ export default function AppTabs() {
   const originals = experience === 'originals';
   const sidebarWidth = useSidebarWidth();
   const originalAutoHide = useOriginalAutoHide();
+  const barLocked = useTabBarLocked(); // the atlas in full screen: no bottom bar over it
 
   // Unauthenticated screens must not show the authenticated navigation.
   const isAuthRoute = ['login', 'onboarding', 'privacy', 'terms'].includes(segments[0] as string);
@@ -73,7 +75,7 @@ export default function AppTabs() {
         <Tabs
           backBehavior="history"
           tabBar={({ navigation }) =>
-            useRail || isAuthRoute || isWidgetRoute || inChat ? null : originals ? (
+            useRail || isAuthRoute || isWidgetRoute || inChat || barLocked ? null : originals ? (
               <LegacyFloatingBar onNavigate={(route) => navigation.navigate(route as never)} />
             ) : (
               <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />
@@ -113,7 +115,6 @@ export default function AppTabs() {
           <Tabs.Screen name="learn/hb-lesson" options={{ href: null }} />
           <Tabs.Screen name="learn/hb-practice" options={{ href: null }} />
           <Tabs.Screen name="explore/discovery" options={{ href: null }} />
-          <Tabs.Screen name="games/med-term-scramble" options={{ href: null }} />
           <Tabs.Screen name="learn/anatomy" options={{ href: null }} />
           <Tabs.Screen name="learn/biochemistry" options={{ href: null }} />
           <Tabs.Screen name="learn/physiology" options={{ href: null }} />

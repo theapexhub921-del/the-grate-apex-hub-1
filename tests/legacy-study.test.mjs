@@ -49,3 +49,31 @@ describe('original questions in this app', () => {
     if (tf) assert.deepEqual(tf.options, ['True', 'False']);
   });
 });
+
+describe('HB2 past question banks', () => {
+  const banks = ['hb2-anatomy', 'hb2-biochemistry', 'hb2-physiology'].map((id) => JSON.parse(readFileSync(`public/curriculum/${id}.json`, 'utf8')));
+
+  it('every question has options and a valid answer; every diagram exists', () => {
+    for (const hb2 of banks) {
+      for (const set of hb2.sets) {
+        assert.match(set.name, /^Past Questions \d+ — /, set.name);
+        for (const q of set.questions) {
+          assert.ok(q.q.trim() && q.o.length >= 2 && q.a >= 0 && q.a < q.o.length, `${hb2.id} ${set.id} ${q.id}`);
+          if (q.img) assert.doesNotThrow(() => readFileSync(`public${q.img}`), q.img);
+        }
+      }
+    }
+  });
+
+  it('diagram questions keep their picture and their A–E order, and are asked as written', () => {
+    const anatomy = banks[0];
+    const pictured = anatomy.sets.flatMap((set) => set.questions).filter((q) => q.img);
+    assert.ok(pictured.length > 50);
+    const question = toQuestion(pictured[0], { course: 'hb2-anatomy', concept: '' });
+    assert.equal(question.image, pictured[0].img);
+    assert.equal(question.fixedOrder, true);
+    const practice = buildPractice(pictured, { course: 'hb2-anatomy' }, pictured.length, 'seed');
+    assert.equal(practice.length, pictured.length);
+    assert.ok(practice.every((item) => item.type === 'choice' && item.image && !item.label));
+  });
+});

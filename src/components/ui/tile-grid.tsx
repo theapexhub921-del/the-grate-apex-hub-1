@@ -1,5 +1,6 @@
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { CardGrid } from '@/components/ui/card-grid';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { PressableCard } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
@@ -10,13 +11,11 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 export type Tile = { id: string; icon: IconName; title: string; detail: string; badge?: string; onPress: () => void; disabled?: boolean; hidden?: boolean };
 
-const rows = <T,>(items: readonly T[], size: number) => Array.from({ length: Math.ceil(items.length / size) }, (_, i) => items.slice(i * size, i * size + size));
-
 /**
- * Uniform tiles: every tile has the same layout (icon, title, one or two lines,
- * an optional badge) and the same width and height in its row; an odd last
- * row keeps its tiles the same size. `columns` is the most per row; narrow
- * screens show fewer.
+ * Uniform tiles: every tile has the same layout (icon, title, up to three
+ * lines, an optional badge) and the same width and height, in every row; an
+ * unfinished last row keeps its tiles the same size. `columns` is the most per
+ * row; narrower space shows fewer.
  */
 export function TileGrid({ tiles, columns = 2 }: { tiles: readonly Tile[]; columns?: number }) {
   return <TileCards tiles={tiles} columns={columns} />;
@@ -28,44 +27,34 @@ function TileCards({ tiles, columns }: { tiles: readonly Tile[]; columns: number
   // in the brand colour instead of in a tinted square.
   const originate = useExperience() === 'originate';
   const colors = useTheme();
-  const { width } = useWindowDimensions();
-  const perRow = width < 640 ? 1 : width < 1100 ? Math.min(2, columns) : columns;
-  const shown = tiles.filter((tile) => !tile.hidden);
   return (
-    <View style={styles.grid}>
-      {rows(shown, perRow).map((row, r) => (
-        <View key={r} style={styles.row}>
-          {row.map((tile) => (
-            <PressableCard key={tile.id} onPress={tile.onPress} disabled={tile.disabled} accessibilityLabel={`${tile.title}. ${tile.detail}`} style={[styles.tile, tile.disabled && styles.off]}>
-              <View style={[styles.icon, originate && styles.iconPlain]}><Icon name={tile.icon} size={20} color={originate ? colors.primaryText : colors.accentText} /></View>
-              <View style={styles.text}>
-                <View style={styles.head}>
-                  <Text style={styles.title} numberOfLines={1}>{tile.title}</Text>
-                  {tile.badge ? <Pill label={tile.badge} tone="gold" /> : null}
-                </View>
-                <Text style={styles.detail} numberOfLines={3}>{tile.detail}</Text>
-              </View>
-            </PressableCard>
-          ))}
-          {Array.from({ length: perRow - row.length }, (_, i) => <View key={`gap${i}`} style={styles.gap} />)}
-        </View>
+    <CardGrid maxColumns={columns} minItemWidth={250}>
+      {tiles.filter((tile) => !tile.hidden).map((tile) => (
+        <PressableCard key={tile.id} onPress={tile.onPress} disabled={tile.disabled} accessibilityLabel={`${tile.title}. ${tile.detail}`} style={[styles.tile, tile.disabled && styles.off]}>
+          <View style={[styles.icon, originate && styles.iconPlain]}><Icon name={tile.icon} size={20} color={originate ? colors.primaryText : colors.accentText} /></View>
+          <View style={styles.text}>
+            <View style={styles.head}>
+              <Text style={styles.title} numberOfLines={1}>{tile.title}</Text>
+              {tile.badge ? <Pill label={tile.badge} tone="gold" /> : null}
+            </View>
+            <Text style={styles.detail} numberOfLines={3}>{tile.detail}</Text>
+          </View>
+        </PressableCard>
       ))}
-    </View>
+    </CardGrid>
   );
 }
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-    grid: { gap: 12 },
-    row: { flexDirection: 'row', gap: 12, alignItems: 'stretch' },
-    tile: { flex: 1, minWidth: 0, minHeight: 116, flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingVertical: 16 },
+    tile: { flexGrow: 1, flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingVertical: 16 },
     off: { opacity: 0.6 },
-    gap: { flex: 1 },
     icon: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentSubtle },
     iconPlain: { width: 24, height: 24, backgroundColor: 'transparent', alignItems: 'flex-start' },
     text: { flex: 1, minWidth: 0, gap: 3 },
-    head: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    head: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 24 },
     title: { ...Type.headline, color: colors.text, flexShrink: 1 },
-    detail: { fontSize: 13.5, lineHeight: 20, color: colors.textSecondary },
+    // Room for all three lines on every tile, so every tile is the same height.
+    detail: { fontSize: 13.5, lineHeight: 20, minHeight: 60, color: colors.textSecondary },
   });
 }
