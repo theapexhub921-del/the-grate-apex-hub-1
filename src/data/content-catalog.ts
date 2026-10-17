@@ -1518,7 +1518,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "BIOCHEMISTRY",
     zip: "Nucleic Acids",
     sourceFileIds: ["na-3-gene-expression-and-regulation-meaa-2025", "na-1-nucleotide-metabolism-full-2025-2", "na-2-nucleic-acid-metabolism-meaa-2025", "na-lockfile-2-nucleic-acid-metabolism-meaa-2025", "na-nucleotide-metabolism-practice-exam", "na-recombinant-dna-technology-full-2022", "na-nucleotide-biosynthesis-full-2022"],
-    status: "source-only",
+    status: "published",
     emoji: "🧬",
     outline: [
       { title: "Nucleotide Biosynthesis (Purine and Pyrimidine Metabolism)", points: [], sourceRefs: [{ sourceId: "na-1-nucleotide-metabolism-full-2025-2" }] },
