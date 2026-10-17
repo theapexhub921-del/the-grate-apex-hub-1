@@ -682,12 +682,17 @@
         border-radius: 18px;
       }
 
-      body.panel-closed #info { bottom: calc(var(--gap) + var(--sab) + 56px); left: calc(var(--gap) * 2 + 48px); }
+      /* with the menu tucked away, the card sits at the bottom beside the menu button */
+      body.panel-closed #info { bottom: calc(var(--gap) + var(--sab)); left: calc(var(--gap) * 2 + 48px); }
       #info.open { transform: translateY(0); }
       body.sheet-half #info.open { opacity: 0; visibility: hidden; pointer-events: none; }
 
-      #info .row .btn { flex: 1 1 auto; }
-      #name { font-size: 17px; }
+      /* compact card so it covers less of the model */
+      #info { padding: 10px 10px 10px 16px; }
+      #meta { margin: 2px 0 8px; font-size: 12px; }
+      #info .row { gap: 6px; }
+      #info .row .btn { flex: 1 1 auto; min-height: 38px; padding: 6px 8px; font-size: 13px; }
+      #name { font-size: 16px; }
       #hint { top: 38%; }
     }
 
@@ -1081,9 +1086,18 @@
       // typing in the search box needs the list open
       q.addEventListener('focus', function () { if (isSheet()) setSheet('half'); });
 
-      // choosing a structure (tap on the model or a search result) tucks the sheet away
+      // choosing a structure (tap on the model or a search result) tucks the menu away so the model stays visible;
+      // deselecting brings the menu back (unless the learner had already hidden it themselves)
+      var autoClosed = false;
       new MutationObserver(function () {
-        if (isSheet() && info.classList.contains('open')) setSheet('peek');
+        if (!isSheet()) return;
+        if (info.classList.contains('open')) {
+          setSheet('peek');
+          if (!panel.classList.contains('closed')) { setClosed(true); autoClosed = true; }
+        } else if (autoClosed) {
+          setClosed(false);
+          autoClosed = false;
+        }
       }).observe(info, { attributes: true, attributeFilter: ['class'] });
 
       // view controls start folded on small screens (the toggle button still opens them)
