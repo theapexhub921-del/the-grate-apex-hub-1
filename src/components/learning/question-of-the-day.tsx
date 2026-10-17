@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { findLesson } from '@/data/curriculum';
-import { pickQuestion, qotdDay, readCloudAnswer, readLocalAnswer, readTally, saveAnswer, type SaveResult, type Tally } from '@/data/qotd';
+import { findQotdQuestion, pickQuestion, qotdDay, readCloudAnswer, readLocalAnswer, readTally, saveAnswer, type SaveResult, type Tally } from '@/data/qotd';
 import { type Answer, isAnswerCorrect } from '@/data/questions';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { routes } from '@/lib/routes';
@@ -30,7 +30,11 @@ export function QuestionOfTheDay() {
   const styles = useThemedStyles(createStyles);
   const experience = useExperience();
   const day = qotdDay();
-  const question = useMemo(() => pickQuestion(day), [day]);
+  const picked = useMemo(() => pickQuestion(day), [day]);
+  // Answered already on this device: always show that question, even if today's
+  // pick has changed since (content was added), never a second one.
+  const [answeredId, setAnsweredId] = useState<string | null>(null);
+  const question = useMemo(() => (answeredId ? findQotdQuestion(answeredId) : null) ?? picked, [answeredId, picked]);
   const [answer, setAnswer] = useState<Answer | undefined>(undefined);
   const [revealed, setRevealed] = useState(false);
   const [status, setStatus] = useState<Status>('loading');
@@ -48,13 +52,15 @@ export function QuestionOfTheDay() {
         cloud = undefined; // offline: fall back to what this device knows
       }
       if (!alive) return;
-      if (local && question && local.questionId === question.id) {
+      const answered = local ? findQotdQuestion(local.questionId) : null;
+      if (local && answered) {
+        setAnsweredId(answered.id);
         setAnswer(local.pick);
         setRevealed(true);
         if (local.synced || cloud) setStatus('saved');
         else {
           // Saved on this device only: try again (the rules count it once at most).
-          const result = await saveAnswer(day, question.id, local.pick, isAnswerCorrect(question, local.pick));
+          const result = await saveAnswer(day, answered.id, local.pick, isAnswerCorrect(answered, local.pick));
           if (alive) setStatus(statusFor(result));
         }
       } else if (cloud) {
@@ -68,7 +74,7 @@ export function QuestionOfTheDay() {
     return () => {
       alive = false;
     };
-  }, [day, question]);
+  }, [day]);
 
   if (!question) return null;
   const entry = findLesson(question.lessonId);
