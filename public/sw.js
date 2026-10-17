@@ -38,6 +38,10 @@ self.addEventListener('fetch', (event) => {
   // the connection was slow) left phones stuck on an old, broken version. The browser's normal checks keep it fresh:
   // the page is revalidated on every open (vercel.json) and its address carries a fresh ?v= stamp (src/lib/atlas-theme.ts).
   if (new URL(request.url).pathname.startsWith('/atlas/')) return;
+  // Game builds (public/game-builds) are left entirely to the browser too: never cached
+  // (updates always show) and never re-served, because the host redirects play.html
+  // to /play and a redirected reply from here would be refused for a page load.
+  if (new URL(request.url).pathname.startsWith('/game-builds/')) return;
 
   if (request.mode === 'navigate') {
     // Always the newest page from the network (bypassing the HTTP cache); the
