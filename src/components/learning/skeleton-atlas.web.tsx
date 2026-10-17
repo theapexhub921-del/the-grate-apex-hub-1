@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { useWindowDimensions } from 'react-native';
 
 import { setTabBarLocked } from '@/components/tab-bar-visibility';
+import { recordAtlasQuiz } from '@/data/atlas-quiz';
+import { parseAtlasQuizMessage } from '@/data/learning/atlas-quiz-rules';
 import { ATLAS_PAGE, atlasFresh, atlasHash, atlasThemeVars } from '@/lib/atlas-theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -31,6 +33,24 @@ export function SkeletonAtlas() {
   useEffect(() => {
     send();
   }, [send]);
+
+  // A finished atlas quiz round: save it (XP once a day + the streak) and tell the viewer how much XP it earned,
+  // so it can show that on its score card. Only this viewer, on this same site, is listened to.
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.source !== frame.current?.contentWindow) return;
+      const result = parseAtlasQuizMessage(event.data);
+      if (!result) return;
+      void recordAtlasQuiz(result)
+        .then((amount) => {
+          frame.current?.contentWindow?.postMessage(JSON.stringify({ type: 'quizXp', amount }), window.location.origin);
+        })
+        .catch(() => undefined); // not saved (e.g. offline): the quiz itself is unaffected
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
 
   const enterFull = () => {
     setFull(true);
