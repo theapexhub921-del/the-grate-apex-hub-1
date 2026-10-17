@@ -6,8 +6,12 @@
 //   Vercel build, the service worker keeps game builds for offline play, and the game
 //   page stays out of the navigation tabs
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
+
+// Update both values together whenever an atlas model (.glb) is changed (see the atlas tests below).
+const KNOWN_MODELS = { version: '1', fingerprint: 'ab6bb914e2085911146be7bfd4e65fc008605f4b7fcf80773ef152b8808cf828' };
 
 const read = (path) => readFileSync(path, 'utf8');
 const vercel = JSON.parse(read('vercel.json'));
@@ -24,6 +28,33 @@ describe('3D atlas wiring', () => {
   });
   it('atlas addresses carry a fresh ?v= stamp', () => {
     assert.match(read('src/lib/atlas-theme.ts'), /export function atlasFresh\(/);
+  });
+  // The models (.glb) are kept by the browser for a year, so they are downloaded once. That is only safe
+  // because their address carries ?m=<MODEL_VERSION>, which must change whenever a model file changes.
+  it('vercel.json lets browsers keep the atlas models', () => {
+    const rule = (vercel.headers ?? []).find((r) => r.source === '/atlas/(.*)\\.glb');
+    assert.ok(rule, 'no Cache-Control rule for /atlas/*.glb');
+    assert.match(rule.headers.find((h) => h.key === 'Cache-Control')?.value ?? '', /max-age=31536000/);
+  });
+  it('the atlas asks for models with the current model version', () => {
+    const html = read('public/atlas/anatomy.html');
+    assert.match(html, /f \+ '\?m=' \+ MODEL_VERSION/, 'model addresses must end in ?m=<MODEL_VERSION>');
+    assert.equal(/const MODEL_VERSION = '(\d+)'/.exec(html)?.[1], KNOWN_MODELS.version);
+  });
+  it('the model version was bumped whenever a model changed', () => {
+    const files = [];
+    const walk = (dir) => readdirSync(dir, { withFileTypes: true }).forEach((e) => (e.isDirectory() ? walk(`${dir}/${e.name}`) : files.push(`${dir}/${e.name}`)));
+    walk('public/atlas');
+    const hash = createHash('sha256');
+    for (const file of files.filter((f) => f.endsWith('.glb')).sort()) {
+      hash.update(file);
+      hash.update(createHash('sha256').update(readFileSync(file)).digest());
+    }
+    assert.equal(
+      hash.digest('hex'),
+      KNOWN_MODELS.fingerprint,
+      'An atlas .glb file changed. Bump MODEL_VERSION in public/atlas/anatomy.html, then update KNOWN_MODELS here (version and fingerprint).',
+    );
   });
 });
 

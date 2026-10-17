@@ -1277,6 +1277,10 @@
     /* ---------- config ---------- */
     // Where the .glb files live. Override with ?base=https://your-cdn/path/
     const BASE = new URLSearchParams(location.search).get('base') || './';
+    // The .glb models are kept by the browser for a long time (vercel.json), so they are only downloaded once.
+    // They are asked for as `file.glb?m=<MODEL_VERSION>`: change this number whenever ANY .glb file changes,
+    // so everyone fetches the new models once (tests/deploy-wiring.test.mjs fails if you forget).
+    const MODEL_VERSION = '1';
 
     const SYSTEMS = [
       // listed in the order of the Body systems panel: the eight systems first, then what else is in the model
@@ -2090,7 +2094,7 @@ bool inRegion(vec3 p) {
           const parts = [];
           for (const f of files) {
             // multi-file systems (the female organs) ship at full detail only, so they skip the lite folder
-            const g = await loader.loadAsync(BASE + (s.files ? '' : MODEL_DIR) + f, e => {
+            const g = await loader.loadAsync(BASE + (s.files ? '' : MODEL_DIR) + f + '?m=' + MODEL_VERSION, e => {
               if (e.total) s.stat.textContent = Math.round((e.loaded / e.total) * 100) + '%';
             });
             parts.push(g.scene);
