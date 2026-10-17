@@ -1953,6 +1953,28 @@ export const contentTopics: ContentTopic[] = [
       { title: "The Larynx", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
     ],
   },
+  {
+    id: "neuroanatomy",
+    title: "Neuroanatomy",
+    subject: "anatomy",
+    courseId: "anatomy-lectures",
+    folderSubject: "ANATOMY",
+    zip: "Anatomy",
+    sourceFileIds: ["anat-cns", "anat-meninges", "anat-neuroscience-steeplechase"],
+    status: "published",
+    emoji: "🧬",
+    note: "HB2 Gross Anatomy (Anatomy/Gross/Neuroanatomy). The steeplechase picture deck is a study aid, not a source.",
+    outline: [
+      { title: "The Nervous System and the Cerebral Hemispheres", points: [], sourceRefs: [{ sourceId: "anat-cns" }] },
+      { title: "Cortical Areas and White Matter", points: [], sourceRefs: [{ sourceId: "anat-cns" }] },
+      { title: "The Thalamus and Diencephalon", points: [], sourceRefs: [{ sourceId: "anat-cns" }] },
+      { title: "The Hypothalamus and Pituitary Gland", points: [], sourceRefs: [{ sourceId: "anat-cns" }] },
+      { title: "Basal Nuclei and Blood Supply of the Brain", points: [], sourceRefs: [{ sourceId: "anat-cns" }] },
+      { title: "The Meninges and Dura Mater", points: [], sourceRefs: [{ sourceId: "anat-meninges" }] },
+      { title: "Dural Venous Sinuses", points: [], sourceRefs: [{ sourceId: "anat-meninges" }] },
+      { title: "Arachnoid, Pia, Meningeal Spaces and Haemorrhage", points: [], sourceRefs: [{ sourceId: "anat-meninges" }] },
+    ],
+  },
 ];
 
 export function getTopicsForSubject(subject: ContentTopic['subject']) {
