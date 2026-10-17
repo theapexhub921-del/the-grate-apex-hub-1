@@ -15,7 +15,8 @@ import { hemeMetabolism } from '@/data/topics/heme-metabolism';
 import { hormones } from '@/data/topics/hormones-endocrine-biochemistry';
 import { inbornErrors } from '@/data/topics/inborn-errors-of-metabolism';
 import { oxygenCarriers } from '@/data/topics/oxygen-carriers';
+import { respiratoryGross } from '@/data/topics/respiratory-system-gross';
 import { upperLimb } from '@/data/topics/upper-limb';
 
 // Anatomy topics are in HB2 Gross Anatomy course order.
-export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, upperLimb, cardiovascularGross];
+export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, upperLimb, cardiovascularGross, respiratoryGross];

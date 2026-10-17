@@ -1865,6 +1865,27 @@ export const contentTopics: ContentTopic[] = [
       { title: "Great Vessels and Arteries of the Trunk", points: [], sourceRefs: [{ sourceId: "cardiovascular-gross-slides" }] },
     ],
   },
+  {
+    id: "respiratory-system-gross",
+    title: "Respiratory System",
+    subject: "anatomy",
+    courseId: "anatomy-lectures",
+    folderSubject: "ANATOMY",
+    zip: "Anatomy",
+    sourceFileIds: ["anat-respiratory-gross"],
+    status: "published",
+    emoji: "🫁",
+    note: "HB2 Gross Anatomy (Anatomy/Gross/Respiratory).",
+    outline: [
+      { title: "Upper Airway: Nasal Cavity and Pharynx", points: [], sourceRefs: [{ sourceId: "anat-respiratory-gross" }] },
+      { title: "The Larynx", points: [], sourceRefs: [{ sourceId: "anat-respiratory-gross" }] },
+      { title: "The Trachea", points: [], sourceRefs: [{ sourceId: "anat-respiratory-gross" }] },
+      { title: "The Thoracic Wall", points: [], sourceRefs: [{ sourceId: "anat-respiratory-gross" }] },
+      { title: "The Diaphragm", points: [], sourceRefs: [{ sourceId: "anat-respiratory-gross" }] },
+      { title: "The Pleura", points: [], sourceRefs: [{ sourceId: "anat-respiratory-gross" }] },
+      { title: "The Lungs and Bronchial Tree", points: [], sourceRefs: [{ sourceId: "anat-respiratory-gross" }] },
+    ],
+  },
 ];
 
 export function getTopicsForSubject(subject: ContentTopic['subject']) {

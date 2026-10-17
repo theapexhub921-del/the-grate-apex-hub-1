@@ -1,0 +1,226 @@
+// Quiz bank for Anatomy → Respiratory System (gross), built from the
+// lecture deck (Respiratory System 2026 v2). Includes 5 Assertion–Reason
+// questions per lesson.
+import { assertionReason as ar, fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import type { ConceptId } from '@/data/topics/respiratory-system-gross/sources';
+
+type Q = QuestionDraft<ConceptId>;
+
+// ─── Lesson 1: Upper Airway ──────────────────────────────────────────
+
+const lesson1: Q[] = [
+  mcq('q1-01', 'rs-components', 'Which structure belongs to the respiratory (not conducting) division?', 'Alveoli', ['Trachea', 'Bronchioles', 'Larynx'], { explanation: 'Slide 16.' }),
+  mcq('q1-02', 'rs-components', 'In this lecture, the upper respiratory tract ends at the:', 'Trachea', ['Larynx', 'Pharynx', 'Bronchioles'], { explanation: 'Slide 17: nasal cavity, pharynx, larynx and trachea.' }),
+  mcq('q1-03', 'rs-components', 'Respiratory movements are accomplished by:', 'The diaphragm and the muscles of the thoracic wall', ['The lungs contracting', 'The pleura', 'The trachealis muscle'], { explanation: 'Slide 17.' }),
+  mcq('q1-04', 'nasal-cavity-resp', 'The posterior openings of the nasal cavity into the pharynx are the:', 'Choanae', ['Nares', 'Vestibules', 'Meatuses'], { explanation: 'Slide 19.', skill: 'terminology' }),
+  mcq('q1-05', 'nasal-cavity-resp', 'The anterior part of the nasal cavity just inside the nostrils is the:', 'Vestibule', ['Choana', 'Sphenoethmoidal recess', 'Concha'], { explanation: 'Slide 24.' }),
+  mcq('q1-06', 'nasal-cavity-resp', 'The anterior half of the nasal septum is formed by:', 'Septal (nasal) cartilage', ['The vomer', 'The perpendicular plate of the ethmoid', 'The palatine bone'], { explanation: 'Slide 24.' }),
+  mcq('q1-07', 'nasal-cavity-resp', 'Loss of the sense of smell is called:', 'Anosmia', ['Epistaxis', 'Dysphagia', 'Rhinorrhoea'], { explanation: 'Slides 10, 26.', skill: 'terminology' }),
+  mcq('q1-08', 'pharynx-parts', 'The pharynx is about how long?', '12 cm', ['5 cm', '25 cm', '40 cm'], { explanation: 'Slide 30.' }),
+  mcq('q1-09', 'pharynx-parts', 'Inferiorly, the pharynx is continuous with the:', 'Oesophagus', ['Trachea', 'Larynx', 'Stomach'], { explanation: 'Slide 30.' }),
+  mcq('q1-10', 'pharynx-parts', 'The nasopharynx extends down to the upper surface of the:', 'Soft palate', ['Epiglottis', 'Cricoid cartilage', 'Hyoid bone'], { explanation: 'Slide 37.' }),
+  mcq('q1-11', 'pharynx-parts', 'The opening of the auditory tube is found on the lateral wall of the:', 'Nasopharynx', ['Oropharynx', 'Laryngopharynx', 'Nasal vestibule'], { explanation: 'Slide 37.' }),
+  mcq('q1-12', 'pharynx-parts', 'The palatine tonsil lies in the lateral wall of the:', 'Oropharynx', ['Nasopharynx', 'Laryngopharynx', 'Larynx'], { explanation: 'Slide 40.' }),
+  mcq('q1-13', 'pharynx-parts', 'The laryngopharynx ends at the lower border of the cricoid cartilage at the level of:', 'C6', ['C1', 'C3', 'T2'], { explanation: 'Slide 42.' }),
+  mcq('q1-14', 'pharynx-parts', 'The piriform recesses lie on either side of the:', 'Laryngeal inlet', ['Palatine tonsil', 'Auditory tube', 'Choanae'], { explanation: 'Slide 42.' }),
+  mcq('q1-15', 'waldeyer-ring', 'The main function of Waldeyer’s ring is to:', 'Act as a barrier to infection, especially in early life', ['Produce saliva', 'Close the nasopharynx during swallowing', 'Support the epiglottis'], { explanation: 'Slide 44.' }),
+  mcq('q1-16', 'waldeyer-ring', 'The adenoids are also called the:', 'Pharyngeal tonsils', ['Lingual tonsils', 'Tubal tonsils', 'Palatine tonsils'], { explanation: 'Slide 44.', skill: 'terminology' }),
+  multi('q1-17', 'pharynx-parts', 'Select the muscles that supplement the pharyngeal constrictors:', ['Stylopharyngeus', 'Palatopharyngeus', 'Salpingopharyngeus'], ['Genioglossus', 'Sternohyoid'], { explanation: 'Slide 32.' }),
+  multi('q1-18', 'rs-components', 'Select all parts of the conducting division:', ['Nasal cavity', 'Larynx', 'Bronchi', 'Bronchioles'], ['Alveoli'], { explanation: 'Slide 16.' }),
+  order('q1-19', 'waldeyer-ring', 'Order the parts of Waldeyer’s ring from superior to inferior:', ['Adenoids (pharyngeal tonsils)', 'Tubal tonsils', 'Palatine tonsils', 'Lingual tonsil'], { explanation: 'Slide 44.' }),
+  fill('q1-20', 'nasal-cavity-resp', 'The short thick hairs at the opening of the nasal cavity are called ____.', ['vibrissae'], { explanation: 'Slide 9 (speaker note).', skill: 'terminology' }),
+  tf({ id: 'q1-21', conceptId: 'pharynx-parts', statement: 'The posterior wall of the oropharynx is formed by all three pharyngeal constrictors.', answer: true, explanation: 'Slide 40.' }),
+  ar('ar1-01', 'pharynx-parts', 'Infections of the nasopharynx can spread to the middle ear.', 'The auditory tube opens on the lateral wall of the nasopharynx.', 'explains', 'Both true; the auditory tube links the nasopharynx to the middle ear (slide 37).'),
+  ar('ar1-02', 'nasal-cavity-resp', 'The nasal septum divides the nasal cavity into two halves.', 'The posterior half of the septum is cartilaginous.', 'a-true-r-false', 'The posterior half is bony (vomer and ethmoid); the anterior half is cartilage (slide 24).'),
+  ar('ar1-03', 'waldeyer-ring', 'The palatine tonsil is part of Waldeyer’s ring.', 'The palatine tonsil lies in the nasopharynx.', 'a-true-r-false', 'It is part of the ring but lies in the oropharynx (slides 40, 44).'),
+  ar('ar1-04', 'rs-components', 'The lungs are part of the respiratory division.', 'Gas exchange occurs in the alveoli.', 'explains', 'Both true; the alveoli are where exchange happens, which defines the respiratory division (slide 16).'),
+  ar('ar1-05', 'pharynx-parts', 'The laryngopharynx extends to the lower border of the cricoid cartilage.', 'The laryngopharynx contains the palatine tonsil.', 'a-true-r-false', 'The extent is correct (C6), but the palatine tonsil is in the oropharynx (slides 40, 42).'),
+];
+
+// ─── Lesson 2: The Larynx ────────────────────────────────────────────
+
+const lesson2: Q[] = [
+  mcq('q2-01', 'larynx-position', 'The larynx lies between:', 'The root of the tongue and the trachea', ['The nasopharynx and oropharynx', 'The trachea and the bronchi', 'The hyoid and the mandible'], { explanation: 'Slide 46.' }),
+  mcq('q2-02', 'larynx-position', 'Compared with an adult male, the larynx in females and children lies:', 'Somewhat higher', ['Somewhat lower', 'At exactly the same level', 'Behind the oesophagus'], { explanation: 'Slide 57.' }),
+  mcq('q2-03', 'larynx-position', 'The larynx forms the lower part of the anterior wall of the:', 'Pharynx', ['Trachea', 'Oral cavity', 'Mediastinum'], { explanation: 'Slide 46.' }),
+  mcq('q2-04', 'larynx-position', 'At puberty in the male, the length of the rima glottidis:', 'Nearly doubles', ['Halves', 'Is unchanged', 'Triples'], { explanation: 'Slide 59.' }),
+  mcq('q2-05', 'larynx-position', 'Before puberty, the male and female larynx:', 'Differ little in size', ['Are very different in size', 'Differ only in cartilage number', 'Lie at different vertebral levels in adults only'], { explanation: 'Slide 59.' }),
+  mcq('q2-06', 'larynx-cartilages-resp', 'How many cartilages does the larynx have?', 'Nine', ['Six', 'Three', 'Twelve'], { explanation: 'Slide 62.' }),
+  mcq('q2-07', 'larynx-cartilages-resp', 'Which is a paired laryngeal cartilage?', 'Arytenoid', ['Thyroid', 'Cricoid', 'Epiglottis'], { explanation: 'Slide 62.' }),
+  mcq('q2-08', 'larynx-cartilages-resp', 'Which cartilage forms the laryngeal prominence (Adam’s apple)?', 'Thyroid', ['Cricoid', 'Arytenoid', 'Epiglottis'], { explanation: 'Slides 46, 59.' }),
+  mcq('q2-09', 'larynx-membranes', 'The thyrohyoid membrane is classified as:', 'Extrinsic', ['Intrinsic', 'A cartilage', 'Part of the vocal fold'], { explanation: 'Slide 65.' }),
+  mcq('q2-10', 'larynx-membranes', 'Which of these is an INTRINSIC laryngeal membrane or ligament?', 'Quadrangular membrane', ['Hyoepiglottic ligament', 'Cricotracheal ligament', 'Thyrohyoid membrane'], { explanation: 'Slide 65.' }),
+  mcq('q2-11', 'larynx-membranes', 'The ligament connecting the cricoid cartilage to the trachea is the:', 'Cricotracheal ligament', ['Cricothyroid ligament', 'Thyroepiglottic ligament', 'Hyoepiglottic ligament'], { explanation: 'Slide 65.' }),
+  mcq('q2-12', 'laryngeal-aditus', 'The anterior boundary of the laryngeal aditus is the:', 'Epiglottis', ['Arytenoid cartilages', 'Cricoid lamina', 'Thyroid lamina'], { explanation: 'Slide 86.' }),
+  mcq('q2-13', 'laryngeal-aditus', 'The cuneiform tubercles lie in the:', 'Aryepiglottic folds', ['Vocal folds', 'Vestibular folds', 'Piriform recesses'], { explanation: 'Slide 86.' }),
+  mcq('q2-14', 'laryngeal-aditus', 'The laryngeal aditus opens from which part of the pharynx?', 'Laryngopharynx', ['Nasopharynx', 'Oropharynx', 'Hypopharyngeal recess of the nose'], { explanation: 'Slide 86.' }),
+  multi('q2-15', 'larynx-cartilages-resp', 'Select the three SINGLE (unpaired) cartilages of the larynx:', ['Thyroid', 'Cricoid', 'Epiglottis'], ['Arytenoid', 'Corniculate', 'Cuneiform'], { explanation: 'Slide 62.' }),
+  multi('q2-16', 'larynx-membranes', 'Select the EXTRINSIC ligaments/membranes of the larynx:', ['Thyrohyoid membrane', 'Cricotracheal ligament', 'Hyoepiglottic ligament'], ['Quadrangular membrane', 'Thyroepiglottic ligament'], { explanation: 'Slide 65.' }),
+  match('q2-17', 'laryngeal-aditus', 'Match each boundary of the laryngeal inlet:', [['Anterior', 'Epiglottis'], ['Posterior', 'Arytenoid apices and corniculate cartilages'], ['Lateral', 'Aryepiglottic folds']], { explanation: 'Slide 86.' }),
+  fill('q2-18', 'larynx-position', 'The opening between the vocal folds is the rima ____.', ['glottidis'], { explanation: 'Slide 59.', skill: 'terminology' }),
+  tf({ id: 'q2-19', conceptId: 'larynx-position', statement: 'In females the larynx enlarges considerably after puberty.', answer: false, explanation: 'Slide 59: only slightly in females; considerably in males.' }),
+  tf({ id: 'q2-20', conceptId: 'larynx-cartilages-resp', statement: 'The corniculate cartilages are paired.', answer: true, explanation: 'Slide 62.' }),
+  tf({ id: 'q2-21', conceptId: 'larynx-position', statement: 'The great vessels of the neck lie on either side of the larynx.', answer: true, explanation: 'Slide 57.' }),
+  ar('ar2-01', 'larynx-position', 'The male voice deepens at puberty.', 'At puberty the male rima glottidis nearly doubles in length.', 'explains', 'Both true; longer vocal folds vibrate at a lower pitch (slide 59).'),
+  ar('ar2-02', 'larynx-cartilages-resp', 'The larynx has nine cartilages.', 'Three cartilages are single and three are paired.', 'explains', 'Both true: 3 single + 3 pairs = 9 (slide 62).'),
+  ar('ar2-03', 'larynx-membranes', 'The thyrohyoid membrane is an extrinsic membrane.', 'The thyrohyoid membrane joins the thyroid cartilage to the hyoid bone.', 'explains', 'Both true; connecting the larynx to a structure outside it makes it extrinsic (slide 65).'),
+  ar('ar2-04', 'laryngeal-aditus', 'The epiglottis forms the anterior boundary of the laryngeal inlet.', 'The epiglottis is a paired cartilage.', 'a-true-r-false', 'The epiglottis is a single cartilage (slides 62, 86).'),
+  ar('ar2-05', 'larynx-position', 'The adult larynx extends from C1 to C3.', 'The larynx lies higher in females and children.', 'a-false-r-true', 'It extends from C4 to C6; it does lie higher in females and children (slide 57).'),
+];
+
+// ─── Lesson 3: The Trachea ───────────────────────────────────────────
+
+const lesson3: Q[] = [
+  mcq('q3-01', 'trachea-extent', 'The trachea begins at the lower part of the larynx at the level of:', 'C6', ['C3', 'T1', 'T4'], { explanation: 'Slide 98.' }),
+  mcq('q3-02', 'trachea-extent', 'The approximate length of the adult trachea is:', '10 cm', ['5 cm', '20 cm', '25 cm'], { explanation: 'Slide 98.' }),
+  mcq('q3-03', 'trachea-extent', 'The side-to-side diameter of the trachea is about:', '2–2.5 cm', ['0.5 cm', '4–5 cm', '6 cm'], { explanation: 'Slide 98.' }),
+  mcq('q3-04', 'trachea-extent', 'Compared with the adult, the trachea of a child is:', 'Smaller, more deeply placed and more mobile', ['Larger and fixed', 'More superficial and rigid', 'Identical'], { explanation: 'Slide 98.' }),
+  mcq('q3-05', 'trachea-neck-relations', 'Which structure crosses in front of the upper trachea in the neck?', 'Isthmus of the thyroid gland', ['Oesophagus', 'Common carotid artery', 'Recurrent laryngeal nerve'], { explanation: 'Slide 101.' }),
+  mcq('q3-06', 'trachea-neck-relations', 'The arteria thyroidea ima, when present, lies:', 'Anterior to the trachea', ['Posterior to the oesophagus', 'Lateral to the carotid sheath', 'Within the larynx'], { explanation: 'Slide 101.' }),
+  mcq('q3-07', 'trachea-neck-relations', 'Which nerves lie lateral to the trachea in the neck?', 'Recurrent laryngeal nerves', ['Phrenic nerves', 'Hypoglossal nerves', 'Accessory nerves'], { explanation: 'Slide 102.' }),
+  mcq('q3-08', 'trachea-thorax-relations', 'In the thorax, the trachea lies in the:', 'Superior mediastinum', ['Anterior mediastinum', 'Middle mediastinum', 'Posterior mediastinum'], { explanation: 'Slide 104.' }),
+  mcq('q3-09', 'trachea-thorax-relations', 'Which vein lies anterior to the trachea in the thorax?', 'Left brachiocephalic vein', ['Azygos vein', 'Right brachiocephalic vein', 'Hemiazygos vein'], { explanation: 'Slide 104.' }),
+  mcq('q3-10', 'trachea-thorax-relations', 'Which nerve lies on the right side of the thoracic trachea?', 'Right vagus', ['Left recurrent laryngeal', 'Right phrenic', 'Left vagus'], { explanation: 'Slide 105.' }),
+  mcq('q3-11', 'trachea-thorax-relations', 'Which nerve lies on the left side of the thoracic trachea?', 'Left recurrent laryngeal nerve', ['Right vagus', 'Left phrenic', 'Greater splanchnic'], { explanation: 'Slide 105.' }),
+  mcq('q3-12', 'trachea-thorax-relations', 'Which nerve plexus is listed in front of the thoracic trachea?', 'Deep cardiac plexus', ['Pulmonary plexus', 'Coeliac plexus', 'Brachial plexus'], { explanation: 'Slide 104.' }),
+  mcq('q3-13', 'trachea-supply', 'The arteries of the trachea come from the:', 'Inferior thyroid and bronchial arteries', ['Superior thyroid and coronary arteries', 'Internal thoracic arteries only', 'Vertebral arteries'], { explanation: 'Slide 106.' }),
+  mcq('q3-14', 'trachea-supply', 'The tracheal veins drain into the:', 'Inferior thyroid veins', ['Azygos vein only', 'External jugular veins', 'Pulmonary veins'], { explanation: 'Slide 106.' }),
+  mcq('q3-15', 'trachea-supply', 'The tracheal mucous membrane is supplied by the:', 'Vagus via the recurrent laryngeal nerves', ['Phrenic nerves', 'Hypoglossal nerve', 'Glossopharyngeal nerve'], { explanation: 'Slide 111.' }),
+  mcq('q3-16', 'trachea-supply', 'The smooth muscle and blood vessels of the trachea receive fibres from the:', 'Upper ganglia of the sympathetic trunk', ['Pelvic splanchnic nerves', 'Facial nerve', 'Lumbar plexus'], { explanation: 'Slide 111.' }),
+  multi('q3-17', 'trachea-supply', 'Select the lymph nodes that drain the trachea:', ['Pretracheal nodes', 'Paratracheal nodes', 'Inferior deep cervical nodes'], ['Inguinal nodes', 'Coeliac nodes'], { explanation: 'Slide 109.' }),
+  multi('q3-18', 'trachea-neck-relations', 'Select the lateral relations of the trachea in the neck:', ['Common carotid arteries', 'Lobes of the thyroid gland', 'Inferior thyroid arteries'], ['Thyroid isthmus', 'Oesophagus'], { explanation: 'Slide 102.' }),
+  match('q3-19', 'trachea-neck-relations', 'Match each relation of the cervical trachea to its side:', [['Thyroid isthmus', 'Anterior'], ['Oesophagus', 'Posterior'], ['Common carotid artery', 'Lateral']], { explanation: 'Slides 101–102.' }),
+  fill('q3-20', 'trachea-extent', 'The trachea divides into the two main bronchi at the ____.', ['carina'], { explanation: 'Slide 98.', skill: 'terminology' }),
+  tf({ id: 'q3-21', conceptId: 'trachea-extent', statement: 'The trachea is larger in males than in females.', answer: true, explanation: 'Slide 98.' }),
+  ar('ar3-01', 'trachea-neck-relations', 'Thyroid surgery risks injury to the recurrent laryngeal nerves.', 'The recurrent laryngeal nerves lie lateral to the trachea close to the thyroid lobes and inferior thyroid arteries.', 'explains', 'Both true; their position beside the trachea and thyroid explains the risk (slide 102).'),
+  ar('ar3-02', 'trachea-extent', 'The trachea ends at the upper border of T5.', 'The trachea begins at C6.', 'true-unrelated', 'Both true (slide 98), but its starting level does not explain where it ends.'),
+  ar('ar3-03', 'trachea-thorax-relations', 'The left recurrent laryngeal nerve lies on the left of the thoracic trachea.', 'The left recurrent laryngeal nerve hooks around the arch of the aorta.', 'explains', 'Both true; looping under the arch brings it up on the left side of the trachea (slide 105; Gray’s).'),
+  ar('ar3-04', 'trachea-supply', 'The trachea is supplied by the bronchial arteries.', 'The bronchial arteries arise from the pulmonary trunk.', 'a-true-r-false', 'The bronchial arteries come from the thoracic aorta, not the pulmonary trunk (slide 106; CVS lecture).'),
+  ar('ar3-05', 'trachea-neck-relations', 'The oesophagus lies anterior to the trachea in the neck.', 'The thyroid isthmus lies anterior to the trachea.', 'a-false-r-true', 'The oesophagus is POSTERIOR; the isthmus is anterior (slides 101–102).'),
+];
+
+// ─── Lesson 4: The Thoracic Wall ─────────────────────────────────────
+
+const lesson4: Q[] = [
+  mcq('q4-01', 'thorax-components', 'Superiorly, the thoracic wall is closed by the:', 'Suprapleural membrane', ['Diaphragm', 'Clavicle', 'Manubrium only'], { explanation: 'Slide 132.' }),
+  mcq('q4-02', 'thorax-components', 'Posteriorly, the thoracic wall is formed by:', '12 thoracic vertebrae and intervertebral discs', ['The scapulae', 'The lumbar vertebrae', 'The ribs only'], { explanation: 'Slide 132.' }),
+  mcq('q4-03', 'thorax-components', 'The breast lies in the:', 'Subcutaneous tissue (superficial fascia)', ['Deep fascia', 'Intercostal space', 'Pleural cavity'], { explanation: 'Slide 135.' }),
+  mcq('q4-04', 'thorax-components', 'The thoracic cavity is divided into:', 'Two pleural cavities and the mediastinum', ['Three pleural cavities', 'A single cavity', 'Thoracic and pelvic parts'], { explanation: 'Slide 118.' }),
+  mcq('q4-05', 'thoracic-muscles', 'Which is an EXTRINSIC muscle of the thoracic wall?', 'Pectoralis major', ['External intercostal', 'Transversus thoracis', 'Subcostalis'], { explanation: 'Slide 136.' }),
+  mcq('q4-06', 'thoracic-muscles', 'Which muscles form the inner layer of the intercostal muscles?', 'Subcostal, innermost intercostal and transversus thoracis', ['External and internal intercostals', 'Serratus posterior superior and inferior', 'Levatores costarum only'], { explanation: 'Slide 159.' }),
+  mcq('q4-07', 'thoracic-muscles', 'Serratus posterior superior inserts into ribs:', '2–5', ['1–4', '9–12', '6–9'], { explanation: 'Slide 151.' }),
+  mcq('q4-08', 'thoracic-muscles', 'Serratus posterior inferior arises from the spinous processes of:', 'T11–L2', ['C6–T2', 'T5–T8', 'L3–S1'], { explanation: 'Slides 148, 153.' }),
+  mcq('q4-09', 'thoracic-muscles', 'The action of serratus posterior inferior is to:', 'Depress the lower ribs (expiration)', ['Elevate the upper ribs', 'Flex the trunk', 'Rotate the scapula'], { explanation: 'Slide 155.' }),
+  mcq('q4-10', 'thoracic-muscles', 'Which nerve runs on the posterior surface of serratus posterior superior, deep to the rhomboids?', 'Dorsal scapular nerve', ['Long thoracic nerve', 'Accessory nerve', 'Thoracodorsal nerve'], { explanation: 'Slide 151.' }),
+  mcq('q4-11', 'thoracic-apertures', 'The thoracic inlet slopes anteroinferiorly because of:', 'The obliquity of the first rib', ['The shape of the clavicle', 'The position of the heart', 'The curvature of the diaphragm'], { explanation: 'Slide 167.', skill: 'cause-effect' }),
+  mcq('q4-12', 'thoracic-apertures', 'The thoracic outlet is closed by the:', 'Diaphragm', ['Suprapleural membrane', 'Pelvic floor', 'Transversus abdominis'], { explanation: 'Slide 172.' }),
+  mcq('q4-13', 'thoracic-apertures', 'The right dome of the diaphragm reaches the upper border of which costal cartilage?', '5th', ['3rd', '7th', '9th'], { explanation: 'Slide 173.' }),
+  mcq('q4-14', 'thoracic-apertures', 'The thoracic cavity is deeper behind than in front because:', 'The outlet slopes obliquely downward and backward', ['The sternum is longer than the vertebral column', 'The heart lies posteriorly', 'The ribs are horizontal'], { explanation: 'Slide 172.', skill: 'cause-effect' }),
+  mcq('q4-15', 'intercostal-space-joints', 'The neurovascular plane of an intercostal space lies between the:', 'Internal and innermost intercostal muscles', ['External and internal intercostals', 'Skin and external intercostal', 'Innermost intercostal and pleura'], { explanation: 'Slide 199.' }),
+  mcq('q4-16', 'intercostal-space-joints', 'The costochondral joints are classified as:', 'Synchondroses', ['Synovial plane joints', 'Saddle joints', 'Symphyses'], { explanation: 'Slide 200.' }),
+  mcq('q4-17', 'intercostal-space-joints', 'The sternoclavicular joint is described as a:', 'Saddle joint', ['Synchondrosis', 'Plane joint', 'Symphysis'], { explanation: 'Slide 200.' }),
+  multi('q4-18', 'thoracic-apertures', 'Select the boundaries of the thoracic inlet:', ['T1 vertebra', 'First pair of ribs and costal cartilages', 'Superior border of the manubrium'], ['Xiphoid process', 'T12 vertebra'], { explanation: 'Slide 167.' }),
+  multi('q4-19', 'thoracic-muscles', 'Select the extrinsic muscles of the thoracic wall listed in the lecture:', ['Pectoralis minor', 'Serratus anterior', 'Subclavius', 'Sternocleidomastoid'], ['Innermost intercostal', 'Subcostalis'], { explanation: 'Slide 136.' }),
+  match('q4-20', 'intercostal-space-joints', 'Match each joint to its type:', [['Intervertebral', 'Symphysis'], ['Costovertebral', 'Synovial plane'], ['Manubriosternal', 'Synchondrosis'], ['Sternoclavicular', 'Saddle']], { explanation: 'Slide 200.' }),
+  order('q4-21', 'intercostal-space-joints', 'Order the intercostal neurovascular bundle from above downward:', ['Vein', 'Artery', 'Nerve'], { explanation: 'Slide 199 (VAN).' }),
+  ar('ar4-01', 'intercostal-space-joints', 'A pleural drain is inserted just above a rib.', 'The intercostal vessels and nerve run along the lower border of each rib.', 'explains', 'Both true; staying near the upper border of the rib below avoids the bundle (slide 199).'),
+  ar('ar4-02', 'thoracic-muscles', 'Serratus posterior superior assists inspiration.', 'Serratus posterior superior elevates the upper ribs.', 'explains', 'Both true; elevating ribs increases thoracic volume (slide 155).'),
+  ar('ar4-03', 'thoracic-apertures', 'The diaphragm is higher on the right than on the left.', 'The right dome reaches the 5th costal cartilage and the left only the 6th.', 'explains', 'Both true; the cartilage levels describe the higher right dome (slides 172–173).'),
+  ar('ar4-04', 'thoracic-muscles', 'The transversus thoracis belongs to the inner layer of intercostal muscles.', 'The serratus posterior muscles have migrated anteriorly.', 'a-true-r-false', 'Transversus thoracis is in the inner layer, but the serratus posterior muscles migrated POSTERIORLY (slides 150, 159).'),
+  ar('ar4-05', 'thorax-components', 'The suprapleural membrane forms the floor of the thorax.', 'The diaphragm closes the thoracic outlet.', 'a-false-r-true', 'The suprapleural membrane closes the top; the diaphragm is the floor (slides 132, 172).'),
+];
+
+// ─── Lesson 5: The Diaphragm ─────────────────────────────────────────
+
+const lesson5: Q[] = [
+  mcq('q5-01', 'diaphragm-parts', 'The sternal part of the diaphragm arises from:', 'The back of the xiphoid process', ['The manubrium', 'The lower six costal cartilages', 'The lumbar vertebrae'], { explanation: 'Slide 177.' }),
+  mcq('q5-02', 'diaphragm-parts', 'The costal part of the diaphragm interdigitates with:', 'Transversus abdominis', ['External oblique', 'Pectoralis major', 'Serratus anterior'], { explanation: 'Slide 177.' }),
+  mcq('q5-03', 'diaphragm-parts', 'The medial arcuate ligament arches over:', 'Psoas major', ['Quadratus lumborum', 'The aorta', 'The oesophagus'], { explanation: 'Slide 180.' }),
+  mcq('q5-04', 'diaphragm-parts', 'The median arcuate ligament is formed by:', 'The medial margins of the two crura meeting in front of the aorta', ['Thickened transversalis fascia', 'The central tendon', 'The xiphoid slips'], { explanation: 'Slide 180.' }),
+  mcq('q5-05', 'diaphragm-parts', 'Which crus is larger and longer?', 'Right crus', ['Left crus', 'Both are equal', 'Neither — there is a single crus'], { explanation: 'Slide 180.' }),
+  mcq('q5-06', 'diaphragm-parts', 'Which leaflet of the central tendon is the largest?', 'Right', ['Left', 'Middle', 'All equal'], { explanation: 'Slide 182.' }),
+  mcq('q5-07', 'diaphragm-parts', 'The central tendon is partly blended with the:', 'Pericardium', ['Liver capsule', 'Pleura of the cupola', 'Oesophagus'], { explanation: 'Slide 182.' }),
+  mcq('q5-08', 'diaphragm-openings', 'The vena caval foramen lies at the level of:', 'T8', ['T10', 'T12', 'L1'], { explanation: 'Slide 183.' }),
+  mcq('q5-09', 'diaphragm-openings', 'Which structure passes through the oesophageal hiatus?', 'Vagus nerves', ['Thoracic duct', 'Azygos vein', 'Right phrenic nerve branches'], { explanation: 'Slide 183.' }),
+  mcq('q5-10', 'diaphragm-openings', 'The thoracic duct passes through the:', 'Aortic hiatus', ['Oesophageal hiatus', 'Vena caval foramen', 'Sternocostal triangle'], { explanation: 'Slide 183.' }),
+  mcq('q5-11', 'diaphragm-openings', 'The lowest and most posterior of the large openings is the:', 'Aortic hiatus', ['Vena caval foramen', 'Oesophageal hiatus', 'Opening for the superior epigastric artery'], { explanation: 'Slide 183.' }),
+  mcq('q5-12', 'diaphragm-openings', 'The superior epigastric artery enters the abdomen by passing:', 'Between the sternal and costal parts of the diaphragm', ['Through the aortic hiatus', 'Through the vena caval foramen', 'Behind the medial arcuate ligament'], { explanation: 'Slide 186.' }),
+  mcq('q5-13', 'diaphragm-openings', 'The sympathetic trunks usually enter the abdomen:', 'Behind the medial arcuate ligaments', ['Through the oesophageal hiatus', 'Through the central tendon', 'Through the right crus'], { explanation: 'Slide 186.' }),
+  mcq('q5-14', 'diaphragm-supply', 'The motor supply of the diaphragm is from:', 'The phrenic nerves (C3–C5)', ['The lower intercostal nerves', 'The vagus nerves', 'The splanchnic nerves'], { explanation: 'Slide 188.' }),
+  mcq('q5-15', 'diaphragm-supply', 'The left inferior phrenic vein drains into the:', 'Left suprarenal vein', ['IVC directly', 'Azygos vein', 'Portal vein'], { explanation: 'Slide 190.' }),
+  mcq('q5-16', 'diaphragm-supply', 'The inferior surface of the diaphragm is supplied by the:', 'Inferior phrenic arteries from the abdominal aorta', ['Superior phrenic arteries', 'Pericardiacophrenic arteries', 'Coronary arteries'], { explanation: 'Slide 190.' }),
+  mcq('q5-17', 'diaphragm-development-clinical', 'The central tendon develops from the:', 'Septum transversum', ['Pleuroperitoneal membranes', 'Dorsal mesentery', 'Body wall mesoderm only'], { explanation: 'Slide 195.' }),
+  mcq('q5-18', 'diaphragm-development-clinical', 'Pain from irritation of the diaphragm is commonly referred to the:', 'Shoulder', ['Umbilicus', 'Groin', 'Back of the thigh'], { explanation: 'Slide 198 (C4).' }),
+  mcq('q5-19', 'diaphragm-development-clinical', 'A retrosternal hernia between the sternal and costal parts of the diaphragm is a:', 'Morgagni hernia', ['Bochdalek hernia', 'Sliding hiatus hernia', 'Femoral hernia'], { explanation: 'Slide 195.', skill: 'terminology' }),
+  match('q5-20', 'diaphragm-openings', 'Match each opening to a structure it transmits:', [['Vena caval foramen (T8)', 'Inferior vena cava'], ['Oesophageal hiatus (T10)', 'Oesophagus'], ['Aortic hiatus (T12)', 'Azygos vein']], { explanation: 'Slide 183.' }),
+  multi('q5-21', 'diaphragm-development-clinical', 'Select the embryological sources of the diaphragm:', ['Septum transversum', 'Cervical myotomes C3–C5', 'Pleuroperitoneal membranes', 'Oesophageal (dorsal) mesentery'], ['Neural crest', 'Pharyngeal arches'], { explanation: 'Slide 195.' }),
+  ar('ar5-01', 'diaphragm-development-clinical', 'Diaphragmatic irritation causes pain felt at the shoulder.', 'The phrenic nerve shares the C4 segment with the skin over the shoulder.', 'explains', 'Both true; shared C4 segment explains the referred pain (slide 198).'),
+  ar('ar5-02', 'diaphragm-supply', 'The diaphragm is supplied by the phrenic nerves.', 'The diaphragm’s muscle develops from cervical myotomes C3–C5.', 'explains', 'Both true; cervical origin of the muscle explains its cervical nerve supply (slides 188, 195).'),
+  ar('ar5-03', 'diaphragm-openings', 'The aortic hiatus transmits the thoracic duct.', 'The aortic hiatus is the highest of the three large openings.', 'a-true-r-false', 'It does transmit the thoracic duct, but it is the LOWEST (T12); the caval foramen is highest (slide 183).'),
+  ar('ar5-04', 'diaphragm-development-clinical', 'A Bochdalek hernia results from failure of the pleuroperitoneal membrane.', 'The pleuroperitoneal membrane forms the central tendon.', 'a-true-r-false', 'The central tendon comes from the septum transversum (slide 195).'),
+  ar('ar5-05', 'diaphragm-supply', 'The lower intercostal nerves are the motor nerves of the peripheral diaphragm.', 'The phrenic nerve carries proprioception from the central tendon.', 'a-false-r-true', 'Lower intercostals are proprioceptive (sensory) only; the phrenic does carry central tendon proprioception (slide 188).'),
+];
+
+// ─── Lesson 6: The Pleura ────────────────────────────────────────────
+
+const lesson6: Q[] = [
+  mcq('q6-01', 'pleura-layers', 'The pleura is a:', 'Serous membrane', ['Mucous membrane', 'Synovial membrane', 'Fibrous capsule'], { explanation: 'Slide 232.' }),
+  mcq('q6-02', 'pleura-layers', 'The visceral and parietal pleura are continuous at the:', 'Hilum (root) of the lung', ['Apex of the lung', 'Costodiaphragmatic recess', 'Cardiac notch'], { explanation: 'Slide 232.' }),
+  mcq('q6-03', 'pleura-layers', 'The costal pleura is separated from the thoracic wall by the:', 'Endothoracic fascia', ['Transversalis fascia', 'Suprapleural membrane', 'Visceral pleura'], { explanation: 'Slide 233.' }),
+  mcq('q6-04', 'pleura-layers', 'Another name for the cervical pleura is the:', 'Cupola (dome of the pleura)', ['Pulmonary ligament', 'Mediastinal pleura', 'Costal line'], { explanation: 'Slide 233.', skill: 'terminology' }),
+  mcq('q6-05', 'pleura-layers', 'The two pleural cavities:', 'Are completely separated from each other', ['Communicate behind the sternum', 'Communicate through the diaphragm', 'Share the pericardial cavity'], { explanation: 'Slide 231.' }),
+  mcq('q6-06', 'pleural-reflections', 'The cervical pleura rises about how far above the clavicle?', '2.5 cm', ['0.5 cm', '5 cm', '8 cm'], { explanation: 'Slide 240.' }),
+  mcq('q6-07', 'pleural-reflections', 'The two pleurae meet behind the sternum from the level of the:', '2nd costal cartilage', ['1st rib', '4th costal cartilage', '6th costal cartilage'], { explanation: 'Slide 240.' }),
+  mcq('q6-08', 'pleural-reflections', 'At which costal cartilage does the left pleura diverge for the cardiac notch?', '4th', ['2nd', '6th', '8th'], { explanation: 'Slide 240.' }),
+  mcq('q6-09', 'pleural-reflections', 'The pleural reflection crosses the midclavicular line at the:', '8th rib', ['6th rib', '10th rib', '12th rib'], { explanation: 'Slide 242.' }),
+  mcq('q6-10', 'pleural-reflections', 'The pleural reflection crosses the midaxillary line at the:', '10th rib', ['8th rib', '6th rib', '12th rib'], { explanation: 'Slide 242.' }),
+  mcq('q6-11', 'pleural-reflections', 'Posteriorly, the pleura reaches the lower border of:', 'T12', ['T10', 'L2', 'T8'], { explanation: 'Slide 242.' }),
+  mcq('q6-12', 'pleural-reflections', 'A feature common to all the pleural reflection landmarks is that they occur at:', 'Even-numbered ribs', ['Odd-numbered ribs', 'Intercostal spaces', 'Vertebral levels only'], { explanation: 'Slide 245.' }),
+  mcq('q6-13', 'pleural-recesses-lines', 'Thoracocentesis is performed at the:', 'Costodiaphragmatic recess', ['Cupola', 'Hilum', 'Cardiac notch'], { explanation: 'Slide 247.', skill: 'application' }),
+  mcq('q6-14', 'pleural-recesses-lines', 'The sternal line of pleural reflection is where the costal pleura becomes the:', 'Mediastinal pleura anteriorly', ['Diaphragmatic pleura', 'Cervical pleura', 'Visceral pleura'], { explanation: 'Slide 248.' }),
+  mcq('q6-15', 'pleural-recesses-lines', 'The costal line of pleural reflection is where the costal pleura becomes the:', 'Diaphragmatic pleura', ['Mediastinal pleura', 'Cervical pleura', 'Pericardium'], { explanation: 'Slide 250.' }),
+  mcq('q6-16', 'pleura-clinical', 'Air in the pleural cavity is called:', 'Pneumothorax', ['Haemothorax', 'Pleural effusion', 'Emphysema'], { explanation: 'Slide 252.', skill: 'terminology' }),
+  mcq('q6-17', 'pleura-clinical', 'Blood in the pleural cavity is called:', 'Haemothorax', ['Pneumothorax', 'Pleurisy', 'Chylothorax'], { explanation: 'Slide 252.', skill: 'terminology' }),
+  multi('q6-18', 'pleura-layers', 'Select the four parts of the parietal pleura:', ['Costal', 'Mediastinal', 'Diaphragmatic', 'Cervical'], ['Visceral', 'Pulmonary'], { explanation: 'Slide 233.' }),
+  order('q6-19', 'pleural-reflections', 'Order the pleural reflection landmarks from superior to inferior on the anterolateral chest:', ['Meets the other pleura at the 2nd costal cartilage', 'Turns laterally at the 6th costal cartilage', 'Crosses the midclavicular line at the 8th rib', 'Crosses the midaxillary line at the 10th rib'], { explanation: 'Slides 240–242.' }),
+  fill('q6-20', 'pleural-recesses-lines', 'Excess pleural fluid is called a pleural ____.', ['effusion'], { explanation: 'Slide 247.', skill: 'terminology' }),
+  tf({ id: 'q6-21', conceptId: 'pleural-recesses-lines', statement: 'In quiet breathing, the lungs extend as far down as the pleural reflections.', answer: false, explanation: 'Slide 247: they do not, leaving the costodiaphragmatic recess.' }),
+  ar('ar6-01', 'pleural-recesses-lines', 'A pleural effusion collects in the costodiaphragmatic recess.', 'The lungs do not extend into the recess in normal breathing.', 'explains', 'Both true; the unfilled recess is the most dependent space where fluid gathers (slide 247).'),
+  ar('ar6-02', 'pleural-reflections', 'The left pleura diverges at the 4th costal cartilage.', 'The heart occupies a cardiac notch on the left.', 'explains', 'Both true; the heart pushes the left pleura laterally (slides 240).'),
+  ar('ar6-03', 'pleura-layers', 'The pleural cavity is a potential space.', 'Visceral and parietal pleura are normally separated by a thin film of fluid only.', 'explains', 'Both true; the layers lie in contact, so the cavity is only potential (slide 236).'),
+  ar('ar6-04', 'pleural-reflections', 'The pleura can be opened in a posterior approach to the kidney.', 'Pleura extends below the medial part of the 12th rib in the costovertebral triangle.', 'explains', 'Both true (slide 245; Gray’s).'),
+  ar('ar6-05', 'pleura-layers', 'The two pleural cavities communicate across the midline.', 'The mediastinum lies between the two pleural cavities.', 'a-false-r-true', 'They are completely separated (slide 231); the mediastinum does lie between them (slide 230).'),
+];
+
+// ─── Lesson 7: The Lungs and Bronchial Tree ──────────────────────────
+
+const lesson7: Q[] = [
+  mcq('q7-01', 'lung-features', 'Healthy lung tissue placed in water will:', 'Float', ['Sink', 'Dissolve', 'Swell'], { explanation: 'Slide 258.' }),
+  mcq('q7-02', 'lung-features', 'Which is NOT one of the three surfaces of the lung?', 'Sternal surface', ['Costal surface', 'Diaphragmatic surface', 'Mediastinal surface'], { explanation: 'Slide 260.' }),
+  mcq('q7-03', 'lung-features', 'The cardiac impression and hilum are found on which surface?', 'Mediastinal', ['Costal', 'Diaphragmatic', 'Apical'], { explanation: 'Slide 263.' }),
+  mcq('q7-04', 'lung-roots-fissures', 'At the left lung root, the most superior structure is the:', 'Left pulmonary artery', ['Left main bronchus', 'Superior pulmonary vein', 'Bronchial vein'], { explanation: 'Slide 268.' }),
+  mcq('q7-05', 'lung-roots-fissures', 'In each lung root, the two pulmonary veins lie:', 'One anterior and one inferior to the bronchus', ['Both above the bronchus', 'Both behind the bronchus', 'On either side of the artery'], { explanation: 'Slides 268, 271.' }),
+  mcq('q7-06', 'lung-roots-fissures', 'The right lung has how many fissures?', 'Two', ['One', 'Three', 'None'], { explanation: 'Slide 273.' }),
+  mcq('q7-07', 'lung-roots-fissures', 'The lingula belongs to the:', 'Left upper lobe', ['Right middle lobe', 'Left lower lobe', 'Right upper lobe'], { explanation: 'Slide 273.' }),
+  mcq('q7-08', 'main-bronchi', 'The right main bronchus enters the lung opposite:', 'T5', ['T4', 'T6', 'T8'], { explanation: 'Slide 207.' }),
+  mcq('q7-09', 'main-bronchi', 'Which vein arches over the right main bronchus?', 'Azygos vein', ['Hemiazygos vein', 'Left brachiocephalic vein', 'Superior vena cava'], { explanation: 'Slide 207.' }),
+  mcq('q7-10', 'main-bronchi', 'The eparterial bronchus supplies the:', 'Right upper lobe', ['Right middle lobe', 'Left upper lobe', 'Lingula'], { explanation: 'Slide 207.' }),
+  mcq('q7-11', 'main-bronchi', 'The left main bronchus passes beneath the:', 'Arch of the aorta', ['Azygos vein', 'Right pulmonary artery', 'Thoracic duct'], { explanation: 'Slide 211.' }),
+  mcq('q7-12', 'main-bronchi', 'Compared with the right, the left main bronchus is:', 'Narrower and longer', ['Wider and shorter', 'More vertical', 'Identical'], { explanation: 'Slides 207, 211.' }),
+  mcq('q7-13', 'bronchopulmonary-segments', 'How many segmental bronchi supply the right lower lobe?', '5', ['2', '3', '4'], { explanation: 'Slide 224.' }),
+  mcq('q7-14', 'bronchopulmonary-segments', 'The surgical unit of the lung is the:', 'Bronchopulmonary segment', ['Lobule', 'Alveolus', 'Lobe'], { explanation: 'Slide 278.' }),
+  mcq('q7-15', 'lung-supply', 'How many bronchial arteries are usually present?', 'Three: one right, two left', ['Two: one each side', 'Four: two each side', 'One'], { explanation: 'Slide 214.' }),
+  mcq('q7-16', 'lung-supply', 'On the left, the bronchial veins drain into the:', 'Accessory hemiazygos vein', ['Azygos vein', 'Pulmonary veins', 'Left brachiocephalic vein directly'], { explanation: 'Slide 216.' }),
+  mcq('q7-17', 'lung-supply', 'Lymph from the lower lobe drains to the:', 'Inferior tracheobronchial nodes', ['Superior tracheobronchial nodes', 'Axillary nodes', 'Parasternal nodes'], { explanation: 'Slide 221.' }),
+  mcq('q7-18', 'lung-supply', 'Sympathetic preganglionic fibres to the lungs arise from spinal segments:', 'T2–T4', ['C3–C5', 'T10–L2', 'S2–S4'], { explanation: 'Slide 229.' }),
+  mcq('q7-19', 'lung-supply', 'The afferent limb of the cough reflex is carried by the:', 'Vagus nerve', ['Phrenic nerve', 'Sympathetic chain', 'Intercostal nerves'], { explanation: 'Slide 227.' }),
+  match('q7-20', 'main-bronchi', 'Match each feature to the correct main bronchus:', [['Has an eparterial branch', 'Right'], ['Enters the lung opposite T6', 'Left'], ['Azygos vein arches over it', 'Right'], ['Passes under the aortic arch', 'Left']], { explanation: 'Slides 207, 211–212.' }),
+  match('q7-21', 'lung-supply', 'Match each autonomic effect on the lung:', [['Vagal efferents', 'Bronchoconstriction'], ['Sympathetic efferents', 'Bronchodilation']], { explanation: 'Slide 229.' }),
+  ar('ar7-01', 'main-bronchi', 'Aspirated foreign bodies most often enter the right main bronchus.', 'The right main bronchus is wider, shorter and more vertical than the left.', 'explains', 'Both true; its shape and direction explain the preference (slide 207; Gray’s).'),
+  ar('ar7-02', 'bronchopulmonary-segments', 'A bronchopulmonary segment can be resected on its own.', 'Each segment has its own segmental bronchus and artery.', 'explains', 'Both true; independent supply allows segmental resection (slide 278).'),
+  ar('ar7-03', 'lung-supply', 'The pulmonary arteries nourish the bronchial walls.', 'The pulmonary artery divides alongside the bronchi.', 'a-false-r-true', 'They accompany the bronchi but supply the alveoli; the bronchial arteries nourish the bronchi (slide 220).'),
+  ar('ar7-04', 'lung-roots-fissures', 'The left lung has three lobes.', 'The left lung has only an oblique fissure.', 'a-false-r-true', 'With one fissure, the left lung has two lobes (slide 273).'),
+  ar('ar7-05', 'lung-supply', 'Sympathetic stimulation dilates the bronchi.', 'Sympathetic efferents to the lung are vasoconstrictor.', 'true-unrelated', 'Both true (slide 229), but vasoconstriction does not explain bronchodilation.'),
+];
+
+export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4, ...lesson5, ...lesson6, ...lesson7];
