@@ -1393,7 +1393,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "BIOCHEMISTRY",
     zip: "Amino Acid metabolism",
     sourceFileIds: ["aa-2-fate-of-carbon-skeleton-in-amino-acid-cataboli", "aa-1-amino-acid-metabolism-maa-2024", "aa-4-catabolism-of-sulfur-containing-amino-acids-ma", "aa-3-transport-of-ammonia-maa-2024", "aa-2", "aa-amino-acid", "aa-ammonia-transport", "aa-sulfur"],
-    status: "source-only",
+    status: "published",
     emoji: "⚗️",
     outline: [
       { title: "Amino Acid Metabolism", points: [], sourceRefs: [{ sourceId: "aa-1-amino-acid-metabolism-maa-2024" }] },

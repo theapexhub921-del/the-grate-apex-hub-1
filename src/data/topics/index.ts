@@ -22,5 +22,6 @@ import { gastrointestinalPhysiology } from '@/data/topics/gastrointestinal-physi
 import { reproductivePhysiology } from '@/data/topics/reproductive-physiology';
 import { specialSenses } from '@/data/topics/special-senses';
 import { freeRadicals } from '@/data/topics/free-radicals-and-oxygen-toxicity';
+import { aminoAcidMetabolism } from '@/data/topics/amino-acid-metabolism';
 
-export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, centralNervousSystem, endocrinology, gastrointestinalPhysiology, renalPhysiology, reproductivePhysiology, specialSenses, freeRadicals, upperLimb];
+export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, centralNervousSystem, endocrinology, gastrointestinalPhysiology, renalPhysiology, reproductivePhysiology, specialSenses, freeRadicals, aminoAcidMetabolism, upperLimb];
