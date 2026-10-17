@@ -1929,6 +1929,30 @@ export const contentTopics: ContentTopic[] = [
       { title: "The Urethra", points: [], sourceRefs: [{ sourceId: "anat-urinary-gross" }] },
     ],
   },
+  {
+    id: "head-and-neck",
+    title: "Head and Neck",
+    subject: "anatomy",
+    courseId: "anatomy-lectures",
+    folderSubject: "ANATOMY",
+    zip: "Anatomy",
+    sourceFileIds: ["anat-head-neck"],
+    status: "published",
+    emoji: "🧠",
+    note: "HB2 Gross Anatomy (Anatomy/Gross/Head and neck).",
+    outline: [
+      { title: "The Neck: Fascia and Triangles", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
+      { title: "The Scalp and Face", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
+      { title: "The Orbit", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
+      { title: "The Pterygopalatine Fossa", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
+      { title: "Nasal Cavity and Paranasal Sinuses", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
+      { title: "The Ear", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
+      { title: "The Tongue and Salivary Glands", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
+      { title: "Cranial Nerves I–VI", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
+      { title: "Cranial Nerves VII–XII", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
+      { title: "The Larynx", points: [], sourceRefs: [{ sourceId: "anat-head-neck" }] },
+    ],
+  },
 ];
 
 export function getTopicsForSubject(subject: ContentTopic['subject']) {
