@@ -417,6 +417,72 @@
 
     #info.open { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
+    /* ---------- quiz ---------- */
+    #quizStart { width: 100%; margin-top: 10px; }
+
+    #quiz {
+      display: none;
+      left: 50%;
+      bottom: var(--gap);
+      transform: translateX(-50%);
+      width: min(520px, calc(100% - var(--gap) * 2));
+      padding: 12px 14px 14px;
+      z-index: 6;
+    }
+
+    /* while a quiz runs, nothing may give the answer away: no menu, no info card, no hover names */
+    body.quizzing #quiz { display: block; }
+    body.quizzing #panel, body.quizzing #openPanel, body.quizzing #info, body.quizzing #tip, body.quizzing #hint { display: none !important; }
+
+    #quiz .qhead {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    #qscore { margin-left: auto; color: var(--cobalt); }
+
+    #quiz .qx {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: var(--raise);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    #quiz .qx:hover { background: var(--cobalt-2); }
+    #qprompt { margin: 6px 0 10px; font-size: 16px; line-height: 1.3; font-weight: 700; }
+    .qopts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .qopts button {
+      min-height: 46px;
+      padding: 6px 10px;
+      line-height: 1.25;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .qopts button:disabled { cursor: default; color: var(--ink); opacity: 0.55; }
+    .qopts button.right { opacity: 1; background: var(--cobalt-2); border-color: var(--cobalt); }
+    .qopts button.wrong { opacity: 1; background: var(--bad-bg); border-color: var(--bad); }
+    #quiz .qfoot { display: flex; align-items: center; gap: 10px; margin-top: 10px; min-height: 38px; }
+    #qfeed { flex: 1; color: var(--ink-2); font-size: 13px; line-height: 1.35; }
+    #qresult { margin: 6px 0 0; font-size: 22px; font-weight: 700; }
+    #qmissed { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; line-height: 1.4; }
+    #qmissed:empty { display: none; }
+    #quiz .qfoot .btn { flex: none; }
+    #qsummary .qfoot .btn { flex: 1 1 0; }
+
     #name { margin: 0; font-size: 18px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em; }
     #meta { margin: 3px 0 14px; color: var(--muted); font-size: 12.5px; }
     .row { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -687,6 +753,13 @@
       #info.open { transform: translateY(0); }
       body.sheet-half #info.open { opacity: 0; visibility: hidden; pointer-events: none; }
 
+      /* the quiz card is compact and sits at the bottom, full width */
+      #quiz { left: var(--gap); right: var(--gap); width: auto; transform: none; bottom: calc(var(--gap) + var(--sab)); padding: 10px; }
+      #qprompt { font-size: 15px; margin: 4px 0 8px; }
+      .qopts { gap: 6px; }
+      .qopts button { min-height: 44px; font-size: 13px; }
+      #quiz .qfoot { margin-top: 8px; }
+
       /* compact card so it covers less of the model */
       #info { padding: 10px 10px 10px 16px; }
       #meta { margin: 2px 0 8px; font-size: 12px; }
@@ -720,6 +793,12 @@
       #openPanel { top: var(--gap); bottom: auto; width: 44px; height: 44px; }
 
       #nav { --nb: 32px; top: var(--gap); right: var(--gap); }
+
+      /* short screens: all four answers in one row, and the question text is dropped */
+      #quiz { width: min(640px, calc(100% - var(--gap) * 2)); padding: 8px 10px 10px; }
+      #qprompt { display: none; }
+      .qopts { grid-template-columns: repeat(4, 1fr); margin-top: 6px; }
+      .qopts button { min-height: 40px; font-size: 12.5px; }
 
       #info {
         left: calc(var(--panel-w) + var(--gap) * 2 + (100% - var(--panel-w) - var(--gap) * 2) / 2);
@@ -790,6 +869,15 @@
       <p id="boot" class="boot" role="status">Loading the 3D atlas&hellip;</p>
       <ul id="results"></ul>
       <button id="reveal" class="btn">Show everything again</button>
+
+      <details class="sec" open>
+        <summary>Quiz</summary>
+        <div class="body">
+          <div id="quizSys" class="chips" role="group" aria-label="Quiz topic"></div>
+          <button id="quizStart" class="btn primary" type="button">Start 10-question quiz</button>
+          <p id="quizStatus" class="organstatus" role="status">Name the highlighted structure. Choose a body system to be tested on.</p>
+        </div>
+      </details>
 
       <details class="sec" open>
         <summary>Single organs</summary>
@@ -958,6 +1046,36 @@
       </div>
     </div>
   </div>
+
+  <section id="quiz" class="card" aria-label="Quiz">
+    <div id="qplay">
+      <div class="qhead">
+        <span id="qcount"></span>
+        <span id="qscore"></span>
+        <button id="qend" class="qx" type="button" aria-label="End the quiz" title="End the quiz">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+      <h2 id="qprompt">What is the highlighted structure?</h2>
+      <div id="qopts" class="qopts" role="group" aria-label="Answers"></div>
+      <div class="qfoot" aria-live="polite">
+        <span id="qfeed"></span>
+        <button id="qnext" class="btn primary" type="button" hidden>Next</button>
+      </div>
+    </div>
+    <div id="qsummary" hidden>
+      <div class="qhead"><span>Quiz finished</span></div>
+      <p id="qresult"></p>
+      <p id="qmissed"></p>
+      <div class="qfoot">
+        <button id="qagain" class="btn primary" type="button">Try again</button>
+        <button id="qdone" class="btn" type="button">Done</button>
+      </div>
+    </div>
+  </section>
 
   <div id="hint" class="card" role="status">
     <h2>Moving around without the buttons</h2>
@@ -2124,6 +2242,7 @@ bool inRegion(vec3 p) {
       const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
       const quick = performance.now() - down.t < 450;
       down = null;
+      if (quiz.active) return;   // during a quiz, tapping the model must not name anything
       if (moved < 6 && quick) {
         const h = pickAt(e.clientX, e.clientY);
         if (h && h.pin) selectPin(h.pin.s, h.pin.i); else select(h ? h.mesh : null);
@@ -2338,6 +2457,206 @@ bool inRegion(vec3 p) {
       else { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
     });
 
+    /* ---------- quiz mode ---------- */
+    // "What is the highlighted structure?" One body system at a time: each question highlights a structure with its name
+    // hidden and offers four choices. While a quiz runs the menu, info card and hover names are hidden (body.quizzing in the
+    // CSS) and taps on the model do nothing, so nothing gives the answer away. Starting a quiz resets the view (showAll) and
+    // shows only the chosen system in x-ray, so the highlighted structure is never hidden behind another. Ending it puts back
+    // which systems were ticked and the x-ray setting. When a round finishes, the score is posted to the host app
+    // ({ type: 'quiz', system, score, total }) in case it wants to record it.
+    const QUIZ_LENGTH = 10;
+    const QUIZ_MIN_SIZE = 0.012;   // metres (diagonal of the structure): anything smaller is too tiny to see or fairly ask about
+    const QUIZ_SYSTEMS = ['skeletal', 'joints', 'muscular', 'nervous', 'cardiovascular', 'visceral', 'lymphoid'];
+    const quiz = { active: false, starting: false, sys: SYSTEMS.find(s => s.id === 'skeletal'), qs: [], i: 0, score: 0, missed: [], answered: false, saved: null };
+    const quizById = id => document.getElementById(id);
+    const quizStartBtn = quizById('quizStart'), quizStatus = quizById('quizStatus'), quizSysEl = quizById('quizSys');
+    const qOpts = quizById('qopts'), qNext = quizById('qnext'), qFeed = quizById('qfeed');
+    const qCount = quizById('qcount'), qScore = quizById('qscore');
+    const qPlay = quizById('qplay'), qSummary = quizById('qsummary');
+    const quizLabel = e => (e.side ? `${e.name} (${e.side.toLowerCase()})` : e.name);
+    const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+    for (const id of QUIZ_SYSTEMS) {
+      const s = SYSTEMS.find(x => x.id === id);
+      if (!s) continue;
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = s.label;
+      b.setAttribute('aria-pressed', String(s === quiz.sys));
+      b.onclick = () => { quiz.sys = s; for (const c of quizSysEl.children) c.setAttribute('aria-pressed', String(c === b)); };
+      quizSysEl.appendChild(b);
+    }
+
+    // every named structure of the system that is showing right now (one entry per structure and side)
+    function quizPool(s) {
+      const seen = new Set(), pool = [], box = new THREE.Box3(), size = new THREE.Vector3();
+      for (const e of index) {
+        if (!e.mesh || e.dup || e.system !== s || !e.mesh.visible) continue;
+        if (!e.name || /^(Unnamed structure|Attachment site)/.test(e.name)) continue;
+        const label = quizLabel(e);
+        if (seen.has(label)) continue;
+        box.makeEmpty();
+        for (const m of partsOf(e.mesh)) box.expandByObject(m);
+        if (box.getSize(size).length() < QUIZ_MIN_SIZE) continue;
+        seen.add(label);
+        pool.push({ mesh: e.mesh, name: e.name, label });
+      }
+      return pool;
+    }
+    // like focusOn, but stands back far enough to see what the structure sits next to
+    function quizFocus(mesh) {
+      const box = new THREE.Box3();
+      for (const m of partsOf(mesh)) box.expandByObject(m);
+      const c = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3()).length() || 0.05;
+      const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const dist = Math.max((size / (2 * half)) * 3.2, 0.15);
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      // on a tall (phone) screen the quiz card covers the lower part: aim a little below the structure so it sits higher up
+      const lift = innerHeight > innerWidth ? 0.3 * dist * half : 0;
+      const up = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion);
+      const target = c.clone().addScaledVector(up, -lift);
+      flyTo(target.clone().add(dir.multiplyScalar(dist)), target);
+    }
+    // "Middle phalanx of third finger of hand" and "Distal phalanx of fifth toe" are the same family: a round asks at most two
+    // of each, so ten questions are not mostly finger and toe bones
+    const quizFamily = n => n.toLowerCase().replace(/^((proximal|middle|distal|upper|lower|superior|inferior|anterior|posterior|medial|lateral|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth)\s+)+/, '').split(/\s+/).slice(0, 2).join(' ');
+    function quizTargets(pool) {
+      const all = shuffle(pool.slice()), chosen = [], perFamily = new Map();
+      for (const p of all) {
+        if (chosen.length === QUIZ_LENGTH) break;
+        const f = quizFamily(p.name), n = perFamily.get(f) || 0;
+        if (n >= 2) continue;
+        perFamily.set(f, n + 1); chosen.push(p);
+      }
+      for (const p of all) {   // a small pool may not reach ten that way: top up with whatever is left
+        if (chosen.length === QUIZ_LENGTH) break;
+        if (!chosen.includes(p)) chosen.push(p);
+      }
+      return shuffle(chosen);
+    }
+    function quizQuestions(pool) {
+      return quizTargets(pool).map(target => {
+        const names = new Set([target.name]), picks = [];
+        for (const p of shuffle(pool.slice())) {   // wrong answers: other structures with a different name
+          if (names.has(p.name)) continue;
+          names.add(p.name); picks.push(p);
+          if (picks.length === 3) break;
+        }
+        return { target, options: shuffle([target, ...picks]) };
+      });
+    }
+
+    function quizEnterScene(s) {
+      deselect();
+      showAll();
+      for (const x of SYSTEMS) if (x.group) x.group.visible = x === s;
+      xrayEl.checked = true; setXray(true);
+      refreshPins(); dirty = true;
+    }
+    function quizLeaveScene() {
+      restoreSelection(); selectedParts = [];
+      const sv = quiz.saved; quiz.saved = null;
+      if (!sv) return;
+      for (const [x, checked] of sv.systems) x.input.checked = checked;
+      setPeel(0);   // works every group's visibility out from the ticked boxes again
+      applyPelvis();
+      xrayEl.checked = sv.xray; setXray(sv.xray);
+      refreshPins(); updateReveal(); dirty = true;
+    }
+
+    async function startQuiz() {
+      if (quiz.active || quiz.starting) return;
+      const s = quiz.sys;
+      quiz.starting = true; quizStartBtn.disabled = true;
+      quiz.saved = { xray: xrayOn, systems: SYSTEMS.map(x => [x, x.input.checked]) };
+      try {
+        if (!s.group) {
+          quizStatus.textContent = `Loading ${s.label.toLowerCase()} (${s.mb} MB)…`;
+          s.input.checked = true;
+          await setSystem(s, true);
+          while (s.loading) await new Promise(r => setTimeout(r, 100));
+        }
+        if (!s.group) {
+          quizLeaveScene();
+          quizStatus.textContent = 'Could not load that system. Check your connection and try again.';
+          return;
+        }
+        quizEnterScene(s);
+        const pool = quizPool(s);
+        if (new Set(pool.map(p => p.name)).size < 4) {
+          quizLeaveScene();
+          quizStatus.textContent = 'This system has too few named structures for a quiz. Try another one.';
+          return;
+        }
+        quiz.pool = pool;
+        quiz.active = true;
+        document.body.classList.add('quizzing');
+        quizStatus.textContent = 'Name the highlighted structure. Choose a body system to be tested on.';
+        beginRound();
+      } finally {
+        quiz.starting = false; quizStartBtn.disabled = false;
+      }
+    }
+    function beginRound() {
+      quiz.qs = quizQuestions(quiz.pool);
+      quiz.i = 0; quiz.score = 0; quiz.missed = [];
+      qSummary.hidden = true; qPlay.hidden = false;
+      showQuestion();
+    }
+    function showQuestion() {
+      const q = quiz.qs[quiz.i];
+      quiz.answered = false;
+      qCount.textContent = `Question ${quiz.i + 1} of ${quiz.qs.length}`;
+      qScore.textContent = `Score ${quiz.score}`;
+      qFeed.textContent = '';
+      qNext.hidden = true;
+      qOpts.replaceChildren(...q.options.map(o => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'btn'; b.textContent = o.label; b._opt = o;
+        b.onclick = () => answerQuiz(b, o);
+        return b;
+      }));
+      // highlight it like a selection, but without the name card
+      restoreSelection();
+      selectedParts = partsOf(q.target.mesh);
+      for (const m of selectedParts) m.material = pickMat;
+      syncXrayFocus();
+      quizFocus(q.target.mesh);
+    }
+    function answerQuiz(btn, opt) {
+      if (quiz.answered) return;
+      quiz.answered = true;
+      const q = quiz.qs[quiz.i], ok = opt === q.target;
+      for (const b of qOpts.children) { b.disabled = true; if (b._opt === q.target) b.classList.add('right'); }
+      if (!ok) { btn.classList.add('wrong'); quiz.missed.push(q.target.label); } else quiz.score++;
+      qScore.textContent = `Score ${quiz.score}`;
+      qFeed.textContent = ok ? 'Correct.' : `Not quite. It is ${q.target.label}.`;
+      qNext.textContent = quiz.i + 1 < quiz.qs.length ? 'Next' : 'See score';
+      qNext.hidden = false;
+      qNext.focus({ preventScroll: true });
+    }
+    function quizNext() {
+      if (!quiz.answered) return;
+      if (++quiz.i < quiz.qs.length) { showQuestion(); return; }
+      restoreSelection(); selectedParts = []; syncXrayFocus(); resetView();
+      const total = quiz.qs.length;
+      quizById('qresult').textContent = `${quiz.score} out of ${total}`;
+      quizById('qmissed').textContent = quiz.missed.length ? 'To review: ' + quiz.missed.slice(0, 6).join(', ') + (quiz.missed.length > 6 ? ` and ${quiz.missed.length - 6} more` : '') + '.' : 'No mistakes. Well done.';
+      qPlay.hidden = true; qSummary.hidden = false;
+      post({ type: 'quiz', system: quiz.sys.id, score: quiz.score, total });
+    }
+    function endQuiz() {
+      if (!quiz.active) return;
+      quiz.active = false;
+      document.body.classList.remove('quizzing');
+      quizLeaveScene();
+    }
+    quizStartBtn.addEventListener('click', startQuiz);
+    qNext.addEventListener('click', quizNext);
+    quizById('qend').addEventListener('click', endQuiz);
+    quizById('qdone').addEventListener('click', endQuiz);
+    quizById('qagain').addEventListener('click', beginRound);
+
     /* ---------- React Native / Expo bridge ---------- */
     function post(msg) {
       if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(msg));
@@ -2354,7 +2673,7 @@ bool inRegion(vec3 p) {
     window.addEventListener('message', onHostMessage);
     document.addEventListener('message', onHostMessage); // Android WebView
 
-    addEventListener('keydown', e => { if (e.key === 'Escape') { deselect(); showAll(); } if (e.key === 'Home') resetView(); });
+    addEventListener('keydown', e => { if (e.key === 'Escape') { if (quiz.active) endQuiz(); else { deselect(); showAll(); } } if (e.key === 'Home') resetView(); });
 
     /* ---------- on-screen view controls (buttons + keyboard) ---------- */
     // Mouse and touch still work as before (drag = rotate, wheel / pinch = zoom, right-drag or two fingers = move).

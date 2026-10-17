@@ -366,6 +366,13 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * If you change `OFFLINE_CACHE`, change it in both `public/sw.js` and `src/lib/offline-study.ts`.
 * The 3D atlas (`/atlas/*`) is deliberately skipped by `public/sw.js` (an old saved copy once left phones stuck on a broken atlas), `vercel.json` makes `/atlas/anatomy` and `/sw.js` revalidate on every load, and every atlas address carries a fresh `?v=` stamp (`atlasFresh()` in `src/lib/atlas-theme.ts`). Keep all three if you touch the atlas wiring; bump `CACHE_NAME` in `public/sw.js` whenever a deploy must purge what phones already saved.
 
+### Anatomy atlas quiz (2026-10-17)
+
+* `public/atlas/anatomy.html` → menu section "Quiz" (the `/* ---------- quiz mode ---------- */` block in the script). The learner picks one body system, and each of 10 questions highlights a structure with its name hidden and offers four choices (wrong answers are other structures with a different name). Structures under 1.2 cm are skipped, and a round asks at most two of the same family (e.g. phalanges).
+* While a quiz runs (`body.quizzing`) the menu, info card, hover names and tapping the model are all switched off so nothing gives the answer away, and only the chosen system shows, in x-ray. Ending the quiz (Done, the close button, or Escape) puts back which systems were ticked and the x-ray setting.
+* The score is posted to the host app as `{ type: 'quiz', system, score, total }`; nothing in the app records it yet (no XP is given).
+* Phones: the quiz card is compact, full width, at the bottom; the camera aims a little below the structure so it sits above the card.
+
 ### Locked elements
 
 * The logo and its hover shine (`src/components/logo-mark.tsx`) are locked, and so is the ~3-second intro (`src/components/animated-icon*.tsx`).
