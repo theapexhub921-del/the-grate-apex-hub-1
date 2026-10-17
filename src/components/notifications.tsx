@@ -19,7 +19,7 @@ import { useNotificationPreferences, usePushNotificationsPreference } from '@/da
 import { markSocialNotificationsRead, readSocialNotificationIds, socialAppNotifications, useSocial } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { clearAppBadge, showDeviceNotification } from '@/lib/device-notifications';
-import { registerWebPush } from '@/lib/web-push';
+import { markAppSeenToday, registerWebPush } from '@/lib/web-push';
 import { useMessageNotifications } from '@/data/message-notifications';
 import { markAccountNotificationsRead, useAccountNotifications } from '@/data/account-notifications';
 import { sendFriendRequest } from '@/data/social';
@@ -70,23 +70,58 @@ export function preferenceFor(item: AppNotification) {
   return 'learningReminders' as const;
 }
 
-// Delivers an alert at device level while the installed web app is in the
-// background. Existing unread items are deliberately not replayed on launch.
+// Notifications this device has already shown or that the learner has already
+// seen in the app (kept between visits, so a reload or a browser restart never
+// shows them again).
+const SEEN_KEY = 'grateapex_seen_notifications';
+const SEEN_LIMIT = 400;
+// Right after the app starts, notifications are still arriving from the
+// account; they are old news, not new alerts.
+const STARTUP_QUIET_MS = 15_000;
+const APP_STARTED = Date.now();
+// These come to the device from the server (api/push.mjs) even with the app
+// closed, so the app does not alert them a second time.
+const SERVER_PUSHED = ['msg:', 'acct:', 'social:', 'inapp:', 'league:'];
+
+function loadSeen(): Set<string> {
+  try {
+    const raw = typeof localStorage === 'undefined' ? null : localStorage.getItem(SEEN_KEY);
+    return new Set(raw ? (JSON.parse(raw) as string[]) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSeen(seen: Set<string>) {
+  try {
+    localStorage.setItem(SEEN_KEY, JSON.stringify([...seen].slice(-SEEN_LIMIT)));
+  } catch {
+    // storage is optional
+  }
+}
+
+// Delivers an alert at device level while the web app is in the background.
+// Each notification is alerted at most once on this device, never one the
+// learner has already had on screen, and never replayed when the app starts.
 export function DeviceNotificationBridge() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const pathname = usePathname();
   const { items, read } = useNotifications();
   const enabled = usePushNotificationsPreference();
-  const seen = useRef(new Set<string>());
-  const started = useRef(false);
+  const seen = useRef<Set<string> | null>(null);
   const [toast, setToast] = useState<AppNotification | null>(null);
 
-  // Opening the app (or coming back to it) clears the number on the app icon.
+  // Opening the app (or coming back to it) clears the number on the app icon and
+  // the alerts still waiting, and tells the daily reminders the learner has been in today.
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    void clearAppBadge();
-    const onVisible = () => { if (document.visibilityState === 'visible') void clearAppBadge(); };
+    const opened = () => {
+      void clearAppBadge();
+      void markAppSeenToday();
+    };
+    if (document.visibilityState === 'visible') opened();
+    const onVisible = () => { if (document.visibilityState === 'visible') opened(); };
     document.addEventListener('visibilitychange', onVisible);
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, []);
@@ -103,21 +138,35 @@ export function DeviceNotificationBridge() {
   }, [enabled]);
 
   useEffect(() => {
-    const unread = items.filter((item) => !read.has(item.id));
-    if (!started.current) {
-      unread.forEach((item) => seen.current.add(item.id));
-      started.current = true;
-      return;
+    if (typeof document === 'undefined') return;
+    if (!seen.current) {
+      // The first time on this device: what is already there counts as seen.
+      const stored = loadSeen();
+      const first = stored.size === 0;
+      seen.current = stored;
+      if (first) {
+        items.forEach((item) => stored.add(item.id));
+        saveSeen(stored);
+        return;
+      }
     }
-
-    for (const item of unread) {
-      if (seen.current.has(item.id)) continue;
-      seen.current.add(item.id);
-      const away = typeof document !== 'undefined' && document.visibilityState !== 'visible';
-      if (enabled && away) void showDeviceNotification(item);
-      // On screen: a short toast for new messages (not while already in that chat).
-      else if (!away && item.id.startsWith('msg:') && pathname !== '/social/message') queueMicrotask(() => setToast(item));
+    const known = seen.current;
+    const away = document.visibilityState !== 'visible';
+    const quiet = Date.now() - APP_STARTED < STARTUP_QUIET_MS;
+    let changed = false;
+    for (const item of items) {
+      if (read.has(item.id) || known.has(item.id)) continue;
+      known.add(item.id);
+      changed = true;
+      if (quiet) continue; // still loading after start-up: not new
+      if (away) {
+        if (enabled && !SERVER_PUSHED.some((prefix) => item.id.startsWith(prefix))) void showDeviceNotification(item);
+      } else if (item.id.startsWith('msg:') && pathname !== '/social/message') {
+        // On screen: a short toast for new messages (not while already in that chat).
+        queueMicrotask(() => setToast(item));
+      }
     }
+    if (changed) saveSeen(known);
   }, [items, read, enabled, pathname]);
 
   useEffect(() => {

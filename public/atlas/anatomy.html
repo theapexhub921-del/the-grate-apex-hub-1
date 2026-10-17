@@ -931,6 +931,7 @@
         <summary>Regions</summary>
         <div class="body">
           <div id="regions" class="chips" role="group" aria-label="Body regions"></div>
+          <div id="limbSide" class="chips" role="group" aria-label="Which limb" style="margin-top:6px" hidden></div>
         </div>
       </details>
 
@@ -1348,12 +1349,17 @@
     ];
     let region = 0;
     const regionU = { value: 0 };
+    // The limb regions show ONE limb at a time. The model's anatomical right is -x and left is +x
+    // (every sided landmark in landmarks.json follows this), so limbSide is -1 for right, +1 for left.
+    let limbSide = -1;
+    const limbSideU = { value: -1 };
     function inRegion(p, id = region) {
       if (!id) return true;
       const ax = Math.abs(p.x), y = p.y;
       const b = y >= 1.05 ? 0.15 : Math.min(0.15 + (1.05 - y) * 0.25, 0.20);
       const arm = ax > b && y > 0.62 && y < 1.46;
-      if (id === 6) return arm;
+      const onSide = p.x * limbSide >= 0;   // only used by the two limb regions
+      if (id === 6) return arm && onSide;
       if (arm) return false;
       switch (id) {
         case 1: return y >= 1.51;
@@ -1361,31 +1367,33 @@
         case 3: return y >= 1.18 && y < 1.40;
         case 4: return y >= 1.00 && y < 1.18;
         case 5: return y >= 0.78 && y < 1.00 && ax <= 0.135;
-        case 7: return y < 1.00 && !(y >= 0.78 && ax <= 0.135);
+        case 7: return y < 1.00 && !(y >= 0.78 && ax <= 0.135) && onSide;
       }
       return true;
     }
     // same test on the GPU: discard fragments outside the active region
     const REGION_GLSL = `
-uniform int uRegion; varying vec3 vRW;
+uniform int uRegion; uniform float uLimbSide; varying vec3 vRW;
 bool inRegion(vec3 p) {
   if (uRegion == 0) return true;
   float ax = abs(p.x), y = p.y;
   float b = y >= 1.05 ? 0.15 : min(0.15 + (1.05 - y) * 0.25, 0.20);
   bool arm = ax > b && y > 0.62 && y < 1.46;
-  if (uRegion == 6) return arm;
+  bool onSide = p.x * uLimbSide >= 0.0;
+  if (uRegion == 6) return arm && onSide;
   if (arm) return false;
   if (uRegion == 1) return y >= 1.51;
   if (uRegion == 2) return y >= 1.40 && y < 1.51;
   if (uRegion == 3) return y >= 1.18 && y < 1.40;
   if (uRegion == 4) return y >= 1.00 && y < 1.18;
   if (uRegion == 5) return y >= 0.78 && y < 1.00 && ax <= 0.135;
-  if (uRegion == 7) return y < 1.00 && !(y >= 0.78 && ax <= 0.135);
+  if (uRegion == 7) return y < 1.00 && !(y >= 0.78 && ax <= 0.135) && onSide;
   return true;
 }`;
     function patchRegion(m) {
       m.onBeforeCompile = sh => {
         sh.uniforms.uRegion = regionU;
+        sh.uniforms.uLimbSide = limbSideU;
         sh.vertexShader = sh.vertexShader
           .replace('#include <common>', '#include <common>\nvarying vec3 vRW;')
           .replace('#include <begin_vertex>', '#include <begin_vertex>\nvRW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
@@ -2417,9 +2425,25 @@ bool inRegion(vec3 p) {
       b.onclick = () => setRegion(r.id === region ? 0 : r.id);
       regionsEl.appendChild(b); regionBtns.set(r.id, b);
     }
+    // Right / Left chips, shown only for the two limb regions (they show one limb at a time)
+    const limbSideEl = document.getElementById('limbSide');
+    const limbSideBtns = new Map();
+    for (const s of [{ v: -1, label: 'Right' }, { v: 1, label: 'Left' }]) {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = s.label;
+      b.setAttribute('aria-pressed', String(s.v === limbSide));
+      b.onclick = () => {
+        if (s.v === limbSide) return;
+        limbSide = s.v; limbSideU.value = s.v;
+        setRegion(region);   // refresh the cut, drop a selection on the other side, re-aim the camera
+      };
+      limbSideEl.appendChild(b); limbSideBtns.set(s.v, b);
+    }
     function setRegion(id, keepCamera) {
       region = id; regionU.value = id;
       for (const [rid, b] of regionBtns) b.setAttribute('aria-pressed', String(rid === id));
+      limbSideEl.hidden = !(id === 6 || id === 7);
+      for (const [v, b] of limbSideBtns) b.setAttribute('aria-pressed', String(v === limbSide));
       if (selected && id) {
         const c = new THREE.Box3().setFromObject(selected).getCenter(new THREE.Vector3());
         if (!inRegion(c)) deselect();
@@ -2433,6 +2457,9 @@ bool inRegion(vec3 p) {
         const r = REGIONS.find(x => x.id === id);
         if (r) {
           const t = new THREE.Vector3(...r.t);
+          // a limb region looks at the chosen limb, not the middle of the body
+          if (id === 6) t.x = limbSide * 0.4;
+          else if (id === 7) t.x = limbSide * 0.1;
           const dir = camera.position.clone().sub(controls.target).normalize();
           flyTo(t.clone().add(dir.multiplyScalar(r.d)), t);
         } else resetView();
