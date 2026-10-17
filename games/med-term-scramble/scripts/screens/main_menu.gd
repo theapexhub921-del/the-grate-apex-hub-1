@@ -33,7 +33,7 @@ func build() -> void:
 	var next_txt := "Max rank reached" if int(info["next"]) < 0 else "%d / %d XP to next rank" % [int(SaveData.data["xp"]), int(info["next"])]
 	pc.add_child(UI.label(next_txt, 13, "muted", "mono"))
 
-	var play := UI.button("Play", "primary", 64)
+	var play := UI.button("Single player", "primary", 64)
 	play.add_theme_font_size_override("font_size", 22)
 	play.pressed.connect(func(): Router.go("modes"))
 	content.add_child(play)

@@ -11,11 +11,14 @@ import { cardiovascularPhysiology } from '@/data/topics/cardiovascular-physiolog
 import { cholesterolAndBileBiosynthesis } from '@/data/topics/cholesterol-and-bile-biosynthesis';
 import { collagenAndElastin } from '@/data/topics/collagen-synthesis';
 import { fattyAcidBiosynthesis } from '@/data/topics/fatty-acid-biosynthesis';
+import { gastrointestinalGross } from '@/data/topics/gastrointestinal-system-gross';
 import { hemeMetabolism } from '@/data/topics/heme-metabolism';
 import { hormones } from '@/data/topics/hormones-endocrine-biochemistry';
 import { inbornErrors } from '@/data/topics/inborn-errors-of-metabolism';
 import { oxygenCarriers } from '@/data/topics/oxygen-carriers';
+import { respiratoryGross } from '@/data/topics/respiratory-system-gross';
 import { upperLimb } from '@/data/topics/upper-limb';
+import { urinaryGross } from '@/data/topics/urinary-system-gross';
 
 // Anatomy topics are in HB2 Gross Anatomy course order.
-export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, upperLimb, cardiovascularGross];
+export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, upperLimb, cardiovascularGross, respiratoryGross, gastrointestinalGross, urinaryGross];

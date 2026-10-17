@@ -13,6 +13,7 @@ export const cardiovascularGross = buildTopic({
   id: TOPIC_ID,
   subject: 'anatomy',
   courseId: 'anatomy-lectures',
+  section: 'Gross Anatomy',
   title: 'Cardiovascular System',
   description:
     'Gross anatomy of the cardiovascular system: the mediastinum, pericardium, external and internal features of the heart, valves and auscultation, conduction and coronary circulation, blood vessel structure, and the great vessels and arteries of the trunk.',

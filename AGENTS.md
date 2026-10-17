@@ -109,6 +109,8 @@ Each topic with lessons lives in `src/data/topics/<topic>/` (`sources.ts`, `less
 
 `src/data/topics/index.ts` (also set the topic's status to `published` in `src/data/content-catalog.ts`)
 
+Anatomy (HB2) is taught in three sections. Every anatomy topic sets `section` in its `index.ts` to `'Gross Anatomy'`, `'Microanatomy'` or `'Embryology'` (`TopicSection` in `lesson-types.ts`); the app shows it as section headings on the topic path and the HB2 course path, a pill on topic cards, the topic breadcrumb and the lesson subtitle. Gross anatomy topics (in course order): Upper Limb, Cardiovascular System, Respiratory System, Gastrointestinal System, Urinary System, Head and Neck, Neuroanatomy. `tests/hb2-study.test.mjs` fails if an anatomy topic has no section.
+
 Subject → course → topic → lesson lookups (the one curriculum model):
 
 `src/data/curriculum.ts`
@@ -136,6 +138,8 @@ Lecture diagrams (tappable images) are in `src/data/figures/` (one file per topi
 
 * In a lesson a diagram is a compact preview card ("Explore diagram"); the interactive diagram opens in a sheet, so diagrams never take over the reading (owner's request). Quiz diagrams are capped at 280 px tall.
 * Topics with diagrams: Cardiovascular Physiology, Upper Limb, and all eight Biochemistry topics (2026-10-16). HB2 lessons show them too (block `lfig` in `hb2-study.ts`).
+
+undefined
 
 Progress functionality is currently in:
 
@@ -365,6 +369,7 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * Settings → Offline study (`src/components/offline-study-card.tsx`, `src/data/offline-study.ts`, `src/lib/offline-study.ts`) downloads a class's banks, diagrams, original lessons and lesson pictures on request. Lesson text, pictures and the lesson list are stored in the same cache on the web (not localStorage, which is too small); `legacy-study.ts` reads them when there is no connection.
 * If you change `OFFLINE_CACHE`, change it in both `public/sw.js` and `src/lib/offline-study.ts`.
 * The 3D atlas (`/atlas/*`) is deliberately skipped by `public/sw.js` (an old saved copy once left phones stuck on a broken atlas), `vercel.json` makes `/atlas/anatomy` and `/sw.js` revalidate on every load, and every atlas address carries a fresh `?v=` stamp (`atlasFresh()` in `src/lib/atlas-theme.ts`). Keep all three if you touch the atlas wiring; bump `CACHE_NAME` in `public/sw.js` whenever a deploy must purge what phones already saved.
+* Med Term Scramble (`public/game-builds/med-term-scramble/`) needs three things kept as well: `node scripts/assemble-games.mjs` at the start of the `vercel.json` build command (it joins `index.wasm` from its parts; without it the game never loads), the `/game-builds/` handling in `public/sw.js` (keeps a copy in the offline cache so a game played once also plays offline; fetches the original request and never saves a redirect, because play.html redirects to /play), and the hidden `games/med-term-scramble` tab in both `app-tabs` files. The game page takes the whole screen like a chat (`setTabBarLocked` while it is open). Touch scrolling inside the game is in `games/med-term-scramble/scripts/ui/screen.gd`; after changing the game, export the pack (`--export-pack Web`) into `public/game-builds/med-term-scramble/index.pck` and update its size in `play.html`. `tests/deploy-wiring.test.mjs` checks the atlas and game wiring.
 
 ### Anatomy atlas quiz (2026-10-17)
 

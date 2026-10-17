@@ -33,7 +33,7 @@ export function TopicCard({ progress, now, compact, style }: { progress: TopicPr
   return (
     <PressableCard
       onPress={() => router.push(routes.topic(topic.id))}
-      accessibilityLabel={`${topic.title}. ${progress.completed} of ${progress.total} lessons completed. ${TOPIC_STATUS_LABEL[progress.status]}.`}
+      accessibilityLabel={`${topic.section ? `${topic.section}: ` : ''}${topic.title}. ${progress.completed} of ${progress.total} lessons completed. ${TOPIC_STATUS_LABEL[progress.status]}.`}
       style={[styles.card, { borderColor: `${tint.soft}55` }, style]}
     >
       <View style={styles.header}>
@@ -45,6 +45,7 @@ export function TopicCard({ progress, now, compact, style }: { progress: TopicPr
             {topic.title}
           </Text>
           <View style={styles.pills}>
+            {topic.section ? <Pill label={topic.section} /> : null}
             <Pill label={TOPIC_STATUS_LABEL[progress.status]} tone={tone} />
             {progress.due > 0 ? <Pill label={`${progress.due} due`} tone="warning" /> : null}
           </View>
