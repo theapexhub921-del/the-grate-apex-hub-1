@@ -7,6 +7,7 @@ import { LegacyBackground } from '@/components/experience/legacy-background';
 import { LegacyFloatingBar } from '@/components/experience/legacy-navigation';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
 import { SubjectGlyph } from '@/components/learning/glyphs';
+import { BackLink } from '@/components/learning/nav-bits';
 import { Button } from '@/components/ui/button';
 import { Card, Interactive } from '@/components/ui/interactive';
 import { PageHeader, Screen } from '@/components/ui/screen';
@@ -50,6 +51,8 @@ export default function ChooseExperienceScreen() {
 
   return (
     <Screen width="content" contentStyle={styles.page}>
+      {/* Opened from Settings: a way back. (On first sign-in the choice has to be made, so none.) */}
+      {saved ? <BackLink fallback={'/settings' as never} /> : null}
       <PageHeader
         eyebrow="Your app"
         title="Choose your interface"

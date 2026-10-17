@@ -1,15 +1,16 @@
 import { type Href, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { createElement, useCallback, useState } from 'react';
-import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
 import { BackLink } from '@/components/learning/nav-bits';
 import { setTabBarLocked } from '@/components/tab-bar-visibility';
 import { Button } from '@/components/ui/button';
 import { PageHeader, Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
-import { isDesktopWidth, type ThemeColors } from '@/constants/theme';
+import { type ThemeColors } from '@/constants/theme';
 import { getStudyGame, LIVE_SITE } from '@/data/games';
+import { usePageZoomPreference } from '@/data/settings';
 import { useDisplayName } from '@/data/user';
 import { useResolvedColorScheme, useThemedStyles } from '@/hooks/use-theme';
 import { isLocalPreview } from '@/lib/local-preview';
@@ -26,13 +27,14 @@ export default function MedTermScrambleScreen() {
   const styles = useThemedStyles(createStyles);
   const scheme = useResolvedColorScheme();
   const name = useDisplayName();
-  const { width } = useWindowDimensions();
   const query = new URLSearchParams({ theme: scheme === 'dark' ? 'dark' : 'light', ...(name ? { name } : {}) }).toString();
   // The live site serves play.html as /play (clean URLs), so ask for /play there
   // and skip the redirect; `npm run web` only knows the real file name.
   const page = isLocalPreview() ? game.buildPath : game.buildPath.replace(/\.html$/, '');
   const src = `${page}?${query}`;
-  const desktop = isDesktopWidth(width);
+  // Settings → Appearance → page zoom scales the whole page; the game is drawn
+  // at its own sharpness, so it is set back to 100% (otherwise it is resampled and blurry).
+  const pageZoom = usePageZoomPreference();
 
   // The app keeps pages alive after you leave them, so the game is only on the
   // page while it is open: leaving removes it (sound and all) and coming back
@@ -50,8 +52,8 @@ export default function MedTermScrambleScreen() {
 
   if (Platform.OS === 'web') {
     return (
-      <View style={[styles.page, desktop && styles.pageDesktop]}>
-        <View style={[styles.bar, !desktop && styles.barMobile]}>
+      <View style={styles.page}>
+        <View style={styles.bar}>
           <BackLink fallback={EXPLORE_HREF} label="Explore" />
           <Text style={styles.barTitle} numberOfLines={1}>{game.title}</Text>
         </View>
@@ -59,7 +61,7 @@ export default function MedTermScrambleScreen() {
           src,
           title: game.title,
           allow: 'autoplay; fullscreen',
-          style: { flex: 1, width: '100%', minHeight: 0, border: 0, borderRadius: desktop ? 12 : 0, backgroundColor: '#14101e' },
+          style: { flex: 1, width: '100%', minHeight: 0, border: 0, display: 'block', backgroundColor: '#14101e', ...(pageZoom !== 100 ? { zoom: 100 / pageZoom } : null) },
         }) : null}
       </View>
     );
@@ -77,11 +79,9 @@ export default function MedTermScrambleScreen() {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-    // Phones: edge to edge under a slim bar. Computers: the space beside the sidebar, thin margin.
+    // Edge to edge under a slim bar, on phones and computers (beside the sidebar): no card, no margin.
     page: { flex: 1 },
-    pageDesktop: { padding: 12, gap: 8 },
-    bar: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    barMobile: { paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4, backgroundColor: colors.background },
+    bar: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4, backgroundColor: colors.background },
     barTitle: { flexShrink: 1, fontSize: 16, fontWeight: '700', color: colors.text },
   });
 }

@@ -22,19 +22,32 @@ var fonts: Dictionary = {}
 
 
 func _ready() -> void:
-	fonts["body"] = _font(["IBM Plex Sans", "Segoe UI", "Roboto", "Helvetica", "Arial"], 400)
-	fonts["bold"] = _font(["IBM Plex Sans", "Segoe UI", "Roboto", "Helvetica", "Arial"], 600)
-	fonts["display"] = _font(["Bricolage Grotesque", "Segoe UI", "Roboto", "Helvetica", "Arial"], 800)
-	fonts["mono"] = _font(["IBM Plex Mono", "Cascadia Mono", "Consolas", "Menlo", "Courier New"], 600)
+	fonts["body"] = _font("ibm-plex-sans", 400, ["IBM Plex Sans", "Segoe UI", "Roboto", "Helvetica", "Arial"])
+	fonts["bold"] = _font("ibm-plex-sans", 600, ["IBM Plex Sans", "Segoe UI", "Roboto", "Helvetica", "Arial"])
+	fonts["display"] = _font("bricolage-grotesque", 800, ["Bricolage Grotesque", "Segoe UI", "Roboto", "Helvetica", "Arial"])
+	fonts["mono"] = _font("ibm-plex-mono", 600, ["IBM Plex Mono", "Cascadia Mono", "Consolas", "Menlo", "Courier New"])
 	refresh()
 
 
-func _font(names: Array, weight: int) -> SystemFont:
-	var f := SystemFont.new()
-	f.font_names = PackedStringArray(names)
-	f.font_weight = weight
-	f.antialiasing = TextServer.FONT_ANTIALIASING_GRAY
-	return f
+## The game's own font files (res://fonts, Latin and Latin Extended), with the
+## device's fonts behind them for any other character. A browser cannot hand
+## system fonts to the game, so without the files the web version fell back to
+## the engine's small built-in font for everything (blurry, no bold or mono).
+func _font(file: String, weight: int, names: Array) -> Font:
+	var system := SystemFont.new()
+	system.font_names = PackedStringArray(names)
+	system.font_weight = weight
+	system.antialiasing = TextServer.FONT_ANTIALIASING_GRAY
+	var main: FontFile = load("res://fonts/%s-latin-%d.ttf" % [file, weight])
+	var extended: FontFile = load("res://fonts/%s-latin-ext-%d.ttf" % [file, weight])
+	if main == null:
+		return system
+	var chain: Array[Font] = []
+	if extended:
+		chain.append(extended)
+	chain.append(system)
+	main.fallbacks = chain
+	return main
 
 
 func refresh() -> void:
