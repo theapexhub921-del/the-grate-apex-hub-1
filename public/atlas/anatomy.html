@@ -1428,7 +1428,7 @@ bool inRegion(vec3 p) {
       n = n.toLowerCase();
       if (/nucleus pulposus/.test(n)) return 0xe8a95c;
       if (/disc|symphysis/.test(n)) return 0xf0c987;  // amber
-      if (/menisc|labrum|cartilage/.test(n)) return 0x7fd8e6;  // cyan
+      if (/menisc|labrum|cartilage/.test(n)) return 0x3d9be9;  // azure blue
       if (/capsule|capsulae|membrane|frenula/.test(n)) return 0xb9a6d8;  // lavender
       if (/fat pad/.test(n)) return 0xf2dc7a;
       if (/ligament|cord/.test(n)) return tint(0x86a3cc, n, 1); // blue ligaments
@@ -1442,7 +1442,7 @@ bool inRegion(vec3 p) {
       const rules = [
         [/teeth|incisor|canine|premolar|molar/, 0xf7f5ee],
         [/ossicle|malleus|incus|stapes/, 0xcdb4e6],
-        [/cartilage/, 0x7fd8e6],
+        [/cartilage/, 0x3d9be9],
         [/coccyx|sacrum/, 0x7b62c4],
         [/vertebra c\d|atlas|axis|cervical vert/, 0x8fb4e8],
         [/vertebra t\d|thoracic vert/, 0x6f93d6],
