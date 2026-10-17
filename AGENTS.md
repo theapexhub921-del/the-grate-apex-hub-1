@@ -109,6 +109,8 @@ Each topic with lessons lives in `src/data/topics/<topic>/` (`sources.ts`, `less
 
 `src/data/topics/index.ts` (also set the topic's status to `published` in `src/data/content-catalog.ts`)
 
+Anatomy (HB2) is taught in three sections. Every anatomy topic sets `section` in its `index.ts` to `'Gross Anatomy'`, `'Microanatomy'` or `'Embryology'` (`TopicSection` in `lesson-types.ts`); the app shows it as section headings on the topic path and the HB2 course path, a pill on topic cards, the topic breadcrumb and the lesson subtitle. Gross anatomy topics (in course order): Upper Limb, Cardiovascular System, Respiratory System, Gastrointestinal System, Urinary System, Head and Neck, Neuroanatomy. `tests/hb2-study.test.mjs` fails if an anatomy topic has no section.
+
 Subject → course → topic → lesson lookups (the one curriculum model):
 
 `src/data/curriculum.ts`

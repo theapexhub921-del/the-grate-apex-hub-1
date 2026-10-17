@@ -13,6 +13,7 @@ export const gastrointestinalGross = buildTopic({
   id: TOPIC_ID,
   subject: 'anatomy',
   courseId: 'anatomy-lectures',
+  section: 'Gross Anatomy',
   title: 'Gastrointestinal System',
   description:
     'Gross anatomy of the abdomen and gut: the anterior and posterior abdominal walls, inguinal region and hernias, oesophagus to anal canal, liver, gallbladder, pancreas and spleen, and the blood supply, portal system, lymphatics and nerves of the GI tract.',
