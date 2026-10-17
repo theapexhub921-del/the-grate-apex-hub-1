@@ -175,7 +175,7 @@ async function streakJob(token, now) {
   const candidates = progress
     .map((doc) => ({ id: idOf(doc), ...fieldsOf(doc) }))
     .filter((item) => item.streak > 0 && typeof item.lastActivityDate === 'string' && item.lastActivityDate >= since);
-  const users = await getMany(token, 'users', candidates.map((item) => item.id), ['webPush', 'preferences.notification_preferences', 'streakPushDay']);
+  const users = await getMany(token, 'users', candidates.map((item) => item.id), ['webPush', 'preferences.notification_preferences', 'streakPushDay', 'appSeenDay']);
   const jobs = [];
   for (const item of candidates) {
     const user = users.get(item.id);
@@ -184,7 +184,7 @@ async function streakJob(token, now) {
     const tz = typeof devices[0].tz === 'number' ? devices[0].tz : 0;
     const { key, hour } = localDay(now, tz);
     const wanted = typeof devices[0].hour === 'number' ? devices[0].hour : undefined; // the learner's chosen hour, if any
-    if (!inReminderHours(hour, wanted) || !streakAtRisk(item.streak, item.lastActivityDate, now, tz) || user?.streakPushDay === key) continue;
+    if (!inReminderHours(hour, wanted) || !streakAtRisk(item.streak, item.lastActivityDate, now, tz) || user?.streakPushDay === key || user?.appSeenDay === key) continue;
     jobs.push({
       devices,
       mark: { token, uid: item.id, key },
@@ -210,7 +210,7 @@ async function reviewJob(token, now) {
   const ids = active.map((item) => item.id);
   const [schedules, users] = await Promise.all([
     getMany(token, 'progress', ids, ['reviewSchedule']),
-    getMany(token, 'users', ids, ['webPush', 'preferences.notification_preferences', 'reviewPushDay']),
+    getMany(token, 'users', ids, ['webPush', 'preferences.notification_preferences', 'reviewPushDay', 'appSeenDay']),
   ]);
   const jobs = [];
   for (const item of active) {
@@ -224,6 +224,7 @@ async function reviewJob(token, now) {
     // and at most one review reminder every other day.
     if (item.lastActivityDate === key || streakAtRisk(item.streak, item.lastActivityDate, now, tz)) continue;
     if (user?.reviewPushDay === key || user?.reviewPushDay === localDay(now - 86_400_000, tz).key) continue;
+    if (user?.appSeenDay === key) continue; // opened the app today: they have seen it there
     const due = reviewDueCount(schedules.get(item.id)?.reviewSchedule, now);
     if (due < REVIEW_MIN_DUE) continue;
     jobs.push({
