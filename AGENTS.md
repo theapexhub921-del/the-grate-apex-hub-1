@@ -137,6 +137,8 @@ Lecture diagrams (tappable images) are in `src/data/figures/` (one file per topi
 * In a lesson a diagram is a compact preview card ("Explore diagram"); the interactive diagram opens in a sheet, so diagrams never take over the reading (owner's request). Quiz diagrams are capped at 280 px tall.
 * Topics with diagrams: Cardiovascular Physiology, Upper Limb, and all eight Biochemistry topics (2026-10-16). HB2 lessons show them too (block `lfig` in `hb2-study.ts`).
 
+undefined
+
 Progress functionality is currently in:
 
 `src/data/progress.ts`
@@ -365,6 +367,7 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * Settings → Offline study (`src/components/offline-study-card.tsx`, `src/data/offline-study.ts`, `src/lib/offline-study.ts`) downloads a class's banks, diagrams, original lessons and lesson pictures on request. Lesson text, pictures and the lesson list are stored in the same cache on the web (not localStorage, which is too small); `legacy-study.ts` reads them when there is no connection.
 * If you change `OFFLINE_CACHE`, change it in both `public/sw.js` and `src/lib/offline-study.ts`.
 * The 3D atlas (`/atlas/*`) is deliberately skipped by `public/sw.js` (an old saved copy once left phones stuck on a broken atlas), `vercel.json` makes `/atlas/anatomy` and `/sw.js` revalidate on every load, and every atlas address carries a fresh `?v=` stamp (`atlasFresh()` in `src/lib/atlas-theme.ts`). Keep all three if you touch the atlas wiring; bump `CACHE_NAME` in `public/sw.js` whenever a deploy must purge what phones already saved.
+* Med Term Scramble (`public/game-builds/med-term-scramble/`) needs three things kept as well: `node scripts/assemble-games.mjs` at the start of the `vercel.json` build command (it joins `index.wasm` from its parts; without it the game never loads), the `/game-builds/` skip in `public/sw.js`, and the hidden `games/med-term-scramble` tab in both `app-tabs` files. `tests/deploy-wiring.test.mjs` checks the atlas and game wiring.
 
 ### Anatomy atlas quiz (2026-10-17)
 
