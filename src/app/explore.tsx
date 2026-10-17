@@ -113,7 +113,7 @@ const START_HERE: readonly { icon: 'learn' | 'home' | 'social' | 'sparkle'; labe
   { icon: 'learn', label: 'Study a lesson', detail: 'Pick up your class curriculum', href: '/learn' },
   { icon: 'home', label: 'Share a post', detail: 'Stories, photos and videos', href: '/' },
   { icon: 'social', label: 'Find classmates', detail: 'Follow people and make friends', href: '/social/friends' },
-  { icon: 'sparkle', label: 'Make it yours', detail: 'Experience and theme', href: '/settings' },
+  { icon: 'sparkle', label: 'Make it yours', detail: 'Interface and theme', href: '/settings' },
 ];
 
 export default function ExploreScreen() {

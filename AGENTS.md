@@ -333,7 +333,8 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 
 * Originate follows `docs/design-system.md` — read it before changing any Originate screen. In short: IBM Plex Sans (Source Serif 4 for lesson text), weights 400/500/600, sentence-case labels, a plain page colour (no atmosphere effects), cards only when grouping helps (radius 12, 1px border, no shadow), lists as `List` / `ListRow` (`src/components/ui/list.tsx`), one primary button per screen, a docked tab bar on phones, and only motion that answers an action.
 * The rules live in the primitives and switch on `useExperience() === 'originate'`, so The Originals and Hybrid look exactly as before. The type rules are applied to every `Text` by `src/components/ui/text.tsx` (`src/data/originate-type.ts`); shape and spacing values are in `src/constants/originate.ts`.
-* The Originals is the default experience; the chooser and Settings never call one experience "recommended" (owner's choice, 2026-10-16).
+* Learners see experiences as **interfaces** (Settings → Interface, "Choose your interface") and The Originals as **Legacy** (owner's requests, 2026-10-17); code, routes and the saved id (`originals`) keep the old words, so nobody's choice resets.
+* The Originals (Legacy) is the default experience; the chooser and Settings never call one experience "recommended" (owner's choice, 2026-10-16).
 * Originate's desktop sidebar (`src/components/desktop-sidebar.tsx`) is the owner's favourite: do not restyle it.
 * Originate's Study page keeps every section The Originals has (course pictures, question of the day, practise-and-plan tiles, your progress, your week), drawn in Originate's style.
 

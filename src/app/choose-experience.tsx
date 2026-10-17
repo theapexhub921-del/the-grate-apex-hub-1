@@ -42,7 +42,7 @@ export default function ChooseExperienceScreen() {
       await saveExperience(choice);
       router.replace('/');
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'Your experience could not be saved.');
+      setError(problem instanceof Error ? problem.message : 'Your interface could not be saved.');
     } finally {
       setSaving(false);
     }
@@ -52,8 +52,8 @@ export default function ChooseExperienceScreen() {
     <Screen width="content" contentStyle={styles.page}>
       <PageHeader
         eyebrow="Your app"
-        title="Choose your experience"
-        subtitle="This changes how the app looks and is laid out — not your account, progress, friends, messages, achievements or XP. You can change it any time in Settings."
+        title="Choose your interface"
+        subtitle="There are three interfaces to choose from. Yours changes how the app looks and is laid out — not your account, progress, friends, messages, achievements or XP. You can change it any time in Settings."
       />
       <View style={styles.list} accessibilityRole="radiogroup">
         {EXPERIENCES.map((id) => {

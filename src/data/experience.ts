@@ -38,11 +38,11 @@ export function needsExperience(profile: Record<string, unknown> | undefined, pr
 
 /** Saves the choice on the account. Throws when it can't be saved. */
 export async function saveExperience(experience: ExperienceId) {
-  if (!isExperience(experience)) throw new Error('Choose one of the three experiences.');
+  if (!isExperience(experience)) throw new Error('Choose one of the three interfaces.');
   const { updateCurrentProfile } = await import('@/lib/profiles'); // loaded on use: keeps this module testable
   const { error } = await updateCurrentProfile({ experience });
   if (error) {
     console.warn('Could not save the experience:', error instanceof Error ? `${error.name}: ${error.message}` : String(error));
-    throw new Error('Your experience could not be saved. Please try again.');
+    throw new Error('Your interface could not be saved. Please try again.');
   }
 }
