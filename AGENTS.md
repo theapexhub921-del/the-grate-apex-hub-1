@@ -375,7 +375,12 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 
 * `public/atlas/anatomy.html` → menu section "Quiz" (the `/* ---------- quiz mode ---------- */` block in the script). The learner picks one body system, and each of 10 questions highlights a structure with its name hidden and offers four choices (wrong answers are other structures with a different name). Structures under 1.2 cm are skipped, and a round asks at most two of the same family (e.g. phalanges).
 * While a quiz runs (`body.quizzing`) the menu, info card, hover names and tapping the model are all switched off so nothing gives the answer away, and only the chosen system shows, in x-ray. Ending the quiz (Done, the close button, or Escape) puts back which systems were ticked and the x-ray setting.
-* The score is posted to the host app as `{ type: 'quiz', system, score, total }`; nothing in the app records it yet (no XP is given).
+* The learner can also pick a body region (Head … Lower limb; the limbs ask Right / Left). The view is cut to that region while the quiz runs (`setRegion(id, true)`), and only structures whose centre is in it are asked about. The Explore tab's own region and limb side are put back afterwards.
+* The Explore tab's Upper limb / Lower limb regions show one limb at a time (Right / Left chips; right is −x, left is +x in the model).
+* A finished round is posted as `{ type: 'quiz', system, region?, side?, score, total }`. On the web the page is an iframe, so `post()` also sends it to the parent window (same origin only).
+  * `src/components/learning/skeleton-atlas.web.tsx` listens (only to its own iframe), checks the message with `parseAtlasQuizMessage` (`src/data/learning/atlas-quiz-rules.ts`) and saves it with `recordAtlasQuiz` (`src/data/atlas-quiz.ts`).
+  * XP: `XP_RULES.atlasQuiz` / `atlasQuizXp` (10, +10 at 90%, +5 at 75%, no penalty), paid once per day (award key `practice:atlas-quiz:<day>`, like the Question of the Day). Every round still counts for the streak. The app replies `{ type: 'quizXp', amount }` and the score card shows it.
+  * On phones the atlas opens in the in-app browser, which has no link back to the app, so scores are not recorded there yet.
 * Phones: the quiz card is compact, full width, at the bottom; the camera aims a little below the structure so it sits above the card.
 
 ### Locked elements

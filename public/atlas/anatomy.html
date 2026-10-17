@@ -499,6 +499,8 @@
     #qresult { margin: 6px 0 0; font-size: 22px; font-weight: 700; }
     #qmissed { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; line-height: 1.4; }
     #qmissed:empty { display: none; }
+    #qxp { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; font-weight: 600; line-height: 1.4; }
+    #qxp:empty { display: none; }
     #quiz .qfoot .btn { flex: none; }
     #qsummary .qfoot .btn { flex: 1 1 0; }
 
@@ -896,10 +898,15 @@
 
       <section id="panelQuiz" class="sec quiz-only" role="tabpanel" aria-labelledby="tabQuiz">
         <div class="body">
+          <p class="organstatus" style="margin:0">Body system</p>
           <div id="quizSys" class="chips" role="group" aria-label="Quiz topic"></div>
+          <p class="organstatus" style="margin:0">Body region</p>
+          <div id="quizRegion" class="chips" role="group" aria-label="Quiz body region"></div>
+          <div id="quizSide" class="chips" role="group" aria-label="Quiz limb side" hidden></div>
+          <p class="organstatus" style="margin:0">Questions</p>
           <div id="quizLen" class="chips" role="group" aria-label="Number of questions"></div>
           <button id="quizStart" class="btn primary" type="button">Start 10-question quiz</button>
-          <p id="quizStatus" class="organstatus" role="status">Name the highlighted structure. Choose a body system to be tested on.</p>
+          <p id="quizStatus" class="organstatus" role="status">Name the highlighted structure. Choose a body system, and a region if you want to be tested on just one part of the body.</p>
         </div>
       </section>
 
@@ -1095,6 +1102,7 @@
       <div class="qhead"><span>Quiz finished</span></div>
       <p id="qresult"></p>
       <p id="qmissed"></p>
+      <p id="qxp" role="status"></p>
       <div class="qfoot">
         <button id="qagain" class="btn primary" type="button">Try again</button>
         <button id="qdone" class="btn" type="button">Done</button>
@@ -1353,12 +1361,12 @@
     // (every sided landmark in landmarks.json follows this), so limbSide is -1 for right, +1 for left.
     let limbSide = -1;
     const limbSideU = { value: -1 };
-    function inRegion(p, id = region) {
+    function inRegion(p, id = region, side = limbSide) {
       if (!id) return true;
       const ax = Math.abs(p.x), y = p.y;
       const b = y >= 1.05 ? 0.15 : Math.min(0.15 + (1.05 - y) * 0.25, 0.20);
       const arm = ax > b && y > 0.62 && y < 1.46;
-      const onSide = p.x * limbSide >= 0;   // only used by the two limb regions
+      const onSide = p.x * side >= 0;   // only used by the two limb regions
       if (id === 6) return arm && onSide;
       if (arm) return false;
       switch (id) {
@@ -2602,8 +2610,10 @@ bool inRegion(vec3 p) {
     // hidden and offers four choices. While a quiz runs the menu, info card and hover names are hidden (body.quizzing in the
     // CSS) and taps on the model do nothing, so nothing gives the answer away. Starting a quiz resets the view (showAll) and
     // shows only the chosen system in x-ray, so the highlighted structure is never hidden behind another. Ending it puts back
-    // which systems were ticked and the x-ray setting. When a round finishes, the score is posted to the host app
-    // ({ type: 'quiz', system, score, total }) in case it wants to record it.
+    // which systems were ticked, the x-ray setting and the Explore tab's region. The learner can also pick a body region
+    // (and, for the limbs, a side): the view is cut to it and only structures centred in it are asked about.
+    // When a round finishes, the score is posted to the host app
+    // ({ type: 'quiz', system, region?, side?, score, total }); the web app saves it and answers { type: 'quizXp', amount }.
     const QUIZ_LENGTHS = [5, 10, 20, 30, 50];   // choices offered in the Quiz tab
     const QUIZ_MIN_SIZE = 0.012;   // metres (diagonal of the structure): anything smaller is too tiny to see or fairly ask about
     const QUIZ_SYSTEMS = [
@@ -2618,7 +2628,10 @@ bool inRegion(vec3 p) {
       { id: 'respiratory', label: 'Respiratory', ids: ['respiratory'] },
       { id: 'endocrine', label: 'Endocrine', ids: ['endocrine'] },
     ];
-    const quiz = { active: false, starting: false, sys: QUIZ_SYSTEMS.find(g => g.id === 'skeletal'), length: 10, qs: [], i: 0, score: 0, missed: [], answered: false, saved: null };
+    // reg: 0 = whole body, otherwise a REGIONS id (6 and 7 are the limbs, which also use side: -1 right, +1 left)
+    const quiz = { active: false, starting: false, sys: QUIZ_SYSTEMS.find(g => g.id === 'skeletal'), reg: 0, side: -1, length: 10, qs: [], i: 0, score: 0, missed: [], answered: false, saved: null };
+    const quizIsLimb = () => quiz.reg === 6 || quiz.reg === 7;
+    const regionSlug = r => r.label.toLowerCase().replace(/\s+/g, '-');
     const quizById = id => document.getElementById(id);
     const quizStartBtn = quizById('quizStart'), quizStatus = quizById('quizStatus'), quizSysEl = quizById('quizSys');
     const qOpts = quizById('qopts'), qNext = quizById('qnext'), qFeed = quizById('qfeed');
@@ -2635,6 +2648,27 @@ bool inRegion(vec3 p) {
       quizSysEl.appendChild(b);
     }
 
+    // Body region: "Whole body" or one of the regions of the Explore tab. The limbs also ask which side.
+    const quizRegionEl = quizById('quizRegion'), quizSideEl = quizById('quizSide');
+    for (const r of [{ id: 0, label: 'Whole body' }, ...REGIONS]) {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = r.label;
+      b.setAttribute('aria-pressed', String(r.id === quiz.reg));
+      b.onclick = () => {
+        quiz.reg = r.id;
+        for (const c of quizRegionEl.children) c.setAttribute('aria-pressed', String(c === b));
+        quizSideEl.hidden = !quizIsLimb();
+      };
+      quizRegionEl.appendChild(b);
+    }
+    for (const s of [{ v: -1, label: 'Right' }, { v: 1, label: 'Left' }]) {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = s.label;
+      b.setAttribute('aria-pressed', String(s.v === quiz.side));
+      b.onclick = () => { quiz.side = s.v; for (const c of quizSideEl.children) c.setAttribute('aria-pressed', String(c === b)); };
+      quizSideEl.appendChild(b);
+    }
+
     const quizLenEl = quizById('quizLen');
     const quizStartLabel = () => { quizStartBtn.textContent = `Start ${quiz.length}-question quiz`; };
     for (const n of QUIZ_LENGTHS) {
@@ -2649,7 +2683,7 @@ bool inRegion(vec3 p) {
 
     // every named structure of the system that is showing right now (one entry per structure and side)
     function quizPool(s) {
-      const seen = new Set(), pool = [], box = new THREE.Box3(), size = new THREE.Vector3();
+      const seen = new Set(), pool = [], box = new THREE.Box3(), size = new THREE.Vector3(), mid = new THREE.Vector3();
       for (const e of index) {
         if (!e.mesh || e.dup || !s.ids.includes(e.system.id) || !e.mesh.visible) continue;
         if (!e.name || /^(Unnamed structure|Attachment site)/.test(e.name)) continue;
@@ -2658,6 +2692,13 @@ bool inRegion(vec3 p) {
         box.makeEmpty();
         for (const m of partsOf(e.mesh)) box.expandByObject(m);
         if (box.getSize(size).length() < QUIZ_MIN_SIZE) continue;
+        if (quiz.reg) {
+          // a region quiz only asks about structures whose centre lies in that region (and, for a limb, on the chosen side;
+          // anything on the midline belongs to neither limb)
+          box.getCenter(mid);
+          if (!inRegion(mid, quiz.reg, quiz.side)) continue;
+          if (quizIsLimb() && Math.abs(mid.x) < 0.02) continue;
+        }
         seen.add(label);
         pool.push({ mesh: e.mesh, name: e.name, label });
       }
@@ -2712,6 +2753,7 @@ bool inRegion(vec3 p) {
       showAll();
       for (const x of SYSTEMS) if (x.group) x.group.visible = s.ids.includes(x.id);
       xrayEl.checked = true; setXray(true);
+      if (quiz.reg) { limbSide = quiz.side; limbSideU.value = quiz.side; setRegion(quiz.reg, true); }   // only the chosen region is drawn
       refreshPins(); dirty = true;
     }
     function quizLeaveScene() {
@@ -2722,6 +2764,7 @@ bool inRegion(vec3 p) {
       setPeel(0);   // works every group's visibility out from the ticked boxes again
       applyPelvis();
       xrayEl.checked = sv.xray; setXray(sv.xray);
+      limbSide = sv.limbSide; limbSideU.value = sv.limbSide; setRegion(sv.region, true);   // the Explore tab's own region and limb side
       refreshPins(); updateReveal(); dirty = true;
     }
 
@@ -2729,7 +2772,7 @@ bool inRegion(vec3 p) {
       if (quiz.active || quiz.starting) return;
       const s = quiz.sys;
       quiz.starting = true; quizStartBtn.disabled = true;
-      quiz.saved = { xray: xrayOn, systems: SYSTEMS.map(x => [x, x.input.checked]) };
+      quiz.saved = { xray: xrayOn, region, limbSide, systems: SYSTEMS.map(x => [x, x.input.checked]) };
       try {
         const members = s.ids.map(id => SYSTEMS.find(x => x.id === id)).filter(Boolean);
         const todo = members.filter(m => !m.group);
@@ -2752,13 +2795,15 @@ bool inRegion(vec3 p) {
         const pool = quizPool(s);
         if (new Set(pool.map(p => p.name)).size < 4) {
           quizLeaveScene();
-          quizStatus.textContent = 'This system has too few named structures for a quiz. Try another one.';
+          quizStatus.textContent = quiz.reg
+            ? 'That region has too few named structures in this system for a quiz. Try another system or region.'
+            : 'This system has too few named structures for a quiz. Try another one.';
           return;
         }
         quiz.pool = pool;
         quiz.active = true;
         document.body.classList.add('quizzing');
-        quizStatus.textContent = 'Name the highlighted structure. Choose a body system to be tested on.';
+        quizStatus.textContent = 'Name the highlighted structure. Choose a body system, and a region if you want to be tested on just one part of the body.';
         beginRound();
       } finally {
         quiz.starting = false; quizStartBtn.disabled = false;
@@ -2768,6 +2813,7 @@ bool inRegion(vec3 p) {
       quiz.qs = quizQuestions(quiz.pool);
       quiz.i = 0; quiz.score = 0; quiz.missed = [];
       qSummary.hidden = true; qPlay.hidden = false;
+      quizById('qxp').textContent = '';
       showQuestion();
     }
     function showQuestion() {
@@ -2810,7 +2856,14 @@ bool inRegion(vec3 p) {
       quizById('qresult').textContent = `${quiz.score} out of ${total}`;
       quizById('qmissed').textContent = quiz.missed.length ? 'To review: ' + quiz.missed.slice(0, 6).join(', ') + (quiz.missed.length > 6 ? ` and ${quiz.missed.length - 6} more` : '') + '.' : 'No mistakes. Well done.';
       qPlay.hidden = true; qSummary.hidden = false;
-      post({ type: 'quiz', system: quiz.sys.id, score: quiz.score, total });
+      quizById('qxp').textContent = '';
+      const reg = quiz.reg ? REGIONS.find(r => r.id === quiz.reg) : null;
+      post({ type: 'quiz', system: quiz.sys.id, region: reg ? regionSlug(reg) : undefined, side: quizIsLimb() ? (quiz.side < 0 ? 'right' : 'left') : undefined, score: quiz.score, total });
+    }
+    // the app answers with the XP the round earned (0 when today's atlas XP was already paid)
+    function showQuizXp(amount) {
+      if (qSummary.hidden || !Number.isFinite(amount) || amount < 0 || amount > 1000) return;
+      quizById('qxp').textContent = amount > 0 ? `+${amount} XP` : 'Today’s atlas XP is already earned. This round still counts as study.';
     }
     function endQuiz() {
       if (!quiz.active) return;
@@ -2827,6 +2880,8 @@ bool inRegion(vec3 p) {
     /* ---------- React Native / Expo bridge ---------- */
     function post(msg) {
       if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(msg));
+      // shown inside the web app (an iframe): tell the page around us, same site only
+      else if (window.parent && window.parent !== window) window.parent.postMessage(msg, window.location.origin);
     }
     function onHostMessage(ev) {
       let m; try { m = JSON.parse(ev.data); } catch { return; }
@@ -2836,6 +2891,7 @@ bool inRegion(vec3 p) {
       if (m.type === 'xray') { xrayEl.checked = !!m.on; setXray(!!m.on); }
       if (m.type === 'reset') { showAll(); deselect(); resetView(); }
       if (m.type === 'search') { q.value = m.q || ''; q.dispatchEvent(new Event('input')); }
+      if (m.type === 'quizXp') showQuizXp(Number(m.amount));
     }
     window.addEventListener('message', onHostMessage);
     document.addEventListener('message', onHostMessage); // Android WebView

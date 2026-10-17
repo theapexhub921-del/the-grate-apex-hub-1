@@ -25,6 +25,9 @@ export const XP_RULES = {
   milestones: { topicCompleted: 50, conceptMastered: 5 },
   // Question of the Day: once a day, more for a correct answer.
   questionOfTheDay: { correct: 15, answered: 5 },
+  // 3D atlas quiz ("name the highlighted structure"): finishing a round pays once a day, so repeating
+  // rounds can't be farmed; every round still counts as study for the streak. Practice, so no penalty.
+  atlasQuiz: { completion: 10, bonusAt90: 10, bonusAt75: 5 },
   passPercent: 70, // a lesson quiz "passed" (also the mastery-check bar is 80)
   masteryCheckPercent: 80,
 } as const;
@@ -90,6 +93,16 @@ export function quizXp(input: {
   if (percent >= 90) lines.push({ label: 'Score 90%+', amount: rules.bonusAt90 });
   else if (percent >= 75) lines.push({ label: 'Score 75%+', amount: rules.bonusAt75 });
   if (wrong > 0) lines.push({ label: `${wrong} incorrect × −${rules.wrongPenalty}`, amount: -wrong * rules.wrongPenalty });
+  return finish(lines, multiplier);
+}
+
+export function atlasQuizXp(input: { correct: number; total: number; multiplier?: number }): XpBreakdown {
+  const multiplier = input.multiplier ?? getActiveMultiplier();
+  if (input.total <= 0) return finish([], multiplier);
+  const percent = Math.round((input.correct / input.total) * 100);
+  const lines: XpLine[] = [{ label: 'Atlas quiz completed', amount: XP_RULES.atlasQuiz.completion }];
+  if (percent >= 90) lines.push({ label: 'Score 90%+', amount: XP_RULES.atlasQuiz.bonusAt90 });
+  else if (percent >= 75) lines.push({ label: 'Score 75%+', amount: XP_RULES.atlasQuiz.bonusAt75 });
   return finish(lines, multiplier);
 }
 
