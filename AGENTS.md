@@ -139,7 +139,11 @@ Lecture diagrams (tappable images) are in `src/data/figures/` (one file per topi
 * In a lesson a diagram is a compact preview card ("Explore diagram"); the interactive diagram opens in a sheet, so diagrams never take over the reading (owner's request). Quiz diagrams are capped at 280 px tall.
 * Topics with diagrams: Cardiovascular Physiology, Upper Limb, and all eight Biochemistry topics (2026-10-16). HB2 lessons show them too (block `lfig` in `hb2-study.ts`).
 
-undefined
+HB2 past papers (Learn → Past question bank → HB2) are in `public/curriculum/hb2-anatomy.json`, `hb2-biochemistry.json` and `hb2-physiology.json`, one set per paper named `Past Questions N — <label>`. A bank question may carry `img` (a plain picture under `public/figures/`, e.g. the histology practical's diagrams); it is shown with the question, asked as written, and kept out of Apex.
+
+* **By topic:** every HB2 past question has a topic (`tp`), written by `scripts/sort-past-questions-by-topic.mjs` (key words, paper hints, neighbouring questions and hand corrections; rerun it after adding past questions and check its counts). The topics per course are in `src/data/past-question-topics.ts` (the app's topics plus groups without lessons, e.g. Embryology). `tests/past-question-topics.test.mjs` fails if a question has no listed topic.
+* **Custom quiz:** each topic card has "Past questions on this topic" (`past=` in the quiz link). `src/data/past-questions.ts` loads a course's past questions and registers them with `curriculum.ts` (`registerExtraQuestions`), so the quiz engine, results and retakes find them by id.
+* **Past question bank:** HB2 has a "By paper / By topic" switch; a topic is sat like a paper (`ptopic=` in `/learn/hb-practice`, mode `pastTopic` in `practice-modes.ts`).
 
 Progress functionality is currently in:
 
