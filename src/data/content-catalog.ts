@@ -1910,6 +1910,25 @@ export const contentTopics: ContentTopic[] = [
       { title: "Portal System, Lymphatics and Innervation of the Gut", points: [], sourceRefs: [{ sourceId: "anat-gi-neurovasculature" }] },
     ],
   },
+  {
+    id: "urinary-system-gross",
+    title: "Urinary System",
+    subject: "anatomy",
+    courseId: "anatomy-lectures",
+    folderSubject: "ANATOMY",
+    zip: "Anatomy",
+    sourceFileIds: ["anat-urinary-gross"],
+    status: "published",
+    emoji: "💧",
+    note: "HB2 Gross Anatomy (Anatomy/Gross/Urinary). The deck's histology objectives belong to Microanatomy.",
+    outline: [
+      { title: "The Kidneys: Position, Coverings and Relations", points: [], sourceRefs: [{ sourceId: "anat-urinary-gross" }] },
+      { title: "Kidney Structure, Vessels and the Suprarenal Glands", points: [], sourceRefs: [{ sourceId: "anat-urinary-gross" }] },
+      { title: "The Ureters", points: [], sourceRefs: [{ sourceId: "anat-urinary-gross" }] },
+      { title: "The Urinary Bladder", points: [], sourceRefs: [{ sourceId: "anat-urinary-gross" }] },
+      { title: "The Urethra", points: [], sourceRefs: [{ sourceId: "anat-urinary-gross" }] },
+    ],
+  },
 ];
 
 export function getTopicsForSubject(subject: ContentTopic['subject']) {
