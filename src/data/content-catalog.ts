@@ -1482,7 +1482,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "BIOCHEMISTRY",
     zip: "Immunology",
     sourceFileIds: ["imm-02-cytokines-chemokines-revised-1", "imm-03-receptors-and-signaling-cytokines-sas", "imm-05-antibody-monoclonal-antibodies-complement", "imm-06-antigens-sas-2024", "imm-04-cells-of-the-immune-system-sas-2024-autosaved", "imm-07-immunity-to-infectious-agents-sas-2026", "imm-01-introduction-historical-perspective-to-immuno", "imm-hypersensitivity-reactions-study-guide", "imm-immunology-introduction-history-study-guide", "imm-the-complement-system-sas-2", "imm-receptors-and-signaling-cytokines-sas", "imm-antibodies-hb-ii-2022-sas", "imm-immunity-to-infectious-agents-sas-tm", "imm-cells-of-the-immune-system-sas-2022-rr-hb2", "imm-antigens-hbii-2022-sas", "imm-micro12-immunodiagnostics-notes-2", "imm-introduction-historical-perspective-to-immunolog"],
-    status: "source-only",
+    status: "published",
     emoji: "🛡️",
     outline: [
       { title: "Introduction & Historical Perspective to Immunology", points: [], sourceRefs: [{ sourceId: "imm-01-introduction-historical-perspective-to-immuno" }] },
