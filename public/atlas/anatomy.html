@@ -903,6 +903,7 @@
           <p class="organstatus" style="margin:0">Body region</p>
           <div id="quizRegion" class="chips" role="group" aria-label="Quiz body region"></div>
           <div id="quizSide" class="chips" role="group" aria-label="Quiz limb side" hidden></div>
+          <div id="quizPart" class="chips" role="group" aria-label="Quiz part of the limb" hidden></div>
           <p class="organstatus" style="margin:0">Questions</p>
           <div id="quizLen" class="chips" role="group" aria-label="Number of questions"></div>
           <button id="quizStart" class="btn primary" type="button">Start 10-question quiz</button>
@@ -939,6 +940,7 @@
         <div class="body">
           <div id="regions" class="chips" role="group" aria-label="Body regions"></div>
           <div id="limbSide" class="chips" role="group" aria-label="Which limb" style="margin-top:6px" hidden></div>
+          <div id="limbPart" class="chips" role="group" aria-label="Part of the limb" style="margin-top:6px" hidden></div>
         </div>
       </details>
 
@@ -1352,8 +1354,8 @@
       { id: 3, label: 'Thorax', t: [0, 1.29, 0], d: 1.15 },
       { id: 4, label: 'Abdomen', t: [0, 1.09, 0], d: 1.1 },
       { id: 5, label: 'Pelvis', t: [0, 0.89, 0], d: 1.15 },
-      { id: 6, label: 'Upper limb', t: [0, 1.05, 0], d: 2.1 },
-      { id: 7, label: 'Lower limb', t: [0, 0.48, 0], d: 2.1 },
+      { id: 6, label: 'Upper limb', t: [0, 1.05, 0], d: 1.5 },
+      { id: 7, label: 'Lower limb', t: [0, 0.48, 0], d: 1.9 },
     ];
     let region = 0;
     const regionU = { value: 0 };
@@ -1361,12 +1363,34 @@
     // (every sided landmark in landmarks.json follows this), so limbSide is -1 for right, +1 for left.
     let limbSide = -1;
     const limbSideU = { value: -1 };
-    function inRegion(p, id = region, side = limbSide) {
+    // Limb parts. The arms hang down at the sides, so a part is a band of height (metres). Joint lines come from the model's
+    // own landmarks (right side): humerus y 1.09-1.41, radius/ulna 0.85-1.10, carpals and hand 0.70-0.88, femur 0.43-0.89,
+    // tibia 0.06-0.43, tarsals 0.01-0.09. So: shoulder joint ~1.30, elbow 1.10, wrist 0.86 (the carpals and the radial and ulnar styloid tips share a height), knee 0.43, ankle 0.085.
+    // t is where the camera looks (x is how far out from the middle, mirrored for the left side), d the viewing distance.
+    const LIMB_PARTS = {
+      6: [
+        { label: 'Shoulder', lo: 1.30, hi: 100, t: [0.20, 1.34, 0], d: 0.9 },
+        { label: 'Arm', lo: 1.10, hi: 1.30, t: [0.22, 1.20, 0], d: 0.9 },
+        { label: 'Forearm', lo: 0.86, hi: 1.10, t: [0.26, 0.98, 0], d: 0.9 },
+        { label: 'Hand', lo: -100, hi: 0.86, t: [0.27, 0.78, 0], d: 0.6 },
+      ],
+      7: [
+        { label: 'Thigh', lo: 0.43, hi: 100, t: [0.09, 0.72, 0], d: 1.1 },
+        { label: 'Leg', lo: 0.085, hi: 0.43, t: [0.09, 0.26, 0], d: 1.0 },
+        { label: 'Foot', lo: -100, hi: 0.085, t: [0.09, 0.04, 0], d: 0.6 },
+      ],
+    };
+    const WHOLE_LIMB = { lo: -100, hi: 100 };
+    let limbPartIdx = -1;            // index into LIMB_PARTS[region], -1 = the whole limb
+    let limbRange = WHOLE_LIMB;
+    const limbLoU = { value: -100 }, limbHiU = { value: 100 };
+    const limbPartOf = (id, idx) => (LIMB_PARTS[id] || [])[idx] || null;
+    function inRegion(p, id = region, side = limbSide, rng = limbRange) {
       if (!id) return true;
       const ax = Math.abs(p.x), y = p.y;
       const b = y >= 1.05 ? 0.15 : Math.min(0.15 + (1.05 - y) * 0.25, 0.20);
       const arm = ax > b && y > 0.62 && y < 1.46;
-      const onSide = p.x * side >= 0;   // only used by the two limb regions
+      const onSide = p.x * side >= 0 && y >= rng.lo && y < rng.hi;   // the chosen limb side and part; only used by the two limb regions
       if (id === 6) return arm && onSide;
       if (arm) return false;
       switch (id) {
@@ -1381,13 +1405,13 @@
     }
     // same test on the GPU: discard fragments outside the active region
     const REGION_GLSL = `
-uniform int uRegion; uniform float uLimbSide; varying vec3 vRW;
+uniform int uRegion; uniform float uLimbSide, uLimbLo, uLimbHi; varying vec3 vRW;
 bool inRegion(vec3 p) {
   if (uRegion == 0) return true;
   float ax = abs(p.x), y = p.y;
   float b = y >= 1.05 ? 0.15 : min(0.15 + (1.05 - y) * 0.25, 0.20);
   bool arm = ax > b && y > 0.62 && y < 1.46;
-  bool onSide = p.x * uLimbSide >= 0.0;
+  bool onSide = p.x * uLimbSide >= 0.0 && y >= uLimbLo && y < uLimbHi;
   if (uRegion == 6) return arm && onSide;
   if (arm) return false;
   if (uRegion == 1) return y >= 1.51;
@@ -1402,6 +1426,8 @@ bool inRegion(vec3 p) {
       m.onBeforeCompile = sh => {
         sh.uniforms.uRegion = regionU;
         sh.uniforms.uLimbSide = limbSideU;
+        sh.uniforms.uLimbLo = limbLoU;
+        sh.uniforms.uLimbHi = limbHiU;
         sh.vertexShader = sh.vertexShader
           .replace('#include <common>', '#include <common>\nvarying vec3 vRW;')
           .replace('#include <begin_vertex>', '#include <begin_vertex>\nvRW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
@@ -2447,11 +2473,32 @@ bool inRegion(vec3 p) {
       };
       limbSideEl.appendChild(b); limbSideBtns.set(s.v, b);
     }
-    function setRegion(id, keepCamera) {
+    // Part chips (Whole limb, Shoulder, Arm, ...), redrawn for whichever limb region is showing
+    const limbPartEl = document.getElementById('limbPart');
+    function drawLimbPartChips() {
+      const list = LIMB_PARTS[region];
+      limbPartEl.hidden = !list;
+      limbPartEl.replaceChildren();
+      if (!list) return;
+      [{ label: 'Whole limb', i: -1 }, ...list.map((p, i) => ({ label: p.label, i }))].forEach(({ label, i }) => {
+        const b = document.createElement('button');
+        b.className = 'chip'; b.type = 'button'; b.textContent = label;
+        b.setAttribute('aria-pressed', String(i === limbPartIdx));
+        b.onclick = () => { if (i !== limbPartIdx) setRegion(region, false, i); };
+        limbPartEl.appendChild(b);
+      });
+    }
+    // partIdx: which part of the limb to show. Left out, the part stays the same while the region stays the same, and a
+    // different region starts with the whole limb.
+    function setRegion(id, keepCamera, partIdx = (id === region ? limbPartIdx : -1)) {
       region = id; regionU.value = id;
+      const part = limbPartOf(id, partIdx);
+      limbPartIdx = part ? partIdx : -1;
+      limbRange = part || WHOLE_LIMB; limbLoU.value = limbRange.lo; limbHiU.value = limbRange.hi;
       for (const [rid, b] of regionBtns) b.setAttribute('aria-pressed', String(rid === id));
       limbSideEl.hidden = !(id === 6 || id === 7);
       for (const [v, b] of limbSideBtns) b.setAttribute('aria-pressed', String(v === limbSide));
+      drawLimbPartChips();
       if (selected && id) {
         const c = new THREE.Box3().setFromObject(selected).getCenter(new THREE.Vector3());
         if (!inRegion(c)) deselect();
@@ -2464,12 +2511,12 @@ bool inRegion(vec3 p) {
       if (!keepCamera) {
         const r = REGIONS.find(x => x.id === id);
         if (r) {
-          const t = new THREE.Vector3(...r.t);
-          // a limb region looks at the chosen limb, not the middle of the body
-          if (id === 6) t.x = limbSide * 0.4;
-          else if (id === 7) t.x = limbSide * 0.1;
+          // a limb looks at the chosen side (and part), not the middle of the body; the left side is the mirror image
+          const view = limbPartOf(id, limbPartIdx) || r;
+          const t = new THREE.Vector3(...view.t);
+          if (id === 6 || id === 7) t.x = limbSide * (limbPartIdx >= 0 ? view.t[0] : (id === 6 ? 0.22 : 0.09));
           const dir = camera.position.clone().sub(controls.target).normalize();
-          flyTo(t.clone().add(dir.multiplyScalar(r.d)), t);
+          flyTo(t.clone().add(dir.multiplyScalar(view.d)), t);
         } else resetView();
       }
       dirty = true;
@@ -2628,8 +2675,9 @@ bool inRegion(vec3 p) {
       { id: 'respiratory', label: 'Respiratory', ids: ['respiratory'] },
       { id: 'endocrine', label: 'Endocrine', ids: ['endocrine'] },
     ];
-    // reg: 0 = whole body, otherwise a REGIONS id (6 and 7 are the limbs, which also use side: -1 right, +1 left)
-    const quiz = { active: false, starting: false, sys: QUIZ_SYSTEMS.find(g => g.id === 'skeletal'), reg: 0, side: -1, length: 10, qs: [], i: 0, score: 0, missed: [], answered: false, saved: null };
+    // reg: 0 = whole body, otherwise a REGIONS id (6 and 7 are the limbs, which also use side: -1 right, +1 left,
+    // and part: an index into LIMB_PARTS[reg], -1 = the whole limb)
+    const quiz = { active: false, starting: false, sys: QUIZ_SYSTEMS.find(g => g.id === 'skeletal'), reg: 0, side: -1, part: -1, length: 10, qs: [], i: 0, score: 0, missed: [], answered: false, saved: null };
     const quizIsLimb = () => quiz.reg === 6 || quiz.reg === 7;
     const regionSlug = r => r.label.toLowerCase().replace(/\s+/g, '-');
     const quizById = id => document.getElementById(id);
@@ -2649,15 +2697,30 @@ bool inRegion(vec3 p) {
     }
 
     // Body region: "Whole body" or one of the regions of the Explore tab. The limbs also ask which side.
-    const quizRegionEl = quizById('quizRegion'), quizSideEl = quizById('quizSide');
+    const quizRegionEl = quizById('quizRegion'), quizSideEl = quizById('quizSide'), quizPartEl = quizById('quizPart');
+    // Whole limb, Shoulder, Arm, ... for the limb that is chosen
+    function drawQuizPartChips() {
+      const list = quizIsLimb() ? LIMB_PARTS[quiz.reg] : null;
+      quizPartEl.hidden = !list;
+      quizPartEl.replaceChildren();
+      if (!list) return;
+      [{ label: 'Whole limb', i: -1 }, ...list.map((p, i) => ({ label: p.label, i }))].forEach(({ label, i }) => {
+        const b = document.createElement('button');
+        b.className = 'chip'; b.type = 'button'; b.textContent = label;
+        b.setAttribute('aria-pressed', String(i === quiz.part));
+        b.onclick = () => { quiz.part = i; for (const c of quizPartEl.children) c.setAttribute('aria-pressed', String(c === b)); };
+        quizPartEl.appendChild(b);
+      });
+    }
     for (const r of [{ id: 0, label: 'Whole body' }, ...REGIONS]) {
       const b = document.createElement('button');
       b.className = 'chip'; b.type = 'button'; b.textContent = r.label;
       b.setAttribute('aria-pressed', String(r.id === quiz.reg));
       b.onclick = () => {
-        quiz.reg = r.id;
+        quiz.reg = r.id; quiz.part = -1;
         for (const c of quizRegionEl.children) c.setAttribute('aria-pressed', String(c === b));
         quizSideEl.hidden = !quizIsLimb();
+        drawQuizPartChips();
       };
       quizRegionEl.appendChild(b);
     }
@@ -2696,7 +2759,7 @@ bool inRegion(vec3 p) {
           // a region quiz only asks about structures whose centre lies in that region (and, for a limb, on the chosen side;
           // anything on the midline belongs to neither limb)
           box.getCenter(mid);
-          if (!inRegion(mid, quiz.reg, quiz.side)) continue;
+          if (!inRegion(mid, quiz.reg, quiz.side, limbPartOf(quiz.reg, quiz.part) || WHOLE_LIMB)) continue;
           if (quizIsLimb() && Math.abs(mid.x) < 0.02) continue;
         }
         seen.add(label);
@@ -2753,7 +2816,7 @@ bool inRegion(vec3 p) {
       showAll();
       for (const x of SYSTEMS) if (x.group) x.group.visible = s.ids.includes(x.id);
       xrayEl.checked = true; setXray(true);
-      if (quiz.reg) { limbSide = quiz.side; limbSideU.value = quiz.side; setRegion(quiz.reg, true); }   // only the chosen region is drawn
+      if (quiz.reg) { limbSide = quiz.side; limbSideU.value = quiz.side; setRegion(quiz.reg, true, quiz.part); }   // only the chosen region (and limb part) is drawn
       refreshPins(); dirty = true;
     }
     function quizLeaveScene() {
@@ -2764,7 +2827,7 @@ bool inRegion(vec3 p) {
       setPeel(0);   // works every group's visibility out from the ticked boxes again
       applyPelvis();
       xrayEl.checked = sv.xray; setXray(sv.xray);
-      limbSide = sv.limbSide; limbSideU.value = sv.limbSide; setRegion(sv.region, true);   // the Explore tab's own region and limb side
+      limbSide = sv.limbSide; limbSideU.value = sv.limbSide; setRegion(sv.region, true, sv.part);   // the Explore tab's own region, limb side and limb part
       refreshPins(); updateReveal(); dirty = true;
     }
 
@@ -2772,7 +2835,7 @@ bool inRegion(vec3 p) {
       if (quiz.active || quiz.starting) return;
       const s = quiz.sys;
       quiz.starting = true; quizStartBtn.disabled = true;
-      quiz.saved = { xray: xrayOn, region, limbSide, systems: SYSTEMS.map(x => [x, x.input.checked]) };
+      quiz.saved = { xray: xrayOn, region, limbSide, part: limbPartIdx, systems: SYSTEMS.map(x => [x, x.input.checked]) };
       try {
         const members = s.ids.map(id => SYSTEMS.find(x => x.id === id)).filter(Boolean);
         const todo = members.filter(m => !m.group);
@@ -2858,7 +2921,8 @@ bool inRegion(vec3 p) {
       qPlay.hidden = true; qSummary.hidden = false;
       quizById('qxp').textContent = '';
       const reg = quiz.reg ? REGIONS.find(r => r.id === quiz.reg) : null;
-      post({ type: 'quiz', system: quiz.sys.id, region: reg ? regionSlug(reg) : undefined, side: quizIsLimb() ? (quiz.side < 0 ? 'right' : 'left') : undefined, score: quiz.score, total });
+      const part = quizIsLimb() ? limbPartOf(quiz.reg, quiz.part) : null;
+      post({ type: 'quiz', system: quiz.sys.id, region: reg ? regionSlug(reg) : undefined, side: quizIsLimb() ? (quiz.side < 0 ? 'right' : 'left') : undefined, part: part ? part.label.toLowerCase() : undefined, score: quiz.score, total });
     }
     // the app answers with the XP the round earned (0 when today's atlas XP was already paid)
     function showQuizXp(amount) {

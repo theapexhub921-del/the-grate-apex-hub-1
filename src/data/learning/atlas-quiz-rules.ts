@@ -2,12 +2,13 @@
 // Pure — no React, no storage — so it can be tested on its own.
 //
 // The atlas (public/atlas/anatomy.html) sends:
-//   { type: 'quiz', system, region?, side?, score, total }
+//   { type: 'quiz', system, region?, side?, part?, score, total }
 
 export type AtlasQuizResult = {
   system: string; // body system the round was about, e.g. 'skeletal'
   region: string | null; // body region the round was limited to, e.g. 'upper-limb' (null = whole body)
   side: 'right' | 'left' | null; // only for the limb regions
+  part: string | null; // part of the limb, e.g. 'forearm' (null = the whole limb, or not a limb)
   score: number;
   total: number;
 };
@@ -34,6 +35,7 @@ export function parseAtlasQuizMessage(data: unknown): AtlasQuizResult | null {
     system,
     region: text(m.region),
     side: m.side === 'right' || m.side === 'left' ? m.side : null,
+    part: text(m.part),
     score,
     total,
   };
