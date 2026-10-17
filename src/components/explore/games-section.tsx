@@ -9,10 +9,12 @@ import { Text } from '@/components/ui/text';
 import { type ThemeColors } from '@/constants/theme';
 import { STUDY_GAMES } from '@/data/games';
 import { useThemedStyles } from '@/hooks/use-theme';
+import { useGameWarmUp } from '@/lib/game-warmup';
 
 // Explore → Games: study games (data in src/data/games.ts).
 export function GamesSection({ style }: { style?: StyleProp<ViewStyle> }) {
   const styles = useThemedStyles(createStyles);
+  useGameWarmUp();
   if (STUDY_GAMES.length === 0) return null;
   return (
     <View style={style}>

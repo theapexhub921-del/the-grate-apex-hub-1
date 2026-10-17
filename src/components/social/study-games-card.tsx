@@ -8,12 +8,14 @@ import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { STUDY_GAMES } from '@/data/games';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { useGameWarmUp } from '@/lib/game-warmup';
 
 // Connect → study games, shown under Battles (the same entry style).
 // Opens the game; its Multiplayer button creates or joins a live room.
 export function StudyGamesCard() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  useGameWarmUp();
   return (
     <>
       {STUDY_GAMES.map((game) => (

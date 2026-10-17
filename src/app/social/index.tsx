@@ -6,6 +6,7 @@ import { Text } from '@/components/ui/text';
 
 import { PersonAvatar, PersonLink } from '@/components/social/profile-card';
 import { NotificationBell } from '@/components/notifications';
+import { CardGrid } from '@/components/ui/card-grid';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Card, PressableCard } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
@@ -178,7 +179,7 @@ export default function SocialScreen() {
       <PageHeader title="Connect" subtitle="Find classmates, message friends and study together." right={<NotificationBell />} />
       <FollowRequestsCard />
       <RecentMessagesCard />
-      <View style={styles.quickActions}>
+      <CardGrid minItemWidth={240} maxColumns={2} style={styles.quickActions}>
         {QUICK_ACTIONS.map((item) => (
           <PressableCard key={item.label} onPress={() => router.push(item.href as never)} accessibilityLabel={item.label} style={styles.quickTile}>
             <View style={styles.quickIcon}><Icon name={item.icon} size={18} color={colors.primaryText} /></View>
@@ -189,7 +190,7 @@ export default function SocialScreen() {
             <Icon name="chevronRight" size={16} color={colors.textTertiary} />
           </PressableCard>
         ))}
-      </View>
+      </CardGrid>
       <Columns
         sideWidth={width >= 1180 ? 380 : 340}
         main={
@@ -251,8 +252,8 @@ function createStyles(colors: ThemeColors) {
     circleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 14 },
     circleText: { fontSize: 14, fontWeight: '700', color: colors.text },
     soonRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    quickActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 16, marginBottom: 18 },
-    quickTile: { flexGrow: 1, flexBasis: 240, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 },
+    quickActions: { marginTop: 16, marginBottom: 18 },
+    quickTile: { flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 },
     quickIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySubtle },
     quickTitle: { ...Type.headline, color: colors.text },
     friendStreakRow: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingVertical: 5 },
