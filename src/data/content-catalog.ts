@@ -1452,7 +1452,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "BIOCHEMISTRY",
     zip: "Free Radical and Oxygen Toxicity",
     sourceFileIds: ["frox-intracellular-vs-extracellular-antioxidants-intr", "frox-free-radical-and-oxygen-toxicity-prof-fay", "frox-presentation-group-4", "frox-free-radical-human-biology-2021-autosaved"],
-    status: "source-only",
+    status: "published",
     emoji: "🔥",
     outline: [
       { title: "Free Radicals and Oxygen Toxicity", points: [], sourceRefs: [{ sourceId: "frox-free-radical-and-oxygen-toxicity-prof-fay" }] },
