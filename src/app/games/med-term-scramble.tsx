@@ -1,6 +1,6 @@
 import { type Href, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { createElement, useCallback } from 'react';
+import { createElement, useCallback, useState } from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { BackLink } from '@/components/learning/nav-bits';
@@ -34,10 +34,18 @@ export default function MedTermScrambleScreen() {
   const src = `${page}?${query}`;
   const desktop = isDesktopWidth(width);
 
-  // The bottom bar goes away while the game is open and comes back on leaving.
+  // The app keeps pages alive after you leave them, so the game is only on the
+  // page while it is open: leaving removes it (sound and all) and coming back
+  // starts it again (the game saves its own progress). The bottom bar goes away
+  // while the game is open and comes back on leaving.
+  const [open, setOpen] = useState(false);
   useFocusEffect(useCallback(() => {
+    setOpen(true);
     setTabBarLocked(true);
-    return () => setTabBarLocked(false);
+    return () => {
+      setOpen(false);
+      setTabBarLocked(false);
+    };
   }, []));
 
   if (Platform.OS === 'web') {
@@ -47,12 +55,12 @@ export default function MedTermScrambleScreen() {
           <BackLink fallback={EXPLORE_HREF} label="Explore" />
           <Text style={styles.barTitle} numberOfLines={1}>{game.title}</Text>
         </View>
-        {createElement('iframe', {
+        {open ? createElement('iframe', {
           src,
           title: game.title,
           allow: 'autoplay; fullscreen',
           style: { flex: 1, width: '100%', minHeight: 0, border: 0, borderRadius: desktop ? 12 : 0, backgroundColor: '#14101e' },
-        })}
+        }) : null}
       </View>
     );
   }
