@@ -1663,7 +1663,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Reproductive Physiology",
     sourceFileIds: ["repro-female-reproductive-system", "repro-male-reproductive-system", "repro-sexual-response"],
-    status: "source-only",
+    status: "published",
     emoji: "🥚",
     outline: [
       { title: "Female Reproductive System", points: [], sourceRefs: [{ sourceId: "repro-female-reproductive-system" }] },
