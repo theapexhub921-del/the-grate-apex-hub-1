@@ -20,5 +20,6 @@ import { upperLimb } from '@/data/topics/upper-limb';
 import { renalPhysiology } from '@/data/topics/renal-physiology';
 import { gastrointestinalPhysiology } from '@/data/topics/gastrointestinal-physiology';
 import { reproductivePhysiology } from '@/data/topics/reproductive-physiology';
+import { specialSenses } from '@/data/topics/special-senses';
 
-export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, centralNervousSystem, endocrinology, gastrointestinalPhysiology, renalPhysiology, reproductivePhysiology, upperLimb];
+export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, centralNervousSystem, endocrinology, gastrointestinalPhysiology, renalPhysiology, reproductivePhysiology, specialSenses, upperLimb];

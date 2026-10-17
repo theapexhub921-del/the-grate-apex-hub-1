@@ -1679,7 +1679,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Special Senses",
     sourceFileIds: ["senses-auditory-vestibular-system-answers", "senses-chemical-senses-answers", "senses-sensory-physiology-study-guide", "senses-visual-system-answers", "senses-chemical-senses", "senses-visual-system", "senses-auditory-and-vestibular-systems"],
-    status: "source-only",
+    status: "published",
     emoji: "👁️",
     outline: [
       { title: "Visual System", points: [], sourceRefs: [{ sourceId: "senses-visual-system" }] },
