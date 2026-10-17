@@ -1649,7 +1649,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Renal Physiology",
     sourceFileIds: ["renal-ai-guide", "renal-renal-system"],
-    status: "source-only",
+    status: "published",
     emoji: "🫘",
     outline: [
       { title: "Renal/Urinary System", points: [], sourceRefs: [{ sourceId: "renal-renal-system" }] },
