@@ -1,0 +1,102 @@
+diff --git a/public/atlas/anatomy.html b/public/atlas/anatomy.html
+index bf64a73..923d2d0 100644
+--- a/public/atlas/anatomy.html
++++ b/public/atlas/anatomy.html
+@@ -1312,7 +1312,14 @@
+       { id: 'respiratory', label: 'Respiratory', via: 'visceral', top: true, match: /^(Respiratory system|Thoracic cavity)\.g$/i, color: 0xd4838f, paint: organColor },
+       { id: 'endocrine', label: 'Endocrine', via: 'visceral', top: true, match: /^Endocrine glands\.g$/i, color: 0xe6b64a, paint: organColor },
+       { id: 'serosa', label: 'Pleura, omenta, mesenteries', via: 'visceral', top: true, match: /pleura|omentum|meso-appendix|mesocolon/i, color: 0xe9cdbd, ghost: true },
+-      { id: 'references', label: 'Reference lines', file: 'References100.glb', mb: 0.1, color: 0x9aa0a6 },
++      // The reference file is split by kind, each with its own colour: the three families of plane (see-through), the surface
++      // lines (rebuilt as thin tubes, because the model's own ribbons are edge-on from the front), the direction arrows and the
++      // movement arrows. 'references' is only the file and is hidden; these four are the rows.
++      { id: 'references', label: 'Reference lines', file: 'References100.glb', mb: 0.1, color: 0x9aa0a6, hidden: true },
++      { id: 'refplanes', label: 'Reference planes', via: 'references', top: true, match: / planes?(\.g)?$/i, color: 0x4aa3f0, ghost: true, opacity: 0.16, noXray: true, paint: refPlaneColor },
++      { id: 'reflines', label: 'Surface lines', via: 'references', top: true, match: / line(\.[lr])?$/i, color: 0xff9f43, tube: 0.003, noXray: true, paint: refLineColor },
++      { id: 'refmoves', label: 'Movements', via: 'references', top: true, match: /^(Abduction|Adduction|Circumduction|(Lateral|Medial) rotation|Supination|Pronation|Inversion|Eversion|Plantar flexion|Dorsiflexion)$/i, color: 0xff6f61, noXray: true, paint: () => 0xff6f61 },
++      { id: 'refdirs', label: 'Directions', via: 'references', top: true, match: /^(Distal|Proximal|Dorsal|Ventral|Frontal|Occipital|Cranial|Caudal|Radial|Ulnar|Tibial|Fibular|Palmar|Plantar)$/i, color: 0xe9edf2, noXray: true, paint: () => 0xe9edf2 },
+     ];
+ 
+     // Quality: phones and tablets (coarse pointer) load the lighter models in ./lite/ (about half the triangles);
+@@ -1391,6 +1398,41 @@ bool inRegion(vec3 p) {
+     }
+ 
+     /* ---------- surface finish per system (roughness, clearcoat, sheen) ---------- */
++    /* ---------- reference lines ---------- */
++    // planes: sagittal blue, coronal amber, transverse violet
++    function refPlaneColor(n) {
++      n = n.toLowerCase();
++      return /median|sagittal/.test(n) ? 0x4aa3f0 : /coronal/.test(n) ? 0xffb347 : /transverse/.test(n) ? 0xb48cff : 0x9aa0a6;
++    }
++    // surface lines: midline yellow, axillary teal, back lines violet, the rest of the front lines orange
++    function refLineColor(n) {
++      n = n.toLowerCase();
++      return /median/.test(n) ? 0xffd24a : /axillary/.test(n) ? 0x3fd0c9 : /paravertebral|scapular/.test(n) ? 0xb36bff : 0xff9f43;
++    }
++    // The model draws each surface line as a ribbon standing on the skin, a fraction of a millimetre thick, so seen from the
++    // front it is edge-on and all but invisible. Rebuild it as a thin tube along the ribbon's centre line.
++    function ribbonToTube(geo, radius) {
++      const pos = geo.attributes.position;
++      const box = new THREE.Box3().setFromBufferAttribute(pos);
++      const size = box.getSize(new THREE.Vector3());
++      const axis = size.y >= size.x && size.y >= size.z ? 'y' : size.z >= size.x ? 'z' : 'x';
++      const span = size[axis];
++      if (!(span > 1e-4)) return geo;
++      const bins = Math.max(6, Math.min(48, Math.round(span / 0.006)));   // one centre point about every 6 mm
++      const sums = Array.from({ length: bins }, () => [0, 0, 0, 0]);
++      const v = new THREE.Vector3();
++      for (let i = 0; i < pos.count; i++) {
++        v.fromBufferAttribute(pos, i);
++        const a = sums[Math.min(bins - 1, Math.floor(((v[axis] - box.min[axis]) / span) * bins))];
++        a[0] += v.x; a[1] += v.y; a[2] += v.z; a[3]++;
++      }
++      const pts = sums.filter(a => a[3]).map(a => new THREE.Vector3(a[0] / a[3], a[1] / a[3], a[2] / a[3]));
++      if (pts.length < 2) return geo;
++      const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), Math.max(12, pts.length * 3), radius, 6, false);
++      geo.dispose();
++      return tube;
++    }
++
+     const FINISH = {
+       skeletal: { r: 0.7, cc: 0, ccr: 0.5 },                 // dry bone, faint polish
+       joints: { r: 0.50, cc: 0.30 },                           // glossy cartilage / ligament
+@@ -1399,6 +1441,7 @@ bool inRegion(vec3 p) {
+       cardiovascular: { r: 0.32, cc: 0.55, ccr: 0.25 },                // wet vessel walls
+       visceral: { r: 0.40, cc: 0.45, ccr: 0.30 },                // moist organ surfaces
+       lymphoid: { r: 0.42, cc: 0.30 },
++      refplanes: { r: 0.6 }, reflines: { r: 0.45, cc: 0.2 }, refmoves: { r: 0.5 }, refdirs: { r: 0.5 },
+       alimentary: { r: 0.40, cc: 0.45, ccr: 0.30 }, urinary: { r: 0.40, cc: 0.45, ccr: 0.30 }, reproductive: { r: 0.40, cc: 0.45, ccr: 0.30 },
+       respiratory: { r: 0.40, cc: 0.45, ccr: 0.30 }, endocrine: { r: 0.40, cc: 0.45, ccr: 0.30 },
+     };
+@@ -1627,6 +1670,7 @@ bool inRegion(vec3 p) {
+     };
+     function syncXrayFocus() { xrayFocus.value = selectedParts.length ? 1 : 0; dirty = true; }
+     function xrayMat(src, bone) {
++      if (src.userData && src.userData.noXray) return src;
+       const key = src.uuid + (bone ? ':b' : ':s');
+       let m = xrayCache.get(key);
+       if (!m) {
+@@ -1857,6 +1901,7 @@ bool inRegion(vec3 p) {
+         clearcoat: fin.cc ?? 0, clearcoatRoughness: fin.ccr ?? 0.35,
+         sheen: fin.sheen ?? 0, sheenRoughness: 0.55, sheenColor: new THREE.Color(0xffd9d0),
+       }));
++      if (s.noXray) s.mat.userData.noXray = true;   // reference marks stay as they are in x-ray mode
+       if (s.ghost) { s.mat.transparent = true; s.mat.opacity = s.opacity ?? 0.28; s.mat.depthWrite = false; }
+       const row = document.createElement('label');
+       row.className = 'sys' + ((s.via && !s.top) || s.sub ? ' sub' : '');
+@@ -2014,6 +2059,7 @@ bool inRegion(vec3 p) {
+           s.group.traverse(n => { if (/^VH_F_/.test(n.name || '')) { n.userData.name = vhName(n.name); if (REPRO_IDS[n.name]) n.userData.onto = REPRO_IDS[n.name]; } });
+           const kids = SYSTEMS.filter(c => c.via === s.id);
+           const moves = [], drops = [];
++          s.group.updateMatrixWorld(true);
+           s.group.traverse(o => {
+             if (!o.isMesh) return;
+             // ".j" meshes are baked label leader-lines from the Blender source, not anatomy
+@@ -2025,6 +2071,7 @@ bool inRegion(vec3 p) {
+               const hit = kids.find(c => (c.match && c.match.test(rawName(n))) || (c.node && c.node.test(n.name || '')));
+               if (hit) { owner = hit; break; }
+             }
++            if (owner.tube) o.geometry = ribbonToTube(o.geometry, owner.tube / (Math.abs(o.getWorldScale(new THREE.Vector3()).x) || 1));   // the tube's radius is in metres; the mesh is scaled
+             const d = describe(o);
+             o.userData.plainMat = owner.mat;
+             o.userData.paintMat = owner.paint ? paintMat(owner.paint(d.name, o), owner) : owner.mat;
