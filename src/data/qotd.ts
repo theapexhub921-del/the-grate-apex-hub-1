@@ -24,13 +24,35 @@ function hash(text: string) {
   return h >>> 0;
 }
 
-/** The same single-answer question for every learner on a given day. */
-export function pickQuestion(day: string): Question | null {
-  const pool = publishedTopics
+function questionPool() {
+  return publishedTopics
     .flatMap((topic) => getTopicQuestions(topic.id))
     .filter((question) => question.type === 'choice' && question.usage !== 'learn' && question.options.length > 2);
-  if (pool.length === 0) return null;
-  return pool[hash(day) % pool.length];
+}
+
+/**
+ * The same single-answer question for every learner on a given day. Every
+ * question gets its own score for the day and the highest wins, so adding new
+ * lessons during the day does not change today's question (it only can if a
+ * new question happens to beat them all). Picking by position in the list
+ * changed the question with every content update.
+ */
+export function pickQuestion(day: string): Question | null {
+  let best: Question | null = null;
+  let bestScore = -1;
+  for (const question of questionPool()) {
+    const score = hash(`${day}:${question.id}`);
+    if (score > bestScore) {
+      best = question;
+      bestScore = score;
+    }
+  }
+  return best;
+}
+
+/** A question from the daily pool by id (the one the learner answered today). */
+export function findQotdQuestion(id: string): Question | null {
+  return questionPool().find((question) => question.id === id) ?? null;
 }
 
 export type LocalAnswer = { day: string; questionId: string; pick: number; synced: boolean };
