@@ -3,11 +3,17 @@ extends Control
 ## Base for every screen: themed background, scrolling centred column that adapts to window width.
 
 const MAX_WIDTH := 720.0
+## How far (pixels) a finger moves up or down before it scrolls instead of tapping.
+const TOUCH_SCROLL_START := 12.0
 
 var params: Dictionary = {}
 var content: VBoxContainer
 var scroll: ScrollContainer
 var _margin: MarginContainer
+var _touch_start := Vector2.ZERO
+var _scroll_start := 0
+var _touching := false
+var _touch_scrolling := false
 
 
 func _ready() -> void:
@@ -38,6 +44,47 @@ func _relayout() -> void:
 	_margin.add_theme_constant_override("margin_right", side)
 	_margin.add_theme_constant_override("margin_top", 22)
 	_margin.add_theme_constant_override("margin_bottom", 40)
+
+
+## Touch scrolling: on a phone, a swipe up or down scrolls the screen even when
+## it starts on a button or card (the scroll box alone only moves when the
+## finger lands on empty space). A button under the finger is let go without
+## being pressed. Sideways drags (sliders) are left alone.
+func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch and event.index == 0:
+		if event.pressed:
+			_touching = true
+			_touch_scrolling = false
+			_touch_start = (make_input_local(event) as InputEventScreenTouch).position
+			_scroll_start = scroll.scroll_vertical
+		else:
+			_touching = false
+			if _touch_scrolling:
+				get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag and event.index == 0 and _touching:
+		# In this screen's own units, so the page follows the finger exactly.
+		var moved: Vector2 = (make_input_local(event) as InputEventScreenDrag).position - _touch_start
+		if not _touch_scrolling and absf(moved.y) > TOUCH_SCROLL_START and absf(moved.y) > absf(moved.x):
+			_touch_scrolling = true
+			_cancel_presses(content)
+		if _touch_scrolling:
+			scroll.scroll_vertical = _scroll_start - int(moved.y)
+			get_viewport().set_input_as_handled()
+	elif _touch_scrolling and event.device == InputEvent.DEVICE_ID_EMULATION and (event is InputEventMouseMotion or event is InputEventMouseButton):
+		# The mouse events a browser makes from the same finger: the swipe is a scroll, not a click.
+		get_viewport().set_input_as_handled()
+		if event is InputEventMouseButton and not event.pressed:
+			_touch_scrolling = false
+
+
+## Lets go of any button the finger went down on, so the swipe does not press it.
+func _cancel_presses(node: Node) -> void:
+	for child in node.get_children():
+		if child is BaseButton and not child.disabled and child.get_draw_mode() in [BaseButton.DRAW_PRESSED, BaseButton.DRAW_HOVER_PRESSED]:
+			var button: BaseButton = child
+			button.disabled = true
+			button.set_deferred("disabled", false)
+		_cancel_presses(child)
 
 
 func column_width() -> float:

@@ -22,7 +22,7 @@ export const STUDY_GAMES: readonly StudyGame[] = [
       'Solve scrambled medical terms from a clinical clue before time runs out. Build streaks, try Medical Rush and Case Mode, and challenge classmates in live multiplayer rooms.',
     href: '/games/med-term-scramble',
     buildPath: '/game-builds/med-term-scramble/play.html',
-    tags: ['112 terms', '14 subjects', 'Multiplayer'],
+    tags: ['112 terms', '14 subjects', 'Single player', 'Multiplayer'],
   },
 ];
 
