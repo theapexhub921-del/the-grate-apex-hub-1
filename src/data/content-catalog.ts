@@ -1886,6 +1886,30 @@ export const contentTopics: ContentTopic[] = [
       { title: "The Lungs and Bronchial Tree", points: [], sourceRefs: [{ sourceId: "anat-respiratory-gross" }] },
     ],
   },
+  {
+    id: "gastrointestinal-system-gross",
+    title: "Gastrointestinal System",
+    subject: "anatomy",
+    courseId: "anatomy-lectures",
+    folderSubject: "ANATOMY",
+    zip: "Anatomy",
+    sourceFileIds: ["anat-abdominal-walls", "anat-gi-tract-organs", "anat-gi-neurovasculature"],
+    status: "published",
+    emoji: "🍽️",
+    note: "HB2 Gross Anatomy (Anatomy/Gross/GIT): three decks merged into one topic.",
+    outline: [
+      { title: "The Abdomen and the Anterolateral Wall", points: [], sourceRefs: [{ sourceId: "anat-abdominal-walls" }] },
+      { title: "Rectus Sheath, Vessels, Nerves and Incisions", points: [], sourceRefs: [{ sourceId: "anat-abdominal-walls" }] },
+      { title: "The Inguinal Region and Hernias", points: [], sourceRefs: [{ sourceId: "anat-abdominal-walls" }] },
+      { title: "The Posterior Abdominal Wall", points: [], sourceRefs: [{ sourceId: "anat-abdominal-walls" }] },
+      { title: "The Oesophagus and Stomach", points: [], sourceRefs: [{ sourceId: "anat-gi-tract-organs" }] },
+      { title: "The Small Intestine", points: [], sourceRefs: [{ sourceId: "anat-gi-tract-organs" }] },
+      { title: "Large Intestine, Rectum and Anal Canal", points: [], sourceRefs: [{ sourceId: "anat-gi-tract-organs" }] },
+      { title: "Liver, Gallbladder, Pancreas and Spleen", points: [], sourceRefs: [{ sourceId: "anat-gi-tract-organs" }] },
+      { title: "Arterial Supply of the GI Tract", points: [], sourceRefs: [{ sourceId: "anat-gi-neurovasculature" }] },
+      { title: "Portal System, Lymphatics and Innervation of the Gut", points: [], sourceRefs: [{ sourceId: "anat-gi-neurovasculature" }] },
+    ],
+  },
 ];
 
 export function getTopicsForSubject(subject: ContentTopic['subject']) {
