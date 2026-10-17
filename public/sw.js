@@ -38,10 +38,33 @@ self.addEventListener('fetch', (event) => {
   // the connection was slow) left phones stuck on an old, broken version. The browser's normal checks keep it fresh:
   // the page is revalidated on every open (vercel.json) and its address carries a fresh ?v= stamp (src/lib/atlas-theme.ts).
   if (new URL(request.url).pathname.startsWith('/atlas/')) return;
-  // Game builds (public/game-builds) are left entirely to the browser too: never cached
-  // (updates always show) and never re-served, because the host redirects play.html
-  // to /play and a redirected reply from here would be refused for a page load.
-  if (new URL(request.url).pathname.startsWith('/game-builds/')) return;
+  // Game builds (public/game-builds): played offline once played (or warmed up) online.
+  // Online, every file comes from the network as usual (the browser's "has it changed?"
+  // check keeps that cheap, so updates always show); a copy goes into the offline cache,
+  // and the large engine file is written again only when it changed (ETag). Offline, the
+  // saved copy is used. The original request is fetched as is, so the host's redirect
+  // (play.html → /play) passes through untouched, and a redirected reply is never saved.
+  const gamePath = new URL(request.url).pathname;
+  if (gamePath.startsWith('/game-builds/')) {
+    if (request.headers.has('range')) return;
+    event.respondWith((async () => {
+      const cache = await caches.open(OFFLINE_CACHE);
+      try {
+        const response = await fetch(request);
+        if (response.status === 200 && response.type === 'basic' && !response.redirected) {
+          const saved = await cache.match(gamePath);
+          const tag = response.headers.get('etag');
+          if (!saved || !tag || saved.headers.get('etag') !== tag) {
+            event.waitUntil(cache.put(gamePath, response.clone()).catch(() => undefined));
+          }
+        }
+        return response;
+      } catch {
+        return (await cache.match(gamePath)) || Response.error();
+      }
+    })());
+    return;
+  }
 
   if (request.mode === 'navigate') {
     // Always the newest page from the network (bypassing the HTTP cache); the

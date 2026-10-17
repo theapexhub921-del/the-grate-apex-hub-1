@@ -3,8 +3,8 @@ extends Screen
 
 func build() -> void:
 	top_bar()
-	content.add_child(UI.eyebrow("Choose a mode"))
-	content.add_child(UI.title("Play"))
+	content.add_child(UI.eyebrow("Play on your own · choose a mode"))
+	content.add_child(UI.title("Single player"))
 	_mode_card("Classic Scramble", "The core game. Unscramble each term before time runs out. Speed and streaks score big.", "Play Classic",
 		func(): Router.go("setup", {"mode": "classic"}), "hema")
 	_mode_card("Medical Rush", "Solve the scramble, then answer a lightning clinical challenge about that term for bonus points.", "Play Medical Rush",
