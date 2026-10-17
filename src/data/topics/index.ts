@@ -18,5 +18,6 @@ import { inbornErrors } from '@/data/topics/inborn-errors-of-metabolism';
 import { oxygenCarriers } from '@/data/topics/oxygen-carriers';
 import { upperLimb } from '@/data/topics/upper-limb';
 import { renalPhysiology } from '@/data/topics/renal-physiology';
+import { gastrointestinalPhysiology } from '@/data/topics/gastrointestinal-physiology';
 
-export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, centralNervousSystem, endocrinology, renalPhysiology, upperLimb];
+export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, centralNervousSystem, endocrinology, gastrointestinalPhysiology, renalPhysiology, upperLimb];

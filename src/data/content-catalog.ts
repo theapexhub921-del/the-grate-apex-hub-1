@@ -1635,7 +1635,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Gastrointestinal Physiology",
     sourceFileIds: ["gi-digestive-system"],
-    status: "source-only",
+    status: "published",
     emoji: "🍽️",
     outline: [
       { title: "Digestive System", points: [], sourceRefs: [{ sourceId: "gi-digestive-system" }] },
