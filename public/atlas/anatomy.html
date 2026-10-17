@@ -654,10 +654,21 @@
       }
 
       #nav {
-        --nb: 42px;
+        --nb: 34px;
         right: var(--gap);
         top: calc(var(--gap) + var(--sat));
+        padding: 6px;
+        gap: 6px;
       }
+
+      /* smaller view pad on phones so it covers less of the model */
+      #nav #navBody { gap: 6px; }
+      #nav .dpad, #nav .zoomrow { gap: 3px; }
+      #nav .nb { border-radius: 10px; }
+      #nav .nb svg { width: 16px; height: 16px; }
+      #nav .nt { width: 30px; height: 30px; }
+      #nav .navhead { font-size: 10.5px; gap: 6px; }
+      #nav .seg button { padding: 6px 10px; font-size: 12px; }
 
       /* the selected-structure card sits just above the sheet (thumb reach); it waits while the sheet is fully open */
       #info, body.panel-closed #info {
@@ -703,7 +714,7 @@
 
       #openPanel { top: var(--gap); bottom: auto; width: 44px; height: 44px; }
 
-      #nav { --nb: 38px; top: var(--gap); right: var(--gap); }
+      #nav { --nb: 32px; top: var(--gap); right: var(--gap); }
 
       #info {
         left: calc(var(--panel-w) + var(--gap) * 2 + (100% - var(--panel-w) - var(--gap) * 2) / 2);
