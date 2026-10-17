@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grateapex-pwa-v9';
+const CACHE_NAME = 'grateapex-pwa-v10';
 // Study material kept for offline revision (question banks, lecture diagrams, and what
 // Settings → Offline study saves: src/lib/offline-study.ts). A different prefix from
 // CACHE_PREFIX on purpose: an app update must never delete what a learner saved.
@@ -32,10 +32,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
-  // Game builds (public/game-builds) are left entirely to the browser: never cached
-  // (updates always show) and never re-served, because the host redirects play.html
-  // to /play and a redirected reply from here would be refused for a page load.
-  if (new URL(request.url).pathname.startsWith('/game-builds/')) return;
+
+  // The 3D atlas (/atlas/...) is never touched by this worker: not the page, not its scripts, not its models. It is a
+  // standalone viewer that changes whenever it is redeployed, and a saved copy (this worker used to fall back to one when
+  // the connection was slow) left phones stuck on an old, broken version. The browser's normal checks keep it fresh:
+  // the page is revalidated on every open (vercel.json) and its address carries a fresh ?v= stamp (src/lib/atlas-theme.ts).
+  if (new URL(request.url).pathname.startsWith('/atlas/')) return;
 
   if (request.mode === 'navigate') {
     // Always the newest page from the network (bypassing the HTTP cache); the

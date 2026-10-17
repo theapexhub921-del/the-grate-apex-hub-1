@@ -70,6 +70,13 @@ export const ATLAS_PAGE = '/atlas/anatomy.html';
 // open this one directly and skip the redirect.
 export const ATLAS_PAGE_DEPLOYED = '/atlas/anatomy';
 
+// A fresh stamp for the address, so a copy of the page that a browser, an in-app browser or a service worker
+// saved earlier can never be mistaken for the current one (a different address is a different cache entry).
+// Put it between the page and the #theme hash:  `${ATLAS_PAGE}${atlasFresh()}${atlasHash(vars)}`
+export function atlasFresh(): string {
+  return `?v=${Date.now().toString(36)}`;
+}
+
 export function atlasHash(vars: AtlasThemeVars): string {
   return `#theme=${encodeURIComponent(JSON.stringify(vars))}`;
 }

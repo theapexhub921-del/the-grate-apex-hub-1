@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useWindowDimensions } from 'react-native';
 
-import { ATLAS_PAGE, atlasHash, atlasThemeVars } from '@/lib/atlas-theme';
+import { setTabBarLocked } from '@/components/tab-bar-visibility';
+import { ATLAS_PAGE, atlasFresh, atlasHash, atlasThemeVars } from '@/lib/atlas-theme';
 import { useTheme } from '@/hooks/use-theme';
 
 // The 3D anatomy atlas (web): the standalone viewer in public/atlas/anatomy.html, shown
@@ -20,7 +21,7 @@ export function SkeletonAtlas() {
   const vars = useMemo(() => atlasThemeVars(colors), [colors]);
 
   // The address is fixed on first render: changing it later would reload the viewer.
-  const [src] = useState(() => `${ATLAS_PAGE}${atlasHash(vars)}`);
+  const [src] = useState(() => `${ATLAS_PAGE}${atlasFresh()}${atlasHash(vars)}`);
 
   // Send the current colours to the viewer (when it has loaded, and whenever the theme changes).
   const send = useCallback(() => {
@@ -44,6 +45,7 @@ export function SkeletonAtlas() {
   // screen some other way (the browser's own Esc) is noticed.
   useEffect(() => {
     if (!full) return;
+    setTabBarLocked(true); // the app's bottom bar sits above the page content, so it is taken away while full screen
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') exitFull();
     };
@@ -55,6 +57,7 @@ export function SkeletonAtlas() {
     window.addEventListener('keydown', onKey);
     document.addEventListener('fullscreenchange', onFullscreenChange);
     return () => {
+      setTabBarLocked(false);
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', onKey);
       document.removeEventListener('fullscreenchange', onFullscreenChange);

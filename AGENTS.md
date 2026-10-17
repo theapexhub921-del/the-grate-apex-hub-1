@@ -137,8 +137,6 @@ Lecture diagrams (tappable images) are in `src/data/figures/` (one file per topi
 * In a lesson a diagram is a compact preview card ("Explore diagram"); the interactive diagram opens in a sheet, so diagrams never take over the reading (owner's request). Quiz diagrams are capped at 280 px tall.
 * Topics with diagrams: Cardiovascular Physiology, Upper Limb, and all eight Biochemistry topics (2026-10-16). HB2 lessons show them too (block `lfig` in `hb2-study.ts`).
 
-HB2 past papers (Learn → Past question bank → HB2) are in `public/curriculum/hb2-anatomy.json`, `hb2-biochemistry.json` and `hb2-physiology.json`, one set per paper named `Past Questions N — <label>`. The second batch was added by `scripts/import-hb2-past-questions-2.mjs` (2026-10-17). A bank question may carry `img` (a plain picture under `public/figures/`, e.g. the histology practical's labelled diagrams in `public/figures/hb2-histology-past/`); it is shown with the question and results, asked as written (no matching/typed variants), and kept out of Apex.
-
 Progress functionality is currently in:
 
 `src/data/progress.ts`
@@ -366,6 +364,7 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * `public/sw.js` keeps the app shell, scripts, pages already visited, question banks (`/curriculum/*.json`, shown from the saved copy and refreshed in the background) and lecture diagrams (`/figures/*`). Banks and diagrams live in the `grateapex-offline-v1` cache, which app updates never delete.
 * Settings → Offline study (`src/components/offline-study-card.tsx`, `src/data/offline-study.ts`, `src/lib/offline-study.ts`) downloads a class's banks, diagrams, original lessons and lesson pictures on request. Lesson text, pictures and the lesson list are stored in the same cache on the web (not localStorage, which is too small); `legacy-study.ts` reads them when there is no connection.
 * If you change `OFFLINE_CACHE`, change it in both `public/sw.js` and `src/lib/offline-study.ts`.
+* The 3D atlas (`/atlas/*`) is deliberately skipped by `public/sw.js` (an old saved copy once left phones stuck on a broken atlas), `vercel.json` makes `/atlas/anatomy` and `/sw.js` revalidate on every load, and every atlas address carries a fresh `?v=` stamp (`atlasFresh()` in `src/lib/atlas-theme.ts`). Keep all three if you touch the atlas wiring; bump `CACHE_NAME` in `public/sw.js` whenever a deploy must purge what phones already saved.
 
 ### Locked elements
 

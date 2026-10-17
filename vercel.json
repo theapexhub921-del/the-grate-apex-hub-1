@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "node scripts/assemble-games.mjs && npx expo export --platform web && cp dist/+not-found.html dist/404.html && rm -f dist/game-builds/*/*.part*",
+  "buildCommand": "npx expo export --platform web && cp dist/+not-found.html dist/404.html",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "crons": [
@@ -14,5 +14,25 @@
     "api/reminders.mjs": {
       "maxDuration": 60
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/atlas/anatomy(.html)?",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    }
+  ]
 }

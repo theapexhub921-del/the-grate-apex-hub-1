@@ -21,6 +21,9 @@ const THRESHOLD = 8;
 
 let hidden = false;
 let pageAtBottom = false;
+// A screen that takes over the whole window (the atlas in full screen) locks the bar away, whatever the
+// Auto-hide setting says. Unlike `hidden` it is not changed by scrolling.
+let locked = false;
 const listeners = new Set<() => void>();
 
 function setHidden(next: boolean) {
@@ -31,6 +34,24 @@ function setHidden(next: boolean) {
 
 export function showTabBar() {
   setHidden(false);
+}
+
+export function setTabBarLocked(next: boolean) {
+  if (locked === next) return;
+  locked = next;
+  listeners.forEach((listener) => listener());
+}
+
+/** True while a full-screen view has asked for the bottom bar to be gone. */
+export function useTabBarLocked() {
+  return useSyncExternalStore(
+    (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    () => locked,
+    () => false
+  );
 }
 
 function setPageAtBottom(next: boolean) {
