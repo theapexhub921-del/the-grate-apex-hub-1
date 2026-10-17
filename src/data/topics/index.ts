@@ -10,11 +10,20 @@ import { cardiovascularPhysiology } from '@/data/topics/cardiovascular-physiolog
 import { centralNervousSystem } from '@/data/topics/central-nervous-system';
 import { cholesterolAndBileBiosynthesis } from '@/data/topics/cholesterol-and-bile-biosynthesis';
 import { collagenAndElastin } from '@/data/topics/collagen-synthesis';
+import { endocrinology } from '@/data/topics/endocrinology';
 import { fattyAcidBiosynthesis } from '@/data/topics/fatty-acid-biosynthesis';
 import { hemeMetabolism } from '@/data/topics/heme-metabolism';
 import { hormones } from '@/data/topics/hormones-endocrine-biochemistry';
 import { inbornErrors } from '@/data/topics/inborn-errors-of-metabolism';
 import { oxygenCarriers } from '@/data/topics/oxygen-carriers';
 import { upperLimb } from '@/data/topics/upper-limb';
+import { renalPhysiology } from '@/data/topics/renal-physiology';
+import { gastrointestinalPhysiology } from '@/data/topics/gastrointestinal-physiology';
+import { reproductivePhysiology } from '@/data/topics/reproductive-physiology';
+import { specialSenses } from '@/data/topics/special-senses';
+import { freeRadicals } from '@/data/topics/free-radicals-and-oxygen-toxicity';
+import { aminoAcidMetabolism } from '@/data/topics/amino-acid-metabolism';
+import { nucleicAcids } from '@/data/topics/nucleic-acids';
+import { immunology } from '@/data/topics/immunology';
 
-export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, centralNervousSystem, upperLimb];
+export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, centralNervousSystem, endocrinology, gastrointestinalPhysiology, renalPhysiology, reproductivePhysiology, specialSenses, freeRadicals, aminoAcidMetabolism, nucleicAcids, immunology, upperLimb];

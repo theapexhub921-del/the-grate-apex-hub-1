@@ -1393,7 +1393,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "BIOCHEMISTRY",
     zip: "Amino Acid metabolism",
     sourceFileIds: ["aa-2-fate-of-carbon-skeleton-in-amino-acid-cataboli", "aa-1-amino-acid-metabolism-maa-2024", "aa-4-catabolism-of-sulfur-containing-amino-acids-ma", "aa-3-transport-of-ammonia-maa-2024", "aa-2", "aa-amino-acid", "aa-ammonia-transport", "aa-sulfur"],
-    status: "source-only",
+    status: "published",
     emoji: "⚗️",
     outline: [
       { title: "Amino Acid Metabolism", points: [], sourceRefs: [{ sourceId: "aa-1-amino-acid-metabolism-maa-2024" }] },
@@ -1452,7 +1452,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "BIOCHEMISTRY",
     zip: "Free Radical and Oxygen Toxicity",
     sourceFileIds: ["frox-intracellular-vs-extracellular-antioxidants-intr", "frox-free-radical-and-oxygen-toxicity-prof-fay", "frox-presentation-group-4", "frox-free-radical-human-biology-2021-autosaved"],
-    status: "source-only",
+    status: "published",
     emoji: "🔥",
     outline: [
       { title: "Free Radicals and Oxygen Toxicity", points: [], sourceRefs: [{ sourceId: "frox-free-radical-and-oxygen-toxicity-prof-fay" }] },
@@ -1482,7 +1482,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "BIOCHEMISTRY",
     zip: "Immunology",
     sourceFileIds: ["imm-02-cytokines-chemokines-revised-1", "imm-03-receptors-and-signaling-cytokines-sas", "imm-05-antibody-monoclonal-antibodies-complement", "imm-06-antigens-sas-2024", "imm-04-cells-of-the-immune-system-sas-2024-autosaved", "imm-07-immunity-to-infectious-agents-sas-2026", "imm-01-introduction-historical-perspective-to-immuno", "imm-hypersensitivity-reactions-study-guide", "imm-immunology-introduction-history-study-guide", "imm-the-complement-system-sas-2", "imm-receptors-and-signaling-cytokines-sas", "imm-antibodies-hb-ii-2022-sas", "imm-immunity-to-infectious-agents-sas-tm", "imm-cells-of-the-immune-system-sas-2022-rr-hb2", "imm-antigens-hbii-2022-sas", "imm-micro12-immunodiagnostics-notes-2", "imm-introduction-historical-perspective-to-immunolog"],
-    status: "source-only",
+    status: "published",
     emoji: "🛡️",
     outline: [
       { title: "Introduction & Historical Perspective to Immunology", points: [], sourceRefs: [{ sourceId: "imm-01-introduction-historical-perspective-to-immuno" }] },
@@ -1518,7 +1518,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "BIOCHEMISTRY",
     zip: "Nucleic Acids",
     sourceFileIds: ["na-3-gene-expression-and-regulation-meaa-2025", "na-1-nucleotide-metabolism-full-2025-2", "na-2-nucleic-acid-metabolism-meaa-2025", "na-lockfile-2-nucleic-acid-metabolism-meaa-2025", "na-nucleotide-metabolism-practice-exam", "na-recombinant-dna-technology-full-2022", "na-nucleotide-biosynthesis-full-2022"],
-    status: "source-only",
+    status: "published",
     emoji: "🧬",
     outline: [
       { title: "Nucleotide Biosynthesis (Purine and Pyrimidine Metabolism)", points: [], sourceRefs: [{ sourceId: "na-1-nucleotide-metabolism-full-2025-2" }] },
@@ -1617,7 +1617,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Endocrinology",
     sourceFileIds: ["endo-calcium-metabolism", "endo-thyroid-hormones-proper-1", "endo-adrenals-4", "endo-endocrinology-lecture-proper-1a-3", "endo-insulin"],
-    status: "source-only",
+    status: "published",
     emoji: "🦋",
     outline: [
       { title: "Endocrinology (introduction)", points: [], sourceRefs: [{ sourceId: "endo-endocrinology-lecture-proper-1a-3" }] },
@@ -1635,7 +1635,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Gastrointestinal Physiology",
     sourceFileIds: ["gi-digestive-system"],
-    status: "source-only",
+    status: "published",
     emoji: "🍽️",
     outline: [
       { title: "Digestive System", points: [], sourceRefs: [{ sourceId: "gi-digestive-system" }] },
@@ -1649,7 +1649,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Renal Physiology",
     sourceFileIds: ["renal-ai-guide", "renal-renal-system"],
-    status: "source-only",
+    status: "published",
     emoji: "🫘",
     outline: [
       { title: "Renal/Urinary System", points: [], sourceRefs: [{ sourceId: "renal-renal-system" }] },
@@ -1663,7 +1663,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Reproductive Physiology",
     sourceFileIds: ["repro-female-reproductive-system", "repro-male-reproductive-system", "repro-sexual-response"],
-    status: "source-only",
+    status: "published",
     emoji: "🥚",
     outline: [
       { title: "Female Reproductive System", points: [], sourceRefs: [{ sourceId: "repro-female-reproductive-system" }] },
@@ -1679,7 +1679,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "PHYSIOLOGY",
     zip: "Special Senses",
     sourceFileIds: ["senses-auditory-vestibular-system-answers", "senses-chemical-senses-answers", "senses-sensory-physiology-study-guide", "senses-visual-system-answers", "senses-chemical-senses", "senses-visual-system", "senses-auditory-and-vestibular-systems"],
-    status: "source-only",
+    status: "published",
     emoji: "👁️",
     outline: [
       { title: "Visual System", points: [], sourceRefs: [{ sourceId: "senses-visual-system" }] },
