@@ -165,6 +165,7 @@ export function TopicScreen({ topicId }: { topicId: string | undefined }) {
           { label: 'Study', href: routes.learn() },
           { label: subject.name, href: routes.subject(topic.subject) },
           ...(course && course.title !== subject.name ? [{ label: course.title, href: routes.course(course.id) }] : []),
+          ...(topic.section ? [{ label: topic.section }] : []),
           { label: topic.title },
         ]}
         style={styles.crumbs}

@@ -69,6 +69,13 @@ export default function LegacyCourseScreen() {
   const done = lessons.filter((lesson) => completed.has(lesson.id)).length;
   // Topics (HB2): each gets a clear heading in the path — its number, lessons and progress.
   const topics = [...new Set(lessons.map((lesson) => lesson.group).filter((group): group is string => Boolean(group)))];
+  // Sections (anatomy: Gross Anatomy, Microanatomy, Embryology): topics are numbered within their section.
+  const sectionOf = (group: string) => lessons.find((lesson) => lesson.group === group)?.section;
+  const topicPlace = (group: string) => {
+    const section = sectionOf(group);
+    const peers = section ? topics.filter((item) => sectionOf(item) === section) : topics;
+    return { section, number: peers.indexOf(group) + 1, total: peers.length };
+  };
   const topicStats = (group: string) => {
     const own = lessons.filter((lesson) => lesson.group === group);
     return { total: own.length, done: own.filter((lesson) => completed.has(lesson.id)).length };
@@ -144,18 +151,31 @@ export default function LegacyCourseScreen() {
           const questions = lesson.qids?.length ?? lesson.qcount ?? 0;
           const last = index === lessons.length - 1;
           const newGroup = lesson.group && lesson.group !== lessons[index - 1]?.group;
+          const newSection = lesson.section && lesson.section !== lessons[index - 1]?.section;
           return (
             <View key={lesson.id}>
+            {newSection && lesson.section ? (() => {
+              const own = lessons.filter((item) => item.section === lesson.section);
+              const count = new Set(own.map((item) => item.group)).size;
+              return (
+                <View style={[styles.sectionBanner, index > 0 && styles.sectionBannerGap]} accessibilityRole="header">
+                  <Text style={styles.sectionBannerKicker}>{course.name.toUpperCase()} SECTION</Text>
+                  <Text style={styles.sectionBannerTitle}>{lesson.section}</Text>
+                  <Text style={styles.metaSoft}>{count} topic{count === 1 ? '' : 's'} · {own.length} lessons</Text>
+                </View>
+              );
+            })() : null}
             {newGroup && lesson.group ? (() => {
               const stats = topicStats(lesson.group);
-              const number = topics.indexOf(lesson.group) + 1;
+              const place = topicPlace(lesson.group);
+              const number = place.number;
               return (
                 <View style={[styles.topicHead, number > 1 && styles.topicHeadGap]} accessibilityRole="header">
                   <View style={[styles.topicBadge, stats.done === stats.total && styles.topicBadgeDone]}>
                     {stats.done === stats.total ? <Icon name="check" size={18} color={colors.onPrimary} strokeWidth={2.6} /> : <Text style={styles.topicBadgeText}>{number}</Text>}
                   </View>
                   <View style={styles.flex}>
-                    <Text style={styles.topicKicker}>TOPIC {number} OF {topics.length}</Text>
+                    <Text style={styles.topicKicker}>{place.section ? `${place.section.toUpperCase()} · ` : ''}TOPIC {number} OF {place.total}</Text>
                     <Text style={styles.topicTitle}>{lesson.group}</Text>
                     <View style={styles.progressRow}>
                       <ProgressBar value={stats.total ? stats.done / stats.total : 0} height={6} style={styles.flex} label={`${lesson.group} lessons completed`} />
@@ -249,6 +269,10 @@ function createStyles(colors: ThemeColors) {
     section: { marginTop: 28 },
     topicHead: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: 16, marginBottom: 10, borderRadius: 18, backgroundColor: colors.surfaceMuted, borderWidth: 1, borderColor: colors.border },
     topicHeadGap: { marginTop: 22 },
+    sectionBanner: { paddingVertical: 4, marginBottom: 12, gap: 2 },
+    sectionBannerGap: { marginTop: 30 },
+    sectionBannerKicker: { ...Type.overline, color: colors.textSecondary },
+    sectionBannerTitle: { ...Type.title1, color: colors.text },
     topicBadge: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySubtle, borderWidth: 1.5, borderColor: colors.primaryBorder },
     topicBadgeDone: { backgroundColor: colors.success, borderColor: colors.success },
     topicBadgeText: { fontSize: 18, fontWeight: '800', color: colors.primaryText },

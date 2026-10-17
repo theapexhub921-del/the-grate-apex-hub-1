@@ -13,6 +13,7 @@ export const respiratoryGross = buildTopic({
   id: TOPIC_ID,
   subject: 'anatomy',
   courseId: 'anatomy-lectures',
+  section: 'Gross Anatomy',
   title: 'Respiratory System',
   description:
     'Gross anatomy of the respiratory system: nasal cavity and pharynx, larynx, trachea, thoracic wall, diaphragm, pleura, and the lungs and bronchial tree.',

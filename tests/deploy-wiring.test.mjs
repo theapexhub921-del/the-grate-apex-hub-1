@@ -3,7 +3,7 @@
 // - the 3D atlas: never touched by the service worker, revalidated on every
 //   open, and loaded with a fresh ?v= stamp
 // - Med Term Scramble: the engine (index.wasm) is joined from its parts in the
-//   Vercel build, the service worker leaves game builds alone, and the game
+//   Vercel build, the service worker keeps game builds for offline play, and the game
 //   page stays out of the navigation tabs
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
@@ -36,8 +36,12 @@ describe('Med Term Scramble wiring', () => {
     assert.ok(files.some((file) => /^index\.wasm\.part\d+$/.test(file)), 'no index.wasm.partNN files');
     for (const file of ['play.html', 'index.js', 'index.pck']) assert.ok(files.includes(file), `missing ${file}`);
   });
-  it('the service worker leaves game builds to the browser', () => {
-    assert.match(sw, /startsWith\('\/game-builds\/'\)\) return;/);
+  it('the service worker saves game builds for offline play, never a redirect', () => {
+    const block = sw.slice(sw.indexOf("startsWith('/game-builds/')"));
+    assert.ok(block.length < sw.length, 'no /game-builds/ handling in public/sw.js');
+    assert.match(block, /await fetch\(request\)/, 'fetch the original request (keeps the play.html redirect intact)');
+    assert.match(block, /!response\.redirected/, 'a redirected reply must never be saved');
+    assert.match(block, /OFFLINE_CACHE/, 'game files belong in the offline cache that app updates keep');
   });
   it('the game page is hidden from the navigation tabs', () => {
     for (const file of ['src/components/app-tabs.web.tsx', 'src/components/app-tabs.tsx']) {
