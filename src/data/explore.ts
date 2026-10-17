@@ -70,6 +70,7 @@ export const EXPLORE_TEAM: readonly ExploreTeamMember[] = [
   { name: 'OrigiNate', role: 'Technical officer / Developer', icon: 'profile' },
   { name: 'Pernellluvsya', role: 'Technical officer / Developer', icon: 'profile' },
   { name: 'Kwame Twumasi', role: 'Technical Advisor', icon: 'profile' },
+  { name: 'Isaiah', role: 'Technical Advisor', icon: 'profile' },
 ];
 export const EXPLORE_CONTACT = { email: 'theapexhub921@gmail.com', subject: 'GrAte Apex Hub question' } as const;
 

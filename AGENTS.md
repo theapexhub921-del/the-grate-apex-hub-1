@@ -139,7 +139,7 @@ Lecture diagrams (tappable images) are in `src/data/figures/` (one file per topi
 * In a lesson a diagram is a compact preview card ("Explore diagram"); the interactive diagram opens in a sheet, so diagrams never take over the reading (owner's request). Quiz diagrams are capped at 280 px tall.
 * Topics with diagrams: Cardiovascular Physiology, Upper Limb, and all eight Biochemistry topics (2026-10-16). HB2 lessons show them too (block `lfig` in `hb2-study.ts`).
 
-undefined
+HB2 past papers (Learn → Past question bank → HB2) are in `public/curriculum/hb2-anatomy.json`, `hb2-biochemistry.json` and `hb2-physiology.json`, one set per paper named `Past Questions N — <label>`. The second batch was added by `scripts/import-hb2-past-questions-2.mjs` (2026-10-17). A bank question may carry `img` (a plain picture under `public/figures/`, e.g. the histology practical's labelled diagrams in `public/figures/hb2-histology-past/`); it is shown with the question and results, asked as written (no matching/typed variants), and kept out of Apex.
 
 Progress functionality is currently in:
 
