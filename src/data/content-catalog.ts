@@ -1687,7 +1687,7 @@ export const contentTopics: ContentTopic[] = [
     folderSubject: "BIOCHEMISTRY",
     zip: "Respiratory Physiology",
     sourceFileIds: ["resp-respiratory-notes-video-5", "resp-respiration", "resp-respiratory-notes-video-5-copy"],
-    status: "source-only",
+    status: "published",
     emoji: "🫁",
     outline: [
       { title: "Respiratory System", points: [], sourceRefs: [{ sourceId: "resp-respiratory-notes-video-5-copy" }] },

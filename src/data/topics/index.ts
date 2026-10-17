@@ -8,6 +8,7 @@ import { bloodCoagulation } from '@/data/topics/blood-coagulation-and-fibrinolys
 import type { BuiltTopic } from '@/data/topics/build';
 import { cardiovascularGross } from '@/data/topics/cardiovascular-system-gross';
 import { cardiovascularPhysiology } from '@/data/topics/cardiovascular-physiology';
+import { respiratoryPhysiology } from '@/data/topics/respiratory-physiology';
 import { cholesterolAndBileBiosynthesis } from '@/data/topics/cholesterol-and-bile-biosynthesis';
 import { collagenAndElastin } from '@/data/topics/collagen-synthesis';
 import { fattyAcidBiosynthesis } from '@/data/topics/fatty-acid-biosynthesis';
@@ -23,4 +24,4 @@ import { upperLimb } from '@/data/topics/upper-limb';
 import { urinaryGross } from '@/data/topics/urinary-system-gross';
 
 // Anatomy topics are in HB2 Gross Anatomy course order.
-export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, upperLimb, cardiovascularGross, respiratoryGross, gastrointestinalGross, urinaryGross, headAndNeck, neuroanatomy];
+export const builtTopics: BuiltTopic[] = [fattyAcidBiosynthesis, cholesterolAndBileBiosynthesis, hemeMetabolism, oxygenCarriers, bloodCoagulation, hormones, inbornErrors, collagenAndElastin, cardiovascularPhysiology, respiratoryPhysiology, upperLimb, cardiovascularGross, respiratoryGross, gastrointestinalGross, urinaryGross, headAndNeck, neuroanatomy];
