@@ -23,7 +23,7 @@ import { Radius, ReadReceiptBlues, Type, type ThemeColors } from '@/constants/th
 import { hideMessage, isHidden, isStarred, previewOf, REACTIONS, reactToMessage, type ReplyRef, sendChatMessage, setTyping, toggleStar, togglePin, uploadChatDocument, useChatPrefs } from '@/data/chat';
 import { contrastRatio } from '@/data/contrast';
 import { deleteCommunityMessage, getOrCreateFriendConversation, listConversationMessages, loadConversationMeta, markConversationSeen, messageStatus, sendVoiceNote, VOICE_NOTE_MAX_SECONDS, type CommunityMessage, type ConversationMeta, type MessageStatus } from '@/data/community';
-import { FriendStreakNotice } from '@/components/chat/friend-streak-notice';
+import { FriendStreakNotice, useStreakNoticeHidden } from '@/components/chat/friend-streak-notice';
 import { StumpCard, StumpComposer, StumpUnavailable } from '@/components/social/stump-card';
 import type { ChoiceQuestion } from '@/data/questions';
 import { answerChatStump, chatStumpAnswers, pickStumpQuestion, stumpQuestion } from '@/data/stumps';
@@ -147,6 +147,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
     return () => { live = false; };
   }, [isGroup, friendId, user, messages.length, streakTick]);
   const streak = streakInfo?.streak ?? 0;
+  const streakNotice = useStreakNoticeHidden(isGroup ? '' : friendId, streakInfo);
   const typing = Boolean(meta?.otherTyping && now() - meta.otherTyping < 7000);
   const presence = isGroup ? `${group?.memberUids.length ?? 0} members${group?.description ? ` · ${group.description}` : ''}` : typing ? 'typing…' : meta?.otherOnline ? 'Active now' : meta?.otherLastSeen ? `Active ${ago(meta.otherLastSeen)}` : 'Messages with your friend';
   const last = visible[visible.length - 1];
@@ -321,13 +322,19 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
                 <Text style={styles.streak}>{streak}</Text>
               </View>
             ) : null}
+            {streakInfo?.lost && streakNotice.hidden ? (
+              <Interactive onPress={streakNotice.show} accessibilityRole="button" accessibilityLabel={`Your ${streakInfo.lost.streak}-day streak with ${title} ended. Restore it`} style={styles.restoreChip}>
+                <Icon name="streak" size={13} color={colors.warningStrong} />
+                <Text style={styles.restoreText}>Restore streak</Text>
+              </Interactive>
+            ) : null}
           </View>
           <Text style={[styles.presence, typing && styles.typing]} numberOfLines={1}>{presence}</Text>
         </View>
         <Interactive onPress={() => { setSearching((value) => !value); setSearch(''); }} accessibilityRole="button" accessibilityLabel="Search in this chat" style={styles.headButton}><Icon name="search" size={20} color={colors.text} /></Interactive>
         <Interactive onPress={() => (isGroup ? setGroupInfo(true) : openProfileCard(friendId))} accessibilityRole="button" accessibilityLabel={isGroup ? 'Group info' : `${title}'s profile`} style={styles.headButton}><Icon name="info" size={20} color={colors.text} /></Interactive>
       </View>
-      {!isGroup ? <FriendStreakNotice status={streakInfo} friendId={friendId} friendName={title} onChanged={() => setStreakTick((n) => n + 1)} /> : null}
+      {!isGroup ? <FriendStreakNotice status={streakInfo} friendId={friendId} friendName={title} onChanged={() => setStreakTick((n) => n + 1)} hidden={streakNotice.hidden} onHide={streakNotice.hide} /> : null}
       {searching ? <TextInput value={search} onChangeText={setSearch} placeholder="Search messages" placeholderTextColor={colors.textTertiary} accessibilityLabel="Search messages" style={styles.search} autoFocus /> : null}
       {pinned ? (
         <Interactive onPress={() => togglePin(chatId!, pinned.id)} accessibilityLabel="Pinned message. Tap to unpin" style={styles.pinned}>
@@ -476,7 +483,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
             value={draft}
             onChangeText={(text) => { setDraft(text); if (chatId) void setTyping(chatId, text.length > 0); }}
             placeholder="Message…"
-            placeholderTextColor={colors.textTertiary}
+            placeholderTextColor={colors.textSecondary}
             accessibilityLabel="Write a message"
             maxLength={500}
             multiline
@@ -650,6 +657,8 @@ function createStyles(colors: ThemeColors) {
     headName: { ...Type.headline, color: colors.text, flexShrink: 1 },
     streak: { fontSize: 13, fontWeight: '800', color: colors.accentText },
     streakBadge: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+    restoreChip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, borderWidth: 1, borderColor: colors.warningBorder, backgroundColor: colors.warningSubtle },
+    restoreText: { fontSize: 12, fontWeight: '600', color: colors.text },
     presence: { fontSize: 12.5, color: colors.textSecondary },
     typing: { color: colors.successText, fontWeight: '700' },
     headButton: { padding: 8, borderRadius: 999 },
@@ -714,7 +723,7 @@ function createStyles(colors: ThemeColors) {
     emojiPanel: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginHorizontal: 16, padding: 8, borderRadius: 16, backgroundColor: colors.surfaceMuted },
     emojiKey: { padding: 6, borderRadius: 10 },
     emojiText: { fontSize: 22 },
-    composer: { flexDirection: 'row', alignItems: 'center', gap: 6, margin: 12, paddingHorizontal: 8, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: colors.borderStrong, backgroundColor: colors.surfaceSunken },
+    composer: { flexDirection: 'row', alignItems: 'center', gap: 6, margin: 12, marginTop: 8, paddingHorizontal: 8, paddingVertical: 6, borderRadius: 999, borderWidth: 1.5, borderColor: colors.borderStrong, backgroundColor: colors.surface },
     tool: { padding: 8, borderRadius: 999 },
     emojiButton: { fontSize: 21 },
     input: { flex: 1, minHeight: 38, maxHeight: 120, paddingVertical: 8, paddingHorizontal: 6, color: colors.text, fontSize: 14.5, textAlignVertical: 'center', borderWidth: 0, ...(webStyle({ outlineStyle: 'none', outlineWidth: 0 }) as object) },

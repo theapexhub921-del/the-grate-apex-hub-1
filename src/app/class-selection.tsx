@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
@@ -24,12 +24,15 @@ export default function ClassSelectionScreen() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  // Already chose a class: go to Study. Only while this page is on screen — a
+  // visited page stays mounted as a hidden tab, and redirecting from there sent
+  // learners to Study from any tab whenever their account updated.
+  useFocusEffect(useCallback(() => {
     const saved = readClassSelection(user?.user_metadata);
     if (saved) {
       router.replace(routes.learnEnvironment(saved));
     }
-  }, [router, user]);
+  }, [router, user]));
 
   async function confirmSelection() {
     if (!classId || !semester || saving) return;

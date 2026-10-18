@@ -98,7 +98,9 @@ async function loadHistory() {
   loaded = true;
   notify();
 
-  await hydrateQuestionHistory();
+  // In the background, like the quiz history: a slow connection must never hold
+  // up recording an answer or finishing a quiz.
+  void hydrateQuestionHistory().catch((error) => console.log('Could not sync question history:', error));
 }
 
 async function saveLocalHistory() {

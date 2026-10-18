@@ -128,6 +128,7 @@ export const legacyLevel = (xp: number) => 1 + Math.floor(Math.max(0, xp) / 150)
 export type LegacyUnlock =
   | { unlocked: true }
   | { unlocked: false; kind: 'admin' }
+  | { unlocked: false; kind: 'premium' }
   | { unlocked: false; kind: 'achievement'; name: string; desc: string }
   | { unlocked: false; kind: 'level'; level: number };
 
@@ -141,6 +142,7 @@ export function legacyThemeUnlock(
   input: { xp: number; achievementLevels: Readonly<Record<string, number>>; isAdmin: boolean; achievement?: (id: string) => { name: string; desc: string } | undefined }
 ): LegacyUnlock {
   if (def.adminOnly && !input.isAdmin) return { unlocked: false, kind: 'admin' };
+  if (def.premium && !input.isAdmin) return { unlocked: false, kind: 'premium' };
   if (def.ach && (input.achievementLevels[def.ach] ?? 0) < 1) {
     const info = input.achievement?.(def.ach);
     return { unlocked: false, kind: 'achievement', name: info?.name ?? def.ach, desc: info?.desc ?? '' };
@@ -153,6 +155,7 @@ export function legacyThemeUnlock(
 export function legacyLockText(lock: Exclude<LegacyUnlock, { unlocked: true }>, emoji = true) {
   const lockMark = emoji ? '🔒 ' : '';
   if (lock.kind === 'admin') return `${lockMark}Admins only`;
+  if (lock.kind === 'premium') return `${lockMark}Premium theme — coming soon`;
   if (lock.kind === 'achievement') return `${lockMark}Earn the "${lock.name}" achievement: ${lock.desc}`;
   return `${lockMark}Unlocks at Level ${lock.level}`;
 }
