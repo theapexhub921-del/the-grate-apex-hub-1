@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, type ReactNode, useContext, useSyncExternalStore } from 'react';
 
-import { DEFAULT_EXPERIENCE, EXPERIENCES_ENABLED, type ExperienceId, isExperience } from '@/data/experience';
+import { DEFAULT_EXPERIENCE, EXPERIENCES_ENABLED, type ExperienceId, heldExperience, isExperience } from '@/data/experience';
 
 // The experience the interface is drawn in (The Originals, Originate, Hybrid).
 //
@@ -44,7 +44,8 @@ function subscribe(listener: () => void) {
 
 /** Called with the account's saved value (or null when signed out / not chosen). */
 export function setActiveExperience(value: unknown) {
-  const next = isExperience(value) ? value : null;
+  // Not saved on the account yet: the one chosen before the username, if any.
+  const next = isExperience(value) ? value : heldExperience();
   deviceRead = true; // a later device read must not override the account
   if (next === active) return;
   active = next;

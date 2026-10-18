@@ -53,12 +53,6 @@ export type ExperienceFont = { fontFamily: string; fontWeight: '400' | '500' | '
 
 export function experienceFont(experience: ExperienceId, style: FontInput, input = false): ExperienceFont | null {
   if (experience === 'originate') return null;
-  if (experience === 'hybrid') {
-    if (input) return null;
-    const family = legacyFontFamily(style);
-    if (family !== 'Poppins') return null;
-    return { fontFamily: WEB_STACK.Poppins, fontWeight: `${legacyWeight(style.fontWeight, 'Poppins')}` as ExperienceFont['fontWeight'] };
-  }
   const family = legacyFontFamily(style, input ? 'Roboto' : undefined);
   return { fontFamily: WEB_STACK[family], fontWeight: `${legacyWeight(style.fontWeight, family)}` as ExperienceFont['fontWeight'] };
 }

@@ -27,10 +27,8 @@ describe('original font rule (old-reference/src/Text.tsx)', () => {
     assert.equal(legacyWeight('600', 'Roboto'), 700);
     assert.equal(legacyWeight('900', 'Montserrat'), 800);
   });
-  it('Originate keeps its own fonts; Hybrid takes only the original headings; inputs are Roboto', () => {
+  it('Originate keeps its own fonts; inputs are Roboto', () => {
     assert.equal(experienceFont('originate', { fontSize: 30, fontWeight: '800' }), null);
-    assert.equal(experienceFont('hybrid', { fontSize: 15 }), null);
-    assert.match(experienceFont('hybrid', { fontSize: 22, fontWeight: '800' }).fontFamily, /^Poppins/);
     assert.match(experienceFont('originals', { fontSize: 30, fontWeight: '700' }, true).fontFamily, /^Roboto/);
   });
 });
@@ -120,7 +118,6 @@ describe('every theme in every experience, drawn the experience’s way', async 
   it('without a choice, The Originals uses the legacy theme and the others the newer one', () => {
     assert.equal(effectiveThemeFamily('originals', null), 'legacy');
     assert.equal(effectiveThemeFamily('originate', null), 'newer');
-    assert.equal(effectiveThemeFamily('hybrid', null), 'newer');
     assert.equal(effectiveThemeFamily('originals', 'newer'), 'newer');
     assert.equal(effectiveThemeFamily('originate', 'legacy'), 'legacy');
   });

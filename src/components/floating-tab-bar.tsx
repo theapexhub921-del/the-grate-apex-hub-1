@@ -5,7 +5,6 @@ import { Text } from '@/components/ui/text';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { LegacyIcon } from '@/components/experience/legacy-icon';
 import { activeNavPath, MOBILE_NAV_ITEMS, NavIconView } from '@/components/nav-items';
 import { useTabBarHidden } from '@/components/tab-bar-visibility';
 import { webStyle } from '@/components/ui/web';
@@ -106,7 +105,6 @@ function FloatingBar({ onNavigate }: { onNavigate: (route: string) => void }) {
   const hidden = mode === 'autoHide' && scrolledAway;
 
   const active = activeNavPath(pathname);
-  const hybrid = useExperience() === 'hybrid';
   const activeIndex = MOBILE_NAV_ITEMS.findIndex((item) => item.path === active);
   const learnIndex = MOBILE_NAV_ITEMS.findIndex((item) => item.path === '/learn');
 
@@ -160,12 +158,7 @@ function FloatingBar({ onNavigate }: { onNavigate: (route: string) => void }) {
               accessibilityLabel={item.accessibilityLabel}
               style={({ pressed }) => [styles.item, isLearn && styles.learnItem, pressed && styles.itemPressed]}
             >
-              {isLearn && hybrid ? (
-                // Hybrid: The Originals' raised Study button and book icon.
-                <View style={[styles.learnIcon, styles.learnHybrid, { borderColor: selected ? colors.accent : colors.surfaceElevated }, elevation(colors, 3)]}>
-                  <LegacyIcon name="book" size={26} color={colors.onPrimary} />
-                </View>
-              ) : isLearn ? (
+              {isLearn ? (
                 <View style={[styles.learnIcon, elevation(colors, 3)]}>
                   <NavIconView icon={item.icon} color={colors.onPrimary} size={26} active />
                 </View>
@@ -270,7 +263,6 @@ function createStyles(colors: ThemeColors) {
       justifyContent: 'center',
     },
     learnLabel: { paddingTop: 0 },
-    learnHybrid: { width: 62, height: 62, borderRadius: 31, top: -24 },
     itemPressed: { transform: [{ scale: 0.94 }] },
     label: { fontSize: 10.5, fontWeight: '700', color: colors.navInactive, letterSpacing: 0.2 },
     labelActive: { color: colors.navActive },

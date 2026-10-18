@@ -71,7 +71,7 @@ export function Button({
   // the filled (main) actions only, keeping this app's lift and shadow.
   const experience = useExperience();
   const originals = experience === 'originals';
-  const pill = originals || (experience === 'hybrid' && filled);
+  const pill = originals;
   const pillColor = variant === 'primary' ? colors.primary : variant === 'gold' || variant === 'apex' ? colors.accent : variant === 'danger' ? colors.error : null;
   const pillStyle = pill
     ? [

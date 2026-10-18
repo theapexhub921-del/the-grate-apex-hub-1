@@ -90,11 +90,12 @@ describe('timed boosts (never more than one hour)', () => {
 
 const { isExperience, needsExperience, EXPERIENCES, EXPERIENCES_ENABLED } = await import('@/data/experience');
 describe('app experience (no default)', () => {
-  it('has exactly three experiences', () => assert.deepEqual([...EXPERIENCES], ['originals', 'originate', 'hybrid']));
+  it('has exactly two experiences (Hybrid was removed)', () => assert.deepEqual([...EXPERIENCES], ['originals', 'originate']));
   it('asks only when the switch is on, the profile was read and no valid choice is saved', () => {
     assert.equal(needsExperience({}, true, true), true);
     assert.equal(needsExperience({ experience: 'nonsense' }, true, true), true);
-    assert.equal(needsExperience({ experience: 'hybrid' }, true, true), false);
+    assert.equal(needsExperience({ experience: 'originate' }, true, true), false);
+    assert.equal(needsExperience({ experience: 'hybrid' }, true, true), true, 'a removed interface is chosen again');
     assert.equal(needsExperience({}, false, true), false, 'profile not read: never guess');
     assert.equal(needsExperience({}, true, false), false, 'switch off: nobody is asked');
     assert.equal(isExperience('originate'), true);

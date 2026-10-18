@@ -7,7 +7,7 @@ const { pageBackdrops, rawThemeColors, surfacesFor, themeColorsFor } = await imp
 const { worstContrast } = await import('@/data/contrast');
 const { THEME_CATALOG } = await import('@/data/theme-catalog');
 
-const EXPERIENCES = ['originals', 'originate', 'hybrid'];
+const EXPERIENCES = ['originals', 'originate'];
 const CHECKS = [
   ['text', 'content', 4.5], ['textSecondary', 'content', 4.5], ['textTertiary', 'content', 3], ['primaryText', 'content', 3],
   ['accentText', 'content', 3], ['error', 'content', 3], ['onPrimary', 'primary', 4.5], ['tabActive', 'nav', 3], ['navInactive', 'nav', 3],

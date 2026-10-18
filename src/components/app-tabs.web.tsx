@@ -10,7 +10,6 @@ import { COLLAPSED_WIDTH, DesktopSidebar } from '@/components/desktop-sidebar';
 import { LegacyBackground } from '@/components/experience/legacy-background';
 import { LEGACY_DESKTOP_MIN, LegacyFloatingBar, LegacySidebar, useOriginalAutoHide } from '@/components/experience/legacy-navigation';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
-import { HomeGreetingWallpaper } from '@/components/social/home-greeting-wallpaper';
 import { NAV_ITEMS } from '@/components/nav-items';
 import { PageTitle } from '@/components/page-title';
 import { webStyle } from '@/components/ui/web';
@@ -63,7 +62,6 @@ export default function AppTabs() {
       {/* Originate: the atmosphere. The Originals and Hybrid: the original
           app's gradient background (see experience/legacy-background). */}
       {experience === 'originate' ? <Atmosphere mood={mood} /> : <LegacyBackground lively={mood === 'lively' || mood === 'expressive'} />}
-      {(segments[0] as string | undefined) === 'index' && experience === 'hybrid' ? <HomeGreetingWallpaper /> : null}
 
       {useRail && !originals ? <DesktopSidebar docked={docked} /> : null}
 

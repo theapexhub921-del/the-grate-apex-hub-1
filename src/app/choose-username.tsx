@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/interactive';
 import { PageHeader, Screen } from '@/components/ui/screen';
 import { Radius, type ThemeColors, Type } from '@/constants/theme';
+import { saveHeldExperience } from '@/data/experience';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { chooseUsername } from '@/lib/accounts';
@@ -36,6 +37,8 @@ export default function ChooseUsernameScreen() {
     setError(null);
     try {
       await chooseUsername(cleaned);
+      // The interface chosen just before this step can now be saved on the account.
+      await saveHeldExperience().catch(() => undefined);
       // The guard moves on as soon as the saved profile arrives.
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : 'Your username could not be saved. Please try again.');

@@ -9,7 +9,6 @@ import { useAtmosphereMood } from '@/components/atmosphere/config';
 import { LegacyBackground } from '@/components/experience/legacy-background';
 import { LegacyFloatingBar } from '@/components/experience/legacy-navigation';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
-import { HomeGreetingWallpaper } from '@/components/social/home-greeting-wallpaper';
 import { NAV_ITEMS } from '@/components/nav-items';
 import { MOTION } from '@/constants/motion';
 import { useExperience } from '@/hooks/use-experience';
@@ -40,7 +39,6 @@ export default function AppTabs() {
     <View style={styles.shell}>
       <OnlinePresenceSync />
       {experience === 'originate' ? <Atmosphere mood={mood} /> : <LegacyBackground lively={mood === 'lively' || mood === 'expressive'} />}
-      {(segments[0] as string | undefined) === 'index' && experience === 'hybrid' ? <HomeGreetingWallpaper /> : null}
       <Tabs
         // Back (incl. Android back button) returns to the page you came from.
         backBehavior="history"

@@ -1,5 +1,6 @@
 // The learner's app experience: Legacy (id 'originals', formerly named
-// "The Originals"), Originate or Hybrid
+// "The Originals") or Originate (Hybrid was removed on 2026-10-18; a learner who
+// had it is asked to choose again)
 // (docs/experiences-architecture.md). An interface choice only — it never
 // changes data, and it is independent of Appearance (themes).
 //
@@ -9,7 +10,7 @@
 /** On: every signed-in learner chooses once (no default); Settings → Experience changes it. */
 export const EXPERIENCES_ENABLED = true;
 
-export const EXPERIENCES = ['originals', 'originate', 'hybrid'] as const;
+export const EXPERIENCES = ['originals', 'originate'] as const;
 export type ExperienceId = (typeof EXPERIENCES)[number];
 
 export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: string }> = {
@@ -18,10 +19,6 @@ export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: stri
     summary: 'The original GrAte Apex Hub, as it was: its colours, emoji, fonts, glass panels, gradient background and navigation — with every new feature inside it.',
   },
   originate: { name: 'Originate', summary: 'The new GrAte Apex Hub design: its themes, layouts, icons and sidebar, in a clean, simple style.' },
-  hybrid: {
-    name: 'Hybrid',
-    summary: 'The best of both: the new layouts, navigation and icons, with the original gradient background, glass panels, pill buttons and headings.',
-  },
 };
 
 /** The default experience: shown until a learner chooses, and preselected in the chooser. */
@@ -36,9 +33,29 @@ export function needsExperience(profile: Record<string, unknown> | undefined, pr
   return enabled && profileLoaded && !isExperience(profile?.experience);
 }
 
+// A new learner chooses the interface before the username. A new Google account
+// has no account record yet (the rules create it together with the username),
+// so the choice is held here, the app is drawn in it, and it is saved on the
+// account right after the username is chosen (choose-username).
+let held: ExperienceId | null = null;
+
+/** The interface chosen before the account could store it, if any. */
+export function heldExperience() {
+  return held;
+}
+
+export function holdExperience(experience: ExperienceId) {
+  held = experience;
+}
+
+/** Saves a held choice on the account (after the username exists). Kept held until the profile reloads with it. */
+export async function saveHeldExperience() {
+  if (held) await saveExperience(held);
+}
+
 /** Saves the choice on the account. Throws when it can't be saved. */
 export async function saveExperience(experience: ExperienceId) {
-  if (!isExperience(experience)) throw new Error('Choose one of the three interfaces.');
+  if (!isExperience(experience)) throw new Error('Choose one of the two interfaces.');
   const { updateCurrentProfile } = await import('@/lib/profiles'); // loaded on use: keeps this module testable
   const { error } = await updateCurrentProfile({ experience });
   if (error) {
