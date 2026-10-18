@@ -26,7 +26,7 @@ export function LearningSync() {
   const colors = useTheme();
   const styles = useThemedStyles(createStyles);
   const latestLearning = useRef({ memory, historyReady });
-  latestLearning.current = { memory, historyReady };
+  useEffect(() => { latestLearning.current = { memory, historyReady }; }, [memory, historyReady]);
   const [online, setOnline] = useState(() => Platform.OS !== 'web' || typeof navigator === 'undefined' || navigator.onLine);
 
   useEffect(() => {

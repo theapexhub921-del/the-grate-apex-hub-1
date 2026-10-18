@@ -45,7 +45,7 @@ export function ApexCoinWalletCard({
   }, [user]);
 
   useEffect(() => {
-    void refresh();
+    queueMicrotask(() => { void refresh(); });
     const timer = setInterval(() => void refresh(), 60_000);
     return () => clearInterval(timer);
   }, [refresh]);

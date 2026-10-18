@@ -27,7 +27,7 @@ export function OfflineStudyCard() {
     setSaved(await savedForClass(selection));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId, semester]);
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => { queueMicrotask(() => { void refresh(); }); }, [refresh]);
 
   if (!offlineSupported()) {
     return <Text style={styles.description}>Saving study material for offline use works in the web app. Open GrAte Apex Hub in your browser, or install it from the browser menu, to use it.</Text>;

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { clock, useVoiceRecorder, VoiceNotePlayer, voiceNotesSupported } from '@/components/social/voice-note';
@@ -23,14 +23,14 @@ export function VoiceClipRecorder({ clip, onClip, compact = false }: { clip: Voi
   const colors = useTheme();
   const stopRef = useRef<() => void>(() => {});
   const recorder = useVoiceRecorder(() => stopRef.current());
-  if (!voiceNotesSupported()) return null;
 
   // Two minutes is the most a note can be; reaching it stops the recording and keeps it.
   async function stop() {
     const result = await recorder.finish();
     if (result) onClip({ blob: result.blob, seconds: result.seconds, previewUrl: URL.createObjectURL(result.blob) });
   }
-  stopRef.current = () => { void stop(); };
+  useEffect(() => { stopRef.current = () => { void stop(); }; });
+  if (!voiceNotesSupported()) return null;
 
   function remove() {
     if (clip) discardVoiceClip(clip);

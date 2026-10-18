@@ -122,13 +122,13 @@ function LessonPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lesson?.id, classLocked]);
 
-  const concepts = useMemo(() => {
-    if (!foundLesson || !foundTopic) return [];
-    return foundLesson.concepts.filter(isTrackableConcept).map((concept) => ({
-      concept,
-      memory: memory.concepts.get(conceptKey(foundTopic.id, concept.id)),
-    }));
-  }, [foundLesson, foundTopic, memory]);
+  // (No useMemo: the React Compiler memoises this, and a hand-written list stopped it.)
+  const concepts = !foundLesson || !foundTopic
+    ? []
+    : foundLesson.concepts.filter(isTrackableConcept).map((concept) => ({
+        concept,
+        memory: memory.concepts.get(conceptKey(foundTopic.id, concept.id)),
+      }));
 
   if (!found || !lesson) {
     return (

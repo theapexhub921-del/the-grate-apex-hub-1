@@ -28,12 +28,17 @@ export function GiftBoostSheet({ visible, onClose, boostId }: { visible: boolean
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
 
-  useEffect(() => {
-    if (!visible) return;
-    setChosen(boostId ?? null);
-    setFriend(null);
-    setMessage(null);
-  }, [visible, boostId]);
+  // Each time the sheet opens, start fresh (reset while drawing, not in an effect).
+  const openKey = visible ? `open:${boostId ?? ''}` : null;
+  const [shownFor, setShownFor] = useState<string | null>(null);
+  if (openKey !== shownFor) {
+    setShownFor(openKey);
+    if (openKey) {
+      setChosen(boostId ?? null);
+      setFriend(null);
+      setMessage(null);
+    }
+  }
 
   const friends = social.people.filter((person) => person.relationship === 'friends');
   const boost = inventory.find((item) => item.id === chosen) ?? null;

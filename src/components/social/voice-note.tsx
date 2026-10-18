@@ -148,12 +148,14 @@ export function VoiceNotePlayer({
   const [at, setAt] = useState(0);
   const [speed, setSpeed] = useState<1 | 1.5 | 2>(1);
   const [waveform] = useState<number[]>(() => seedWaveform(url));
+  // The recording's real length once the browser knows it (read in an event, never while drawing).
+  const [mediaDuration, setMediaDuration] = useState<number | null>(null);
 
   // raf tick → smooth progress
-  const tick = useCallback(() => {
+  const tick = useCallback(function step() {
     const el = audio.current;
     if (el) setAt(el.currentTime);
-    rafRef.current = requestAnimationFrame(tick);
+    rafRef.current = requestAnimationFrame(step);
   }, []);
 
   const stopRaf = useCallback(() => {
@@ -174,6 +176,7 @@ export function VoiceNotePlayer({
     if (!audio.current) {
       const el = new Audio(url);
       el.playbackRate = speed;
+      el.onloadedmetadata = () => { if (Number.isFinite(el.duration) && el.duration > 0) setMediaDuration(el.duration); };
       el.onended = () => {
         setPlaying(false);
         setAt(0);
@@ -227,7 +230,7 @@ export function VoiceNotePlayer({
     if (audio.current) audio.current.playbackRate = next;
   }
 
-  const duration = (audio.current?.duration) || seconds;
+  const duration = mediaDuration || seconds;
   const share = duration > 0 ? Math.min(1, at / duration) : 0;
   const filledBars = Math.round(share * BAR_COUNT);
   const displayTime = playing || at > 0 ? at : seconds;
