@@ -18,7 +18,7 @@ import { DeviceNotificationBridge } from '@/components/notifications';
 import { PageTitle } from '@/components/page-title';
 import { StreakCelebrationWatcher } from '@/components/streak-celebration-watcher';
 import { EXPERIENCES_ENABLED, heldExperience, needsExperience } from '@/data/experience';
-import { needsOnboarding, useOnboardingState } from '@/data/onboarding';
+import { needsOnboarding, saveHeldSignUpConsent, useOnboardingState } from '@/data/onboarding';
 import { useFontSizePreference, usePageZoomPreference } from '@/data/settings';
 import { applyWebFontScale } from '@/lib/web-font-scaling';
 import { readClassSelection } from '@/data/class-curriculum';
@@ -50,6 +50,14 @@ function AppGuard({ children }: { children: ReactNode }) {
   const segments = useSegments();
   const router = useRouter();
   const onboarding = useOnboardingState();
+
+  // A Terms tick given on the sign-up form before "Continue with Google" is
+  // saved once the new account has a username (and so a users document).
+  const accountReady = !!session && session.user.profileLoaded && !needsUsername(session.user.profile?.username);
+  const accountUid = session?.user.id;
+  useEffect(() => {
+    if (accountReady) void saveHeldSignUpConsent();
+  }, [accountReady, accountUid]);
 
   useEffect(() => {
     // Don't redirect until the session state is known.
