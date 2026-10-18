@@ -57,7 +57,7 @@ import { useExperience } from '@/hooks/use-experience';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { themeColorsFor, useTheme, useThemedStyles, useThemeFamily } from '@/hooks/use-theme';
 import { legacyAtmosphere, paletteGradient } from '@/data/theme-portrayal';
-import { deleteMyAccount, FULL_ACCOUNT_DELETION } from '@/lib/account';
+import { deleteConfirmationFor, deleteMyAccount, FULL_ACCOUNT_DELETION } from '@/lib/account';
 import { updateCurrentProfile } from '@/lib/profiles';
 import { routes } from '@/lib/routes';
 import { signOut } from 'firebase/auth';
@@ -131,6 +131,8 @@ export default function SettingsScreen() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deletePassword, setDeletePassword] = useState('');
+  const deleteConfirmation = deleteConfirmationFor();
   const [resetProgressOpen, setResetProgressOpen] = useState(false);
   const [resettingProgress, setResettingProgress] = useState(false);
   const [resetProgressError, setResetProgressError] = useState<string | null>(null);
@@ -180,13 +182,20 @@ export default function SettingsScreen() {
     if (deleting) return;
     setDeleting(true);
     setDeleteError(null);
-    const { error } = await deleteMyAccount();
+    const { error } = await deleteMyAccount({ password: deletePassword });
     setDeleting(false);
     if (error) {
       setDeleteError(error);
       return;
     }
+    setDeletePassword('');
     router.replace('/login');
+  }
+
+  function closeDelete() {
+    setDeleteOpen(false);
+    setDeleteError(null);
+    setDeletePassword('');
   }
 
   async function handleResetProgress() {
@@ -560,8 +569,27 @@ export default function SettingsScreen() {
         </View>
       </SettingsSection>
 
-      <Sheet visible={deleteOpen} onClose={() => { if (!deleting) { setDeleteOpen(false); setDeleteError(null); } }} title="Delete your account?" subtitle="This action cannot be undone." footer={<View style={styles.confirmActions}><Button label="Cancel" variant="secondary" onPress={() => { setDeleteOpen(false); setDeleteError(null); }} disabled={deleting} /><Button label="Delete account" variant="danger" onPress={() => void handleDeleteAccount()} loading={deleting} /> </View>}>
+      <Sheet visible={deleteOpen} onClose={() => { if (!deleting) closeDelete(); }} title="Delete your account?" subtitle="This action cannot be undone." footer={<View style={styles.confirmActions}><Button label="Cancel" variant="secondary" onPress={closeDelete} disabled={deleting} /><Button label={deleteConfirmation === 'google' ? 'Confirm with Google and delete' : 'Delete account'} variant="danger" onPress={() => void handleDeleteAccount()} loading={deleting} disabled={deleteConfirmation === 'password' && !deletePassword} /> </View>}>
         <Text style={styles.optionDescription}>{FULL_ACCOUNT_DELETION ? 'Your profile, learning progress, XP, quiz and review history, friends, posts, messages and notifications will be permanently erased.' : 'Your sign-in and your private learning progress will be deleted now. Your public profile, username, leaderboard entry and what you shared stay until the GrAte Apex Hub team removes them — email theapexhub921@gmail.com first to ask for that.'}</Text>
+        {deleteConfirmation === 'password' ? (
+          <TextInput
+            style={[styles.nameInput, styles.deletePassword]}
+            value={deletePassword}
+            onChangeText={(text) => { setDeletePassword(text); setDeleteError(null); }}
+            onSubmitEditing={() => { if (deletePassword) void handleDeleteAccount(); }}
+            placeholder="Your password, to confirm"
+            placeholderTextColor={colors.textTertiary}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="current-password"
+            returnKeyType="done"
+            editable={!deleting}
+            accessibilityLabel="Your password, to confirm deleting your account"
+          />
+        ) : deleteConfirmation === 'google' ? (
+          <Text style={styles.optionDescription}>To confirm it is you, a Google window opens when you press delete.</Text>
+        ) : null}
         {deleteError ? <Text style={styles.signOutText}>{deleteError}</Text> : null}
       </Sheet>
 
@@ -725,6 +753,7 @@ function createStyles(colors: ThemeColors) {
     optionLabelSelected: { color: colors.primaryText },
     optionDescription: { fontSize: 13, lineHeight: 18, color: colors.textSecondary, marginTop: 2 },
     nameInputRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 },
+    deletePassword: { flex: 0, marginTop: 12 },
     nameInput: {
       flex: 1,
       minHeight: 46,

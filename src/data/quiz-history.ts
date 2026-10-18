@@ -162,9 +162,11 @@ async function loadHistory() {
     console.log('Could not load quiz history:', error);
   }
 
-  // Start cloud hydration after local loading so a network problem never
-  // prevents the quiz/history screens from using their local data.
-  await hydrateQuizHistory();
+  // The cloud merge runs in the background after local loading: it downloads the
+  // account's attempts and uploads missing ones one by one, and a slow or absent
+  // connection must never hold up saving a finished quiz (that stopped the
+  // results page from opening). Listeners are notified when it lands.
+  void hydrateQuizHistory().catch((error) => console.log('Could not sync quiz history:', error));
 }
 
 async function saveLocalHistory() {
