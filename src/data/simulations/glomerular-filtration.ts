@@ -26,7 +26,7 @@ export type FiltrationState = SimState & {
 const RA = 0.45;
 const DOWN = 0.55; // efferent + downstream
 const KF = 12.5;
-const SNS = [1, 1.6, 3.2];
+const SNS = [1, 1.15, 1.6];
 
 function model(values: Record<string, number>): FiltrationState {
   const { map, auto, sympathetic, chp, bcop } = values;

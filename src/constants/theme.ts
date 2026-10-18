@@ -435,6 +435,9 @@ export const Anatomy = {
   urine: '#EBCB55',
   urineDark: '#C9A22A',
   mucosa: '#EFA7A0',
+  nucleus: '#6E4F8C',
+  mitochondria: '#D98B5F',
+  tracer: '#2F9E7A',
   outline: '#4A2A2E',
 } as const;
 
