@@ -321,7 +321,15 @@ export type SimulationId =
   | 'o2-dissociation'
   | 'vq-matching'
   | 'breathing-control'
-  | 'altitude-hypoxia';
+  | 'altitude-hypoxia'
+  // Renal Physiology
+  | 'renal-vessels'
+  | 'glomerular-filtration'
+  | 'glucose-tm'
+  | 'urine-concentration'
+  | 'renal-clearance'
+  | 'micturition'
+  | 'acid-base';
 
 // What the model must show after a prediction is run (checked by
 // tests/simulations.test.mjs, so a prediction's answer always matches

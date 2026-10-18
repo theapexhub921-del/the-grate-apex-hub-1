@@ -2,6 +2,7 @@
 // Source: the "Renal System" lecture deck (rs in sources.ts).
 import type { LessonDraft } from '@/data/topics/build';
 import { interactive, readingExtras } from '@/data/topics/renal-physiology/interactive';
+import { withSimulation } from '@/data/topics/renal-physiology/simulations';
 import { rs, type ConceptId } from '@/data/topics/renal-physiology/sources';
 
 type Draft = LessonDraft<ConceptId>;
@@ -683,5 +684,5 @@ const lesson7: Draft = {
 export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7].map((lesson) => ({
   ...lesson,
   ...readingExtras[lesson.id],
-  interactive: interactive[lesson.id],
+  interactive: withSimulation(lesson.id, interactive[lesson.id]),
 }));
