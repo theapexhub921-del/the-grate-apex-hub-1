@@ -79,6 +79,7 @@ export const vqMatching: SimDefinition<VqState> = {
     { key: 'kind', label: 'This alveolus', noDelta: true, text: (v) => VQ_KINDS[v] ?? '' },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'matched', label: 'Matched (V/Q = 1)', values: START, caption: 'Ventilation and blood flow match: blood leaves with PO₂ about 100 and PCO₂ 40.' },
     { id: 'shunt', label: 'Blocked airway (V/Q = 0)', values: { vq: 0, membrane: 0 }, caption: 'No air reaches the alveolus: blood leaves as venous blood, PO₂ 40, PCO₂ 46.' },

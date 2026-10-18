@@ -65,3 +65,21 @@ export function Caption({ x, y, text, anchor = 'start', tone = 'secondary', size
     </SvgText>
   );
 }
+
+// A name tag on an illustration: text on a soft rounded backing so it stays
+// readable over tissue. Width is estimated from the text length.
+export function Tag({ x, y, text, anchor = 'middle', tone = 'primary', size = 11 }: { x: number; y: number; text: string; anchor?: 'start' | 'middle' | 'end'; tone?: 'primary' | 'error' | 'success' | 'warning'; size?: number }) {
+  const colors = useTheme();
+  const w = text.length * size * 0.56 + 12;
+  const h = size + 9;
+  const left = anchor === 'start' ? x : anchor === 'end' ? x - w : x - w / 2;
+  const fill = { primary: colors.text, error: colors.error, success: colors.successText, warning: colors.warningText }[tone];
+  return (
+    <G>
+      <Rect x={left} y={y - h / 2} width={w} height={h} rx={h / 2} fill={colors.surface} opacity={0.92} stroke={colors.border} strokeWidth={1} />
+      <SvgText x={left + w / 2} y={y + size * 0.36} fontSize={size} fontWeight="700" fill={fill} textAnchor="middle">
+        {text}
+      </SvgText>
+    </G>
+  );
+}

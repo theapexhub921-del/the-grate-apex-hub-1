@@ -83,6 +83,7 @@ export const breathingControl: SimDefinition<ControlState> = {
     { key: 'narcosis', label: 'CNS', noDelta: true, text: (v) => (v ? 'CO₂ narcosis' : 'Normal') },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'rest', label: 'At rest', values: START, caption: 'PCO₂ 40, PO₂ 100: about 6 L/min, driven mainly by the central chemoreceptors.' },
     { id: 'co2', label: 'Rebreathing CO₂', values: { ...START, paco2: 50 }, caption: 'A rise in CO₂ raises CSF H⁺: breathing increases steeply.' },

@@ -96,6 +96,7 @@ export const altitudeHypoxia: SimDefinition<AltitudeState> = {
     { key: 'paco2', label: 'Arterial PCO₂', unit: 'mmHg', hidden: true },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'sea', label: 'Sea level', values: START, caption: 'Breathing air at sea level: PO₂ about 100, saturation about 97%.' },
     { id: 'mountain', label: '5000 m, just arrived', values: { ...START, altitude: 5000 }, caption: 'Low barometric pressure: hypoxic hypoxia and cyanosis.' },

@@ -55,6 +55,7 @@ export const alveolarVentilation: SimDefinition<VentilationState> = {
     { key: 'perBreath', label: 'Fresh air per breath', unit: 'ml' },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'rest', label: 'Quiet breathing', values: START, caption: '500 ml × 12 = 6 L/min, but only 350 ml of each breath reaches the alveoli.' },
     { id: 'shallow', label: 'Rapid, shallow', values: { ...START, rate: 24, tidal: 250 }, caption: 'Same minute volume, but most of each breath is dead space.' },

@@ -97,6 +97,7 @@ export const o2Dissociation: SimDefinition<DissociationState> = {
     { key: 'dissolvedPct', label: 'Carried dissolved', unit: '%', decimals: 1 },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'normal', label: 'Arterial blood', values: START, caption: 'At 100 mmHg haemoglobin is nearly saturated; only about 1% of the O₂ is dissolved.' },
     { id: 'venous', label: 'Venous blood', values: { ...START, po2: 40 }, caption: 'At 40 mmHg haemoglobin is still about 75% saturated — a reserve.' },

@@ -1,52 +1,58 @@
 import { View } from 'react-native';
-import { Rect } from 'react-native-svg';
+import { Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
+import { Anatomy as A } from '@/constants/theme';
 import { type VentilationState } from '@/data/simulations/alveolar-ventilation';
-import { useTheme } from '@/hooks/use-theme';
 
-import { Bars, Caption } from './kit';
-import { Canvas, Legend, type GraphicProps } from './shared';
+import { AlveolarCluster, mix } from './anatomy/cells';
+import { Diaphragm, Heart, Lungs, Torso, useSvgIds } from './anatomy/lungs';
+import { Tag } from './kit';
+import { Canvas, type GraphicProps } from './shared';
 
 const W = 400;
 const H = 300;
 
-// One breath as a bar split into dead space and fresh alveolar air, then
-// the per-minute totals.
-export function AlveolarVentilationGraphic({ state, baseline }: GraphicProps<VentilationState>) {
-  const colors = useTheme();
-  const scale = 300 / 1500;
-  const deadW = Math.min(state.tidal, state.dead) * scale;
-  const freshW = state.perBreath * scale;
+// Breathing at the chosen rate and depth. Each breath fills the airways
+// (and any snorkel) first — that air never reaches the alveoli — and only
+// the rest freshens the alveoli, shown magnified on the right.
+export function AlveolarVentilationGraphic({ state, time, reduceMotion }: GraphicProps<VentilationState>) {
+  const id = useSvgIds('av');
+  const period = 60 / Math.max(1, state.rate);
+  const phase = reduceMotion ? 1 : (1 - Math.cos((2 * Math.PI * time) / period)) / 2;
+  const fraction = state.tidal > 0 ? state.perBreath / state.tidal : 0;
+  const inflate = 0.1 + phase * Math.min(1.2, state.tidal / 900);
+  const snorkel = (state.dead - 150) / 500; // 0–1
+  const airwayAir = mix(A.cartilageShade, A.airDeep, phase);
+  const fresh = Math.min(1, state.readouts.alveolar / 8);
 
   return (
-    <View style={{ gap: 10 }}>
-      <Canvas width={W} height={H} label={`Each breath ${Math.round(state.tidal)} ml: ${Math.round(Math.min(state.tidal, state.dead))} ml dead space, ${Math.round(state.perBreath)} ml to the alveoli. Alveolar ventilation ${state.readouts.alveolar.toFixed(1)} L/min.`}>
-        <Caption x={20} y={24} text={`One breath: ${Math.round(state.tidal)} ml × ${Math.round(state.rate)} breaths a minute`} tone="primary" />
-        <Rect x={20} y={36} width={300} height={34} rx={8} fill={colors.surfaceMuted} />
-        <Rect x={20} y={36} width={deadW} height={34} rx={8} fill={colors.textTertiary} opacity={0.6} />
-        <Rect x={20 + deadW} y={36} width={freshW} height={34} rx={8} fill={colors.primary} opacity={0.85} />
-        <Caption x={20} y={88} text={`Dead space ${Math.round(Math.min(state.tidal, state.dead))} ml`} tone="tertiary" size={11} />
-        <Caption x={320} y={88} anchor="end" text={`To the alveoli ${Math.round(state.perBreath)} ml`} size={11} />
-
-        <Bars
-          x={20}
-          y={120}
-          width={W - 20}
-          labelWidth={130}
-          rows={[
-            { label: 'Minute volume', value: state.readouts.minute, baseline: baseline.readouts.minute, max: 30, color: colors.textSecondary, text: `${state.readouts.minute.toFixed(1)} L` },
-            { label: 'Alveolar ventilation', value: state.readouts.alveolar, baseline: baseline.readouts.alveolar, max: 30, color: colors.primary, text: `${state.readouts.alveolar.toFixed(1)} L` },
-            { label: 'Wasted (dead space)', value: state.readouts.deadVent, baseline: baseline.readouts.deadVent, max: 30, color: colors.warning, text: `${state.readouts.deadVent.toFixed(1)} L` },
-          ]}
-        />
-        <Caption x={20} y={240} text="Per minute. Dashed marks: before your change." tone="tertiary" size={11} />
+    <View>
+      <Canvas width={W} height={H} label={`${Math.round(state.rate)} breaths a minute of ${Math.round(state.tidal)} ml: ${Math.round(Math.min(state.tidal, state.dead))} ml stays in the airways${snorkel > 0 ? ' and snorkel' : ''}, ${Math.round(state.perBreath)} ml reaches the alveoli.`}>
+        <Defs>
+          <LinearGradient id={id('tube')} x1="0" y1="0" x2="1" y2="0">
+            <Stop offset="0" stopColor={A.boneShade} />
+            <Stop offset="0.5" stopColor="#FFFFFF" />
+            <Stop offset="1" stopColor={A.boneShade} />
+          </LinearGradient>
+        </Defs>
+        <G transform="translate(4 56) scale(0.98)">
+          <Torso />
+          <Diaphragm inflate={inflate} />
+          <Heart />
+          <Lungs inflate={inflate} lumen={airwayAir} fresh={phase * fraction} />
+        </G>
+        {snorkel > 0 ? (
+          <G>
+            <Rect x={110} y={56 - 120 * snorkel} width={12} height={120 * snorkel + 4} rx={4} fill={`url(#${id('tube')})`} stroke={A.boneShade} />
+            <Rect x={113} y={56 - 120 * snorkel} width={6} height={(120 * snorkel + 4) * phase} fill={A.airDeep} opacity={0.8} />
+            <Tag x={160} y={Math.max(14, 50 - 120 * snorkel)} text={`Snorkel +${Math.round(state.dead - 150)} ml`} size={10} anchor="start" tone="error" />
+          </G>
+        ) : null}
+        <Tag x={160} y={snorkel > 0 ? 70 : 40} text="Airways: dead space 150 ml" size={10} anchor="start" />
+        <AlveolarCluster cx={330} cy={170} size={54} inflate={inflate} fresh={fresh} />
+        <Tag x={330} y={246} text="Alveoli" />
+        <Tag x={330} y={268} text={`${Math.round(state.perBreath)} ml fresh per breath`} size={10} tone={state.perBreath < 200 ? 'error' : 'primary'} />
       </Canvas>
-      <Legend
-        items={[
-          { label: 'Fresh air to alveoli', color: colors.primary },
-          { label: 'Dead space', color: colors.textTertiary },
-        ]}
-      />
     </View>
   );
 }

@@ -398,6 +398,46 @@ export const Type = {
 // every theme (components/learning/figure-view.tsx).
 export const Paper = '#FFFFFF';
 
+// Tissue colours for the illustrated organs in lesson simulations
+// (lungs, kidney, bladder, eye, ear...). Real tissue looks the same in
+// light and dark mode, so these do not change with the theme.
+export const Anatomy = {
+  lung: '#E9A3A1',
+  lungLight: '#F8D3CC',
+  lungDark: '#B9616A',
+  lungEdge: '#8E3F4C',
+  cartilage: '#F2E7D6',
+  cartilageShade: '#C8B394',
+  lumen: '#5E1F2C',
+  bone: '#F1E7D3',
+  boneShade: '#C9B796',
+  muscle: '#C04E50',
+  muscleLight: '#E07C74',
+  muscleDark: '#7D2A33',
+  skin: '#E9BC9C',
+  skinShade: '#C48E6E',
+  fat: '#F3DA8E',
+  nerve: '#F0D96A',
+  nerveDark: '#B89A2C',
+  artery: '#D3343A',
+  arteryDark: '#8E1C24',
+  vein: '#5C4A9E',
+  veinDark: '#36296B',
+  bloodOxy: '#D12F35',
+  bloodDeoxy: '#6C2A5E',
+  air: '#D8ECF7',
+  airDeep: '#9CC7E2',
+  pleura: '#CFE3EF',
+  kidney: '#A8443F',
+  kidneyLight: '#D07466',
+  kidneyDark: '#6E2420',
+  medulla: '#8E3434',
+  urine: '#EBCB55',
+  urineDark: '#C9A22A',
+  mucosa: '#EFA7A0',
+  outline: '#4A2A2E',
+} as const;
+
 export const Radius = {
   xs: 8,
   sm: 12,

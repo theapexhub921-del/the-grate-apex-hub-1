@@ -1,54 +1,38 @@
 import { View } from 'react-native';
-import { Circle, Line, Path } from 'react-native-svg';
+import { G } from 'react-native-svg';
 
 import { CONDITIONS, type ComplianceState } from '@/data/simulations/lung-compliance';
-import { useTheme } from '@/hooks/use-theme';
 
-import { Caption } from './kit';
-import { Axes, Canvas, Legend, linear, pathOf, type GraphicProps } from './shared';
+import { AlveolarCluster } from './anatomy/cells';
+import { Diaphragm, Heart, Lungs } from './anatomy/lungs';
+import { Tag } from './kit';
+import { Canvas, type GraphicProps } from './shared';
 
 const W = 400;
 const H = 300;
-const L = 54;
-const R = 270;
-const T = 24;
-const B = 240;
+const BREATH = 4;
+const KIND = ['normal', 'fibrosis', 'oedema', 'emphysema'] as const;
 
-export function LungComplianceGraphic({ state, baseline }: GraphicProps<ComplianceState>) {
-  const colors = useTheme();
-  const x = linear([0, 10], [L, R]);
-  const y = linear([0, 1500], [B, T]);
-  const line = (c: number): [number, number][] => [
-    [0, 0],
-    [Math.min(10, 1500 / c), Math.min(1500, c * 10)],
-  ];
-  // An alveolus: open with surfactant, shrinking as surface tension rises.
-  const radius = Math.max(8, 44 - (state.collapse - 100) / 8);
-  const baseRadius = Math.max(8, 44 - (baseline.collapse - 100) / 8);
+// The lungs breathing with the same pressure change, and a magnified
+// cluster of alveoli showing surfactant, scarring, fluid or broken walls.
+export function LungComplianceGraphic({ state, time, reduceMotion }: GraphicProps<ComplianceState>) {
+  const phase = reduceMotion ? 1 : (1 - Math.cos((2 * Math.PI * time) / BREATH)) / 2;
+  const depth = Math.min(1.3, state.tidal / 800);
+  const inflate = (state.condition === 3 ? 0.45 : 0.1) + phase * depth;
+  const surfactant = state.surfactant / 100;
 
   return (
-    <View style={{ gap: 10 }}>
-      <Canvas width={W} height={H} label={`${CONDITIONS[state.condition]}, surfactant ${state.surfactant}%: compliance ${Math.round(state.compliance)} ml per mmHg; breath ${Math.round(state.tidal)} ml.`}>
-        <Axes x={x} y={y} xTicks={[0, 2, 4, 6, 8, 10]} yTicks={[0, 500, 1000, 1500]} left={L} right={R} top={T} bottom={B} xLabel="Pressure change (mmHg)" yLabel="Volume (ml)" />
-        <Path d={pathOf(line(baseline.compliance), x, y)} stroke={colors.textTertiary} strokeWidth={2} strokeDasharray="5 4" />
-        <Path d={pathOf(line(state.compliance), x, y)} stroke={colors.primary} strokeWidth={3} />
-        <Line x1={x(state.pressure)} x2={x(state.pressure)} y1={B} y2={y(Math.min(1500, state.tidal))} stroke={colors.accent} strokeDasharray="4 3" />
-        <Circle cx={x(state.pressure)} cy={y(Math.min(1500, state.tidal))} r={6} fill={colors.accent} stroke={colors.surface} strokeWidth={2} />
-        <Caption x={(L + R) / 2} y={T - 6} anchor="middle" text="Slope = compliance" tone="tertiary" size={11} />
-
-        <Caption x={335} y={46} anchor="middle" text="An alveolus" />
-        <Circle cx={335} cy={120} r={baseRadius} fill="none" stroke={colors.textTertiary} strokeDasharray="4 3" />
-        <Circle cx={335} cy={120} r={radius} fill={colors.primary} opacity={0.3} stroke={colors.primary} strokeWidth={2} />
-        <Caption x={335} y={190} anchor="middle" text={`Surfactant ${state.surfactant}%`} size={11} />
-        <Caption x={335} y={206} anchor="middle" text={state.surfactant < 40 ? 'Collapsing' : 'Open'} tone={state.surfactant < 40 ? 'error' : 'success'} size={11} />
+    <View>
+      <Canvas width={W} height={H} label={`${CONDITIONS[state.condition]}, surfactant ${Math.round(state.surfactant)}%: each breath is ${Math.round(state.tidal)} ml.`}>
+        <G transform="translate(4 30) scale(0.98)">
+          <Diaphragm inflate={inflate} />
+          <Heart />
+          <Lungs inflate={inflate} stiff={state.condition === 1 ? 1 : 0} showAirways={false} />
+        </G>
+        <AlveolarCluster cx={322} cy={150} size={64} inflate={0.2 + phase * Math.min(1, depth)} surfactant={surfactant} condition={KIND[state.condition] ?? 'normal'} />
+        <Tag x={322} y={254} text="Alveoli (magnified)" />
+        <Tag x={322} y={276} text={surfactant < 0.4 && state.condition === 0 ? 'Collapsing: little surfactant' : CONDITIONS[state.condition]} tone={state.condition === 0 && surfactant >= 0.4 ? 'primary' : 'error'} size={10} />
       </Canvas>
-      <Legend
-        items={[
-          { label: 'Now', color: colors.primary },
-          { label: 'Before', color: colors.textTertiary, dashed: true },
-          { label: 'This breath', color: colors.accent, dashed: true },
-        ]}
-      />
     </View>
   );
 }

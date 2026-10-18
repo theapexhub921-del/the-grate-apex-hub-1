@@ -65,6 +65,7 @@ export const breathingMechanics: SimDefinition<MechanicsState> = {
     { key: 'lung', label: 'Lung', noDelta: true, text: (v) => (v ? 'Expanded' : 'Collapsed') },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'quiet', label: 'Quiet breath', values: START, caption: 'The chest expands, intrapleural pressure falls from −2.5 to −6 mmHg, lung pressure dips below atmospheric and about 500 ml flows in.' },
     { id: 'deep', label: 'Deep breath', values: { ...START, effort: 200 }, caption: 'A bigger effort makes intrapleural pressure more negative and draws in more air.' },

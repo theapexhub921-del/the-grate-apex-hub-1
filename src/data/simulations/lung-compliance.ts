@@ -64,6 +64,7 @@ export const lungCompliance: SimDefinition<ComplianceState> = {
     { key: 'collapse', label: 'Pull to collapse alveoli', unit: '% of normal' },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'normal', label: 'Normal lung', values: START, caption: 'A 3.5 mmHg swing moves about 500 ml.' },
     { id: 'rds', label: 'Premature baby', values: { ...START, surfactant: 10 }, caption: 'Little surfactant: surface tension is high, compliance low, alveoli collapse.' },

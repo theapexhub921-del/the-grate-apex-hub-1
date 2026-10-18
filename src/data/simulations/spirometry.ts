@@ -97,6 +97,7 @@ export const spirometry: SimDefinition<SpiroState> = {
     { key: 'minute', label: 'Minute volume (12 breaths/min)', unit: 'L/min', decimals: 1 },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'healthy', label: 'Healthy adult', values: START, caption: 'VC = IRV + TV + ERV. FEV1 is about 83% of it.' },
     { id: 'athlete', label: 'Athlete', values: { ...START, person: 1 }, caption: 'Training increases the vital capacity.' },
