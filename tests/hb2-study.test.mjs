@@ -53,3 +53,14 @@ test('practice mixes types, keeps original ids and is deterministic', () => {
     assert.ok(q.lessonId, q.id);
   }
 });
+
+test('HB2 anatomy lessons show their section (Gross Anatomy, Microanatomy, Embryology)', () => {
+  const anatomy = hb2Lessons('hb2-anatomy');
+  assert.ok(anatomy.length > 0);
+  const sections = ['Gross Anatomy', 'Microanatomy', 'Embryology'];
+  for (const lesson of anatomy) {
+    assert.ok(sections.includes(lesson.section), `${lesson.id} has no anatomy section`);
+    assert.ok(lesson.sub.startsWith(`${lesson.section} · `), `${lesson.id}: subtitle does not name its section`);
+  }
+  for (const topic of getSubjectTopics('anatomy')) assert.ok(sections.includes(topic.section), `${topic.id} has no section`);
+});

@@ -94,6 +94,8 @@ export function lessonBody(lesson: Lesson): { sections: LocalSection[]; extras?:
 export type LocalLessonMeta = {
   id: string; course: string; order: number; title: string; sub?: string; icon: string; summary: string; minutes: number;
   sections: { id: string; title: string }[]; qids: string[]; qcount: number; group: string; subject: SubjectId; xp: number;
+  /** The part of the subject the topic belongs to (e.g. Gross Anatomy). */
+  section?: string;
 };
 
 const topicsOf = (course: LocalCourse): Topic[] => getSubjectTopics(course.subject);
@@ -111,7 +113,7 @@ export function hb2Lessons(courseId: string): LocalLessonMeta[] {
         course: course.id,
         order: order++,
         title: lesson.title,
-        sub: topic.title,
+        sub: topic.section ? `${topic.section} · ${topic.title}` : topic.title,
         icon: course.icon,
         summary: escape(lesson.description),
         minutes: lesson.estimatedMinutes ?? Math.max(5, lesson.chunks.length * 3),
@@ -121,6 +123,7 @@ export function hb2Lessons(courseId: string): LocalLessonMeta[] {
         group: topic.title,
         subject: course.subject,
         xp: lesson.xp,
+        ...(topic.section ? { section: topic.section } : {}),
       };
     })
   );

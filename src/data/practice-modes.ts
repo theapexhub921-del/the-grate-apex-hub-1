@@ -2,6 +2,7 @@
 //   practice   the whole course, mixed question types (20)
 //   lesson     a lesson's own questions (all of them)
 //   set        one of the course's quizzes (30), or a whole paper as an exam
+//   pastTopic  every past question on one topic, sat as an exam (HB2; data/past-question-topics.ts)
 //   apex       the Apex Challenge (30 questions, 10 seconds each)
 //   review     spaced review: due questions or last time's mistakes (20)
 //   mock       Predicted test N: a 70-question mock exam, answers at the end
@@ -16,6 +17,7 @@ export type PracticeMode =
   | { kind: 'practice' }
   | { kind: 'lesson'; lessonId: string }
   | { kind: 'set'; setId: string; exam: boolean }
+  | { kind: 'pastTopic'; topicId: string }
   | { kind: 'apex' }
   | { kind: 'review'; which: 'due' | 'missed' }
   | { kind: 'mock'; n: number }
@@ -56,6 +58,7 @@ export function parsePracticeMode(get: (key: string) => string | undefined): Pra
       },
     };
   }
+  if (get('ptopic')) return { kind: 'pastTopic', topicId: get('ptopic')! };
   if (lesson) return { kind: 'lesson', lessonId: lesson };
   if (set) return { kind: 'set', setId: set, exam: get('exam') === '1' };
   return { kind: 'practice' };
@@ -87,13 +90,14 @@ export function modeSettings(mode: PracticeMode): ModeSettings {
     case 'set': return mode.exam
       ? { count: Infinity, feedback: 'submit', variants: false, fixed: false, xp: 'practice', key: `paper-${mode.setId}` }
       : { count: 30, feedback: 'instant', variants: true, fixed: false, xp: 'practice', key: mode.setId };
+    case 'pastTopic': return { count: Infinity, feedback: 'submit', variants: false, fixed: false, xp: 'practice', key: `topic-${mode.topicId}` };
     case 'lesson': return { count: Infinity, feedback: 'instant', variants: true, fixed: false, xp: 'practice', key: mode.lessonId };
     default: return { count: 20, feedback: 'instant', variants: true, fixed: false, xp: 'practice', key: 'all' };
   }
 }
 
 /** The page title for a mode. */
-export function modeTitle(mode: PracticeMode, courseName: string, names: { lesson?: string; set?: string } = {}) {
+export function modeTitle(mode: PracticeMode, courseName: string, names: { lesson?: string; set?: string; topic?: string } = {}) {
   switch (mode.kind) {
     case 'apex': return `${courseName} · Apex Challenge`;
     case 'mock': return `${courseName} · Predicted test ${mode.n}`;
@@ -102,6 +106,7 @@ export function modeTitle(mode: PracticeMode, courseName: string, names: { lesso
     case 'custom': return `${courseName} · Custom quiz`;
     case 'review': return `${courseName} · ${mode.which === 'due' ? 'Due for review' : 'Fix your mistakes'}`;
     case 'set': return names.set ? `${courseName} · ${names.set}` : `${courseName} · practice`;
+    case 'pastTopic': return `${courseName} · Past questions: ${names.topic ?? 'one topic'}`;
     case 'lesson': return names.lesson ? `${names.lesson} · practice` : `${courseName} · practice`;
     default: return `${courseName} · practice`;
   }

@@ -79,6 +79,37 @@ export async function registerWebPush() {
 }
 
 /** Stops push on this browser and removes it from the account (when alerts are turned off). */
+const SEEN_DAY_KEY = 'grateapex_app_seen_day';
+
+/** Today's date on this device, 'YYYY-MM-DD' (the same day api/_push-logic.mjs works out from the time zone). */
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * Notes on the account that the learner opened the app today (users/{uid}.appSeenDay),
+ * so the daily reminders (api/reminders.mjs) do not repeat what they have already seen
+ * in the app. Written at most once a day from this device.
+ */
+export async function markAppSeenToday() {
+  if (typeof window === 'undefined') return;
+  const today = todayKey();
+  try {
+    await auth.authStateReady();
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const key = `${SEEN_DAY_KEY}:${uid}`;
+    try {
+      if (window.localStorage.getItem(key) === today) return;
+    } catch { /* storage blocked: write anyway */ }
+    await setDoc(doc(db, 'users', uid), { appSeenDay: today }, { merge: true });
+    try { window.localStorage.setItem(key, today); } catch { /* fine */ }
+  } catch {
+    // worst case a reminder is sent that the learner has already seen
+  }
+}
+
 export async function unregisterWebPush() {
   if (!supported()) return;
   const uid = auth.currentUser?.uid;

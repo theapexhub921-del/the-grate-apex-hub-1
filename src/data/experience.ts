@@ -1,4 +1,5 @@
-// The learner's app experience: The Originals, Originate or Hybrid
+// The learner's app experience: Legacy (id 'originals', formerly named
+// "The Originals"), Originate or Hybrid
 // (docs/experiences-architecture.md). An interface choice only — it never
 // changes data, and it is independent of Appearance (themes).
 //
@@ -13,7 +14,7 @@ export type ExperienceId = (typeof EXPERIENCES)[number];
 
 export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: string }> = {
   originals: {
-    name: 'The Originals',
+    name: 'Legacy',
     summary: 'The original GrAte Apex Hub, as it was: its colours, emoji, fonts, glass panels, gradient background and navigation — with every new feature inside it.',
   },
   originate: { name: 'Originate', summary: 'The new GrAte Apex Hub design: its themes, layouts, icons and sidebar, in a clean, simple style.' },
@@ -37,11 +38,11 @@ export function needsExperience(profile: Record<string, unknown> | undefined, pr
 
 /** Saves the choice on the account. Throws when it can't be saved. */
 export async function saveExperience(experience: ExperienceId) {
-  if (!isExperience(experience)) throw new Error('Choose one of the three experiences.');
+  if (!isExperience(experience)) throw new Error('Choose one of the three interfaces.');
   const { updateCurrentProfile } = await import('@/lib/profiles'); // loaded on use: keeps this module testable
   const { error } = await updateCurrentProfile({ experience });
   if (error) {
     console.warn('Could not save the experience:', error instanceof Error ? `${error.name}: ${error.message}` : String(error));
-    throw new Error('Your experience could not be saved. Please try again.');
+    throw new Error('Your interface could not be saved. Please try again.');
   }
 }

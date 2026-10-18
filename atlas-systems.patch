@@ -1,0 +1,433 @@
+diff --git a/public/atlas/anatomy.html b/public/atlas/anatomy.html
+index c313f1a..bf64a73 100644
+--- a/public/atlas/anatomy.html
++++ b/public/atlas/anatomy.html
+@@ -254,6 +254,25 @@
+       font-weight: 700;
+     }
+ 
++    /* Panel tabs: Explore (search, organs, layers, display) and Quiz */
++    .ptabs { flex: none; display: flex; gap: 6px; padding: 0 14px 10px; }
++    .ptab {
++      flex: 1;
++      min-height: 36px;
++      border-radius: 999px;
++      border: 1px solid var(--line);
++      background: var(--well);
++      color: var(--ink-2);
++      font-size: 13px;
++      cursor: pointer;
++      transition: background 0.15s, color 0.15s, border-color 0.15s;
++    }
++    .ptab:hover { border-color: var(--cobalt); color: var(--ink); }
++    .ptab[aria-selected="true"] { background: var(--cobalt); border-color: var(--cobalt); color: var(--on-cobalt); font-weight: 700; }
++    #panel[data-tab="quiz"] .explore-only { display: none !important; }
++    #panel[data-tab="explore"] .quiz-only { display: none !important; }
++    .sec.quiz-only + .sec { border-top: 0; }
++
+     [hidden] { display: none !important; }
+ 
+     .boot { margin: 2px 0 10px; padding: 9px 12px; border-radius: var(--r-sm); background: var(--well); border: 1px solid var(--line); color: var(--ink-2); font-size: 12.5px; }
+@@ -833,7 +852,7 @@
+     </svg>
+   </button>
+ 
+-  <aside id="panel" class="card" aria-label="Atlas menu">
++  <aside id="panel" class="card" data-tab="explore" aria-label="Atlas menu">
+     <button id="sheetHandle" class="handle" type="button" aria-label="Expand or collapse the menu"
+       aria-expanded="true"></button>
+     <div class="phead">
+@@ -855,7 +874,12 @@
+       </button>
+     </div>
+ 
+-    <div class="searchwrap">
++    <div class="ptabs" role="tablist" aria-label="Atlas menu sections">
++      <button id="tabExplore" class="ptab" type="button" role="tab" aria-selected="true">Explore</button>
++      <button id="tabQuiz" class="ptab" type="button" role="tab" aria-selected="false" aria-controls="panelQuiz">Quiz</button>
++    </div>
++
++    <div class="searchwrap explore-only">
+       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+         <circle cx="11" cy="11" r="7" />
+@@ -866,20 +890,20 @@
+     </div>
+ 
+     <div class="pscroll">
+-      <p id="boot" class="boot" role="status">Loading the 3D atlas&hellip;</p>
+-      <ul id="results"></ul>
+-      <button id="reveal" class="btn">Show everything again</button>
++      <p id="boot" class="boot explore-only" role="status">Loading the 3D atlas&hellip;</p>
++      <ul id="results" class="explore-only"></ul>
++      <button id="reveal" class="btn explore-only">Show everything again</button>
+ 
+-      <details class="sec" open>
+-        <summary>Quiz</summary>
++      <section id="panelQuiz" class="sec quiz-only" role="tabpanel" aria-labelledby="tabQuiz">
+         <div class="body">
+           <div id="quizSys" class="chips" role="group" aria-label="Quiz topic"></div>
++          <div id="quizLen" class="chips" role="group" aria-label="Number of questions"></div>
+           <button id="quizStart" class="btn primary" type="button">Start 10-question quiz</button>
+           <p id="quizStatus" class="organstatus" role="status">Name the highlighted structure. Choose a body system to be tested on.</p>
+         </div>
+-      </details>
++      </section>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Single organs</summary>
+         <div class="body">
+           <div id="organs" class="organs" role="group" aria-label="Show one organ on its own">
+@@ -893,7 +917,7 @@
+         </div>
+       </details>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Sex</summary>
+         <div class="body">
+           <div id="pelvis" class="chips" role="group" aria-label="Pelvis: male or female">
+@@ -903,21 +927,21 @@
+         </div>
+       </details>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Regions</summary>
+         <div class="body">
+           <div id="regions" class="chips" role="group" aria-label="Body regions"></div>
+         </div>
+       </details>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Body systems</summary>
+         <div class="body">
+           <div id="systems"></div>
+         </div>
+       </details>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Peel layers</summary>
+         <div class="body">
+           <input id="peel" type="range" min="0" max="6" step="1" value="0"
+@@ -926,14 +950,14 @@
+         </div>
+       </details>
+ 
+-      <details class="sec">
++      <details class="sec explore-only">
+         <summary>Colour-code</summary>
+         <div class="body">
+           <div id="coding"></div>
+         </div>
+       </details>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Display</summary>
+         <div class="body">
+           <label class="sys"><input type="checkbox" id="xray"><span class="swatch" style="--c:#7fd6ff"></span><span>X-ray
+@@ -1244,29 +1268,35 @@
+     const BASE = new URLSearchParams(location.search).get('base') || './';
+ 
+     const SYSTEMS = [
++      // listed in the order of the Body systems panel: the eight systems first, then what else is in the model
++      { id: 'visceral', label: 'Organs', file: 'VisceralSystem100.glb', mb: 4.5, color: 0xd98c7a, paint: organColor, hidden: true },
++      // The Organs file is split by the model's own groups into body systems. These are children of 'visceral' (the file),
++      // which is hidden: every structure in it belongs to exactly one of them.
++      { id: 'alimentary', label: 'Alimentary', via: 'visceral', top: true, match: /^(Digestive system|Abdominopelvic cavity)\.g$/i, color: 0xd98c7a, paint: organColor },
+       {
+-        id: 'skeletal', label: 'Skeleton', file: 'SkeletalSystem100.glb', mb: 7.4, color: 0xcdbf9f, on: true, paint: boneColor, coded: false,
+-        code: { label: 'Bones', hint: 'by region', swatch: 'linear-gradient(90deg,#e6c98a 20%,#8fb4e8 20% 40%,#8ccf9b 40% 60%,#f2b36a 60% 80%,#e88a9a 80%)' }
+-      },
+-      { id: 'attachments', label: 'Muscle attachment sites', via: 'skeletal', match: /(\.|muscle)[oe]\d*[lr](-mesh)?$/i, color: 0xb5473f },
+-      { id: 'sinuses', label: 'Paranasal sinuses', via: 'skeletal', match: /^sinus of /i, color: 0xd946c0 },   // frontal + sphenoid air spaces, split out so they never share the bone colour
+-      { id: 'joints', label: 'Joints', file: 'Joints100.glb', mb: 2.1, color: 0x86a3cc, paint: jointColor },
+-      { id: 'muscular', label: 'Muscles', file: 'MuscularSystem100.glb', mb: 6.7, color: 0xb5473f, paint: muscleColor },
+-      { id: 'fascia', label: 'Fascia', via: 'muscular', match: /fasci/i, color: 0xe8d6a8, ghost: true, opacity: 0.3 },
+-      { id: 'bursae', label: 'Bursae, tendon sheaths', via: 'muscular', match: /bursa|tendon sheath/i, color: 0x2fb8a0, paint: sacColor },
+-      {
+-        id: 'nervous', label: 'Nerves, brain', file: 'NervousSystem100.glb', mb: 9.0, color: 0xe8c547, swatch: 'linear-gradient(90deg,#7aa2e0 25%,#e6b85c 25% 50%,#7cc98a 50% 75%,#e8c547 75%)', paint: nervousColor, naturalPaint: naturalNervousColor, coded: true,
++        id: 'nervous', label: 'Nervous', file: 'NervousSystem100.glb', mb: 9.0, color: 0xe8c547, swatch: 'linear-gradient(90deg,#7aa2e0 25%,#e6b85c 25% 50%,#7cc98a 50% 75%,#e8c547 75%)', paint: nervousColor, naturalPaint: naturalNervousColor, coded: true,
+         code: { label: 'Brain', hint: 'by lobe', swatch: 'linear-gradient(90deg,#7aa2e0 25%,#e6b85c 25% 50%,#7cc98a 50% 75%,#b77ad6 75%)' },
+         natural: { label: 'Brain & spinal cord', hint: 'natural colour', swatch: 'linear-gradient(90deg,#b0998e 40%,#efe8d8 40% 75%,#e6dfcc 75%)' }
+       },
+       {
+-        id: 'cardiovascular', label: 'Blood vessels', file: 'CardioVascular41.glb', mb: 7.6, color: 0xc22d3a, swatch: 'linear-gradient(90deg,#d62f3b 50%,#2f6fd6 50%)', paint: vesselColor, coded: true,
++        id: 'cardiovascular', label: 'Cardiovascular', file: 'CardioVascular41.glb', mb: 7.6, color: 0xc22d3a, swatch: 'linear-gradient(90deg,#d62f3b 50%,#2f6fd6 50%)', paint: vesselColor, coded: true,
+         code: { label: 'Blood vessels', hint: 'artery / vein', swatch: 'linear-gradient(90deg,#d62f3b 50%,#2f6fd6 50%)' }
+       },
+-      { id: 'visceral', label: 'Organs', file: 'VisceralSystem100.glb', mb: 4.5, color: 0xd98c7a, paint: organColor },
+-      { id: 'serosa', label: 'Pleura, omenta, mesenteries', via: 'visceral', match: /pleura|omentum|meso-appendix|mesocolon/i, color: 0xe9cdbd, ghost: true },
++      { id: 'lymphoid', label: 'Lymphatic', file: 'LymphoidOrgans100.glb', mb: 0.6, color: 0x6fb58a },
++      { id: 'muscular', label: 'Muscular', file: 'MuscularSystem100.glb', mb: 6.7, color: 0xb5473f, paint: muscleColor },
++      { id: 'fascia', label: 'Fascia', via: 'muscular', match: /fasci/i, color: 0xe8d6a8, ghost: true, opacity: 0.3 },
++      { id: 'bursae', label: 'Bursae, tendon sheaths', via: 'muscular', match: /bursa|tendon sheath/i, color: 0x2fb8a0, paint: sacColor },
++      {
++        id: 'skeletal', label: 'Skeletal', file: 'SkeletalSystem100.glb', mb: 7.4, color: 0xcdbf9f, on: true, paint: boneColor, coded: false,
++        code: { label: 'Bones', hint: 'by region', swatch: 'linear-gradient(90deg,#e6c98a 20%,#8fb4e8 20% 40%,#8ccf9b 40% 60%,#f2b36a 60% 80%,#e88a9a 80%)' }
++      },
++      { id: 'attachments', label: 'Muscle attachment sites', via: 'skeletal', match: /(\.|muscle)[oe]\d*[lr](-mesh)?$/i, color: 0xb5473f },
++      { id: 'sinuses', label: 'Paranasal sinuses', via: 'skeletal', match: /^sinus of /i, color: 0xd946c0 },   // frontal + sphenoid air spaces, split out so they never share the bone colour
++      { id: 'joints', label: 'Joints', sub: true, file: 'Joints100.glb', mb: 2.1, color: 0x86a3cc, paint: jointColor },
++      { id: 'urinary', label: 'Urinary', via: 'visceral', top: true, match: /^Urinary system\.g$/i, color: 0x9d3a3f, paint: organColor },
++      { id: 'reproductive', label: 'Reproductive', via: 'visceral', top: true, match: /^Genital systems\.g$/i, node: /^VH_F/, color: 0xe6a0a8, paint: organColor },
+       {
+-        id: 'breasts', label: 'Female breasts', color: 0xf2b8c0, mb: 8.0,
++        id: 'breasts', label: 'Female breasts', sub: true, color: 0xf2b8c0, mb: 8.0,
+         files: ['reproductive/breasts.glb'], offset: [0.0125, 0.866, 0.098],   // 6 cm forward of the other female organs, so the base sits on the pectoral muscles
+         paint: n => (/fat/i.test(n) ? 0xf0d8a0 : /lactiferous|areolar/i.test(n) ? 0xc0606e : 0xf2b8c0),
+       },
+@@ -1279,7 +1309,9 @@
+         files: ['reproductive/vagina-ligaments.glb'], keep: ['VH_F_femur_R', 'VH_F_femur_L'],
+         offset: [0.0125, 0.866, 0.038],
+       },
+-      { id: 'lymphoid', label: 'Lymphatic', file: 'LymphoidOrgans100.glb', mb: 0.6, color: 0x6fb58a },
++      { id: 'respiratory', label: 'Respiratory', via: 'visceral', top: true, match: /^(Respiratory system|Thoracic cavity)\.g$/i, color: 0xd4838f, paint: organColor },
++      { id: 'endocrine', label: 'Endocrine', via: 'visceral', top: true, match: /^Endocrine glands\.g$/i, color: 0xe6b64a, paint: organColor },
++      { id: 'serosa', label: 'Pleura, omenta, mesenteries', via: 'visceral', top: true, match: /pleura|omentum|meso-appendix|mesocolon/i, color: 0xe9cdbd, ghost: true },
+       { id: 'references', label: 'Reference lines', file: 'References100.glb', mb: 0.1, color: 0x9aa0a6 },
+     ];
+ 
+@@ -1367,6 +1399,8 @@ bool inRegion(vec3 p) {
+       cardiovascular: { r: 0.32, cc: 0.55, ccr: 0.25 },                // wet vessel walls
+       visceral: { r: 0.40, cc: 0.45, ccr: 0.30 },                // moist organ surfaces
+       lymphoid: { r: 0.42, cc: 0.30 },
++      alimentary: { r: 0.40, cc: 0.45, ccr: 0.30 }, urinary: { r: 0.40, cc: 0.45, ccr: 0.30 }, reproductive: { r: 0.40, cc: 0.45, ccr: 0.30 },
++      respiratory: { r: 0.40, cc: 0.45, ccr: 0.30 }, endocrine: { r: 0.40, cc: 0.45, ccr: 0.30 },
+     };
+ 
+     /* ---------- organ colouring ---------- */
+@@ -1771,8 +1805,26 @@ bool inRegion(vec3 p) {
+       isoPoints.geometry.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+     }
+ 
++    // landmarks of the Organs file are shared out between the body systems that came from it: by the structure each one
++    // sits on, or for the group headings ("Digestive system", "Lungs") by what they are called
++    const ORGAN_LANDMARK_FALLBACK = [
++      ['urinary', /urinary|kidney|bladder|ureter|urethra/i],
++      ['respiratory', /thoracic cavity|respiratory|tracheo|bronch|paranasal|lung|laryn|nose|nasal|pleura/i],
++      ['reproductive', /genital|penis|testis|prostate|uter|ovar|vagin/i],
++      ['endocrine', /endocrine|parathyroid|hypophysis|thyroid|pineal|suprarenal/i],
++    ];
++    function organLandmarks(s) {
++      const owners = new Map();
++      for (const e of index) if (e.mesh && e.system && e.system.via === 'visceral') owners.set(rawName(e.mesh).replace(/-mesh$/i, ''), e.system.id);
++      return (landmarkData.visceral || []).filter(r => {
++        let id = r[5] && owners.get(r[5]);
++        if (!id) { const f = ORGAN_LANDMARK_FALLBACK.find(([, re]) => re.test(r[0])); id = f ? f[0] : 'alimentary'; }
++        return id === s.id;
++      });
++    }
+     function addPins(s) {
+-      const data = landmarkData[s.id];
++      if (s.id === 'visceral') return;   // see organLandmarks
++      const data = s.via === 'visceral' && s.top && landmarkData.visceral ? organLandmarks(s) : landmarkData[s.id];
+       if (!data || !data.length || !s.group || s.pins) return;
+       const arr = new Float32Array(data.length * 3);
+       data.forEach((r, i) => { arr[i * 3] = r[2]; arr[i * 3 + 1] = r[3]; arr[i * 3 + 2] = r[4]; });
+@@ -1807,7 +1859,7 @@ bool inRegion(vec3 p) {
+       }));
+       if (s.ghost) { s.mat.transparent = true; s.mat.opacity = s.opacity ?? 0.28; s.mat.depthWrite = false; }
+       const row = document.createElement('label');
+-      row.className = 'sys' + (s.via ? ' sub' : '');
++      row.className = 'sys' + ((s.via && !s.top) || s.sub ? ' sub' : '');
+       row.innerHTML = `<input type="checkbox" ${s.on ? 'checked' : ''}><span class="swatch" style="--c:${s.swatch || '#' + s.color.toString(16).padStart(6, '0')};${s.swatch ? '--b:#8a5fa0;' : ''}"></span><span>${s.label}</span><span class="stat">${s.via ? '' : s.mb + ' MB'}</span>`;
+       s.input = row.querySelector('input');
+       s.stat = row.querySelector('.stat');
+@@ -1970,7 +2022,7 @@ bool inRegion(vec3 p) {
+             if (s.id === 'visceral' && /^sigmoid[ _]colon$/i.test(o.name || '')) { drops.push(o); return; }   // removed: it stopped short of the midline and the model has no rectum
+             let owner = s;
+             for (let n = o; kids.length && n && n !== s.group; n = n.parent) {
+-              const hit = kids.find(c => c.match.test(rawName(n)));
++              const hit = kids.find(c => (c.match && c.match.test(rawName(n))) || (c.node && c.node.test(n.name || '')));
+               if (hit) { owner = hit; break; }
+             }
+             const d = describe(o);
+@@ -1993,6 +2045,7 @@ bool inRegion(vec3 p) {
+           for (const [o, c] of moves) c.group.attach(o);
+           for (const c of kids) c.group.visible = c.input.checked && !isPeeled(c);
+           addPins(s);
++          for (const c of kids) addPins(c);
+           s.stat.textContent = s.mb + ' MB';
+         } catch (err) {
+           console.error(err);
+@@ -2116,7 +2169,7 @@ bool inRegion(vec3 p) {
+           stems: /^(Thoracic_aorta_1|(Left|Right)_common_carotid_artery_1|(Left|Right)_subclavian_artery_1|Superior_vena_cava_1|(Left|Right)_brachiocephalic_vein_1|Inferior_vena_cava_\(thoracic_part\)_1|(Left|Right)_pulmonary_artery_1|(Left|Right)_(superior|inferior)_pulmonary_vein_1)$/,
+         },
+       },
+-      { id: 'lungs', label: 'Lungs', sys: 'visceral', node: /^Lungs\.g$/ },
++      { id: 'lungs', label: 'Lungs', sys: 'respiratory', node: /^Lungs\.g$/ },
+     ];
+     const organsActive = new Set();
+     const organBtns = new Map(ORGANS.map(o => [o.id, document.querySelector('#organs [data-organ="' + o.id + '"]')]));
+@@ -2393,7 +2446,7 @@ bool inRegion(vec3 p) {
+         const m = e.mesh;
+         if (!m) continue;
+         const female = FEMALE_ONLY.test(m.name || '') || e.system.id === 'breasts';
+-        const male = MALE_ONLY.test(((m.name || '') + ' ' + ((m.userData && m.userData.name) || '')).toLowerCase()) || (e.system.id === 'visceral' && MALE_SIGMOID.test(m.name || ''));
++        const male = MALE_ONLY.test(((m.name || '') + ' ' + ((m.userData && m.userData.name) || '')).toLowerCase()) || (e.system.id === 'alimentary' && MALE_SIGMOID.test(m.name || ''));
+         const pelvicOff = false;   // the male sacrum and coccyx stay in both modes: the female ones sit about 4 cm behind the muscles
+         if (!(female || male || e.system.id === 'skeletal')) continue;
+         if (!female && !male && !isPelvicBone(m)) continue;
+@@ -2416,6 +2469,8 @@ bool inRegion(vec3 p) {
+     }
+     pelvisBtns.forEach(b => b.addEventListener('click', () => setPelvis(b.dataset.mode)));
+ 
++    const ORGAN_SYSTEM_IDS = ['alimentary', 'urinary', 'reproductive', 'respiratory', 'endocrine'];   // what the old single Organs system became
++
+     /* ---------- layer peeling ---------- */
+     // outermost first; each step of the slider removes the next layer. Skeleton and reference lines always stay.
+     const LAYERS = [
+@@ -2423,7 +2478,7 @@ bool inRegion(vec3 p) {
+       { label: 'Muscles', ids: ['muscular', 'bursae'] },
+       { label: 'Vessels, lymphatics', ids: ['cardiovascular', 'lymphoid'] },
+       { label: 'Nerves', ids: ['nervous'] },
+-      { label: 'Organs', ids: ['visceral'] },
++      { label: 'Organs', ids: [...ORGAN_SYSTEM_IDS, 'visceral'] },
+       { label: 'Joints', ids: ['joints'] },
+     ];
+     const peelEl = document.getElementById('peel');
+@@ -2457,6 +2512,17 @@ bool inRegion(vec3 p) {
+       else { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+     });
+ 
++    /* ---------- panel tabs ---------- */
++    (function () {
++      const panelEl = document.getElementById('panel');
++      const tabs = { explore: document.getElementById('tabExplore'), quiz: document.getElementById('tabQuiz') };
++      function showTab(name) {
++        panelEl.dataset.tab = name;
++        for (const k in tabs) tabs[k].setAttribute('aria-selected', String(k === name));
++      }
++      for (const k in tabs) tabs[k].addEventListener('click', () => showTab(k));
++    })();
++
+     /* ---------- quiz mode ---------- */
+     // "What is the highlighted structure?" One body system at a time: each question highlights a structure with its name
+     // hidden and offers four choices. While a quiz runs the menu, info card and hover names are hidden (body.quizzing in the
+@@ -2464,10 +2530,21 @@ bool inRegion(vec3 p) {
+     // shows only the chosen system in x-ray, so the highlighted structure is never hidden behind another. Ending it puts back
+     // which systems were ticked and the x-ray setting. When a round finishes, the score is posted to the host app
+     // ({ type: 'quiz', system, score, total }) in case it wants to record it.
+-    const QUIZ_LENGTH = 10;
++    const QUIZ_LENGTHS = [5, 10, 20, 30, 50];   // choices offered in the Quiz tab
+     const QUIZ_MIN_SIZE = 0.012;   // metres (diagonal of the structure): anything smaller is too tiny to see or fairly ask about
+-    const QUIZ_SYSTEMS = ['skeletal', 'joints', 'muscular', 'nervous', 'cardiovascular', 'visceral', 'lymphoid'];
+-    const quiz = { active: false, starting: false, sys: SYSTEMS.find(s => s.id === 'skeletal'), qs: [], i: 0, score: 0, missed: [], answered: false, saved: null };
++    const QUIZ_SYSTEMS = [
++      { id: 'alimentary', label: 'Alimentary', ids: ['alimentary'] },
++      { id: 'nervous', label: 'Nervous', ids: ['nervous'] },
++      { id: 'cardiovascular', label: 'Cardiovascular', ids: ['cardiovascular'] },
++      { id: 'lymphatic', label: 'Lymphatic', ids: ['lymphoid'] },
++      { id: 'muscular', label: 'Muscular', ids: ['muscular'] },
++      { id: 'skeletal', label: 'Skeletal', ids: ['skeletal', 'joints'] },
++      { id: 'urinary', label: 'Urinary', ids: ['urinary'] },
++      { id: 'reproductive', label: 'Reproductive', ids: ['reproductive'] },   // follows the Male / Female choice
++      { id: 'respiratory', label: 'Respiratory', ids: ['respiratory'] },
++      { id: 'endocrine', label: 'Endocrine', ids: ['endocrine'] },
++    ];
++    const quiz = { active: false, starting: false, sys: QUIZ_SYSTEMS.find(g => g.id === 'skeletal'), length: 10, qs: [], i: 0, score: 0, missed: [], answered: false, saved: null };
+     const quizById = id => document.getElementById(id);
+     const quizStartBtn = quizById('quizStart'), quizStatus = quizById('quizStatus'), quizSysEl = quizById('quizSys');
+     const qOpts = quizById('qopts'), qNext = quizById('qnext'), qFeed = quizById('qfeed');
+@@ -2476,9 +2553,7 @@ bool inRegion(vec3 p) {
+     const quizLabel = e => (e.side ? `${e.name} (${e.side.toLowerCase()})` : e.name);
+     const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+ 
+-    for (const id of QUIZ_SYSTEMS) {
+-      const s = SYSTEMS.find(x => x.id === id);
+-      if (!s) continue;
++    for (const s of QUIZ_SYSTEMS) {
+       const b = document.createElement('button');
+       b.className = 'chip'; b.type = 'button'; b.textContent = s.label;
+       b.setAttribute('aria-pressed', String(s === quiz.sys));
+@@ -2486,11 +2561,23 @@ bool inRegion(vec3 p) {
+       quizSysEl.appendChild(b);
+     }
+ 
++    const quizLenEl = quizById('quizLen');
++    const quizStartLabel = () => { quizStartBtn.textContent = `Start ${quiz.length}-question quiz`; };
++    for (const n of QUIZ_LENGTHS) {
++      const b = document.createElement('button');
++      b.className = 'chip'; b.type = 'button'; b.textContent = String(n);
++      b.setAttribute('aria-label', `${n} questions`);
++      b.setAttribute('aria-pressed', String(n === quiz.length));
++      b.onclick = () => { quiz.length = n; for (const c of quizLenEl.children) c.setAttribute('aria-pressed', String(c === b)); quizStartLabel(); };
++      quizLenEl.appendChild(b);
++    }
++    quizStartLabel();
++
+     // every named structure of the system that is showing right now (one entry per structure and side)
+     function quizPool(s) {
+       const seen = new Set(), pool = [], box = new THREE.Box3(), size = new THREE.Vector3();
+       for (const e of index) {
+-        if (!e.mesh || e.dup || e.system !== s || !e.mesh.visible) continue;
++        if (!e.mesh || e.dup || !s.ids.includes(e.system.id) || !e.mesh.visible) continue;
+         if (!e.name || /^(Unnamed structure|Attachment site)/.test(e.name)) continue;
+         const label = quizLabel(e);
+         if (seen.has(label)) continue;
+@@ -2523,13 +2610,13 @@ bool inRegion(vec3 p) {
+     function quizTargets(pool) {
+       const all = shuffle(pool.slice()), chosen = [], perFamily = new Map();
+       for (const p of all) {
+-        if (chosen.length === QUIZ_LENGTH) break;
++        if (chosen.length === quiz.length) break;
+         const f = quizFamily(p.name), n = perFamily.get(f) || 0;
+         if (n >= 2) continue;
+         perFamily.set(f, n + 1); chosen.push(p);
+       }
+-      for (const p of all) {   // a small pool may not reach ten that way: top up with whatever is left
+-        if (chosen.length === QUIZ_LENGTH) break;
++      for (const p of all) {   // a small pool may not reach the chosen length that way: top up with whatever is left
++        if (chosen.length === quiz.length) break;
+         if (!chosen.includes(p)) chosen.push(p);
+       }
+       return shuffle(chosen);
+@@ -2549,7 +2636,7 @@ bool inRegion(vec3 p) {
+     function quizEnterScene(s) {
+       deselect();
+       showAll();
+-      for (const x of SYSTEMS) if (x.group) x.group.visible = x === s;
++      for (const x of SYSTEMS) if (x.group) x.group.visible = s.ids.includes(x.id);
+       xrayEl.checked = true; setXray(true);
+       refreshPins(); dirty = true;
+     }
+@@ -2570,13 +2657,19 @@ bool inRegion(vec3 p) {
+       quiz.starting = true; quizStartBtn.disabled = true;
+       quiz.saved = { xray: xrayOn, systems: SYSTEMS.map(x => [x, x.input.checked]) };
+       try {
+-        if (!s.group) {
+-          quizStatus.textContent = `Loading ${s.label.toLowerCase()} (${s.mb} MB)…`;
+-          s.input.checked = true;
+-          await setSystem(s, true);
+-          while (s.loading) await new Promise(r => setTimeout(r, 100));
++        const members = s.ids.map(id => SYSTEMS.find(x => x.id === id)).filter(Boolean);
++        const todo = members.filter(m => !m.group);
++        if (todo.length) {
++          const parentOf = m => (m.via ? SYSTEMS.find(x => x.id === m.via) : null);
++          const mb = todo.reduce((a, m) => a + (parentOf(m) ? (parentOf(m).group ? 0 : parentOf(m).mb) : m.mb || 0), 0);
++          quizStatus.textContent = `Loading ${s.label.toLowerCase()} (${Math.round(mb * 10) / 10} MB)…`;
++          for (const m of todo) {
++            m.input.checked = true;
++            await setSystem(m, true);
++            while (m.loading) await new Promise(r => setTimeout(r, 100));
++          }
+         }
+-        if (!s.group) {
++        if (members.some(m => !m.group)) {
+           quizLeaveScene();
+           quizStatus.textContent = 'Could not load that system. Check your connection and try again.';
+           return;
+@@ -2663,7 +2756,7 @@ bool inRegion(vec3 p) {
+     }
+     function onHostMessage(ev) {
+       let m; try { m = JSON.parse(ev.data); } catch { return; }
+-      if (m.type === 'toggle') { const s = SYSTEMS.find(x => x.id === m.id); if (s) { s.input.checked = !!m.on; setSystem(s, !!m.on); } }
++      if (m.type === 'toggle') { for (const id of (m.id === 'visceral' ? ORGAN_SYSTEM_IDS : [m.id])) { const s = SYSTEMS.find(x => x.id === id); if (s) { s.input.checked = !!m.on; setSystem(s, !!m.on); } } }
+       if (m.type === 'pins') { pinsOnEl.checked = !!m.on; pinsOn = !!m.on; refreshPins(); }
+       if (m.type === 'peel') setPeel(m.level);
+       if (m.type === 'xray') { xrayEl.checked = !!m.on; setXray(!!m.on); }

@@ -22,6 +22,7 @@ import { XP_RULES } from '@/data/learning/xp-rules';
 import { bankQuestions, buildPractice, legacyCourse, loadLegacyBank, loadLegacyLessonList, toQuestion } from '@/data/legacy-study';
 import { shuffleSeeded } from '@/data/legacy-questions';
 import { modeSettings, modeTitle, parsePracticeMode } from '@/data/practice-modes';
+import { pastTopicTitle } from '@/data/past-question-topics';
 import { loadPrePost, percentOf, savePrePost } from '@/data/prepost';
 import { buildLocalPractice, hb2LessonById, hb2Sets } from '@/data/hb2-study';
 import { legacyQuestionMemory, legacyReviewFor } from '@/data/legacy-review';
@@ -85,7 +86,7 @@ export default function LegacyPracticeScreen() {
       const take = (size: number) => (settings.count === Infinity ? size : Math.min(settings.count, size));
       // HB2 with a past-question set from the supplementary bank: skip to the legacy bank path.
       const isHb2SupplSet = course.subject && setId && !hb2Sets(course.id).find((s) => s.id === setId);
-      if (course.subject && !isHb2SupplSet) {
+      if (course.subject && !isHb2SupplSet && practice.kind !== 'pastTopic') {
         // HB2: this app's questions (their ids feed spaced review).
         const sets = hb2Sets(course.id);
         const all = sets.flatMap((item) => item.questions);
@@ -116,6 +117,10 @@ export default function LegacyPracticeScreen() {
         source = all.filter((q) => ids.has(q.id));
       } else if (setId) {
         source = all.filter((q) => q.set === setId);
+      } else if (practice.kind === 'pastTopic') {
+        // Every past question on the topic, once each (some are in more than one paper).
+        const seen = new Set<string>();
+        source = all.filter((q) => (q.tp ?? 'other') === practice.topicId && !seen.has(q.id) && Boolean(seen.add(q.id)));
       } else if (reviewIds) {
         // Spaced review of the original questions (data/legacy-review.ts).
         source = all.filter((q) => reviewIds.has(q.id));
@@ -126,9 +131,10 @@ export default function LegacyPracticeScreen() {
         if (chosen.length) source = chosen;
       }
       if (before) source = source.filter((q) => !before.has(`legacy:${course.id}:${q.id}`));
-      if (apex) source = source.filter((q) => q.kind !== 'input' && q.o?.length > 1 && q.a >= 0);
+      // Apex: no diagram questions (10 seconds is too short to read a picture).
+      if (apex) source = source.filter((q) => q.kind !== 'input' && q.o?.length > 1 && q.a >= 0 && !q.img);
       if (source.length === 0) return fail(reviewIds ? 'Nothing to review here right now — well done.' : 'There are no questions here yet.');
-      setTitle(modeTitle(practice, course.name, { lesson: lesson?.title, set: set?.name }));
+      setTitle(modeTitle(practice, course.name, { lesson: lesson?.title, set: set?.name, topic: practice.kind === 'pastTopic' ? pastTopicTitle(course.id, practice.topicId) : undefined }));
       const size = take(source.length);
       setQuestions(
         settings.variants

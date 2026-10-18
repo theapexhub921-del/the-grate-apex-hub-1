@@ -14,6 +14,7 @@ import { MemoryDistribution } from '@/components/learning/memory-ui';
 import { NextActionHero, NextActionList } from '@/components/learning/next-action-card';
 import { PersonalGoalsCard } from '@/components/learning/personal-goals-card';
 import { QuestionOfTheDay } from '@/components/learning/question-of-the-day';
+import { CardGrid } from '@/components/ui/card-grid';
 import { type Tile, TileGrid } from '@/components/ui/tile-grid';
 import { LearningWeekCard } from '@/components/learning/learning-week-card';
 import { ReviewCalendar } from '@/components/learning/review-calendar';
@@ -123,7 +124,7 @@ export default function LearnScreen() {
       </Card>
 
       <SectionHeader title="Subjects" subtitle="Subject → course → topic → lessons." style={styles.section} />
-      <View style={styles.subjectGrid}>
+      <CardGrid minItemWidth={260} maxColumns={3}>
       {offeredSubjects.map((subject) => {
         const status = getSubjectStatus(subject);
         const progress = subjectProgress(subject.id, inputs);
@@ -168,17 +169,16 @@ export default function LearnScreen() {
           </PressableCard>
         );
       })}
-
-      </View>
+      </CardGrid>
 
       {recent.length > 0 ? (
         <>
           <SectionHeader title="Your topics" subtitle="Where you have been learning recently." style={styles.section} />
-          <View style={styles.topicGrid}>
+          <CardGrid minItemWidth={280} maxColumns={3}>
           {recent.map((topic) => (
-            <View key={topic.topic.id} style={styles.topicGridItem}><TopicCard progress={topic} now={now} compact /></View>
+            <TopicCard key={topic.topic.id} progress={topic} now={now} compact style={styles.fill} />
           ))}
-          </View>
+          </CardGrid>
         </>
       ) : null}
     </View>
@@ -512,8 +512,7 @@ function createStyles(colors: ThemeColors) {
     comingIcon: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceElevated },
     comingTitle: { ...Type.title3, color: colors.text },
     comingText: { ...Type.body, color: colors.textSecondary },
-    subjectGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-    subjectCard: { flexGrow: 1, flexBasis: 260, minWidth: 240, maxWidth: 500, flexDirection: 'row', alignItems: 'center', gap: 14 },
+    subjectCard: { flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 14 },
     subjectInfo: { flex: 1, minWidth: 0, gap: 4 },
     subjectTitleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
     subjectTitle: { ...Type.title3, color: colors.text },
@@ -522,8 +521,7 @@ function createStyles(colors: ThemeColors) {
     flex: { flex: 1 },
     subjectMeta: { fontSize: 12, color: colors.textSecondary, fontWeight: '600' },
     subjectNote: { fontSize: 12, color: colors.textTertiary },
-    topicGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-    topicGridItem: { flexGrow: 1, flexBasis: 280, minWidth: 260, maxWidth: 440 },
+    fill: { flexGrow: 1 },
     reviewCard: { gap: 10 },
     reviewHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     reviewIcon: { width: 34, height: 34, borderRadius: 11, backgroundColor: colors.primarySubtle, alignItems: 'center', justifyContent: 'center' },

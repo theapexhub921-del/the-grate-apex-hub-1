@@ -60,6 +60,8 @@ export type LegacyLessonMeta = {
   sections: { id: string; title: string }[]; qids?: string[]; qcount?: number; extras?: string[]; v?: string;
   /** HB2 only: the topic the lesson belongs to, its subject and completion XP. */
   group?: string; subject?: SubjectId; xp?: number;
+  /** HB2 only: the part of the subject the topic belongs to (e.g. Gross Anatomy). */
+  section?: string;
 };
 export type Rich = string;
 export type Block =

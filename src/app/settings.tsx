@@ -289,10 +289,10 @@ export default function SettingsScreen() {
       </SettingsSection>
 
       {EXPERIENCES_ENABLED ? (
-        <SettingsSection title="Experience">
+        <SettingsSection title="Interface">
           <Text style={styles.optionLabel}>{isExperience(user?.profile?.experience) ? EXPERIENCE_INFO[user.profile.experience].name : 'Not chosen yet'}</Text>
           <Text style={styles.optionDescription}>Changes how the app looks and is laid out. Your account, progress, friends, messages, achievements, XP and theme stay as they are.</Text>
-          <Button label="Change experience" variant="secondary" size="sm" onPress={() => router.push('/choose-experience' as Href)} />
+          <Button label="Change interface" variant="secondary" size="sm" onPress={() => router.push('/choose-experience' as Href)} />
         </SettingsSection>
       ) : null}
 
