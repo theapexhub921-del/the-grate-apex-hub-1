@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -44,11 +44,13 @@ export default function PersonScreen() {
     }
   }, [uid]);
 
+  // My own page is the You tab. Only while this page is on screen (a visited
+  // page stays mounted as a hidden tab and must not move the learner elsewhere).
+  useFocusEffect(useCallback(() => {
+    if (uid && uid === user?.uid) router.replace('/profile');
+  }, [uid, user?.uid]));
   useEffect(() => {
-    if (uid && uid === user?.uid) {
-      router.replace('/profile');
-      return;
-    }
+    if (uid && uid === user?.uid) return;
     queueMicrotask(() => { void load(); });
   }, [uid, user?.uid, load]);
 
