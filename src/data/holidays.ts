@@ -43,3 +43,56 @@ function withNeighbours(dates: readonly string[]): ReadonlySet<string> {
 export const EASTER_DAYS: ReadonlySet<string> = new Set(Array.from({ length: 2050 - 2020 + 1 }, (_, i) => easterSunday(2020 + i)));
 export const EID_AL_FITR_DAYS = withNeighbours(EID_AL_FITR);
 export const EID_AL_ADHA_DAYS = withNeighbours(EID_AL_ADHA);
+
+// ── Special-day themes: 24 hours, then Premium ─────────────────────────────
+// A special-day theme (Christmas, Valentine, New Year, Independence, Easter,
+// both Eids) opens for 24 hours from the learner's first study on its day.
+// After that it locks again; keeping it for good is a Premium feature (owner's
+// decision, 2026-10-18; Premium is not built yet).
+
+export const SPECIAL_THEME_HOURS = 24;
+
+type SpecialDay = { label: string; isDay: (day: string) => boolean };
+const onDate = (monthDay: string) => (day: string) => day.slice(5) === monthDay;
+const inSet = (days: ReadonlySet<string>) => (day: string) => days.has(day);
+
+/** The special day of each special-day theme's achievement (achievements.ts ids). */
+export const SPECIAL_DAYS: Readonly<Record<string, SpecialDay>> = {
+  xmas: { label: '25 December', isDay: onDate('12-25') },
+  val: { label: '14 February', isDay: onDate('02-14') },
+  ny: { label: '1 January', isDay: onDate('01-01') },
+  gh: { label: '6 March', isDay: onDate('03-06') },
+  easter: { label: 'Easter Sunday', isDay: inSet(EASTER_DAYS) },
+  eidfitr: { label: 'Eid al-Fitr', isDay: inSet(EID_AL_FITR_DAYS) },
+  eidadha: { label: 'Eid al-Adha', isDay: inSet(EID_AL_ADHA_DAYS) },
+};
+
+/** 'YYYY-MM-DD' in the device's time zone (the same day the achievements count). */
+export const localDayKey = (time: number) => {
+  const d = new Date(time);
+  return key(d.getFullYear(), d.getMonth() + 1, d.getDate());
+};
+
+/**
+ * When the theme's 24 hours began: the learner's first study on the most recent
+ * of its special days, or null if they never studied on one.
+ */
+export function specialThemeStart(achievement: string, studyTimes: Iterable<number>): number | null {
+  const special = SPECIAL_DAYS[achievement];
+  if (!special) return null;
+  const firstByDay = new Map<string, number>();
+  for (const time of studyTimes) {
+    if (!(time > 0)) continue;
+    const day = localDayKey(time);
+    if (!special.isDay(day)) continue;
+    const seen = firstByDay.get(day);
+    if (seen === undefined || time < seen) firstByDay.set(day, time);
+  }
+  const latest = [...firstByDay.keys()].sort().pop();
+  return latest ? firstByDay.get(latest)! : null;
+}
+
+/** True while the theme's 24 hours are running. */
+export function specialThemeOpen(start: number | null, now: number) {
+  return start !== null && now >= start && now < start + SPECIAL_THEME_HOURS * 3_600_000;
+}

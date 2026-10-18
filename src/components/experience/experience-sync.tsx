@@ -1,8 +1,10 @@
 import { doc, getDoc } from 'firebase/firestore';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useAchievementStore, useAchievements } from '@/data/achievements-store';
 import { ACHIEVEMENTS } from '@/data/achievements';
+import { specialThemeStart } from '@/data/holidays';
+import { useLearning } from '@/data/learning/use-learning';
 import { DEFAULT_LEGACY_THEME, legacyThemeById } from '@/data/legacy-theme-colors';
 import { useProgress, waitForProgressSync } from '@/data/progress';
 import { chooseLegacyTheme, setLegacyThemePreference, useAppearancePreference, useLegacyThemePreference } from '@/data/settings';
@@ -83,7 +85,7 @@ export function ExperienceSync() {
     if (!entry) return;
     const lock = lockOf(entry);
     if (lock.unlocked) return;
-    if (lock.kind === 'achievement' && !achievementsReady) return; // not known yet
+    if ((lock.kind === 'achievement' || lock.kind === 'special') && !achievementsReady) return; // not known yet
     if ((lock.kind === 'admin' || lock.kind === 'premium') && !checked) return; // admins can use both
     void chooseLegacyTheme(DEFAULT_LEGACY_THEME);
   }, [uid, xpReadyFor, family, appearance, legacyTheme, lockOf, achievementsReady, checked]);
@@ -97,6 +99,13 @@ export function useThemeLocks() {
   const { states } = useAchievements();
   const { recorded } = useAchievementStore();
   const { isAdmin } = useIsAdmin();
+  // Every study time on this account (answers, quizzes, lessons): the special-day
+  // themes' 24 hours start at the first study on their day.
+  const { attempts, quizzes, now } = useLearning();
+  const studyTimes = useMemo(
+    () => [...attempts.map((item) => item.attemptedAt), ...quizzes.map((item) => item.completedAt), ...Object.values(progress.lessonCompletedAt)],
+    [attempts, quizzes, progress.lessonCompletedAt]
+  );
   return useCallback(
     (entry: ThemeEntry): ThemeLock => {
       const levels: Record<string, number> = { ...recorded };
@@ -105,12 +114,13 @@ export function useThemeLocks() {
         xp: progress.xp,
         achievementLevels: levels,
         isAdmin,
+        special: { start: (achievement) => specialThemeStart(achievement, studyTimes), now },
         achievement: (id) => {
           const found = ACHIEVEMENTS.find((item) => item.id === id);
           return found ? { name: found.name, desc: found.goal(found.levels[0]) } : undefined;
         },
       });
     },
-    [progress.xp, states, recorded, isAdmin]
+    [progress.xp, states, recorded, isAdmin, studyTimes, now]
   );
 }

@@ -343,6 +343,12 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * Originate's desktop sidebar (`src/components/desktop-sidebar.tsx`) is the owner's favourite: do not restyle it.
 * Originate's Study page keeps every section The Originals has (course pictures, question of the day, practise-and-plan tiles, your progress, your week), drawn in Originate's style.
 
+### Themes
+
+* Every theme is in `src/data/theme-catalog.ts` (locks: level, achievement, admin, premium, special). Added themes live in `src/data/extra-themes.ts`.
+* **Special-day themes** (Christmas, Valentine, New Year, Independence in the Ghana flag colours, Easter, Eid al-Fitr, Eid al-Adha) open for **24 hours from the learner's first study on their day**, then lock again; keeping one is Premium (owner, 2026-10-18). Days, Easter and the Eid table (to 2032, day either side accepted) are in `src/data/holidays.ts`; `useThemeLocks` in `experience-sync.tsx` feeds the study times. An expired theme is switched back to the default.
+* **Premium** is not built yet: premium themes (MSA, red and white) are locked for everyone except admins and say "coming soon".
+
 ### Primitives (`src/components/ui/`)
 
 * `Card` / `PressableCard` (with tones), `Button`, `IconButton`
