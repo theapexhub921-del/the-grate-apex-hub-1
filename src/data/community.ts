@@ -16,6 +16,9 @@ import {
   where,
   writeBatch,
   limitToLast,
+  onSnapshot,
+  type DocumentData,
+  type Unsubscribe,
 } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
@@ -780,31 +783,85 @@ export async function getOrCreateFriendConversation(friendId: string): Promise<s
   return id;
 }
 
+function conversationMessageOf(conversationId: string, id: string, d: DocumentData): CommunityMessage {
+  const audio = d.audio && typeof d.audio.url === 'string' ? { url: d.audio.url as string, seconds: Number(d.audio.d) || 0 } : null;
+  return {
+    id, conversation_id: conversationId, sender_id: String(d.from ?? ''), body: String(d.text ?? ''), created_at: iso(d.createdAt), audio,
+    reply: d.reply && typeof d.reply === 'object' ? { mid: String(d.reply.mid ?? ''), from: String(d.reply.from ?? ''), text: String(d.reply.text ?? '') } : null,
+    reactions: d.reactions && typeof d.reactions === 'object' ? (d.reactions as Record<string, string>) : {},
+    media: cleanMedia(d.media),
+    doc: d.doc && typeof d.doc.url === 'string' && safeUrl(d.doc.url) ? { url: d.doc.url as string, name: String(d.doc.name ?? 'Document') } : null,
+    fwd: d.fwd === true,
+    share: shareOf(d.share),
+  };
+}
+
+const latestMessages = (conversationId: string) => query(collection(db, 'chats', conversationId, 'messages'), orderBy('createdAt', 'asc'), limitToLast(200));
+
 export async function listConversationMessages(conversationId: string): Promise<CommunityMessage[]> {
-  const snap = await getDocs(query(collection(db, 'chats', conversationId, 'messages'), orderBy('createdAt', 'asc'), limitToLast(200)));
-  return snap.docs.map((item) => {
-    const d = item.data();
-    const audio = d.audio && typeof d.audio.url === 'string' ? { url: d.audio.url as string, seconds: Number(d.audio.d) || 0 } : null;
-    return {
-      id: item.id, conversation_id: conversationId, sender_id: String(d.from ?? ''), body: String(d.text ?? ''), created_at: iso(d.createdAt), audio,
-      reply: d.reply && typeof d.reply === 'object' ? { mid: String(d.reply.mid ?? ''), from: String(d.reply.from ?? ''), text: String(d.reply.text ?? '') } : null,
-      reactions: d.reactions && typeof d.reactions === 'object' ? (d.reactions as Record<string, string>) : {},
-      media: cleanMedia(d.media),
-      doc: d.doc && typeof d.doc.url === 'string' && safeUrl(d.doc.url) ? { url: d.doc.url as string, name: String(d.doc.name ?? 'Document') } : null,
-      fwd: d.fwd === true,
-      share: shareOf(d.share),
-    };
-  });
+  const snap = await getDocs(latestMessages(conversationId));
+  return snap.docs.map((item) => conversationMessageOf(conversationId, item.id, item.data({ serverTimestamps: 'estimate' })));
+}
+
+/**
+ * The chat's newest 200 messages, live. Firebase sends only what changed, so an
+ * open chat costs one read per new message (the project is on the free plan,
+ * 50,000 reads a day; reading the whole chat every few seconds used it up).
+ */
+export function watchConversationMessages(conversationId: string, onList: (list: CommunityMessage[]) => void, onError: (error: unknown) => void): Unsubscribe {
+  return onSnapshot(
+    latestMessages(conversationId),
+    (snap) => onList(snap.docs.map((item) => conversationMessageOf(conversationId, item.id, item.data({ serverTimestamps: 'estimate' })))),
+    onError
+  );
+}
+
+// My chats, kept live by one listener and shared by the chats list, the bell
+// and the recent-messages card (they used to read every chat every 15–30 s).
+type ChatDoc = { id: string; data: DocumentData };
+type LiveChats = { uid: string; docs: ChatDoc[] | null; stop: Unsubscribe; waiting: ((ok: boolean) => void)[] };
+let liveChats: LiveChats | null = null;
+const myChatsListeners = new Set<() => void>();
+
+/** Called whenever one of my chats changes (a new message, a read mark). */
+export function onMyChatsChanged(listener: () => void) {
+  myChatsListeners.add(listener);
+  return () => { myChatsListeners.delete(listener); };
+}
+
+function myChatDocs(me: string): Promise<ChatDoc[] | null> {
+  if (!liveChats || liveChats.uid !== me) {
+    liveChats?.stop();
+    const entry: LiveChats = { uid: me, docs: null, stop: () => {}, waiting: [] };
+    liveChats = entry;
+    entry.stop = onSnapshot(
+      query(collection(db, 'chats'), where('members', 'array-contains', me), limit(100)),
+      (snap) => {
+        entry.docs = snap.docs.map((item) => ({ id: item.id, data: item.data({ serverTimestamps: 'estimate' }) }));
+        entry.waiting.splice(0).forEach((resolve) => resolve(true));
+        myChatsListeners.forEach((listener) => listener());
+      },
+      () => {
+        // Signed out, or offline before the first answer: start again next time.
+        entry.waiting.splice(0).forEach((resolve) => resolve(false));
+        if (liveChats === entry) liveChats = null;
+      }
+    );
+  }
+  const entry = liveChats;
+  if (entry.docs) return Promise.resolve(entry.docs);
+  return new Promise((resolve) => entry.waiting.push((ok) => resolve(ok ? entry.docs : null)));
 }
 
 /** My chats, most recent first (members contains me; sorted here so no extra index is needed). */
 export async function listMyConversations(max = 8): Promise<ConversationSummary[]> {
   const me = await signedInUserId();
-  const snap = await getDocs(query(collection(db, 'chats'), where('members', 'array-contains', me), limit(100)));
+  const docs = (await myChatDocs(me))
+    ?? (await getDocs(query(collection(db, 'chats'), where('members', 'array-contains', me), limit(100)))).docs.map((item) => ({ id: item.id, data: item.data() }));
   const millis = (value: unknown) => (value as { toMillis?: () => number } | null)?.toMillis?.() ?? 0;
-  return snap.docs
+  return docs
     .map((item) => {
-      const d = item.data();
+      const d = item.data;
       const otherId = ((d.members ?? []) as string[]).find((member) => member !== me) ?? '';
       const lastAt = millis(d.lastAt);
       const seenAt = millis((d.seen ?? {})[me]);
@@ -925,11 +982,38 @@ const millisOf = (value: unknown) => {
   return v && typeof v.toMillis === 'function' ? v.toMillis() : null;
 };
 
-export async function loadConversationMeta(conversationId: string, mine: { readReceipts: boolean; shareOnlineStatus: boolean }): Promise<ConversationMeta> {
+type MetaPrefs = { readReceipts: boolean; shareOnlineStatus: boolean };
+
+export async function loadConversationMeta(conversationId: string, mine: MetaPrefs): Promise<ConversationMeta> {
   const me = await signedInUserId();
   const chat = (await getDoc(doc(db, 'chats', conversationId)).catch(() => null))?.data() ?? {};
   const otherId = ((chat.members ?? []) as string[]).find((member) => member !== me) ?? null;
   const other = otherId ? (await getDoc(doc(db, 'users', otherId)).catch(() => null))?.data() ?? {} : {};
+  return conversationMetaOf(otherId, chat, other, mine);
+}
+
+/** Read marks, typing and the friend's presence, live (the chat and the friend's profile). */
+export function watchConversationMeta(conversationId: string, me: string, mine: MetaPrefs, onMeta: (meta: ConversationMeta) => void): Unsubscribe {
+  let chat: DocumentData = {};
+  let other: DocumentData = {};
+  let otherId: string | null = null;
+  let stopOther: Unsubscribe = () => {};
+  const emit = () => onMeta(conversationMetaOf(otherId, chat, other, mine));
+  const stopChat = onSnapshot(doc(db, 'chats', conversationId), (snap) => {
+    chat = snap.data({ serverTimestamps: 'estimate' }) ?? {};
+    const next = ((chat.members ?? []) as string[]).find((member) => member !== me) ?? null;
+    if (next !== otherId) {
+      stopOther();
+      otherId = next;
+      other = {};
+      stopOther = next ? onSnapshot(doc(db, 'users', next), (user) => { other = user.data() ?? {}; emit(); }, () => {}) : () => {};
+    }
+    emit();
+  }, () => {});
+  return () => { stopChat(); stopOther(); };
+}
+
+function conversationMetaOf(otherId: string | null, chat: DocumentData, other: DocumentData, mine: MetaPrefs): ConversationMeta {
   const theirReceipts = other.readReceipts !== false;
   const lastSeen = typeof other.lastSeen === 'number' ? other.lastSeen : null;
   return {

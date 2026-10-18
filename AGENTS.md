@@ -130,10 +130,20 @@ Social (real friends) is in `src/data/social.ts`, backed by Firestore:
 * Usernames, learner search, friend requests, and social notifications.
 * Realtime sync through Firestore snapshot listeners.
 
-"Stump a friend" (`src/data/stumps.ts`, `src/components/social/stump-card.tsx`): a multiple-choice question sent from quiz results or from the stump button in any chat (`pickStumpQuestion` picks one the learner has answered). The composer sends it to any mix of the feed, friends (each in the private chat) and groups (`sendStump`). Answers are saved to question history as practice, no XP. Only the sender sees who got it right or wrong; others see only their own result. Works with the deployed Firestore rules unchanged.
+**Firebase reads (free plan, owner 2026-10-18):** the project is on Firebase's free Spark plan (50,000 document reads a day for everyone). Never poll Firestore with `getDocs` on a timer: use `onSnapshot` listeners, which are charged only for changed documents. Open chats (`watchConversationMessages`, `watchConversationMeta`, `watchGroupMessages`, `watchGroup`), the chats list (`myChatDocs` in `community.ts`, shared by the chats list, the bell and the recent-messages card), the groups list (`listMyGroups`) and the bell's account notifications are all live. The friend streak reads only messages newer than the last load. `tests/firebase-reads.test.mjs` checks this, and that every collection the app uses has a rule.
 
-* **Feed:** a post with `stump: { qid, note }`; answers are hidden `replies` with `stump: { pick, ok }`.
-* **Chats and groups:** a message with `share: { kind: 'stump', uid, username, id: <question id>, text, note }` (the original app's shared-post shape, so it shows there as a shared post); an answer is a message with `share: { kind: 'stumpAnswer', id: <stump message id>, pick, ok }`. Answer messages are not drawn as bubbles: the stump card reads them (`chatStumpAnswers`).
+"Stump a friend" (`src/data/stumps.ts`, `src/components/social/stump-card.tsx`): a multiple-choice question sent from quiz results or from the stump button in any chat (`pickStumpQuestion` picks only questions the learner has answered, owner 2026-10-18). The composer sends it to any mix of the feed, friends (each in the private chat) and groups (`sendStump`). Answers are saved to question history as practice, no XP. Only the sender sees who got it right or wrong; others see only their own result, and the database enforces it (owner: answers must be private).
+
+* **Feed:** a post with `stump: { qid, note }`; answers are private documents `posts/{id}/stumpAnswers/{uid}` (readable by the answerer and the post's author). Older answers were public `replies` with `stump: { pick, ok }` and are still read.
+* **Chats and groups:** a message with `share: { kind: 'stump', uid, username, id: <question id>, text, note }` (the original app's shared-post shape, so it shows there as a shared post). In a direct chat an answer is a message with `share: { kind: 'stumpAnswer', id: <stump message id>, pick, ok }` (only the two of you can read it). In a group an answer is a private document `groups/{gid}/stumpAnswers/{stump message id}_{uid}` (`from`, `to` = the sharer), read live by `watchGroupStumpAnswers`. Answer messages are never drawn as bubbles: the stump card reads them (`chatStumpAnswers`).
+* Until the 2026-10-18 rules are published, answering falls back to the old public way, so nothing breaks.
+* Past-paper questions (`legacy:<course>:<id>`) are only known once their paper is loaded: `useStumpQuestion` / `StumpById` load it first, so friends who never opened that paper can still answer.
+
+**Groups** (`src/data/group-chat.ts`) hold up to `GROUP_MAX_MEMBERS` = 20 people (owner 2026-10-18; the rules allow 20).
+
+**Push addresses** are private: `pushDevices/{uid}.webPush` (owner-only rule). `api/push.mjs` and `api/reminders.mjs` read them with the service account (`api/_admin.mjs`, Vercel setting `FIREBASE_SERVICE_ACCOUNT`) and merge the older public `users/{uid}.webPush` list (`mergeDevices`). The app removes the public copy only after `GET /api/push` says `privateDevices: true`.
+
+**The live address** (`https://grateapex.vercel.app`) is only in `src/lib/live-site.ts` (`LIVE_SITE`, `SITE_BASE`, `API_BASE`) on the app side.
 
 Database changes use Firestore rules in `firestore.rules`. Deploy them only with the owner's approval.
 
@@ -331,13 +341,13 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 
 ### Atmosphere
 
-* The page background is the shell's atmosphere layer (`src/components/atmosphere/`). In Originate it is one plain colour from the theme (the per-route moods no longer change the look); The Originals and Hybrid draw the original gradient instead.
+* The page background is the shell's atmosphere layer (`src/components/atmosphere/`). In Originate it is one plain colour from the theme (the per-route moods no longer change the look); The Originals (Legacy) draws the original gradient instead. (Hybrid was removed on 2026-10-18.)
 * Screens are transparent, so build pages with `Screen` from `src/components/ui/screen.tsx`. Do not give screens an opaque page background.
 
 ### Originate design system (2026-10-16)
 
 * Originate follows `docs/design-system.md` — read it before changing any Originate screen. In short: IBM Plex Sans (Source Serif 4 for lesson text), weights 400/500/600, sentence-case labels, a plain page colour (no atmosphere effects), cards only when grouping helps (radius 12, 1px border, no shadow), lists as `List` / `ListRow` (`src/components/ui/list.tsx`), one primary button per screen, a docked tab bar on phones, and only motion that answers an action.
-* The rules live in the primitives and switch on `useExperience() === 'originate'`, so The Originals and Hybrid look exactly as before. The type rules are applied to every `Text` by `src/components/ui/text.tsx` (`src/data/originate-type.ts`); shape and spacing values are in `src/constants/originate.ts`.
+* The rules live in the primitives and switch on `useExperience() === 'originate'`, so The Originals (Legacy) looks exactly as before. The type rules are applied to every `Text` by `src/components/ui/text.tsx` (`src/data/originate-type.ts`); shape and spacing values are in `src/constants/originate.ts`.
 * Learners see experiences as **interfaces** (Settings → Interface, "Choose your interface") and The Originals as **Legacy** (owner's requests, 2026-10-17); code, routes and the saved id (`originals`) keep the old words, so nobody's choice resets.
 * The Originals (Legacy) is the default experience; the chooser and Settings never call one experience "recommended" (owner's choice, 2026-10-16).
 * Originate's desktop sidebar (`src/components/desktop-sidebar.tsx`) is the owner's favourite: do not restyle it.

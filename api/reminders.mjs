@@ -18,10 +18,10 @@
 // Vercel as FIREBASE_SERVICE_ACCOUNT (the whole JSON file, or that JSON in base64).
 // Learners' notification switches (Settings → Notifications: Streak reminders,
 // League, Weekly summary) are honoured. Deliveries use the same push keys as api/push.mjs.
-import { importPKCS8, SignJWT } from 'jose';
 import webpush from 'web-push';
 
-import { inReminderHours, isSundayLocal, leagueNudge, leagueWeek, localDay, localWeekStart, pushAddress, REVIEW_MIN_DUE, reviewDueCount, streakAtRisk, weeklySummary } from './_push-logic.mjs';
+import { adminToken, serviceAccount } from './_admin.mjs';
+import { inReminderHours, isSundayLocal, leagueNudge, leagueWeek, localDay, localWeekStart, mergeDevices, pushAddress, REVIEW_MIN_DUE, reviewDueCount, streakAtRisk, weeklySummary } from './_push-logic.mjs';
 
 const PROJECT = 'grate-apex';
 const DB = `projects/${PROJECT}/databases/(default)/documents`;
@@ -44,37 +44,7 @@ function plain(value) {
 const fieldsOf = (doc) => Object.fromEntries(Object.entries(doc?.fields ?? {}).map(([key, value]) => [key, plain(value)]));
 const idOf = (doc) => String(doc.name).split('/').pop();
 
-// ── Permission to read everything (service account → short-lived token) ──
-function serviceAccount() {
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (!raw) return null;
-  try {
-    const text = raw.trim().startsWith('{') ? raw : Buffer.from(raw, 'base64').toString('utf8');
-    const account = JSON.parse(text);
-    return account.client_email && account.private_key ? account : null;
-  } catch {
-    return null;
-  }
-}
-
-async function adminToken(account) {
-  const key = await importPKCS8(account.private_key, 'RS256');
-  const assertion = await new SignJWT({ scope: 'https://www.googleapis.com/auth/datastore' })
-    .setProtectedHeader({ alg: 'RS256', typ: 'JWT' })
-    .setIssuer(account.client_email)
-    .setSubject(account.client_email)
-    .setAudience('https://oauth2.googleapis.com/token')
-    .setIssuedAt()
-    .setExpirationTime('1h')
-    .sign(key);
-  const response = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion }),
-  });
-  if (!response.ok) throw new Error(`Google refused the service account (${response.status}).`);
-  return (await response.json()).access_token;
-}
+// Permission to read everything (service account → short-lived token): api/_admin.mjs.
 
 const api = (token, path, init = {}) => fetch(`${FIRESTORE}${path}`, { ...init, headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' } });
 
@@ -107,6 +77,13 @@ async function getMany(token, collection, ids, fields) {
   return out;
 }
 
+/** Learners' profiles (only the named fields) with their devices from both places (private pushDevices first). */
+async function usersWithDevices(token, ids, fields) {
+  const [users, devices] = await Promise.all([getMany(token, 'users', ids, fields), getMany(token, 'pushDevices', ids, ['webPush'])]);
+  for (const [id, user] of users) user.webPush = mergeDevices(devices.get(id)?.webPush, user.webPush);
+  return users;
+}
+
 async function leagueMembers(token, week, tier) {
   const response = await api(token, ':runQuery', {
     method: 'POST',
@@ -123,7 +100,9 @@ async function leagueMembers(token, week, tier) {
     }),
   });
   if (!response.ok) throw new Error(`Could not read league tier ${tier} (${response.status}).`);
-  return (await response.json()).filter((row) => row.document).map((row) => ({ id: idOf(row.document), ...fieldsOf(row.document) }));
+  const people = (await response.json()).filter((row) => row.document).map((row) => ({ id: idOf(row.document), ...fieldsOf(row.document) }));
+  const devices = await getMany(token, 'pushDevices', people.map((person) => person.id), ['webPush']);
+  return people.map((person) => ({ ...person, webPush: mergeDevices(devices.get(person.id)?.webPush, person.webPush) }));
 }
 
 // ── Sending ───────────────────────────────────────────────────────────
@@ -175,7 +154,7 @@ async function streakJob(token, now) {
   const candidates = progress
     .map((doc) => ({ id: idOf(doc), ...fieldsOf(doc) }))
     .filter((item) => item.streak > 0 && typeof item.lastActivityDate === 'string' && item.lastActivityDate >= since);
-  const users = await getMany(token, 'users', candidates.map((item) => item.id), ['webPush', 'preferences.notification_preferences', 'streakPushDay', 'appSeenDay']);
+  const users = await usersWithDevices(token, candidates.map((item) => item.id), ['webPush', 'preferences.notification_preferences', 'streakPushDay', 'appSeenDay']);
   const jobs = [];
   for (const item of candidates) {
     const user = users.get(item.id);
@@ -210,7 +189,7 @@ async function reviewJob(token, now) {
   const ids = active.map((item) => item.id);
   const [schedules, users] = await Promise.all([
     getMany(token, 'progress', ids, ['reviewSchedule']),
-    getMany(token, 'users', ids, ['webPush', 'preferences.notification_preferences', 'reviewPushDay', 'appSeenDay']),
+    usersWithDevices(token, ids, ['webPush', 'preferences.notification_preferences', 'reviewPushDay', 'appSeenDay']),
   ]);
   const jobs = [];
   for (const item of active) {
@@ -274,7 +253,7 @@ async function weeklyJob(token, now) {
   const active = progress
     .map((doc) => ({ id: idOf(doc), ...fieldsOf(doc) }))
     .filter((item) => typeof item.lastActivityDate === 'string' && item.lastActivityDate >= since);
-  const users = await getMany(token, 'users', active.map((item) => item.id), ['webPush', 'preferences.notification_preferences', 'weeklyPushWeek', 'league']);
+  const users = await usersWithDevices(token, active.map((item) => item.id), ['webPush', 'preferences.notification_preferences', 'weeklyPushWeek', 'league']);
   const ready = [];
   for (const item of active) {
     const user = users.get(item.id);

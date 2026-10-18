@@ -1,11 +1,16 @@
 // Push notifications that arrive even when GrAte Apex Hub is closed (web app
 // on phones and computers). When device alerts are on, this browser registers
-// with its push service and its address is kept on the learner's account
-// (users/{uid}.webPush, at most five devices). After a message is sent, the
-// app asks /api/push (api/push.mjs) to alert the friend's devices.
+// with its push service and its address is kept privately for the learner
+// (pushDevices/{uid}.webPush, at most five devices; only the learner and the
+// server can read it). After a message is sent, the app asks /api/push
+// (api/push.mjs) to alert the friend's devices.
+// Older accounts kept the addresses on the public profile (users/{uid}.webPush),
+// which every signed-in learner can read. They are moved off it as soon as the
+// server says it can read the private copy (GET /api/push); until then both are kept.
 // The key below is the public half of the push key pair; the private half is
 // only in the server's settings.
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { API_BASE } from '@/lib/live-site';
+import { deleteField, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Platform } from 'react-native';
 
 import { readStreakReminderHour } from '@/data/settings';
@@ -14,6 +19,7 @@ import { auth, db } from '@/lib/firebase';
 export const VAPID_PUBLIC_KEY = 'BCk5aBexMixVfqDa-M2BoJzVIhYj2lQwkGfVFvu9977rvGTmrJ0A96VGT9V8HgOSjDa4Qj7J6mG-96n9L-uQ4HQ';
 
 const MAX_DEVICES = 5;
+const SERVER = API_BASE;
 const emulator = process.env.EXPO_PUBLIC_FIREBASE_EMULATOR === '1';
 
 const supported = () =>
@@ -64,13 +70,24 @@ export async function registerWebPush() {
     subscription ??= await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: serverKey });
     const json = subscription.toJSON() as { endpoint?: string; keys?: { p256dh?: string; auth?: string } };
     if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) { webPushError = 'This device returned an incomplete push address.'; return false; }
-    const ref = doc(db, 'users', uid);
-    const existing = ((await getDoc(ref)).data()?.webPush ?? []) as Device[];
-    // Already saved as this account's newest device: nothing to write.
+    const publicRef = doc(db, 'users', uid);
+    const privateRef = doc(db, 'pushDevices', uid);
+    const [publicSnap, privateSnap] = await Promise.all([getDoc(publicRef), getDoc(privateRef).catch(() => null)]);
+    const publicList = (publicSnap.data()?.webPush ?? []) as Device[];
+    const privateList = (privateSnap?.data()?.webPush ?? []) as Device[];
     const hour = await readStreakReminderHour();
-    if (existing[0]?.endpoint === json.endpoint && existing[0]?.tz === timeZoneOffset() && (existing[0]?.hour ?? null) === hour) return true;
-    const devices = [{ endpoint: json.endpoint, keys: { p256dh: json.keys.p256dh, auth: json.keys.auth }, at: Date.now(), tz: timeZoneOffset(), ...(hour === null ? {} : { hour }) }, ...existing.filter((device) => device?.endpoint && device.endpoint !== json.endpoint)].slice(0, MAX_DEVICES);
-    await setDoc(ref, { webPush: devices }, { merge: true });
+    const isThis = (device?: Device) => device?.endpoint === json.endpoint && device?.tz === timeZoneOffset() && (device?.hour ?? null) === hour;
+    // Already saved as this account's newest device, privately and nowhere public: nothing to write.
+    if (isThis(privateList[0]) && !publicList.length) return true;
+    const known = [...privateList, ...publicList].filter((device, index, all) => device?.endpoint && device.endpoint !== json.endpoint && all.findIndex((other) => other?.endpoint === device.endpoint) === index);
+    const devices = [{ endpoint: json.endpoint, keys: { p256dh: json.keys.p256dh, auth: json.keys.auth }, at: Date.now(), tz: timeZoneOffset(), ...(hour === null ? {} : { hour }) }, ...known].slice(0, MAX_DEVICES);
+    const savedPrivately = isThis(privateList[0]) || (await setDoc(privateRef, { webPush: devices, updatedAt: serverTimestamp() }).then(() => true, () => false));
+    if (savedPrivately && (await serverReadsPrivateDevices())) {
+      if (publicList.length) await setDoc(publicRef, { webPush: deleteField() }, { merge: true });
+    } else if (!isThis(publicList[0])) {
+      // The private rules or the server's key are not set up yet: keep the public copy too.
+      await setDoc(publicRef, { webPush: devices }, { merge: true });
+    }
     return true;
   } catch (error) {
     webPushError = error instanceof Error ? error.message : 'Could not register this device for push.';
@@ -121,15 +138,24 @@ export async function unregisterWebPush() {
     const endpoint = subscription.endpoint;
     await subscription.unsubscribe().catch(() => { });
     if (!uid) return;
-    const ref = doc(db, 'users', uid);
-    const existing = ((await getDoc(ref)).data()?.webPush ?? []) as Device[];
-    await setDoc(ref, { webPush: existing.filter((device) => device?.endpoint !== endpoint) }, { merge: true });
+    for (const ref of [doc(db, 'pushDevices', uid), doc(db, 'users', uid)]) {
+      const existing = ((await getDoc(ref).catch(() => null))?.data()?.webPush ?? []) as Device[];
+      if (existing.some((device) => device?.endpoint === endpoint)) await setDoc(ref, { webPush: existing.filter((device) => device?.endpoint !== endpoint) }, { merge: true }).catch(() => {});
+    }
   } catch {
     // nothing to remove
   }
 }
 
-const SERVER = Platform.OS === 'web' ? '' : 'https://grateapex.vercel.app';
+/** True when the server can read private push addresses (it has the project's service account). */
+async function serverReadsPrivateDevices() {
+  try {
+    const response = await fetch(`${SERVER}/api/push`);
+    return response.ok && (await response.json()).privateDevices === true;
+  } catch {
+    return false;
+  }
+}
 
 /** Asks the server to alert the friend's devices about the message just sent (best effort). */
 export async function announceMessage(chatId: string, to: string | null | undefined) {

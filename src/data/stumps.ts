@@ -13,14 +13,20 @@
 // can be shared. Answering is also saved in the learner's question history
 // (as practice), so it counts as revision. It earns no XP.
 //
-// Privacy: only the sharer's card lists who got it right or wrong; everyone
-// else sees just their own result. (The shared rules let any signed-in learner
-// read replies, so this is a screen rule, not a database one.)
-import { collection, doc, getDocs, limit, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
+// Privacy (owner, 2026-10-18: answers must be private): only the sharer sees
+// who got it right or wrong; everyone else sees just their own result. Answers
+// are saved where the rules let only the answerer and the sharer read them:
+//   posts/{id}/stumpAnswers/{uid}            feed stumps
+//   groups/{gid}/stumpAnswers/{mid}_{uid}    group stumps (to = the sharer)
+// A direct chat has only the two of you, so answers there stay chat messages.
+// Until the new rules are published, saving falls back to the old public way
+// (a reply / a group message), and older answers are still read from there.
+import { collection, doc, getDoc, getDocs, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, type Unsubscribe, where } from 'firebase/firestore';
 
 import { sendChatMessage } from '@/data/chat';
 import { blockedLearners, type CommunityMessage, createCommunityPost, getOrCreateFriendConversation, type MessageShare, myUsername } from '@/data/community';
-import { getQuestion, getTopicQuestions, publishedTopics } from '@/data/curriculum';
+import { getQuestion } from '@/data/curriculum';
+import { loadPastQuestions } from '@/data/past-questions';
 import { forgetFriendStreak } from '@/data/friend-streak-store';
 import { sendGroupMessage } from '@/data/group-chat';
 import { getQuestionHistory, recordQuestionAttempts } from '@/data/question-history';
@@ -42,6 +48,19 @@ export function canStump(question: Question | undefined | null): question is Cho
 export function stumpQuestion(questionId: string): ChoiceQuestion | null {
   const question = getQuestion(questionId);
   return canStump(question) ? question : null;
+}
+
+/** A past-paper question id (`legacy:<course>:<id>`): its paper can be loaded to find it. */
+export const canLoadStumpQuestion = (questionId: string) => /^legacy:[^:]+:/.test(questionId);
+
+/** The shared question, loading its past-paper bank first when this device hasn't yet. */
+export async function loadStumpQuestion(questionId: string): Promise<ChoiceQuestion | null> {
+  const found = stumpQuestion(questionId);
+  if (found) return found;
+  const course = /^legacy:([^:]+):/.exec(questionId)?.[1];
+  if (!course) return null;
+  await loadPastQuestions(course).catch(() => null);
+  return stumpQuestion(questionId);
 }
 
 /**
@@ -66,28 +85,40 @@ export async function createStumpPost(question: ChoiceQuestion, note: string) {
   return createCommunityPost(stumpPostText(question, cleanNote), undefined, null, { qid: question.id, note: cleanNote });
 }
 
-/** Everyone's answers to a stump, first answer per learner, oldest first. */
-export async function listStumpAnswers(postId: string): Promise<StumpAnswer[]> {
-  const [snap, blocked] = await Promise.all([
-    getDocs(query(collection(db, 'posts', postId, 'replies'), orderBy('createdAt', 'asc'), limit(300))),
+const isoOf = (value: unknown) => ((value as { toDate?: () => Date } | null)?.toDate ? (value as { toDate: () => Date }).toDate().toISOString() : new Date().toISOString());
+const denied = (error: unknown) => (error as { code?: string } | null)?.code === 'permission-denied';
+
+/** First answer per learner, oldest first, without blocked learners. */
+export function firstAnswers(list: readonly StumpAnswer[], blocked: ReadonlySet<string> = new Set()): StumpAnswer[] {
+  const seen = new Set<string>();
+  return [...list]
+    .sort((a, b) => Date.parse(a.at) - Date.parse(b.at))
+    .filter((answer) => {
+      if (!answer.userId || seen.has(answer.userId) || blocked.has(answer.userId)) return false;
+      seen.add(answer.userId);
+      return true;
+    });
+}
+
+/** Answers I can see on a feed stump: all of them on my own, otherwise only mine. */
+export async function listStumpAnswers(postId: string, sharerId?: string | null): Promise<StumpAnswer[]> {
+  const me = (await myUsername().catch(() => null))?.uid ?? null;
+  const privateAnswers = collection(db, 'posts', postId, 'stumpAnswers');
+  const [legacy, hidden, blocked] = await Promise.all([
+    // Answers saved before the private rules (public replies).
+    getDocs(query(collection(db, 'posts', postId, 'replies'), orderBy('createdAt', 'asc'), limit(300))).then((snap) => snap.docs.flatMap((item) => {
+      const d = item.data();
+      if (!d.stump || typeof d.stump.pick !== 'number') return [];
+      return [{ userId: String(d.authorUid ?? ''), username: typeof d.authorName === 'string' ? d.authorName : null, pick: d.stump.pick as number, ok: d.stump.ok === true, at: isoOf(d.createdAt) }];
+    })).catch(() => [] as StumpAnswer[]),
+    (me && sharerId === me
+      ? getDocs(query(privateAnswers, limit(500))).then((snap) => snap.docs.map((item) => ({ id: item.id, d: item.data() })))
+      : me ? getDoc(doc(privateAnswers, me)).then((item) => (item.exists() ? [{ id: item.id, d: item.data() }] : [])) : Promise.resolve([])
+    ).catch(() => []),
     blockedLearners(),
   ]);
-  const seen = new Set<string>();
-  const answers: StumpAnswer[] = [];
-  for (const item of snap.docs) {
-    const d = item.data();
-    const userId = String(d.authorUid ?? '');
-    if (!d.stump || typeof d.stump.pick !== 'number' || !userId || seen.has(userId) || blocked.has(userId)) continue;
-    seen.add(userId);
-    answers.push({
-      userId,
-      username: typeof d.authorName === 'string' ? d.authorName : null,
-      pick: d.stump.pick,
-      ok: d.stump.ok === true,
-      at: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : new Date().toISOString(),
-    });
-  }
-  return answers;
+  const answers = hidden.map(({ id, d }) => ({ userId: id, username: typeof d.username === 'string' ? d.username : null, pick: Number(d.pick), ok: d.ok === true, at: isoOf(d.at) }));
+  return firstAnswers([...legacy, ...answers], blocked);
 }
 
 /**
@@ -95,32 +126,33 @@ export async function listStumpAnswers(postId: string): Promise<StumpAnswer[]> {
  * One try each: if I already answered (say, on another copy of the card), that
  * answer is returned and nothing new is saved.
  */
-export async function answerStump(postId: string, question: ChoiceQuestion, pick: number): Promise<StumpAnswer> {
+export async function answerStump(postId: string, question: ChoiceQuestion, pick: number, sharerId?: string | null): Promise<StumpAnswer> {
   const me = await myUsername();
-  const earlier = (await listStumpAnswers(postId)).find((answer) => answer.userId === me.uid);
+  const earlier = (await listStumpAnswers(postId, sharerId)).find((answer) => answer.userId === me.uid);
   if (earlier) return earlier;
   const ok = pick === question.answer;
-  await setDoc(doc(collection(db, 'posts', postId, 'replies')), {
-    body: 'Answered this Stump a friend question.',
-    authorUid: me.uid,
-    authorName: me.username,
-    createdAt: serverTimestamp(),
-    stump: { pick, ok },
-  });
-  // Counts as revision in the learning engine (no XP).
-  void recordQuestionAttempts([
-    {
-      questionId: question.id,
-      topicId: question.topicId ?? '',
-      lessonId: question.lessonId ?? '',
-      concept: question.concept,
-      conceptId: question.conceptId,
-      correct: ok,
-      attemptedAt: Date.now(),
-      mode: 'practice',
-    },
-  ]).catch(() => undefined);
+  try {
+    await setDoc(doc(db, 'posts', postId, 'stumpAnswers', me.uid), { username: me.username, pick, ok, at: serverTimestamp() });
+  } catch (error) {
+    if (!denied(error)) throw error;
+    // The private rules are not published yet: the old public way.
+    await setDoc(doc(collection(db, 'posts', postId, 'replies')), {
+      body: 'Answered this Stump a friend question.',
+      authorUid: me.uid,
+      authorName: me.username,
+      createdAt: serverTimestamp(),
+      stump: { pick, ok },
+    });
+  }
+  recordStumpPractice(question, ok);
   return { userId: me.uid, username: me.username, pick, ok, at: new Date().toISOString() };
+}
+
+/** Answering counts as revision in the learning engine (no XP). */
+function recordStumpPractice(question: ChoiceQuestion, ok: boolean) {
+  void recordQuestionAttempts([
+    { questionId: question.id, topicId: question.topicId ?? '', lessonId: question.lessonId ?? '', concept: question.concept, conceptId: question.conceptId, correct: ok, attemptedAt: Date.now(), mode: 'practice' },
+  ]).catch(() => undefined);
 }
 
 // ─── Stumps sent in chats (direct and group) ─────────────────────────
@@ -135,8 +167,9 @@ export async function answerStump(postId: string, question: ChoiceQuestion, pick
 //
 // Answers are not shown as chat bubbles: the stump card reads them. As on the
 // feed, only the sender sees who got it right or wrong; everyone else sees
-// just their own result (a screen rule — chat members can read each other's
-// messages).
+// just their own result. In a group, answers are private documents
+// (groups/{gid}/stumpAnswers, see the top of this file), so other members
+// can't read them at all.
 
 export type StumpTargets = { feed: boolean; friendIds: readonly string[]; groupIds: readonly string[] };
 export type StumpSendResult = { feed: boolean; friends: number; groups: number; failed: number };
@@ -182,23 +215,51 @@ export async function sendStump(question: ChoiceQuestion, note: string, targets:
   return result;
 }
 
-/** Everyone's answers to a stump in a chat (from the chat's messages), first answer per learner. */
-export function chatStumpAnswers(messages: readonly CommunityMessage[], stumpMessageId: string): StumpAnswer[] {
-  const seen = new Set<string>();
-  const answers: StumpAnswer[] = [];
-  for (const message of messages) {
+/**
+ * Everyone's answers to a stump in a chat, first answer per learner: answer
+ * messages (direct chats, and group answers saved before the private rules)
+ * plus a group's private answers (`extra`).
+ */
+export function chatStumpAnswers(messages: readonly CommunityMessage[], stumpMessageId: string, extra: readonly StumpAnswer[] = []): StumpAnswer[] {
+  const fromMessages = messages.flatMap((message) => {
     const share = message.share;
-    if (share?.kind !== 'stumpAnswer' || share.id !== stumpMessageId || typeof share.pick !== 'number') continue;
-    if (seen.has(message.sender_id)) continue;
-    seen.add(message.sender_id);
-    answers.push({ userId: message.sender_id, username: share.username, pick: share.pick, ok: share.ok === true, at: message.created_at });
-  }
-  return answers;
+    if (share?.kind !== 'stumpAnswer' || share.id !== stumpMessageId || typeof share.pick !== 'number') return [];
+    return [{ userId: message.sender_id, username: share.username, pick: share.pick, ok: share.ok === true, at: message.created_at }];
+  });
+  return firstAnswers([...fromMessages, ...extra]);
+}
+
+/**
+ * A group's private stump answers I may read, live, by stump message id: the
+ * answers to my stumps, and my own answers. Empty until the rules allow it.
+ */
+export function watchGroupStumpAnswers(groupId: string, me: string, onAnswers: (byStump: ReadonlyMap<string, StumpAnswer[]>) => void): Unsubscribe {
+  const toMe = new Map<string, StumpAnswer & { stump: string }>();
+  const fromMe = new Map<string, StumpAnswer & { stump: string }>();
+  const emit = () => {
+    const byStump = new Map<string, StumpAnswer[]>();
+    for (const answer of [...toMe.values(), ...fromMe.values()]) byStump.set(answer.stump, [...(byStump.get(answer.stump) ?? []), answer]);
+    onAnswers(byStump);
+  };
+  const listen = (field: 'to' | 'from', into: Map<string, StumpAnswer & { stump: string }>) => onSnapshot(
+    query(collection(db, 'groups', groupId, 'stumpAnswers'), where(field, '==', me), limit(500)),
+    (snap) => {
+      into.clear();
+      for (const item of snap.docs) {
+        const d = item.data({ serverTimestamps: 'estimate' });
+        into.set(item.id, { stump: String(d.stump ?? ''), userId: String(d.from ?? ''), username: typeof d.username === 'string' ? d.username : null, pick: Number(d.pick), ok: d.ok === true, at: isoOf(d.at) });
+      }
+      emit();
+    },
+    () => {} // the private rules are not published yet
+  );
+  const stops = [listen('to', toMe), listen('from', fromMe)];
+  return () => stops.forEach((stop) => stop());
 }
 
 /** Saves my answer to a stump in a chat. One try: an earlier answer is returned unchanged. */
 export async function answerChatStump(
-  where: { chatId: string; friendId?: string; groupId?: string },
+  place: { chatId: string; friendId?: string; groupId?: string; sharerId?: string },
   stumpMessageId: string,
   question: ChoiceQuestion,
   pick: number,
@@ -209,18 +270,26 @@ export async function answerChatStump(
   if (mine) return mine;
   const ok = pick === question.answer;
   const share: MessageShare = { kind: 'stumpAnswer', uid: me.uid, username: me.username, id: stumpMessageId, text: 'Answered a Stump a friend question.', pick, ok };
-  if (where.groupId) await sendGroupMessage(where.groupId, '', { share });
-  else await sendChatMessage(where.chatId, '', { share });
-  void recordQuestionAttempts([
-    { questionId: question.id, topicId: question.topicId ?? '', lessonId: question.lessonId ?? '', concept: question.concept, conceptId: question.conceptId, correct: ok, attemptedAt: Date.now(), mode: 'practice' },
-  ]).catch(() => undefined);
+  if (place.groupId) {
+    try {
+      await setDoc(doc(db, 'groups', place.groupId, 'stumpAnswers', `${stumpMessageId}_${me.uid}`), {
+        from: me.uid, to: place.sharerId ?? '', stump: stumpMessageId, username: me.username, pick, ok, at: serverTimestamp(),
+      });
+    } catch (error) {
+      if (!denied(error)) throw error;
+      await sendGroupMessage(place.groupId, '', { share }); // the private rules are not published yet
+    }
+  } else {
+    await sendChatMessage(place.chatId, '', { share });
+  }
+  recordStumpPractice(question, ok);
   return { userId: me.uid, username: me.username, pick, ok, at: new Date().toISOString() };
 }
 
 /**
- * A question to stump a friend with, picked at random: first from questions I
- * have answered (most recent 200), else from any published lesson. `skip`
- * avoids repeats when the learner asks for another one.
+ * A question to stump a friend with, picked at random from questions I have
+ * answered myself (most recent 200) — never one I haven't met (owner,
+ * 2026-10-18). `skip` avoids repeats when the learner asks for another one.
  */
 export function pickStumpQuestion(skip: ReadonlySet<string> = new Set()): ChoiceQuestion | null {
   const recent: ChoiceQuestion[] = [];
@@ -233,6 +302,5 @@ export function pickStumpQuestion(skip: ReadonlySet<string> = new Set()): Choice
     const question = stumpQuestion(id);
     if (question && !skip.has(id)) recent.push(question);
   }
-  const pool = recent.length ? recent : publishedTopics.flatMap((topic) => getTopicQuestions(topic.id)).filter((item): item is ChoiceQuestion => canStump(item) && !skip.has(item.id));
-  return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+  return recent.length ? recent[Math.floor(Math.random() * recent.length)] : null;
 }

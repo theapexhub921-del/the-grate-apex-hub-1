@@ -24,15 +24,15 @@ import type { StumpRef } from '@/data/community';
 import { type GroupSummary, listMyGroups } from '@/data/group-chat';
 import type { ChoiceQuestion } from '@/data/questions';
 import { personName, type SocialPerson, useSocial } from '@/data/social';
-import { answerStump, LETTERS, listStumpAnswers, sendStump, STUMP_NOTE_MAX, stumpOptionOrder, type StumpAnswer, type StumpSendResult } from '@/data/stumps';
+import { answerStump, canLoadStumpQuestion, LETTERS, listStumpAnswers, loadStumpQuestion, sendStump, STUMP_NOTE_MAX, stumpOptionOrder, stumpQuestion, type StumpAnswer, type StumpSendResult } from '@/data/stumps';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 const errorText = (caught: unknown, fallback: string) => (caught instanceof Error && caught.message ? caught.message : fallback);
 
 /** A stump inside a chat: its answers come from the chat's messages, and answering sends a message. */
-export type ChatStumpSource = { answers: readonly StumpAnswer[]; answer: (pick: number) => Promise<StumpAnswer> };
+export type ChatStumpSource = { answers: readonly StumpAnswer[]; answer: (pick: number, question: ChoiceQuestion) => Promise<StumpAnswer> };
 
-export function StumpCard({ postId, question, stump, authorId, authorName, ownId, people, chat }: {
+type StumpCardProps = {
   postId: string; // the feed post id, or the chat message id
   question: ChoiceQuestion;
   stump: StumpRef;
@@ -42,7 +42,17 @@ export function StumpCard({ postId, question, stump, authorId, authorName, ownId
   people: readonly SocialPerson[];
   /** Set for a stump sent in a chat. */
   chat?: ChatStumpSource;
-}) {
+};
+
+/** A stump by its question id: loads a past-paper question first if needed; `fallback` when it can't be found. */
+export function StumpById({ fallback, ...card }: Omit<StumpCardProps, 'question'> & { fallback: ReactNode }) {
+  const question = useStumpQuestion(card.stump.qid);
+  if (question === undefined) return <StumpLoading />;
+  if (!question) return <>{fallback}</>;
+  return <StumpCard {...card} question={question} />;
+}
+
+export function StumpCard({ postId, question, stump, authorId, authorName, ownId, people, chat }: StumpCardProps) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const order = useMemo(() => stumpOptionOrder(question), [question]);
@@ -55,9 +65,9 @@ export function StumpCard({ postId, question, stump, authorId, authorName, ownId
   useEffect(() => {
     if (chat) return; // a chat stump reads its answers from the chat
     let live = true;
-    listStumpAnswers(postId).then((list) => { if (live) setLoaded(list); }).catch(() => { if (live) setLoaded([]); });
+    listStumpAnswers(postId, authorId).then((list) => { if (live) setLoaded(list); }).catch(() => { if (live) setLoaded([]); });
     return () => { live = false; };
-  }, [postId, chat]);
+  }, [postId, chat, authorId]);
 
   const base = chat ? [...chat.answers] : loaded;
   const answers = base && saved && !base.some((item) => item.userId === saved.userId) ? [...base, saved] : base;
@@ -70,7 +80,7 @@ export function StumpCard({ postId, question, stump, authorId, authorName, ownId
     setBusy(true);
     setError(null);
     try {
-      const answer = chat ? await chat.answer(choice) : await answerStump(postId, question, choice);
+      const answer = chat ? await chat.answer(choice, question) : await answerStump(postId, question, choice, authorId);
       setSaved(answer);
       if (!chat) setLoaded((list) => [...(list ?? []).filter((item) => item.userId !== answer.userId), answer]);
     } catch (caught) {
@@ -149,6 +159,41 @@ export function StumpCard({ postId, question, stump, authorId, authorName, ownId
           <Text style={styles.muted}>Only you can see who got it right or wrong.</Text>
         </View>
       ) : null}
+    </View>
+  );
+}
+
+/**
+ * The question a stump shares, by id. Past-paper questions are only known once
+ * their paper's bank is loaded, so a friend who hasn't opened that paper gets
+ * it loaded here first. undefined while loading, null when it can't be found.
+ */
+export function useStumpQuestion(questionId: string | null | undefined): ChoiceQuestion | null | undefined {
+  const known = questionId ? stumpQuestion(questionId) : null;
+  const [loaded, setLoaded] = useState<{ id: string; question: ChoiceQuestion | null } | null>(null);
+  const needsLoading = Boolean(questionId) && !known && canLoadStumpQuestion(questionId ?? '');
+  useEffect(() => {
+    if (!needsLoading || !questionId) return;
+    let live = true;
+    void loadStumpQuestion(questionId).then((question) => { if (live) setLoaded({ id: questionId, question }); });
+    return () => { live = false; };
+  }, [needsLoading, questionId]);
+  if (known || !questionId) return known;
+  if (!needsLoading) return null;
+  return loaded?.id === questionId ? loaded.question : undefined;
+}
+
+/** Shown while a stump's question loads. */
+export function StumpLoading() {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  return (
+    <View style={styles.card}>
+      <View style={styles.head}>
+        <Icon name="challenge" size={16} color={colors.primaryText} />
+        <Text style={styles.kicker}>STUMP A FRIEND</Text>
+      </View>
+      <Text style={styles.muted}>Loading the question…</Text>
     </View>
   );
 }

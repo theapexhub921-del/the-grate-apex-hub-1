@@ -1,3 +1,4 @@
+import { LIVE_SITE, LIVE_SITE_LABEL } from '@/lib/live-site';
 import { Href, router } from 'expo-router';
 
 import { EXPERIENCE_INFO, EXPERIENCES_ENABLED, isExperience } from '@/data/experience';
@@ -242,15 +243,15 @@ export default function SettingsScreen() {
       if (Platform.OS === 'web' && typeof navigator !== 'undefined') {
         const browserNavigator = navigator as Navigator & { share?: (data: ShareData) => Promise<void> };
         if (browserNavigator.share) {
-          await browserNavigator.share({ title: 'GrAte Apex Hub', text: 'Study, practise and connect with GrAte Apex Hub.', url: 'https://grateapex.vercel.app/' });
+          await browserNavigator.share({ title: 'GrAte Apex Hub', text: 'Study, practise and connect with GrAte Apex Hub.', url: `${LIVE_SITE}/` });
           shared = true;
         } else if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText('https://grateapex.vercel.app/');
+          await navigator.clipboard.writeText(`${LIVE_SITE}/`);
           shared = true;
           copiedLink = true;
         }
       } else {
-        const result = await Share.share({ title: 'GrAte Apex Hub', message: 'Study, practise and connect with GrAte Apex Hub: https://grateapex.vercel.app/' });
+        const result = await Share.share({ title: 'GrAte Apex Hub', message: `Study, practise and connect with GrAte Apex Hub: ${LIVE_SITE}/` });
         shared = result.action === Share.sharedAction;
       }
       if (!shared) {
@@ -489,9 +490,9 @@ export default function SettingsScreen() {
             <Text style={styles.optionDescription}>In Chrome or Edge, use the install icon in the address bar or choose Install GrAte Apex Hub from the browser menu. On Mac Safari, choose File → Add to Dock.</Text>
           </View>
         </View>
-        <Interactive onPress={() => void Linking.openURL('https://grateapex.vercel.app/')} accessibilityRole="link" style={styles.optionRow}>
+        <Interactive onPress={() => void Linking.openURL(`${LIVE_SITE}/`)} accessibilityRole="link" style={styles.optionRow}>
           <Icon name="share" size={18} color={colors.primaryText} />
-          <View style={styles.flex}><Text style={styles.optionLabel}>Open GrAte Apex Hub</Text><Text style={styles.optionDescription}>grateapex.vercel.app</Text></View>
+          <View style={styles.flex}><Text style={styles.optionLabel}>Open GrAte Apex Hub</Text><Text style={styles.optionDescription}>{LIVE_SITE_LABEL}</Text></View>
           <Icon name="chevronRight" size={18} color={colors.textTertiary} />
         </Interactive>
       </SettingsSection>

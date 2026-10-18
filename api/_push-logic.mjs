@@ -20,6 +20,24 @@ export const pushAddress = (endpoint) => {
   }
 };
 
+/**
+ * A learner's devices from both places they can be saved: the private
+ * pushDevices/{uid} document (newest first) and the older public
+ * users/{uid}.webPush list. Each address once, at most five.
+ */
+export function mergeDevices(...lists) {
+  const seen = new Set();
+  const out = [];
+  for (const list of lists) {
+    for (const device of Array.isArray(list) ? list : []) {
+      if (!device || typeof device.endpoint !== 'string' || seen.has(device.endpoint)) continue;
+      seen.add(device.endpoint);
+      out.push(device);
+    }
+  }
+  return out.slice(0, 5);
+}
+
 export const USER_ID = /^[A-Za-z0-9]{6,64}$/;
 export const BATTLE_ID = /^b[a-z0-9]{6,30}$/;
 

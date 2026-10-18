@@ -1,7 +1,9 @@
 // Copy of the Firestore security rules deployed to the grate-apex project, as
 // supplied by the owner on 2026-10-09. This repository has no firebase.json, so
 // nothing is deployed from here: changes are reviewed as diffs against this
-// file and deployed only with the owner's approval.
+// file and deployed only with the owner's approval (the owner pastes the whole
+// file into Firebase console → Firestore Database → Rules → Publish).
+// 2026-10-18: added pushDevices, posts/*/stumpAnswers and groups/*/stumpAnswers.
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -159,6 +161,19 @@ service cloud.firestore {
           allow update, delete: if false;
         }
       }
+    }
+
+    // Push addresses of a learner's phones and computers (added 2026-10-18, src/lib/web-push.ts).
+    // Private: only the learner can read or change them; the server (api/push.mjs,
+    // api/reminders.mjs) reads them with its service account. They used to sit on the
+    // public profile (users/{uid}.webPush), which every signed-in learner can read.
+    match /pushDevices/{uid} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['webPush', 'updatedAt'])
+        && request.resource.data.webPush is list
+        && request.resource.data.webPush.size() <= 5
+        && request.resource.data.updatedAt == request.time;
     }
 
     // Username registry: stops two people (e.g. a Google account and a password account)
@@ -331,6 +346,25 @@ service cloud.firestore {
           || request.auth.uid == get(/databases/$(database)/documents/posts/$(postId)).data.authorUid;
         allow update: if false;
       }
+    }
+
+    // Stump a friend answers on the feed (added 2026-10-18, src/data/stumps.ts). Private:
+    // only the learner who answered and the post's author (who sent the question) can
+    // read one. One answer each (the id is the answerer's uid), never changed.
+    match /posts/{postId}/stumpAnswers/{uid} {
+      allow get: if request.auth != null
+        && (request.auth.uid == uid
+            || request.auth.uid == get(/databases/$(database)/documents/posts/$(postId)).data.authorUid);
+      allow list: if request.auth != null
+        && request.auth.uid == get(/databases/$(database)/documents/posts/$(postId)).data.authorUid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['username', 'pick', 'ok', 'at'])
+        && (request.resource.data.username == null
+            || (request.resource.data.username is string && request.resource.data.username.size() <= 30))
+        && request.resource.data.pick is int && request.resource.data.pick >= 0 && request.resource.data.pick < 8
+        && request.resource.data.ok is bool
+        && request.resource.data.at == request.time;
+      allow update, delete: if false;
     }
 
     // Post views (added 2026-10-13, docs/firestore-rules-post-views.txt). Each signed-in learner
@@ -580,6 +614,28 @@ service cloud.firestore {
           && request.resource.data.get('reactions', {}).diff(resource.data.get('reactions', {})).affectedKeys().hasOnly([request.auth.uid])
           && (!(request.auth.uid in request.resource.data.get('reactions', {}))
               || (request.resource.data.reactions[request.auth.uid] is string && request.resource.data.reactions[request.auth.uid].size() <= 8));
+      }
+
+      // Stump a friend answers in a group (added 2026-10-18, src/data/stumps.ts). Private:
+      // only the member who answered (from) and the member who sent the question (to) can
+      // read one. The id is "<stump message id>_<answerer uid>", so one answer each, and
+      // `to` must be the real author of that stump message.
+      match /stumpAnswers/{aid} {
+        allow read: if request.auth != null
+          && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to);
+        allow create: if request.auth != null
+          && request.auth.uid in get(/databases/$(database)/documents/groups/$(gid)).data.memberUids
+          && request.resource.data.keys().hasOnly(['from', 'to', 'stump', 'username', 'pick', 'ok', 'at'])
+          && request.resource.data.from == request.auth.uid
+          && request.resource.data.stump is string && request.resource.data.stump.size() <= 64
+          && aid == request.resource.data.stump + '_' + request.auth.uid
+          && request.resource.data.to == get(/databases/$(database)/documents/groups/$(gid)/messages/$(request.resource.data.stump)).data.authorUid
+          && (request.resource.data.username == null
+              || (request.resource.data.username is string && request.resource.data.username.size() <= 30))
+          && request.resource.data.pick is int && request.resource.data.pick >= 0 && request.resource.data.pick < 8
+          && request.resource.data.ok is bool
+          && request.resource.data.at == request.time;
+        allow update, delete: if false;
       }
     }
 

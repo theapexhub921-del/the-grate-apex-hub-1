@@ -367,9 +367,13 @@ const searchSpellings = (text: string) => [...new Set([text, text.toLowerCase(),
 
 let directory: { at: number; docs: Promise<{ id: string; data: Record<string, unknown> }[]> } | null = null;
 
-/** Learner accounts for name search (cached for a few minutes; users is readable by every signed-in learner). */
+/**
+ * Learner accounts for name search (users is readable by every signed-in
+ * learner). Reading it costs one Firebase read per account, so it is kept for
+ * 30 minutes (the project is on the free plan's daily read allowance).
+ */
 function learnerDirectory() {
-  if (!directory || Date.now() - directory.at > 5 * 60_000) {
+  if (!directory || Date.now() - directory.at > 30 * 60_000) {
     directory = {
       at: Date.now(),
       docs: getDocs(query(collection(db, 'users'), limit(2000)))

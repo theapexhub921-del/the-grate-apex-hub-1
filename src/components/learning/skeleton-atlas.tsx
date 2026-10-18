@@ -1,3 +1,4 @@
+import { LIVE_SITE } from '@/lib/live-site';
 import * as WebBrowser from 'expo-web-browser';
 import { StyleSheet, View } from 'react-native';
 
@@ -9,7 +10,7 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { ATLAS_PAGE_DEPLOYED, atlasFresh, atlasHash, atlasThemeVars } from '@/lib/atlas-theme';
 
 // Where the atlas page is hosted for the phone apps (same address the app already uses for its API).
-const SITE = process.env.EXPO_PUBLIC_API_BASE || 'https://grateapex.vercel.app';
+const SITE = process.env.EXPO_PUBLIC_API_BASE || LIVE_SITE;
 
 // The 3D anatomy atlas (phone apps): opens the same viewer in the in-app browser, painted
 // with the app's current theme. (The web version shows it inside the page: skeleton-atlas.web.tsx.)

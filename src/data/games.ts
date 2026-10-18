@@ -27,7 +27,7 @@ export const STUDY_GAMES: readonly StudyGame[] = [
 ];
 
 /** The live site, used when the native app opens a web game in the browser. */
-export const LIVE_SITE = 'https://grateapex.vercel.app';
+export { LIVE_SITE } from '@/lib/live-site';
 
 export function getStudyGame(id: string) {
   return STUDY_GAMES.find((game) => game.id === id);
