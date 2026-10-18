@@ -86,7 +86,7 @@ export function ExperienceSync() {
     const lock = lockOf(entry);
     if (lock.unlocked) return;
     if ((lock.kind === 'achievement' || lock.kind === 'special') && !achievementsReady) return; // not known yet
-    if ((lock.kind === 'admin' || lock.kind === 'premium') && !checked) return; // admins can use both
+    if (lock.kind === 'admin' && !checked) return;
     void chooseLegacyTheme(DEFAULT_LEGACY_THEME);
   }, [uid, xpReadyFor, family, appearance, legacyTheme, lockOf, achievementsReady, checked]);
 

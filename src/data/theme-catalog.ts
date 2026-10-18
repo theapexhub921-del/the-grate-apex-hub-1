@@ -4,7 +4,8 @@
 // theme unlocks with XP (the original level: 1 + every 150 XP), and brat stays
 // admins-only. The special-day themes (Christmas, Valentine, New Year,
 // Independence, Easter, both Eids) open for 24 hours from the learner's first
-// study on their day, then lock again: keeping one is Premium (data/holidays.ts).
+// study on their day, then lock again until that day comes round (data/holidays.ts).
+// Everything is free: no theme is paid for (owner, 2026-10-18).
 //
 // Under the hood a theme is still one of this app's palettes ('newer') or one
 // of the original app's themes ('legacy'), so saved choices keep working.
@@ -25,7 +26,6 @@ export type ThemeEntry = {
   level: number;
   ach?: string;
   adminOnly?: boolean;
-  premium?: boolean;
 };
 
 // Names for the learner. Look-alikes get different names so the list is clear.
@@ -50,7 +50,7 @@ const LEGACY_OVERRIDES: Record<string, { name?: string; level?: number }> = {
 };
 
 // Free themes first, then by level; achievement and admin themes last.
-const rank = (entry: { level: number; ach?: string; adminOnly?: boolean; premium?: boolean }) => (entry.adminOnly ? 2000 : entry.premium ? 1500 : entry.ach ? 1000 : entry.level);
+const rank = (entry: { level: number; ach?: string; adminOnly?: boolean }) => (entry.adminOnly ? 2000 : entry.ach ? 1000 : entry.level);
 
 export const THEME_CATALOG: readonly ThemeEntry[] = [
   ...NEWER.map((entry) => ({ ...entry, key: `newer:${entry.id}`, family: 'newer' as const })),
@@ -65,7 +65,6 @@ export const THEME_CATALOG: readonly ThemeEntry[] = [
       level: Math.max(1, override.level ?? theme.unlock),
       ach: theme.ach,
       adminOnly: theme.adminOnly,
-      premium: theme.premium,
     };
   }),
 ].sort((a, b) => rank(a) - rank(b) || (a.key === 'legacy:dark' ? -1 : b.key === 'legacy:dark' ? 1 : 0));
@@ -73,7 +72,6 @@ export const THEME_CATALOG: readonly ThemeEntry[] = [
 export type ThemeLock =
   | { unlocked: true }
   | { unlocked: false; kind: 'admin' }
-  | { unlocked: false; kind: 'premium' }
   /** A special-day theme outside its 24 hours (`ended`: the learner had them, and they are over). */
   | { unlocked: false; kind: 'special'; day: string; ended: boolean }
   | { unlocked: false; kind: 'achievement'; name: string; desc: string }
@@ -92,8 +90,6 @@ export function themeLock(
   }
 ): ThemeLock {
   if (entry.adminOnly && !input.isAdmin) return { unlocked: false, kind: 'admin' };
-  // Premium does not exist yet: locked for everyone (admins can try it).
-  if (entry.premium && !input.isAdmin) return { unlocked: false, kind: 'premium' };
   // A special-day theme: open for its 24 hours only (admins can always try it).
   const day = entry.ach ? SPECIAL_DAYS[entry.ach] : undefined;
   if (day && input.special && !input.isAdmin) {
@@ -113,11 +109,10 @@ export const xpForLevel = (level: number) => Math.max(0, (level - 1) * 150);
 
 export function themeLockText(lock: Exclude<ThemeLock, { unlocked: true }>) {
   if (lock.kind === 'admin') return 'Admins only';
-  if (lock.kind === 'premium') return 'Premium theme — coming soon';
   if (lock.kind === 'special') {
     return lock.ended
-      ? `Your 24 hours with it have ended. Study on ${lock.day} to open it again, or keep it with Premium (coming soon).`
-      : `Study on ${lock.day} to use it for 24 hours. Keep it for good with Premium (coming soon).`;
+      ? `Your 24 hours with it have ended. Study on ${lock.day} to open it again.`
+      : `Study on ${lock.day} to use it for 24 hours.`;
   }
   if (lock.kind === 'achievement') return `Earn the “${lock.name}” achievement: ${lock.desc}`;
   return `Unlocks at Level ${lock.level} (${xpForLevel(lock.level).toLocaleString()} XP)`;

@@ -4,7 +4,7 @@
 // - The seasonal themes (2026-10-18) unlock like Christmas and Valentine: earn the
 //   matching "Special days" achievement by studying on that day (achievements.ts,
 //   moving dates in data/holidays.ts). Independence uses the Ghana flag's colours.
-// - MSA (red and white) is a premium theme: locked until premium exists.
+// - MSA (red and white) unlocks at Level 15. Everything is free (owner, 2026-10-18).
 import type { LegacyThemeDef } from '@/data/legacy-themes';
 
 export const EXTRA_THEMES: readonly LegacyThemeDef[] = [
@@ -48,7 +48,7 @@ export const EXTRA_THEMES: readonly LegacyThemeDef[] = [
     panel: 'rgba(255,255,255,0.07)', panelBrd: 'rgba(214,170,100,0.34)', accent: '#d9a85f', gold: '#e8c27f',
   },
   {
-    id: 'msa', icon: '❤️', name: 'MSA', desc: 'Crisp white with bold red. A premium theme.', unlock: 0, light: true, premium: true,
+    id: 'msa', icon: '❤️', name: 'MSA', desc: 'Crisp white with bold red.', unlock: 15, light: true,
     bg1: '#ffffff', bg2: '#fff1f2', bg3: '#ffe1e4', ink: '#2b0a0e', silver: '#5c1f26', dim: '#7a3a41',
     panel: 'rgba(200,16,46,0.05)', panelBrd: 'rgba(200,16,46,0.24)', accent: '#c8102e', gold: '#a50d26',
   },
