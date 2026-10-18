@@ -7,9 +7,9 @@ const { ACHIEVEMENTS, computeMetrics, evaluateAchievements, legacyStats, newLeve
 const app = (over = {}) => ({ answers: [], quizzes: [], xp: 0, lessonsCompleted: 0, lessonCompletedAt: [], topicsCompleted: 0, conceptsMastered: 0, ...over });
 
 describe('achievement definitions', () => {
-  it('imports all 66 original milestones plus 6 of this app’s, with unique ids', () => {
-    assert.equal(ACHIEVEMENTS.length, 72);
-    assert.equal(new Set(ACHIEVEMENTS.map((a) => a.id)).size, 72);
+  it('imports all 66 original milestones plus 6 of this app’s and 4 seasonal ones, with unique ids', () => {
+    assert.equal(ACHIEVEMENTS.length, 76);
+    assert.equal(new Set(ACHIEVEMENTS.map((a) => a.id)).size, 76);
   });
   it('every achievement has five strictly increasing, measurable levels', () => {
     for (const a of ACHIEVEMENTS) {

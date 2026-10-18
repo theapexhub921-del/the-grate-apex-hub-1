@@ -13,6 +13,8 @@
 // plus what the original app recorded in the shared progress document, so
 // legacy students keep their history.
 
+import { EASTER_DAYS, EID_AL_ADHA_DAYS, EID_AL_FITR_DAYS } from '@/data/holidays';
+
 export type AchievementGroup = 'Questions' | 'Streaks' | 'Levels' | 'Skill' | 'Lessons' | 'Mistakes' | 'Habits' | 'Special days' | 'GRATEAPEX';
 
 export type Metric =
@@ -24,6 +26,7 @@ export type Metric =
   | 'fixed'
   | 'comebacks' | 'weekendDays' | 'busyDays' | 'monthsStudied'
   | 'yearsNewYear' | 'yearsValentine' | 'yearsChristmas' | 'yearsNewYearsEve'
+  | 'yearsIndependence' | 'yearsEaster' | 'yearsEidFitr' | 'yearsEidAdha'
   | 'lessonsCompleted' | 'quizzesAced' | 'topicsCompleted' | 'conceptsMastered' | 'reviewDays' | 'apexFinished';
 
 export type AchievementDef = {
@@ -123,6 +126,10 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
   { id: 'ny', name: 'New year, new me', group: 'Special days', metric: 'yearsNewYear', levels: [1, 2, 3, 4, 5], goal: (n) => (n === 1 ? 'Study on 1 January' : `Study on 1 January in ${n} different years`) },
   { id: 'val', name: 'Hopelessly devoted', group: 'Special days', metric: 'yearsValentine', levels: [1, 2, 3, 4, 5], goal: (n) => (n === 1 ? 'Study on 14 February' : `Study on 14 February in ${n} different years`) },
   { id: 'xmas', name: 'Christmas cram', group: 'Special days', metric: 'yearsChristmas', levels: [1, 2, 3, 4, 5], goal: (n) => (n === 1 ? 'Study on 25 December' : `Study on 25 December in ${n} different years`) },
+  { id: 'gh', name: 'Freedom and justice', group: 'Special days', metric: 'yearsIndependence', levels: [1, 2, 3, 4, 5], goal: (n) => (n === 1 ? 'Study on 6 March (Independence Day)' : `Study on 6 March in ${n} different years`) },
+  { id: 'easter', name: 'Risen and revising', group: 'Special days', metric: 'yearsEaster', levels: [1, 2, 3, 4, 5], goal: (n) => (n === 1 ? 'Study on Easter Sunday' : `Study on Easter Sunday in ${n} different years`) },
+  { id: 'eidfitr', name: 'Eid Mubarak', group: 'Special days', metric: 'yearsEidFitr', levels: [1, 2, 3, 4, 5], goal: (n) => (n === 1 ? 'Study on Eid al-Fitr' : `Study on Eid al-Fitr in ${n} different years`) },
+  { id: 'eidadha', name: 'Blessed Eid al-Adha', group: 'Special days', metric: 'yearsEidAdha', levels: [1, 2, 3, 4, 5], goal: (n) => (n === 1 ? 'Study on Eid al-Adha' : `Study on Eid al-Adha in ${n} different years`) },
   { id: 'nye', name: 'Last one of the year', group: 'Special days', metric: 'yearsNewYearsEve', levels: [1, 2, 3, 4, 5], goal: (n) => (n === 1 ? 'Study on 31 December' : `Study on 31 December in ${n} different years`) },
 
   // ── This app's milestones (reconciled from the profile page) ─────────────
@@ -239,6 +246,8 @@ export function computeMetrics(app: AppStats, legacy: LegacyStats = NO_LEGACY): 
 
   const counted = app.quizzes.filter((quiz) => !quiz.practice);
   const years = (monthDay: string) => new Set(days.filter((key) => key.slice(5) === monthDay).map((key) => key.slice(0, 4))).size;
+  // Days that move each year (data/holidays.ts): the years studied on one.
+  const yearsOn = (dates: ReadonlySet<string>) => new Set(days.filter((key) => dates.has(key)).map((key) => key.slice(0, 4))).size;
   const reviewDays = new Set(app.answers.filter((item) => item.mode === 'review' || item.mode === 'recall').map((item) => dayKey(item.attemptedAt))).size;
 
   return {
@@ -270,6 +279,10 @@ export function computeMetrics(app: AppStats, legacy: LegacyStats = NO_LEGACY): 
     yearsValentine: years('02-14'),
     yearsChristmas: years('12-25'),
     yearsNewYearsEve: years('12-31'),
+    yearsIndependence: years('03-06'),
+    yearsEaster: yearsOn(EASTER_DAYS),
+    yearsEidFitr: yearsOn(EID_AL_FITR_DAYS),
+    yearsEidAdha: yearsOn(EID_AL_ADHA_DAYS),
     lessonsCompleted: app.lessonsCompleted,
     quizzesAced: counted.filter((quiz) => (quiz.kind === 'lesson' || quiz.kind === 'topic') && quiz.percentage >= 90).length,
     topicsCompleted: app.topicsCompleted,

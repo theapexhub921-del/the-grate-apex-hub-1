@@ -22,6 +22,7 @@ export type ThemeEntry = {
   level: number;
   ach?: string;
   adminOnly?: boolean;
+  premium?: boolean;
 };
 
 // Names for the learner. Look-alikes get different names so the list is clear.
@@ -46,7 +47,7 @@ const LEGACY_OVERRIDES: Record<string, { name?: string; level?: number }> = {
 };
 
 // Free themes first, then by level; achievement and admin themes last.
-const rank = (entry: { level: number; ach?: string; adminOnly?: boolean }) => (entry.adminOnly ? 2000 : entry.ach ? 1000 : entry.level);
+const rank = (entry: { level: number; ach?: string; adminOnly?: boolean; premium?: boolean }) => (entry.adminOnly ? 2000 : entry.premium ? 1500 : entry.ach ? 1000 : entry.level);
 
 export const THEME_CATALOG: readonly ThemeEntry[] = [
   ...NEWER.map((entry) => ({ ...entry, key: `newer:${entry.id}`, family: 'newer' as const })),
@@ -61,6 +62,7 @@ export const THEME_CATALOG: readonly ThemeEntry[] = [
       level: Math.max(1, override.level ?? theme.unlock),
       ach: theme.ach,
       adminOnly: theme.adminOnly,
+      premium: theme.premium,
     };
   }),
 ].sort((a, b) => rank(a) - rank(b) || (a.key === 'legacy:dark' ? -1 : b.key === 'legacy:dark' ? 1 : 0));
@@ -68,6 +70,7 @@ export const THEME_CATALOG: readonly ThemeEntry[] = [
 export type ThemeLock =
   | { unlocked: true }
   | { unlocked: false; kind: 'admin' }
+  | { unlocked: false; kind: 'premium' }
   | { unlocked: false; kind: 'achievement'; name: string; desc: string }
   | { unlocked: false; kind: 'level'; level: number };
 
@@ -77,6 +80,8 @@ export function themeLock(
   input: { xp: number; achievementLevels: Readonly<Record<string, number>>; isAdmin: boolean; achievement?: (id: string) => { name: string; desc: string } | undefined }
 ): ThemeLock {
   if (entry.adminOnly && !input.isAdmin) return { unlocked: false, kind: 'admin' };
+  // Premium does not exist yet: locked for everyone (admins can try it).
+  if (entry.premium && !input.isAdmin) return { unlocked: false, kind: 'premium' };
   if (entry.ach && (input.achievementLevels[entry.ach] ?? 0) < 1) {
     const info = input.achievement?.(entry.ach);
     return { unlocked: false, kind: 'achievement', name: info?.name ?? entry.ach, desc: info?.desc ?? '' };
@@ -90,6 +95,7 @@ export const xpForLevel = (level: number) => Math.max(0, (level - 1) * 150);
 
 export function themeLockText(lock: Exclude<ThemeLock, { unlocked: true }>) {
   if (lock.kind === 'admin') return 'Admins only';
+  if (lock.kind === 'premium') return 'Premium theme — coming soon';
   if (lock.kind === 'achievement') return `Earn the “${lock.name}” achievement: ${lock.desc}`;
   return `Unlocks at Level ${lock.level} (${xpForLevel(lock.level).toLocaleString()} XP)`;
 }
