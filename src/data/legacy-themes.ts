@@ -12,7 +12,6 @@ export type LegacyThemeDef = {
   gradient?: string[]; // optional custom background gradient (rainbow)
   ach?: string;        // achievement id that must be earned to unlock this theme (see achievements.ts)
   adminOnly?: boolean; // only shown to (and usable by) admins
-  premium?: boolean;   // a premium theme: locked for everyone until premium exists (admins can try it)
 };
 
 export const LEGACY_THEMES: readonly LegacyThemeDef[] = [

@@ -136,6 +136,33 @@ export async function acceptCurrentLegalVersions(): Promise<{ error: string | nu
   }
 }
 
+// "Continue with Google" on the sign-up form: the learner ticks the Terms box
+// before leaving for Google, but their account (and its users document) only
+// exists once they are back and have a username. The tick is held on the
+// device until then, so the introduction doesn't ask a second time.
+const PENDING_CONSENT_KEY = 'grateapex_pending_google_legal_consent';
+
+export async function holdSignUpConsent() {
+  await AsyncStorage.setItem(PENDING_CONSENT_KEY, JSON.stringify({ at: new Date().toISOString(), version: TERMS_VERSION })).catch(() => undefined);
+}
+
+/** Saves a held sign-up tick to the signed-in account (once it has a users document). */
+export async function saveHeldSignUpConsent() {
+  try {
+    const saved = await AsyncStorage.getItem(PENDING_CONSENT_KEY);
+    if (!saved || !auth.currentUser) return;
+    const consent = JSON.parse(saved) as { at?: string; version?: string };
+    if (!consent.at || consent.version !== TERMS_VERSION) {
+      await AsyncStorage.removeItem(PENDING_CONSENT_KEY);
+      return;
+    }
+    const result = await acceptCurrentLegalVersions();
+    if (!result.error) await AsyncStorage.removeItem(PENDING_CONSENT_KEY);
+  } catch (problem) {
+    console.warn('Could not save account legal consent:', problem);
+  }
+}
+
 /** Marks the introduction as done (finished or skipped) for this learner. */
 export async function completeOnboarding(userId: string, how: Entry['how']) {
   records = { ...records, [userId]: { at: Date.now(), how } };

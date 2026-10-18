@@ -154,7 +154,7 @@ describe('Appearance: one list of themes (owner rules, 2026-10-10)', async () =>
     assert.equal(new Set(names).size, names.length);
     for (const name of ['Apex Legacy', 'Apex Redefined', 'Blossom', 'Rosewood', 'Blackout', 'Obsidian']) assert.ok(names.includes(name), name);
   });
-  it('every other theme unlocks with XP (and the seasonal themes need their achievement; brat is admins-only; MSA is premium)', () => {
+  it('every other theme unlocks with XP (and the seasonal themes need their achievement; brat is admins-only)', () => {
     const seasonal = { xmas: 1, val: 1, ny: 1, gh: 1, easter: 1, eidfitr: 1, eidadha: 1 };
     for (const entry of THEME_CATALOG) {
       if (themeLock(entry, base).unlocked) continue;
@@ -166,7 +166,8 @@ describe('Appearance: one list of themes (owner rules, 2026-10-10)', async () =>
       assert.equal(themeLock(entry, { ...base, xp: 1_000_000 }).kind, 'achievement', id);
     }
     const msa = THEME_CATALOG.find((entry) => entry.id === 'msa');
-    assert.equal(themeLockText(themeLock(msa, { xp: 1_000_000, achievementLevels: seasonal, isAdmin: false })), 'Premium theme — coming soon');
+    assert.equal(themeLockText(themeLock(msa, base)), 'Unlocks at Level 15 (2,100 XP)');
+    assert.equal(themeLock(msa, { ...base, xp: 2100 }).unlocked, true, 'free: no theme is paid for');
     const apex = THEME_CATALOG.find((entry) => entry.key === 'newer:apex');
     assert.equal(themeLockText(themeLock(apex, base)), 'Unlocks at Level 2 (150 XP)');
     assert.equal(themeLock(apex, { ...base, xp: 150 }).unlocked, true);

@@ -1,5 +1,4 @@
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 import { Href, router } from 'expo-router';
 import { type ReactNode, useEffect, useState } from 'react';
@@ -20,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
 import { elevation, Radius, ThemeColors, Type } from '@/constants/theme';
-import { needsOnboarding, useOnboardingState } from '@/data/onboarding';
+import { acceptCurrentLegalVersions, holdSignUpConsent, needsOnboarding, saveHeldSignUpConsent, useOnboardingState } from '@/data/onboarding';
 import { setDisplayName } from '@/data/user';
 import { useTheme } from '@/hooks/use-theme';
 import { friendlyGoogleError, signInWithGoogle, takeOAuthPending } from '@/lib/google-auth';
@@ -60,8 +59,6 @@ type Mode = 'signIn' | 'signUp' | 'checkEmail' | 'reset' | 'newPassword';
 
 const MIN_PASSWORD = 8;
 const ONBOARDING_HREF = '/onboarding' as Href;
-const PENDING_GOOGLE_CONSENT_KEY = 'grateapex_pending_google_legal_consent';
-const LEGAL_VERSION = '2026-10-05';
 
 // Email/password sign-in using Supabase.
 // Hidden from the tab bar; open it at /login.
@@ -133,7 +130,7 @@ export default function LoginScreen() {
           active = false;
         };
       }
-      void recordPendingGoogleConsent();
+      void saveHeldSignUpConsent();
       return () => {
         active = false;
       };
@@ -248,6 +245,10 @@ export default function LoginScreen() {
       // Username reserved and profile created together (lib/accounts.ts);
       // nothing is left half-made if either fails.
       await registerWithEmail({ email, password, username, displayName: fullName });
+      // The Terms box ticked above is the learner's acceptance; save it so the
+      // introduction doesn't ask again. (If this fails, the introduction asks.)
+      const consent = await acceptCurrentLegalVersions();
+      if (consent.error) console.warn('Could not save sign-up consent:', consent.error);
       setPassword('');
       setSignUpConfirm('');
       router.replace(HOME_HREF);
@@ -279,7 +280,7 @@ export default function LoginScreen() {
       return;
     }
     if (mode === 'signUp') {
-      await AsyncStorage.setItem(PENDING_GOOGLE_CONSENT_KEY, JSON.stringify({ at: new Date().toISOString(), version: LEGAL_VERSION }));
+      await holdSignUpConsent();
     }
     setGoogleLoading(true);
     setError(null);
@@ -695,19 +696,6 @@ function isWrongUsernameOrPassword(code?: string | null) {
     code === 'auth/user-not-found' ||
     code === 'auth/invalid-email'
   );
-}
-
-async function recordPendingGoogleConsent() {
-  try {
-    const saved = await AsyncStorage.getItem(PENDING_GOOGLE_CONSENT_KEY);
-    if (!saved) return;
-    const consent = JSON.parse(saved) as { at?: string; version?: string };
-    if (!consent.at || consent.version !== LEGAL_VERSION) return;
-    // User data is saved by the new Firebase backend later.
-    await AsyncStorage.removeItem(PENDING_GOOGLE_CONSENT_KEY);
-  } catch (problem) {
-    console.warn('Could not save account legal consent:', problem);
-  }
 }
 
 type LoginStyles = ReturnType<typeof createStyles>;

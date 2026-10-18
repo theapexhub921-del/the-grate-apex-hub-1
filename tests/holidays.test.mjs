@@ -20,7 +20,7 @@ describe('special days', () => {
   });
 });
 
-describe('special-day themes last 24 hours (then Premium)', () => {
+describe('special-day themes last 24 hours', () => {
   const at = (y, m, d, h = 0, min = 0) => new Date(y, m - 1, d, h, min).getTime();
   const HOUR = 3_600_000;
   it('the 24 hours start at the first study on the most recent special day', () => {
@@ -35,14 +35,14 @@ describe('special-day themes last 24 hours (then Premium)', () => {
     assert.equal(specialThemeOpen(start, start + 24 * HOUR), false);
     assert.equal(specialThemeOpen(null, start), false);
   });
-  it('the theme list follows it, and points to Premium afterwards', () => {
+  it('the theme list follows it, and says how to open it again', () => {
     const christmas = THEME_CATALOG.find((entry) => entry.id === 'christmas');
     const start = at(2026, 12, 25, 9);
     const input = (now, admin = false) => ({ xp: 0, achievementLevels: { xmas: 1 }, isAdmin: admin, special: { start: () => start, now } });
     assert.equal(themeLock(christmas, input(start + HOUR)).unlocked, true);
     const ended = themeLock(christmas, input(start + 25 * HOUR));
     assert.equal(ended.kind, 'special');
-    assert.match(themeLockText(ended), /Premium/);
+    assert.equal(themeLockText(ended), 'Your 24 hours with it have ended. Study on 25 December to open it again.');
     assert.equal(themeLock(christmas, input(start + 25 * HOUR, true)).unlocked, true, 'admins can always try it');
     const never = themeLock(THEME_CATALOG.find((entry) => entry.id === 'eidfitr'), { xp: 0, achievementLevels: {}, isAdmin: false, special: { start: () => null, now: start } });
     assert.match(themeLockText(never), /^Study on Eid al-Fitr to use it for 24 hours/);

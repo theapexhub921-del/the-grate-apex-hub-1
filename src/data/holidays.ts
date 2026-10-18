@@ -44,11 +44,10 @@ export const EASTER_DAYS: ReadonlySet<string> = new Set(Array.from({ length: 205
 export const EID_AL_FITR_DAYS = withNeighbours(EID_AL_FITR);
 export const EID_AL_ADHA_DAYS = withNeighbours(EID_AL_ADHA);
 
-// ── Special-day themes: 24 hours, then Premium ─────────────────────────────
+// ── Special-day themes: 24 hours ───────────────────────────────────────────
 // A special-day theme (Christmas, Valentine, New Year, Independence, Easter,
-// both Eids) opens for 24 hours from the learner's first study on its day.
-// After that it locks again; keeping it for good is a Premium feature (owner's
-// decision, 2026-10-18; Premium is not built yet).
+// both Eids) opens for 24 hours from the learner's first study on its day,
+// then locks again until that day comes round (owner's decision, 2026-10-18).
 
 export const SPECIAL_THEME_HOURS = 24;
 
