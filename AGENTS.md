@@ -345,9 +345,9 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 
 ### Themes
 
-* Every theme is in `src/data/theme-catalog.ts` (locks: level, achievement, admin, premium, special). Added themes live in `src/data/extra-themes.ts`.
-* **Special-day themes** (Christmas, Valentine, New Year, Independence in the Ghana flag colours, Easter, Eid al-Fitr, Eid al-Adha) open for **24 hours from the learner's first study on their day**, then lock again; keeping one is Premium (owner, 2026-10-18). Days, Easter and the Eid table (to 2032, day either side accepted) are in `src/data/holidays.ts`; `useThemeLocks` in `experience-sync.tsx` feeds the study times. An expired theme is switched back to the default.
-* **Premium** is not built yet: premium themes (MSA, red and white) are locked for everyone except admins and say "coming soon".
+* Every theme is in `src/data/theme-catalog.ts` (locks: level, achievement, admin, special). Everything is free: no theme is paid for (owner, 2026-10-18). Added themes live in `src/data/extra-themes.ts`.
+* **Special-day themes** (Christmas, Valentine, New Year, Independence in the Ghana flag colours, Easter, Eid al-Fitr, Eid al-Adha) open for **24 hours from the learner's first study on their day**, then lock again until that day comes round (owner, 2026-10-18). Days, Easter and the Eid table (to 2032, day either side accepted) are in `src/data/holidays.ts`; `useThemeLocks` in `experience-sync.tsx` feeds the study times. An expired theme is switched back to the default.
+* MSA (red and white) unlocks at Level 15.
 
 ### Primitives (`src/components/ui/`)
 
