@@ -117,6 +117,10 @@ function AppGuard({ children }: { children: ReactNode }) {
     const onClassSelection = first === 'class-selection';
     const classSelection = readClassSelection(session.user.user_metadata);
     if (!classSelection) {
+      // Only once the account was actually read: a profile that failed to load
+      // (offline blip) has no class in it, and must not send the learner to the
+      // class page (which then sends them to Study).
+      if (!session.user.profileLoaded) return;
       // Right after the introduction a new learner sees "Suggested for you" first;
       // its Continue button leads on to the class.
       if (!onClassSelection && first !== 'suggested') router.replace('/class-selection' as Href);
