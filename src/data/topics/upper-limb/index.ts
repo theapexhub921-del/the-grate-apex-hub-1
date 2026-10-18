@@ -15,6 +15,7 @@ export const upperLimb = buildTopic({
   id: TOPIC_ID,
   subject: 'anatomy',
   courseId: 'anatomy-lectures',
+  section: 'Gross Anatomy',
   title: 'Upper Limb',
   description:
     'Comprehensive regional anatomy of the upper limb: osteology, limb bud embryology, joints, pectoral girdle, rotator cuff, axillary spaces, arm, cubital fossa, forearm compartments, anatomical snuffbox, and neurovasculature.',

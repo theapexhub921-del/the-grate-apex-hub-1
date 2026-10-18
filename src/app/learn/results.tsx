@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 import { MemoryStateBadge } from '@/components/learning/memory-ui';
-import { QuestionFigure } from '@/components/learning/figure-view';
+import { QuestionFigure, QuestionImage } from '@/components/learning/figure-view';
 import { AiExplain } from '@/components/learning/ai-explain';
 import { explainItem } from '@/components/question-card';
 import { aiLessonForQuestion } from '@/data/ai-context';
@@ -32,6 +32,7 @@ import { describeDue, formatDuration } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
 import { formatXp, XP_RULES } from '@/data/learning/xp-rules';
 import { type Answer, type ChoiceQuestion, correctAnswerText, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
+import { pastCourseOf, usePastQuestions } from '@/data/past-questions';
 import { canStump } from '@/data/stumps';
 import { type AttemptKind, type QuizAttempt, useQuizHistory } from '@/data/quiz-history';
 import { useRotatingCompliment, useRotatingRemark } from '@/hooks/use-learning-remark';
@@ -155,7 +156,10 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
             : found?.lesson.title ?? 'Quiz';
   const topicLabel = found?.lesson.title ?? topic?.title ?? 'this topic';
 
-  const questions = useMemo(() => getQuestionsByIds(attempt.questionIds), [attempt.questionIds]);
+  // Past questions (custom quizzes) are found once their course has loaded.
+  const pastReady = usePastQuestions(attempt.questionIds.map(pastCourseOf).filter((id): id is string => Boolean(id)));
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- look the questions up again once past questions have loaded
+  const questions = useMemo(() => getQuestionsByIds(attempt.questionIds), [attempt.questionIds, pastReady]);
   const rows: Row[] = useMemo(
     () =>
       questions.map((question) => {
@@ -229,6 +233,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
       router.replace(
         routes.customQuiz({
           lessonIds: attempt.customQuiz.lessonIds,
+          pastTopicIds: attempt.customQuiz.pastTopicIds,
           size: attempt.customQuiz.size,
           feedback: attempt.customQuiz.feedback,
           secondsPerQuestion: attempt.customQuiz.secondsPerQuestion,
@@ -454,6 +459,7 @@ function QuestionReview({ row, index, onStump }: { row: Row; index: number; onSt
       </Text>
       <Text style={styles.reviewPrompt}>{row.question.prompt}</Text>
       {row.question.figure ? <QuestionFigure figure={row.question.figure} revealed /> : null}
+      {row.question.image ? <QuestionImage src={row.question.image} /> : null}
       {!row.correct ? (
         <Text style={styles.reviewLine}>
           <Text style={styles.reviewLabel}>Your answer: </Text>

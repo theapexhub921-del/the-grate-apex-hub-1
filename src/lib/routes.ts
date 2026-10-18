@@ -55,13 +55,13 @@ export const routes = {
   legacyLesson: (lessonId: string | null | undefined, section?: number, tab?: 'cards' | 'glossary') =>
     valid(lessonId) ? (`/learn/hb-lesson${query({ lesson: lessonId, section, tab })}` as Href) : fallback('legacyLesson', '/learn'),
   legacyPractice: (options: {
-    course: string; lesson?: string; set?: string; apex?: boolean; review?: 'due' | 'missed';
+    course: string; lesson?: string; set?: string; pastTopic?: string; apex?: boolean; review?: 'due' | 'missed';
     exam?: boolean; mock?: number; drill?: boolean; prepost?: 'pre' | 'post';
     custom?: { lessons: string[]; sets: string[]; count: number; seconds?: number; feedback: 'instant' | 'submit' };
   }) =>
     valid(options.course)
       ? (`/learn/hb-practice${query({
-          course: options.course, lesson: options.lesson, set: options.set, apex: options.apex ? 1 : undefined, review: options.review,
+          course: options.course, lesson: options.lesson, set: options.set, ptopic: options.pastTopic, apex: options.apex ? 1 : undefined, review: options.review,
           exam: options.exam ? 1 : undefined, mock: options.mock, drill: options.drill ? 1 : undefined, prepost: options.prepost,
           custom: options.custom ? 1 : undefined, lessons: options.custom?.lessons.join(',') || undefined, sets: options.custom?.sets.join(',') || undefined,
           count: options.custom?.count, seconds: options.custom?.seconds, feedback: options.custom ? options.custom.feedback : undefined,
@@ -102,11 +102,12 @@ export const routes = {
 
   customQuizBuilder: () => '/learn/custom-quiz' as Href,
 
-  customQuiz: (options: { lessonIds: string[]; size: number; feedback: 'instant' | 'submit'; secondsPerQuestion?: number }) =>
-    options.lessonIds.length > 0
+  customQuiz: (options: { lessonIds: string[]; pastTopicIds?: string[]; size: number; feedback: 'instant' | 'submit'; secondsPerQuestion?: number }) =>
+    options.lessonIds.length > 0 || (options.pastTopicIds?.length ?? 0) > 0
       ? (`/learn/quiz${query({
           custom: 1,
-          lessons: options.lessonIds.join(','),
+          lessons: options.lessonIds.join(',') || undefined,
+          past: options.pastTopicIds?.join(',') || undefined,
           size: options.size,
           feedback: options.feedback,
           seconds: options.secondsPerQuestion,

@@ -10,7 +10,7 @@ import { Icon } from '@/components/ui/icon';
 import { Card, Interactive } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
 import { Screen } from '@/components/ui/screen';
-import { ErrorScreen, InlineNotice } from '@/components/ui/state-views';
+import { ErrorScreen, InlineNotice, LoadingState } from '@/components/ui/state-views';
 import { setPendingXpReward } from '@/components/xp-toast';
 import type { ThemeColors } from '@/constants/theme';
 import { findLesson, getLessonQuestions, getLessonQuizBank, getQuestionsByIds, getTopic } from '@/data/curriculum';
@@ -20,6 +20,8 @@ import { selectQuestions, type SelectionRequest } from '@/data/learning/selectio
 import { currentMemoryModel } from '@/data/learning/state';
 import { nowMs } from '@/data/learning/time';
 import { XP_RULES } from '@/data/learning/xp-rules';
+import { pastCourseForSubject } from '@/data/past-question-topics';
+import { pastCourseOf, pastQuestionsFor, usePastQuestions } from '@/data/past-questions';
 import { useProgress } from '@/data/progress';
 import { deleteQuizDraft, getQuizDraft, type QuizDraft, saveQuizDraft } from '@/data/quiz-drafts';
 import { ensureQuestionHistoryLoaded } from '@/data/question-history';
@@ -47,6 +49,7 @@ type QuizPlan = {
 // /learn/quiz?lesson=<id>[&masteryCheck=true]   lesson quiz / mastery check
 // /learn/quiz?topic=<id>                         cumulative topic quiz
 // /learn/quiz?practice=<id,id,…>                 practise specific questions
+// /learn/quiz?custom=1&lessons=<ids>&past=<topic ids>&size=…   custom quiz (past = topics whose HB2 past questions are included)
 // Older links: ?course=<id>&challenge=apex → Apex Challenge;
 //              ?lesson=<id>&practiceWrong=true&wrongQuestions=<ids> → practice
 export default function QuizRoute() {
@@ -59,17 +62,32 @@ export default function QuizRoute() {
   const custom = param(params.custom) === '1';
   const attemptToken = param(params.attempt) ?? '';
   const customLessonIds = custom ? [...new Set((param(params.lessons) ?? '').split(',').filter(Boolean))] : undefined;
+  const customPastTopicIds = custom ? [...new Set((param(params.past) ?? '').split(',').filter((id) => getTopic(id)))] : undefined;
   const customSize = custom ? Math.max(1, Math.min(50, Number(param(params.size)) || 10)) : undefined;
   const feedback = param(params.feedback) === 'submit' ? 'submit' : 'instant';
   const parsedSeconds = Number(param(params.seconds));
   const perQuestionSeconds = custom && Number.isInteger(parsedSeconds) && parsedSeconds >= 5 && parsedSeconds <= 120 ? parsedSeconds : undefined;
   const customSettings: CustomQuizSettings | undefined =
-    custom && customLessonIds?.length
-      ? { lessonIds: customLessonIds, size: customSize ?? 10, feedback, secondsPerQuestion: perQuestionSeconds }
+    custom && (customLessonIds?.length || customPastTopicIds?.length)
+      ? { lessonIds: customLessonIds ?? [], pastTopicIds: customPastTopicIds?.length ? customPastTopicIds : undefined, size: customSize ?? 10, feedback, secondsPerQuestion: perQuestionSeconds }
       : undefined;
+  const practiceIds = practice ? practice.split(',').filter(Boolean) : undefined;
+  // Past questions are loaded before the quiz is planned, so they can be found by id.
+  const pastCourses = [
+    ...(customPastTopicIds ?? []).map((id) => pastCourseForSubject(getTopic(id)!.subject)),
+    ...(practiceIds ?? []).map(pastCourseOf).filter((id): id is string => Boolean(id)),
+  ];
+  const pastReady = usePastQuestions(pastCourses);
 
   if (param(params.challenge) === 'apex' || (!lessonId && !topicId && !practice && param(params.course))) {
     return <Redirect href={routes.apex(param(params.course))} />;
+  }
+  if (!pastReady) {
+    return (
+      <Screen width="learning">
+        <LoadingState label="Loading past questions…" />
+      </Screen>
+    );
   }
 
   // The quiz link without the one-off parts, so a saved quiz can be reopened later.
@@ -85,9 +103,10 @@ export default function QuizRoute() {
       key={`${lessonId ?? ''}:${topicId ?? ''}:${practice ?? ''}:${masteryCheck}:${custom}:${attemptToken}`}
       lessonId={lessonId}
       topicId={topicId}
-      practiceIds={practice ? practice.split(',').filter(Boolean) : undefined}
+      practiceIds={practiceIds}
       masteryCheck={masteryCheck}
       customLessonIds={customLessonIds}
+      customPastTopicIds={customPastTopicIds}
       customSize={customSize}
       customSettings={customSettings}
       initialFeedback={custom ? feedback : undefined}
@@ -102,25 +121,33 @@ function buildPlan(input: {
   practiceIds?: string[];
   masteryCheck: boolean;
   customLessonIds?: string[];
+  customPastTopicIds?: string[];
   customSize?: number;
   customSettings?: CustomQuizSettings;
   completed: string[];
 }): QuizPlan | null {
-  const { lessonId, topicId, practiceIds, masteryCheck, customLessonIds, customSize, customSettings, completed } = input;
+  const { lessonId, topicId, practiceIds, masteryCheck, customLessonIds, customPastTopicIds, customSize, customSettings, completed } = input;
 
-  if (customLessonIds && customLessonIds.length > 0) {
-    const lessonIds = customLessonIds.filter((id) => findLesson(id));
+  if (customLessonIds?.length || customPastTopicIds?.length) {
+    const lessonIds = (customLessonIds ?? []).filter((id) => findLesson(id));
+    const pastTopics = (customPastTopicIds ?? []).map((id) => getTopic(id)).filter((topic) => topic !== undefined);
     const questionIds = Array.from(
-      new Set(lessonIds.flatMap((id) => getLessonQuestions(id).filter((question) => question.usage !== 'learn').map((question) => question.id)))
+      new Set([
+        ...lessonIds.flatMap((id) => getLessonQuestions(id).filter((question) => question.usage !== 'learn').map((question) => question.id)),
+        ...pastTopics.flatMap((topic) => pastQuestionsFor(pastCourseForSubject(topic.subject), topic.id).map((question) => question.id)),
+      ])
     );
     if (questionIds.length === 0) return null;
     const size = Math.min(customSize ?? 10, questionIds.length);
-    const topicIds = new Set(lessonIds.map((id) => findLesson(id)?.topic.id).filter((id): id is string => Boolean(id)));
+    const topicIds = new Set([
+      ...lessonIds.map((id) => findLesson(id)?.topic.id).filter((id): id is string => Boolean(id)),
+      ...pastTopics.map((topic) => topic.id),
+    ]);
     return {
       kind: 'practice',
       attemptMode: 'practice',
       title: 'Custom practice',
-      subtitle: `A fresh set of up to ${size} questions from your selected lessons.`,
+      subtitle: `A fresh set of up to ${size} questions from your selection.`,
       topicId: topicIds.size === 1 ? Array.from(topicIds)[0] : '',
       request: { scope: { kind: 'questions', questionIds }, size },
       backHref: routes.customQuizBuilder(),
@@ -191,7 +218,9 @@ function buildPlan(input: {
 // Which saved quiz this is: its kind and what it covers (the same quiz always gets the same key).
 function draftKey(plan: QuizPlan, practiceIds?: string[]): string {
   if (plan.kind === 'practice') {
-    const ids = plan.customQuiz ? plan.customQuiz.lessonIds : (practiceIds ?? []);
+    const ids = plan.customQuiz
+      ? [...plan.customQuiz.lessonIds, ...(plan.customQuiz.pastTopicIds ?? []).map((id) => `past:${id}`)]
+      : (practiceIds ?? []);
     let hash = 5381;
     for (const char of ids.join(',')) hash = ((hash << 5) + hash + char.charCodeAt(0)) | 0;
     return `${plan.customQuiz ? 'custom' : 'practice'}:${(hash >>> 0).toString(36)}`;
@@ -207,6 +236,7 @@ function QuizScreen({
   practiceIds,
   masteryCheck,
   customLessonIds,
+  customPastTopicIds,
   customSize,
   customSettings,
   initialFeedback,
@@ -219,6 +249,7 @@ function QuizScreen({
   practiceIds?: string[];
   masteryCheck: boolean;
   customLessonIds?: string[];
+  customPastTopicIds?: string[];
   customSize?: number;
   customSettings?: CustomQuizSettings;
   initialFeedback?: FeedbackMode;
@@ -227,7 +258,7 @@ function QuizScreen({
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const progress = useProgress();
-  const plan = buildPlan({ lessonId, topicId, practiceIds, masteryCheck, customLessonIds, customSize, customSettings, completed: progress.completedLessons });
+  const plan = buildPlan({ lessonId, topicId, practiceIds, masteryCheck, customLessonIds, customPastTopicIds, customSize, customSettings, completed: progress.completedLessons });
   const [mode, setMode] = useState<FeedbackMode>(initialFeedback ?? 'instant');
   const [items, setItems] = useState<SessionItem[] | null>(null);
   const [seed, setSeed] = useState('');

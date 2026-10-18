@@ -241,8 +241,19 @@ function TopicProgression({ topics, now }: { topics: TopicProgress[]; now: numbe
         const done = topic.status === 'completed' || topic.status === 'mastered';
         const isNext = index === nextIndex;
         const last = index === topics.length - 1;
+        // Anatomy is taught in sections (Gross Anatomy, Microanatomy, Embryology): a heading where each starts.
+        const section = topic.topic.section;
+        const newSection = section && section !== topics[index - 1]?.topic.section;
+        const sectionCount = section ? topics.filter((item) => item.topic.section === section).length : 0;
         return (
-          <View key={topic.topic.id} style={styles.step} role="listitem">
+          <View key={topic.topic.id}>
+          {newSection ? (
+            <View style={[styles.sectionHead, index > 0 && styles.sectionHeadGap]} accessibilityRole="header">
+              <Text style={styles.sectionTitle}>{section}</Text>
+              <Text style={styles.sectionMeta}>{sectionCount} topic{sectionCount === 1 ? '' : 's'}</Text>
+            </View>
+          ) : null}
+          <View style={styles.step} role="listitem">
             <View style={styles.stepRail}>
               <View style={[styles.stepNode, done && styles.stepNodeDone, isNext && styles.stepNodeNext]}>
                 {done ? (
@@ -259,6 +270,7 @@ function TopicProgression({ topics, now }: { topics: TopicProgress[]; now: numbe
               ) : null}
               <TopicCard progress={topic} now={now} />
             </View>
+          </View>
           </View>
         );
       })}
@@ -309,6 +321,10 @@ function createStyles(colors: ThemeColors) {
     stepBody: { flex: 1, minWidth: 0 },
     stepBodySpaced: { paddingBottom: 14 },
     upNext: { ...Type.overline, fontSize: 10, color: colors.primaryText, marginBottom: 6, marginTop: 2 },
+    sectionHead: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, marginBottom: 4, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: colors.border },
+    sectionHeadGap: { marginTop: 18 },
+    sectionTitle: { ...Type.title3, color: colors.text },
+    sectionMeta: { fontSize: 12, fontWeight: '700', color: colors.textSecondary },
     empty: { marginTop: 4 },
   });
 }

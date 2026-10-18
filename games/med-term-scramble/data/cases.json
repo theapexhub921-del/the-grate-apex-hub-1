@@ -1,0 +1,38 @@
+{
+  "_help": "Each case is a chain of scramble steps. The last step is the diagnosis.",
+  "cases": [
+    {
+      "id": "crushing_chest_pain",
+      "title": "Crushing Chest Pain",
+      "presentation": "A 58-year-old man who smokes has had 40 minutes of crushing central chest pain radiating to his left arm, with sweating and nausea.",
+      "steps": [
+        {"id": "case1_ischemia", "stage": "Mechanism", "term": "ISCHEMIA", "category": "Cardiology", "difficulty": 2, "clue": "His pain comes from heart muscle starved of blood flow. Name the process.", "definition": "Inadequate blood supply to a tissue, causing oxygen shortage.", "explanation": "Myocardial ischemia causes the pressure-like pain of angina and infarction.", "related": ["ANGINA"]},
+        {"id": "case1_ecg", "stage": "Investigation", "term": "ELECTROCARDIOGRAM", "category": "Cardiology", "difficulty": 4, "clue": "The first test to perform within 10 minutes of his arrival", "definition": "A recording of the heart's electrical activity.", "explanation": "A 12-lead ECG quickly identifies ST-elevation MI, which needs immediate reperfusion.", "related": ["STEMI"]},
+        {"id": "case1_troponin", "stage": "Biomarker", "term": "TROPONIN", "category": "Cardiology", "difficulty": 2, "clue": "Cardiac protein measured in blood to confirm heart muscle injury", "definition": "A cardiac muscle protein released into the blood when heart cells are damaged.", "explanation": "A rise and fall of troponin confirms myocardial injury.", "related": ["BIOMARKER"]},
+        {"id": "case1_dx", "stage": "Diagnosis", "term": "INFARCTION", "category": "Cardiology", "difficulty": 3, "clue": "ST elevation and raised troponin: myocardial ____", "definition": "Death of tissue caused by an interrupted blood supply.", "explanation": "Diagnosis: ST-elevation myocardial infarction. Treat with urgent PCI, plus aspirin and a second antiplatelet.", "related": ["STEMI", "PCI"]}
+      ]
+    },
+    {
+      "id": "thirsty_teenager",
+      "title": "The Thirsty Teenager",
+      "presentation": "A 16-year-old girl has had two weeks of extreme thirst, passing lots of urine and weight loss. Today she is vomiting, drowsy and breathing deeply.",
+      "steps": [
+        {"id": "case2_polyuria", "stage": "Symptom", "term": "POLYURIA", "category": "Endocrinology", "difficulty": 2, "clue": "The medical term for passing large volumes of urine", "definition": "Passing abnormally large volumes of urine.", "explanation": "High glucose spills into urine and pulls water with it (osmotic diuresis).", "related": ["POLYDIPSIA"]},
+        {"id": "case2_ketones", "stage": "Bedside test", "term": "KETONES", "category": "Biochemistry", "difficulty": 2, "clue": "These are strongly positive in her blood and give her breath a fruity smell", "definition": "Acidic molecules made when the body breaks down fat for fuel.", "explanation": "Without insulin, fat is broken down, producing ketones.", "related": ["KETOSIS"]},
+        {"id": "case2_acidosis", "stage": "Blood gas", "term": "ACIDOSIS", "category": "Biochemistry", "difficulty": 2, "clue": "Her venous pH is 7.1. Name this state.", "definition": "An excess of acid in the body fluids, lowering blood pH.", "explanation": "Ketones cause a high anion gap metabolic acidosis. Deep Kussmaul breathing blows off CO2 to compensate.", "related": ["KUSSMAUL"]},
+        {"id": "case2_dx", "stage": "Diagnosis", "term": "KETOACIDOSIS", "category": "Endocrinology", "difficulty": 4, "clue": "New type 1 diabetes presenting as diabetic ____", "definition": "A life-threatening state of high ketones, acidosis and usually high glucose.", "explanation": "Diagnosis: diabetic ketoacidosis. Treat with IV fluids, fixed-rate insulin and careful potassium replacement.", "related": ["INSULIN", "POTASSIUM"]}
+      ]
+    },
+    {
+      "id": "fever_stiff_neck",
+      "title": "Fever and a Stiff Neck",
+      "presentation": "A 19-year-old student has a high fever, severe headache and vomiting. Light hurts her eyes, her neck is stiff, and purple spots are appearing on her legs.",
+      "steps": [
+        {"id": "case3_photophobia", "stage": "Symptom", "term": "PHOTOPHOBIA", "category": "Neurology", "difficulty": 3, "clue": "The term for her discomfort with light", "definition": "Abnormal sensitivity or discomfort on exposure to light.", "explanation": "Photophobia, headache and neck stiffness suggest meningeal irritation.", "related": ["MENINGISM"]},
+        {"id": "case3_petechiae", "stage": "Examination", "term": "PETECHIAE", "category": "Hematology", "difficulty": 3, "clue": "Tiny purple spots that do not fade under a pressed glass", "definition": "Pinpoint, non-blanching spots from bleeding under the skin.", "explanation": "A non-blanching rash with fever suggests meningococcal sepsis.", "related": ["PURPURA"]},
+        {"id": "case3_organism", "stage": "Organism", "term": "MENINGOCOCCUS", "category": "Microbiology", "difficulty": 4, "clue": "The gram-negative diplococcus most likely responsible", "definition": "Neisseria meningitidis, a gram-negative diplococcus.", "explanation": "It spreads by droplets and can kill within hours. Close contacts need prophylaxis.", "related": ["NEISSERIA"]},
+        {"id": "case3_dx", "stage": "Diagnosis", "term": "MENINGITIS", "category": "Neurology", "difficulty": 3, "clue": "Diagnosis: meningococcal ____ with sepsis", "definition": "Inflammation of the membranes covering the brain and spinal cord.", "explanation": "Diagnosis: bacterial meningitis. Give IV ceftriaxone immediately and do not delay for a lumbar puncture.", "related": ["CEFTRIAXONE"]}
+      ]
+    }
+  ]
+}

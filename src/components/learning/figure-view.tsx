@@ -7,6 +7,7 @@
 //                   then reveal it.
 //   QuestionFigure  with a quiz question: labels covered and the asked-about
 //                   part marked; once answered, its label is uncovered.
+//   QuestionImage   a plain picture with a question (past papers' diagrams).
 import { Image } from 'expo-image';
 import { useState, type ReactNode } from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -34,6 +35,16 @@ const MAX_HEIGHT = 480;
 const QUESTION_MAX_HEIGHT = 280;
 // The preview card in a lesson.
 const PREVIEW_HEIGHT = 120;
+
+/** A plain picture with a question (a past paper's labelled diagram). */
+export function QuestionImage({ src, label = 'Diagram for this question' }: { src: string; label?: string }) {
+  const styles = useThemedStyles(createStyles);
+  return (
+    <View style={[styles.canvas, styles.questionImage]}>
+      <Image source={{ uri: figureUri(src) }} style={StyleSheet.absoluteFill} contentFit="contain" accessibilityLabel={label} transition={150} />
+    </View>
+  );
+}
 
 /** The picture at its own shape, with covers and pins drawn over it. */
 function Canvas({ figure, children, label, maxHeight = MAX_HEIGHT }: { figure: LessonFigure; children?: ReactNode; label: string; maxHeight?: number }) {
@@ -252,6 +263,7 @@ function createStyles(colors: ThemeColors) {
     muted: { ...Type.caption, color: colors.textTertiary },
     caption: { ...Type.caption, color: colors.textTertiary },
     questionFigure: { marginVertical: 4 },
+    questionImage: { height: QUESTION_MAX_HEIGHT, marginVertical: 4 },
     previewCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 10, marginVertical: 6, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
     previewHover: { borderColor: colors.primaryBorder },
     previewImage: { height: PREVIEW_HEIGHT, maxWidth: '45%', borderRadius: Radius.sm, overflow: 'hidden', backgroundColor: Paper },

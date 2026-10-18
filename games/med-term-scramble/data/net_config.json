@@ -1,0 +1,5 @@
+{
+  "_help": "Firebase Realtime Database used for multiplayer rooms (same project as the HTML prototype).",
+  "database_url": "https://med-term-scramble-default-rtdb.firebaseio.com",
+  "poll_seconds": 0.7
+}

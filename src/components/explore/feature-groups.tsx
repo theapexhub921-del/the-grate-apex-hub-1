@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { ExploreDemo, LearnDemo, ReviewDemo, SimFrame, type DemoProps } from '@/components/onboarding/tour-demos';
 import { Button } from '@/components/ui/button';
+import { CardGrid } from '@/components/ui/card-grid';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Card, Interactive } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
@@ -27,14 +28,14 @@ export function ExploreFeatureGroups() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [tourIndex, setTourIndex] = useState<number | null>(null);
   return <>
-    <View style={styles.grid}>{groups.map((group, index) => <Card key={group.id} style={styles.group}>
+    <CardGrid minItemWidth={285} maxColumns={3}>{groups.map((group, index) => <Card key={group.id} style={styles.group}>
       <View style={styles.heading}><View style={styles.icon}><Icon name={group.icon} size={19} color={colors.primaryText} /></View><View style={styles.copy}><Text style={styles.title}>{group.title}</Text><Text style={styles.detail}>{group.summary}</Text></View></View>
       <View style={styles.actions}>
         <Interactive onPress={() => setExpanded(expanded === group.id ? null : group.id)} style={styles.action}><Text style={styles.actionText}>{expanded === group.id ? 'Hide features' : `View ${group.features.length} features`}</Text><Icon name={expanded === group.id ? 'chevronUp' : 'chevronDown'} size={15} color={colors.primaryText} /></Interactive>
         <Interactive onPress={() => setTourIndex(index)} style={styles.action}><Text style={styles.actionText}>Try this group</Text><Icon name="play" size={14} color={colors.primaryText} /></Interactive>
       </View>
       {expanded === group.id ? <View style={styles.list}>{group.features.map((feature) => { const status = feature.status === 'available' ? 'Available' : feature.status === 'limited' ? 'In progress' : feature.status === 'coming-soon' ? 'Coming soon' : feature.status; return <View key={feature.title} style={styles.feature}><View style={styles.copy}><Text style={styles.featureTitle}>{feature.title}</Text><Text style={styles.detail}>{feature.detail}</Text></View>{status ? <Pill label={status} tone={status === 'Available' ? 'primary' : 'neutral'} /> : null}</View>; })}</View> : null}
-    </Card>)}</View>
+    </Card>)}</CardGrid>
     {tourIndex !== null ? <Walkthrough group={groups[tourIndex]} onClose={() => setTourIndex(null)} onNext={() => setTourIndex((tourIndex + 1) % groups.length)} /> : null}
   </>;
 }
@@ -67,7 +68,7 @@ function PersonalDemo({ done, onDone }: DemoProps) {
 }
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-    grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 }, group: { flexBasis: '31%', flexGrow: 1, minWidth: 285, gap: 13, padding: 17 },
+    group: { flexGrow: 1, gap: 13, padding: 17 },
     heading: { flexDirection: 'row', alignItems: 'flex-start', gap: 11 }, icon: { width: 34, height: 34, borderRadius: 11, backgroundColor: colors.primarySubtle, alignItems: 'center', justifyContent: 'center' },
     copy: { flex: 1, minWidth: 0, gap: 3 }, title: { ...Type.headline, color: colors.text }, detail: { fontSize: 13, lineHeight: 19, color: colors.textSecondary },
     actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: 11 }, action: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 3 }, actionText: { fontSize: 12, fontWeight: '800', color: colors.primaryText },

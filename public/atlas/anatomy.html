@@ -1,0 +1,3123 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Anatomy atlas</title>
+  <style>
+    /* GRATEAPEX anatomy atlas.
+       Every colour comes from a variable. The app hands over its theme (see the bridge script below), so the
+       atlas follows light / dark and the learner's accent. The values here are the dark fallback. */
+    :root {
+      color-scheme: dark;
+      --stage-a: #1d242c;
+      --stage-b: #0d1014;
+      --paper: #1b2129;
+      --card: #151a20;
+      --well: #0e1216;
+      --raise: #28313c;
+      --glass: rgba(21, 26, 32, 0.78);
+      --line: rgba(255, 255, 255, 0.09);
+      --ink: #eaeef2;
+      --ink-2: #b5c0ca;
+      --muted: #8896a3;
+      --on-ink: #0d1014;
+      --cobalt: #3ad1c0;
+      --cobalt-2: rgba(58, 209, 192, 0.16);
+      --on-cobalt: #06201d;
+      --focus: #3ad1c0;
+      --bad: #ff8a80;
+      --bad-bg: #3a1d1b;
+      --shadow-c: rgba(0, 0, 0, 0.4);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 16px 40px rgba(0, 0, 0, 0.35);
+      --r-lg: 18px;
+      --r-md: 12px;
+      --r-sm: 9px;
+      --gap: 12px;
+      --panel-w: 316px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+
+    body {
+      font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--ink);
+      background: radial-gradient(ellipse at 50% 28%, var(--stage-a), var(--stage-b) 78%);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #c {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      outline: none;
+    }
+
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+    /* ---------- shared surface ---------- */
+    .card {
+      position: fixed;
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px) saturate(1.2);
+      -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    }
+
+    button { font: inherit; color: inherit; }
+
+    /* ---------- left panel ---------- */
+    #panel {
+      left: var(--gap);
+      top: var(--gap);
+      bottom: var(--gap);
+      width: var(--panel-w);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.28s cubic-bezier(.2, .8, .2, 1), opacity 0.2s;
+      z-index: 3;
+    }
+
+    #panel.closed {
+      transform: translateX(calc(-100% - var(--gap) - 8px));
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .phead {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 14px 10px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+
+    .brand .mark {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: var(--cobalt);
+      color: var(--on-cobalt);
+    }
+
+    .brand b { display: block; font-size: 15px; line-height: 1.15; letter-spacing: -0.01em; }
+    .brand small { display: block; color: var(--muted); font-size: 12px; }
+
+    .iconbtn {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--raise);
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .iconbtn:hover { background: var(--cobalt-2); }
+    .iconbtn:active { transform: scale(0.94); }
+
+    .searchwrap { position: relative; padding: 0 14px 10px; flex: none; }
+
+    .searchwrap svg {
+      position: absolute;
+      left: 26px;
+      top: 11px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    input[type="search"] {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px 0 36px;
+      border-radius: var(--r-md);
+      border: 1px solid var(--line);
+      background: var(--well);
+      color: var(--ink);
+      font: inherit;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input[type="search"]::placeholder { color: var(--muted); }
+    input[type="search"]:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px var(--cobalt-2); }
+
+    .pscroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 0 14px 12px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line) transparent;
+    }
+
+    #results { list-style: none; margin: 0 0 6px; padding: 0; }
+
+    #results li:empty { display: none; }
+
+    #results button {
+      width: 100%;
+      text-align: left;
+      padding: 9px 10px;
+      border: 0;
+      border-radius: var(--r-sm);
+      background: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    #results button:hover, #results button:focus-visible { background: var(--cobalt-2); }
+    #results button span { font-weight: 600; }
+    #results button small { color: var(--muted); font-size: 12px; }
+
+    /* sections */
+    .sec { border-top: 1px solid var(--line); }
+    .sec:first-of-type { border-top: 0; }
+
+    .sec > summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 2px;
+      cursor: pointer;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .sec > summary::-webkit-details-marker { display: none; }
+
+    .sec > summary::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.2s;
+      opacity: 0.7;
+    }
+
+    .sec[open] > summary::after { transform: rotate(-135deg) translateY(-2px); }
+    .sec > summary:hover { color: var(--ink-2); }
+    .sec .body { padding: 0 0 12px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .chip {
+      min-height: 34px;
+      padding: 0 13px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--well);
+      color: var(--ink-2);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .chip:hover { border-color: var(--cobalt); color: var(--ink); }
+
+    .chip[aria-pressed="true"] {
+      background: var(--cobalt);
+      border-color: var(--cobalt);
+      color: var(--on-cobalt);
+      font-weight: 700;
+    }
+
+    /* Panel tabs: Explore (search, organs, layers, display) and Quiz */
+    .ptabs { flex: none; display: flex; gap: 6px; padding: 0 14px 10px; }
+    .ptab {
+      flex: 1;
+      min-height: 36px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--well);
+      color: var(--ink-2);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .ptab:hover { border-color: var(--cobalt); color: var(--ink); }
+    .ptab[aria-selected="true"] { background: var(--cobalt); border-color: var(--cobalt); color: var(--on-cobalt); font-weight: 700; }
+    #panel[data-tab="quiz"] .explore-only { display: none !important; }
+    #panel[data-tab="explore"] .quiz-only { display: none !important; }
+    .sec.quiz-only + .sec { border-top: 0; }
+
+    [hidden] { display: none !important; }
+
+    .boot { margin: 2px 0 10px; padding: 9px 12px; border-radius: var(--r-sm); background: var(--well); border: 1px solid var(--line); color: var(--ink-2); font-size: 12.5px; }
+
+    /* single-organ buttons */
+    .organs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+    .organ {
+      min-height: 48px;
+      padding: 0 8px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--well);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+    }
+
+    .organ:hover { border-color: var(--cobalt); }
+    .organ:active { transform: scale(0.96); }
+    .organ[aria-pressed="true"] { background: var(--cobalt); border-color: var(--cobalt); color: var(--on-cobalt); }
+
+    .organstatus { margin: 8px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+
+    /* rows (systems, colour-coding, display toggles) */
+    .sys {
+      display: grid;
+      grid-template-columns: 20px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 8px;
+      margin: 0 -8px;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      position: relative;   /* the hidden checkbox must sit inside its row, or focusing it scrolls the whole panel */
+      transition: background 0.12s;
+    }
+
+    .sys.sub { margin-left: 14px; }
+    .sys:hover { background: var(--cobalt-2); }
+    .sys input { position: absolute; left: 0; top: 0; width: 20px; height: 20px; margin: 0; opacity: 0; pointer-events: none; }
+
+    .swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 7px;
+      border: 2px solid var(--line);
+      background: transparent;
+      transition: background 0.15s, border-color 0.15s, transform 0.12s;
+    }
+
+    .sys input:checked + .swatch { background: var(--c); border-color: var(--b, var(--c)); }
+    .sys:active .swatch { transform: scale(0.92); }
+    .sys input:focus-visible + .swatch { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+    .sys .stat {
+      color: var(--muted);
+      font-size: 11.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sys .stat.err { color: var(--bad); font-weight: 600; }
+
+    /* peel slider */
+    #peel {
+      width: 100%;
+      margin: 6px 0 2px;
+      accent-color: var(--cobalt);
+      height: 28px;
+    }
+
+    #peelLabel {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--well);
+      border: 1px solid var(--line);
+      color: var(--ink-2);
+      font-size: 12px;
+    }
+
+    /* buttons */
+    button.btn {
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--line);
+      background: var(--raise);
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    button.btn:hover { background: var(--cobalt-2); }
+    button.btn:active { transform: scale(0.97); }
+
+    button.primary { background: var(--cobalt); border-color: var(--cobalt); color: var(--on-cobalt); }
+    button.primary:hover { background: var(--cobalt); filter: brightness(1.1); }
+
+    #reveal { display: none; width: 100%; margin: 0 0 10px; }
+    #reveal.show { display: block; }
+
+    /* credits */
+    #credit { margin: 4px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.5; }
+    #credit summary { cursor: pointer; color: var(--ink-2); padding: 8px 0; }
+    #credit p { margin: 6px 0 0; }
+    #credit a { color: var(--cobalt); }
+
+    /* ---------- reopen-panel button (shown when the panel is closed) ---------- */
+    #openPanel {
+      position: fixed;
+      left: var(--gap);
+      top: var(--gap);
+      z-index: 3;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: none;
+      place-items: center;
+      padding: 0;
+      cursor: pointer;
+      color: var(--ink);
+      background: var(--glass);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    #openPanel.show { display: grid; }
+
+    /* ---------- selected-structure card ---------- */
+    #info {
+      left: calc(var(--panel-w) + var(--gap) * 2 + (100% - var(--panel-w) - var(--gap) * 2) / 2);
+      transform: translateX(-50%) translateY(18px);
+      bottom: var(--gap);
+      width: min(440px, calc(100% - var(--panel-w) - var(--gap) * 5));
+      padding: 16px 16px 14px 20px;
+      opacity: 0;
+      visibility: hidden;
+      overflow: hidden;
+      z-index: 3;
+      transition: opacity 0.2s, transform 0.28s cubic-bezier(.2, .8, .2, 1), visibility 0.2s;
+    }
+
+    body.panel-closed #info { left: 50%; width: min(440px, calc(100% - var(--gap) * 2)); }
+
+    #info::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      background: var(--cobalt);
+    }
+
+    #info.open { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+    /* ---------- quiz ---------- */
+    #quizStart { width: 100%; margin-top: 10px; }
+
+    #quiz {
+      display: none;
+      left: 50%;
+      bottom: var(--gap);
+      transform: translateX(-50%);
+      width: min(520px, calc(100% - var(--gap) * 2));
+      padding: 12px 14px 14px;
+      z-index: 6;
+    }
+
+    /* while a quiz runs, nothing may give the answer away: no menu, no info card, no hover names */
+    body.quizzing #quiz { display: block; }
+    body.quizzing #panel, body.quizzing #openPanel, body.quizzing #info, body.quizzing #tip, body.quizzing #hint { display: none !important; }
+
+    #quiz .qhead {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    #qscore { margin-left: auto; color: var(--cobalt); }
+
+    #quiz .qx {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: var(--raise);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    #quiz .qx:hover { background: var(--cobalt-2); }
+    #qprompt { margin: 6px 0 10px; font-size: 16px; line-height: 1.3; font-weight: 700; }
+    .qopts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .qopts button {
+      min-height: 46px;
+      padding: 6px 10px;
+      line-height: 1.25;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .qopts button:disabled { cursor: default; color: var(--ink); opacity: 0.55; }
+    .qopts button.right { opacity: 1; background: var(--cobalt-2); border-color: var(--cobalt); }
+    .qopts button.wrong { opacity: 1; background: var(--bad-bg); border-color: var(--bad); }
+    #quiz .qfoot { display: flex; align-items: center; gap: 10px; margin-top: 10px; min-height: 38px; }
+    #qfeed { flex: 1; color: var(--ink-2); font-size: 13px; line-height: 1.35; }
+    #qresult { margin: 6px 0 0; font-size: 22px; font-weight: 700; }
+    #qmissed { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; line-height: 1.4; }
+    #qmissed:empty { display: none; }
+    #qxp { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; font-weight: 600; line-height: 1.4; }
+    #qxp:empty { display: none; }
+    #quiz .qfoot .btn { flex: none; }
+    #qsummary .qfoot .btn { flex: 1 1 0; }
+
+    #name { margin: 0; font-size: 18px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em; }
+    #meta { margin: 3px 0 14px; color: var(--muted); font-size: 12.5px; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    #info.pin #isolate, #info.pin #hide { display: none; }
+
+    /* ---------- view controls (dock) ---------- */
+    #nav {
+      --nb: 40px;
+      right: var(--gap);
+      top: var(--gap);
+      padding: 10px;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    #nav .navhead {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-left: 4px;
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    #navBody { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+    #nav.min #navBody { display: none; }
+    #nav.min .navhead svg { transform: rotate(180deg); }
+    #nav .navbtns { display: flex; gap: 4px; }
+
+    #nav .seg {
+      display: flex;
+      padding: 3px;
+      gap: 2px;
+      width: 100%;
+      background: var(--well);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+    }
+
+    #nav .seg button {
+      flex: 1;
+      border: 0;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: none;
+      color: var(--muted);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    #nav .seg button[aria-pressed="true"] {
+      background: var(--raise);
+      color: var(--ink);
+      box-shadow: 0 1px 3px var(--shadow-c);
+    }
+
+    #nav .dpad { display: grid; grid-template-columns: repeat(3, var(--nb)); gap: 4px; }
+    #nav .zoomrow { display: flex; gap: 4px; }
+
+    #nav .nb, #nav .nt {
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: var(--raise);
+      color: var(--ink);
+      cursor: pointer;
+      touch-action: none;
+      padding: 0;
+      transition: background 0.12s, transform 0.1s;
+    }
+
+    #nav .nb { width: var(--nb); height: var(--nb); border-radius: 12px; }
+    #nav .zoomrow .nb { width: calc(var(--nb) * 1.5 + 2px); }
+    #nav .nt { width: 28px; height: 28px; border-radius: 9px; }
+    #nav .nb:hover, #nav .nt:hover { background: var(--cobalt-2); }
+    #nav .nb:active { transform: scale(0.94); }
+    #nav .nb.down { background: var(--cobalt); border-color: var(--cobalt); color: var(--on-cobalt); }
+
+    /* ---------- hint, tooltip, notice ---------- */
+    #hint {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(360px, calc(100% - 32px));
+      padding: 18px 20px;
+      z-index: 7;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s, visibility 0.25s;
+    }
+
+    #hint.show { opacity: 1; visibility: visible; }
+    #hint h2 { margin: 0 0 8px; font-size: 14px; font-weight: 700; }
+    #hint ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--ink-2); }
+    #hint li { margin: 4px 0; }
+    #hint .hint-touch { display: none; }
+
+    #tip {
+      position: fixed;
+      pointer-events: none;
+      display: none;
+      z-index: 5;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--on-ink);
+      background: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    #notice {
+      position: fixed;
+      left: 50%;
+      top: 14px;
+      transform: translateX(-50%);
+      max-width: min(560px, calc(100% - 24px));
+      padding: 11px 15px;
+      border-radius: var(--r-md);
+      background: var(--bad-bg);
+      border: 1px solid var(--bad);
+      color: var(--ink);
+      display: none;
+      z-index: 6;
+    }
+
+    #notice code { background: var(--glass); padding: 1px 5px; border-radius: 4px; }
+
+    @media (pointer: coarse) {
+      #hint .hint-mouse { display: none; }
+      #hint .hint-touch { display: block; }
+      #nav { --nb: 44px; }
+      .chip { min-height: 38px; }
+      .sys { padding: 10px 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #hint, #panel, #info { transition: none; }
+    }
+
+    /* ---------- touch: bigger targets, no iOS zoom-on-focus ---------- */
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+    @media (pointer: coarse) {
+      input[type="search"] { font-size: 16px; height: 46px; }
+      .searchwrap svg { top: 14px; }
+      button.btn { min-height: 44px; }
+      .iconbtn { width: 40px; height: 40px; }
+      #peel { height: 44px; }
+      #nav .seg button { padding: 9px 12px; }
+      #nav .nt { width: 36px; height: 36px; }
+      #results button { padding: 12px 10px; }
+      .organ { min-height: 52px; }
+    }
+
+    /* ---------- phones (portrait / narrow): the menu is a bottom sheet ---------- */
+    .handle { display: none; }
+
+    @media (max-width: 760px) {
+      :root {
+        --gap: 8px;
+        --peek-h: 156px;
+        --half-h: min(48vh, 440px);
+        --sab: env(safe-area-inset-bottom, 0px);
+        --sat: env(safe-area-inset-top, 0px);
+      }
+
+      @supports (height: 1dvh) { :root { --half-h: min(48dvh, 440px); } }
+
+      #panel {
+        left: var(--gap);
+        right: var(--gap);
+        top: auto;
+        bottom: calc(var(--gap) + var(--sab));
+        width: auto;
+        height: var(--half-h);
+        border-radius: 22px;
+        transition: height 0.26s cubic-bezier(.2, .8, .2, 1), transform 0.28s cubic-bezier(.2, .8, .2, 1), opacity 0.2s;
+      }
+
+      #panel.peek { height: var(--peek-h); }
+      #panel.peek .pscroll { display: none; }
+      #panel.closed { transform: translateY(calc(100% + var(--gap) + var(--sab) + 12px)); }
+
+      .handle {
+        display: block;
+        flex: none;
+        width: 100%;
+        height: 26px;
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: grab;
+        touch-action: none;
+        position: relative;
+      }
+
+      .handle::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 11px;
+        width: 40px;
+        height: 5px;
+        margin-left: -20px;
+        border-radius: 3px;
+        background: var(--muted);
+        opacity: 0.55;
+      }
+
+      .phead { padding-top: 2px; }
+      .pscroll { padding-bottom: calc(14px + var(--sab)); }
+
+      #openPanel {
+        top: auto;
+        left: var(--gap);
+        bottom: calc(var(--gap) + var(--sab));
+        width: 48px;
+        height: 48px;
+      }
+
+      #nav {
+        --nb: 34px;
+        right: var(--gap);
+        top: calc(var(--gap) + var(--sat));
+        padding: 6px;
+        gap: 6px;
+      }
+
+      /* smaller view pad on phones so it covers less of the model */
+      #nav #navBody { gap: 6px; }
+      #nav .dpad, #nav .zoomrow { gap: 3px; }
+      #nav .nb { border-radius: 10px; }
+      #nav .nb svg { width: 16px; height: 16px; }
+      #nav .nt { width: 30px; height: 30px; }
+      #nav .navhead { font-size: 10.5px; gap: 6px; }
+      #nav .seg button { padding: 6px 10px; font-size: 12px; }
+
+      /* the selected-structure card sits just above the sheet (thumb reach); it waits while the sheet is fully open */
+      #info, body.panel-closed #info {
+        left: var(--gap);
+        right: var(--gap);
+        top: auto;
+        width: auto;
+        max-width: none;
+        bottom: calc(var(--peek-h) + var(--gap) * 2 + var(--sab));
+        transform: translateY(14px);
+        border-radius: 18px;
+      }
+
+      /* with the menu tucked away, the card sits at the bottom beside the menu button */
+      body.panel-closed #info { bottom: calc(var(--gap) + var(--sab)); left: calc(var(--gap) * 2 + 48px); }
+      #info.open { transform: translateY(0); }
+      body.sheet-half #info.open { opacity: 0; visibility: hidden; pointer-events: none; }
+
+      /* the quiz card is compact and sits at the bottom, full width */
+      #quiz { left: var(--gap); right: var(--gap); width: auto; transform: none; bottom: calc(var(--gap) + var(--sab)); padding: 10px; }
+      #qprompt { font-size: 15px; margin: 4px 0 8px; }
+      .qopts { gap: 6px; }
+      .qopts button { min-height: 44px; font-size: 13px; }
+      #quiz .qfoot { margin-top: 8px; }
+
+      /* compact card so it covers less of the model */
+      #info { padding: 10px 10px 10px 16px; }
+      #meta { margin: 2px 0 8px; font-size: 12px; }
+      #info .row { gap: 6px; }
+      #info .row .btn { flex: 1 1 auto; min-height: 38px; padding: 6px 8px; font-size: 13px; }
+      #name { font-size: 16px; }
+      #hint { top: 38%; }
+    }
+
+    /* ---------- landscape phones: a side menu instead of a bottom sheet ---------- */
+    @media (max-height: 520px) and (orientation: landscape) {
+      :root { --gap: 8px; --panel-w: 272px; }
+
+      #panel {
+        left: var(--gap);
+        right: auto;
+        top: var(--gap);
+        bottom: var(--gap);
+        width: var(--panel-w);
+        height: auto;
+        border-radius: var(--r-lg);
+      }
+
+      #panel.peek { height: auto; }
+      #panel.peek .pscroll { display: block; }
+      #panel.closed { transform: translateX(calc(-100% - var(--gap) - 8px)); }
+      .handle { display: none; }
+      .phead { padding-top: 10px; }
+      .pscroll { padding-bottom: 10px; }
+
+      #openPanel { top: var(--gap); bottom: auto; width: 44px; height: 44px; }
+
+      #nav { --nb: 32px; top: var(--gap); right: var(--gap); }
+
+      /* short screens: all four answers in one row, and the question text is dropped */
+      #quiz { width: min(640px, calc(100% - var(--gap) * 2)); padding: 8px 10px 10px; }
+      #qprompt { display: none; }
+      .qopts { grid-template-columns: repeat(4, 1fr); margin-top: 6px; }
+      .qopts button { min-height: 40px; font-size: 12.5px; }
+
+      #info {
+        left: calc(var(--panel-w) + var(--gap) * 2 + (100% - var(--panel-w) - var(--gap) * 2) / 2);
+        right: auto;
+        top: auto;
+        bottom: var(--gap);
+        width: min(420px, calc(100% - var(--panel-w) - var(--gap) * 5));
+        transform: translateX(-50%) translateY(14px);
+      }
+
+      body.panel-closed #info { left: 50%; width: min(420px, calc(100% - var(--gap) * 2)); bottom: var(--gap); }
+      #info.open, body.sheet-half #info.open { opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+      #hint { top: 50%; }
+    }
+  </style>
+  <script type="importmap">
+{ "imports": {
+    "three": "./vendor/three/build/three.module.min.js",
+    "three/addons/": "./vendor/three/examples/jsm/"
+} }
+</script>
+</head>
+
+<body>
+  <canvas id="c" tabindex="0"
+    aria-label="3D anatomy model. Drag to rotate, scroll or pinch to zoom, tap a structure to select it. Arrow keys turn the model, Shift and arrow keys move it, plus and minus zoom. The View buttons do the same."></canvas>
+
+  <button id="openPanel" type="button" aria-label="Open the atlas menu" title="Open the atlas menu">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"
+      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 7h16M4 12h16M4 17h10" />
+    </svg>
+  </button>
+
+  <aside id="panel" class="card" data-tab="explore" aria-label="Atlas menu">
+    <button id="sheetHandle" class="handle" type="button" aria-label="Expand or collapse the menu"
+      aria-expanded="true"></button>
+    <div class="phead">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="4.5" r="2" />
+            <path d="M12 8v6M7 10.5l5-2.5 5 2.5M12 14l-3.5 7M12 14l3.5 7" />
+          </svg>
+        </span>
+        <span><b>Anatomy atlas</b><small>3D reference</small></span>
+      </div>
+      <button id="closePanel" class="iconbtn" type="button" aria-label="Hide the menu" title="Hide the menu">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 6l-6 6 6 6" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="ptabs" role="tablist" aria-label="Atlas menu sections">
+      <button id="tabExplore" class="ptab" type="button" role="tab" aria-selected="true">Explore</button>
+      <button id="tabQuiz" class="ptab" type="button" role="tab" aria-selected="false" aria-controls="panelQuiz">Quiz</button>
+    </div>
+
+    <div class="searchwrap explore-only">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <path d="M20 20l-3.5-3.5" />
+      </svg>
+      <input id="q" type="search" placeholder="Search structures" autocomplete="off"
+        aria-label="Search loaded structures">
+    </div>
+
+    <div class="pscroll">
+      <p id="boot" class="boot explore-only" role="status">Loading the 3D atlas&hellip;</p>
+      <ul id="results" class="explore-only"></ul>
+      <button id="reveal" class="btn explore-only">Show everything again</button>
+
+      <section id="panelQuiz" class="sec quiz-only" role="tabpanel" aria-labelledby="tabQuiz">
+        <div class="body">
+          <p class="organstatus" style="margin:0">Body system</p>
+          <div id="quizSys" class="chips" role="group" aria-label="Quiz topic"></div>
+          <p class="organstatus" style="margin:0">Body region</p>
+          <div id="quizRegion" class="chips" role="group" aria-label="Quiz body region"></div>
+          <div id="quizSide" class="chips" role="group" aria-label="Quiz limb side" hidden></div>
+          <div id="quizPart" class="chips" role="group" aria-label="Quiz part of the limb" hidden></div>
+          <p class="organstatus" style="margin:0">Questions</p>
+          <div id="quizLen" class="chips" role="group" aria-label="Number of questions"></div>
+          <button id="quizStart" class="btn primary" type="button">Start 10-question quiz</button>
+          <p id="quizStatus" class="organstatus" role="status">Name the highlighted structure. Choose a body system, and a region if you want to be tested on just one part of the body.</p>
+        </div>
+      </section>
+
+      <details class="sec explore-only" open>
+        <summary>Single organs</summary>
+        <div class="body">
+          <div id="organs" class="organs" role="group" aria-label="Show one organ on its own">
+            <button class="organ" type="button" data-organ="brain" aria-pressed="false">Brain</button>
+            <button class="organ" type="button" data-organ="heart" aria-pressed="false">Heart</button>
+            <button class="organ" type="button" data-organ="lungs" aria-pressed="false">Lungs</button>
+          </div>
+          <label class="sys" id="vesselsRow" hidden><input type="checkbox" id="heartVessels" checked><span class="swatch"
+              style="--c:#c22d3a;--b:#2f6fd6"></span><span>Include great vessels</span><span class="stat">+ coronaries</span></label>
+          <p id="organStatus" class="organstatus" role="status">Pick one or more. Everything else is hidden.</p>
+        </div>
+      </details>
+
+      <details class="sec explore-only" open>
+        <summary>Sex</summary>
+        <div class="body">
+          <div id="pelvis" class="chips" role="group" aria-label="Pelvis: male or female">
+            <button class="chip" type="button" data-mode="male" aria-pressed="true">Male</button>
+            <button class="chip" type="button" data-mode="female" aria-pressed="false">Female</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec explore-only" open>
+        <summary>Regions</summary>
+        <div class="body">
+          <div id="regions" class="chips" role="group" aria-label="Body regions"></div>
+          <div id="limbSide" class="chips" role="group" aria-label="Which limb" style="margin-top:6px" hidden></div>
+          <div id="limbPart" class="chips" role="group" aria-label="Part of the limb" style="margin-top:6px" hidden></div>
+        </div>
+      </details>
+
+      <details class="sec explore-only" open>
+        <summary>Body systems</summary>
+        <div class="body">
+          <div id="systems"></div>
+        </div>
+      </details>
+
+      <details class="sec explore-only" open>
+        <summary>Peel layers</summary>
+        <div class="body">
+          <input id="peel" type="range" min="0" max="6" step="1" value="0"
+            aria-label="Peel layers from the outside in" aria-describedby="peelLabel">
+          <div id="peelLabel">All layers shown</div>
+        </div>
+      </details>
+
+      <details class="sec explore-only">
+        <summary>Colour-code</summary>
+        <div class="body">
+          <div id="coding"></div>
+        </div>
+      </details>
+
+      <details class="sec explore-only" open>
+        <summary>Display</summary>
+        <div class="body">
+          <label class="sys"><input type="checkbox" id="xray"><span class="swatch" style="--c:#7fd6ff"></span><span>X-ray
+              mode</span><span class="stat">see-through</span></label>
+          <label class="sys"><input type="checkbox" id="pinsOn" checked><span class="swatch"
+              style="--c:#ffffff;--b:#8896a3"></span><span>Landmark pins</span><span class="stat">on isolate</span></label>
+          <label class="sys"><input type="checkbox" id="aoOn" checked><span class="swatch"
+              style="--c:#8a96a3"></span><span>Ambient occlusion</span><span class="stat">depth</span></label>
+        </div>
+      </details>
+
+      <details id="credit">
+        <summary>Credits and licence</summary>
+        <p>Anatomy models: the <a data-ext href="https://github.com/LluisV/Z-Anatomy">Z-Anatomy</a> project, licensed
+          <a data-ext href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Z-Anatomy is derived from
+          BodyParts3D.
+        </p>
+        <p>Changes made to the models: converted from FBX to glTF (GLB) and compressed with Meshopt; label and leader-line
+          helper meshes and unused texture coordinates removed; a lighter copy for phones simplified to about half the
+          triangles; landmark ownership data added. Colours and lighting are applied by this viewer. The modified models
+          are shared under the same CC BY-SA 4.0 licence.</p>
+        <p>Vagina and ligaments, female reproductive organs, breasts: HuBMAP Human Reference
+          Atlas 3D reference objects (Visible Human
+          Female, National Library of Medicine), licensed CC BY 4.0. Positioned and renamed for this viewer.</p>
+      </details>
+    </div>
+  </aside>
+
+  <section id="info" class="card" aria-live="polite">
+    <h2 id="name"></h2>
+    <p id="meta"></p>
+    <div class="row">
+      <button class="btn primary" id="focus">Zoom to</button>
+      <button class="btn" id="isolate">Isolate</button>
+      <button class="btn" id="hide">Hide</button>
+      <button class="btn" id="clear">Deselect</button>
+    </div>
+  </section>
+  <div id="nav" class="card" role="group" aria-label="View controls">
+    <div class="navhead">
+      <span>View</span>
+      <span class="navbtns">
+        <button id="navHelp" class="nt" type="button" aria-label="How to move around" title="How to move around">
+          <span aria-hidden="true" style="font-weight:700;font-size:14px;line-height:1">?</span>
+        </button>
+        <button id="navToggle" class="nt" type="button" aria-expanded="true" aria-controls="navBody"
+          aria-label="Hide view controls" title="Hide view controls">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 15l6-6 6 6" />
+          </svg>
+        </button>
+      </span>
+    </div>
+    <div id="navBody">
+      <div class="seg" role="group" aria-label="What the arrows do">
+        <button type="button" data-mode="rotate" aria-pressed="true">Rotate</button>
+        <button type="button" data-mode="move" aria-pressed="false">Move</button>
+      </div>
+      <div class="dpad">
+        <span></span>
+        <button class="nb" type="button" data-act="Up" aria-label="Turn up" title="Turn up">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 15l6-6 6 6" />
+          </svg>
+        </button>
+        <span></span>
+        <button class="nb" type="button" data-act="Left" aria-label="Turn left" title="Turn left">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 6l-6 6 6 6" />
+          </svg>
+        </button>
+        <button class="nb" type="button" data-act="reset" aria-label="Reset view" title="Reset view (Home)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+          </svg>
+        </button>
+        <button class="nb" type="button" data-act="Right" aria-label="Turn right" title="Turn right">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </button>
+        <span></span>
+        <button class="nb" type="button" data-act="Down" aria-label="Turn down" title="Turn down">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+        <span></span>
+      </div>
+      <div class="zoomrow">
+        <button class="nb" type="button" data-act="zoomOut" aria-label="Zoom out" title="Zoom out (-)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14" />
+          </svg>
+        </button>
+        <button class="nb" type="button" data-act="zoomIn" aria-label="Zoom in" title="Zoom in (+)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <section id="quiz" class="card" aria-label="Quiz">
+    <div id="qplay">
+      <div class="qhead">
+        <span id="qcount"></span>
+        <span id="qscore"></span>
+        <button id="qend" class="qx" type="button" aria-label="End the quiz" title="End the quiz">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+      <h2 id="qprompt">What is the highlighted structure?</h2>
+      <div id="qopts" class="qopts" role="group" aria-label="Answers"></div>
+      <div class="qfoot" aria-live="polite">
+        <span id="qfeed"></span>
+        <button id="qnext" class="btn primary" type="button" hidden>Next</button>
+      </div>
+    </div>
+    <div id="qsummary" hidden>
+      <div class="qhead"><span>Quiz finished</span></div>
+      <p id="qresult"></p>
+      <p id="qmissed"></p>
+      <p id="qxp" role="status"></p>
+      <div class="qfoot">
+        <button id="qagain" class="btn primary" type="button">Try again</button>
+        <button id="qdone" class="btn" type="button">Done</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="hint" class="card" role="status">
+    <h2>Moving around without the buttons</h2>
+    <ul class="hint-mouse">
+      <li>Drag to turn the model</li>
+      <li>Scroll to zoom toward the pointer</li>
+      <li>Right-drag, or Shift + drag, to move it</li>
+      <li>Double-click a structure to zoom to it; double-click empty space to reset</li>
+      <li>Arrow keys turn, Shift + arrows move, + and - zoom</li>
+    </ul>
+    <ul class="hint-touch">
+      <li>Drag with one finger to turn the model</li>
+      <li>Pinch to zoom toward your fingers</li>
+      <li>Drag with two fingers to move it</li>
+      <li>Double-tap a structure to zoom to it; double-tap empty space to reset</li>
+    </ul>
+  </div>
+
+  <div id="tip"></div>
+  <div id="notice" role="alert"></div>
+
+  <script>
+    // GRATEAPEX theme bridge: the app hands this page its colours (in the address as #theme=..., and again by
+    // postMessage when the learner changes theme). Every "--name" it sends is a CSS variable on this page, so the
+    // whole atlas (stage, panels, buttons, accent) follows the app's light / dark theme and accent colour.
+    (function () {
+      function apply(vars) {
+        if (!vars) return;
+        var root = document.documentElement;
+        for (var key in vars) {
+          if (key.indexOf('--') === 0 && vars[key]) root.style.setProperty(key, vars[key]);
+        }
+        if (vars.__scheme === 'light' || vars.__scheme === 'dark') {
+          root.style.setProperty('color-scheme', vars.__scheme);
+          root.setAttribute('data-scheme', vars.__scheme);
+        }
+      }
+      try {
+        var m = /[#&]theme=([^&]*)/.exec(location.hash);
+        if (m) apply(JSON.parse(decodeURIComponent(m[1])));
+      } catch (e) { }
+      window.addEventListener('message', function (event) {
+        if (event.origin !== location.origin) return;
+        var d = event.data;
+        if (d && d.type === 'grateapex-theme') apply(d.vars);
+      });
+    })();
+  </script>
+  <script>
+    // Loading watchdog: if the 3D engine cannot start (slow or broken connection, blocked file) say so on screen
+    // instead of leaving an empty menu. The viewer sets window.__atlasReady when it has started.
+    (function () {
+      var note = document.getElementById('notice');
+      var boot = document.getElementById('boot');
+      function fail(msg) {
+        if (window.__atlasReady) return;
+        note.style.display = 'block';
+        note.textContent = msg;
+        if (boot) boot.textContent = 'The atlas did not finish loading.';
+      }
+      window.addEventListener('error', function (e) {
+        fail('The atlas could not start' + (e && e.message ? ': ' + e.message : '') + '. Check your connection and reload the page.');
+      }, true);
+      window.addEventListener('unhandledrejection', function (e) {
+        fail('The atlas could not start' + (e && e.reason && e.reason.message ? ': ' + e.reason.message : '') + '. Check your connection and reload the page.');
+      });
+      setTimeout(function () {
+        if (!window.__atlasReady && boot) boot.textContent = 'Still loading. This can take a minute on a slow connection.';
+      }, 8000);
+      setTimeout(function () { fail('The atlas is taking too long to load. Check your connection and reload the page.'); }, 45000);
+    })();
+  </script>
+  <script>
+    // Menu panel. Wide screens: a side panel with Hide / Show. Phones: a bottom sheet with two heights
+    // (half open, or just the search bar showing) that you drag or tap. Selecting a structure tucks the sheet
+    // down so the model stays visible; the view controls start folded on small screens.
+    (function () {
+      var body = document.body;
+      var panel = document.getElementById('panel');
+      var openBtn = document.getElementById('openPanel');
+      var closeBtn = document.getElementById('closePanel');
+      var handle = document.getElementById('sheetHandle');
+      var info = document.getElementById('info');
+      var q = document.getElementById('q');
+      var nav = document.getElementById('nav');
+      var sheet = window.matchMedia('(max-width: 760px)');
+      var side = window.matchMedia('(max-height: 520px) and (orientation: landscape)');
+      var isSheet = function () { return sheet.matches && !side.matches; };
+
+      function setSheet(state) {   // 'half' | 'peek'
+        var peek = state === 'peek';
+        panel.classList.toggle('peek', peek);
+        body.classList.toggle('sheet-peek', peek);
+        body.classList.toggle('sheet-half', !peek);
+        handle.setAttribute('aria-expanded', String(!peek));
+      }
+      function setClosed(closed) {
+        panel.classList.toggle('closed', closed);
+        openBtn.classList.toggle('show', closed);
+        body.classList.toggle('panel-closed', closed);
+        if (closed) panel.setAttribute('inert', ''); else panel.removeAttribute('inert');
+      }
+      panel.addEventListener('scroll', function () { panel.scrollTop = 0; panel.scrollLeft = 0; });
+      closeBtn.addEventListener('click', function () { setClosed(true); });
+      openBtn.addEventListener('click', function () { setClosed(false); });
+      setSheet('half');
+
+      // drag the handle up or down, or just tap it
+      var startY = null, moved = 0;
+      handle.addEventListener('pointerdown', function (e) { startY = e.clientY; moved = 0; handle.setPointerCapture(e.pointerId); });
+      handle.addEventListener('pointermove', function (e) { if (startY !== null) moved = e.clientY - startY; });
+      function end() {
+        if (startY === null) return;
+        var open = !panel.classList.contains('peek');
+        if (moved < -28) setSheet('half');
+        else if (moved > 28) setSheet('peek');
+        else setSheet(open ? 'peek' : 'half');
+        startY = null;
+      }
+      handle.addEventListener('pointerup', end);
+      handle.addEventListener('pointercancel', function () { startY = null; });
+
+      // choosing an organ tucks the sheet away so the organ is in view
+      window.addEventListener('atlas-organs', function () { if (isSheet()) setSheet('peek'); });
+
+      // typing in the search box needs the list open
+      q.addEventListener('focus', function () { if (isSheet()) setSheet('half'); });
+
+      // choosing a structure (tap on the model or a search result) tucks the menu away so the model stays visible;
+      // deselecting brings the menu back (unless the learner had already hidden it themselves)
+      var autoClosed = false;
+      new MutationObserver(function () {
+        if (!isSheet()) return;
+        if (info.classList.contains('open')) {
+          setSheet('peek');
+          if (!panel.classList.contains('closed')) { setClosed(true); autoClosed = true; }
+        } else if (autoClosed) {
+          setClosed(false);
+          autoClosed = false;
+        }
+      }).observe(info, { attributes: true, attributeFilter: ['class'] });
+
+      // view controls start folded on small screens (the toggle button still opens them)
+      if (sheet.matches || side.matches) {
+        nav.classList.add('min');
+        var t = document.getElementById('navToggle');
+        t.setAttribute('aria-expanded', 'false');
+        t.setAttribute('aria-label', 'Show view controls');
+        t.title = 'Show view controls';
+      }
+    })();
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+    /* ---------- config ---------- */
+    // Where the .glb files live. Override with ?base=https://your-cdn/path/
+    const BASE = new URLSearchParams(location.search).get('base') || './';
+    // The .glb models are kept by the browser for a long time (vercel.json), so they are only downloaded once.
+    // They are asked for as `file.glb?m=<MODEL_VERSION>`: change this number whenever ANY .glb file changes,
+    // so everyone fetches the new models once (tests/deploy-wiring.test.mjs fails if you forget).
+    const MODEL_VERSION = '1';
+
+    const SYSTEMS = [
+      // listed in the order of the Body systems panel: the eight systems first, then what else is in the model
+      { id: 'visceral', label: 'Organs', file: 'VisceralSystem100.glb', mb: 4.5, color: 0xd98c7a, paint: organColor, hidden: true },
+      // The Organs file is split by the model's own groups into body systems. These are children of 'visceral' (the file),
+      // which is hidden: every structure in it belongs to exactly one of them.
+      { id: 'alimentary', label: 'Alimentary', via: 'visceral', top: true, match: /^(Digestive system|Abdominopelvic cavity)\.g$/i, color: 0xd98c7a, paint: organColor },
+      {
+        id: 'nervous', label: 'Nervous', file: 'NervousSystem100.glb', mb: 9.0, color: 0xe8c547, swatch: 'linear-gradient(90deg,#7aa2e0 25%,#e6b85c 25% 50%,#7cc98a 50% 75%,#e8c547 75%)', paint: nervousColor, naturalPaint: naturalNervousColor, coded: true,
+        code: { label: 'Brain', hint: 'by lobe', swatch: 'linear-gradient(90deg,#7aa2e0 25%,#e6b85c 25% 50%,#7cc98a 50% 75%,#b77ad6 75%)' },
+        natural: { label: 'Brain & spinal cord', hint: 'natural colour', swatch: 'linear-gradient(90deg,#b0998e 40%,#efe8d8 40% 75%,#e6dfcc 75%)' }
+      },
+      {
+        id: 'cardiovascular', label: 'Cardiovascular', file: 'CardioVascular41.glb', mb: 7.6, color: 0xc22d3a, swatch: 'linear-gradient(90deg,#d62f3b 50%,#2f6fd6 50%)', paint: vesselColor, coded: true,
+        code: { label: 'Blood vessels', hint: 'artery / vein', swatch: 'linear-gradient(90deg,#d62f3b 50%,#2f6fd6 50%)' }
+      },
+      { id: 'lymphoid', label: 'Lymphatic', file: 'LymphoidOrgans100.glb', mb: 0.6, color: 0x6fb58a },
+      { id: 'muscular', label: 'Muscular', file: 'MuscularSystem100.glb', mb: 6.7, color: 0xb5473f, paint: muscleColor },
+      { id: 'fascia', label: 'Fascia', via: 'muscular', match: /fasci/i, color: 0xe8d6a8, ghost: true, opacity: 0.3 },
+      { id: 'bursae', label: 'Bursae, tendon sheaths', via: 'muscular', match: /bursa|tendon sheath/i, color: 0x2fb8a0, paint: sacColor },
+      {
+        id: 'skeletal', label: 'Skeletal', file: 'SkeletalSystem100.glb', mb: 7.4, color: 0xcdbf9f, on: true, paint: boneColor, coded: false,
+        code: { label: 'Bones', hint: 'by region', swatch: 'linear-gradient(90deg,#e6c98a 20%,#8fb4e8 20% 40%,#8ccf9b 40% 60%,#f2b36a 60% 80%,#e88a9a 80%)' }
+      },
+      { id: 'attachments', label: 'Muscle attachment sites', via: 'skeletal', match: /(\.|muscle)[oe]\d*[lr](-mesh)?$/i, color: 0xb5473f },
+      { id: 'sinuses', label: 'Paranasal sinuses', via: 'skeletal', match: /^sinus of /i, color: 0xd946c0 },   // frontal + sphenoid air spaces, split out so they never share the bone colour
+      { id: 'joints', label: 'Joints', sub: true, file: 'Joints100.glb', mb: 2.1, color: 0x86a3cc, paint: jointColor },
+      { id: 'urinary', label: 'Urinary', via: 'visceral', top: true, match: /^Urinary system\.g$/i, color: 0x9d3a3f, paint: organColor },
+      { id: 'reproductive', label: 'Reproductive', via: 'visceral', top: true, match: /^Genital systems\.g$/i, node: /^VH_F/, color: 0xe6a0a8, paint: organColor },
+      {
+        id: 'breasts', label: 'Female breasts', sub: true, color: 0xf2b8c0, mb: 8.0,
+        files: ['reproductive/breasts.glb'], offset: [0.0125, 0.866, 0.098],   // 6 cm forward of the other female organs, so the base sits on the pectoral muscles
+        paint: n => (/fat/i.test(n) ? 0xf0d8a0 : /lactiferous|areolar/i.test(n) ? 0xc0606e : 0xf2b8c0),
+      },
+      {
+        id: 'pelvis', label: 'Sacrum and coccyx (female)', hidden: true, keep: ['VH_F_sacrum', 'VH_F_coccyx'], color: 0xcdbf9f, paint: boneColor, coded: false, mb: 1.04,
+        files: ['reproductive/pelvis-bones.glb'], offset: [0.0125, 0.866, 0.038],   // same local frame as the uterus files
+      },
+      {
+        id: 'femur', label: 'Femur (female)', hidden: true, color: 0xe6dcc4, paint: boneColor, coded: false, mb: 0,
+        files: ['reproductive/vagina-ligaments.glb'], keep: ['VH_F_femur_R', 'VH_F_femur_L'],
+        offset: [0.0125, 0.866, 0.038],
+      },
+      { id: 'respiratory', label: 'Respiratory', via: 'visceral', top: true, match: /^(Respiratory system|Thoracic cavity)\.g$/i, color: 0xd4838f, paint: organColor },
+      { id: 'endocrine', label: 'Endocrine', via: 'visceral', top: true, match: /^Endocrine glands\.g$/i, color: 0xe6b64a, paint: organColor },
+      { id: 'serosa', label: 'Pleura, omenta, mesenteries', via: 'visceral', top: true, match: /pleura|omentum|meso-appendix|mesocolon/i, color: 0xe9cdbd, ghost: true },
+      // The reference file is split by kind, each with its own colour: the three families of plane (see-through), the surface
+      // lines (rebuilt as thin tubes, because the model's own ribbons are edge-on from the front), the direction arrows and the
+      // movement arrows. 'references' is only the file and is hidden; these four are the rows.
+      { id: 'references', label: 'Reference lines', file: 'References100.glb', mb: 0.1, color: 0x9aa0a6, hidden: true },
+      { id: 'refplanes', label: 'Reference planes', via: 'references', top: true, match: / planes?(\.g)?$/i, color: 0x4aa3f0, ghost: true, opacity: 0.16, noXray: true, paint: refPlaneColor },
+      { id: 'reflines', label: 'Surface lines', via: 'references', top: true, match: / line(\.[lr])?$/i, color: 0xff9f43, tube: 0.003, noXray: true, paint: refLineColor },
+      { id: 'refmoves', label: 'Movements', via: 'references', top: true, match: /^(Abduction|Adduction|Circumduction|(Lateral|Medial) rotation|Supination|Pronation|Inversion|Eversion|Plantar flexion|Dorsiflexion)$/i, color: 0xff6f61, noXray: true, paint: () => 0xff6f61 },
+      { id: 'refdirs', label: 'Directions', via: 'references', top: true, match: /^(Distal|Proximal|Dorsal|Ventral|Frontal|Occipital|Cranial|Caudal|Radial|Ulnar|Tibial|Fibular|Palmar|Plantar)$/i, color: 0xe9edf2, noXray: true, paint: () => 0xe9edf2 },
+    ];
+
+    // Quality: phones and tablets (coarse pointer) load the lighter models in ./lite/ (about half the triangles);
+    // everything else loads the full-detail set. Override with ?quality=lite or ?quality=high.
+    const QUALITY = new URLSearchParams(location.search).get('quality');
+    const LITE = QUALITY ? QUALITY === 'lite' : matchMedia('(pointer: coarse)').matches;
+    const MODEL_DIR = LITE ? 'lite/' : '';
+    const MB_LITE = { 'SkeletalSystem100.glb': 5.4, 'Joints100.glb': 1.8, 'MuscularSystem100.glb': 5.0, 'NervousSystem100.glb': 5.9, 'CardioVascular41.glb': 5.0, 'VisceralSystem100.glb': 3.0, 'LymphoidOrgans100.glb': 0.6, 'References100.glb': 0.1 };
+    if (LITE) for (const s of SYSTEMS) if (s.file && MB_LITE[s.file]) s.mb = MB_LITE[s.file];
+
+    /* ---------- body regions ---------- */
+    // World-space cut (metres, model is ~1.75 tall, y up). Boundaries are planar approximations
+    // of the standard regional divisions, measured from the model's own landmarks:
+    //   head | y >= 1.51 (base of mandible)         neck | 1.40-1.51 (clavicle / T1)
+    //   thorax | 1.18-1.40 (diaphragm level)        abdomen | 1.00-1.18 (iliac crest / L5)
+    //   pelvis | 0.78-1.00, |x| <= 0.135            upper limb | lateral to the trunk, arms are abducted
+    //   lower limb | below 1.00, outside the pelvis
+    const REGIONS = [
+      { id: 1, label: 'Head', t: [0, 1.60, 0], d: 0.75 },
+      { id: 2, label: 'Neck', t: [0, 1.46, 0], d: 0.65 },
+      { id: 3, label: 'Thorax', t: [0, 1.29, 0], d: 1.15 },
+      { id: 4, label: 'Abdomen', t: [0, 1.09, 0], d: 1.1 },
+      { id: 5, label: 'Pelvis', t: [0, 0.89, 0], d: 1.15 },
+      { id: 6, label: 'Upper limb', t: [0, 1.05, 0], d: 1.5 },
+      { id: 7, label: 'Lower limb', t: [0, 0.48, 0], d: 1.9 },
+    ];
+    let region = 0;
+    const regionU = { value: 0 };
+    // The limb regions show ONE limb at a time. The model's anatomical right is -x and left is +x
+    // (every sided landmark in landmarks.json follows this), so limbSide is -1 for right, +1 for left.
+    let limbSide = -1;
+    const limbSideU = { value: -1 };
+    // Limb parts. The arms hang down at the sides, so a part is a band of height (metres). Joint lines come from the model's
+    // own landmarks (right side): humerus y 1.09-1.41, radius/ulna 0.85-1.10, carpals and hand 0.70-0.88, femur 0.43-0.89,
+    // tibia 0.06-0.43, tarsals 0.01-0.09. So: shoulder joint ~1.30, elbow 1.10, wrist 0.86 (the carpals and the radial and ulnar styloid tips share a height), knee 0.43, ankle 0.085.
+    // t is where the camera looks (x is how far out from the middle, mirrored for the left side), d the viewing distance.
+    const LIMB_PARTS = {
+      6: [
+        { label: 'Shoulder', lo: 1.30, hi: 100, t: [0.20, 1.34, 0], d: 0.9 },
+        { label: 'Arm', lo: 1.10, hi: 1.30, t: [0.22, 1.20, 0], d: 0.9 },
+        { label: 'Forearm', lo: 0.86, hi: 1.10, t: [0.26, 0.98, 0], d: 0.9 },
+        { label: 'Hand', lo: -100, hi: 0.86, t: [0.27, 0.78, 0], d: 0.6 },
+      ],
+      7: [
+        { label: 'Thigh', lo: 0.43, hi: 100, t: [0.09, 0.72, 0], d: 1.1 },
+        { label: 'Leg', lo: 0.085, hi: 0.43, t: [0.09, 0.26, 0], d: 1.0 },
+        { label: 'Foot', lo: -100, hi: 0.085, t: [0.09, 0.04, 0], d: 0.6 },
+      ],
+    };
+    const WHOLE_LIMB = { lo: -100, hi: 100 };
+    let limbPartIdx = -1;            // index into LIMB_PARTS[region], -1 = the whole limb
+    let limbRange = WHOLE_LIMB;
+    const limbLoU = { value: -100 }, limbHiU = { value: 100 };
+    const limbPartOf = (id, idx) => (LIMB_PARTS[id] || [])[idx] || null;
+    function inRegion(p, id = region, side = limbSide, rng = limbRange) {
+      if (!id) return true;
+      const ax = Math.abs(p.x), y = p.y;
+      const b = y >= 1.05 ? 0.15 : Math.min(0.15 + (1.05 - y) * 0.25, 0.20);
+      const arm = ax > b && y > 0.62 && y < 1.46;
+      const onSide = p.x * side >= 0 && y >= rng.lo && y < rng.hi;   // the chosen limb side and part; only used by the two limb regions
+      if (id === 6) return arm && onSide;
+      if (arm) return false;
+      switch (id) {
+        case 1: return y >= 1.51;
+        case 2: return y >= 1.40 && y < 1.51;
+        case 3: return y >= 1.18 && y < 1.40;
+        case 4: return y >= 1.00 && y < 1.18;
+        case 5: return y >= 0.78 && y < 1.00 && ax <= 0.135;
+        case 7: return y < 1.00 && !(y >= 0.78 && ax <= 0.135) && onSide;
+      }
+      return true;
+    }
+    // same test on the GPU: discard fragments outside the active region
+    const REGION_GLSL = `
+uniform int uRegion; uniform float uLimbSide, uLimbLo, uLimbHi; varying vec3 vRW;
+bool inRegion(vec3 p) {
+  if (uRegion == 0) return true;
+  float ax = abs(p.x), y = p.y;
+  float b = y >= 1.05 ? 0.15 : min(0.15 + (1.05 - y) * 0.25, 0.20);
+  bool arm = ax > b && y > 0.62 && y < 1.46;
+  bool onSide = p.x * uLimbSide >= 0.0 && y >= uLimbLo && y < uLimbHi;
+  if (uRegion == 6) return arm && onSide;
+  if (arm) return false;
+  if (uRegion == 1) return y >= 1.51;
+  if (uRegion == 2) return y >= 1.40 && y < 1.51;
+  if (uRegion == 3) return y >= 1.18 && y < 1.40;
+  if (uRegion == 4) return y >= 1.00 && y < 1.18;
+  if (uRegion == 5) return y >= 0.78 && y < 1.00 && ax <= 0.135;
+  if (uRegion == 7) return y < 1.00 && !(y >= 0.78 && ax <= 0.135) && onSide;
+  return true;
+}`;
+    function patchRegion(m) {
+      m.onBeforeCompile = sh => {
+        sh.uniforms.uRegion = regionU;
+        sh.uniforms.uLimbSide = limbSideU;
+        sh.uniforms.uLimbLo = limbLoU;
+        sh.uniforms.uLimbHi = limbHiU;
+        sh.vertexShader = sh.vertexShader
+          .replace('#include <common>', '#include <common>\nvarying vec3 vRW;')
+          .replace('#include <begin_vertex>', '#include <begin_vertex>\nvRW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+        sh.fragmentShader = sh.fragmentShader
+          .replace('#include <common>', '#include <common>\n' + REGION_GLSL)
+          .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\nif (!inRegion(vRW)) discard;');
+      };
+      m.customProgramCacheKey = () => 'region-cut';
+      return m;
+    }
+
+    /* ---------- surface finish per system (roughness, clearcoat, sheen) ---------- */
+    /* ---------- reference lines ---------- */
+    // planes: sagittal blue, coronal amber, transverse violet
+    function refPlaneColor(n) {
+      n = n.toLowerCase();
+      return /median|sagittal/.test(n) ? 0x4aa3f0 : /coronal/.test(n) ? 0xffb347 : /transverse/.test(n) ? 0xb48cff : 0x9aa0a6;
+    }
+    // surface lines: midline yellow, axillary teal, back lines violet, the rest of the front lines orange
+    function refLineColor(n) {
+      n = n.toLowerCase();
+      return /median/.test(n) ? 0xffd24a : /axillary/.test(n) ? 0x3fd0c9 : /paravertebral|scapular/.test(n) ? 0xb36bff : 0xff9f43;
+    }
+    // The model draws each surface line as a ribbon standing on the skin, a fraction of a millimetre thick, so seen from the
+    // front it is edge-on and all but invisible. Rebuild it as a thin tube along the ribbon's centre line.
+    function ribbonToTube(geo, radius) {
+      const pos = geo.attributes.position;
+      const box = new THREE.Box3().setFromBufferAttribute(pos);
+      const size = box.getSize(new THREE.Vector3());
+      const axis = size.y >= size.x && size.y >= size.z ? 'y' : size.z >= size.x ? 'z' : 'x';
+      const span = size[axis];
+      if (!(span > 1e-4)) return geo;
+      const bins = Math.max(6, Math.min(48, Math.round(span / 0.006)));   // one centre point about every 6 mm
+      const sums = Array.from({ length: bins }, () => [0, 0, 0, 0]);
+      const v = new THREE.Vector3();
+      for (let i = 0; i < pos.count; i++) {
+        v.fromBufferAttribute(pos, i);
+        const a = sums[Math.min(bins - 1, Math.floor(((v[axis] - box.min[axis]) / span) * bins))];
+        a[0] += v.x; a[1] += v.y; a[2] += v.z; a[3]++;
+      }
+      const pts = sums.filter(a => a[3]).map(a => new THREE.Vector3(a[0] / a[3], a[1] / a[3], a[2] / a[3]));
+      if (pts.length < 2) return geo;
+      const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), Math.max(12, pts.length * 3), radius, 6, false);
+      geo.dispose();
+      return tube;
+    }
+
+    const FINISH = {
+      skeletal: { r: 0.7, cc: 0, ccr: 0.5 },                 // dry bone, faint polish
+      joints: { r: 0.50, cc: 0.30 },                           // glossy cartilage / ligament
+      muscular: { r: 0.52, cc: 0.15, sheen: 0.45 },              // fibrous sheen
+      nervous: { r: 0.42, cc: 0.30 },
+      cardiovascular: { r: 0.32, cc: 0.55, ccr: 0.25 },                // wet vessel walls
+      visceral: { r: 0.40, cc: 0.45, ccr: 0.30 },                // moist organ surfaces
+      lymphoid: { r: 0.42, cc: 0.30 },
+      refplanes: { r: 0.6 }, reflines: { r: 0.45, cc: 0.2 }, refmoves: { r: 0.5 }, refdirs: { r: 0.5 },
+      alimentary: { r: 0.40, cc: 0.45, ccr: 0.30 }, urinary: { r: 0.40, cc: 0.45, ccr: 0.30 }, reproductive: { r: 0.40, cc: 0.45, ccr: 0.30 },
+      respiratory: { r: 0.40, cc: 0.45, ccr: 0.30 }, endocrine: { r: 0.40, cc: 0.45, ccr: 0.30 },
+    };
+
+    /* ---------- organ colouring ---------- */
+    // Z-Anatomy ships organs as bare geometry, so tint each structure by name.
+    function organColor(n) {
+      n = n.toLowerCase();
+      const j = (base, k) => {              // small per-structure variation so neighbours separate
+        let h = 0; for (const ch of n) h = (h * 31 + ch.charCodeAt(0)) | 0;
+        const f = 1 + (((h >>> 0) % 13) - 6) / 100 * k;
+        const c = new THREE.Color(base); c.multiplyScalar(f); return c.getHex();
+      };
+      if (/bronch|trachea/.test(n)) return j(0xb8c7d8, 1);
+      if (/epiglottis|laryn|pharynx|uvula|soft palate/.test(n)) return j(0xd58f8f, 1);
+      if (/lung/.test(n)) return j(/superior/.test(n) ? 0xe9a3a8 : /middle/.test(n) ? 0xdf94a0 : 0xd4838f, 1);
+      if (/liver/.test(n)) return j(0x8f3b2e, 3);
+      if (/gallbladder/.test(n)) return 0x4e8a3f;
+      if (/bile duct/.test(n)) return 0x7aa63c;
+      if (/pancreatic duct/.test(n)) return 0xe6c65a;
+      if (/stomach/.test(n)) return 0xdc8c78;
+      if (/oesophagus/.test(n)) return 0xc66b66;
+      if (/duodenum/.test(n)) return 0xe2a35c;
+      if (/jejunum|ileum/.test(n)) return 0xd9806c;
+      if (/taenia/.test(n)) return 0xece0b0;
+      if (/colon|appendix|caecum/.test(n)) return j(0xc98e5c, 2);
+      if (/kidney/.test(n)) return 0x9d3a3f;
+      if (/suprarenal/.test(n)) return 0xe6b64a;
+      if (/renal pelvis|ureter|urethra/.test(n)) return 0xe8c77c;
+      if (/bladder/.test(n)) return 0xd9a47e;
+      if (/thyroid|parathyroid/.test(n)) return 0xb85a4e;
+      if (/hypophysis|pineal/.test(n)) return 0xe3c892;
+      if (/parotid|submandibular|sublingual|salivary/.test(n)) return 0xd9a27a;
+      if (/tongue/.test(n)) return 0xd4636d;
+      if (/gingiva/.test(n)) return 0xe27d88;
+      if (/nasal/.test(n)) return 0xe49c9c;
+      if (/testis|epididymis|ductus|deferens|seminal|prostate|penis|glans|cavernosum|spongiosum|ejaculatory/.test(n)) return 0xdcb79b;
+      if (/uterus|uterine body|cervi|cornua|cornu|fundus of uterus|ostium of uterine|lower uterine|posterior wall of uterus|anterior wall of uterus|internal os|external os/.test(n)) return j(0xe38aa2, 1);
+      if (/ovary|ovarian/.test(n)) return j(0xe3b27a, 1);
+      if (/vagina/.test(n)) return j(0xf0a0b4, 1);
+      if (/ligament/.test(n)) return j(0xe8d6a8, 1);
+      if (/fallopian|uterine tube|fibria|infundibulum|ampulla of uterine|isthmus of fallopian/.test(n)) return j(0xd9a0a0, 1);
+      return 0xd98c7a;
+    }
+    // connective tissue in the muscle and joint files: each type reads as its own thing
+    function tint(base, n, k) {              // per-structure brightness jitter so neighbours separate
+      let h = 0; for (const ch of n) h = (h * 31 + ch.charCodeAt(0)) | 0;
+      const c = new THREE.Color(base); c.multiplyScalar(1 + (((h >>> 0) % 13) - 6) / 100 * k); return c.getHex();
+    }
+    function muscleColor(n) {
+      n = n.toLowerCase();
+      if (/aponeurosis/.test(n)) return 0xe3c37a;  // gold-cream sheets
+      if (/tendon|tendinous/.test(n)) return 0xf1eadb;  // pearl white
+      if (/retinaculum|septum|ligament|fibrous sheath|raphe|linea alba|tract/.test(n)) return 0xc2a173; // tan bands
+      return tint(0xb5473f, n, 1.2);                                                // muscle red
+    }
+    function sacColor(n) {
+      return /tendon sheath|synovial sheath/i.test(n) ? 0x2fb8a0 : 0x9bd46a;       // sheaths teal, bursae lime
+    }
+    function jointColor(n) {
+      n = n.toLowerCase();
+      if (/nucleus pulposus/.test(n)) return 0xe8a95c;
+      if (/disc|symphysis/.test(n)) return 0xf0c987;  // amber
+      if (/menisc|labrum|cartilage/.test(n)) return 0x3d9be9;  // azure blue
+      if (/capsule|capsulae|membrane|frenula/.test(n)) return 0xb9a6d8;  // lavender
+      if (/fat pad/.test(n)) return 0xf2dc7a;
+      if (/ligament|cord/.test(n)) return tint(0x86a3cc, n, 1); // blue ligaments
+      return 0xcfd6dc;
+    }
+    // bones: one hue per region. Class comes from the structure's name plus its ancestor groups.
+    function boneColor(n, mesh) {
+      const chain = [];
+      for (let o = mesh; o; o = o.parent) chain.push(((o.userData && o.userData.name) || o.name || '').replace(/_/g, ' ').toLowerCase());
+      for (let i = 0; i < chain.length; i++) chain[i] = chain[i].replace(/\./g, '').replace(/-mesh$/, '').replace(/ \d+$/, '');   // loader suffixes, dots
+      const rules = [
+        [/teeth|incisor|canine|premolar|molar/, 0xf7f5ee],
+        [/ossicle|malleus|incus|stapes/, 0xcdb4e6],
+        [/cartilage/, 0x3d9be9],
+        [/coccyx|sacrum/, 0x7b62c4],
+        [/vertebra c\d|atlas|axis|cervical vert/, 0x8fb4e8],
+        [/vertebra t\d|thoracic vert/, 0x6f93d6],
+        [/vertebra l\d|lumbar vert/, 0x5576c4],
+        [/sternum/, 0x5fb67a],
+        [/(^|\s)ribs?[glr]?$/, 0x8ccf9b],
+        [/mandible|hyoid|extracranial/, 0xd9a066],
+        [/cranium|cranial|frontal bone|parietal|occipital|temporal bone|sphenoid|ethmoid|maxilla|zygomatic|nasal bone|lacrimal|palatine|concha|vomer/, 0xe6c98a],
+        [/pectoral girdle|clavicle|scapula/, 0xe58f5a],
+        [/upper limb|humerus|radius|ulna|carpal|metacarp|of hand/, 0xf2b36a],
+        [/pelvic girdle|hip bone/, 0xd0607a],
+        [/lower limb|femur|tibia|fibula|patella|foot|tarsal|metatars/, 0xe88a9a],
+      ];
+      for (const g of chain) for (const [re, hex] of rules) if (re.test(g)) return tint(new THREE.Color(hex).multiplyScalar(0.88).getHex(), n.toLowerCase(), 0.8);
+      return 0xcdbf9f;
+    }
+    // vessels: arteries red, veins blue, heart its own deep muscle tone.
+    // Class comes from the ancestor groups in the glb ("Arterial system", "Venous system", "Heart").
+    function vesselColor(n, mesh) {
+      let kind = '';
+      for (let o = mesh; o; o = o.parent) {
+        const g = (o.userData && o.userData.name) || o.name || '';
+        if (/^heart/i.test(g) && !kind) kind = 'heart';
+        else if (/venous.?system|veins?\b/i.test(g)) { kind = kind || 'vein'; }
+        else if (/arterial.?system|arter/i.test(g)) { kind = kind || 'artery'; }
+      }
+      const nl = n.toLowerCase();
+      if (kind === 'heart') {
+        if (/leaflet|valve|cusp/.test(nl)) return 0xe9d9c4;     // valve leaflets
+        if (/papillary|chordae/.test(nl)) return 0xa8363f;
+        return tint(0x9c2f3a, nl, 1);                          // myocardium / chambers
+      }
+      if (kind === 'vein' || /\bvein|vena|venous|sinus\b/.test(nl)) return tint(0x2f6fd6, nl, 1.5);   // blue
+      return tint(0xd62f3b, nl, 1.5);                                                              // red
+    }
+    // brain and CNS: one hue per lobe / region; peripheral nerves stay yellow.
+    // Class comes from the structure's own name plus its ancestor groups in the glb.
+    function nervousColor(n, mesh) {
+      const chain = [];
+      for (let o = mesh; o; o = o.parent) chain.push(((o.userData && o.userData.name) || o.name || '').replace(/_/g, ' ').toLowerCase());
+      const nl = n.toLowerCase();
+      const sulcal = /sulc|sulci|fissure|lat.fis/.test(nl);
+      const gyral = (hex, k) => { const c = new THREE.Color(tint(hex, nl, 1.2)); if (sulcal) c.multiplyScalar(k || 0.78); return c.getHex(); };
+      const flat = hex => hex;
+      const rules = [
+        [/choroid plexus/, 0xb5524a, flat],
+        [/ventricle|aqueduct|central canal/, 0x5ec2f0, flat],
+        [/optic (chiasm|tract)/, 0xe8c547, flat],
+        [/white matter|commissur|projection fibres|corpus callosum|fornix|stria (terminalis|medullaris)|septum pellucidum|funiculus|fasciculus|posterolateral tract/, 0xf2ede2, flat],
+        [/grey matter|horn of spinal|intermediate zone/, 0xb4b4c0, flat],
+        [/dura|falx|tentorium/, 0xa8645a, flat],
+        [/pia|leptomeninges|arachnoid/, 0xd9a0a0, flat],
+        [/hippocamp/, 0xd04f7a, gyral],
+        [/corpus striatum|caudate|putamen|globus|lentiform|amygdal|basal forebrain|septal/, 0x3fb8b0, flat],
+        [/hypothalam|mamillary/, 0xe5733f, flat],
+        [/thalam|geniculate|habenula|diencephalon/, 0xf0925a, flat],
+        [/interlobar sulci/, 0x7d8294, flat],
+        [/frontal lobe/, 0x7aa2e0, gyral],
+        [/parietal lobe/, 0xe6b85c, gyral],
+        [/temporal lobe/, 0x7cc98a, gyral],
+        [/occipital lobe/, 0xb77ad6, gyral],
+        [/insula/, 0xe58f6a, gyral],
+        [/limbic lobe/, 0xe47a9a, gyral],
+        [/cerebell/, 0xcfa06f, gyral],
+        [/midbrain|colliculus|tegmentum|tectum|peduncle/, 0x68a8c8, flat],
+        [/pons/, 0x8b8fd6, flat],
+        [/medulla/, 0xa882c8, flat],
+        [/spinal cord/, 0xe6dfcc, flat],
+        [/cerebrum|telencephalon|brain/, 0xd9c2b0, gyral],
+      ];
+      for (const g of chain) {
+        if (/peripheral nervous system/.test(g)) break;
+        for (const [re, hex, fn] of rules) if (re.test(g)) return fn(hex);
+        if (/sense organs/.test(g)) {
+          if (/sclera/.test(nl)) return 0xf4f1ea;
+          if (/iris/.test(nl)) return 0x4a7fa8;
+          if (/cornea/.test(nl)) return 0xcfe6ee;
+          if (/lens/.test(nl)) return 0xe8f0f5;
+          if (/retina/.test(nl)) return 0xd98a6a;
+          return 0xd8c4a0;
+        }
+      }
+      return 0xe8c547;
+    }
+    // natural brain colours: fresh grey matter is a warm grey-pink, white matter a pale cream, meninges and
+    // ventricles nearly clear. Peripheral nerves keep their plain colour, as in the other schemes.
+    function naturalNervousColor(n, mesh) {
+      const chain = [];
+      for (let o = mesh; o; o = o.parent) chain.push(((o.userData && o.userData.name) || o.name || '').replace(/_/g, ' ').toLowerCase());
+      const nl = n.toLowerCase();
+      const sulcal = /sulc|sulci|fissure|lat.fis/.test(nl);
+      const cortex = hex => { const c = new THREE.Color(tint(hex, nl, 0.6)); if (sulcal) c.multiplyScalar(0.8); return c.getHex(); };
+      const flat = hex => hex;
+      const rules = [
+        [/choroid plexus/, 0xb5524a, flat],
+        [/ventricle|aqueduct|central canal/, 0xcfe3ea, flat],
+        [/optic (chiasm|tract)/, 0xe8e0cc, flat],
+        [/white matter|commissur|projection fibres|corpus callosum|fornix|stria (terminalis|medullaris)|septum pellucidum|funiculus|fasciculus|posterolateral tract/, 0xefe8d8, flat],
+        [/grey matter|horn of spinal|intermediate zone/, 0xa39690, flat],
+        [/dura|falx|tentorium/, 0xd6cdc0, flat],
+        [/pia|leptomeninges|arachnoid/, 0xcfc6ba, flat],
+        [/hippocamp/, 0xa89088, cortex],
+        [/corpus striatum|caudate|putamen|globus|lentiform|amygdal|basal forebrain|septal/, 0xa8948b, flat],
+        [/hypothalam|mamillary/, 0xa89088, flat],
+        [/thalam|geniculate|habenula|diencephalon/, 0xb09a90, flat],
+        [/interlobar sulci/, 0x8e8580, flat],
+        [/cerebell/, 0xa48a80, cortex],
+        [/midbrain|colliculus|tegmentum|tectum|peduncle/, 0xb9a097, flat],
+        [/pons/, 0xb29a90, flat],
+        [/medulla/, 0xb49c93, flat],
+        [/spinal cord/, 0xe6dfcc, flat],
+        [/cerebrum|telencephalon|brain|frontal lobe|parietal lobe|temporal lobe|occipital lobe|insula|limbic lobe/, 0xb0998e, cortex],
+      ];
+      for (const g of chain) {
+        if (/peripheral nervous system/.test(g)) break;
+        for (const [re, hex, fn] of rules) if (re.test(g)) return fn(hex);
+        if (/sense organs/.test(g)) {
+          if (/sclera/.test(nl)) return 0xf4f1ea;
+          if (/iris/.test(nl)) return 0x4a7fa8;
+          if (/cornea/.test(nl)) return 0xcfe6ee;
+          if (/lens/.test(nl)) return 0xe8f0f5;
+          if (/retina/.test(nl)) return 0xd98a6a;
+          return 0xd8c4a0;
+        }
+      }
+      return 0xe8c547;
+    }
+    const paintCache = new Map();
+    function paintMat(hex, owner) {
+      const key = owner.id + hex;
+      let m = paintCache.get(key);
+      if (!m) { m = patchRegion(owner.mat.clone()); m.color.setHex(hex); paintCache.set(key, m); }
+      return m;
+    }
+
+    /* ---------- x-ray mode ---------- */
+    // Each structure gets a Fresnel-alpha variant of its own material: surfaces seen edge-on glow, surfaces
+    // facing the camera fade. Bones get a higher floor so the skeleton stays readable through soft tissue.
+    const XRAY_BONE = new Set(['skeletal', 'attachments', 'sinuses']);
+    let xrayOn = false;
+    // 0 = nothing selected (every structure is a soft see-through shell); 1 = something is selected (the rest fades right back,
+    // so the selected structure is the one solid thing). One shared value, so no materials need swapping when the selection changes.
+    const xrayFocus = { value: 0 };
+    const xrayCache = new Map();
+    const baseMat = m => {   // the material a part has when it is not selected
+      const mat = m.userData.mat || m.userData.system.mat;
+      return xrayOn ? xrayMat(mat, XRAY_BONE.has(m.userData.system.id)) : mat;
+    };
+    function syncXrayFocus() { xrayFocus.value = selectedParts.length ? 1 : 0; dirty = true; }
+    function xrayMat(src, bone) {
+      if (src.userData && src.userData.noXray) return src;
+      const key = src.uuid + (bone ? ':b' : ':s');
+      let m = xrayCache.get(key);
+      if (!m) {
+        m = patchRegion(src.clone());
+        const regionHook = m.onBeforeCompile;
+        m.transparent = true; m.depthWrite = false; m.side = THREE.DoubleSide;
+        m.onBeforeCompile = sh => {
+          regionHook(sh);
+          sh.uniforms.uXFocus = xrayFocus;
+          sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uXFocus;');
+          sh.fragmentShader = sh.fragmentShader.replace('#include <opaque_fragment>', `#include <opaque_fragment>
+            float xFr = 1.0 - abs(dot(normalize(normal), normalize(vViewPosition)));
+            float xA = ${bone ? 'mix(mix(0.45, 1.0, pow(xFr, 1.4)), mix(0.07, 0.40, pow(xFr, 1.6)), uXFocus)' : 'mix(mix(0.04, 0.8, pow(xFr, 2.2)), mix(0.015, 0.30, pow(xFr, 2.0)), uXFocus)'};
+            gl_FragColor = vec4(mix(gl_FragColor.rgb, vec3(0.62, 0.86, 1.0), ${bone ? '0.15' : '0.45'}) * ${bone ? '1.0' : '0.9'}, xA);`);
+        };
+        m.customProgramCacheKey = () => 'region-xray2-' + (bone ? 'bone' : 'soft');
+        xrayCache.set(key, m);
+      }
+      return m;
+    }
+    function setXray(on) {
+      xrayOn = !!on;
+      for (const { mesh } of index) {
+        if (mesh) mesh.material = selectedParts.includes(mesh) ? pickMat : baseMat(mesh);   // the selected part stays solid
+      }
+      syncXrayFocus();
+      post({ type: 'xray', on: xrayOn });
+    }
+
+    /* ---------- scene ---------- */
+    const canvas = document.getElementById('c');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.toneMapping = THREE.NeutralToneMapping;   // keeps tissue colours true while rolling off highlights
+    renderer.toneMappingExposure = 0.92;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.02, 20);
+    const HOME = { pos: new THREE.Vector3(0, 1.0, 3.3), target: new THREE.Vector3(0, 0.88, 0) };
+    camera.position.copy(HOME.pos);
+    scene.add(camera);
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.target.copy(HOME.target);
+    controls.enableDamping = true;
+    controls.screenSpacePanning = true;
+    controls.minDistance = 0.05;
+    controls.maxDistance = 8;
+    controls.zoomToCursor = true;   // scroll or pinch zooms toward the point you are pointing at
+
+    { // soft studio reflections: gives organs a moist, rounded look instead of flat clay
+      const pm = new THREE.PMREMGenerator(renderer);
+      scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
+      scene.environmentIntensity = 0.75;
+      pm.dispose();
+    }
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x6a707a, 0.6));   // lifted ground colour so undersides and shadow sides are never black
+    // camera-relative rig (lights ride on the camera, so the lighting stays flattering as you orbit)
+    const key = new THREE.DirectionalLight(0xfff4e6, 1.5); key.position.set(1.8, 2.2, 2.5); camera.add(key);      // warm key, upper right
+    const fill = new THREE.DirectionalLight(0xdfe8ff, 0.8); fill.position.set(-2.2, 0.4, 1.8); camera.add(fill);  // cool fill from the front-left
+    const rim = new THREE.DirectionalLight(0xffffff, 0.8); rim.position.set(0, 1.5, -2.5); camera.add(rim);       // back rim to separate edges
+    const lamp = new THREE.DirectionalLight(0xffffff, 0.25); lamp.position.set(0, 0, 3); camera.add(lamp);        // headlamp so cavities and close-ups stay lit
+
+    let dirty = true;
+    let navHeld = false;   // true while an on-screen button or key is moving the camera
+
+    /* ---------- ambient occlusion (screen-space) ---------- */
+    const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
+    composer.addPass(new RenderPass(scene, camera));
+    const gtao = new GTAOPass(scene, camera, 1, 1);
+    gtao.updateGtaoMaterial({ radius: 0.045, distanceExponent: 1.6, thickness: 0.6, scale: 0.9, samples: 16, distanceFallOff: 1 });
+    gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 16 });
+    gtao.blendIntensity = 0.55;   // lighter AO so crevices don't turn muddy
+    composer.addPass(gtao);
+    composer.addPass(new OutputPass());
+    const aoEl = document.getElementById('aoOn');
+    aoEl.checked = !matchMedia('(pointer: coarse)').matches;   // off by default on phones/tablets
+    aoEl.addEventListener('change', () => { dirty = true; });
+    const xrayEl = document.getElementById('xray');
+    xrayEl.addEventListener('change', () => setXray(xrayEl.checked));
+    // AO reads depth/normals of every mesh, so it can't see the region cut or translucent layers: pause it then.
+    const aoActive = () => aoEl.checked && !xrayOn && region === 0 && !SYSTEMS.some(s => s.ghost && s.group && s.group.visible);
+    let lastMove = 0, needRefine = false;
+
+    function resize() {
+      const w = innerWidth, h = innerHeight;
+      renderer.setSize(w, h, false);
+      composer.setPixelRatio(renderer.getPixelRatio());
+      composer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      dirty = true;
+    }
+    addEventListener('resize', resize);
+    resize();
+
+    (function loop() {
+      requestAnimationFrame(loop);
+      const moved = controls.update() || navHeld;
+      if (moved) lastMove = performance.now();
+      if (moved || dirty) {
+        // plain MSAA render while the camera is moving, AO-refined render once it settles
+        if (!moved && aoActive()) composer.render(); else renderer.render(scene, camera);
+        dirty = false;
+        if (moved) needRefine = true;
+      } else if (needRefine && performance.now() - lastMove > 140) {
+        needRefine = false;
+        if (aoActive()) composer.render();
+      }
+    })();
+
+    /* ---------- loading ---------- */
+    const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
+
+    const pickMat = patchRegion(new THREE.MeshStandardMaterial({
+      color: 0x3ad1c0, emissive: 0x1a8f84, emissiveIntensity: 0.55,
+      roughness: 0.45, side: THREE.DoubleSide,
+    }));
+
+    const index = [];            // searchable structures
+    const seenKeys = new Set();  // one search entry per structure, even when it is built from several mesh pieces
+    const nameNode = o => { for (let n = o; n; n = n.parent) if (n.userData && n.userData.name) return n; return o; };
+    // a bone (or any structure) can be split into several mesh pieces (e.g. shaft + ends); act on all of them together
+    const partsOf = mesh => index.filter(e => e.mesh && e.mesh.userData.key === mesh.userData.key).map(e => e.mesh);
+    const hidden = new Set();    // meshes hidden individually
+    let isolated = false;
+    let peelLevel = 0;                // number of outer layers peeled away (see LAYERS below)
+    const peeledIds = new Set();      // system ids currently peeled
+    const isPeeled = s => peeledIds.has(s.id);
+
+    /* ---------- landmark pins ---------- */
+    let pinsOn = true;
+    let landmarkData = {};
+    const dotTex = (() => {
+      const c = document.createElement('canvas'); c.width = c.height = 64;
+      const g = c.getContext('2d');
+      g.beginPath(); g.arc(32, 32, 28, 0, Math.PI * 2); g.fillStyle = 'rgba(10,13,16,0.9)'; g.fill();
+      g.beginPath(); g.arc(32, 32, 18, 0, Math.PI * 2); g.fillStyle = '#ffffff'; g.fill();
+      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+    })();
+    const pinMat = patchRegion(new THREE.PointsMaterial({ size: 9, sizeAttenuation: false, map: dotTex, transparent: true, alphaTest: 0.4, depthWrite: false }));
+    const pinHiMat = new THREE.PointsMaterial({ size: 22, sizeAttenuation: false, map: dotTex, color: 0x3ad1c0, transparent: true, alphaTest: 0.4, depthTest: false });
+    const pinHi = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0], 3)), pinHiMat);
+    pinHi.visible = false; pinHi.renderOrder = 10; pinHi.frustumCulled = false; scene.add(pinHi);
+
+    // Landmark pins only appear while a part is isolated, and only the ones that belong to that part.
+    let isoPins = [];                                   // [{ s, i }] landmarks on the isolated part(s)
+    const isoPoints = new THREE.Points(new THREE.BufferGeometry(), pinMat);
+    isoPoints.frustumCulled = false; isoPoints.visible = false; scene.add(isoPoints);
+    // each landmark row is [name, side, x, y, z, owner]; owner is the structure it belongs to in the source model
+    // (empty for region-level labels such as "Pelvic girdle", which have no single part to sit on).
+    function computeIsoPins() {
+      isoPins = [];
+      const owners = new Set(selectedParts.map(m => rawName(m).replace(/-mesh$/i, '')));
+      for (const s of SYSTEMS) {
+        if (!s.pinData || !s.group || !s.group.visible) continue;
+        const have = new Set(s.pinData.map(r => r[0] + '|' + r[5]));
+        s.pinData.forEach((r, i) => {
+          if (!r[5]) return;
+          if (owners.has(r[5])) { isoPins.push({ s, i }); return; }
+          // a midline landmark with no side (e.g. a sagittal border) is stored once but belongs to both paired bones,
+          // unless the other bone already has its own copy of it
+          if (!r[1] && Math.abs(r[2]) < 0.012 && /\.[lr]$/i.test(r[5])) {
+            const twin = r[5].replace(/\.(r|l)$/i, m => (m === '.r' ? '.l' : '.r'));
+            if (owners.has(twin) && !have.has(r[0] + '|' + twin)) isoPins.push({ s, i });
+          }
+        });
+      }
+    }
+    function buildIsoPoints() {
+      const arr = new Float32Array(isoPins.length * 3);
+      isoPins.forEach(({ s, i }, k) => { const r = s.pinData[i]; arr[k * 3] = r[2]; arr[k * 3 + 1] = r[3]; arr[k * 3 + 2] = r[4]; });
+      isoPoints.geometry.dispose();
+      isoPoints.geometry = new THREE.BufferGeometry();
+      isoPoints.geometry.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+    }
+
+    // landmarks of the Organs file are shared out between the body systems that came from it: by the structure each one
+    // sits on, or for the group headings ("Digestive system", "Lungs") by what they are called
+    const ORGAN_LANDMARK_FALLBACK = [
+      ['urinary', /urinary|kidney|bladder|ureter|urethra/i],
+      ['respiratory', /thoracic cavity|respiratory|tracheo|bronch|paranasal|lung|laryn|nose|nasal|pleura/i],
+      ['reproductive', /genital|penis|testis|prostate|uter|ovar|vagin/i],
+      ['endocrine', /endocrine|parathyroid|hypophysis|thyroid|pineal|suprarenal/i],
+    ];
+    function organLandmarks(s) {
+      const owners = new Map();
+      for (const e of index) if (e.mesh && e.system && e.system.via === 'visceral') owners.set(rawName(e.mesh).replace(/-mesh$/i, ''), e.system.id);
+      return (landmarkData.visceral || []).filter(r => {
+        let id = r[5] && owners.get(r[5]);
+        if (!id) { const f = ORGAN_LANDMARK_FALLBACK.find(([, re]) => re.test(r[0])); id = f ? f[0] : 'alimentary'; }
+        return id === s.id;
+      });
+    }
+    function addPins(s) {
+      if (s.id === 'visceral') return;   // see organLandmarks
+      const data = s.via === 'visceral' && s.top && landmarkData.visceral ? organLandmarks(s) : landmarkData[s.id];
+      if (!data || !data.length || !s.group || s.pins) return;
+      const arr = new Float32Array(data.length * 3);
+      data.forEach((r, i) => { arr[i * 3] = r[2]; arr[i * 3 + 1] = r[3]; arr[i * 3 + 2] = r[4]; });
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+      s.pins = new THREE.Points(g, pinMat);
+      s.pins.frustumCulled = false;
+      s.pinData = data;
+      scene.add(s.pins);
+      data.forEach((r, i) => index.push({ pin: true, system: s, i, name: r[0], side: r[1] === 'R' ? 'Right' : r[1] === 'L' ? 'Left' : '' }));
+      if (isolated) { computeIsoPins(); buildIsoPoints(); }
+      refreshPins();
+    }
+    function refreshPins() {
+      for (const s of SYSTEMS) if (s.pins) s.pins.visible = false;   // pins are drawn by isoPoints, never for the whole body
+      isoPoints.visible = pinsOn && isolated && isoPins.length > 0;
+      pinHi.visible = !!selectedPin;
+      dirty = true;
+    }
+    fetch(BASE + 'landmarks.json').then(r => r.json()).then(d => {
+      landmarkData = d;
+      for (const s of SYSTEMS) addPins(s);
+    }).catch(() => { });
+
+    const systemsEl = document.getElementById('systems');
+    for (const s of SYSTEMS) {
+      const fin = FINISH[s.id] || {};
+      s.mat = patchRegion(new THREE.MeshPhysicalMaterial({
+        color: s.color, roughness: fin.r ?? 0.62, metalness: 0, side: THREE.DoubleSide,
+        clearcoat: fin.cc ?? 0, clearcoatRoughness: fin.ccr ?? 0.35,
+        sheen: fin.sheen ?? 0, sheenRoughness: 0.55, sheenColor: new THREE.Color(0xffd9d0),
+      }));
+      if (s.noXray) s.mat.userData.noXray = true;   // reference marks stay as they are in x-ray mode
+      if (s.ghost) { s.mat.transparent = true; s.mat.opacity = s.opacity ?? 0.28; s.mat.depthWrite = false; }
+      const row = document.createElement('label');
+      row.className = 'sys' + ((s.via && !s.top) || s.sub ? ' sub' : '');
+      row.innerHTML = `<input type="checkbox" ${s.on ? 'checked' : ''}><span class="swatch" style="--c:${s.swatch || '#' + s.color.toString(16).padStart(6, '0')};${s.swatch ? '--b:#8a5fa0;' : ''}"></span><span>${s.label}</span><span class="stat">${s.via ? '' : s.mb + ' MB'}</span>`;
+      s.input = row.querySelector('input');
+      s.stat = row.querySelector('.stat');
+      s.input.addEventListener('change', () => setSystem(s, s.input.checked));
+      systemsEl.appendChild(row);
+      s.row = row;
+      if (s.hidden || s.id === 'breasts') row.style.display = 'none';   // breasts only show in the list once Female is chosen (see setPelvis)
+    }
+
+    // ontology IDs for the female reproductive structures (from the HuBMAP crosswalk)
+    const REPRO_IDS = {
+      VH_F_mammary_gland_L: 'FMA:57991', VH_F_mammary_gland_R: 'FMA:57987',
+      VH_F_fat_L: 'FMA:73166', VH_F_fat_R: 'FMA:73165',
+      VH_F_areolar_tubercles_L: 'UBERON:0011828', VH_F_areolar_tubercles_R: 'UBERON:0011828',
+      VH_F_mammary_lobes_L: 'UBERON:0018140', VH_F_mammary_lobes_R: 'UBERON:0018140',
+      VH_F_main_lactiferous_ducts_L: 'UBERON:0015134', VH_F_main_lactiferous_ducts_R: 'UBERON:0015134',
+      VH_F_main_lactiferous_sinuses_L: 'FMA:58088', VH_F_main_lactiferous_sinuses_R: 'FMA:58088',
+      VH_F_suspensory_ligaments_L: 'FMA:73119', VH_F_suspensory_ligaments_R: 'FMA:73118',
+      VH_F_sacrum: 'UBERON:0003690', VH_F_coccyx: 'UBERON:0001350', VH_F_pelvis: 'UBERON:0001270', VH_F_ilium: 'UBERON:0001273',
+      VH_F_sacrum: 'UBERON:0003690', VH_F_coccyx: 'UBERON:0001350', VH_F_pelvis: 'UBERON:0001270',
+      VH_F_ilium: 'UBERON:0001273', VH_F_ilium_compact_bone_L: 'UBERON:0001439', VH_F_ilium_compact_bone_R: 'UBERON:0001439',
+      VH_F_ilium_spongy_bone_L: 'UBERON:0002483', VH_F_ilium_spongy_bone_R: 'UBERON:0002483',
+      VH_F_vagina: 'UBERON:0000996',
+      VH_F_broad_ligament: 'UBERON:0012332',
+      VH_F_left_round_ligament_of_uterus: 'FMA:57790', VH_F_right_round_ligament_of_uterus: 'FMA:57789',
+      VH_F_left_uterosacral_ligament: 'FMA:19120', VH_F_right_uterosacral_ligament: 'FMA:19119',
+      VH_F_left_cardinal_ligament_of_uterus: 'FMA:77064', VH_F_right_cardinal_ligament_of_uterus: 'FMA:77064',
+      VH_F_ovarian_ligament_L: 'FMA:55424', VH_F_ovarian_ligament_R: 'FMA:55423',
+      VH_F_suspensory_ligament_of_ovary_L: 'FMA:19824', VH_F_suspensory_ligament_of_ovary_R: 'FMA:19823',
+      "VH_F_abdominal_ostium_of_uterine_tube": "FMA:77049",
+      "VH_F_ampulla_of_uterine_tube_L": "FMA:18492",
+      "VH_F_ampulla_of_uterine_tube_R": "FMA:18491",
+      "VH_F_anterior_wall_of_uterus": "FMA:224876",
+      "VH_F_body_of_uterus": "UBERON:0009853",
+      "VH_F_cervix": "UBERON:0000002",
+      "VH_F_external_cervical_os": "UBERON:0013760",
+      "VH_F_fallopian_tube_L": "UBERON:0001303",
+      "VH_F_fallopian_tube_R": "UBERON:0001302",
+      "VH_F_fibria_of_uterine_tube_L": "FMA:18498",
+      "VH_F_fibria_of_uterine_tube_R": "FMA:18497",
+      "VH_F_fundus_of_uterus": "FMA:17561",
+      "VH_F_internal_cervical_os": "UBERON:0013759",
+      "VH_F_isthmus_of_fallopian_tube_L": "FMA:18494",
+      "VH_F_isthmus_of_fallopian_tube_R": "FMA:18493",
+      "VH_F_left_ovary": "FMA:7214",
+      "VH_F_lower_uterine_segment": "FMA:17752",
+      "VH_F_posterior_wall_of_uterus": "FMA:224878",
+      "VH_F_right_ovary": "FMA:7213",
+      "VH_F_uterine_tube_infundibulum_L": "FMA:18490",
+      "VH_F_uterine_tube_infundibulum_R": "FMA:18489",
+      "VH_F_uterus": "UBERON:0000995"
+    };
+    // HRA reference names like VH_F_left_ovary or VH_F_fallopian_tube_L become "Ovary.l" / "Fallopian tube.r"
+    function vhName(raw) {
+      let s = raw.replace(/^VH_F_/, '').replace(/_/g, ' ').trim();
+      let suf = '';
+      const a = s.match(/^(left|right) (.*)$/i); if (a) { suf = a[1].toLowerCase() === 'left' ? '.l' : '.r'; s = a[2]; }
+      const b = s.match(/^(.*) ([LR])$/); if (b) { suf = b[2] === 'L' ? '.l' : '.r'; s = b[1]; }
+      return s.charAt(0).toUpperCase() + s.slice(1) + suf;
+    }
+    function rawName(o) {
+      for (let n = o; n; n = n.parent) if (n.userData && n.userData.name) return n.userData.name;
+      return (o.name || 'Unnamed structure').replace(/_/g, ' ');
+    }
+    function describe(mesh) {
+      let raw = rawName(mesh).replace(/-mesh$/i, '');
+      // muscle / tendon / ligament footprints on bones: ".or" = origin right, ".e2l" = insertion left, etc.
+      const att = raw.match(/^(.*?)(?:\.|(?<=muscle))([oe])\d*([lr])$/i);
+      if (att) {
+        const base = att[1].trim();
+        return {
+          name: 'Attachment site for ' + base.charAt(0).toLowerCase() + base.slice(1),
+          side: att[3].toLowerCase() === 'l' ? 'Left' : 'Right',
+          note: att[2].toLowerCase() === 'o' ? 'origin' : 'insertion',
+        };
+      }
+      const side = /\.l$/i.test(raw) ? 'Left' : /\.r$/i.test(raw) ? 'Right' : '';
+      const name = raw.replace(/\.[a-z]{1,2}$/i, '').trim();
+      return { name, side };
+    }
+
+    // colour-coding switches: each system with a paint scheme can show its scheme or one plain colour
+    const plainSwatch = s => '#' + s.color.toString(16).padStart(6, '0');
+    // colour modes per system: 'plain' (one colour), 'coded' (the scheme) or 'natural' (real tissue colours)
+    function setColourMode(s, mode) {
+      s.mode = mode;
+      s.coded = mode === 'coded';
+      for (const e of index) {
+        if (!e.mesh || e.system !== s) continue;
+        const u = e.mesh.userData;
+        const m = mode === 'natural' ? u.naturalMat : mode === 'coded' ? u.paintMat : u.plainMat;
+        u.mat = m;
+        if (!selectedParts.includes(e.mesh)) e.mesh.material = xrayOn ? xrayMat(m, XRAY_BONE.has(s.id)) : m;
+      }
+      if (s.codeInput) s.codeInput.checked = mode === 'coded';
+      if (s.naturalInput) s.naturalInput.checked = mode === 'natural';
+      s.rowSwatch && s.rowSwatch.style.setProperty('--c', mode === 'coded' ? (s.swatch || s.code.swatch) : mode === 'natural' ? s.natural.swatch : plainSwatch(s));
+      dirty = true;
+    }
+    function setCoding(s, on) { setColourMode(s, on ? 'coded' : 'plain'); }
+    function setNatural(s, on) { setColourMode(s, on ? 'natural' : 'plain'); }
+    const codingEl = document.getElementById('coding');
+    for (const s of SYSTEMS) {
+      if (!s.code) continue;
+      const row = document.createElement('label');
+      row.className = 'sys';
+      row.innerHTML = `<input type="checkbox" ${s.coded ? 'checked' : ''}><span class="swatch" style="--c:${s.code.swatch};--b:#8a5fa0"></span><span>${s.code.label}</span><span class="stat">${s.code.hint}</span>`;
+      s.codeInput = row.querySelector('input');
+      s.codeInput.addEventListener('change', e => setCoding(s, e.target.checked));
+      codingEl.appendChild(row);
+      if (s.natural) {
+        const nrow = document.createElement('label');
+        nrow.className = 'sys';
+        nrow.innerHTML = `<input type="checkbox"><span class="swatch" style="--c:${s.natural.swatch};--b:#8a5fa0"></span><span>${s.natural.label}</span><span class="stat">${s.natural.hint}</span>`;
+        s.naturalInput = nrow.querySelector('input');
+        s.naturalInput.addEventListener('change', e => setNatural(s, e.target.checked));
+        codingEl.appendChild(nrow);
+      }
+      s.rowSwatch = [...document.querySelectorAll('#systems .sys')].find(r => r.querySelector('span:nth-of-type(2)').textContent === s.label)?.querySelector('.swatch');
+      if (s.rowSwatch && !s.coded) s.rowSwatch.style.setProperty('--c', plainSwatch(s));
+    }
+
+    async function setSystem(s, on) {
+      if (s.via) {
+        const p = SYSTEMS.find(x => x.id === s.via);
+        if (on && !p.group) {
+          if (!p.loading) await setSystem(p, true);
+          while (p.loading) await new Promise(r => setTimeout(r, 100));
+        }
+        if (!s.group) { if (on) s.input.checked = false; return; }
+        s.group.visible = on && s.input.checked && !isPeeled(s);
+        if (!on && selected && selected.userData.system === s) deselect();
+        dirty = true;
+        return;
+      }
+      if (on && !s.group && !s.loading) {
+        s.loading = true;
+        s.stat.classList.remove('err');
+        try {
+          const files = s.files || [s.file];
+          const parts = [];
+          for (const f of files) {
+            // multi-file systems (the female organs) ship at full detail only, so they skip the lite folder
+            const g = await loader.loadAsync(BASE + (s.files ? '' : MODEL_DIR) + f + '?m=' + MODEL_VERSION, e => {
+              if (e.total) s.stat.textContent = Math.round((e.loaded / e.total) * 100) + '%';
+            });
+            parts.push(g.scene);
+          }
+          if (parts.length === 1) s.group = parts[0];
+          else { s.group = new THREE.Group(); parts.forEach(p => s.group.add(p)); }
+          if (s.offset) s.group.position.set(...s.offset);
+          s.group.traverse(n => { if (/^VH_F_/.test(n.name || '')) { n.userData.name = vhName(n.name); if (REPRO_IDS[n.name]) n.userData.onto = REPRO_IDS[n.name]; } });
+          const kids = SYSTEMS.filter(c => c.via === s.id);
+          const moves = [], drops = [];
+          s.group.updateMatrixWorld(true);
+          s.group.traverse(o => {
+            if (!o.isMesh) return;
+            // ".j" meshes are baked label leader-lines from the Blender source, not anatomy
+            if (/\.j(-mesh)?$/i.test(rawName(o))) { drops.push(o); return; }
+            if (s.keep && !s.keep.includes(o.name)) { drops.push(o); return; }   // only the listed structures
+            if (s.id === 'visceral' && /^sigmoid[ _]colon$/i.test(o.name || '')) { drops.push(o); return; }   // removed: it stopped short of the midline and the model has no rectum
+            let owner = s;
+            for (let n = o; kids.length && n && n !== s.group; n = n.parent) {
+              const hit = kids.find(c => (c.match && c.match.test(rawName(n))) || (c.node && c.node.test(n.name || '')));
+              if (hit) { owner = hit; break; }
+            }
+            if (owner.tube) o.geometry = ribbonToTube(o.geometry, owner.tube / (Math.abs(o.getWorldScale(new THREE.Vector3()).x) || 1));   // the tube's radius is in metres; the mesh is scaled
+            const d = describe(o);
+            o.userData.plainMat = owner.mat;
+            o.userData.paintMat = owner.paint ? paintMat(owner.paint(d.name, o), owner) : owner.mat;
+            o.userData.naturalMat = owner.naturalPaint ? paintMat(owner.naturalPaint(d.name, o), owner) : o.userData.paintMat;
+            const mat = owner.mode === 'natural' ? o.userData.naturalMat : owner.coded === false ? o.userData.plainMat : o.userData.paintMat;
+            o.material = xrayOn ? xrayMat(mat, XRAY_BONE.has(owner.id)) : mat;
+            o.userData.mat = mat;
+            o.userData.system = owner;
+            o.userData.label = d;
+            o.userData.key = nameNode(o);
+            const dup = seenKeys.has(o.userData.key); seenKeys.add(o.userData.key);
+            index.push({ mesh: o, name: d.name, side: d.side, note: d.note, system: owner, dup });
+            if (owner !== s) moves.push([o, owner]);
+          });
+          drops.forEach(o => o.removeFromParent());
+          scene.add(s.group);
+          for (const c of kids) { c.group = new THREE.Group(); scene.add(c.group); }
+          for (const [o, c] of moves) c.group.attach(o);
+          for (const c of kids) c.group.visible = c.input.checked && !isPeeled(c);
+          addPins(s);
+          for (const c of kids) addPins(c);
+          s.stat.textContent = s.mb + ' MB';
+        } catch (err) {
+          console.error(err);
+          s.stat.textContent = 'Failed';
+          s.stat.classList.add('err');
+          s.input.checked = false;
+          showNotice(`Couldn't load <code>${s.file}</code>. Serve this folder over http (for example <code>npx serve .</code>) instead of opening the file directly, or set <code>?base=</code> to where the models are hosted.`);
+        }
+        s.loading = false;
+      }
+      if (s.group) s.group.visible = on && s.input.checked && !isPeeled(s);
+      if (!on && selected && selected.userData.system === s) deselect();
+      if (!on && selectedPin && selectedPin.s === s) deselect();
+      applyPelvis();
+      refreshPins();
+    }
+
+    function showNotice(html) {
+      const n = document.getElementById('notice');
+      n.innerHTML = html; n.style.display = 'block';
+      setTimeout(() => (n.style.display = 'none'), 12000);
+    }
+
+    /* ---------- selection ---------- */
+    const info = document.getElementById('info');
+    const nameEl = document.getElementById('name');
+    const metaEl = document.getElementById('meta');
+    const revealBtn = document.getElementById('reveal');
+    let selected = null, selectedPin = null, selectedParts = [];
+    function restoreSelection() {
+      for (const m of selectedParts) m.material = baseMat(m);
+      selectedParts = [];
+    }
+
+    function select(mesh) {
+      restoreSelection();
+      selected = mesh;
+      selectedPin = null; info.classList.remove('pin');
+      if (!mesh) { info.classList.remove('open'); syncXrayFocus(); refreshPins(); return; }
+      const s = mesh.userData.system;
+      if (isPeeled(s)) unpeelFor(s);
+      if (s.group && !s.group.visible) { s.input.checked = true; s.group.visible = true; }
+      selectedParts = partsOf(mesh);
+      for (const m of selectedParts) m.material = pickMat;
+      syncXrayFocus();
+      const { name, side, note } = mesh.userData.label;
+      nameEl.textContent = name;
+      let onto = '';
+      for (let o = mesh; o && !onto; o = o.parent) onto = (o.userData && o.userData.onto) || '';
+      metaEl.textContent = [side, note, s.label, onto].filter(Boolean).join(' \u00b7 ');
+      info.classList.add('open');
+      refreshPins();
+      post({ type: 'select', name, side, system: s.id, ontology: onto });
+    }
+    function selectPin(s, i) {
+      restoreSelection(); selected = null;
+      if (isPeeled(s)) unpeelFor(s);
+      if (s.group && !s.group.visible) { s.input.checked = true; s.group.visible = true; }
+      const r = s.pinData[i];
+      selectedPin = { s, i };
+      syncXrayFocus();
+      const side = r[1] === 'R' ? 'Right' : r[1] === 'L' ? 'Left' : '';
+      pinHi.geometry.attributes.position.setXYZ(0, r[2], r[3], r[4]);
+      pinHi.geometry.attributes.position.needsUpdate = true;
+      pinHi.geometry.computeBoundingSphere();
+      nameEl.textContent = r[0];
+      metaEl.textContent = [side, s.label, 'landmark'].filter(Boolean).join(' \u00b7 ');
+      info.classList.add('pin'); info.classList.add('open');
+      refreshPins();
+      post({ type: 'select', kind: 'landmark', name: r[0], side, system: s.id });
+    }
+    const deselect = () => select(null);
+
+    function updateReveal() {
+      revealBtn.classList.toggle('show', isolated || hidden.size > 0 || region !== 0 || peelLevel !== 0);
+    }
+    function showAll() {
+      organsClear();
+      for (const { mesh } of index) if (mesh) mesh.visible = true;
+      hidden.clear(); isolated = false; isoPins = []; setPeel(0); updateReveal(); refreshPins();
+      if (region) setRegion(0);
+      applyPelvis();
+    }
+    function isolate() {
+      if (!selected) return;
+      organsClear();
+      const keep = new Set(selectedParts);
+      for (const { mesh } of index) if (mesh) mesh.visible = keep.has(mesh);
+      isolated = true; computeIsoPins(); buildIsoPoints(); updateReveal(); refreshPins();
+    }
+    function hideSelected() {
+      if (!selected) return;
+      for (const m of selectedParts) { m.visible = false; hidden.add(m); }
+      deselect(); updateReveal(); dirty = true;
+    }
+
+    document.getElementById('focus').onclick = () => {
+      if (selected) focusOn(selected);
+      else if (selectedPin) { const r = selectedPin.s.pinData[selectedPin.i]; focusPoint(new THREE.Vector3(r[2], r[3], r[4])); }
+    };
+    const pinsOnEl = document.getElementById('pinsOn');
+    pinsOnEl.addEventListener('change', () => { pinsOn = pinsOnEl.checked; refreshPins(); });
+    document.getElementById('isolate').onclick = isolate;
+    document.getElementById('hide').onclick = hideSelected;
+    document.getElementById('clear').onclick = deselect;
+    revealBtn.onclick = showAll;
+
+    /* ---------- single organs: Brain, Heart, Lungs (pick one or several) ---------- */
+    // Each organ is one whole group in its model file (Brain.g, Heart.g, Lungs.g). Choosing an organ loads that file if it
+    // is not loaded yet, hides everything else and flies the camera to it. Choosing several shows them together.
+    // "Show everything again" (or Escape) brings the whole body back.
+    const ORGANS = [
+      { id: 'brain', label: 'Brain', sys: 'nervous', node: /^Brain\.g$/ },
+      {
+        id: 'heart', label: 'Heart', sys: 'cardiovascular', node: /^Heart\.g$/,
+        // "Include great vessels" adds what the usual heart diagrams show: aorta (ascending, arch, its branch stubs, a stretch of the
+        // descending part), pulmonary trunk and arteries, pulmonary veins, venae cavae, coronary arteries and cardiac veins. The model
+        // gives every vessel its own short stem mesh ("..._1") apart from its long branches, so only the stems are taken: stubs, not trees.
+        extra: {
+          groups: /^(Ascending aorta|Aortic arch|Pulmonary trunk|Arteries of heart\.g|Cardiac veins\.g)$/,
+          stems: /^(Thoracic_aorta_1|(Left|Right)_common_carotid_artery_1|(Left|Right)_subclavian_artery_1|Superior_vena_cava_1|(Left|Right)_brachiocephalic_vein_1|Inferior_vena_cava_\(thoracic_part\)_1|(Left|Right)_pulmonary_artery_1|(Left|Right)_(superior|inferior)_pulmonary_vein_1)$/,
+        },
+      },
+      { id: 'lungs', label: 'Lungs', sys: 'respiratory', node: /^Lungs\.g$/ },
+    ];
+    const organsActive = new Set();
+    const organBtns = new Map(ORGANS.map(o => [o.id, document.querySelector('#organs [data-organ="' + o.id + '"]')]));
+    const organStatus = document.getElementById('organStatus');
+    const vesselsEl = document.getElementById('heartVessels');
+    const vesselsRow = document.getElementById('vesselsRow');
+    let organsKeep = false, organsRun = 0;
+
+    function inOrgan(mesh, def) {
+      const sys = mesh.userData.system;
+      if (!sys || sys.id !== def.sys) return false;
+      const extra = def.extra && vesselsEl.checked ? def.extra : null;
+      if (extra && extra.stems.test(mesh.name || '')) return true;
+      for (let n = mesh; n; n = n.parent) {
+        const nm = n.userData && n.userData.name;
+        if (nm && (def.node.test(nm) || (extra && extra.groups.test(nm)))) return true;
+      }
+      return false;
+    }
+    function syncOrganUI(msg) {
+      for (const [id, b] of organBtns) if (b) b.setAttribute('aria-pressed', String(organsActive.has(id)));
+      vesselsRow.hidden = !organsActive.has('heart');
+      const names = ORGANS.filter(o => organsActive.has(o.id)).map(o => o.id === 'heart' && vesselsEl.checked ? 'Heart + great vessels' : o.label);
+      organStatus.textContent = msg || (names.length ? 'Showing: ' + names.join(' + ') + '. Tap a part to see its name.' : 'Pick one or more. Everything else is hidden.');
+    }
+    function organsClear() {   // called whenever something else changes what is shown
+      if (organsKeep || !organsActive.size) return;
+      organsActive.clear(); organsRun++; syncOrganUI();
+    }
+    function fitMeshes(list) {
+      const box = new THREE.Box3();
+      for (const m of list) box.expandByObject(m);
+      if (box.isEmpty()) return;
+      const c = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3()).length() || 0.05;
+      const dist = Math.max(size / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * 1.5, 0.12);
+      flyTo(c.clone().add(new THREE.Vector3(0, 0.04, 1).normalize().multiplyScalar(dist)), c);   // looked at from the front
+    }
+    async function applyOrgans() {
+      const run = ++organsRun;
+      const defs = ORGANS.filter(o => organsActive.has(o.id));
+      if (!defs.length) { organsKeep = true; showAll(); organsKeep = false; syncOrganUI(); return; }
+      syncOrganUI('Loading\u2026');
+      for (const def of defs) {
+        const s = SYSTEMS.find(x => x.id === def.sys);
+        if (s && (!s.group || !s.input.checked)) { s.input.checked = true; await setSystem(s, true); }
+        if (run !== organsRun) return;   // the choice changed while loading
+      }
+      deselect();
+      organsKeep = true; showAll(); organsKeep = false;
+      const keep = [];
+      for (const e of index) {
+        if (!e.mesh) continue;
+        const on = defs.some(d => inOrgan(e.mesh, d));
+        e.mesh.visible = on;
+        if (on) keep.push(e.mesh);
+      }
+      if (!keep.length) {
+        organsKeep = true; showAll(); organsKeep = false;
+        organsActive.clear(); syncOrganUI("Couldn't show that organ. Check the model files loaded.");
+        return;
+      }
+      isolated = true;
+      const prev = selectedParts; selectedParts = keep; computeIsoPins(); buildIsoPoints(); selectedParts = prev;
+      updateReveal(); refreshPins(); dirty = true;
+      fitMeshes(keep);
+      syncOrganUI();
+      window.dispatchEvent(new CustomEvent('atlas-organs'));
+    }
+    vesselsEl.addEventListener('change', () => { if (organsActive.has('heart')) applyOrgans(); });
+    for (const o of ORGANS) {
+      const b = organBtns.get(o.id);
+      if (!b) continue;
+      b.addEventListener('click', () => {
+        if (organsActive.has(o.id)) organsActive.delete(o.id); else organsActive.add(o.id);
+        applyOrgans();
+      });
+    }
+
+    /* ---------- picking ---------- */
+    const ray = new THREE.Raycaster();
+    const ndc = new THREE.Vector2();
+    const tmp = new THREE.Vector3();
+    function pickMesh(cx, cy) {
+      ndc.set((cx / innerWidth) * 2 - 1, -(cy / innerHeight) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      const pool = [];
+      for (const s of SYSTEMS) {
+        if (!s.group || !s.group.visible) continue;
+        s.group.traverse(o => { if (o.isMesh && o.visible) pool.push(o); });
+      }
+      // translucent layers (fascia, membranes) only catch clicks where nothing solid is behind them
+      const hits = ray.intersectObjects(pool, false).filter(h => inRegion(h.point));
+      return hits.find(h => !h.object.userData.system.ghost) || hits[0] || null;
+    }
+    function nearestPin(cx, cy, boneDist) {
+      if (!pinsOn || !isolated) return null;
+      const radius = matchMedia('(pointer: coarse)').matches ? 22 : 12;
+      let best = null, bd = radius;
+      for (const { s, i } of isoPins) {
+        const r = s.pinData[i];
+        tmp.set(r[2], r[3], r[4]);
+        if (region && !inRegion(tmp)) continue;
+        const camDist = camera.position.distanceTo(tmp);
+        tmp.project(camera);
+        if (tmp.z > 1 || tmp.z < -1) continue;
+        const d = Math.hypot((tmp.x + 1) / 2 * innerWidth - cx, (1 - tmp.y) / 2 * innerHeight - cy);
+        if (d < bd && camDist <= boneDist + 0.02) { bd = d; best = { s, i }; }
+      }
+      return best;
+    }
+    function pickAt(cx, cy) {
+      const hit = pickMesh(cx, cy);
+      const pin = nearestPin(cx, cy, hit ? hit.distance : Infinity);
+      if (pin) return { pin };
+      return hit ? { mesh: hit.object } : null;
+    }
+
+    let down = null, lastTap = null;
+    canvas.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+    canvas.addEventListener('pointerup', e => {
+      if (!down) return;
+      const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
+      const quick = performance.now() - down.t < 450;
+      down = null;
+      if (quiz.active) return;   // during a quiz, tapping the model must not name anything
+      if (moved < 6 && quick) {
+        const h = pickAt(e.clientX, e.clientY);
+        if (h && h.pin) selectPin(h.pin.s, h.pin.i); else select(h ? h.mesh : null);
+        // double-click / double-tap: zoom to the structure under the pointer, or reset the view on empty space
+        const now = performance.now();
+        const dbl = e.button === 0 && lastTap && now - lastTap.t < 320 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 28;
+        lastTap = dbl || e.button !== 0 ? null : { x: e.clientX, y: e.clientY, t: now };
+        if (dbl) {
+          if (h && h.pin) { const r = h.pin.s.pinData[h.pin.i]; focusPoint(new THREE.Vector3(r[2], r[3], r[4])); }
+          else if (h) focusOn(h.mesh);
+          else resetView();
+        }
+      }
+    });
+
+    const tip = document.getElementById('tip');
+    let hoverBusy = false;
+    canvas.addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse' || e.buttons || hoverBusy) return;
+      hoverBusy = true;
+      setTimeout(() => {
+        hoverBusy = false;
+        const h = pickAt(e.clientX, e.clientY);
+        if (h) {
+          let name, side;
+          if (h.pin) { const r = h.pin.s.pinData[h.pin.i]; name = r[0]; side = r[1] === 'R' ? 'right' : r[1] === 'L' ? 'left' : ''; }
+          else { name = h.mesh.userData.label.name; side = h.mesh.userData.label.side.toLowerCase(); }
+          tip.textContent = side ? `${name} (${side})` : name;
+          tip.style.left = e.clientX + 14 + 'px';
+          tip.style.top = e.clientY + 14 + 'px';
+          tip.style.display = 'block';
+        } else tip.style.display = 'none';
+      }, 70);
+    });
+    canvas.addEventListener('pointerleave', () => (tip.style.display = 'none'));
+
+    /* ---------- camera ---------- */
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function flyTo(pos, target) {
+      if (reduceMotion) { camera.position.copy(pos); controls.target.copy(target); dirty = true; return; }
+      const p0 = camera.position.clone(), t0 = controls.target.clone(), start = performance.now(), dur = 450;
+      (function step(now) {
+        const k = Math.min((now - start) / dur, 1), e = 1 - Math.pow(1 - k, 3);
+        camera.position.lerpVectors(p0, pos, e);
+        controls.target.lerpVectors(t0, target, e);
+        dirty = true;
+        if (k < 1) requestAnimationFrame(step);
+      })(start);
+    }
+    function focusOn(mesh) {
+      const box = new THREE.Box3();
+      for (const m of (mesh.userData.key ? partsOf(mesh) : [mesh])) box.expandByObject(m);
+      const c = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3()).length() || 0.05;
+      const dist = Math.max(size / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * 1.6, 0.08);
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      flyTo(c.clone().add(dir.multiplyScalar(dist)), c);
+    }
+    function focusPoint(c, dist = 0.2) {
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      flyTo(c.clone().add(dir.multiplyScalar(dist)), c.clone());
+    }
+    function resetView() { flyTo(HOME.pos.clone(), HOME.target.clone()); }
+
+    /* ---------- regions UI ---------- */
+    const regionsEl = document.getElementById('regions');
+    const regionBtns = new Map();
+    for (const r of [{ id: 0, label: 'All' }, ...REGIONS]) {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = r.label;
+      b.setAttribute('aria-pressed', r.id === 0 ? 'true' : 'false');
+      b.onclick = () => setRegion(r.id === region ? 0 : r.id);
+      regionsEl.appendChild(b); regionBtns.set(r.id, b);
+    }
+    // Right / Left chips, shown only for the two limb regions (they show one limb at a time)
+    const limbSideEl = document.getElementById('limbSide');
+    const limbSideBtns = new Map();
+    for (const s of [{ v: -1, label: 'Right' }, { v: 1, label: 'Left' }]) {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = s.label;
+      b.setAttribute('aria-pressed', String(s.v === limbSide));
+      b.onclick = () => {
+        if (s.v === limbSide) return;
+        limbSide = s.v; limbSideU.value = s.v;
+        setRegion(region);   // refresh the cut, drop a selection on the other side, re-aim the camera
+      };
+      limbSideEl.appendChild(b); limbSideBtns.set(s.v, b);
+    }
+    // Part chips (Whole limb, Shoulder, Arm, ...), redrawn for whichever limb region is showing
+    const limbPartEl = document.getElementById('limbPart');
+    function drawLimbPartChips() {
+      const list = LIMB_PARTS[region];
+      limbPartEl.hidden = !list;
+      limbPartEl.replaceChildren();
+      if (!list) return;
+      [{ label: 'Whole limb', i: -1 }, ...list.map((p, i) => ({ label: p.label, i }))].forEach(({ label, i }) => {
+        const b = document.createElement('button');
+        b.className = 'chip'; b.type = 'button'; b.textContent = label;
+        b.setAttribute('aria-pressed', String(i === limbPartIdx));
+        b.onclick = () => { if (i !== limbPartIdx) setRegion(region, false, i); };
+        limbPartEl.appendChild(b);
+      });
+    }
+    // partIdx: which part of the limb to show. Left out, the part stays the same while the region stays the same, and a
+    // different region starts with the whole limb.
+    function setRegion(id, keepCamera, partIdx = (id === region ? limbPartIdx : -1)) {
+      region = id; regionU.value = id;
+      const part = limbPartOf(id, partIdx);
+      limbPartIdx = part ? partIdx : -1;
+      limbRange = part || WHOLE_LIMB; limbLoU.value = limbRange.lo; limbHiU.value = limbRange.hi;
+      for (const [rid, b] of regionBtns) b.setAttribute('aria-pressed', String(rid === id));
+      limbSideEl.hidden = !(id === 6 || id === 7);
+      for (const [v, b] of limbSideBtns) b.setAttribute('aria-pressed', String(v === limbSide));
+      drawLimbPartChips();
+      if (selected && id) {
+        const c = new THREE.Box3().setFromObject(selected).getCenter(new THREE.Vector3());
+        if (!inRegion(c)) deselect();
+      }
+      if (selectedPin && id) {
+        const r = selectedPin.s.pinData[selectedPin.i];
+        if (!inRegion({ x: r[2], y: r[3], z: r[4] })) deselect();
+      }
+      updateReveal();
+      if (!keepCamera) {
+        const r = REGIONS.find(x => x.id === id);
+        if (r) {
+          // a limb looks at the chosen side (and part), not the middle of the body; the left side is the mirror image
+          const view = limbPartOf(id, limbPartIdx) || r;
+          const t = new THREE.Vector3(...view.t);
+          if (id === 6 || id === 7) t.x = limbSide * (limbPartIdx >= 0 ? view.t[0] : (id === 6 ? 0.22 : 0.09));
+          const dir = camera.position.clone().sub(controls.target).normalize();
+          flyTo(t.clone().add(dir.multiplyScalar(view.d)), t);
+        } else resetView();
+      }
+      dirty = true;
+    }
+
+    /* ---------- search ---------- */
+    const q = document.getElementById('q');
+    const results = document.getElementById('results');
+    q.addEventListener('input', () => {
+      const term = q.value.trim().toLowerCase();
+      results.innerHTML = '';
+      if (term.length < 2) return;
+      const found = index.filter(i => !i.dup && i.name.toLowerCase().includes(term)).slice(0, 12);
+      if (!found.length) {
+        const li = document.createElement('li');
+        li.style.cssText = 'color:var(--muted);padding:7px 8px';
+        li.textContent = 'No match. Turn on more systems to search them.';
+        results.appendChild(li);
+        return;
+      }
+      for (const f of found) {
+        const li = document.createElement('li');
+        const b = document.createElement('button');
+        b.innerHTML = '<span></span><small></small>';
+        b.firstChild.textContent = f.name;
+        b.lastChild.textContent = [f.side, f.note, f.system.label, f.pin ? 'landmark' : ''].filter(Boolean).join(', ');
+        b.onclick = () => {
+          if (region) setRegion(0, true);
+          if (f.pin) { selectPin(f.system, f.i); const r = f.system.pinData[f.i]; focusPoint(new THREE.Vector3(r[2], r[3], r[4])); }
+          else { select(f.mesh); for (const m of selectedParts) m.visible = true; focusOn(f.mesh); }
+          q.value = ''; results.innerHTML = '';
+        };
+        li.appendChild(b);
+        results.appendChild(li);
+      }
+    });
+
+    /* ---------- pelvis: male (skeleton) or female (HRA) ---------- */
+    let pelvisMode = 'male';
+    const pelvisBtns = [...document.getElementById('pelvis').querySelectorAll('button')];
+    const isPelvicBone = mesh => {
+      for (let o = mesh; o; o = o.parent) {
+        const n = ((o.userData && o.userData.name) || o.name || '').replace(/_/g, ' ').replace(/\.g$/i, '').toLowerCase();
+        if (/^(sacrum|coccyx)/.test(n)) return true;
+      }
+      return false;
+    };
+    // sex-specific structures: the Male / Female choice hides the other sex's parts
+    const FEMALE_ONLY = /^VH_F_.*(uterus|uterine|uterosacral|ovar|fallop|vagin|sigmoid_colon|cervi|cornu|ostium|fibria|infundib|placent|mammar|lactiferous|areolar|suspensory_ligament|mesovar|broad_ligament|fat_[lr]$)/i;
+    // the model's own sigmoid colon runs through the space the vagina occupies, so Female mode swaps it for a reshaped copy (VH_F_sigmoid_colon) that sits behind the vagina
+    const MALE_SIGMOID = /^sigmoid[ _]colon$/i;
+    const MALE_ONLY = /prostat|\btestis|\btestes|\btesticular|epididym|deferens|seminal|ejaculat|penis|glans|cavernos|spongiosum|bulbourethral|cowper|scrot|\burethra\b/i;   // the only urethra in the models is the male one
+    // hides the other sex's structures and the male sacrum and coccyx in female mode; restores them in male mode
+    function applyPelvis() {
+      for (const e of index) {
+        const m = e.mesh;
+        if (!m) continue;
+        const female = FEMALE_ONLY.test(m.name || '') || e.system.id === 'breasts';
+        const male = MALE_ONLY.test(((m.name || '') + ' ' + ((m.userData && m.userData.name) || '')).toLowerCase()) || (e.system.id === 'alimentary' && MALE_SIGMOID.test(m.name || ''));
+        const pelvicOff = false;   // the male sacrum and coccyx stay in both modes: the female ones sit about 4 cm behind the muscles
+        if (!(female || male || e.system.id === 'skeletal')) continue;
+        if (!female && !male && !isPelvicBone(m)) continue;
+        const hideSex = (pelvisMode === 'male' && female) || (pelvisMode === 'female' && male);
+        m.visible = !hidden.has(m) && !hideSex && !pelvicOff;
+      }
+      if (selected && !selected.visible) select(null);
+    }
+    async function setPelvis(mode) {
+      pelvisMode = mode;
+      pelvisBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+      const breasts = SYSTEMS.find(x => x.id === 'breasts');
+      if (breasts && breasts.row) breasts.row.style.display = mode === 'female' ? '' : 'none';
+      for (const id of ['femur']) {   // the female sacrum ('pelvis') is no longer shown
+        const fem = SYSTEMS.find(x => x.id === id);
+        fem.input.checked = mode === 'female';
+        await setSystem(fem, mode === 'female');
+      }
+      applyPelvis(); refreshPins(); dirty = true;
+    }
+    pelvisBtns.forEach(b => b.addEventListener('click', () => setPelvis(b.dataset.mode)));
+
+    const ORGAN_SYSTEM_IDS = ['alimentary', 'urinary', 'reproductive', 'respiratory', 'endocrine'];   // what the old single Organs system became
+
+    /* ---------- layer peeling ---------- */
+    // outermost first; each step of the slider removes the next layer. Skeleton and reference lines always stay.
+    const LAYERS = [
+      { label: 'Fascia and breasts', ids: ['fascia', 'serosa', 'breasts'] },
+      { label: 'Muscles', ids: ['muscular', 'bursae'] },
+      { label: 'Vessels, lymphatics', ids: ['cardiovascular', 'lymphoid'] },
+      { label: 'Nerves', ids: ['nervous'] },
+      { label: 'Organs', ids: [...ORGAN_SYSTEM_IDS, 'visceral'] },
+      { label: 'Joints', ids: ['joints'] },
+    ];
+    const peelEl = document.getElementById('peel');
+    const peelLabelEl = document.getElementById('peelLabel');
+    peelEl.max = LAYERS.length;
+    function setPeel(n) {
+      n = Math.max(0, Math.min(LAYERS.length, Math.round(Number(n) || 0)));
+      peelLevel = n; peelEl.value = n;
+      peeledIds.clear();
+      LAYERS.slice(0, n).forEach(l => l.ids.forEach(id => peeledIds.add(id)));
+      for (const s of SYSTEMS) if (s.group) s.group.visible = s.input.checked && !isPeeled(s);
+      if (selected && isPeeled(selected.userData.system)) deselect();
+      if (selectedPin && isPeeled(selectedPin.s)) deselect();
+      const txt = n === 0 ? 'All layers shown' : n === LAYERS.length ? 'Skeleton only' : 'Outer layer now: ' + LAYERS[n].label;
+      peelLabelEl.textContent = txt;
+      peelEl.setAttribute('aria-valuetext', txt);
+      updateReveal(); refreshPins(); dirty = true;
+      post({ type: 'peel', level: n });
+    }
+    // selecting something inside a peeled layer (e.g. from search) brings that layer back
+    function unpeelFor(s) {
+      const i = LAYERS.findIndex(l => l.ids.includes(s.id));
+      if (i >= 0 && i < peelLevel) setPeel(i);
+    }
+    peelEl.addEventListener('input', () => setPeel(peelEl.value));
+
+    // links in the credits open in the host app's browser when embedded in a WebView
+    document.getElementById('credit').addEventListener('click', e => {
+      const a = e.target.closest('a[data-ext]'); if (!a) return;
+      if (window.ReactNativeWebView) { e.preventDefault(); post({ type: 'openUrl', url: a.href }); }
+      else { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    });
+
+    /* ---------- panel tabs ---------- */
+    (function () {
+      const panelEl = document.getElementById('panel');
+      const tabs = { explore: document.getElementById('tabExplore'), quiz: document.getElementById('tabQuiz') };
+      function showTab(name) {
+        panelEl.dataset.tab = name;
+        for (const k in tabs) tabs[k].setAttribute('aria-selected', String(k === name));
+      }
+      for (const k in tabs) tabs[k].addEventListener('click', () => showTab(k));
+    })();
+
+    /* ---------- quiz mode ---------- */
+    // "What is the highlighted structure?" One body system at a time: each question highlights a structure with its name
+    // hidden and offers four choices. While a quiz runs the menu, info card and hover names are hidden (body.quizzing in the
+    // CSS) and taps on the model do nothing, so nothing gives the answer away. Starting a quiz resets the view (showAll) and
+    // shows only the chosen system in x-ray, so the highlighted structure is never hidden behind another. Ending it puts back
+    // which systems were ticked, the x-ray setting and the Explore tab's region. The learner can also pick a body region
+    // (and, for the limbs, a side): the view is cut to it and only structures centred in it are asked about.
+    // When a round finishes, the score is posted to the host app
+    // ({ type: 'quiz', system, region?, side?, score, total }); the web app saves it and answers { type: 'quizXp', amount }.
+    const QUIZ_LENGTHS = [5, 10, 20, 30, 50];   // choices offered in the Quiz tab
+    const QUIZ_MIN_SIZE = 0.012;   // metres (diagonal of the structure): anything smaller is too tiny to see or fairly ask about
+    const QUIZ_SYSTEMS = [
+      { id: 'alimentary', label: 'Alimentary', ids: ['alimentary'] },
+      { id: 'nervous', label: 'Nervous', ids: ['nervous'] },
+      { id: 'cardiovascular', label: 'Cardiovascular', ids: ['cardiovascular'] },
+      { id: 'lymphatic', label: 'Lymphatic', ids: ['lymphoid'] },
+      { id: 'muscular', label: 'Muscular', ids: ['muscular'] },
+      { id: 'skeletal', label: 'Skeletal', ids: ['skeletal', 'joints'] },
+      { id: 'urinary', label: 'Urinary', ids: ['urinary'] },
+      { id: 'reproductive', label: 'Reproductive', ids: ['reproductive'] },   // follows the Male / Female choice
+      { id: 'respiratory', label: 'Respiratory', ids: ['respiratory'] },
+      { id: 'endocrine', label: 'Endocrine', ids: ['endocrine'] },
+    ];
+    // reg: 0 = whole body, otherwise a REGIONS id (6 and 7 are the limbs, which also use side: -1 right, +1 left,
+    // and part: an index into LIMB_PARTS[reg], -1 = the whole limb)
+    const quiz = { active: false, starting: false, sys: QUIZ_SYSTEMS.find(g => g.id === 'skeletal'), reg: 0, side: -1, part: -1, length: 10, qs: [], i: 0, score: 0, missed: [], answered: false, saved: null };
+    const quizIsLimb = () => quiz.reg === 6 || quiz.reg === 7;
+    const regionSlug = r => r.label.toLowerCase().replace(/\s+/g, '-');
+    const quizById = id => document.getElementById(id);
+    const quizStartBtn = quizById('quizStart'), quizStatus = quizById('quizStatus'), quizSysEl = quizById('quizSys');
+    const qOpts = quizById('qopts'), qNext = quizById('qnext'), qFeed = quizById('qfeed');
+    const qCount = quizById('qcount'), qScore = quizById('qscore');
+    const qPlay = quizById('qplay'), qSummary = quizById('qsummary');
+    const quizLabel = e => (e.side ? `${e.name} (${e.side.toLowerCase()})` : e.name);
+    const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+    for (const s of QUIZ_SYSTEMS) {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = s.label;
+      b.setAttribute('aria-pressed', String(s === quiz.sys));
+      b.onclick = () => { quiz.sys = s; for (const c of quizSysEl.children) c.setAttribute('aria-pressed', String(c === b)); };
+      quizSysEl.appendChild(b);
+    }
+
+    // Body region: "Whole body" or one of the regions of the Explore tab. The limbs also ask which side.
+    const quizRegionEl = quizById('quizRegion'), quizSideEl = quizById('quizSide'), quizPartEl = quizById('quizPart');
+    // Whole limb, Shoulder, Arm, ... for the limb that is chosen
+    function drawQuizPartChips() {
+      const list = quizIsLimb() ? LIMB_PARTS[quiz.reg] : null;
+      quizPartEl.hidden = !list;
+      quizPartEl.replaceChildren();
+      if (!list) return;
+      [{ label: 'Whole limb', i: -1 }, ...list.map((p, i) => ({ label: p.label, i }))].forEach(({ label, i }) => {
+        const b = document.createElement('button');
+        b.className = 'chip'; b.type = 'button'; b.textContent = label;
+        b.setAttribute('aria-pressed', String(i === quiz.part));
+        b.onclick = () => { quiz.part = i; for (const c of quizPartEl.children) c.setAttribute('aria-pressed', String(c === b)); };
+        quizPartEl.appendChild(b);
+      });
+    }
+    for (const r of [{ id: 0, label: 'Whole body' }, ...REGIONS]) {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = r.label;
+      b.setAttribute('aria-pressed', String(r.id === quiz.reg));
+      b.onclick = () => {
+        quiz.reg = r.id; quiz.part = -1;
+        for (const c of quizRegionEl.children) c.setAttribute('aria-pressed', String(c === b));
+        quizSideEl.hidden = !quizIsLimb();
+        drawQuizPartChips();
+      };
+      quizRegionEl.appendChild(b);
+    }
+    for (const s of [{ v: -1, label: 'Right' }, { v: 1, label: 'Left' }]) {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = s.label;
+      b.setAttribute('aria-pressed', String(s.v === quiz.side));
+      b.onclick = () => { quiz.side = s.v; for (const c of quizSideEl.children) c.setAttribute('aria-pressed', String(c === b)); };
+      quizSideEl.appendChild(b);
+    }
+
+    const quizLenEl = quizById('quizLen');
+    const quizStartLabel = () => { quizStartBtn.textContent = `Start ${quiz.length}-question quiz`; };
+    for (const n of QUIZ_LENGTHS) {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.type = 'button'; b.textContent = String(n);
+      b.setAttribute('aria-label', `${n} questions`);
+      b.setAttribute('aria-pressed', String(n === quiz.length));
+      b.onclick = () => { quiz.length = n; for (const c of quizLenEl.children) c.setAttribute('aria-pressed', String(c === b)); quizStartLabel(); };
+      quizLenEl.appendChild(b);
+    }
+    quizStartLabel();
+
+    // every named structure of the system that is showing right now (one entry per structure and side)
+    function quizPool(s) {
+      const seen = new Set(), pool = [], box = new THREE.Box3(), size = new THREE.Vector3(), mid = new THREE.Vector3();
+      for (const e of index) {
+        if (!e.mesh || e.dup || !s.ids.includes(e.system.id) || !e.mesh.visible) continue;
+        if (!e.name || /^(Unnamed structure|Attachment site)/.test(e.name)) continue;
+        const label = quizLabel(e);
+        if (seen.has(label)) continue;
+        box.makeEmpty();
+        for (const m of partsOf(e.mesh)) box.expandByObject(m);
+        if (box.getSize(size).length() < QUIZ_MIN_SIZE) continue;
+        if (quiz.reg) {
+          // a region quiz only asks about structures whose centre lies in that region (and, for a limb, on the chosen side;
+          // anything on the midline belongs to neither limb)
+          box.getCenter(mid);
+          if (!inRegion(mid, quiz.reg, quiz.side, limbPartOf(quiz.reg, quiz.part) || WHOLE_LIMB)) continue;
+          if (quizIsLimb() && Math.abs(mid.x) < 0.02) continue;
+        }
+        seen.add(label);
+        pool.push({ mesh: e.mesh, name: e.name, label });
+      }
+      return pool;
+    }
+    // like focusOn, but stands back far enough to see what the structure sits next to
+    function quizFocus(mesh) {
+      const box = new THREE.Box3();
+      for (const m of partsOf(mesh)) box.expandByObject(m);
+      const c = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3()).length() || 0.05;
+      const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const dist = Math.max((size / (2 * half)) * 3.2, 0.15);
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      // on a tall (phone) screen the quiz card covers the lower part: aim a little below the structure so it sits higher up
+      const lift = innerHeight > innerWidth ? 0.3 * dist * half : 0;
+      const up = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion);
+      const target = c.clone().addScaledVector(up, -lift);
+      flyTo(target.clone().add(dir.multiplyScalar(dist)), target);
+    }
+    // "Middle phalanx of third finger of hand" and "Distal phalanx of fifth toe" are the same family: a round asks at most two
+    // of each, so ten questions are not mostly finger and toe bones
+    const quizFamily = n => n.toLowerCase().replace(/^((proximal|middle|distal|upper|lower|superior|inferior|anterior|posterior|medial|lateral|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth)\s+)+/, '').split(/\s+/).slice(0, 2).join(' ');
+    function quizTargets(pool) {
+      const all = shuffle(pool.slice()), chosen = [], perFamily = new Map();
+      for (const p of all) {
+        if (chosen.length === quiz.length) break;
+        const f = quizFamily(p.name), n = perFamily.get(f) || 0;
+        if (n >= 2) continue;
+        perFamily.set(f, n + 1); chosen.push(p);
+      }
+      for (const p of all) {   // a small pool may not reach the chosen length that way: top up with whatever is left
+        if (chosen.length === quiz.length) break;
+        if (!chosen.includes(p)) chosen.push(p);
+      }
+      return shuffle(chosen);
+    }
+    function quizQuestions(pool) {
+      return quizTargets(pool).map(target => {
+        const names = new Set([target.name]), picks = [];
+        for (const p of shuffle(pool.slice())) {   // wrong answers: other structures with a different name
+          if (names.has(p.name)) continue;
+          names.add(p.name); picks.push(p);
+          if (picks.length === 3) break;
+        }
+        return { target, options: shuffle([target, ...picks]) };
+      });
+    }
+
+    function quizEnterScene(s) {
+      deselect();
+      showAll();
+      for (const x of SYSTEMS) if (x.group) x.group.visible = s.ids.includes(x.id);
+      xrayEl.checked = true; setXray(true);
+      if (quiz.reg) { limbSide = quiz.side; limbSideU.value = quiz.side; setRegion(quiz.reg, true, quiz.part); }   // only the chosen region (and limb part) is drawn
+      refreshPins(); dirty = true;
+    }
+    function quizLeaveScene() {
+      restoreSelection(); selectedParts = [];
+      const sv = quiz.saved; quiz.saved = null;
+      if (!sv) return;
+      for (const [x, checked] of sv.systems) x.input.checked = checked;
+      setPeel(0);   // works every group's visibility out from the ticked boxes again
+      applyPelvis();
+      xrayEl.checked = sv.xray; setXray(sv.xray);
+      limbSide = sv.limbSide; limbSideU.value = sv.limbSide; setRegion(sv.region, true, sv.part);   // the Explore tab's own region, limb side and limb part
+      refreshPins(); updateReveal(); dirty = true;
+    }
+
+    async function startQuiz() {
+      if (quiz.active || quiz.starting) return;
+      const s = quiz.sys;
+      quiz.starting = true; quizStartBtn.disabled = true;
+      quiz.saved = { xray: xrayOn, region, limbSide, part: limbPartIdx, systems: SYSTEMS.map(x => [x, x.input.checked]) };
+      try {
+        const members = s.ids.map(id => SYSTEMS.find(x => x.id === id)).filter(Boolean);
+        const todo = members.filter(m => !m.group);
+        if (todo.length) {
+          const parentOf = m => (m.via ? SYSTEMS.find(x => x.id === m.via) : null);
+          const mb = todo.reduce((a, m) => a + (parentOf(m) ? (parentOf(m).group ? 0 : parentOf(m).mb) : m.mb || 0), 0);
+          quizStatus.textContent = `Loading ${s.label.toLowerCase()} (${Math.round(mb * 10) / 10} MB)…`;
+          for (const m of todo) {
+            m.input.checked = true;
+            await setSystem(m, true);
+            while (m.loading) await new Promise(r => setTimeout(r, 100));
+          }
+        }
+        if (members.some(m => !m.group)) {
+          quizLeaveScene();
+          quizStatus.textContent = 'Could not load that system. Check your connection and try again.';
+          return;
+        }
+        quizEnterScene(s);
+        const pool = quizPool(s);
+        if (new Set(pool.map(p => p.name)).size < 4) {
+          quizLeaveScene();
+          quizStatus.textContent = quiz.reg
+            ? 'That region has too few named structures in this system for a quiz. Try another system or region.'
+            : 'This system has too few named structures for a quiz. Try another one.';
+          return;
+        }
+        quiz.pool = pool;
+        quiz.active = true;
+        document.body.classList.add('quizzing');
+        quizStatus.textContent = 'Name the highlighted structure. Choose a body system, and a region if you want to be tested on just one part of the body.';
+        beginRound();
+      } finally {
+        quiz.starting = false; quizStartBtn.disabled = false;
+      }
+    }
+    function beginRound() {
+      quiz.qs = quizQuestions(quiz.pool);
+      quiz.i = 0; quiz.score = 0; quiz.missed = [];
+      qSummary.hidden = true; qPlay.hidden = false;
+      quizById('qxp').textContent = '';
+      showQuestion();
+    }
+    function showQuestion() {
+      const q = quiz.qs[quiz.i];
+      quiz.answered = false;
+      qCount.textContent = `Question ${quiz.i + 1} of ${quiz.qs.length}`;
+      qScore.textContent = `Score ${quiz.score}`;
+      qFeed.textContent = '';
+      qNext.hidden = true;
+      qOpts.replaceChildren(...q.options.map(o => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'btn'; b.textContent = o.label; b._opt = o;
+        b.onclick = () => answerQuiz(b, o);
+        return b;
+      }));
+      // highlight it like a selection, but without the name card
+      restoreSelection();
+      selectedParts = partsOf(q.target.mesh);
+      for (const m of selectedParts) m.material = pickMat;
+      syncXrayFocus();
+      quizFocus(q.target.mesh);
+    }
+    function answerQuiz(btn, opt) {
+      if (quiz.answered) return;
+      quiz.answered = true;
+      const q = quiz.qs[quiz.i], ok = opt === q.target;
+      for (const b of qOpts.children) { b.disabled = true; if (b._opt === q.target) b.classList.add('right'); }
+      if (!ok) { btn.classList.add('wrong'); quiz.missed.push(q.target.label); } else quiz.score++;
+      qScore.textContent = `Score ${quiz.score}`;
+      qFeed.textContent = ok ? 'Correct.' : `Not quite. It is ${q.target.label}.`;
+      qNext.textContent = quiz.i + 1 < quiz.qs.length ? 'Next' : 'See score';
+      qNext.hidden = false;
+      qNext.focus({ preventScroll: true });
+    }
+    function quizNext() {
+      if (!quiz.answered) return;
+      if (++quiz.i < quiz.qs.length) { showQuestion(); return; }
+      restoreSelection(); selectedParts = []; syncXrayFocus(); resetView();
+      const total = quiz.qs.length;
+      quizById('qresult').textContent = `${quiz.score} out of ${total}`;
+      quizById('qmissed').textContent = quiz.missed.length ? 'To review: ' + quiz.missed.slice(0, 6).join(', ') + (quiz.missed.length > 6 ? ` and ${quiz.missed.length - 6} more` : '') + '.' : 'No mistakes. Well done.';
+      qPlay.hidden = true; qSummary.hidden = false;
+      quizById('qxp').textContent = '';
+      const reg = quiz.reg ? REGIONS.find(r => r.id === quiz.reg) : null;
+      const part = quizIsLimb() ? limbPartOf(quiz.reg, quiz.part) : null;
+      post({ type: 'quiz', system: quiz.sys.id, region: reg ? regionSlug(reg) : undefined, side: quizIsLimb() ? (quiz.side < 0 ? 'right' : 'left') : undefined, part: part ? part.label.toLowerCase() : undefined, score: quiz.score, total });
+    }
+    // the app answers with the XP the round earned (0 when today's atlas XP was already paid)
+    function showQuizXp(amount) {
+      if (qSummary.hidden || !Number.isFinite(amount) || amount < 0 || amount > 1000) return;
+      quizById('qxp').textContent = amount > 0 ? `+${amount} XP` : 'Today’s atlas XP is already earned. This round still counts as study.';
+    }
+    function endQuiz() {
+      if (!quiz.active) return;
+      quiz.active = false;
+      document.body.classList.remove('quizzing');
+      quizLeaveScene();
+    }
+    quizStartBtn.addEventListener('click', startQuiz);
+    qNext.addEventListener('click', quizNext);
+    quizById('qend').addEventListener('click', endQuiz);
+    quizById('qdone').addEventListener('click', endQuiz);
+    quizById('qagain').addEventListener('click', beginRound);
+
+    /* ---------- React Native / Expo bridge ---------- */
+    function post(msg) {
+      if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(msg));
+      // shown inside the web app (an iframe): tell the page around us, same site only
+      else if (window.parent && window.parent !== window) window.parent.postMessage(msg, window.location.origin);
+    }
+    function onHostMessage(ev) {
+      let m; try { m = JSON.parse(ev.data); } catch { return; }
+      if (m.type === 'toggle') { for (const id of (m.id === 'visceral' ? ORGAN_SYSTEM_IDS : [m.id])) { const s = SYSTEMS.find(x => x.id === id); if (s) { s.input.checked = !!m.on; setSystem(s, !!m.on); } } }
+      if (m.type === 'pins') { pinsOnEl.checked = !!m.on; pinsOn = !!m.on; refreshPins(); }
+      if (m.type === 'peel') setPeel(m.level);
+      if (m.type === 'xray') { xrayEl.checked = !!m.on; setXray(!!m.on); }
+      if (m.type === 'reset') { showAll(); deselect(); resetView(); }
+      if (m.type === 'search') { q.value = m.q || ''; q.dispatchEvent(new Event('input')); }
+      if (m.type === 'quizXp') showQuizXp(Number(m.amount));
+    }
+    window.addEventListener('message', onHostMessage);
+    document.addEventListener('message', onHostMessage); // Android WebView
+
+    addEventListener('keydown', e => { if (e.key === 'Escape') { if (quiz.active) endQuiz(); else { deselect(); showAll(); } } if (e.key === 'Home') resetView(); });
+
+    /* ---------- on-screen view controls (buttons + keyboard) ---------- */
+    // Mouse and touch still work as before (drag = rotate, wheel / pinch = zoom, right-drag or two fingers = move).
+    // These add the same moves as buttons and keys. Press and hold a button to keep going.
+    //   Keys: arrows turn, Shift+arrows move, + and - zoom, Home resets.
+    {
+      const nav = document.getElementById('nav');
+      const held = new Map();       // what is pressed (a button or a key) -> the move it makes
+      const since = new Map();      // when it was pressed, so even a quick tap moves a visible amount
+      let mode = 'rotate', last = 0, raf = 0;
+      const off = new THREE.Vector3(), sph = new THREE.Spherical(), side = new THREE.Vector3(), lift = new THREE.Vector3();
+      const TURN = 1.4, ZOOM = 1.6, MOVE = 0.7, MIN_PRESS = 160;   // radians/s, zoom rate/s, share of the distance/s, ms
+
+      function apply(act, dt) {
+        off.copy(camera.position).sub(controls.target);
+        if (act === 'zoomIn' || act === 'zoomOut') {
+          const len = THREE.MathUtils.clamp(off.length() * Math.exp((act === 'zoomIn' ? -1 : 1) * ZOOM * dt), controls.minDistance, controls.maxDistance);
+          camera.position.copy(controls.target).add(off.setLength(len));
+          return;
+        }
+        if (act.startsWith('turn')) {   // the model turns the way the arrow points, like dragging it
+          const a = TURN * dt;
+          sph.setFromVector3(off);
+          if (act === 'turnLeft') sph.theta += a;
+          if (act === 'turnRight') sph.theta -= a;
+          if (act === 'turnUp') sph.phi += a;
+          if (act === 'turnDown') sph.phi -= a;
+          sph.phi = THREE.MathUtils.clamp(sph.phi, 0.02, Math.PI - 0.02);
+          camera.position.copy(controls.target).add(off.setFromSpherical(sph));
+          return;
+        }
+        // move: the model slides the way the arrow points, so the camera slides the other way
+        camera.updateMatrixWorld();
+        side.setFromMatrixColumn(camera.matrix, 0);
+        lift.setFromMatrixColumn(camera.matrix, 1);
+        const d = off.length() * MOVE * dt;
+        const delta = new THREE.Vector3();
+        if (act === 'moveLeft') delta.copy(side).multiplyScalar(d);
+        if (act === 'moveRight') delta.copy(side).multiplyScalar(-d);
+        if (act === 'moveUp') delta.copy(lift).multiplyScalar(-d);
+        if (act === 'moveDown') delta.copy(lift).multiplyScalar(d);
+        camera.position.add(delta);
+        controls.target.add(delta);
+      }
+
+      function tick(now) {
+        if (!held.size) { raf = 0; navHeld = false; dirty = true; return; }
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+        navHeld = true;
+        for (const act of new Set(held.values())) apply(act, dt);
+        raf = requestAnimationFrame(tick);
+      }
+      function press(id, act) {
+        if (held.has(id)) return;
+        held.set(id, act);
+        since.set(id, performance.now());
+        if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
+      }
+      function release(id) {
+        if (!held.has(id)) return;
+        const wait = MIN_PRESS - (performance.now() - since.get(id));
+        const drop = () => { held.delete(id); since.delete(id); };
+        if (wait > 0) setTimeout(drop, wait); else drop();
+      }
+
+      // buttons
+      const actFor = btn => {
+        const a = btn.dataset.act;
+        return (a === 'zoomIn' || a === 'zoomOut') ? a : (mode === 'rotate' ? 'turn' : 'move') + a;
+      };
+      for (const btn of nav.querySelectorAll('.nb')) {
+        if (btn.dataset.act === 'reset') { btn.addEventListener('click', resetView); continue; }
+        btn.addEventListener('pointerdown', e => {
+          e.preventDefault();
+          try { btn.setPointerCapture(e.pointerId); } catch { }
+          btn.classList.add('down');
+          press(btn, actFor(btn));
+        });
+        const up = () => { btn.classList.remove('down'); release(btn); };
+        btn.addEventListener('pointerup', up);
+        btn.addEventListener('pointercancel', up);
+        btn.addEventListener('click', e => {   // Enter or Space on a focused button (no pointer involved)
+          if (e.detail !== 0) return;
+          press(btn, actFor(btn));
+          setTimeout(() => release(btn), MIN_PRESS);
+        });
+      }
+      nav.addEventListener('contextmenu', e => e.preventDefault());
+
+      // Rotate / Move switch: changes what the four arrows do, and what their labels say
+      const word = { Up: 'up', Down: 'down', Left: 'left', Right: 'right' };
+      function setMode(m) {
+        mode = m;
+        for (const b of nav.querySelectorAll('.seg button')) b.setAttribute('aria-pressed', String(b.dataset.mode === m));
+        for (const b of nav.querySelectorAll('.dpad .nb')) {
+          if (!word[b.dataset.act]) continue;
+          const label = (m === 'rotate' ? 'Turn ' : 'Move ') + word[b.dataset.act];
+          b.setAttribute('aria-label', label);
+          b.title = label;
+        }
+      }
+      for (const b of nav.querySelectorAll('.seg button')) b.addEventListener('click', () => setMode(b.dataset.mode));
+
+      // hide / show the whole pad (it can be in the way on a small screen)
+      const toggle = document.getElementById('navToggle');
+      toggle.addEventListener('click', () => {
+        const hide = !nav.classList.contains('min');
+        nav.classList.toggle('min', hide);
+        toggle.setAttribute('aria-expanded', String(!hide));
+        const label = hide ? 'Show view controls' : 'Hide view controls';
+        toggle.setAttribute('aria-label', label);
+        toggle.title = label;
+      });
+
+      // "How to move around" tip: shown briefly on opening, and again from the ? button.
+      // It goes away when you touch the model, or after a few seconds.
+      const hint = document.getElementById('hint');
+      let hintTimer = 0;
+      const hideHint = () => { clearTimeout(hintTimer); hint.classList.remove('show'); };
+      const showHint = () => { clearTimeout(hintTimer); hint.classList.add('show'); hintTimer = setTimeout(hideHint, 9000); };
+      document.getElementById('navHelp').addEventListener('click', () => (hint.classList.contains('show') ? hideHint() : showHint()));
+      canvas.addEventListener('pointerdown', hideHint);
+      setTimeout(showHint, 1200);
+
+      // keyboard (ignored while typing in the search box or using a slider)
+      const ARROW = { ArrowLeft: 'Left', ArrowRight: 'Right', ArrowUp: 'Up', ArrowDown: 'Down' };
+      addEventListener('keydown', e => {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        const t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+        let act = null;
+        if (ARROW[e.key]) act = (e.shiftKey ? 'move' : 'turn') + ARROW[e.key];
+        else if (e.key === '+' || e.key === '=') act = 'zoomIn';
+        else if (e.key === '-' || e.key === '_') act = 'zoomOut';
+        if (!act) return;
+        e.preventDefault();
+        press('key:' + e.key, act);
+      });
+      addEventListener('keyup', e => {
+        if (e.key === 'Shift') { for (const id of [...held.keys()]) if (typeof id === 'string') release(id); return; }
+        release('key:' + e.key);
+      });
+      addEventListener('blur', () => { for (const id of [...held.keys()]) release(id); });
+    }
+
+    /* ---------- start ---------- */
+    for (const s of SYSTEMS) if (s.on) setSystem(s, true);
+    post({ type: 'ready' });
+  
+    window.__atlasReady = true;
+    { const boot = document.getElementById('boot'); if (boot) boot.remove(); }
+  </script>
+</body>
+
+</html>

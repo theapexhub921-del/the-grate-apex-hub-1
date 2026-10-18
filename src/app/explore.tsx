@@ -4,9 +4,11 @@ import { useMemo, useState } from 'react';
 import { Linking, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
+import { CardGrid } from '@/components/ui/card-grid';
 import { Icon } from '@/components/ui/icon';
 import { ExploreFeatureGroups } from '@/components/explore/feature-groups';
 import { FeatureGuideSimulator } from '@/components/explore/feature-guide-simulator';
+import { GamesSection } from '@/components/explore/games-section';
 import { OrganisationSimulator } from '@/components/explore/organisation-simulator';
 import { PwaInstallCard } from '@/components/pwa-install-card';
 import { Card, Interactive } from '@/components/ui/interactive';
@@ -111,7 +113,7 @@ const START_HERE: readonly { icon: 'learn' | 'home' | 'social' | 'sparkle'; labe
   { icon: 'learn', label: 'Study a lesson', detail: 'Pick up your class curriculum', href: '/learn' },
   { icon: 'home', label: 'Share a post', detail: 'Stories, photos and videos', href: '/' },
   { icon: 'social', label: 'Find classmates', detail: 'Follow people and make friends', href: '/social/friends' },
-  { icon: 'sparkle', label: 'Make it yours', detail: 'Experience and theme', href: '/settings' },
+  { icon: 'sparkle', label: 'Make it yours', detail: 'Interface and theme', href: '/settings' },
 ];
 
 export default function ExploreScreen() {
@@ -139,19 +141,22 @@ export default function ExploreScreen() {
       {/* Discovery first (owner request): concepts, connections and research; the
           welcome and the simulations follow. */}
 
+      {/* Study games (src/data/games.ts). */}
+      <GamesSection style={styles.firstSection} />
+
       {weeklySession ? <SectionHeader title={`${upcoming ? 'Next week' : 'This week'} · ${weeklySession.title}`} subtitle={`${weeklySession.summary} Begins ${weekLabel}.`} style={styles.section} /> : null}
 
       <View style={styles.weekPill}><Pill label={`This week · updated ${updated}`} tone="gold" /><Text style={styles.weekNote}>New concepts, connections and research every Monday.</Text></View>
       <SectionHeader title="Medical concepts" subtitle="This week’s ideas from your course lessons, plus a few that sit across the curriculum." style={styles.firstSection} />
-      <View style={styles.featureGrid}>{[...week.concepts, ...getItemsByCategory('concept'), ...weeklyItems.filter((item) => item.category === 'concept')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
+      <CardGrid minItemWidth={280} maxColumns={2}>{[...week.concepts, ...getItemsByCategory('concept'), ...weeklyItems.filter((item) => item.category === 'concept')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</CardGrid>
 
       <SectionHeader title="Connections" subtitle="Follow a mechanism from foundational science to what it can mean in a clinical setting." style={styles.section} />
-      <View style={styles.featureGrid}>{[...week.connections, ...getItemsByCategory('connection'), ...weeklyItems.filter((item) => item.category === 'connection')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
+      <CardGrid minItemWidth={280} maxColumns={2}>{[...week.connections, ...getItemsByCategory('connection'), ...weeklyItems.filter((item) => item.category === 'connection')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</CardGrid>
 
       <SectionHeader title="Emerging research" subtitle="The newest peer-reviewed reviews and trials on this week’s themes (from Europe PMC), dated and labelled by study design. Research here is supplemental and does not replace course material." style={styles.section} />
       {research.status === 'loading' ? <Text style={styles.weekNote}>Finding this week’s research…</Text> : null}
       {research.status === 'offline' ? <Text style={styles.weekNote}>This week’s research couldn’t be loaded right now — showing earlier summaries.</Text> : null}
-      <View style={styles.featureGrid}>{research.items.map((item) => <LiveResearchCard key={item.id} item={item} />)}{[...getItemsByCategory('research'), ...weeklyItems.filter((item) => item.category === 'research')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</View>
+      <CardGrid minItemWidth={280} maxColumns={2}>{research.items.map((item) => <LiveResearchCard key={item.id} item={item} />)}{[...getItemsByCategory('research'), ...weeklyItems.filter((item) => item.category === 'research')].map((item) => <DiscoveryCard key={item.id} item={item} />)}</CardGrid>
 
       <View style={[styles.introGrid, styles.section]}>
         <Card style={styles.introCard}>
@@ -191,7 +196,7 @@ export default function ExploreScreen() {
       {/* A guided tour of every feature (owner request: a simulation, not a wall of cards). */}
       <FeatureGuideSimulator />
       <SectionHeader title="What's New" subtitle="Dated product updates, kept separate from medical research." style={styles.section} />
-      <View style={styles.featureGrid}>{getExploreAnnouncements().map((item) => <AnnouncementCard key={item.id} item={item} />)}</View>
+      <CardGrid minItemWidth={270} maxColumns={2}>{getExploreAnnouncements().map((item) => <AnnouncementCard key={item.id} item={item} />)}</CardGrid>
 
       <SectionHeader title="About GrAte Apex Hub" subtitle="A learning companion built around your course material and your study circle." style={styles.section} />
       <Card style={styles.aboutCard}>
@@ -199,13 +204,13 @@ export default function ExploreScreen() {
       </Card>
 
       <SectionHeader title="Meet the team" subtitle="The people building and supporting GrAte Apex Hub." style={styles.section} />
-      <View style={styles.featureGrid}>
+      <CardGrid minItemWidth={180} maxColumns={5}>
         {EXPLORE_TEAM.map((member) => <Card key={member.name} style={styles.teamCard}>
           <View style={styles.featureIcon}><Icon name={member.icon} size={19} color={colors.primaryText} /></View>
           <Text style={styles.featureTitle}>{member.name}</Text>
           <Text style={styles.featureDescription}>{member.role}</Text>
         </Card>)}
-      </View>
+      </CardGrid>
       <Card style={[styles.aboutCard, styles.contactCard]}>
         <Text style={styles.featureTitle}>Contact us</Text>
         <Text style={styles.featureDescription}>Send the GrAte Apex Hub team a question, idea or feedback.</Text>
@@ -349,20 +354,19 @@ function createStyles(colors: ThemeColors) {
     guideLink: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 9, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.primarySubtle },
     guideLinkText: { fontSize: 13, fontWeight: '700', color: colors.primaryText },
     contactAddress: { fontWeight: '700', color: colors.text },
-    featureGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
     featureCard: { flexBasis: '31%', flexGrow: 1, minWidth: 230, gap: 9, padding: 16 },
     featureTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
     featureIcon: { width: 34, height: 34, borderRadius: 11, backgroundColor: colors.primarySubtle, alignItems: 'center', justifyContent: 'center' },
     featureTitle: { ...Type.headline, color: colors.text },
     featureDescription: { fontSize: 13, lineHeight: 19, color: colors.textSecondary },
-    announcementCard: { flexBasis: '48%', flexGrow: 1, minWidth: 270, gap: 10, padding: 18 },
+    announcementCard: { flexGrow: 1, gap: 10, padding: 18 },
     announcementHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     aboutCard: { gap: 12, padding: 18 },
     contactCard: { marginTop: 14 },
     widgetCard: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 14, padding: 18 },
     widgetCopy: { flex: 1, minWidth: 260, gap: 5 },
-    teamCard: { flex: 1, minWidth: 180, gap: 10, padding: 18 },
-    discoveryCard: { flexBasis: '48%', flexGrow: 1, minWidth: 280, gap: 11, padding: 18 },
+    teamCard: { flexGrow: 1, gap: 10, padding: 18 },
+    discoveryCard: { flexGrow: 1, gap: 11, padding: 18 },
     discoveryTop: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
     discoveryDetails: { borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: 12, gap: 12 },
     discoveryToggle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: 11 },

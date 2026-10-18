@@ -370,10 +370,16 @@ export type Lesson = {
 
 // A published topic: lessons + question bank, built from a draft in
 // data/topics/<topic>/ by data/topics/build.ts.
+// A part of a subject that groups its topics (owner request: anatomy is
+// taught as gross anatomy, microanatomy and embryology). Shown on the
+// topic path, topic cards, the topic page and the HB2 course path.
+export type TopicSection = 'Gross Anatomy' | 'Microanatomy' | 'Embryology';
+
 export type Topic = {
   id: string; // same as the topic id in content-catalog.ts
   subject: SubjectId;
   courseId: string;
+  section?: TopicSection;
   title: string;
   description: string;
   emoji: string;

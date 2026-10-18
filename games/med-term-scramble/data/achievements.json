@@ -1,0 +1,18 @@
+{
+  "_help": "type: total_correct, streak, fastest, perfect_round, no_mistakes, category_correct, games, rush_correct, cases_solved",
+  "achievements": [
+    {"id": "first_diagnosis", "name": "First Diagnosis", "description": "Solve your first term.", "type": "total_correct", "value": 1},
+    {"id": "correct_10", "name": "10 Correct", "description": "Solve 10 terms in total.", "type": "total_correct", "value": 10},
+    {"id": "correct_50", "name": "50 Correct", "description": "Solve 50 terms in total.", "type": "total_correct", "value": 50},
+    {"id": "correct_100", "name": "100 Correct", "description": "Solve 100 terms in total.", "type": "total_correct", "value": 100},
+    {"id": "speed_demon", "name": "Speed Demon", "description": "Solve a term in under 3 seconds.", "type": "fastest", "value": 3},
+    {"id": "perfect_round", "name": "Perfect Round", "description": "Get every term right in a round of 5 or more.", "type": "perfect_round", "value": 5},
+    {"id": "streak_10", "name": "10 Streak", "description": "Reach a streak of 10.", "type": "streak", "value": 10},
+    {"id": "anatomy_expert", "name": "Anatomy Expert", "description": "Solve 25 Anatomy terms.", "type": "category_correct", "category": "Anatomy", "value": 25},
+    {"id": "biochem_expert", "name": "Biochemistry Expert", "description": "Solve 25 Biochemistry terms.", "type": "category_correct", "category": "Biochemistry", "value": 25},
+    {"id": "no_mistakes", "name": "No Mistakes", "description": "Finish a round of 10 or more with zero wrong attempts.", "type": "no_mistakes", "value": 10},
+    {"id": "rush_responder", "name": "Rapid Responder", "description": "Answer 10 Medical Rush challenges correctly.", "type": "rush_correct", "value": 10},
+    {"id": "case_closed", "name": "Case Closed", "description": "Solve a full clinical case.", "type": "cases_solved", "value": 1},
+    {"id": "regular", "name": "Ward Regular", "description": "Play 10 games.", "type": "games", "value": 10}
+  ]
+}

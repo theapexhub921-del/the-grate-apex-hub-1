@@ -109,6 +109,8 @@ Each topic with lessons lives in `src/data/topics/<topic>/` (`sources.ts`, `less
 
 `src/data/topics/index.ts` (also set the topic's status to `published` in `src/data/content-catalog.ts`)
 
+Anatomy (HB2) is taught in three sections. Every anatomy topic sets `section` in its `index.ts` to `'Gross Anatomy'`, `'Microanatomy'` or `'Embryology'` (`TopicSection` in `lesson-types.ts`); the app shows it as section headings on the topic path and the HB2 course path, a pill on topic cards, the topic breadcrumb and the lesson subtitle. Gross anatomy topics (in course order): Upper Limb, Cardiovascular System, Respiratory System, Gastrointestinal System, Urinary System, Head and Neck, Neuroanatomy. `tests/hb2-study.test.mjs` fails if an anatomy topic has no section.
+
 Subject → course → topic → lesson lookups (the one curriculum model):
 
 `src/data/curriculum.ts`
@@ -136,6 +138,12 @@ Lecture diagrams (tappable images) are in `src/data/figures/` (one file per topi
 
 * In a lesson a diagram is a compact preview card ("Explore diagram"); the interactive diagram opens in a sheet, so diagrams never take over the reading (owner's request). Quiz diagrams are capped at 280 px tall.
 * Topics with diagrams: Cardiovascular Physiology, Upper Limb, and all eight Biochemistry topics (2026-10-16). HB2 lessons show them too (block `lfig` in `hb2-study.ts`).
+
+HB2 past papers (Learn → Past question bank → HB2) are in `public/curriculum/hb2-anatomy.json`, `hb2-biochemistry.json` and `hb2-physiology.json`, one set per paper named `Past Questions N — <label>`. A bank question may carry `img` (a plain picture under `public/figures/`, e.g. the histology practical's diagrams); it is shown with the question, asked as written, and kept out of Apex.
+
+* **By topic:** every HB2 past question has a topic (`tp`), written by `scripts/sort-past-questions-by-topic.mjs` (key words, paper hints, neighbouring questions and hand corrections; rerun it after adding past questions and check its counts). The topics per course are in `src/data/past-question-topics.ts` (the app's topics plus groups without lessons, e.g. Embryology). `tests/past-question-topics.test.mjs` fails if a question has no listed topic.
+* **Custom quiz:** each topic card has "Past questions on this topic" (`past=` in the quiz link). `src/data/past-questions.ts` loads a course's past questions and registers them with `curriculum.ts` (`registerExtraQuestions`), so the quiz engine, results and retakes find them by id.
+* **Past question bank:** HB2 has a "By paper / By topic" switch; a topic is sat like a paper (`ptopic=` in `/learn/hb-practice`, mode `pastTopic` in `practice-modes.ts`).
 
 Progress functionality is currently in:
 
@@ -325,7 +333,8 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 
 * Originate follows `docs/design-system.md` — read it before changing any Originate screen. In short: IBM Plex Sans (Source Serif 4 for lesson text), weights 400/500/600, sentence-case labels, a plain page colour (no atmosphere effects), cards only when grouping helps (radius 12, 1px border, no shadow), lists as `List` / `ListRow` (`src/components/ui/list.tsx`), one primary button per screen, a docked tab bar on phones, and only motion that answers an action.
 * The rules live in the primitives and switch on `useExperience() === 'originate'`, so The Originals and Hybrid look exactly as before. The type rules are applied to every `Text` by `src/components/ui/text.tsx` (`src/data/originate-type.ts`); shape and spacing values are in `src/constants/originate.ts`.
-* The Originals is the default experience; the chooser and Settings never call one experience "recommended" (owner's choice, 2026-10-16).
+* Learners see experiences as **interfaces** (Settings → Interface, "Choose your interface") and The Originals as **Legacy** (owner's requests, 2026-10-17); code, routes and the saved id (`originals`) keep the old words, so nobody's choice resets.
+* The Originals (Legacy) is the default experience; the chooser and Settings never call one experience "recommended" (owner's choice, 2026-10-16).
 * Originate's desktop sidebar (`src/components/desktop-sidebar.tsx`) is the owner's favourite: do not restyle it.
 * Originate's Study page keeps every section The Originals has (course pictures, question of the day, practise-and-plan tiles, your progress, your week), drawn in Originate's style.
 
@@ -364,6 +373,21 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * `public/sw.js` keeps the app shell, scripts, pages already visited, question banks (`/curriculum/*.json`, shown from the saved copy and refreshed in the background) and lecture diagrams (`/figures/*`). Banks and diagrams live in the `grateapex-offline-v1` cache, which app updates never delete.
 * Settings → Offline study (`src/components/offline-study-card.tsx`, `src/data/offline-study.ts`, `src/lib/offline-study.ts`) downloads a class's banks, diagrams, original lessons and lesson pictures on request. Lesson text, pictures and the lesson list are stored in the same cache on the web (not localStorage, which is too small); `legacy-study.ts` reads them when there is no connection.
 * If you change `OFFLINE_CACHE`, change it in both `public/sw.js` and `src/lib/offline-study.ts`.
+* The 3D atlas (`/atlas/*`) is deliberately skipped by `public/sw.js` (an old saved copy once left phones stuck on a broken atlas), `vercel.json` makes `/atlas/anatomy` and `/sw.js` revalidate on every load, and every atlas address carries a fresh `?v=` stamp (`atlasFresh()` in `src/lib/atlas-theme.ts`). Keep all three if you touch the atlas wiring; bump `CACHE_NAME` in `public/sw.js` whenever a deploy must purge what phones already saved.
+* The atlas models (`/atlas/**/*.glb`, ~80 MB) are downloaded once: `vercel.json` lets browsers keep them for a year, and the page asks for them as `file.glb?m=<MODEL_VERSION>` (`MODEL_VERSION` in `public/atlas/anatomy.html`). **When any .glb file changes, bump `MODEL_VERSION` and update `KNOWN_MODELS` in `tests/deploy-wiring.test.mjs`** (the test fails until you do), otherwise learners keep seeing the old models. The page itself (`anatomy.html`) is still revalidated on every open.
+* Med Term Scramble (`public/game-builds/med-term-scramble/`) needs three things kept as well: `node scripts/assemble-games.mjs` at the start of the `vercel.json` build command (it joins `index.wasm` from its parts; without it the game never loads), the `/game-builds/` handling in `public/sw.js` (keeps a copy in the offline cache so a game played once also plays offline; fetches the original request and never saves a redirect, because play.html redirects to /play), and the hidden `games/med-term-scramble` tab in both `app-tabs` files. The game page takes the whole screen like a chat (`setTabBarLocked` while it is open). Touch scrolling inside the game is in `games/med-term-scramble/scripts/ui/screen.gd`; after changing the game, export the pack (`--export-pack Web`) into `public/game-builds/med-term-scramble/index.pck` and update its size in `play.html`. `tests/deploy-wiring.test.mjs` checks the atlas and game wiring.
+
+### Anatomy atlas quiz (2026-10-17)
+
+* `public/atlas/anatomy.html` → menu section "Quiz" (the `/* ---------- quiz mode ---------- */` block in the script). The learner picks one body system, and each of 10 questions highlights a structure with its name hidden and offers four choices (wrong answers are other structures with a different name). Structures under 1.2 cm are skipped, and a round asks at most two of the same family (e.g. phalanges).
+* While a quiz runs (`body.quizzing`) the menu, info card, hover names and tapping the model are all switched off so nothing gives the answer away, and only the chosen system shows, in x-ray. Ending the quiz (Done, the close button, or Escape) puts back which systems were ticked and the x-ray setting.
+* The learner can also pick a body region (Head … Lower limb; the limbs ask Right / Left). The view is cut to that region while the quiz runs (`setRegion(id, true)`), and only structures whose centre is in it are asked about. The Explore tab's own region and limb side are put back afterwards.
+* The Explore tab's Upper limb / Lower limb regions show one limb at a time (Right / Left chips; right is −x, left is +x in the model), and can be narrowed to a part: Shoulder, Arm, Forearm, Hand (upper) or Thigh, Leg, Foot (lower). The arms hang down at the sides, so a part is a band of height (`LIMB_PARTS` in `anatomy.html`: shoulder ≥ 1.30 m, elbow 1.10, wrist 0.86, knee 0.43, ankle 0.085, measured from `landmarks.json`). The same side and band are tested on the CPU (`inRegion`) and in the shader (`uLimbSide`, `uLimbLo`, `uLimbHi`). The quiz uses the same parts. `tests/atlas-quiz.test.mjs` runs the page's own `inRegion` against the real landmarks, so keep the CPU and shader tests in step.
+* A finished round is posted as `{ type: 'quiz', system, region?, side?, score, total }`. On the web the page is an iframe, so `post()` also sends it to the parent window (same origin only).
+  * `src/components/learning/skeleton-atlas.web.tsx` listens (only to its own iframe), checks the message with `parseAtlasQuizMessage` (`src/data/learning/atlas-quiz-rules.ts`) and saves it with `recordAtlasQuiz` (`src/data/atlas-quiz.ts`).
+  * XP: `XP_RULES.atlasQuiz` / `atlasQuizXp` (10, +10 at 90%, +5 at 75%, no penalty), paid once per day (award key `practice:atlas-quiz:<day>`, like the Question of the Day). Every round still counts for the streak. The app replies `{ type: 'quizXp', amount }` and the score card shows it.
+  * On phones the atlas opens in the in-app browser, which has no link back to the app, so scores are not recorded there yet.
+* Phones: the quiz card is compact, full width, at the bottom; the camera aims a little below the structure so it sits above the card.
 
 ### Locked elements
 

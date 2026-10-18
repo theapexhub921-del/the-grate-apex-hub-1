@@ -1,0 +1,199 @@
+diff --git a/public/atlas/anatomy.html b/public/atlas/anatomy.html
+index c313f1a..8f0c911 100644
+--- a/public/atlas/anatomy.html
++++ b/public/atlas/anatomy.html
+@@ -254,6 +254,25 @@
+       font-weight: 700;
+     }
+ 
++    /* Panel tabs: Explore (search, organs, layers, display) and Quiz */
++    .ptabs { flex: none; display: flex; gap: 6px; padding: 0 14px 10px; }
++    .ptab {
++      flex: 1;
++      min-height: 36px;
++      border-radius: 999px;
++      border: 1px solid var(--line);
++      background: var(--well);
++      color: var(--ink-2);
++      font-size: 13px;
++      cursor: pointer;
++      transition: background 0.15s, color 0.15s, border-color 0.15s;
++    }
++    .ptab:hover { border-color: var(--cobalt); color: var(--ink); }
++    .ptab[aria-selected="true"] { background: var(--cobalt); border-color: var(--cobalt); color: var(--on-cobalt); font-weight: 700; }
++    #panel[data-tab="quiz"] .explore-only { display: none !important; }
++    #panel[data-tab="explore"] .quiz-only { display: none !important; }
++    .sec.quiz-only + .sec { border-top: 0; }
++
+     [hidden] { display: none !important; }
+ 
+     .boot { margin: 2px 0 10px; padding: 9px 12px; border-radius: var(--r-sm); background: var(--well); border: 1px solid var(--line); color: var(--ink-2); font-size: 12.5px; }
+@@ -833,7 +852,7 @@
+     </svg>
+   </button>
+ 
+-  <aside id="panel" class="card" aria-label="Atlas menu">
++  <aside id="panel" class="card" data-tab="explore" aria-label="Atlas menu">
+     <button id="sheetHandle" class="handle" type="button" aria-label="Expand or collapse the menu"
+       aria-expanded="true"></button>
+     <div class="phead">
+@@ -855,7 +874,12 @@
+       </button>
+     </div>
+ 
+-    <div class="searchwrap">
++    <div class="ptabs" role="tablist" aria-label="Atlas menu sections">
++      <button id="tabExplore" class="ptab" type="button" role="tab" aria-selected="true">Explore</button>
++      <button id="tabQuiz" class="ptab" type="button" role="tab" aria-selected="false" aria-controls="panelQuiz">Quiz</button>
++    </div>
++
++    <div class="searchwrap explore-only">
+       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+         <circle cx="11" cy="11" r="7" />
+@@ -866,20 +890,20 @@
+     </div>
+ 
+     <div class="pscroll">
+-      <p id="boot" class="boot" role="status">Loading the 3D atlas&hellip;</p>
+-      <ul id="results"></ul>
+-      <button id="reveal" class="btn">Show everything again</button>
++      <p id="boot" class="boot explore-only" role="status">Loading the 3D atlas&hellip;</p>
++      <ul id="results" class="explore-only"></ul>
++      <button id="reveal" class="btn explore-only">Show everything again</button>
+ 
+-      <details class="sec" open>
+-        <summary>Quiz</summary>
++      <section id="panelQuiz" class="sec quiz-only" role="tabpanel" aria-labelledby="tabQuiz">
+         <div class="body">
+           <div id="quizSys" class="chips" role="group" aria-label="Quiz topic"></div>
++          <div id="quizLen" class="chips" role="group" aria-label="Number of questions"></div>
+           <button id="quizStart" class="btn primary" type="button">Start 10-question quiz</button>
+           <p id="quizStatus" class="organstatus" role="status">Name the highlighted structure. Choose a body system to be tested on.</p>
+         </div>
+-      </details>
++      </section>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Single organs</summary>
+         <div class="body">
+           <div id="organs" class="organs" role="group" aria-label="Show one organ on its own">
+@@ -893,7 +917,7 @@
+         </div>
+       </details>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Sex</summary>
+         <div class="body">
+           <div id="pelvis" class="chips" role="group" aria-label="Pelvis: male or female">
+@@ -903,21 +927,21 @@
+         </div>
+       </details>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Regions</summary>
+         <div class="body">
+           <div id="regions" class="chips" role="group" aria-label="Body regions"></div>
+         </div>
+       </details>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Body systems</summary>
+         <div class="body">
+           <div id="systems"></div>
+         </div>
+       </details>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Peel layers</summary>
+         <div class="body">
+           <input id="peel" type="range" min="0" max="6" step="1" value="0"
+@@ -926,14 +950,14 @@
+         </div>
+       </details>
+ 
+-      <details class="sec">
++      <details class="sec explore-only">
+         <summary>Colour-code</summary>
+         <div class="body">
+           <div id="coding"></div>
+         </div>
+       </details>
+ 
+-      <details class="sec" open>
++      <details class="sec explore-only" open>
+         <summary>Display</summary>
+         <div class="body">
+           <label class="sys"><input type="checkbox" id="xray"><span class="swatch" style="--c:#7fd6ff"></span><span>X-ray
+@@ -2457,6 +2481,17 @@ bool inRegion(vec3 p) {
+       else { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+     });
+ 
++    /* ---------- panel tabs ---------- */
++    (function () {
++      const panelEl = document.getElementById('panel');
++      const tabs = { explore: document.getElementById('tabExplore'), quiz: document.getElementById('tabQuiz') };
++      function showTab(name) {
++        panelEl.dataset.tab = name;
++        for (const k in tabs) tabs[k].setAttribute('aria-selected', String(k === name));
++      }
++      for (const k in tabs) tabs[k].addEventListener('click', () => showTab(k));
++    })();
++
+     /* ---------- quiz mode ---------- */
+     // "What is the highlighted structure?" One body system at a time: each question highlights a structure with its name
+     // hidden and offers four choices. While a quiz runs the menu, info card and hover names are hidden (body.quizzing in the
+@@ -2464,10 +2499,10 @@ bool inRegion(vec3 p) {
+     // shows only the chosen system in x-ray, so the highlighted structure is never hidden behind another. Ending it puts back
+     // which systems were ticked and the x-ray setting. When a round finishes, the score is posted to the host app
+     // ({ type: 'quiz', system, score, total }) in case it wants to record it.
+-    const QUIZ_LENGTH = 10;
++    const QUIZ_LENGTHS = [5, 10, 20, 30, 50];   // choices offered in the Quiz tab
+     const QUIZ_MIN_SIZE = 0.012;   // metres (diagonal of the structure): anything smaller is too tiny to see or fairly ask about
+     const QUIZ_SYSTEMS = ['skeletal', 'joints', 'muscular', 'nervous', 'cardiovascular', 'visceral', 'lymphoid'];
+-    const quiz = { active: false, starting: false, sys: SYSTEMS.find(s => s.id === 'skeletal'), qs: [], i: 0, score: 0, missed: [], answered: false, saved: null };
++    const quiz = { active: false, starting: false, sys: SYSTEMS.find(s => s.id === 'skeletal'), length: 10, qs: [], i: 0, score: 0, missed: [], answered: false, saved: null };
+     const quizById = id => document.getElementById(id);
+     const quizStartBtn = quizById('quizStart'), quizStatus = quizById('quizStatus'), quizSysEl = quizById('quizSys');
+     const qOpts = quizById('qopts'), qNext = quizById('qnext'), qFeed = quizById('qfeed');
+@@ -2486,6 +2521,18 @@ bool inRegion(vec3 p) {
+       quizSysEl.appendChild(b);
+     }
+ 
++    const quizLenEl = quizById('quizLen');
++    const quizStartLabel = () => { quizStartBtn.textContent = `Start ${quiz.length}-question quiz`; };
++    for (const n of QUIZ_LENGTHS) {
++      const b = document.createElement('button');
++      b.className = 'chip'; b.type = 'button'; b.textContent = String(n);
++      b.setAttribute('aria-label', `${n} questions`);
++      b.setAttribute('aria-pressed', String(n === quiz.length));
++      b.onclick = () => { quiz.length = n; for (const c of quizLenEl.children) c.setAttribute('aria-pressed', String(c === b)); quizStartLabel(); };
++      quizLenEl.appendChild(b);
++    }
++    quizStartLabel();
++
+     // every named structure of the system that is showing right now (one entry per structure and side)
+     function quizPool(s) {
+       const seen = new Set(), pool = [], box = new THREE.Box3(), size = new THREE.Vector3();
+@@ -2523,13 +2570,13 @@ bool inRegion(vec3 p) {
+     function quizTargets(pool) {
+       const all = shuffle(pool.slice()), chosen = [], perFamily = new Map();
+       for (const p of all) {
+-        if (chosen.length === QUIZ_LENGTH) break;
++        if (chosen.length === quiz.length) break;
+         const f = quizFamily(p.name), n = perFamily.get(f) || 0;
+         if (n >= 2) continue;
+         perFamily.set(f, n + 1); chosen.push(p);
+       }
+-      for (const p of all) {   // a small pool may not reach ten that way: top up with whatever is left
+-        if (chosen.length === QUIZ_LENGTH) break;
++      for (const p of all) {   // a small pool may not reach the chosen length that way: top up with whatever is left
++        if (chosen.length === quiz.length) break;
+         if (!chosen.includes(p)) chosen.push(p);
+       }
+       return shuffle(chosen);

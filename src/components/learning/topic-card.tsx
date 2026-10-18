@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 import { MemoryDistribution } from '@/components/learning/memory-ui';
@@ -16,7 +16,7 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { routes } from '@/lib/routes';
 
 // A published topic with real progress.
-export function TopicCard({ progress, now, compact }: { progress: TopicProgress; now: number; compact?: boolean }) {
+export function TopicCard({ progress, now, compact, style }: { progress: TopicProgress; now: number; compact?: boolean; style?: StyleProp<ViewStyle> }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const { topic } = progress;
@@ -33,8 +33,8 @@ export function TopicCard({ progress, now, compact }: { progress: TopicProgress;
   return (
     <PressableCard
       onPress={() => router.push(routes.topic(topic.id))}
-      accessibilityLabel={`${topic.title}. ${progress.completed} of ${progress.total} lessons completed. ${TOPIC_STATUS_LABEL[progress.status]}.`}
-      style={[styles.card, { borderColor: `${tint.soft}55` }]}
+      accessibilityLabel={`${topic.section ? `${topic.section}: ` : ''}${topic.title}. ${progress.completed} of ${progress.total} lessons completed. ${TOPIC_STATUS_LABEL[progress.status]}.`}
+      style={[styles.card, { borderColor: `${tint.soft}55` }, style]}
     >
       <View style={styles.header}>
         <View style={[styles.emojiTile, { borderColor: `${tint.soft}66` }]} aria-hidden>
@@ -45,6 +45,7 @@ export function TopicCard({ progress, now, compact }: { progress: TopicProgress;
             {topic.title}
           </Text>
           <View style={styles.pills}>
+            {topic.section ? <Pill label={topic.section} /> : null}
             <Pill label={TOPIC_STATUS_LABEL[progress.status]} tone={tone} />
             {progress.due > 0 ? <Pill label={`${progress.due} due`} tone="warning" /> : null}
           </View>
@@ -81,7 +82,7 @@ export function TopicCard({ progress, now, compact }: { progress: TopicProgress;
 }
 
 // A topic whose lecture material is inventoried but not yet built.
-export function PendingTopicCard({ topic }: { topic: ContentTopic }) {
+export function PendingTopicCard({ topic, style }: { topic: ContentTopic; style?: StyleProp<ViewStyle> }) {
   const styles = useThemedStyles(createStyles);
   const label =
     topic.status === 'needs-classification'
@@ -90,7 +91,7 @@ export function PendingTopicCard({ topic }: { topic: ContentTopic }) {
         ? 'No usable lecture file in this ZIP'
         : 'Lecture material received · lessons in preparation';
   return (
-    <Card style={[styles.card, styles.pending]}>
+    <Card style={[styles.card, styles.pending, style]}>
       <View style={styles.header}>
         <TopicGlyph title={topic.title} subject={topic.subject} size={46} />
         <View style={styles.headerText}>

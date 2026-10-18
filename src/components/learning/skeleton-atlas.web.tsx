@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useWindowDimensions } from 'react-native';
 
-import { ATLAS_PAGE, atlasHash, atlasThemeVars } from '@/lib/atlas-theme';
+import { setTabBarLocked } from '@/components/tab-bar-visibility';
+import { recordAtlasQuiz } from '@/data/atlas-quiz';
+import { parseAtlasQuizMessage } from '@/data/learning/atlas-quiz-rules';
+import { ATLAS_PAGE, atlasFresh, atlasHash, atlasThemeVars } from '@/lib/atlas-theme';
 import { useTheme } from '@/hooks/use-theme';
 
-// The 3D skeleton atlas (web): the standalone viewer in public/atlas/skeleton.html, shown
+// The 3D anatomy atlas (web): the standalone viewer in public/atlas/anatomy.html, shown
 // inside the page and painted with the app's current theme. When the theme changes the
 // viewer is re-coloured in place, so what the learner is looking at is not reloaded.
 //
@@ -20,7 +23,7 @@ export function SkeletonAtlas() {
   const vars = useMemo(() => atlasThemeVars(colors), [colors]);
 
   // The address is fixed on first render: changing it later would reload the viewer.
-  const [src] = useState(() => `${ATLAS_PAGE}${atlasHash(vars)}`);
+  const [src] = useState(() => `${ATLAS_PAGE}${atlasFresh()}${atlasHash(vars)}`);
 
   // Send the current colours to the viewer (when it has loaded, and whenever the theme changes).
   const send = useCallback(() => {
@@ -30,6 +33,24 @@ export function SkeletonAtlas() {
   useEffect(() => {
     send();
   }, [send]);
+
+  // A finished atlas quiz round: save it (XP once a day + the streak) and tell the viewer how much XP it earned,
+  // so it can show that on its score card. Only this viewer, on this same site, is listened to.
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.source !== frame.current?.contentWindow) return;
+      const result = parseAtlasQuizMessage(event.data);
+      if (!result) return;
+      void recordAtlasQuiz(result)
+        .then((amount) => {
+          frame.current?.contentWindow?.postMessage(JSON.stringify({ type: 'quizXp', amount }), window.location.origin);
+        })
+        .catch(() => undefined); // not saved (e.g. offline): the quiz itself is unaffected
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
 
   const enterFull = () => {
     setFull(true);
@@ -44,6 +65,7 @@ export function SkeletonAtlas() {
   // screen some other way (the browser's own Esc) is noticed.
   useEffect(() => {
     if (!full) return;
+    setTabBarLocked(true); // the app's bottom bar sits above the page content, so it is taken away while full screen
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') exitFull();
     };
@@ -55,6 +77,7 @@ export function SkeletonAtlas() {
     window.addEventListener('keydown', onKey);
     document.addEventListener('fullscreenchange', onFullscreenChange);
     return () => {
+      setTabBarLocked(false);
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', onKey);
       document.removeEventListener('fullscreenchange', onFullscreenChange);
@@ -112,7 +135,7 @@ export function SkeletonAtlas() {
   return (
     <div ref={shell} style={shellStyle}>
       <div style={bar}>
-        <span style={{ color: colors.text, fontSize: 14, fontWeight: 700 }}>Skeleton atlas</span>
+        <span style={{ color: colors.text, fontSize: 14, fontWeight: 700 }}>Anatomy atlas</span>
         <button
           type="button"
           style={button}
@@ -125,7 +148,7 @@ export function SkeletonAtlas() {
       <iframe
         ref={frame}
         src={src}
-        title="3D skeleton atlas"
+        title="3D anatomy atlas"
         onLoad={send}
         allow="fullscreen"
         style={{ flex: 1, minHeight: 0, width: '100%', border: 0, display: 'block' }}

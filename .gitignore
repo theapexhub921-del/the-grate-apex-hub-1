@@ -57,3 +57,8 @@ example
 *-debug.log
 
 /scratch/
+
+# Game web builds: the joined file is rebuilt from its parts (scripts/assemble-games.mjs)
+/public/game-builds/*/index.wasm
+# Godot editor cache
+/games/*/.godot/

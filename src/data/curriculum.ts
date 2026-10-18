@@ -220,13 +220,22 @@ function questions(): QuestionIndex {
   return index;
 }
 
+// Questions from outside the lessons: HB2 past questions, loaded on demand
+// (data/past-questions.ts). Once loaded they are found by id like any other
+// question, so custom quizzes, results and retakes can use them.
+const extraQuestions = new Map<string, Question>();
+
+export function registerExtraQuestions(list: readonly Question[]) {
+  for (const question of list) extraQuestions.set(question.id, question);
+}
+
 export function getQuestion(questionId: string | undefined | null): Question | undefined {
-  return questionId ? questions().byId.get(questionId) : undefined;
+  return questionId ? (questions().byId.get(questionId) ?? extraQuestions.get(questionId)) : undefined;
 }
 
 export function getQuestionsByIds(ids: string[]): Question[] {
   const index = questions();
-  return ids.map((id) => index.byId.get(id)).filter((q): q is Question => Boolean(q));
+  return ids.map((id) => index.byId.get(id) ?? extraQuestions.get(id)).filter((q): q is Question => Boolean(q));
 }
 
 export function getRecall(recallId: string | undefined | null): RecallPrompt | undefined {

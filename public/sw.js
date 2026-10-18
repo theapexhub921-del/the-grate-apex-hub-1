@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grateapex-pwa-v8';
+const CACHE_NAME = 'grateapex-pwa-v10';
 // Study material kept for offline revision (question banks, lecture diagrams, and what
 // Settings → Offline study saves: src/lib/offline-study.ts). A different prefix from
 // CACHE_PREFIX on purpose: an app update must never delete what a learner saved.
@@ -32,6 +32,39 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+
+  // The 3D atlas (/atlas/...) is never touched by this worker: not the page, not its scripts, not its models. It is a
+  // standalone viewer that changes whenever it is redeployed, and a saved copy (this worker used to fall back to one when
+  // the connection was slow) left phones stuck on an old, broken version. The browser's normal checks keep it fresh:
+  // the page is revalidated on every open (vercel.json) and its address carries a fresh ?v= stamp (src/lib/atlas-theme.ts).
+  if (new URL(request.url).pathname.startsWith('/atlas/')) return;
+  // Game builds (public/game-builds): played offline once played (or warmed up) online.
+  // Online, every file comes from the network as usual (the browser's "has it changed?"
+  // check keeps that cheap, so updates always show); a copy goes into the offline cache,
+  // and the large engine file is written again only when it changed (ETag). Offline, the
+  // saved copy is used. The original request is fetched as is, so the host's redirect
+  // (play.html → /play) passes through untouched, and a redirected reply is never saved.
+  const gamePath = new URL(request.url).pathname;
+  if (gamePath.startsWith('/game-builds/')) {
+    if (request.headers.has('range')) return;
+    event.respondWith((async () => {
+      const cache = await caches.open(OFFLINE_CACHE);
+      try {
+        const response = await fetch(request);
+        if (response.status === 200 && response.type === 'basic' && !response.redirected) {
+          const saved = await cache.match(gamePath);
+          const tag = response.headers.get('etag');
+          if (!saved || !tag || saved.headers.get('etag') !== tag) {
+            event.waitUntil(cache.put(gamePath, response.clone()).catch(() => undefined));
+          }
+        }
+        return response;
+      } catch {
+        return (await cache.match(gamePath)) || Response.error();
+      }
+    })());
+    return;
+  }
 
   if (request.mode === 'navigate') {
     // Always the newest page from the network (bypassing the HTTP cache); the

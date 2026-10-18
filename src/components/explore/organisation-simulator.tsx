@@ -24,7 +24,7 @@ const TABS: Record<string, TabInfo> = {
   '/social': { title: 'Connect', detail: 'Find classmates, create study groups, discuss assignments and message accepted friends.' },
   '/learn': { title: 'Study', detail: 'Your class’s courses — lessons section by section, practice in four question types, Apex Challenges, your week and your goals.' },
   '/explore': { title: 'Explore', detail: 'Learn what each feature does, see announcements and discover what’s being built.' },
-  '/profile': { title: 'You', detail: 'Your profile, achievements, progress and settings — including the experience and theme you chose.' },
+  '/profile': { title: 'You', detail: 'Your profile, achievements, progress and settings — including the interface and theme you chose.' },
 };
 
 const AUTOPLAY_MS = 4200;

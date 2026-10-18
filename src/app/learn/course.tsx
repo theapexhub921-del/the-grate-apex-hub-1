@@ -8,6 +8,7 @@ import { Breadcrumbs, BackLink } from '@/components/learning/nav-bits';
 import { NextActionHero } from '@/components/learning/next-action-card';
 import { PendingTopicCard, TopicCard } from '@/components/learning/topic-card';
 import { Button } from '@/components/ui/button';
+import { CardGrid } from '@/components/ui/card-grid';
 import { Card } from '@/components/ui/interactive';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { Screen, SectionHeader } from '@/components/ui/screen';
@@ -98,18 +99,14 @@ export default function CourseRoute() {
       {action ? <View style={styles.block}><NextActionHero action={action} /></View> : null}
 
       <SectionHeader title="Topics" style={styles.block} />
-      <View style={[styles.grid, desktop && styles.gridDesktop]}>
+      <CardGrid minItemWidth={340} maxColumns={desktop ? 2 : 1}>
         {progress.topics.map((topic) => (
-          <View key={topic.topic.id} style={desktop ? styles.gridItem : null}>
-            <TopicCard progress={topic} now={now} />
-          </View>
+          <TopicCard key={topic.topic.id} progress={topic} now={now} style={styles.fill} />
         ))}
         {pending.map((topic) => (
-          <View key={topic.id} style={desktop ? styles.gridItem : null}>
-            <PendingTopicCard topic={topic} />
-          </View>
+          <PendingTopicCard key={topic.id} topic={topic} style={styles.fill} />
         ))}
-      </View>
+      </CardGrid>
     </Screen>
   );
 }
@@ -123,8 +120,6 @@ function createStyles(colors: ThemeColors) {
     summaryText: { fontSize: 14, fontWeight: '600', color: colors.textSecondary },
     actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
     block: { marginTop: 20 },
-    grid: { gap: 12 },
-    gridDesktop: { flexDirection: 'row', flexWrap: 'wrap' },
-    gridItem: { width: '49%', flexGrow: 1, minWidth: 340 },
+    fill: { flexGrow: 1 },
   });
 }
