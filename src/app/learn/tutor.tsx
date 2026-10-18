@@ -10,6 +10,7 @@ import { PageHeader, Screen, SectionHeader } from '@/components/ui/screen';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { createRealtimeTutorSession } from '@/data/ai-tutor';
+import { friendlyError } from '@/lib/errors';
 
 type TranscriptLine = { id: string; speaker: 'You' | 'GrAte Apex Hub'; text: string };
 
@@ -153,7 +154,7 @@ export default function TutorScreen() {
       audioRef.current = null;
       setBusy(false);
       setStatus('Ready when you are');
-      setError(caught instanceof Error ? caught.message : 'The tutor could not start. Please try again.');
+      setError(friendlyError(caught, 'The tutor could not start. Please try again.'));
     }
   }
 

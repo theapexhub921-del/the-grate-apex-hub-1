@@ -12,6 +12,7 @@ import { claimIncomingCoins, readApexCoinBalance, sendApexCoins } from '@/data/a
 import { personName, type SocialPerson, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 export function ApexCoinWalletCard({
   style,
@@ -61,7 +62,7 @@ export function ApexCoinWalletCard({
       setRecipient(null);
       setAmount('');
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Coins could not be sent. Please try again.');
+      setMessage(friendlyError(error, 'Coins could not be sent. Please try again.'));
     } finally { setBusy(false); }
   }
 

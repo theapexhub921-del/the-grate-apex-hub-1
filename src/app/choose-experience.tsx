@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { ExperiencePreview, setActiveExperience } from '@/hooks/use-experience';
 import { needsUsername } from '@/lib/login-identifier';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 // /choose-experience — hidden. The route guard sends a learner here when the
 // experience switch is on and they have not chosen yet (there is no default).
@@ -50,7 +51,7 @@ export default function ChooseExperienceScreen() {
       }
       router.replace('/');
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'Your interface could not be saved.');
+      setError(friendlyError(problem, 'Your interface could not be saved.'));
     } finally {
       setSaving(false);
     }

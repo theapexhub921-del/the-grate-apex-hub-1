@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import { deleteUser, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup, signOut, type User } from 'firebase/auth';
 import { deleteDoc, doc } from 'firebase/firestore';
 
+import { friendlyError } from '@/lib/errors';
 import { auth, db } from '@/lib/firebase';
 
 // Firebase only deletes an account that signed in within the last 5 minutes
@@ -111,6 +112,6 @@ export async function deleteMyAccount(options: { password?: string } = {}): Prom
     return { error: null };
   } catch (error: any) {
     if (error?.code === 'auth/requires-recent-login') return { error: SIGN_IN_AGAIN };
-    return { error: error?.message || 'Your account could not be deleted. Please try again.' };
+    return { error: friendlyError(error, 'Your account could not be deleted. Please try again.') };
   }
 }

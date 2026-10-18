@@ -18,6 +18,7 @@ import { useDisplayName } from '@/data/user';
 import { createTimetableBlock, deleteTimetableBlock, listStudyPlans, listTimetableBlocks, saveStudyPlan, updateStudyPlanProgress, updateTimetableBlock, type StudyPlan, type TimetableBlock } from '@/data/planning';
 import { routes } from '@/lib/routes';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -74,7 +75,7 @@ export default function PlannerScreen() {
       setReady(true);
     }).catch((cause: unknown) => {
       if (!active) return;
-      setError(cause instanceof Error ? cause.message : 'Could not load your saved planning data.');
+      setError(friendlyError(cause, 'Could not load your saved planning data.'));
       setReady(true);
     });
     return () => { active = false; };
@@ -99,7 +100,7 @@ export default function PlannerScreen() {
       const next = await saveStudyPlan({ title: 'My study plan', topic_ids: selectedIds, duration_days: days, goal: goal.trim(), status: 'active' });
       setPlan(next);
       setSaved(true);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not save the study plan.'); }
+    } catch (cause) { setError(friendlyError(cause, 'Could not save the study plan.')); }
     finally { setSavingPlan(false); }
   }
 
@@ -113,13 +114,13 @@ export default function PlannerScreen() {
       const row = editingId ? await updateTimetableBlock(editingId, input) : await createTimetableBlock(input);
       setEntries((old) => editingId ? old.map((entry) => entry.id === editingId ? row : entry) : [...old, row].sort((a,b) => a.weekday - b.weekday || a.start_time.localeCompare(b.start_time)));
       setTitle(''); setSubject(''); setEditingId(null); setSheetOpen(false);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not save the timetable block.'); }
+    } catch (cause) { setError(friendlyError(cause, 'Could not save the timetable block.')); }
     finally { setSavingEntry(false); }
   }
 
   async function removeEntry(id: string) {
     try { await deleteTimetableBlock(id); setEntries((old) => old.filter((entry) => entry.id !== id)); setSheetOpen(false); setEditingId(null); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not remove the timetable block.'); }
+    catch (cause) { setError(friendlyError(cause, 'Could not remove the timetable block.')); }
   }
 
   return (

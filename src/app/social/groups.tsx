@@ -17,6 +17,7 @@ import { createGroup, listMyGroups, type GroupSummary } from '@/data/group-chat'
 import { personName, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 // A group opens as its group chat in Messages, where Group info lists the
 // members and the owner can add more.
@@ -50,7 +51,7 @@ export default function StudyGroupsScreen() {
     try {
       setGroups(await listMyGroups());
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not load study groups.');
+      setError(friendlyError(caught, 'Could not load study groups.'));
     } finally {
       setLoading(false);
     }
@@ -81,7 +82,7 @@ export default function StudyGroupsScreen() {
       }
       router.push(groupChatHref({ id, name }));
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not create the group.');
+      setError(friendlyError(caught, 'Could not create the group.'));
     } finally {
       setBusy(false);
     }

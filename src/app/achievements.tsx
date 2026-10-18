@@ -18,6 +18,7 @@ import { useAchievements } from '@/data/achievements-store';
 import { describeGiftBoost } from '@/data/boost-gifts';
 import { activatePowerup, boostRemainingMs, describeBoost, usePowerups, useActiveBoost } from '@/data/learning/powerups';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 // /achievements — hidden; reached from You (profile) and the level-complete
 // notice. Every original-app milestone plus this app's own, five levels each.
@@ -114,7 +115,7 @@ function BoostPanel() {
     try {
       await activatePowerup(id);
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'That boost could not be started.');
+      setError(friendlyError(problem, 'That boost could not be started.'));
     }
   }
 

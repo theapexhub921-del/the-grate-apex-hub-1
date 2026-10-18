@@ -32,6 +32,7 @@ import { awardXp } from '@/data/progress';
 import { isAnswerCorrect, type Question } from '@/data/questions';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { param, routes } from '@/lib/routes';
+import { friendlyError } from '@/lib/errors';
 
 // /learn/hb-practice?course=…[&lesson=…|&set=…][&apex=1] — practice from an
 // original course's question bank: a lesson's own questions, one of the
@@ -141,7 +142,7 @@ export default function LegacyPracticeScreen() {
           ? buildPractice(source, { course: course.id, lessonId }, size, seed)
           : shuffleSeeded(source, seed).slice(0, size).map((q) => toQuestion(q, { course: course.id, lessonId, concept: q.t || q.setName || 'General' }))
       );
-    })().catch((problem) => fail(problem instanceof Error ? problem.message : 'The questions could not be loaded.'));
+    })().catch((problem) => fail(friendlyError(problem, 'The questions could not be loaded.')));
     return () => { live = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [course, seed, paramKey, reviewIds]);

@@ -23,6 +23,7 @@ import { isAnswerCorrect, type Question } from '@/data/questions';
 import { useAuth } from '@/hooks/use-auth';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { param } from '@/lib/routes';
+import { friendlyError } from '@/lib/errors';
 
 // /social/battle?id=… — play your side of a battle: the same questions as your
 // opponent (same course and seed), 15 seconds each. Then the result, once
@@ -87,7 +88,7 @@ export default function BattleScreen() {
         setBattle(found);
         setQuestions(await battleQuestions(found));
       })
-      .catch((problem) => { if (live) setError(problem instanceof Error ? problem.message : 'The battle could not be loaded.'); });
+      .catch((problem) => { if (live) setError(friendlyError(problem, 'The battle could not be loaded.')); });
     return () => { live = false; };
   }, [id]);
 

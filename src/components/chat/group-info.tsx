@@ -15,6 +15,7 @@ import { addGroupMember, createGroup, deleteGroup, type GroupInfo, leaveGroup } 
 import { personName, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 const MAX_MEMBERS = 10; // the shared rules allow up to 10 people in a group
 
@@ -38,7 +39,7 @@ export function GroupInfoSheet({ visible, group, onClose, onChanged, onReport }:
   async function add(uid: string) {
     setBusy(uid);
     setError(null);
-    try { await addGroupMember(group.id, uid); onChanged(); } catch (problem) { setError(problem instanceof Error ? problem.message : 'Could not add them.'); }
+    try { await addGroupMember(group.id, uid); onChanged(); } catch (problem) { setError(friendlyError(problem, 'Could not add them.')); }
     setBusy(null);
   }
   async function leave() {
@@ -119,7 +120,7 @@ export function NewGroupSheet({ visible, onClose }: { visible: boolean; onClose:
       router.push(`/social/message?group=${encodeURIComponent(id)}&name=${encodeURIComponent(name.trim())}` as Href);
       if (failed.length) setError(`${failed.length} could not be added.`);
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'The group could not be created.');
+      setError(friendlyError(problem, 'The group could not be created.'));
     }
     setBusy(false);
   }

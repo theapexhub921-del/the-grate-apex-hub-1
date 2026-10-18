@@ -12,6 +12,7 @@ import { saveClassSelection } from '@/lib/accounts';
 import { routes } from '@/lib/routes';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { type ThemeColors } from '@/constants/theme';
+import { friendlyError } from '@/lib/errors';
 
 export default function ClassSelectionScreen() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function ClassSelectionScreen() {
       await saveClassSelection(saved);
       router.replace(routes.learnEnvironment(saved));
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'Your class selection could not be saved. Please try again.');
+      setError(friendlyError(problem, 'Your class selection could not be saved. Please try again.'));
     } finally {
       setSaving(false);
     }

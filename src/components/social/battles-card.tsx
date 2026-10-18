@@ -20,6 +20,7 @@ import { personName, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 // Connect → Battles (the original app's Compete tab, without XP stakes): the
 // card opens a panel with your XP and record and "Challenge someone".
@@ -44,7 +45,7 @@ export function BattlesCard() {
       setBattles(await listBattles());
       setError(null);
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'Battles could not be loaded.');
+      setError(friendlyError(problem, 'Battles could not be loaded.'));
     }
   }, []);
   useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
@@ -71,7 +72,7 @@ export function BattlesCard() {
       setPicking(false);
       router.push({ pathname: '/social/battle', params: { id: battle.id } } as never);
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'The challenge could not be sent.');
+      setError(friendlyError(problem, 'The challenge could not be sent.'));
     } finally {
       setBusy(false);
     }

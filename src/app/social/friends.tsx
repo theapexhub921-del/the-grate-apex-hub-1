@@ -25,6 +25,7 @@ import {
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { blockCommunityUser, reportCommunityContent } from '@/data/community';
 import { nextUsernameChange, USERNAME_CHANGE_DAYS } from '@/lib/accounts';
+import { friendlyError } from '@/lib/errors';
 
 // '/social' is the Social hub (social/index.tsx). Cast because the
 // generated route types can lag behind newly added routes.
@@ -125,7 +126,7 @@ function UsernameCard({ username }: { username: string | null }) {
       setEditing(false);
       if (had) setNextChange(await nextUsernameChange());
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Please try again.');
+      setError(friendlyError(caught, 'Please try again.'));
     } finally {
       setBusy(false);
     }
@@ -187,7 +188,7 @@ function ShareActivityCard({ share }: { share: boolean }) {
         value={share}
         onValueChange={(next) => {
           setError(null);
-          setShareActivity(next).catch((caught) => setError(caught instanceof Error ? caught.message : 'Please try again.'));
+          setShareActivity(next).catch((caught) => setError(friendlyError(caught, 'Please try again.')));
         }}
         trackColor={{ true: colors.primary, false: colors.track }}
         accessibilityLabel="Share my activity with friends"
@@ -218,7 +219,7 @@ function SearchCard() {
           }
         })
         .catch((caught) => {
-          if (!cancelled) setError(caught instanceof Error ? caught.message : 'Search failed.');
+          if (!cancelled) setError(friendlyError(caught, 'Search failed.'));
         });
     }, 300);
     return () => {
@@ -277,7 +278,7 @@ function PersonRow({ person, first, compact }: { person: SocialPerson; first: bo
       await action();
       setConfirm(false);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Please try again.');
+      setError(friendlyError(caught, 'Please try again.'));
     } finally {
       setBusy(false);
     }

@@ -36,6 +36,7 @@ import { completeLesson, useProgress } from '@/data/progress';
 import { finishLesson } from '@/data/learning/actions';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { param, routes } from '@/lib/routes';
+import { friendlyError } from '@/lib/errors';
 
 // /learn/hb-lesson?lesson=<id>[&section=n] — an original-app lesson, read the
 // way the original app taught it: one section at a time (its kicker, title
@@ -80,7 +81,7 @@ export default function LegacyLessonScreen() {
         const total = lessonBody.sections.length;
         setIndex(Number.isInteger(requested) && requested >= 1 && requested <= total ? requested - 1 : Math.min(already, Math.max(0, total - 1)));
       })
-      .catch((problem) => { if (live) setError(problem instanceof Error ? problem.message : 'This lesson could not be loaded.'); });
+      .catch((problem) => { if (live) setError(friendlyError(problem, 'This lesson could not be loaded.')); });
     return () => { live = false; };
     // The section param only picks the starting section.
     // eslint-disable-next-line react-hooks/exhaustive-deps

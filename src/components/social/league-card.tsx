@@ -14,6 +14,7 @@ import { useNow } from '@/data/learning/use-learning';
 import { LEAGUE_TIERS, type LeagueView, loadLeague, outcomeFor } from '@/data/leagues';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { routes } from '@/lib/routes';
+import { friendlyError } from '@/lib/errors';
 
 // Connect → League: this week's league with everyone in your tier (friends
 // and strangers), ranked by XP earned this week. Top 20% move up a tier, the
@@ -30,7 +31,7 @@ export function LeagueCard() {
       setView(await loadLeague());
       setError(null);
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'The league could not be loaded.');
+      setError(friendlyError(problem, 'The league could not be loaded.'));
     }
   }, []);
   useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));

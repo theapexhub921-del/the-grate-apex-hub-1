@@ -10,6 +10,7 @@ import { protectFriendStreak } from '@/data/friend-streak-store';
 import { RESTORE_COST } from '@/data/learning/streak-rules';
 import { useProgress } from '@/data/progress';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 // Under a chat's header: "stump each other today" while a friend streak is at
 // risk, and the freeze / coin restore when one has just ended (data/friend-streaks.ts).
@@ -32,7 +33,7 @@ export function FriendStreakNotice({ status, friendId, friendName, onChanged }: 
       setMessage({ text: `Your ${streak}-day streak with ${friendName} is back.`, ok: true });
       onChanged();
     } catch (error) {
-      setMessage({ text: error instanceof Error ? error.message : 'The streak could not be restored.', ok: false });
+      setMessage({ text: friendlyError(error, 'The streak could not be restored.'), ok: false });
     } finally {
       setBusy(null);
     }

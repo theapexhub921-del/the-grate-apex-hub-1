@@ -21,6 +21,7 @@ import { personName, refreshSocial, type FriendActivity, useSocial } from '@/dat
 import { useAvatarUrl, useDisplayName } from '@/data/user';
 import { type ThemeColors, Type } from '@/constants/theme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 /** Feed built only from friend profiles and activity. */
 export function SocialActivityFeed({ children, showActivity = true }: { children?: ReactNode; showActivity?: boolean }) {
@@ -63,7 +64,7 @@ export function SocialActivityFeed({ children, showActivity = true }: { children
     try {
       setStories(await listLiveStories());
     } catch (caught) {
-      setStoryError(caught instanceof Error ? caught.message : 'Stories need the community database migration.');
+      setStoryError(friendlyError(caught, 'Stories need the community database migration.'));
     }
   }
 
@@ -105,7 +106,7 @@ export function SocialActivityFeed({ children, showActivity = true }: { children
       setStoryOpen(false);
       await refreshStories();
     } catch (caught) {
-      setStoryError(caught instanceof Error ? caught.message : 'Could not share your story.');
+      setStoryError(friendlyError(caught, 'Could not share your story.'));
     } finally {
       setStoryBusy(false);
     }
@@ -118,7 +119,7 @@ export function SocialActivityFeed({ children, showActivity = true }: { children
       setStories((all) => all.filter((item) => item.id !== story.id));
       return true;
     } catch (caught) {
-      setStoryError(caught instanceof Error ? caught.message : 'Could not delete this story.');
+      setStoryError(friendlyError(caught, 'Could not delete this story.'));
       return false;
     }
   }
@@ -137,7 +138,7 @@ export function SocialActivityFeed({ children, showActivity = true }: { children
     try {
       result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images', 'videos'], quality: 0.85, videoMaxDuration: 60 });
     } catch (caught) {
-      setStoryError(caught instanceof Error ? caught.message : 'Could not open your photo library.');
+      setStoryError(friendlyError(caught, 'Could not open your photo library.'));
       return;
     }
     if (result.canceled || !result.assets[0]) return;

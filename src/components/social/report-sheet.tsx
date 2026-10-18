@@ -10,6 +10,7 @@ import { Type, type ThemeColors } from '@/constants/theme';
 import { reportCommunityContent } from '@/data/community';
 import { CONTACT_EMAIL } from '@/lib/contact';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 // Report a post, comment or person: the usual reasons, or the learner's own
 // words. The report is saved privately for the team (supportTickets, which
@@ -106,7 +107,7 @@ export function ReportSheet({
       onDone('Thanks. Your report was sent privately to the team. Your email app opens with a copy to send to the team.');
       openEmail(email.mailto);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'The report could not be sent. Please try again.');
+      setError(friendlyError(caught, 'The report could not be sent. Please try again.'));
     } finally {
       setBusy(false);
     }

@@ -16,6 +16,7 @@ import { createFriendChallenge, listFriendChallenges, respondToFriendChallenge, 
 import { publishedTopics, getTopic } from '@/data/curriculum';
 import { type SocialPerson, personName, useSocial } from '@/data/social';
 import { useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 // Five lessons in a week earn a streak freeze, added automatically (data/progress.ts).
 export function WeeklyChallengeCard() {
@@ -51,7 +52,7 @@ export function WeeklyLeagueCard() {
 
   const refresh = useCallback(async () => {
     try { setEntries(await loadWeeklyLeague()); setError(null); }
-    catch (caught) { setError(caught instanceof Error ? caught.message : 'Weekly league is not available.'); }
+    catch (caught) { setError(friendlyError(caught, 'Weekly league is not available.')); }
     finally { setLoading(false); }
   }, []);
   useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
@@ -109,7 +110,7 @@ export function FriendBattlesCard({ friends }: { friends: readonly SocialPerson[
       }));
       setResults(Object.fromEntries(pairs));
       setError(null);
-    } catch (caught) { setError(caught instanceof Error ? caught.message : 'Friend battles are not available.'); }
+    } catch (caught) { setError(friendlyError(caught, 'Friend battles are not available.')); }
   }, []);
   useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
 
@@ -126,14 +127,14 @@ export function FriendBattlesCard({ friends }: { friends: readonly SocialPerson[
       await createFriendChallenge(friendId, `${topic.title} battle`, topic.id);
       setNotice(`Challenge sent for ${topic.title}.`);
       await refresh();
-    } catch (caught) { setError(caught instanceof Error ? caught.message : 'Could not send the challenge.'); }
+    } catch (caught) { setError(friendlyError(caught, 'Could not send the challenge.')); }
     finally { setBusy(false); }
   }
 
   async function respond(id: string, accept: boolean) {
     setBusy(true); setError(null);
     try { await respondToFriendChallenge(id, accept); await refresh(); }
-    catch (caught) { setError(caught instanceof Error ? caught.message : 'Could not update the challenge.'); }
+    catch (caught) { setError(friendlyError(caught, 'Could not update the challenge.')); }
     finally { setBusy(false); }
   }
 

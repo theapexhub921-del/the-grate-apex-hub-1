@@ -26,6 +26,7 @@ import { legacyQuestionMemory, legacyReviewFor } from '@/data/legacy-review';
 import { useQuestionHistory } from '@/data/question-history';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { param, routes } from '@/lib/routes';
+import { friendlyError } from '@/lib/errors';
 
 // /learn/hb-course?course=<id> — one of the original app's HB1 courses, in
 // this app's layout: its lessons as a path in order, each with its sections,
@@ -56,7 +57,7 @@ export default function LegacyCourseScreen() {
     let live = true;
     Promise.all([loadLegacyLessons(course.id), loadLegacySectionProgress()])
       .then(([list, read]) => { if (live) { setLessons(list); setSectionsRead(read); } })
-      .catch((problem) => { if (live) setError(problem instanceof Error ? problem.message : 'This course could not be loaded.'); });
+      .catch((problem) => { if (live) setError(friendlyError(problem, 'This course could not be loaded.')); });
     loadCourseSets(course.id).then((value) => { if (live) setSets(value); }).catch(() => {});
     return () => { live = false; };
   }, [course]);

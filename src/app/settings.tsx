@@ -64,6 +64,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { enableDeviceNotifications } from '@/lib/device-notifications';
 import { registerWebPush, sendTestPush, unregisterWebPush } from '@/lib/web-push';
+import { friendlyError } from '@/lib/errors';
 
 const HOME_HREF = '/' as Href;
 const formatHour = (hour: number) => `${hour % 12 === 0 ? 12 : hour % 12}:00 ${hour < 12 ? 'AM' : 'PM'}`;
@@ -208,7 +209,7 @@ export default function SettingsScreen() {
       setResetProgressOpen(false);
       setResetProgressDone(true);
     } catch (error) {
-      setResetProgressError(error instanceof Error ? error.message : 'Could not reset progress. Please try again.');
+      setResetProgressError(friendlyError(error, 'Could not reset progress. Please try again.'));
     } finally {
       setResettingProgress(false);
     }

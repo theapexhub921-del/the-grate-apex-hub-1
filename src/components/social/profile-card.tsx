@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { db } from '@/lib/firebase';
 import { routes } from '@/lib/routes';
+import { friendlyError } from '@/lib/errors';
 
 // Tap anyone's profile picture → their profile card (like other social apps):
 // picture, name with the gold tick, posts / followers / following, level and
@@ -96,7 +97,7 @@ function ProfileCardSheet({ uid, onClose }: { uid: string | null; onClose: () =>
     queueMicrotask(() => { if (live) { setProfile(null); setError(null); } });
     getPublicProfile(uid)
       .then((value) => { if (live) setProfile(value); })
-      .catch((problem) => { if (live) setError(problem instanceof Error ? problem.message : 'This profile could not be loaded.'); });
+      .catch((problem) => { if (live) setError(friendlyError(problem, 'This profile could not be loaded.')); });
     return () => { live = false; };
   }, [uid]);
 
@@ -113,7 +114,7 @@ function ProfileCardSheet({ uid, onClose }: { uid: string | null; onClose: () =>
       else await sendFriendRequest(shown.userId);
       setProfile(await getPublicProfile(shown.userId));
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'That did not work. Please try again.');
+      setError(friendlyError(problem, 'That did not work. Please try again.'));
     } finally {
       setBusy(false);
     }

@@ -30,6 +30,7 @@ import type { QuizAttempt } from '@/data/quiz-history';
 import { getSubjectStatus, getSubjectStatusLabel, subjects } from '@/data/subjects';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { routes } from '@/lib/routes';
+import { friendlyError } from '@/lib/errors';
 
 const RECENT_LIMIT = 6;
 
@@ -86,7 +87,7 @@ export default function ProgressScreen() {
       setCoinBalance(recovery.balance);
       setRecoveryNotice(`Your ${recovery.streak}-day streak is back. Study today to keep it going.`);
     } catch (caught) {
-      setCoinError(caught instanceof Error ? caught.message : 'Could not recover this streak.');
+      setCoinError(friendlyError(caught, 'Could not recover this streak.'));
     } finally {
       setRecoveringStreak(false);
     }

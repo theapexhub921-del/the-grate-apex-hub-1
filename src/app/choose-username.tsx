@@ -13,6 +13,7 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { chooseUsername } from '@/lib/accounts';
 import { auth } from '@/lib/firebase';
 import { cleanUsername, validateUsername } from '@/lib/login-identifier';
+import { friendlyError } from '@/lib/errors';
 
 // /choose-username — hidden. The route guard (app/_layout.tsx) sends a
 // signed-in learner here when their profile has no username in the shared
@@ -41,7 +42,7 @@ export default function ChooseUsernameScreen() {
       await saveHeldExperience().catch(() => undefined);
       // The guard moves on as soon as the saved profile arrives.
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : 'Your username could not be saved. Please try again.');
+      setError(friendlyError(failure, 'Your username could not be saved. Please try again.'));
     } finally {
       setSaving(false);
     }

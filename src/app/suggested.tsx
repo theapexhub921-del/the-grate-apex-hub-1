@@ -14,6 +14,7 @@ import { Type, type ThemeColors } from '@/constants/theme';
 import { refreshSocial, sendFriendRequest, useSocial } from '@/data/social';
 import { loadGoldAccounts, type SuggestedAccount } from '@/data/verified';
 import { useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 // Shown once, right after the introduction: the gold-tick accounts to follow.
 export default function SuggestedScreen() {
@@ -40,7 +41,7 @@ export default function SuggestedScreen() {
         await sendFriendRequest(uid);
         setFollowed((list) => [...list, uid]);
       } catch (problem) {
-        setError(problem instanceof Error ? problem.message : 'Could not follow right now.');
+        setError(friendlyError(problem, 'Could not follow right now.'));
       }
     }
     setBusy(null);

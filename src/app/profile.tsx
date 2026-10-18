@@ -30,6 +30,7 @@ import { getRankProgress } from '@/data/ranks';
 import { useAvatarUrl, useDisplayName } from '@/data/user';
 import { getRecommendedFriends, personName, sendFriendRequest, useSocial, type SocialRecommendation, getPublicProfile } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 type MenuItem = { icon: IconName; label: string; detail: string; href: Href };
 
@@ -344,7 +345,7 @@ function RecommendedFriendRow({ person }: { person: SocialRecommendation }) {
       await sendFriendRequest(person.userId);
       setSent(true);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not send request. Please try again.');
+      setError(friendlyError(caught, 'Could not send request. Please try again.'));
     } finally {
       setBusy(false);
     }

@@ -35,6 +35,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { uploadMedia, uploadVoiceNote, type Media } from '@/lib/media';
 import { announceGroupMessage, announceMessage } from '@/lib/web-push';
+import { friendlyError } from '@/lib/errors';
 
 const EMOJI = ['😀', '😂', '🥹', '😍', '😎', '🤔', '😴', '😭', '🔥', '❤️', '👍', '🙏', '🎉', '📚', '🧠', '💯', '✅', '🩺'];
 const STATUS_LABEL: Record<MessageStatus, string> = { sent: 'Sent', delivered: 'Delivered', read: 'Seen' };
@@ -109,7 +110,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
       setError(null);
       if (list.some((message) => message.sender_id !== user?.id)) void markConversationSeen(id, privacy.readReceipts);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not load messages.');
+      setError(friendlyError(caught, 'Could not load messages.'));
     } finally {
       setLoading(false);
     }
@@ -120,7 +121,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
     queueMicrotask(() => { if (live) { setLoading(true); setMessages([]); setReply(null); } });
     (groupId ? Promise.resolve(groupId) : getOrCreateFriendConversation(friendId))
       .then(async (id) => { if (!live) return; setChatId(id); await refresh(id); })
-      .catch((caught) => { if (live) { setError(caught instanceof Error ? caught.message : 'Could not open this conversation.'); setLoading(false); } });
+      .catch((caught) => { if (live) { setError(friendlyError(caught, 'Could not open this conversation.')); setLoading(false); } });
     return () => { live = false; };
   }, [friendId, groupId, refresh]);
 
@@ -167,7 +168,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
       else { await sendVoiceNote(chatId, url, note.seconds); void announceMessage(chatId, friendId); }
       await refresh(chatId);
     } catch (caught) {
-      setNotice(caught instanceof Error ? caught.message : 'Could not send this recording.');
+      setNotice(friendlyError(caught, 'Could not send this recording.'));
     } finally {
       setBusy(false);
     }
@@ -185,7 +186,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
       setReply(null);
       await refresh(chatId);
     } catch (caught) {
-      setNotice(caught instanceof Error ? caught.message : 'Could not send this message.');
+      setNotice(friendlyError(caught, 'Could not send this message.'));
     } finally {
       setBusy(false);
     }
@@ -203,7 +204,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
       setBusy(false);
       await send({ media });
     } catch (caught) {
-      setNotice(caught instanceof Error ? caught.message : 'Could not send these photos.');
+      setNotice(friendlyError(caught, 'Could not send these photos.'));
       setBusy(false);
     }
   }
@@ -225,7 +226,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
         setBusy(false);
         await send({ doc: uploaded });
       } catch (caught) {
-        setNotice(caught instanceof Error ? caught.message : 'Could not send this document.');
+        setNotice(friendlyError(caught, 'Could not send this document.'));
         setBusy(false);
       }
     };

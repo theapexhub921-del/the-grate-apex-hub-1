@@ -4,6 +4,7 @@ import { doc, updateDoc, setDoc } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
 import type { AuthUser } from '@/hooks/use-auth';
+import { friendlyError } from '@/lib/errors';
 
 // First-run introduction ("onboarding") state.
 //
@@ -131,7 +132,7 @@ export async function acceptCurrentLegalVersions(): Promise<{ error: string | nu
     );
     return { error: null };
   } catch (problem) {
-    return { error: problem instanceof Error ? problem.message : 'Could not save your acceptance. Please try again.' };
+    return { error: friendlyError(problem, 'Could not save your acceptance. Please try again.') };
   }
 }
 

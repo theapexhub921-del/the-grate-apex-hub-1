@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { friendlyError } from '@/lib/errors';
 
 export function ClassAccessCard({ target, current, lessonsComplete, lessonsTotal, trialUsed, trialExpiresAt, onStartTrial, onBack }: {
   target: ClassSelection;
@@ -48,7 +49,7 @@ export function ClassAccessCard({ target, current, lessonsComplete, lessonsTotal
       onStartTrial();
     } catch (err: any) {
       setSaving(false);
-      setError(err?.message ?? 'The free trial could not be saved. Try again.');
+      setError(friendlyError(err, 'The free trial could not be saved. Try again.'));
     }
   }
   return <Card style={styles.card} tone="insight">

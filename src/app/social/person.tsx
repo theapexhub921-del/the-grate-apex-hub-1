@@ -19,6 +19,7 @@ import { getPublicProfile, type PublicProfile, sendFriendRequest, unfollowLearne
 import { useAuth } from '@/hooks/use-auth';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { param } from '@/lib/routes';
+import { friendlyError } from '@/lib/errors';
 
 // /social/person?user=<uid> — another learner's profile: who they are, their
 // real follower / following counts, Follow (or Follow back / Following),
@@ -40,7 +41,7 @@ export default function PersonScreen() {
     try {
       setProfile(await getPublicProfile(uid));
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'This profile could not be loaded.');
+      setError(friendlyError(problem, 'This profile could not be loaded.'));
     }
   }, [uid]);
 
@@ -60,7 +61,7 @@ export default function PersonScreen() {
       else await sendFriendRequest(profile.userId);
       await load();
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'That did not work. Please try again.');
+      setError(friendlyError(problem, 'That did not work. Please try again.'));
     } finally {
       setBusy(false);
     }

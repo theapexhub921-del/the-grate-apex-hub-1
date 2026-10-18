@@ -15,6 +15,7 @@ import { listVisibleStudyGroups, type StudyGroup } from '@/data/community';
 import { personName, useSocial } from '@/data/social';
 import { auth } from '@/lib/firebase';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 export default function ConferencesScreen() {
   const styles = useThemedStyles(createStyles);
@@ -43,7 +44,7 @@ export default function ConferencesScreen() {
       setConferences(upcoming);
       setGroups(groupList);
     }
-    catch (e) { setError(e instanceof Error ? e.message : 'Could not load conferences.'); }
+    catch (e) { setError(friendlyError(e, 'Could not load conferences.')); }
   }
   useEffect(() => { queueMicrotask(() => { void reload(); }); }, []);
 
@@ -52,7 +53,7 @@ export default function ConferencesScreen() {
     try {
       const [thread, people] = await Promise.all([listConferenceMessages(conf.id), conferenceParticipants(conf.id)]);
       setMessages(thread); setParticipants(people.filter((p) => p.status !== 'left').map((p) => p.user_id)); setError('');
-    } catch (e) { setError(e instanceof Error ? e.message : 'Could not open this conference.'); }
+    } catch (e) { setError(friendlyError(e, 'Could not open this conference.')); }
   }
 
   async function create() {
@@ -63,7 +64,7 @@ export default function ConferencesScreen() {
       if (Number.isNaN(start.getTime())) throw new Error('Enter a valid conference date and time.');
       const conf = await createConference({ name: name.trim(), topic: topic.trim(), starts_at: start.toISOString(), group_id: groupId }, invitees);
       setName(''); setTopic(''); setInvitees([]); await reload(); await open(conf);
-    } catch (e) { setError(e instanceof Error ? e.message : 'Could not schedule the conference.'); }
+    } catch (e) { setError(friendlyError(e, 'Could not schedule the conference.')); }
     finally { setBusy(false); }
   }
 
@@ -73,14 +74,14 @@ export default function ConferencesScreen() {
       setBusy(true); setError('');
       if (join) await joinConference(selected.id); else await leaveConference(selected.id);
       await open(selected);
-    } catch (e) { setError(e instanceof Error ? e.message : 'Could not update your attendance.'); }
+    } catch (e) { setError(friendlyError(e, 'Could not update your attendance.')); }
     finally { setBusy(false); }
   }
 
   async function send() {
     if (!selected || !draft.trim()) return;
     try { const msg = await sendConferenceMessage(selected.id, draft); setMessages((old) => [...old, msg]); setDraft(''); }
-    catch (e) { setError(e instanceof Error ? e.message : 'Could not send the message.'); }
+    catch (e) { setError(friendlyError(e, 'Could not send the message.')); }
   }
 
   return <Screen width="wide">

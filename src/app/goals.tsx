@@ -11,6 +11,7 @@ import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import { createPersonalGoal, deletePersonalGoal, listPersonalGoals, refreshProgressGoals, type PersonalGoal } from '@/data/planning';
 import { getProgressSnapshot } from '@/data/progress';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 const GOAL_TYPES: { value: PersonalGoal['goal_type']; label: string }[] = [
   { value: 'lessons', label: 'Lessons' }, { value: 'xp', label: 'XP' }, { value: 'streak', label: 'Streak days' },
@@ -34,7 +35,7 @@ export default function GoalsScreen() {
       await refreshProgressGoals({ lessonsCompleted: progress.lessonsCompleted, xp: progress.xp, streak: progress.streak });
       setGoals(await listPersonalGoals());
       setError('');
-    } catch (e) { setError(e instanceof Error ? e.message : 'Could not load your goals.'); }
+    } catch (e) { setError(friendlyError(e, 'Could not load your goals.')); }
     finally { setBusy(false); }
   }
 
@@ -48,12 +49,12 @@ export default function GoalsScreen() {
       await createPersonalGoal({ title: title.trim(), goal_type: kind, target: value, deadline: deadline.trim() || null });
       setTitle(''); setDeadline('');
       await reload();
-    } catch (e) { setError(e instanceof Error ? e.message : 'Could not save the goal.'); }
+    } catch (e) { setError(friendlyError(e, 'Could not save the goal.')); }
   }
 
   async function remove(id: string) {
     try { await deletePersonalGoal(id); setGoals((old) => old.filter((goal) => goal.id !== id)); }
-    catch (e) { setError(e instanceof Error ? e.message : 'Could not remove the goal.'); }
+    catch (e) { setError(friendlyError(e, 'Could not remove the goal.')); }
   }
 
   return <Screen width="content">

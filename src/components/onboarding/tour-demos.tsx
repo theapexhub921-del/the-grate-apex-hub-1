@@ -25,6 +25,7 @@ import { subjects } from '@/data/subjects';
 import { setDisplayName, useDisplayName } from '@/data/user';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { enableDeviceNotifications } from '@/lib/device-notifications';
+import { friendlyError } from '@/lib/errors';
 
 // Miniature, working pieces of GRATEAPEX for the first-run introduction.
 // Everything here is PRACTICE: answers, XP and schedules shown are examples
@@ -659,7 +660,7 @@ export function UsernameDemo({ done, onDone }: DemoProps) {
       setSaved(true);
       onDone();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not save your username. Please try again.');
+      setError(friendlyError(caught, 'Could not save your username. Please try again.'));
     } finally {
       setBusy(false);
     }

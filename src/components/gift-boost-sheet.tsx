@@ -13,6 +13,7 @@ import { usePowerups } from '@/data/learning/powerups';
 import { personName, type SocialPerson, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { friendlyError } from '@/lib/errors';
 
 // "Gift a boost": pick one of your XP boosts and an accepted friend. The boost
 // leaves your inventory and arrives in theirs (data/boost-gifts.ts).
@@ -48,7 +49,7 @@ export function GiftBoostSheet({ visible, onClose, boostId }: { visible: boolean
       setChosen(null);
       setFriend(null);
     } catch (error) {
-      setMessage({ text: error instanceof Error ? error.message : 'The boost could not be sent. Please try again.', ok: false });
+      setMessage({ text: friendlyError(error, 'The boost could not be sent. Please try again.'), ok: false });
     } finally {
       setBusy(false);
     }
