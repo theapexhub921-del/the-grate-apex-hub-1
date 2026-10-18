@@ -16,6 +16,14 @@ import type { TractState } from '@/data/simulations/sensory-tracts';
 import type { ShockState } from '@/data/simulations/shock';
 import type { SoundsState } from '@/data/simulations/sounds-jvp';
 import type { ReflexState } from '@/data/simulations/stretch-reflex';
+import type { MechanicsState } from '@/data/simulations/breathing-mechanics';
+import type { SpiroState } from '@/data/simulations/spirometry';
+import type { ComplianceState } from '@/data/simulations/lung-compliance';
+import type { VentilationState } from '@/data/simulations/alveolar-ventilation';
+import type { DissociationState } from '@/data/simulations/o2-dissociation';
+import type { VqState } from '@/data/simulations/vq-matching';
+import type { ControlState } from '@/data/simulations/breathing-control';
+import type { AltitudeState } from '@/data/simulations/altitude-hypoxia';
 import type { SimState } from '@/data/simulations/types';
 import type { FlowState } from '@/data/simulations/vessel-flow';
 
@@ -33,6 +41,14 @@ import { PainGateGraphic } from './pain-gate';
 import { PvLoopGraphic } from './pv-loop';
 import { ReceptorAdaptationGraphic } from './receptor-adaptation';
 import { SensoryTractsGraphic } from './sensory-tracts';
+import { BreathingMechanicsGraphic } from './breathing-mechanics';
+import { SpirometryGraphic } from './spirometry';
+import { LungComplianceGraphic } from './lung-compliance';
+import { AlveolarVentilationGraphic } from './alveolar-ventilation';
+import { O2DissociationGraphic } from './o2-dissociation';
+import { VqMatchingGraphic } from './vq-matching';
+import { BreathingControlGraphic } from './breathing-control';
+import { AltitudeHypoxiaGraphic } from './altitude-hypoxia';
 import type { GraphicProps } from './shared';
 import { ShockGraphic } from './shock';
 import { SoundsJvpGraphic } from './sounds-jvp';
@@ -78,6 +94,22 @@ export function SimulationGraphic({ id, ...props }: GraphicProps<SimState> & { i
       return <BasalGangliaGraphic {...(props as GraphicProps<BasalState>)} />;
     case 'brain-lesion':
       return <BrainLesionGraphic {...(props as GraphicProps<BrainState>)} />;
+    case 'breathing-mechanics':
+      return <BreathingMechanicsGraphic {...(props as GraphicProps<MechanicsState>)} />;
+    case 'spirometry':
+      return <SpirometryGraphic {...(props as GraphicProps<SpiroState>)} />;
+    case 'lung-compliance':
+      return <LungComplianceGraphic {...(props as GraphicProps<ComplianceState>)} />;
+    case 'alveolar-ventilation':
+      return <AlveolarVentilationGraphic {...(props as GraphicProps<VentilationState>)} />;
+    case 'o2-dissociation':
+      return <O2DissociationGraphic {...(props as GraphicProps<DissociationState>)} />;
+    case 'vq-matching':
+      return <VqMatchingGraphic {...(props as GraphicProps<VqState>)} />;
+    case 'breathing-control':
+      return <BreathingControlGraphic {...(props as GraphicProps<ControlState>)} />;
+    case 'altitude-hypoxia':
+      return <AltitudeHypoxiaGraphic {...(props as GraphicProps<AltitudeState>)} />;
     default:
       return null;
   }

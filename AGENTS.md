@@ -159,7 +159,7 @@ Learning remarks are currently in:
 
 ## Lesson simulations (interactive models)
 
-The interactive layer has a fourth step type, `simulate` (`SimulationStep` in `src/data/lesson-types.ts`). Each Cardiovascular Physiology and Central Nervous System lesson has one, placed just before its final recall prompt.
+The interactive layer has a fourth step type, `simulate` (`SimulationStep` in `src/data/lesson-types.ts`). Each Cardiovascular Physiology, Central Nervous System and Respiratory Physiology lesson has one, placed just before its final recall prompt. Newer topics use the shared helpers in `src/data/topics/sim-helpers.ts` and the drawing kit `graphics/kit.tsx`.
 
 * **Models** (pure, testable): `src/data/simulations/<id>.ts`, registered in `src/data/simulations/index.ts`. A model takes control values and returns readouts, plus anything its drawing needs. Each lists its controls, readouts, Explore situations and Challenges, and a `modelNote` saying what is simplified and where the numbers come from (lecture slides; any textbook value is labelled).
 * **Drawings**: `src/components/learning/simulations/graphics/<id>.tsx` (react-native-svg, theme colours only), chosen in `graphics/index.tsx`.

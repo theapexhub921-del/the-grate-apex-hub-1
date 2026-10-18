@@ -19,7 +19,7 @@ export const respiratoryPhysiology = buildTopic({
   emoji: '🫁',
   source: 'Lecture: Respiratory System',
   sourceFileIds: contentTopics.find((topic) => topic.id === TOPIC_ID)?.sourceFileIds ?? [],
-  contentVersion: 1,
+  contentVersion: 2,
   concepts,
   lessons,
   questions,

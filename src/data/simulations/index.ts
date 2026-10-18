@@ -18,6 +18,14 @@ import { sensoryTracts } from '@/data/simulations/sensory-tracts';
 import { shock } from '@/data/simulations/shock';
 import { soundsJvp } from '@/data/simulations/sounds-jvp';
 import { stretchReflex } from '@/data/simulations/stretch-reflex';
+import { breathingMechanics } from '@/data/simulations/breathing-mechanics';
+import { spirometry } from '@/data/simulations/spirometry';
+import { lungCompliance } from '@/data/simulations/lung-compliance';
+import { alveolarVentilation } from '@/data/simulations/alveolar-ventilation';
+import { o2Dissociation } from '@/data/simulations/o2-dissociation';
+import { vqMatching } from '@/data/simulations/vq-matching';
+import { breathingControl } from '@/data/simulations/breathing-control';
+import { altitudeHypoxia } from '@/data/simulations/altitude-hypoxia';
 import type { SimDefinition, SimValues } from '@/data/simulations/types';
 import { vesselFlow } from '@/data/simulations/vessel-flow';
 
@@ -41,6 +49,15 @@ export const SIMULATIONS: Record<SimulationId, SimDefinition> = {
   'cerebellar-reach': cerebellarReach,
   'basal-ganglia': basalGanglia,
   'brain-lesion': brainLesion,
+  // Respiratory Physiology
+  'breathing-mechanics': breathingMechanics,
+  'spirometry': spirometry,
+  'lung-compliance': lungCompliance,
+  'alveolar-ventilation': alveolarVentilation,
+  'o2-dissociation': o2Dissociation,
+  'vq-matching': vqMatching,
+  'breathing-control': breathingControl,
+  'altitude-hypoxia': altitudeHypoxia,
 };
 
 export function getSimulation(id: SimulationId): SimDefinition | undefined {

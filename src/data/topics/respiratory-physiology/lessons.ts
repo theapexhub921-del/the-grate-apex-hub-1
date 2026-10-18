@@ -1,6 +1,7 @@
 // Physiology → Respiratory Physiology: the nine lessons (reading layer).
 import type { LessonDraft } from '@/data/topics/build';
 import { interactive } from '@/data/topics/respiratory-physiology/interactive';
+import { withSimulation } from '@/data/topics/respiratory-physiology/simulations';
 import { GUYTON, pdf, rs, TOPIC_ID, type ConceptId } from '@/data/topics/respiratory-physiology/sources';
 
 type Draft = LessonDraft<ConceptId>;
@@ -1100,5 +1101,5 @@ const lesson9: Draft = {
 
 export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7, lesson8, lesson9].map((lesson) => ({
   ...lesson,
-  interactive: interactive[lesson.id],
+  interactive: withSimulation(lesson.id, interactive[lesson.id]),
 }));

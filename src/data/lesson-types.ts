@@ -312,7 +312,16 @@ export type SimulationId =
   | 'motor-lesion'
   | 'cerebellar-reach'
   | 'basal-ganglia'
-  | 'brain-lesion';
+  | 'brain-lesion'
+  // Respiratory Physiology
+  | 'breathing-mechanics'
+  | 'spirometry'
+  | 'lung-compliance'
+  | 'alveolar-ventilation'
+  | 'o2-dissociation'
+  | 'vq-matching'
+  | 'breathing-control'
+  | 'altitude-hypoxia';
 
 // What the model must show after a prediction is run (checked by
 // tests/simulations.test.mjs, so a prediction's answer always matches
