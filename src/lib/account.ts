@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { deleteUser, signOut } from 'firebase/auth';
+import { Platform } from 'react-native';
+import { deleteUser, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup, signOut, type User } from 'firebase/auth';
 import { deleteDoc, doc } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
@@ -21,6 +22,48 @@ export const FULL_ACCOUNT_DELETION = Boolean(ACCOUNT_DELETION_URL);
 const SIGN_IN_AGAIN =
   'For your security, please sign out, sign in again, and then delete your account within a few minutes.';
 
+/** How the learner confirms who they are before deleting: their password, or Google. */
+export type DeleteConfirmation = 'password' | 'google' | 'sign-in-again';
+
+/**
+ * Firebase asks for a fresh sign-in before an account can be deleted. Rather
+ * than sending the learner away to sign out and in again, the delete dialog
+ * confirms their identity on the spot: a password field for email accounts,
+ * a Google pop-up for Google accounts (web). Phones signed in with Google
+ * still need to sign in again, as before.
+ */
+export function deleteConfirmationFor(user: User | null = auth.currentUser): DeleteConfirmation {
+  const providers = (user?.providerData ?? []).map((info) => info.providerId);
+  if (providers.includes('password')) return 'password';
+  if (providers.includes('google.com') && Platform.OS === 'web') return 'google';
+  return 'sign-in-again';
+}
+
+async function confirmIdentity(user: User, password: string | undefined): Promise<string | null> {
+  const way = deleteConfirmationFor(user);
+  try {
+    if (way === 'password') {
+      if (!password) return 'Please enter your password to confirm.';
+      if (!user.email) return SIGN_IN_AGAIN;
+      await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password));
+      return null;
+    }
+    if (way === 'google') {
+      await reauthenticateWithPopup(user, new GoogleAuthProvider());
+      return null;
+    }
+    return SIGN_IN_AGAIN;
+  } catch (error: any) {
+    const code = String(error?.code ?? '');
+    if (code === 'auth/wrong-password' || code === 'auth/invalid-credential' || code === 'auth/invalid-login-credentials') return 'That password is not right. Please try again.';
+    if (code === 'auth/too-many-requests') return 'Too many attempts. Please wait a few minutes and try again.';
+    if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return 'Google confirmation was cancelled, so nothing was deleted.';
+    if (code === 'auth/user-mismatch') return 'Please confirm with the same Google account you are signed in with.';
+    if (code === 'auth/network-request-failed') return 'No connection. Please check your internet and try again.';
+    return 'We could not confirm it is you. Please try again.';
+  }
+}
+
 async function clearLocalCache(userId: string) {
   try {
     const keys = await AsyncStorage.getAllKeys();
@@ -30,14 +73,19 @@ async function clearLocalCache(userId: string) {
   }
 }
 
-export async function deleteMyAccount(): Promise<{ error: string | null }> {
+export async function deleteMyAccount(options: { password?: string } = {}): Promise<{ error: string | null }> {
   const user = auth.currentUser;
   if (!user) return { error: 'You are not signed in.' };
   const userId = user.uid;
 
   try {
-    const { authTime, token } = await user.getIdTokenResult();
-    if (!(Date.now() - Date.parse(authTime) < RECENT_SIGN_IN_MS)) return { error: SIGN_IN_AGAIN };
+    // Confirm who it is first, unless they signed in moments ago.
+    const { authTime } = await user.getIdTokenResult();
+    if (!(Date.now() - Date.parse(authTime) < RECENT_SIGN_IN_MS)) {
+      const problem = await confirmIdentity(user, options.password);
+      if (problem) return { error: problem };
+    }
+    const { token } = await user.getIdTokenResult(true);
 
     if (FULL_ACCOUNT_DELETION) {
       // Everything, on the trusted server (server/account-deletion.mjs).
