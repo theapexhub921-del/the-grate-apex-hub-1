@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { BackLink } from '@/components/learning/nav-bits';
+import { SimulationLibrary } from '@/components/learning/simulation-library';
 import { SkeletonAtlas } from '@/components/learning/skeleton-atlas';
 import { LegacyCourseTile } from '@/components/learning/legacy-course-tile';
 import { CoursePracticeModes } from '@/components/learning/course-practice-modes';
@@ -45,8 +46,10 @@ export default function LegacyCourseScreen() {
   const [sets, setSets] = useState<{ id: string; name: string; count: number }[] | null>(null);
   const [sectionsRead, setSectionsRead] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
-  // Anatomy also has the 3D skeleton atlas: add &tab=atlas to the address (e.g. ?course=hb2-anatomy&tab=atlas) to open it directly.
-  const [tab, setTab] = useState<'lessons' | 'atlas'>(param(params.tab) === 'atlas' ? 'atlas' : 'lessons');
+  // Anatomy also has the 3D skeleton atlas and HB2 Physiology the lesson simulations, each on its own tab:
+  // add &tab=atlas or &tab=simulations to the address to open it directly.
+  const startTab = param(params.tab);
+  const [tab, setTab] = useState<'lessons' | 'atlas' | 'simulations'>(startTab === 'atlas' || startTab === 'simulations' ? startTab : 'lessons');
 
   useEffect(() => {
     if (!course) return;
@@ -65,6 +68,8 @@ export default function LegacyCourseScreen() {
 
   // The anatomy courses (HB1 "anatomy" and HB2 "hb2-anatomy") also have the 3D skeleton atlas.
   const isAnatomy = course.id === 'anatomy' || course.id === 'hb2-anatomy';
+  // HB2 Physiology is built from this app's lessons, which have the simulations.
+  const isPhysiology = course.subject === 'physiology';
 
   const done = lessons.filter((lesson) => completed.has(lesson.id)).length;
   // Topics (HB2): each gets a clear heading in the path — its number, lessons and progress.
@@ -116,9 +121,23 @@ export default function LegacyCourseScreen() {
           style={styles.tabs}
         />
       ) : null}
+      {isPhysiology ? (
+        <SegmentedControl
+          label="Physiology sections"
+          value={tab}
+          onChange={setTab}
+          options={[
+            { value: 'lessons', label: 'Lessons' },
+            { value: 'simulations', label: 'Simulations' },
+          ]}
+          style={styles.tabs}
+        />
+      ) : null}
 
       {isAnatomy && tab === 'atlas' ? (
         <SkeletonAtlas />
+      ) : isPhysiology && tab === 'simulations' ? (
+        <SimulationLibrary subject="physiology" />
       ) : (
         <>
       {review && review.tracked > 0 ? (

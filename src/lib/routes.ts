@@ -52,6 +52,9 @@ export const routes = {
     valid(courseId)
       ? (`/learn/hb-course${query({ course: courseId, viewClass: selection?.classId, viewSemester: selection?.semester })}` as Href)
       : fallback('legacyCourse', '/learn'),
+  /** One lesson's simulation on its own page (Physiology → Simulations tab). */
+  simulation: (lessonId: string | null | undefined) =>
+    valid(lessonId) ? (`/learn/simulation${query({ lesson: lessonId })}` as Href) : fallback('simulation', '/learn'),
   legacyLesson: (lessonId: string | null | undefined, section?: number, tab?: 'cards' | 'glossary') =>
     valid(lessonId) ? (`/learn/hb-lesson${query({ lesson: lessonId, section, tab })}` as Href) : fallback('legacyLesson', '/learn'),
   legacyPractice: (options: {

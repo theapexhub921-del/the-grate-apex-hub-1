@@ -33,14 +33,17 @@ import { param, routes } from '@/lib/routes';
 // `atlas` (optional): an interactive atlas for the subject. When given, the page gets a
 // Courses | Atlas switch under its title, and the Atlas tab shows it in place of the course list.
 // Opening /learn/anatomy?tab=atlas lands straight on the atlas.
-export function SubjectScreen({ subject, atlas }: { subject: SubjectId; atlas?: ReactNode }) {
+// `simulations` (optional): the same, as a Courses | Simulations switch (Physiology; ?tab=simulations).
+export function SubjectScreen({ subject, atlas, simulations }: { subject: SubjectId; atlas?: ReactNode; simulations?: ReactNode }) {
   const styles = useThemedStyles(createStyles);
   const { width } = useWindowDimensions();
   const desktop = isDesktopWidth(width);
   const { user } = useAuth();
   const params = useLocalSearchParams<{ viewClass?: string | string[]; viewSemester?: string | string[]; tab?: string | string[] }>();
-  const [tab, setTab] = useState<'courses' | 'atlas'>(param(params.tab) === 'atlas' ? 'atlas' : 'courses');
+  const startTab = param(params.tab);
+  const [tab, setTab] = useState<'courses' | 'atlas' | 'simulations'>(startTab === 'atlas' || startTab === 'simulations' ? startTab : 'courses');
   const showAtlas = Boolean(atlas) && tab === 'atlas';
+  const showSimulations = Boolean(simulations) && tab === 'simulations';
   const ownSelection = readClassSelection(user?.user_metadata);
   const trial = readAcademicTrial(user?.user_metadata);
   const viewSelection = makeClassSelection(param(params.viewClass), Number(param(params.viewSemester))) ?? ownSelection;
@@ -109,9 +112,23 @@ export function SubjectScreen({ subject, atlas }: { subject: SubjectId; atlas?: 
           style={styles.tabs}
         />
       ) : null}
+      {simulations ? (
+        <SegmentedControl
+          label={`${info.name} sections`}
+          value={tab}
+          onChange={setTab}
+          options={[
+            { value: 'courses', label: 'Courses' },
+            { value: 'simulations', label: 'Simulations' },
+          ]}
+          style={styles.tabs}
+        />
+      ) : null}
 
       {showAtlas ? (
         atlas
+      ) : showSimulations ? (
+        simulations
       ) : (
         <>
       {status === 'available' ? (
