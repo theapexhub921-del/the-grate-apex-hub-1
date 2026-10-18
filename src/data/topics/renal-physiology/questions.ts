@@ -13,8 +13,8 @@ const lesson1: Q[] = [
   multi('q1-02', 'urinary-system', 'Which hormones or enzymes does the kidney produce? Select all that apply.', ['Renin', 'Erythropoietin'], ['Insulin', 'Aldosterone'], { explanation: 'Slide 4.' }),
   mcq('q1-03', 'kidney-structure', 'The kidneys lie…', 'Retroperitoneally on the posterior abdominal wall', ['Within the peritoneal cavity', 'In the pelvis', 'Anterior to the liver'], { explanation: 'Slide 5.' }),
   mcq('q1-04', 'kidney-structure', 'What passes through the renal hilum?', 'Renal artery, renal vein and ureter', ['Only the ureter', 'The adrenal vein', 'The renal pyramids'], { explanation: 'Slide 5.' }),
-  mcq('q1-05', 'kidney-structure', 'How many renal pyramids does the lecture describe in the medulla?', 'Seven', ['Three', 'Twelve', 'One'], { explanation: 'Slide 6.' }),
-  mcq('q1-06', 'nephron-types', 'About how many nephrons are there in each kidney?', '1.25 million', ['125,000', '12.5 million', '1,000'], { explanation: 'Slide 9.' }),
+  // mcq('q1-05', 'kidney-structu… retired: the slide figure disagrees with Guyton (see discrepancies).
+  // mcq('q1-06', 'nephron-types'… retired: the slide figure disagrees with Guyton (see discrepancies).
   mcq('q1-07', 'nephron-vessels', 'The vasa recta arise from…', 'Efferent arterioles of juxtamedullary nephrons', ['Afferent arterioles', 'The renal vein', 'Efferent arterioles of cortical nephrons only'], { explanation: 'Slide 13.' }),
   mcq('q1-08', 'nephron-vessels', 'Why is the glomerular endothelium exceptionally porous?', 'It is heavily fenestrated', ['It has no basement membrane', 'It lacks tight junctions only', 'It is made of podocytes'], { explanation: 'Slide 11.' }),
   order('q1-09', 'nephron-tubule', 'Order the parts of the renal tubule.', ['Bowman’s capsule', 'Proximal convoluted tubule', 'Loop of Henle', 'Distal convoluted tubule', 'Collecting duct'], { explanation: 'Slides 15–17.' }),

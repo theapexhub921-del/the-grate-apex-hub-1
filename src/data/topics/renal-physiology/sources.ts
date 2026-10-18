@@ -65,7 +65,30 @@ export const concepts = {
 
 export type ConceptId = keyof typeof concepts;
 
+// Reference textbook (clarification only).
+const GUYTON: SourceReference[] = [{ sourceId: 'guyton-hall-14e' }];
+
 export const discrepancies: SourceDiscrepancy[] = [
+  {
+    id: 'renal-pyramid-number',
+    concept: 'Number of renal pyramids',
+    status: 'unresolved',
+    statements: [
+      { text: 'Slide 6: the medulla is “made up of seven cone-shaped medullary or renal pyramids”.', sourceRefs: rs([6]) },
+      { text: 'Guyton: the medulla is divided into 8 to 10 cone-shaped renal pyramids.', sourceRefs: GUYTON },
+    ],
+    note: 'Not quizzed (question q1-05 retired).',
+  },
+  {
+    id: 'nephron-number',
+    concept: 'Number of nephrons in each kidney',
+    status: 'unresolved',
+    statements: [
+      { text: 'Slide 9: each kidney contains about 1.25 million nephrons.', sourceRefs: rs([9]) },
+      { text: 'Guyton: each kidney contains about 800,000 to 1,000,000 nephrons.', sourceRefs: GUYTON },
+    ],
+    note: 'Not quizzed (question q1-06 retired).',
+  },
   {
     id: 'ph-range',
     concept: 'Normal arterial pH',

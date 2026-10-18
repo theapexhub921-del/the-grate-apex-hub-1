@@ -51,12 +51,14 @@ const lesson1: Draft = {
         { label: 'Major calyces' },
         { label: 'Renal pelvis', detail: 'Leaves at the hilum and drains into the ureter.' },
       ],
+      notes: [{ kind: 'check', text: 'Slide 6 gives seven renal pyramids; Guyton gives 8 to 10. Not quizzed — confirm with the lecturer.' }],
       sourceRefs: rs([5, 6, 7]),
     },
     {
       title: 'Two kinds of nephron',
       kind: 'comparison',
       paragraphs: ['The nephron is the structural and functional unit of the kidney; each kidney has about 1.25 million (slide 9).'],
+      notes: [{ kind: 'check', text: 'Slide 9 gives about 1.25 million nephrons per kidney; Guyton gives about 800,000 to 1,000,000. The number is not quizzed.' }],
       table: {
         columns: ['', 'Cortical (~85%)', 'Juxtamedullary (~15%)'],
         rows: [
