@@ -58,7 +58,7 @@ export async function loadFriendStreak(friendId: string, options: { fresh?: bool
     const messages = snap.docs.map((item) => {
       const d = item.data();
       const at = d.createdAt?.toMillis ? d.createdAt.toMillis() : Date.now();
-      return { sender_id: String(d.from ?? ''), created_at: new Date(at).toISOString() };
+      return { sender_id: String(d.from ?? ''), created_at: new Date(at).toISOString(), stump: d.share?.kind === 'stump' };
     });
     const status = friendStreakStatus(messages, me, friendId, Date.now(), covered);
     cache.set(chatId, { at: Date.now(), status });

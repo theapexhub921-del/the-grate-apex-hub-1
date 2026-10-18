@@ -5,14 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { Radius, type ThemeColors } from '@/constants/theme';
-import type { FriendStreakStatus } from '@/data/friend-streaks';
+import { type FriendStreakStatus, STUMP_STREAKS_FROM } from '@/data/friend-streaks';
 import { protectFriendStreak } from '@/data/friend-streak-store';
 import { RESTORE_COST } from '@/data/learning/streak-rules';
 import { useProgress } from '@/data/progress';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
-// Under a chat's header: "message each other today" while a friend streak is at
+// Under a chat's header: "stump each other today" while a friend streak is at
 // risk, and the freeze / coin restore when one has just ended (data/friend-streaks.ts).
+// During the changeover days (before STUMP_STREAKS_FROM) a message still counts,
+// and the notice says that stumps will be needed.
 export function FriendStreakNotice({ status, friendId, friendName, onChanged }: { status: FriendStreakStatus | null; friendId: string; friendName: string; onChanged: () => void }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
@@ -20,6 +22,7 @@ export function FriendStreakNotice({ status, friendId, friendName, onChanged }: 
   const [busy, setBusy] = useState<'freeze' | 'coins' | null>(null);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
   if (!status) return null;
+  const switchDay = new Date(`${STUMP_STREAKS_FROM}T12:00:00`).toLocaleDateString([], { day: 'numeric', month: 'long' });
 
   async function protect(method: 'freeze' | 'coins') {
     setBusy(method);
@@ -42,7 +45,7 @@ export function FriendStreakNotice({ status, friendId, friendName, onChanged }: 
       <View style={styles.box}>
         <View style={styles.row}>
           <Icon name="streak" size={16} color={colors.warningStrong} />
-          <Text style={styles.text}>Your {status.lost.streak}-day streak with {friendName} ended: {days === 1 ? 'a day' : `${days} days`} without you both messaging.</Text>
+          <Text style={styles.text}>Your {status.lost.streak}-day streak with {friendName} ended: {days === 1 ? 'a day' : `${days} days`} without you both stumping each other.</Text>
         </View>
         <View style={styles.actions}>
           <Button label={`Use ${days} freeze${days === 1 ? '' : 's'}`} size="sm" variant="secondary" onPress={() => void protect('freeze')} loading={busy === 'freeze'} disabled={!enough || busy !== null} accessibilityHint={`You have ${progress.streakFreezes}`} />
@@ -54,13 +57,28 @@ export function FriendStreakNotice({ status, friendId, friendName, onChanged }: 
     );
   }
 
-  if (status.atRisk) {
-    const waiting = !status.meToday ? 'Send a message today' : !status.friendToday ? `${friendName} hasn’t messaged today yet` : '';
+  if (status.atRisk && status.stumpsNeeded) {
+    const waiting = !status.meToday ? `Stump ${friendName} today` : !status.friendToday ? `${friendName} hasn’t stumped you today yet` : '';
     return (
       <View style={[styles.box, styles.soft]}>
         <View style={styles.row}>
           <Icon name="streak" size={16} color={colors.accentText} />
-          <Text style={styles.text}>Keep your {status.streak}-day streak: you both need to message today. {waiting}.</Text>
+          <Text style={styles.text}>Keep your {status.streak}-day streak: you both need to stump each other today. {waiting}.</Text>
+        </View>
+      </View>
+    );
+  }
+
+  // The changeover days: a message still counts, but say what is coming.
+  if (!status.stumpsNeeded && status.streak > 0 && !message) {
+    return (
+      <View style={[styles.box, styles.soft]}>
+        <View style={styles.row}>
+          <Icon name="challenge" size={16} color={colors.primaryText} />
+          <Text style={styles.text}>
+            {status.atRisk ? `Keep your ${status.streak}-day streak: you both need to message today. ` : ''}
+            From {switchDay}, friend streaks are kept by stumping each other every day. Tap the stump button beside the message box to send {friendName} a question.
+          </Text>
         </View>
       </View>
     );

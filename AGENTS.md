@@ -130,7 +130,10 @@ Social (real friends) is in `src/data/social.ts`, backed by Firestore:
 * Usernames, learner search, friend requests, and social notifications.
 * Realtime sync through Firestore snapshot listeners.
 
-"Stump a friend" (`src/data/stumps.ts`, `src/components/social/stump-card.tsx`): from quiz results, a multiple-choice question is shared to the feed as a post with `stump: { qid, note }`; friends answer on the card (answers are hidden `replies` with `stump: { pick, ok }`, saved to question history as practice, no XP). Only the sharer sees who got it right or wrong; others see only their own result. Works with the deployed Firestore rules unchanged.
+"Stump a friend" (`src/data/stumps.ts`, `src/components/social/stump-card.tsx`): a multiple-choice question sent from quiz results or from the stump button in any chat (`pickStumpQuestion` picks one the learner has answered). The composer sends it to any mix of the feed, friends (each in the private chat) and groups (`sendStump`). Answers are saved to question history as practice, no XP. Only the sender sees who got it right or wrong; others see only their own result. Works with the deployed Firestore rules unchanged.
+
+* **Feed:** a post with `stump: { qid, note }`; answers are hidden `replies` with `stump: { pick, ok }`.
+* **Chats and groups:** a message with `share: { kind: 'stump', uid, username, id: <question id>, text, note }` (the original app's shared-post shape, so it shows there as a shared post); an answer is a message with `share: { kind: 'stumpAnswer', id: <stump message id>, pick, ok }`. Answer messages are not drawn as bubbles: the stump card reads them (`chatStumpAnswers`).
 
 Database changes use Firestore rules in `firestore.rules`. Deploy them only with the owner's approval.
 
@@ -208,7 +211,7 @@ Rules in one pure, tested module: `src/data/learning/streak-rules.ts` (`tests/st
 * **Freezes:** 5 lessons completed in a week (Monday–Sunday) earn one, up to 2 stored (`streakFreezes`, `freezeWeeks`). One is used automatically for each missed day.
 * **Restore:** within 3 days of losing it, for 100 Apex Coins (`restoreStreakWithCoins` in `apex-coins.ts`; coins are given back if it fails). The old streak continues, including any study done since.
 * Saved with the progress (`progress/{uid}`: `streak`, `lastActivityDate`, `streakFreezes`, `freezeWeeks`, `lostStreak`) and on `scores/{uid}` (`streak`, `streakDay`, `streakFreezes`) so friends see it lapse.
-* **Friend streaks** (`src/data/friend-streaks.ts` rules, `src/data/friend-streak-store.ts` loading): days on which both friends messaged each other, from the chat's last 400 days. A missed day can be covered by either friend with freezes (one per day) or 100 coins; covered days are shared in `friendStreaks/{chatId}`. Shown in the chat header, the chats list and Social → Friend streaks; the chat shows "at risk" and "restore" notes (`components/chat/friend-streak-notice.tsx`).
+* **Friend streaks** (`src/data/friend-streaks.ts` rules, `src/data/friend-streak-store.ts` loading): days on which both friends **stumped each other** in their chat (owner's rule, 2026-10-18), from the chat's last 400 days. Days before `STUMP_STREAKS_FROM` (2026-10-21) count when both sent any message, so streaks that existed at the switch were kept; do not move that date backwards. Group stumps do not count toward a pair's streak. A missed day can be covered by either friend with freezes (one per day) or 100 coins; covered days are shared in `friendStreaks/{chatId}`. Shown in the chat header, the chats list and Social → Friend streaks; the chat shows "at risk" and "restore" notes (`components/chat/friend-streak-notice.tsx`).
 
 ## Stories (Instagram-style)
 

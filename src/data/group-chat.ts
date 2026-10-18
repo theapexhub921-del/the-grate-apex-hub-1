@@ -6,7 +6,8 @@
 // members may set their own reaction; only the author may delete.
 import { arrayRemove, collection, deleteDoc, deleteField, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 
-import type { CommunityMessage } from '@/data/community';
+import { cleanShare } from '@/data/chat';
+import { type CommunityMessage, type MessageShare, shareOf } from '@/data/community';
 import { auth, db } from '@/lib/firebase';
 import { cleanMedia, safeUrl, type Media } from '@/lib/media';
 
@@ -115,21 +116,23 @@ export async function listGroupMessages(groupId: string): Promise<(CommunityMess
       media: cleanMedia(d.media),
       doc: d.doc && typeof d.doc.url === 'string' && safeUrl(d.doc.url) ? { url: d.doc.url as string, name: String(d.doc.name ?? 'Document') } : null,
       fwd: d.fwd === true,
+      share: shareOf(d.share),
     };
   });
 }
 
-export async function sendGroupMessage(groupId: string, body: string, extras: { reply?: { mid: string; from: string; text: string } | null; fwd?: boolean; media?: Media[]; doc?: { url: string; name: string } | null; audio?: { url: string; seconds: number } | null } = {}) {
+export async function sendGroupMessage(groupId: string, body: string, extras: { reply?: { mid: string; from: string; text: string } | null; fwd?: boolean; media?: Media[]; doc?: { url: string; name: string } | null; audio?: { url: string; seconds: number } | null; share?: MessageShare | null } = {}) {
   const me = await myName();
   const text = body.trim();
   if (text.length > 500) throw new Error('Messages can be up to 500 characters.');
-  if (!text && !extras.media?.length && !extras.doc && !extras.audio) throw new Error('Write a message first.');
+  if (!text && !extras.media?.length && !extras.doc && !extras.audio && !extras.share) throw new Error('Write a message first.');
   const data: Record<string, unknown> = { authorUid: me.uid, authorName: me.username, text, createdAt: serverTimestamp() };
   if (extras.reply) data.reply = { mid: extras.reply.mid, from: extras.reply.from, text: extras.reply.text.slice(0, 120) };
   if (extras.fwd) data.fwd = true;
   if (extras.media?.length) data.media = extras.media.slice(0, 3).map((item) => ({ t: item.t, url: item.url }));
   if (extras.doc) data.doc = { url: extras.doc.url, name: extras.doc.name.slice(0, 100) };
   if (extras.audio) data.audio = { url: extras.audio.url, d: Math.max(1, Math.min(120, Math.round(extras.audio.seconds))) };
+  if (extras.share) data.share = cleanShare(extras.share);
   try {
     await setDoc(doc(collection(db, 'groups', groupId, 'messages')), data);
   } catch (error) {

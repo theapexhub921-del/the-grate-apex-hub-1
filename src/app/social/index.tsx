@@ -44,7 +44,7 @@ const QUICK_ACTIONS: { label: string; detail: string; icon: IconName; href: stri
 
 // Social — the academic community. Your own week is real; classmate
 // features wait for real connections (nothing here is a fake person).
-// Friend streaks: days in a row you and each friend both messaged (data/friend-streaks.ts).
+// Friend streaks: days in a row you and each friend both stumped each other (data/friend-streaks.ts).
 function FriendStreaksCard({ friends }: { friends: SocialPerson[] }) {
   const styles = useThemedStyles(createStyles);
   const [streaks, setStreaks] = useState<Record<string, number>>({});
@@ -73,7 +73,7 @@ function FriendStreaksCard({ friends }: { friends: SocialPerson[] }) {
             <Text style={styles.boardXp}>{streak} day{streak === 1 ? '' : 's'}</Text>
           </View>
         );
-      }) : <Text style={styles.note}>Add friends and message each other to start a friend streak.</Text>}
+      }) : <Text style={styles.note}>Add friends and stump each other with a question every day to start a friend streak.</Text>}
       <Text style={styles.note}>A friend streak grows each day you both send each other a message. A missed day ends it at midnight, unless you cover it with a streak freeze or restore it for {RESTORE_COST} Apex Coins (open the chat).</Text>
     </Card>
   );

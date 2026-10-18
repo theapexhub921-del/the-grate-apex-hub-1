@@ -145,7 +145,33 @@ export type CommunityMessage = {
   media?: { t: 'image' | 'video'; url: string; w?: number; h?: number }[];
   doc?: { url: string; name: string } | null;
   fwd?: boolean;
+  /** A post or Stump a friend question sent inside the message (data/stumps.ts). */
+  share?: MessageShare | null;
 };
+
+/**
+ * The message's `share` attachment, in the original app's shape ({kind, uid,
+ * username, id, text}). This app adds two kinds: 'stump' (id = the question
+ * id, plus the sender's note) and 'stumpAnswer' (id = the stump message id,
+ * plus the picked option and whether it was right).
+ */
+export type MessageShare = { kind: string; uid: string; username: string | null; id: string; text: string; note?: string; pick?: number; ok?: boolean };
+
+export function shareOf(value: unknown): MessageShare | null {
+  if (!value || typeof value !== 'object') return null;
+  const s = value as Record<string, unknown>;
+  if (typeof s.kind !== 'string' || typeof s.id !== 'string') return null;
+  return {
+    kind: s.kind,
+    uid: String(s.uid ?? ''),
+    username: typeof s.username === 'string' ? s.username : null,
+    id: s.id,
+    text: String(s.text ?? ''),
+    ...(typeof s.note === 'string' ? { note: s.note } : {}),
+    ...(typeof s.pick === 'number' ? { pick: s.pick } : {}),
+    ...(typeof s.ok === 'boolean' ? { ok: s.ok } : {}),
+  };
+}
 
 /** One of my chats, for the recent-messages list. */
 export type ConversationSummary = {
@@ -766,6 +792,7 @@ export async function listConversationMessages(conversationId: string): Promise<
       media: cleanMedia(d.media),
       doc: d.doc && typeof d.doc.url === 'string' && safeUrl(d.doc.url) ? { url: d.doc.url as string, name: String(d.doc.name ?? 'Document') } : null,
       fwd: d.fwd === true,
+      share: shareOf(d.share),
     };
   });
 }

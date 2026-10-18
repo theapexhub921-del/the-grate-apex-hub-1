@@ -24,6 +24,9 @@ import { hideMessage, isHidden, isStarred, previewOf, REACTIONS, reactToMessage,
 import { contrastRatio } from '@/data/contrast';
 import { deleteCommunityMessage, getOrCreateFriendConversation, listConversationMessages, loadConversationMeta, markConversationSeen, messageStatus, sendVoiceNote, VOICE_NOTE_MAX_SECONDS, type CommunityMessage, type ConversationMeta, type MessageStatus } from '@/data/community';
 import { FriendStreakNotice } from '@/components/chat/friend-streak-notice';
+import { StumpCard, StumpComposer, StumpUnavailable } from '@/components/social/stump-card';
+import type { ChoiceQuestion } from '@/data/questions';
+import { answerChatStump, chatStumpAnswers, pickStumpQuestion, stumpQuestion } from '@/data/stumps';
 import type { FriendStreakStatus } from '@/data/friend-streaks';
 import { loadFriendStreak } from '@/data/friend-streak-store';
 import { usePrivacyPreferences } from '@/data/settings';
@@ -85,6 +88,9 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
   const [search, setSearch] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  // Stump a friend from the chat (data/stumps.ts): the question being sent, and those already offered.
+  const [stumpQ, setStumpQ] = useState<ChoiceQuestion | null>(null);
+  const offered = useRef(new Set<string>());
   const scroll = useRef<ScrollView>(null);
   const input = useRef<RNTextInput>(null);
 
@@ -125,7 +131,8 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
   }, [chatId, refresh]);
 
   const readBlue = [...ReadReceiptBlues].sort((a, b) => contrastRatio(b, colors.primary) - contrastRatio(a, colors.primary))[0];
-  const visible = useMemo(() => (chatId ? messages.filter((message) => !isHidden(prefs, chatId, message.id)) : messages), [messages, prefs, chatId]);
+  // Answers to stumps are read by the stump's card, not shown as bubbles.
+  const visible = useMemo(() => messages.filter((message) => message.share?.kind !== 'stumpAnswer' && !(chatId && isHidden(prefs, chatId, message.id))), [messages, prefs, chatId]);
   const shown = search.trim() ? visible.filter((message) => message.body.toLowerCase().includes(search.trim().toLowerCase())) : visible;
   const pinnedId = chatId ? prefs.pinned[chatId] : undefined;
   const pinned = pinnedId ? visible.find((message) => message.id === pinnedId) : undefined;
@@ -225,6 +232,24 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
     picker.click();
   }
 
+  function openStump(another = false) {
+    if (!another) offered.current = new Set();
+    const question = pickStumpQuestion(offered.current);
+    if (!question) {
+      setNotice(another ? 'No other questions to choose from yet.' : 'Answer a few lesson questions first — then you can stump your friends with them.');
+      return;
+    }
+    offered.current.add(question.id);
+    setStumpQ(question);
+  }
+
+  async function answerStumpHere(stumpMessageId: string, question: ChoiceQuestion, pick: number) {
+    if (!chatId) throw new Error('This chat is not ready yet.');
+    const answer = await answerChatStump({ chatId, groupId: isGroup ? chatId : undefined, friendId }, stumpMessageId, question, pick, chatStumpAnswers(messages, stumpMessageId));
+    void refresh(chatId);
+    return answer;
+  }
+
   function startReply(message: CommunityMessage) {
     setReply({ mid: message.id, from: message.sender_id, text: previewOf(message) });
     setMenu(null);
@@ -317,7 +342,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
           <View style={styles.hello}>
             {isGroup ? <Avatar name={title} size={88} ring="gold" /> : <PersonAvatar uid={friendId} uri={friend?.avatarUrl ?? null} name={title} size={88} ring="gold" />}
             <Text style={styles.helloName}>{title}</Text>
-            <Text style={styles.empty}>Say hello or share what you’re studying.</Text>
+            <Text style={styles.empty}>{isGroup ? 'Say hello or share what you’re studying.' : `Stump ${title} with a question to start a friend streak: tap the stump button beside the message box.`}</Text>
           </View>
         ) : null}
         {search.trim() ? <Text style={styles.searchCount}>{shown.length} message{shown.length === 1 ? '' : 's'} found</Text> : null}
@@ -329,6 +354,8 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
           const newDay = !prev || at - Date.parse(prev.created_at) > 60 * 60_000;
           const lastOfGroup = !next || next.sender_id !== message.sender_id;
           const replied = message.reply ? byId.get(message.reply.mid) : undefined;
+          const share = message.share?.kind === 'stump' ? message.share : null;
+          const stumpQuestionNow = share ? stumpQuestion(share.id) : null;
           return (
             <View key={message.id}>
               {newDay ? <Text style={styles.day}>{dayLabel(at)}</Text> : null}
@@ -337,6 +364,23 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
                   {!mine ? <View style={styles.avatarSlot}>{lastOfGroup ? <PersonAvatar uid={message.sender_id} uri={isGroup ? null : friend?.avatarUrl ?? null} name={senderName(message)} size={28} /> : null}</View> : null}
                   <View style={[styles.stack, mine && styles.stackMine]}>
                     {isGroup && !mine && (!prev || prev.sender_id !== message.sender_id) ? <Text style={styles.sender}>{senderName(message)}</Text> : null}
+                    {share ? (
+                      <View style={styles.stumpWrap}>
+                        {stumpQuestionNow ? (
+                          <StumpCard
+                            postId={message.id}
+                            question={stumpQuestionNow}
+                            stump={{ qid: share.id, note: share.note ?? '' }}
+                            authorId={message.sender_id}
+                            authorName={senderName(message)}
+                            ownId={user?.id ?? null}
+                            people={social.people}
+                            chat={{ answers: chatStumpAnswers(messages, message.id), answer: (pick) => answerStumpHere(message.id, stumpQuestionNow, pick) }}
+                          />
+                        ) : <StumpUnavailable text={share.text} note={share.note} />}
+                        <Text style={styles.stumpTime}>{new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</Text>
+                      </View>
+                    ) : (
                     <Interactive
                       onLongPress={() => setMenu(message)}
                       onPress={canSwipe ? () => setMenu(message) : undefined}
@@ -387,6 +431,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
                         </View>
                       )}
                     </Interactive>
+                    )}
                     <Reactions message={message} me={user?.id} onPress={() => setWho(message)} />
                   </View>
                 </View>
@@ -424,6 +469,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
       ) : (
         <View style={styles.composer}>
           <Interactive onPress={() => setEmojiOpen((value) => !value)} accessibilityLabel="Emoji" style={styles.tool}><Text style={styles.emojiButton}>🙂</Text></Interactive>
+          <Interactive onPress={() => openStump()} disabled={!chatId} accessibilityRole="button" accessibilityLabel={isGroup ? 'Stump the group with a question' : `Stump ${title} with a question (keeps your friend streak)`} style={styles.tool}><Icon name="challenge" size={21} color={colors.primaryText} /></Interactive>
           <TextInput
             ref={input}
             value={draft}
@@ -495,6 +541,15 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
 
       {/* Forward to a friend */}
       {isGroup && group ? <GroupInfoSheet visible={groupInfo} group={group} onClose={() => setGroupInfo(false)} onChanged={() => chatId && void refresh(chatId)} onReport={() => { setGroupInfo(false); setReport({ type: 'user', id: group.ownerUid, label: `group “${group.name}”` }); }} /> : null}
+      <StumpComposer
+        question={stumpQ}
+        onClose={() => setStumpQ(null)}
+        feed={false}
+        friendIds={isGroup || !friendId ? [] : [friendId]}
+        groupIds={isGroup && chatId ? [chatId] : []}
+        onAnother={() => openStump(true)}
+        onSent={() => { if (chatId) void refresh(chatId); setStreakTick((n) => n + 1); }}
+      />
       <ForwardSheet message={forward} onClose={() => setForward(null)} onDone={(count) => { setForward(null); setNotice(`Forwarded to ${count} chat${count === 1 ? '' : 's'}.`); }} />
       <ReportSheet target={report} reporter={user?.profile?.username ?? null} onClose={() => setReport(null)} onHide={() => {}} onDone={() => { setReport(null); setNotice('Thanks — the team will review it.'); }} />
     </View>
@@ -674,6 +729,8 @@ function createStyles(colors: ThemeColors) {
     menuHover: { backgroundColor: colors.surfaceMuted },
     menuLabel: { fontSize: 15, fontWeight: '600', color: colors.text },
     whoRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
+    stumpWrap: { width: 340, maxWidth: '100%', gap: 4 },
+    stumpTime: { fontSize: 11, color: colors.textTertiary, alignSelf: 'flex-end' },
     whoName: { flex: 1, fontSize: 14.5, color: colors.text },
     check: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: colors.borderStrong },
     checkOn: { backgroundColor: colors.primary, borderColor: colors.primary },

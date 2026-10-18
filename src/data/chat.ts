@@ -11,6 +11,7 @@ import { collection, deleteField, doc, serverTimestamp, updateDoc, writeBatch } 
 import { Platform } from 'react-native';
 import { useSyncExternalStore } from 'react';
 
+import type { MessageShare } from '@/data/community';
 import { auth, db } from '@/lib/firebase';
 import { CLOUDINARY, safeUrl, type Media } from '@/lib/media';
 
@@ -18,7 +19,16 @@ export const REACTIONS = ['❤️', '😂', '😮', '😢', '😡', '👍', '�
 
 export type ReplyRef = { mid: string; from: string; text: string };
 export type ChatDoc = { url: string; name: string };
-export type ChatExtras = { reply?: ReplyRef | null; fwd?: boolean; media?: Media[]; doc?: ChatDoc | null };
+export type ChatExtras = { reply?: ReplyRef | null; fwd?: boolean; media?: Media[]; doc?: ChatDoc | null; share?: MessageShare | null };
+
+/** A share attachment as stored (the deployed rules allow `share` with text ≤300). */
+export function cleanShare(share: MessageShare): Record<string, unknown> {
+  const out: Record<string, unknown> = { kind: share.kind, uid: share.uid, username: share.username ?? '', id: share.id, text: share.text.slice(0, 280) };
+  if (share.note) out.note = share.note.slice(0, 200);
+  if (typeof share.pick === 'number') out.pick = share.pick;
+  if (typeof share.ok === 'boolean') out.ok = share.ok;
+  return out;
+}
 
 const me = () => {
   const uid = auth.currentUser?.uid;
@@ -27,7 +37,9 @@ const me = () => {
 };
 
 /** A short preview of a message for replies, the chat list and notifications. */
-export function previewOf(message: { body: string; media?: Media[] | null; doc?: ChatDoc | null; audio?: unknown }) {
+export function previewOf(message: { body: string; media?: Media[] | null; doc?: ChatDoc | null; audio?: unknown; share?: MessageShare | null }) {
+  if (message.share?.kind === 'stump') return 'Stump a friend question';
+  if (message.share?.kind === 'stumpAnswer') return 'Answered a Stump a friend question';
   if (message.body.trim()) return message.body.trim().slice(0, 120);
   if (message.media?.length) return message.media.length > 1 ? `${message.media.length} photos` : message.media[0].t === 'video' ? 'Video' : 'Photo';
   if (message.doc) return `Document: ${message.doc.name}`.slice(0, 120);
@@ -40,16 +52,17 @@ export async function sendChatMessage(chatId: string, body: string, extras: Chat
   const uid = me();
   const text = body.trim();
   if (text.length > 500) throw new Error('Messages can be up to 500 characters.');
-  if (!text && !extras.media?.length && !extras.doc) throw new Error('Write a message first.');
+  if (!text && !extras.media?.length && !extras.doc && !extras.share) throw new Error('Write a message first.');
   const ref = doc(collection(db, 'chats', chatId, 'messages'));
   const data: Record<string, unknown> = { from: uid, text, createdAt: serverTimestamp() };
   if (extras.reply) data.reply = { mid: extras.reply.mid, from: extras.reply.from, text: extras.reply.text.slice(0, 120) };
   if (extras.fwd) data.fwd = true;
   if (extras.media?.length) data.media = extras.media.slice(0, 3).map((item) => ({ t: item.t, url: item.url, ...(item.w ? { w: item.w } : {}), ...(item.h ? { h: item.h } : {}) }));
   if (extras.doc) data.doc = { url: extras.doc.url, name: extras.doc.name.slice(0, 100) };
+  if (extras.share) data.share = cleanShare(extras.share);
   const batch = writeBatch(db);
   batch.set(ref, data);
-  batch.update(doc(db, 'chats', chatId), { lastText: previewOf({ body: text, media: extras.media, doc: extras.doc }), lastAt: serverTimestamp(), lastFrom: uid, [`seen.${uid}`]: serverTimestamp(), [`typing.${uid}`]: deleteField() });
+  batch.update(doc(db, 'chats', chatId), { lastText: previewOf({ body: text, media: extras.media, doc: extras.doc, share: extras.share }), lastAt: serverTimestamp(), lastFrom: uid, [`seen.${uid}`]: serverTimestamp(), [`typing.${uid}`]: deleteField() });
   try {
     await batch.commit();
   } catch (error) {
