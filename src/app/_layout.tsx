@@ -17,7 +17,7 @@ import { LearningSync } from '@/components/learning/learning-sync';
 import { DeviceNotificationBridge } from '@/components/notifications';
 import { PageTitle } from '@/components/page-title';
 import { StreakCelebrationWatcher } from '@/components/streak-celebration-watcher';
-import { EXPERIENCES_ENABLED, needsExperience } from '@/data/experience';
+import { EXPERIENCES_ENABLED, heldExperience, needsExperience } from '@/data/experience';
 import { needsOnboarding, useOnboardingState } from '@/data/onboarding';
 import { useFontSizePreference, usePageZoomPreference } from '@/data/settings';
 import { applyWebFontScale } from '@/lib/web-font-scaling';
@@ -76,9 +76,22 @@ function AppGuard({ children }: { children: ReactNode }) {
     // Authenticated on a password-recovery link: stay to set the password.
     if (onLoginScreen && isRecoveryUrl()) return;
 
-    // A username in the shared format comes first (new Google accounts, and
-    // early new-app accounts whose "username" was a full name). Only once the
-    // profile was actually read — never because it couldn't be loaded.
+    // A new learner's first steps, in this order (owner's request, 2026-10-18):
+    // 1. the interface (no default) — only while EXPERIENCES_ENABLED is on. A choice
+    //    made before the account has a username is held until the username exists.
+    const onChooseExperience = first === 'choose-experience';
+    if (needsExperience(session.user.profile, session.user.profileLoaded) && !heldExperience()) {
+      if (!onChooseExperience) router.replace('/choose-experience' as Href);
+      return;
+    }
+    if (onChooseExperience && !EXPERIENCES_ENABLED) {
+      router.replace('/');
+      return;
+    }
+
+    // 2. a username in the shared format (new Google accounts, and early new-app
+    //    accounts whose "username" was a full name). Only once the profile was
+    //    actually read — never because it couldn't be loaded.
     const onChooseUsername = first === 'choose-username';
     if (session.user.profileLoaded && needsUsername(session.user.profile?.username)) {
       if (!onChooseUsername) router.replace('/choose-username' as Href);
@@ -89,16 +102,7 @@ function AppGuard({ children }: { children: ReactNode }) {
       return;
     }
 
-    // The app experience (no default) — only while EXPERIENCES_ENABLED is on.
-    const onChooseExperience = first === 'choose-experience';
-    if (needsExperience(session.user.profile, session.user.profileLoaded)) {
-      if (!onChooseExperience) router.replace('/choose-experience' as Href);
-      return;
-    }
-    if (onChooseExperience && !EXPERIENCES_ENABLED) {
-      router.replace('/');
-      return;
-    }
+    // 3. the introduction (below), then the class.
 
     // Wait for the saved introduction state (read from the device).
     if (!onboarding.ready) return;
@@ -113,7 +117,9 @@ function AppGuard({ children }: { children: ReactNode }) {
     const onClassSelection = first === 'class-selection';
     const classSelection = readClassSelection(session.user.user_metadata);
     if (!classSelection) {
-      if (!onClassSelection) router.replace('/class-selection' as Href);
+      // Right after the introduction a new learner sees "Suggested for you" first;
+      // its Continue button leads on to the class.
+      if (!onClassSelection && first !== 'suggested') router.replace('/class-selection' as Href);
       return;
     }
     if (onClassSelection) {

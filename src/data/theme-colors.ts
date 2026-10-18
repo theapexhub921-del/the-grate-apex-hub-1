@@ -3,9 +3,9 @@
 import { ATMOSPHERE } from '@/components/atmosphere/palettes';
 import { type ColorSchemeName, Colors, type ThemeColors } from '@/constants/theme';
 import { composite, ensureContrast, luminance, worstContrast } from '@/data/contrast';
-import { hybridGlass, withAlpha } from '@/data/experience-style';
+import { withAlpha } from '@/data/experience-style';
 import type { ExperienceId } from '@/data/experience';
-import { legacyThemeById, legacyThemeColors, originalsThemeColors } from '@/data/legacy-theme-colors';
+import { legacyThemeById, originalsThemeColors } from '@/data/legacy-theme-colors';
 import { legacyColorsOf } from '@/data/legacy-themes';
 import { effectiveThemeFamily, legacyAtmosphere, originalsFromNewer, originateFromLegacy, paletteGradient, type ThemeFamily } from '@/data/theme-portrayal';
 
@@ -13,9 +13,9 @@ import { effectiveThemeFamily, legacyAtmosphere, originalsFromNewer, originateFr
 export function rawThemeColors(experience: ExperienceId, scheme: ColorSchemeName, legacyTheme: string, chosen: ThemeFamily | null): ThemeColors {
   const family = effectiveThemeFamily(experience, chosen);
   const def = legacyThemeById(legacyTheme);
-  if (experience === 'originals' || experience === 'hybrid') {
-    if (family !== 'legacy') return experience === 'originals' ? originalsFromNewer(Colors[scheme], scheme === 'light') : hybridGlass(Colors[scheme]);
-    const base = experience === 'originals' ? originalsThemeColors(def) : legacyThemeColors(def);
+  if (experience === 'originals') {
+    if (family !== 'legacy') return originalsFromNewer(Colors[scheme], scheme === 'light');
+    const base = originalsThemeColors(def);
     // A veiled page (Matcha, Rainbow) also gets glass with more body, so card text
     // sits on a steady colour instead of the full gradient.
     const scrim = gradientPage(scheme, def.id, 'legacy').scrim;

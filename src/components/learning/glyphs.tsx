@@ -60,15 +60,14 @@ export function SubjectGlyph({ subject, size = 48, style }: { subject: SubjectId
       </View>
     );
   }
-  // Hybrid: this app's drawn icon on the original course colours.
-  const stops = experience === 'hybrid' ? ORIGINAL_COURSE[subject].gradient : tint.gradient;
+  const stops = tint.gradient;
   return (
     <View style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }, style]} aria-hidden>
       <GradientTile size={size} radius={radius} colors={stops} />
       {/* Positioned above the tile: an absolutely positioned SVG would
           otherwise paint over an in-flow icon on the web. */}
       <View style={styles.glyphIcon}>
-        <Icon name={subject} size={Math.round(size * 0.52)} color={experience === 'hybrid' ? '#FFFFFF' : tint.ink} strokeWidth={1.9} />
+        <Icon name={subject} size={Math.round(size * 0.52)} color={tint.ink} strokeWidth={1.9} />
       </View>
     </View>
   );

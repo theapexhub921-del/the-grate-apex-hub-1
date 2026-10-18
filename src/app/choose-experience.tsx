@@ -13,9 +13,10 @@ import { Card, Interactive } from '@/components/ui/interactive';
 import { PageHeader, Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { Radius, type ThemeColors, Type } from '@/constants/theme';
-import { DEFAULT_EXPERIENCE, EXPERIENCE_INFO, EXPERIENCES, type ExperienceId, isExperience, saveExperience } from '@/data/experience';
+import { DEFAULT_EXPERIENCE, EXPERIENCE_INFO, EXPERIENCES, type ExperienceId, holdExperience, isExperience, saveExperience } from '@/data/experience';
 import { useAuth } from '@/hooks/use-auth';
-import { ExperiencePreview } from '@/hooks/use-experience';
+import { ExperiencePreview, setActiveExperience } from '@/hooks/use-experience';
+import { needsUsername } from '@/lib/login-identifier';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // /choose-experience — hidden. The route guard sends a learner here when the
@@ -40,7 +41,13 @@ export default function ChooseExperienceScreen() {
     setSaving(true);
     setError(null);
     try {
-      await saveExperience(choice);
+      if (needsUsername(user?.profile?.username)) {
+        // No username yet (a new account): keep the choice and save it right after the username.
+        holdExperience(choice);
+        setActiveExperience(choice);
+      } else {
+        await saveExperience(choice);
+      }
       router.replace('/');
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : 'Your interface could not be saved.');
@@ -56,7 +63,7 @@ export default function ChooseExperienceScreen() {
       <PageHeader
         eyebrow="Your app"
         title="Choose your interface"
-        subtitle="There are three interfaces to choose from. Yours changes how the app looks and is laid out — not your account, progress, friends, messages, achievements or XP. You can change it any time in Settings."
+        subtitle="There are two interfaces to choose from. Yours changes how the app looks and is laid out — not your account, progress, friends, messages, achievements or XP. You can change it any time in Settings."
       />
       <View style={styles.list} accessibilityRole="radiogroup">
         {EXPERIENCES.map((id) => {

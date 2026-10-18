@@ -90,6 +90,9 @@ export function useVerifiedTier(uid: string | null | undefined): VerifiedTier | 
 
 export type SuggestedAccount = { uid: string; username: string; displayName: string | null; avatarUrl: string | null; bio: string | null };
 
+/** The first three suggestions, in this order; the other gold-tick accounts follow. */
+export const SUGGESTED_FIRST: readonly string[] = ['grateapex_official', 'prince', 'originate'];
+
 /** The gold-tick accounts, for "Suggested for you" after onboarding (not including you). */
 export async function loadGoldAccounts(): Promise<SuggestedAccount[]> {
   await auth.authStateReady();
@@ -115,7 +118,12 @@ export async function loadGoldAccounts(): Promise<SuggestedAccount[]> {
     }
   }
 
-  // @grateapex_official first, then the owner's order (the list above).
-  const order = (name: string) => (name.toLowerCase() === 'grateapex_official' ? -1 : VERIFIED_USERNAMES.indexOf(name.toLowerCase()));
+  // The owner's order (2026-10-18): @grateapex_official, @prince, @originate, then the
+  // other gold-tick accounts in the order of the list above.
+  const order = (name: string) => {
+    const lower = name.toLowerCase();
+    const pinned = SUGGESTED_FIRST.indexOf(lower);
+    return pinned >= 0 ? pinned - SUGGESTED_FIRST.length : VERIFIED_USERNAMES.indexOf(lower);
+  };
   return accounts.sort((a, b) => order(a.username) - order(b.username));
 }

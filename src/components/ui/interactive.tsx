@@ -188,7 +188,6 @@ type CardStyles = ReturnType<typeof createStyles>;
 // border and a press dims the card — no lift.
 function experienceCard(styles: CardStyles, experience: ExperienceId, tone: CardTone) {
   if (experience === 'originate') return [styles.originate, styles[`o_${tone}` as const]];
-  if (experience === 'hybrid') return styles.hybridGlass;
   return [styles.legacyPanel, tone === 'primary' || tone === 'insight' ? styles.legacyPrimary : tone === 'reward' ? styles.legacyReward : tone === 'outline' ? styles.legacyOutline : null];
 }
 
