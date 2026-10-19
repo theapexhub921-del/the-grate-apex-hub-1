@@ -103,3 +103,23 @@ describe('Study game wiring (Med Term Scramble, Golden Hour)', () => {
     }
   });
 });
+
+// The Android app (a Trusted Web Activity built with PWABuilder, docs/android-app.md)
+// opens the live site full screen only while the site vouches for the app's
+// signing key here. If this file goes missing or changes, the installed app
+// shows a browser address bar instead of looking like an app.
+describe('Android app wiring', () => {
+  it('serves the Digital Asset Links file for com.grateapex.app', () => {
+    const links = JSON.parse(readFileSync(new URL('../public/.well-known/assetlinks.json', import.meta.url), 'utf8'));
+    const target = links.find((item) => item.target?.package_name === 'com.grateapex.app')?.target;
+    assert.ok(target, 'com.grateapex.app is listed');
+    assert.ok(links[0].relation.includes('delegate_permission/common.handle_all_urls'));
+    assert.deepEqual(target.sha256_cert_fingerprints, ['70:FF:0D:A4:82:0B:4E:92:8B:CC:64:A1:1D:E5:40:1E:2A:3E:B7:08:76:40:6B:1A:07:93:4F:C6:B7:A4:F7:F5']);
+  });
+
+  it('keeps the web manifest the app is built from', () => {
+    const manifest = JSON.parse(readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8'));
+    assert.equal(manifest.start_url, '/');
+    assert.equal(manifest.display, 'standalone');
+  });
+});
