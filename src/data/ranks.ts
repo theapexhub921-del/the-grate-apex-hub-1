@@ -148,7 +148,8 @@ export function getLeagueOutcome(position: number, size: number): LeagueOutcome 
     return 'stays';
   }
 
-  const promoted = Math.floor(size * LEAGUE_RULES.promotionShare);
+  // At least one moves up whenever there are two or more (20% of a small league rounds down to nobody).
+  const promoted = size >= 2 ? Math.max(1, Math.floor(size * LEAGUE_RULES.promotionShare)) : 0;
   const relegated = Math.floor(size * LEAGUE_RULES.relegationShare);
 
   if (position <= promoted) {

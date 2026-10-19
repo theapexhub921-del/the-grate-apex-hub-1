@@ -28,6 +28,17 @@ test('league outcome matches the app for every position of leagues up to 40', ()
   }
 });
 
+test('small leagues still promote first place (20% of 2–4 people rounded down to nobody)', () => {
+  assert.equal(getLeagueOutcome(1, 1), 'stays');
+  for (const size of [2, 3, 4]) {
+    assert.equal(getLeagueOutcome(1, size), 'promoted', `1/${size}`);
+    assert.equal(getLeagueOutcome(2, size), 'stays', `2/${size}`);
+  }
+  assert.equal(getLeagueOutcome(2, 10), 'promoted');
+  assert.equal(getLeagueOutcome(3, 10), 'stays');
+  assert.equal(getLeagueOutcome(10, 10), 'relegated');
+});
+
 test('battle winner: higher score, then the faster time, otherwise a draw', () => {
   const s = (score, seconds) => ({ score, total: 10, seconds });
   assert.equal(battleWinner(null, s(7, 40)), null);
