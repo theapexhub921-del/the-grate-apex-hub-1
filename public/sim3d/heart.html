@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GRATEAPEX — 3D heart</title>
+  <!--
+    The beating 3D heart shown with the cardiac-cycle simulation
+    (src/components/learning/simulations/heart-3d.web.tsx). It loads the heart
+    from the atlas model (Z-Anatomy / BodyParts3D, CC BY-SA 4.0 — see
+    /atlas/ATTRIBUTION.md) and moves it from messages the app sends:
+      { type: 'grateapex-heart', lv, la, rv, ra, lvP, aortic, mitral }
+    lv, la, rv, ra: chamber volumes 0 (smallest) – 1 (fullest)
+    lvP: left ventricular pressure 0–1 (the muscle glows with it)
+    aortic, mitral: true when that valve is open
+    With no messages it beats on its own at 72 a minute.
+  -->
+  <style>
+    html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+    canvas { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
+    #msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 500 13px system-ui, sans-serif; color: #8a8a8a; pointer-events: none; }
+    #credit { position: absolute; right: 8px; bottom: 6px; font: 10px system-ui, sans-serif; color: #9a9a9a; }
+    #credit a { color: inherit; }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/atlas/vendor/three/build/three.module.min.js",
+      "three/addons/": "/atlas/vendor/three/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="c" aria-label="3D model of the heart, beating"></canvas>
+  <div id="msg">Loading the heart…</div>
+  <div id="credit">Model: <a href="/atlas/ATTRIBUTION.md" target="_blank" rel="noopener">Z-Anatomy, CC BY-SA</a></div>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    // Must match MODEL_VERSION in /atlas/anatomy.html, so the browser reuses the model it already saved
+    // (tests/deploy-wiring.test.mjs checks this).
+    const MODEL_VERSION = '1';
+    const LITE = matchMedia('(max-width: 700px), (pointer: coarse)').matches;
+    const URL_MODEL = (LITE ? '/atlas/lite/' : '/atlas/') + 'CardioVascular41.glb?m=' + MODEL_VERSION;
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const canvas = document.getElementById('c');
+    const msg = document.getElementById('msg');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, LITE ? 1.5 : 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.95;
+
+    const scene = new THREE.Scene();
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    const key = new THREE.DirectionalLight(0xffffff, 1.6);
+    key.position.set(1.5, 2.5, 3);
+    scene.add(key, new THREE.HemisphereLight(0xfff4ee, 0x402020, 0.5));
+
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 50);
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.autoRotate = !reduceMotion;
+    controls.autoRotateSpeed = 0.8;
+    canvas.addEventListener('pointerdown', () => { controls.autoRotate = false; });
+
+    // Tissue colours (the same family as the app's Anatomy palette).
+    const mat = (color, extra = {}) => new THREE.MeshPhysicalMaterial({ color, roughness: 0.5, metalness: 0, clearcoat: 0.45, clearcoatRoughness: 0.3, envMapIntensity: 0.6, ...extra });
+    const M = {
+      ventricle: mat('#7e2422'),
+      atrium: mat('#8f3330'),
+      artery: mat('#b01e24'),
+      vein: mat('#2f3f8f'),
+      valve: mat('#efe2cc', { transparent: true, opacity: 1, clearcoat: 0.2 }),
+    };
+    const lvMat = M.ventricle.clone();
+    const semilunarMat = M.valve.clone();
+    const avMat = M.valve.clone();
+
+    const label = o => ((o.userData && o.userData.name) || o.name || '').replace(/_/g, ' ');
+    const chain = o => { const s = []; for (let n = o; n; n = n.parent) s.push(label(n).toLowerCase()); return s.join(' / '); };
+
+    function materialFor(mesh) {
+      const c = chain(mesh);
+      if (/leaflet|cusp|valve/.test(c) && !/root of/.test(label(mesh).toLowerCase())) return 'valve';
+      if (/left ventricle/.test(c)) return 'lv';
+      if (/ventricle|papillary/.test(c)) return 'ventricle';
+      if (/atrium|auricle/.test(c)) return 'atrium';
+      if (/pulmonary vein/.test(c)) return 'artery';
+      if (/vein|vena|sinus|pulmonary trunk|pulmonary artery/.test(c)) return 'vein';
+      return 'artery';
+    }
+
+    const pivots = {};
+    let root = null;
+    let size = 0.12;
+
+    const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
+    loader.load(URL_MODEL, gltf => {
+      gltf.scene.updateMatrixWorld(true);
+      let heart = null;
+      gltf.scene.traverse(o => { if (!heart && /^heart(\.g|g)?$/i.test(label(o))) heart = o; });
+      if (!heart) { msg.textContent = 'The heart model could not be found.'; return; }
+      const hbox = new THREE.Box3().setFromObject(heart);
+      const centre = hbox.getCenter(new THREE.Vector3());
+      size = hbox.getSize(new THREE.Vector3()).length();
+      const reach = size * 0.95;
+
+      // Keep the heart and the parts of the great vessels and coronary vessels close to it.
+      const keep = [];
+      gltf.scene.traverse(o => {
+        if (!o.isMesh) return;
+        let inHeart = false;
+        for (let n = o; n; n = n.parent) if (n === heart) inHeart = true;
+        const c = new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3());
+        const own = label(o).toLowerCase();
+        const nearVessel = /^(ascending aorta|aortic arch 1|pulmonary trunk 1|bifurcation of pulmonary trunk|superior vena cava 1|inferior vena cava \(thoracic part\) 1|(right|left) (superior|inferior) pulmonary vein 1|.*coronary artery.*|anterior interventricular artery.*|septal branches of anterior interventricular artery|right inferolateral branch of right coronary artery|circumflex artery of heart.*|great cardiac vein|middle cardiac vein|inferior vein of left ventricle.*|coronary sinus 1)$/.test(own);
+        if (inHeart || (nearVessel && c.distanceTo(centre) < reach)) keep.push(o);
+      });
+      root = new THREE.Group();
+      for (const o of keep) {
+        const kind = materialFor(o);
+        o.material = kind === 'lv' ? lvMat : M[kind] || M.artery;
+        const c = chain(o);
+        if (kind === 'valve') o.material = /atrioventricular/.test(c) ? avMat : semilunarMat;
+        root.attach(o);
+      }
+      scene.add(root);
+      root.updateMatrixWorld(true);
+
+      // The ventricles shorten towards the valve plane (the base) and the atria squeeze towards it,
+      // so both groups pivot about the centre of the valves: no gaps open between chambers.
+      const valveBox = new THREE.Box3();
+      keep.filter(o => /valv|leaflet/.test(chain(o))).forEach(o => valveBox.expandByObject(o));
+      const base = valveBox.isEmpty() ? centre.clone() : valveBox.getCenter(new THREE.Vector3());
+      const group = (key, test) => {
+        const pivot = new THREE.Group();
+        pivot.position.copy(base);
+        root.add(pivot);
+        pivot.updateMatrixWorld(true);
+        keep.filter(o => test(chain(o))).forEach(o => pivot.attach(o));
+        pivots[key] = pivot;
+      };
+      group('ventricles', c => /ventricle|papillary|interventricular|cardiac vein|vein of left ventricle|coronary artery|circumflex|inferolateral|valve|leaflet/.test(c) && !/atrium/.test(c));
+      group('atria', c => /atrium|auricle/.test(c));
+      controls.target.copy(centre);
+      camera.position.copy(centre).add(new THREE.Vector3(0.12 * size, 0.08 * size, 1.75 * size));
+      controls.minDistance = size * 1.1;
+      controls.maxDistance = size * 4;
+      controls.update();
+      msg.style.display = 'none';
+    }, undefined, () => { msg.textContent = 'The 3D heart could not load.'; });
+
+    // The heart's state: from the app, or our own 72-a-minute beat.
+    let state = null;
+    let lastMessage = 0;
+    addEventListener('message', e => {
+      if (e.origin !== location.origin) return;
+      const d = typeof e.data === 'string' ? (() => { try { return JSON.parse(e.data); } catch { return null; } })() : e.data;
+      if (d && d.type === 'grateapex-heart') { state = d; lastMessage = performance.now(); }
+    });
+    function ownBeat(t) {
+      const beat = 60 / 72;
+      const f = (t % beat) / beat;
+      const atrial = f < 0.12 ? Math.sin((f / 0.12) * Math.PI) : 0;
+      const sys = f >= 0.12 && f < 0.48 ? Math.sin(((f - 0.12) / 0.36) * Math.PI) : 0;
+      const lv = f < 0.12 ? 0.75 + 0.25 * (f / 0.12) : f < 0.48 ? 1 - Math.min(1, (f - 0.16) / 0.26) : 0.0 + Math.min(0.75, ((f - 0.48) / 0.4) * 0.75);
+      return { lv, rv: lv, la: 1 - atrial, ra: 1 - atrial, lvP: sys, aortic: f > 0.16 && f < 0.44, mitral: f < 0.12 || f > 0.56 };
+    }
+
+    function resize() {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      if (canvas.width !== Math.round(w * renderer.getPixelRatio()) || canvas.height !== Math.round(h * renderer.getPixelRatio())) {
+        renderer.setSize(w, h, false);
+        camera.aspect = w / Math.max(1, h);
+        camera.updateProjectionMatrix();
+      }
+    }
+
+    const glow = new THREE.Color('#ff2a1a');
+    renderer.setAnimationLoop(now => {
+      resize();
+      const t = now / 1000;
+      const s = state && now - lastMessage < 1500 ? state : ownBeat(reduceMotion ? 0.3 : t);
+      const sc = (key, v, k) => { const p = pivots[key]; if (p) p.scale.setScalar(1 - k * (1 - Math.max(0, Math.min(1, v)))); };
+      sc('ventricles', s.lv, 0.14);
+      sc('atria', s.la, 0.12);
+      lvMat.emissive.copy(glow);
+      lvMat.emissiveIntensity = 0.9 * Math.max(0, Math.min(1, s.lvP));
+      // open valves fade so you can see through them; shut ones are solid
+      semilunarMat.opacity = s.aortic ? 0.15 : 1;
+      avMat.opacity = s.mitral ? 0.15 : 1;
+      controls.update();
+      renderer.render(scene, camera);
+    });
+  </script>
+</body>
+</html>
