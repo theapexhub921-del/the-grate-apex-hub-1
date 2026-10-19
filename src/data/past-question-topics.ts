@@ -11,10 +11,10 @@ export const OTHER_PAST_TOPIC = 'other';
 
 export const PAST_TOPICS: Record<string, readonly PastTopic[]> = {
   'hb2-anatomy': [
-    { id: 'upper-limb', title: 'Upper Limb' },
     { id: 'cardiovascular-system-gross', title: 'Cardiovascular System' },
     { id: 'respiratory-system-gross', title: 'Respiratory System' },
     { id: 'gastrointestinal-system-gross', title: 'Gastrointestinal System' },
+    { id: 'upper-limb', title: 'Upper Limb' },
     { id: 'general-anatomy', title: 'General Anatomy: Bones, Joints and Body Systems' },
     { id: 'embryology', title: 'Embryology' },
     { id: 'histology', title: 'Histology' },
