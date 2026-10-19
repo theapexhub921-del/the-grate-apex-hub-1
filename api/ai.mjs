@@ -22,10 +22,11 @@
 // Keys live in Vercel's settings; at least one of CHAT_API_KEY / GEMINI_API_KEY is needed.
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 
+import { geminiCall, ModelCallError, openAiCompatibleCall } from './_ai-models.mjs';
+
 const PROJECT = 'grate-apex';
 const KEYS = createRemoteJWKSet(new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'));
-const MODEL = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
-const ENDPOINT = (model) => `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+// Models: see api/_ai-models.mjs (falls back to other models when one is retired or overloaded).
 
 const MAX_LESSON_CHARS = 60_000;
 const MAX_QUESTION_CHARS = 1_000;
@@ -119,23 +120,15 @@ class ProviderError extends Error {}
 async function openAiCompatible({ system, turns, maxTokens, json }) {
   const key = process.env.CHAT_API_KEY;
   if (!key) return null;
-  const base = (process.env.CHAT_API_BASE || 'https://api.groq.com/openai/v1').replace(/\/+$/, '');
-  const model = process.env.CHAT_MODEL || 'llama-3.3-70b-versatile';
   const messages = [{ role: 'system', content: system }, ...turns.map((turn) => ({ role: turn.role === 'model' ? 'assistant' : 'user', content: turn.text }))];
-  const payload = { model, messages, max_tokens: Math.min(maxTokens, 4096), temperature: 0.5 };
+  const payload = { messages, max_tokens: Math.min(maxTokens, 8192), temperature: 0.5 };
   if (json) payload.response_format = { type: 'json_object' };
-  const response = await fetch(`${base}/chat/completions`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(45_000),
-  });
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    console.error('Lesson AI provider error', response.status, detail.slice(0, 500));
-    throw new ProviderError(response.status === 429 ? 'busy' : 'upstream');
+  let data;
+  try {
+    data = await openAiCompatibleCall({ key, base: process.env.CHAT_API_BASE, configured: process.env.CHAT_MODEL, payload, timeoutMs: 45_000, label: 'Lesson AI' });
+  } catch (problem) {
+    throw new ProviderError(problem instanceof ModelCallError && problem.status === 429 ? 'busy' : 'upstream');
   }
-  const data = await response.json();
   const output = String(data?.choices?.[0]?.message?.content ?? '').trim();
   if (!output) throw new ProviderError('empty');
   return output;
@@ -146,22 +139,17 @@ async function gemini({ system, turns, maxTokens, json }) {
   if (!key) return null;
   const generationConfig = { maxOutputTokens: maxTokens };
   if (json) generationConfig.responseMimeType = 'application/json';
-  const response = await fetch(ENDPOINT(MODEL), {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: system }] },
-      contents: turns.map((turn) => ({ role: turn.role, parts: [{ text: turn.text }] })),
-      generationConfig,
-    }),
-    signal: AbortSignal.timeout(45_000),
-  });
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    console.error('Gemini error', response.status, detail.slice(0, 500));
-    throw new ProviderError(response.status === 429 ? 'busy' : 'upstream');
+  const body = {
+    systemInstruction: { parts: [{ text: system }] },
+    contents: turns.map((turn) => ({ role: turn.role, parts: [{ text: turn.text }] })),
+    generationConfig,
+  };
+  let data;
+  try {
+    data = await geminiCall({ key, configured: process.env.GEMINI_MODEL, body, timeoutMs: 45_000, label: 'Lesson AI (Gemini)' });
+  } catch (problem) {
+    throw new ProviderError(problem instanceof ModelCallError && [429, 503].includes(problem.status) ? 'busy' : 'upstream');
   }
-  const data = await response.json();
   const candidate = data?.candidates?.[0];
   const output = (candidate?.content?.parts ?? []).filter((part) => !part.thought && typeof part.text === 'string').map((part) => part.text).join('').trim();
   if (!output) throw new ProviderError(data?.promptFeedback?.blockReason || candidate?.finishReason === 'SAFETY' ? 'blocked' : 'empty');

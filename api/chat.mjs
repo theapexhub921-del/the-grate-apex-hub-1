@@ -12,12 +12,15 @@
 //   1. Any OpenAI-compatible service (Groq, OpenRouter, OpenAI, Together…):
 //        CHAT_API_KEY   the key
 //        CHAT_API_BASE  default https://api.groq.com/openai/v1
-//        CHAT_MODEL     default llama-3.3-70b-versatile
+//        CHAT_MODEL     optional; otherwise the best model the key can use
 //   2. Gemini (the same GEMINI_API_KEY as api/ai.mjs):
-//        GEMINI_CHAT_MODEL  default gemini-3.1-flash-lite
+//        GEMINI_CHAT_MODEL  optional (default gemini-3.1-flash-lite)
+// Retired or overloaded models are skipped automatically (api/_ai-models.mjs).
 // Set whichever you have; at least one key is needed. Keys live in Vercel's
 // environment variables and never reach the app.
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+
+import { geminiCall, ModelCallError, openAiCompatibleCall } from './_ai-models.mjs';
 
 const PROJECT = 'grate-apex';
 const KEYS = createRemoteJWKSet(new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'));
@@ -65,20 +68,13 @@ class ProviderError extends Error {
 async function openAiCompatible(messages) {
   const key = process.env.CHAT_API_KEY;
   if (!key) return null;
-  const base = (process.env.CHAT_API_BASE || 'https://api.groq.com/openai/v1').replace(/\/+$/, '');
-  const model = process.env.CHAT_MODEL || 'llama-3.3-70b-versatile';
-  const response = await fetch(`${base}/chat/completions`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
-    body: JSON.stringify({ model, messages, max_tokens: 2048, temperature: 0.6 }),
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    console.error('Chat provider error', response.status, detail.slice(0, 500));
-    throw new ProviderError(response.status === 429 ? 'busy' : 'upstream', response.status);
+  let data;
+  try {
+    data = await openAiCompatibleCall({ key, base: process.env.CHAT_API_BASE, configured: process.env.CHAT_MODEL, payload: { messages, max_tokens: 4096, temperature: 0.6 }, timeoutMs: 20_000, label: 'Study chat' });
+  } catch (problem) {
+    const status = problem instanceof ModelCallError ? problem.status : 0;
+    throw new ProviderError(status === 429 ? 'busy' : 'upstream', status);
   }
-  const data = await response.json();
   const output = String(data?.choices?.[0]?.message?.content ?? '').trim();
   if (!output) throw new ProviderError('upstream', 200);
   return output;
@@ -87,25 +83,20 @@ async function openAiCompatible(messages) {
 async function gemini(messages) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return null;
-  const model = process.env.GEMINI_CHAT_MODEL || process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+  const configured = process.env.GEMINI_CHAT_MODEL || process.env.GEMINI_MODEL;
   const contents = [];
   for (const turn of messages.filter((m) => m.role !== 'system')) {
     const role = turn.role === 'assistant' ? 'model' : 'user';
     if (contents.length && contents[contents.length - 1].role === role) contents[contents.length - 1].parts[0].text += `\n${turn.content}`;
     else contents.push({ role, parts: [{ text: turn.content }] });
   }
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
-    body: JSON.stringify({ systemInstruction: { parts: [{ text: RULES }] }, contents, generationConfig: { maxOutputTokens: 4096 } }),
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    console.error('Gemini chat error', response.status, detail.slice(0, 500));
-    throw new ProviderError(response.status === 429 ? 'busy' : 'upstream', response.status);
+  let data;
+  try {
+    data = await geminiCall({ key, configured, body: { systemInstruction: { parts: [{ text: RULES }] }, contents, generationConfig: { maxOutputTokens: 4096 } }, timeoutMs: 20_000, label: 'Study chat (Gemini)' });
+  } catch (problem) {
+    const status = problem instanceof ModelCallError ? problem.status : 0;
+    throw new ProviderError([429, 503].includes(status) ? 'busy' : 'upstream', status);
   }
-  const data = await response.json();
   const candidate = data?.candidates?.[0];
   const output = (candidate?.content?.parts ?? []).filter((part) => !part.thought && typeof part.text === 'string').map((part) => part.text).join('').trim();
   if (!output) throw new ProviderError(data?.promptFeedback?.blockReason || candidate?.finishReason === 'SAFETY' ? 'blocked' : 'upstream', 200);
