@@ -27,7 +27,7 @@ export const interactive: Record<string, Steps> = {
   ],
 
   'gastrointestinal-physiology-2': [
-    ask(mcq('c2-01', 'carbohydrate-digestion', 'Why does starch digestion stop in the stomach?', 'Acid inactivates salivary amylase', ['The stomach absorbs starch', 'Pepsin digests starch', 'Bile is absent'], { explanation: 'Slide 17.', skill: 'cause-effect' })),
+    ask(mcq('c2-01', 'carbohydrate-digestion', 'Why does starch digestion stop in the stomach?', 'Acid inactivates salivary amylase', ['The stomach absorbs starch before it is digested', 'Pepsin digests the starch to glucose', 'Bile is absent, so amylase cannot work'], { explanation: 'Slide 17.', skill: 'cause-effect' })),
     learn('Sugar transporters', ['Glucose and galactose enter by SGLT1 (with Na⁺); fructose by GLUT5; all leave by GLUT2.'], { sourceRefs: ds([21]) }),
     ask(match('c2-02', 'carbohydrate-absorption', 'Match each transporter to its job.', [
       ['SGLT1', 'Glucose and galactose in, with Na⁺'],
@@ -36,7 +36,7 @@ export const interactive: Record<string, Steps> = {
     ], { explanation: 'Slide 21.' })),
     ask(order('c2-03', 'protein-digestion', 'Order the activation of pancreatic proteases.', ['Enterokinase from the duodenal mucosa', 'Trypsinogen → trypsin', 'Trypsin activates chymotrypsinogen and procarboxypeptidase'], { explanation: 'Slides 24–25.' })),
     learn('Fat needs bile', ['Bile acids emulsify fat into small droplets so water-soluble pancreatic lipase, held on by colipase, can reach it.'], { sourceRefs: ds([30, 31]) }),
-    ask(mcq('c2-04', 'lipid-absorption', 'Why do chylomicrons enter lacteals rather than blood capillaries?', 'They are too large to pass the capillary basement membrane', ['Lacteals actively pump them', 'Blood capillaries are absent in villi', 'They are water-soluble'], { explanation: 'Slides 33–34.', skill: 'cause-effect' })),
+    ask(mcq('c2-04', 'lipid-absorption', 'Why do chylomicrons enter lacteals rather than blood capillaries?', 'They are too large to pass the capillary basement membrane', ['Lacteals actively pump them in with ATP-driven carriers', 'Blood capillaries are absent from the core of the villi', 'They are water-soluble and dissolve in the lymph'], { explanation: 'Slides 33–34.', skill: 'cause-effect' })),
     recall('r2-01', 'lipid-absorption', 'Trace a dietary triglyceride from the duodenum into the lymph.', [
       'Bile acids emulsify fat into small droplets.',
       'Pancreatic lipase (with colipase) splits triglyceride into free fatty acids and monoglycerides.',
@@ -46,12 +46,12 @@ export const interactive: Record<string, Steps> = {
   ],
 
   'gastrointestinal-physiology-3': [
-    ask(mcq('c3-01', 'water-absorption', 'Where is most of the water entering the gut absorbed?', 'The small intestine (about 90%)', ['The stomach', 'The colon', 'The oesophagus'], { explanation: 'Slide 36.' })),
+    ask(mcq('c3-01', 'water-absorption', 'Where is most of the water entering the gut absorbed?', 'The small intestine (about 90%)', ['The stomach (about 50%)', 'The colon (about 90%)', 'The oesophagus'], { explanation: 'Slide 36.' })),
     learn('Water follows sodium', ['Active Na⁺ transport into the lateral spaces creates the osmotic gradient; Cl⁻ and water follow.'], { sourceRefs: ds([37, 38]) }),
-    ask(mcq('c3-02', 'sodium-absorption', 'Why does a solution of glucose and salt treat dehydration from diarrhoea?', 'Glucose is absorbed with Na⁺ by SGLT1, and water follows', ['Glucose blocks secretion', 'Salt kills bacteria', 'Glucose is absorbed in the colon'], { explanation: 'Slides 42–43: oral rehydration therapy.', skill: 'application', clinical: true })),
+    ask(mcq('c3-02', 'sodium-absorption', 'Why does a solution of glucose and salt treat dehydration from diarrhoea?', 'Glucose is absorbed with Na⁺ by SGLT1, and water follows', ['Glucose blocks the chloride secretion that causes the diarrhoea', 'Salt kills the bacteria, and glucose replaces lost energy', 'Glucose is absorbed in the colon, pulling sodium with it'], { explanation: 'Slides 42–43: oral rehydration therapy.', skill: 'application', clinical: true })),
     ask(order('c3-03', 'iron-absorption', 'Order the steps of non-haem iron absorption.', ['Ferrireductase reduces Fe³⁺ to Fe²⁺', 'DMT-1 carries Fe²⁺ into the enterocyte', 'Ferroportin exports Fe²⁺', 'Hephaestin oxidises it', 'Transferrin carries it in plasma'], { explanation: 'Slides 51–53.' })),
-    ask(mcq('c3-04', 'iron-absorption', 'What does hepcidin do?', 'Blocks intestinal iron absorption and release from stores', ['Increases iron absorption', 'Carries iron in plasma', 'Reduces Fe³⁺ to Fe²⁺'], { explanation: 'Slide 53.' })),
-    ask(mcq('c3-05', 'vitamin-absorption', 'A patient has had the terminal ileum removed. Which vitamin will they fail to absorb?', 'Vitamin B12', ['Vitamin C', 'Folate', 'Vitamin B1'], { explanation: 'Slide 55: B12–intrinsic factor is taken up in the lower ileum.', skill: 'application', clinical: true })),
+    ask(mcq('c3-04', 'iron-absorption', 'What does hepcidin do?', 'Blocks intestinal iron absorption and release from stores', ['Increases intestinal iron absorption when stores are full', 'Carries iron in the plasma to the bone marrow', 'Reduces Fe³⁺ to Fe²⁺ at the brush border'], { explanation: 'Slide 53.' })),
+    ask(mcq('c3-05', 'vitamin-absorption', 'A patient has had the terminal ileum removed. Which vitamin will they fail to absorb?', 'Vitamin B12', ['Vitamin C', 'Folate', 'Vitamin B1 (thiamine)'], { explanation: 'Slide 55: B12–intrinsic factor is taken up in the lower ileum.', skill: 'application', clinical: true })),
     recall('r3-01', 'calcium-absorption', 'Describe transcellular calcium absorption and how it depends on vitamin D and calcium intake.', [
       'In the duodenum and upper jejunum Ca²⁺ enters across the brush border through CaT1/TRPV6.',
       'Calbindin (CaBP) carries it across the cell.',
@@ -61,11 +61,11 @@ export const interactive: Record<string, Steps> = {
   ],
 
   'gastrointestinal-physiology-4': [
-    ask(mcq('c4-01', 'saliva', 'Why is final saliva hypotonic?', 'Ducts remove Na⁺ and Cl⁻ but are impermeable to water', ['Acini secrete pure water', 'Ducts add water', 'Saliva contains no electrolytes'], { explanation: 'Slide 63.', skill: 'cause-effect' })),
+    ask(mcq('c4-01', 'saliva', 'Why is final saliva hypotonic?', 'Ducts remove Na⁺ and Cl⁻ but are impermeable to water', ['Acini secrete pure water with no electrolytes', 'Ducts add water to the saliva as it flows', 'Saliva contains no electrolytes at any flow rate'], { explanation: 'Slide 63.', skill: 'cause-effect' })),
     learn('Salivation is purely neural', ['Taste (sour most strongly) → salivatory nuclei → parasympathetic (copious, watery) and sympathetic (sparse, protein-rich). Both increase saliva.'], { sourceRefs: ds([117, 118]) }),
-    ask(mcq('c4-02', 'saliva-control', 'Which nerve carries parasympathetic fibres to the parotid gland, through the otic ganglion?', 'Glossopharyngeal (IX)', ['Facial (VII)', 'Vagus (X)', 'Trigeminal (V)'], { explanation: 'Slide 118.' })),
+    ask(mcq('c4-02', 'saliva-control', 'Which nerve carries parasympathetic fibres to the parotid gland, through the otic ganglion?', 'Glossopharyngeal (IX)', ['Facial (VII), via the submandibular ganglion', 'Vagus (X)', 'Trigeminal (V)'], { explanation: 'Slide 118.' })),
     ask(order('c4-03', 'gastric-acid', 'Order the steps of acid secretion in the parietal cell.', ['Carbonic anhydrase makes HCO₃⁻ from CO₂', 'HCO₃⁻ leaves in exchange for Cl⁻ (alkaline tide)', 'Cl⁻ enters the canaliculus', 'H⁺/K⁺-ATPase pumps H⁺ into the lumen'], { explanation: 'Slides 71–72.' })),
-    ask(mcq('c4-04', 'gastric-acid', 'Why does blood leaving the stomach after a meal become slightly alkaline?', 'Parietal cells release HCO₃⁻ into the blood — the alkaline tide', ['The stomach absorbs bicarbonate from food', 'Gastrin is alkaline', 'Mucus enters the blood'], { explanation: 'Slide 71.', skill: 'cause-effect' })),
+    ask(mcq('c4-04', 'gastric-acid', 'Why does blood leaving the stomach after a meal become slightly alkaline?', 'Parietal cells release HCO₃⁻ into the blood — the alkaline tide', ['The stomach absorbs bicarbonate from the food in the meal', 'Gastrin is alkaline and enters the gastric veins', 'Mucus from the surface cells enters the blood'], { explanation: 'Slide 71.', skill: 'cause-effect' })),
     ask(match('c4-05', 'gastric-other', 'Match each gastric cell to its product.', [
       ['Parietal cell', 'HCl and intrinsic factor'],
       ['Chief cell', 'Pepsinogen and gastric lipase'],
@@ -81,11 +81,11 @@ export const interactive: Record<string, Steps> = {
   ],
 
   'gastrointestinal-physiology-5': [
-    ask(mcq('c5-01', 'pancreatic-enzymes', 'Why are pancreatic proteases secreted as inactive proenzymes?', 'So they do not digest the pancreas itself', ['Because they need bile to fold', 'Because the pancreas is acidic', 'Because they act only in the colon'], { explanation: 'Slide 81.', skill: 'cause-effect' })),
+    ask(mcq('c5-01', 'pancreatic-enzymes', 'Why are pancreatic proteases secreted as inactive proenzymes?', 'So they do not digest the pancreas itself', ['Because they need bile to fold into their active shape', 'Because the pancreas is acidic and would destroy them', 'Because they act only in the colon, not in the duodenum'], { explanation: 'Slide 81.', skill: 'cause-effect' })),
     learn('Two hormones, two products', ['Acid in the duodenum → secretin → bicarbonate and water from duct cells. Fat and peptides → CCK → enzymes from acinar cells.'], { sourceRefs: ds([125, 126]) }),
-    ask(mcq('c5-02', 'pancreas-control', 'Acid chyme enters the duodenum. Which hormone mainly responds, and what does the pancreas secrete?', 'Secretin — bicarbonate and water', ['CCK — enzymes', 'Gastrin — acid', 'Motilin — mucus'], { explanation: 'Slide 125.', skill: 'application' })),
-    ask(mcq('c5-03', 'pancreas-control', 'In which phase is most pancreatic juice secreted?', 'Intestinal (50–80%)', ['Cephalic', 'Gastric', 'Interdigestive'], { explanation: 'Slide 124.' })),
-    ask(mcq('c5-04', 'intestinal-secretion', 'What is the main driving force for fluid secretion by crypt enterocytes?', 'Transcellular Cl⁻ secretion through CFTR', ['Active water pumping', 'Glucose secretion', 'HCO₃⁻ reabsorption'], { explanation: 'Slide 89.' })),
+    ask(mcq('c5-02', 'pancreas-control', 'Acid chyme enters the duodenum. Which hormone mainly responds, and what does the pancreas secrete?', 'Secretin — bicarbonate and water', ['CCK — enzymes from the acinar cells', 'Gastrin — acid from the parietal cells', 'Motilin — mucus from Brunner’s glands'], { explanation: 'Slide 125.', skill: 'application' })),
+    ask(mcq('c5-03', 'pancreas-control', 'In which phase is most pancreatic juice secreted?', 'Intestinal (50–80%)', ['Cephalic (50–80%)', 'Gastric (about 70%)', 'Interdigestive'], { explanation: 'Slide 124.' })),
+    ask(mcq('c5-04', 'intestinal-secretion', 'What is the main driving force for fluid secretion by crypt enterocytes?', 'Transcellular Cl⁻ secretion through CFTR', ['Active pumping of water through aquaporins', 'Glucose secretion through SGLT1 in reverse', 'HCO₃⁻ reabsorption from the crypt lumen'], { explanation: 'Slide 89.' })),
     recall('r5-01', 'pancreatic-bicarbonate', 'Explain how pancreatic duct cells secrete bicarbonate.', [
       'Secretin (cAMP) and ACh (Ca²⁺) open luminal Cl⁻ channels, so Cl⁻ enters the lumen.',
       'A luminal Cl⁻/HCO₃⁻ antiport exchanges it for HCO₃⁻; CFTR also passes HCO₃⁻.',
@@ -97,10 +97,10 @@ export const interactive: Record<string, Steps> = {
   'gastrointestinal-physiology-6': [
     ask(mcq('c6-01', 'enteric-nervous-system', 'Which plexus mainly controls gut motility?', 'The myenteric (Auerbach’s) plexus', ['The submucosal (Meissner’s) plexus', 'The coeliac plexus', 'The pelvic plexus'], { explanation: 'Slide 104.' })),
     learn('Two divisions', ['Parasympathetic (vagus, pelvic nerves) increases motility and secretion and relaxes sphincters. Sympathetic (T5–L2) inhibits them and contracts sphincters and vessels.'], { sourceRefs: ds([107, 108]) }),
-    ask(mcq('c6-02', 'extrinsic-nerves', 'What does sympathetic stimulation do to the gut?', 'Inhibits secretion and motility; contracts sphincters', ['Increases secretion and motility', 'Relaxes sphincters', 'Has no effect'], { explanation: 'Slide 108.' })),
+    ask(mcq('c6-02', 'extrinsic-nerves', 'What does sympathetic stimulation do to the gut?', 'Inhibits secretion and motility; contracts sphincters', ['Increases secretion and motility; relaxes sphincters', 'Relaxes sphincters but has no effect on secretion', 'Has no effect on secretion, motility or sphincters'], { explanation: 'Slide 108.' })),
     ask(order('c6-03', 'gastric-phases', 'Order the phases of gastric secretion.', ['Cephalic', 'Gastric', 'Intestinal'], { explanation: 'Slide 110.' })),
-    ask(mcq('c6-04', 'gastric-phases', 'Which phase produces most of the acid secreted with a meal?', 'The gastric phase (about 70%)', ['The cephalic phase', 'The intestinal phase', 'All equally'], { explanation: 'Slide 113.' })),
-    ask(mcq('c6-05', 'gastric-phases', 'How does fat in the duodenum reduce gastric acid secretion?', 'It releases GIP and CCK, which inhibit parietal cells', ['It releases gastrin', 'It stimulates the vagus', 'It neutralises acid directly'], { explanation: 'Slide 115.', skill: 'cause-effect' })),
+    ask(mcq('c6-04', 'gastric-phases', 'Which phase produces most of the acid secreted with a meal?', 'The gastric phase (about 70%)', ['The cephalic phase (about 70%)', 'The intestinal phase (about 50%)', 'All three phases equally'], { explanation: 'Slide 113.' })),
+    ask(mcq('c6-05', 'gastric-phases', 'How does fat in the duodenum reduce gastric acid secretion?', 'It releases GIP and CCK, which inhibit parietal cells', ['It releases gastrin, which slows the parietal cells', 'It stimulates the vagus to the stomach', 'It neutralises the acid directly in the duodenum'], { explanation: 'Slide 115.', skill: 'cause-effect' })),
     recall('r6-01', 'gastric-phases', 'Describe the cephalic, gastric and intestinal phases of gastric secretion.', [
       'Cephalic: sight, smell, taste or thought of food → vagus → ACh stimulates parietal cells directly and via gastrin and histamine; up to ~40% of maximum.',
       'Gastric: distension (vagovagal and local reflexes) and protein products release gastrin; ~70% of meal-related acid.',
@@ -109,12 +109,12 @@ export const interactive: Record<string, Steps> = {
   ],
 
   'gastrointestinal-physiology-7': [
-    ask(mcq('c7-01', 'gi-smooth-muscle', 'Which cells generate the slow waves of the gut?', 'Interstitial cells of Cajal', ['Enterochromaffin cells', 'Chief cells', 'Kupffer cells'], { explanation: 'Slide 131.' })),
+    ask(mcq('c7-01', 'gi-smooth-muscle', 'Which cells generate the slow waves of the gut?', 'Interstitial cells of Cajal', ['Enterochromaffin-like cells', 'Chief cells', 'Kupffer cells'], { explanation: 'Slide 131.' })),
     learn('Slow waves set the pace', ['Slow waves bring the muscle near threshold; only when spikes fire on top of them does it contract. Stretch and ACh depolarise; noradrenaline hyperpolarises.'], { sourceRefs: ds([131, 132]) }),
     ask(mcq('c7-02', 'motility-types', 'Which movement mixes chyme by moving it back and forth?', 'Segmentation', ['Peristalsis', 'Mass movement', 'Receptive relaxation'], { explanation: 'Slide 137.' })),
     ask(order('c7-03', 'swallowing', 'Order the phases of swallowing.', ['Oral preparatory', 'Oral propulsive', 'Pharyngeal', 'Oesophageal'], { explanation: 'Slides 139–144.' })),
-    ask(mcq('c7-04', 'swallowing', 'During the pharyngeal phase, what stops food entering the nose?', 'The soft palate rises against the posterior pharyngeal wall', ['The epiglottis', 'The upper oesophageal sphincter', 'The tongue'], { explanation: 'Slide 142.' })),
-    ask(mcq('c7-05', 'gastric-motility', 'What is receptive relaxation?', 'Relaxation of the orad stomach as food is swallowed', ['Relaxation of the pylorus during emptying', 'Relaxation of the colon after a meal', 'Relaxation of the anal sphincter'], { explanation: 'Slide 150.', skill: 'terminology' })),
+    ask(mcq('c7-04', 'swallowing', 'During the pharyngeal phase, what stops food entering the nose?', 'The soft palate rises against the posterior pharyngeal wall', ['The epiglottis tilting back over the nasal opening', 'The upper oesophageal sphincter closing tightly', 'The tongue pressing up against the hard palate'], { explanation: 'Slide 142.' })),
+    ask(mcq('c7-05', 'gastric-motility', 'What is receptive relaxation?', 'Relaxation of the orad stomach as food is swallowed', ['Relaxation of the pylorus during gastric emptying', 'Relaxation of the colon after a large meal', 'Relaxation of the internal anal sphincter'], { explanation: 'Slide 150.', skill: 'terminology' })),
     recall('r7-01', 'gastric-motility', 'Explain how the proximal and distal stomach divide the work of storing, mixing and emptying.', [
       'Proximal stomach (cardia, fundus, body) is the reservoir: thin muscle, weak tonic contractions, receptive and adaptive relaxation (NANC: NO, VIP, PACAP, ATP).',
       'Distal stomach (antrum, pylorus) is the pump: thick muscle, phasic peristaltic waves that grow stronger towards the closed pylorus, grinding food into chyme.',
@@ -125,9 +125,9 @@ export const interactive: Record<string, Steps> = {
   'gastrointestinal-physiology-8': [
     ask(mcq('c8-01', 'small-intestine-motility', 'Which hormone elicits the migrating motor complex?', 'Motilin', ['Gastrin', 'CCK', 'Secretin'], { explanation: 'Slide 165.' })),
     learn('The colon’s shape', ['Three taeniae coli, shorter than the colon, gather it into haustra.'], { sourceRefs: ds([167]) }),
-    ask(mcq('c8-02', 'colon', 'Why does a person often need to defecate soon after breakfast?', 'The gastrocolic reflex triggers mass movements', ['The MMC starts after meals', 'Breakfast relaxes the external sphincter', 'Haustral contractions stop'], { explanation: 'Slides 172–173.', skill: 'application' })),
+    ask(mcq('c8-02', 'colon', 'Why does a person often need to defecate soon after breakfast?', 'The gastrocolic reflex triggers mass movements', ['The MMC starts after meals and empties the colon', 'Breakfast relaxes the external anal sphincter', 'Haustral contractions stop after the night’s fast'], { explanation: 'Slides 172–173.', skill: 'application' })),
     ask(mcq('c8-03', 'defecation', 'What does the defecation reflex itself produce?', 'The urge to defecate', ['Automatic defecation', 'Contraction of the internal sphincter', 'Vomiting'], { explanation: 'Slide 179.' })),
-    ask(mcq('c8-04', 'vomiting', 'Where is the chemoreceptor trigger zone?', 'The area postrema in the floor of the fourth ventricle', ['The hypothalamus', 'The stomach wall', 'The cerebellum'], { explanation: 'Slide 188.' })),
+    ask(mcq('c8-04', 'vomiting', 'Where is the chemoreceptor trigger zone?', 'The area postrema in the floor of the fourth ventricle', ['The lateral hypothalamus, near the feeding centre', 'The wall of the stomach, in the myenteric plexus', 'The cerebellum, beside the vestibular nuclei'], { explanation: 'Slide 188.' })),
     ask(order('c8-05', 'vomiting', 'Order the stages of vomiting.', ['Nausea', 'Retching', 'Emesis'], { explanation: 'Slide 184.' })),
     recall('r8-01', 'defecation', 'Describe how defecation happens, including the sphincters and reflexes involved.', [
       'A mass movement fills the rectum; rising pressure triggers the defecation reflex: the rectum contracts and the internal anal sphincter relaxes, giving the urge.',
@@ -141,7 +141,7 @@ export const interactive: Record<string, Steps> = {
     ask(mcq('c9-01', 'liver', 'Which two vessels supply the hepatic sinusoids?', 'The hepatic artery and portal vein', ['The hepatic vein and portal vein', 'The coeliac and splenic arteries', 'The central vein and hepatic artery'], { explanation: 'Slides 195–196.' })),
     learn('Bile acids to bile salts', ['Cholic and chenodeoxycholic acids are conjugated with glycine or taurine to make bile salts, which are better detergents.'], { sourceRefs: ds([201, 202]) }),
     ask(mcq('c9-02', 'bile-secretion', 'A fatty meal reaches the duodenum. Which hormone empties the gallbladder?', 'CCK', ['Secretin', 'Gastrin', 'Motilin'], { explanation: 'Slides 208–209: CCK contracts the gallbladder and relaxes the sphincter of Oddi.', skill: 'application' })),
-    ask(mcq('c9-03', 'bile', 'Why do pigment gallstones form more readily in the gallbladder?', 'It concentrates Ca²⁺ and bilirubin, so calcium bilirubinate precipitates', ['It secretes bilirubin', 'It makes bile alkaline', 'It absorbs all bile salts'], { explanation: 'Slide 204.', skill: 'cause-effect' })),
+    ask(mcq('c9-03', 'bile', 'Why do pigment gallstones form more readily in the gallbladder?', 'It concentrates Ca²⁺ and bilirubin, so calcium bilirubinate precipitates', ['It secretes bilirubin into the stored bile', 'It makes bile alkaline, so bilirubin crystallises', 'It absorbs all the bile salts that keep bilirubin dissolved'], { explanation: 'Slide 204.', skill: 'cause-effect' })),
     ask(mcq('c9-04', 'jaundice', 'A patient with sickle cell crisis becomes jaundiced with high unconjugated bilirubin. Which type?', 'Pre-hepatic', ['Hepatic', 'Post-hepatic', 'Obstructive'], { explanation: 'Slides 213–214: haemolysis overwhelms the liver.', skill: 'application', clinical: true })),
     recall('r9-01', 'jaundice', 'Classify jaundice by where the problem lies, with the bilirubin type and two causes of each.', [
       'Pre-hepatic: excess haemolysis overwhelms the liver; unconjugated bilirubin; e.g. malaria, sickle cell, G6PD deficiency.',

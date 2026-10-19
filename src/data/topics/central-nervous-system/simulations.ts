@@ -169,7 +169,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s3-02', 'dorsal-columns', 'Only the right dorsal column is cut at T10. Where is vibration and joint position sense lost?', 'In the right leg', ['In the left leg', 'In both legs'], {
+        question: mcq('s3-02', 'dorsal-columns', 'Only the right dorsal column is cut at T10. Where is vibration and joint position sense lost?', 'In the right leg', ['In the left leg', 'In both legs equally'], {
           ...predict,
           explanation: 'The dorsal columns ascend on the same side and cross only in the medulla (Sensory II, p. 7).',
         }),
@@ -204,7 +204,7 @@ export const simulations: Record<string, Step> = {
     sourceRefs: s2([16, 17, 21, 22, 23, 24]),
     predictions: [
       {
-        question: mcq('s4-01', 'pain-types', 'Ten seconds after the injury, which kind of pain is the main one?', 'Slow, burning pain carried by C fibres', ['Fast, sharp pain carried by Aδ fibres', 'Neither — pain receptors have adapted'], {
+        question: mcq('s4-01', 'pain-types', 'Ten seconds after the injury, which kind of pain is the main one?', 'Slow, burning pain carried by C fibres', ['Fast, sharp pain carried by Aδ fibres', 'Neither — the pain receptors have already adapted'], {
           ...predict,
           explanation: 'Fast pain is brief. Slow pain builds steadily because its transmitter, substance P, is slow to build up and slow to be destroyed (Sensory II, p. 21).',
         }),
@@ -278,7 +278,7 @@ export const simulations: Record<string, Step> = {
     sourceRefs: mo([14, 17, 18, 19]),
     predictions: [
       {
-        question: mcq('s6-01', 'motor-lesions', 'The right femoral nerve was cut a month ago. What does the quadriceps look like?', 'Wasted and flaccid, with no knee jerk', ['Stiff, with a brisk knee jerk', 'Normal bulk, weak and spastic'], {
+        question: mcq('s6-01', 'motor-lesions', 'The right femoral nerve was cut a month ago. What does the quadriceps look like?', 'Wasted and flaccid, with no knee jerk', ['Stiff and spastic, with a brisk knee jerk', 'Normal bulk, weak and spastic, with clonus'], {
           ...predict,
           explanation: 'A lower motor neuron lesion: flaccid paralysis, atrophy, lost reflexes and fibrillation (Motor Activity, slide 19).',
         }),
@@ -383,7 +383,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s9-02', 'brain-lobes', 'Only the visual association area is destroyed. What happens?', 'She can see, but cannot recognise what she sees', ['She is blind', 'Nothing — the primary visual area is intact'], {
+        question: mcq('s9-02', 'brain-lobes', 'Only the visual association area is destroyed. What happens?', 'She can see, but cannot recognise what she sees', ['She is blind in both eyes', 'Nothing changes — the primary visual area is intact'], {
           ...predict,
           explanation: 'The Brain, slides 13–14: destroying the visuosensory centre causes blindness; destroying only the association area removes recognition.',
         }),
@@ -395,7 +395,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s9-03', 'deep-structures', 'Both hippocampi are removed. What is lost?', 'The ability to form new memories', ['Memories of childhood', 'The ability to speak'], {
+        question: mcq('s9-03', 'deep-structures', 'Both hippocampi are removed. What is lost?', 'The ability to form new memories', ['Memories of childhood and early life', 'The ability to speak and understand'], {
           ...predict,
           explanation: 'The hippocampus is needed to file new memories into long-term storage; old memories remain (The Brain, slide 28).',
         }),

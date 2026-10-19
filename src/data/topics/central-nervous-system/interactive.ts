@@ -37,7 +37,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c1-04', 'adaptation-muller', 'You put on a watch and soon stop feeling it, yet your carotid baroreceptors keep reporting blood pressure all day. Why the difference?', 'Touch receptors adapt rapidly (phasic); BP receptors adapt slowly (tonic)', ['Touch receptors are damaged by pressure', 'BP receptors are pain receptors', 'Touch signals cannot reach the cortex'], {
+      mcq('c1-04', 'adaptation-muller', 'You put on a watch and soon stop feeling it, yet your carotid baroreceptors keep reporting blood pressure all day. Why the difference?', 'Touch receptors adapt rapidly (phasic); BP receptors adapt slowly (tonic)', ['Touch receptors are damaged by the steady pressure of the watch', 'Baroreceptors are pain receptors, which never adapt at all', 'Touch signals from the wrist cannot reach the cerebral cortex'], {
         explanation: 'Sensory I, p. 10: rapid (phasic) adaptors — touch, smell; slow (tonic) — lung inflation, BP, temperature.',
         skill: 'application',
       })
@@ -68,7 +68,7 @@ export const interactive: Record<string, Steps> = {
       'Ia annulospiral endings wrap bag and chain fibres; II flower-spray endings are on chain fibres only. Motor supply: γ-efferents.',
     ], { sourceRefs: s1([14]) }),
     ask(
-      mcq('c2-02', 'stretch-reflex', 'Why is the knee jerk called monosynaptic?', 'The spindle afferent synapses directly on the α-motor neuron', ['Only one muscle fibre contracts', 'It uses one interneuron', 'Only one spinal segment exists for the knee'], {
+      mcq('c2-02', 'stretch-reflex', 'Why is the knee jerk called monosynaptic?', 'The spindle afferent synapses directly on the α-motor neuron', ['Only one muscle fibre contracts in the quadriceps', 'It uses one interneuron between afferent and motor neuron', 'Only one spinal segment supplies the whole knee'], {
         explanation: 'Sensory I, pp. 12–13: afferent → α-motor neuron, one synapse.',
         skill: 'cause-effect',
       })
@@ -77,13 +77,13 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: s1([24]),
     }),
     ask(
-      mcq('c2-03', 'gamma-efferents', 'A nervous student’s knee jerks are brisk. What explains it?', 'Descending signals raise γ discharge, making the spindles more sensitive', ['Anxiety damages the Golgi tendon organs', 'Anxiety blocks the α-motor neurons', 'The spindles stop adapting'], {
+      mcq('c2-03', 'gamma-efferents', 'A nervous student’s knee jerks are brisk. What explains it?', 'Descending signals raise γ discharge, making the spindles more sensitive', ['Anxiety damages the Golgi tendon organs, removing their inhibition', 'Anxiety blocks the α-motor neurons until the reflex bursts through', 'The spindles stop adapting because adrenaline acts on them directly'], {
         explanation: 'Sensory I, p. 25: γ-efferents are controlled by descending tracts; hyperactive reflexes can be seen in anxious people. Jendrassik’s manoeuvre works the same way.',
         skill: 'application',
       })
     ),
     ask(
-      mcq('c2-04', 'gamma-efferents', 'When the biceps is reflexly made to contract, what happens to the triceps?', 'It is inhibited and relaxes', ['It contracts too', 'It is unaffected', 'It goes into spasm'], {
+      mcq('c2-04', 'gamma-efferents', 'When the biceps is reflexly made to contract, what happens to the triceps?', 'It is inhibited and relaxes', ['It contracts too, to steady the elbow', 'It is unaffected by the biceps reflex', 'It goes into spasm to oppose the biceps'], {
         explanation: 'Reciprocal innervation (Sensory I, p. 25): Ia impulses pass to the antagonist to inhibit it.',
         skill: 'prediction',
       })
@@ -131,7 +131,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c3-04', 'dorsal-columns', 'Same lesion — right half of the cord at T10. Where is vibration and joint position sense lost?', 'In the right leg', ['In the left leg', 'In both legs', 'Nowhere'], {
+      mcq('c3-04', 'dorsal-columns', 'Same lesion — right half of the cord at T10. Where is vibration and joint position sense lost?', 'In the right leg', ['In the left leg', 'In both legs', 'Nowhere — it crosses higher up'], {
         explanation: 'The dorsal columns ascend on the same side until the medulla.',
         skill: 'pathway-reasoning',
       })
@@ -146,7 +146,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c3-06', 'temperature', 'A hand is held in water at 47 °C. What does the person feel?', 'Pain — above 45 °C pain replaces temperature', ['Warmth that soon fades by adaptation', 'Cold', 'Nothing — temperature receptors adapt fully'], {
+      mcq('c3-06', 'temperature', 'A hand is held in water at 47 °C. What does the person feel?', 'Pain — above 45 °C pain replaces temperature', ['Warmth that soon fades by adaptation', 'Cold, as the cold receptors fire paradoxically', 'Nothing — temperature receptors adapt fully at this heat'], {
         explanation: 'Sensory II, p. 15: no adaptation above 40 °C; above 45 °C tissue damage and pain.',
         skill: 'prediction',
       })
@@ -178,13 +178,13 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: s2([21]),
     }),
     ask(
-      mcq('c4-03', 'pain-pathways', 'Why does slow pain build up gradually and last long after the injury?', 'Its transmitter, substance P, is slow to build up and slow to be destroyed', ['C fibres are myelinated', 'It travels in the dorsal columns', 'It is relayed through the cerebellum'], {
+      mcq('c4-03', 'pain-pathways', 'Why does slow pain build up gradually and last long after the injury?', 'Its transmitter, substance P, is slow to build up and slow to be destroyed', ['C fibres are thickly myelinated, so the signal is delayed at each node', 'It travels in the dorsal columns, which relay slowly through the medulla', 'It is relayed through the cerebellum before reaching the cortex'], {
         explanation: 'Sensory II, p. 21.',
         skill: 'cause-effect',
       })
     ),
     ask(
-      mcq('c4-04', 'pain-control', 'Why does rubbing a bumped elbow ease the pain?', 'Large tactile fibres from the same area inhibit transmission of the pain signals', ['Rubbing releases bradykinin', 'Rubbing blocks the thalamus', 'Rubbing speeds up C fibres'], {
+      mcq('c4-04', 'pain-control', 'Why does rubbing a bumped elbow ease the pain?', 'Large tactile fibres from the same area inhibit transmission of the pain signals', ['Rubbing releases bradykinin, which blocks the nociceptors', 'Rubbing blocks the thalamus from relaying the pain signals', 'Rubbing speeds up the C fibres so the pain passes more quickly'], {
         explanation: 'Local suppression (Sensory II, p. 22): stimulating large sensory fibres depresses pain transmission from the same area, by pre- or post-synaptic inhibition.',
         skill: 'cause-effect',
       })
@@ -195,7 +195,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c4-06', 'referred-pain', 'A patient with a headache asks why “the brain hurts”. Which statement is correct?', 'The brain itself is insensitive; the pain comes from structures like the venous sinuses, tentorium and meninges', ['Neurons in the cortex have many pain receptors', 'Headache is always caused by a tumour', 'Headache travels in the dorsal columns'], {
+      mcq('c4-06', 'referred-pain', 'A patient with a headache asks why “the brain hurts”. Which statement is correct?', 'The brain itself is insensitive; the pain comes from structures like the venous sinuses, tentorium and meninges', ['Neurons in the cerebral cortex carry many pain receptors of their own', 'Headache is always caused by a tumour pressing on the brain tissue', 'Headache travels to the cortex in the dorsal columns of the cord'], {
         explanation: 'Sensory II, p. 28: headache is usually referred pain from deep structures.',
         clinical: true,
       })
@@ -223,7 +223,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c5-03', 'cord-tracts', 'A tract is called the “spinocerebellar” tract. What can you tell from its name?', 'It is sensory, running from the spinal cord to the cerebellum', ['It is motor, from the cerebellum to the cord', 'It is a plexus', 'It is a cranial nerve'], {
+      mcq('c5-03', 'cord-tracts', 'A tract is called the “spinocerebellar” tract. What can you tell from its name?', 'It is sensory, running from the spinal cord to the cerebellum', ['It is motor, running from the cerebellum to the spinal cord', 'It is a plexus of spinal nerves near the cerebellum', 'It is a cranial nerve that leaves the brainstem'], {
         explanation: 'Spinal Cord, slide 8: spino- first means it starts in the cord and ascends; the ending names its destination.',
         skill: 'application',
       })
@@ -257,7 +257,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 6 — Motor cortex and descending control ────────────────
   'central-nervous-system-6': [
     ask(
-      mcq('c6-01', 'final-common-path', 'Why are the spinal and cranial motor neurons called the “final common pathway”?', 'Every motor command — cortical, brainstem, reflex — must pass through them to reach muscle', ['They are the last neurons to develop', 'They are shared by both sides of the body', 'They carry sensation back to the brain'], {
+      mcq('c6-01', 'final-common-path', 'Why are the spinal and cranial motor neurons called the “final common pathway”?', 'Every motor command — cortical, brainstem, reflex — must pass through them to reach muscle', ['They are the last neurons in the nervous system to develop before birth', 'They are shared by both sides of the body, so commands from each side converge', 'They carry all sensation back from the muscles to the brain and cerebellum'], {
         explanation: 'Motor Activity, slide 3: they receive input from all over and are the only route to muscle.',
         skill: 'cause-effect',
       })
@@ -272,7 +272,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c6-03', 'brainstem-motor', 'Which brainstem nucleus inhibits antigravity muscles?', 'The medullary reticular nucleus', ['The pontine reticular nucleus', 'The vestibular nucleus', 'The red nucleus'], {
+      mcq('c6-03', 'brainstem-motor', 'Which brainstem nucleus inhibits antigravity muscles?', 'The medullary reticular nucleus', ['The pontine reticular nucleus', 'The lateral vestibular nucleus', 'The red nucleus'], {
         explanation: 'Motor Activity, slide 16: medullary reticular inhibits; pontine reticular and vestibular nuclei excite.',
       })
     ),
@@ -366,12 +366,12 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: bg([7]),
     }),
     ask(
-      mcq('c8-03', 'bg-disorders', 'In Parkinson’s disease, which neurons are lost?', 'Dopaminergic neurons of the substantia nigra', ['GABA neurons of the striatum', 'Purkinje cells', 'Neurons of the subthalamic nucleus'], {
+      mcq('c8-03', 'bg-disorders', 'In Parkinson’s disease, which neurons are lost?', 'Dopaminergic neurons of the substantia nigra', ['GABA neurons of the striatum (caudate)', 'Purkinje cells of the cerebellum', 'Neurons of the subthalamic nucleus'], {
         explanation: 'Basal Ganglia, slide 8: degeneration of the nigrostriatal dopamine system.',
       })
     ),
     ask(
-      mcq('c8-04', 'bg-disorders', 'Using the lecture’s model, why does losing dopamine make muscles rigid?', 'Dopamine normally inhibits the caudate and putamen; without it their excitatory influence dominates', ['Dopamine normally excites the muscles directly', 'Dopamine loss damages the spindles', 'The cerebellum takes over the movement'], {
+      mcq('c8-04', 'bg-disorders', 'Using the lecture’s model, why does losing dopamine make muscles rigid?', 'Dopamine normally inhibits the caudate and putamen; without it their excitatory influence dominates', ['Dopamine normally excites the muscles directly at the neuromuscular junction', 'Dopamine loss damages the muscle spindles, so tone cannot be sensed', 'The cerebellum takes over the movement and stiffens every joint'], {
         explanation: 'Basal Ganglia, slide 9: cutting off the inhibitory influence of dopamine leads to overactivity and rigidity.',
         skill: 'cause-effect',
       })
@@ -395,7 +395,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 9 — The brain ──────────────────────────────────────────
   'central-nervous-system-9': [
     ask(
-      mcq('c9-01', 'brain-overview', 'A tumour is described as “infratentorial”. Where is it?', 'In the cerebellum or brainstem', ['In the frontal lobe', 'Anywhere above the tentorium', 'In the spinal cord'], {
+      mcq('c9-01', 'brain-overview', 'A tumour is described as “infratentorial”. Where is it?', 'In the cerebellum or brainstem', ['In the frontal lobe', 'Anywhere above the tentorium', 'In the cervical spinal cord'], {
         explanation: 'The Brain, slide 15: infratentorial = below the tentorium, in the hindbrain or brainstem.',
         skill: 'terminology',
       })
@@ -404,13 +404,13 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: br([7, 9, 11, 13]),
     }),
     ask(
-      mcq('c9-02', 'brain-lobes', 'A patient speaks fluently but cannot understand what is said to them. Which lobe is damaged?', 'Temporal — Wernicke’s aphasia', ['Frontal — Broca’s aphasia', 'Occipital', 'Parietal — dyscalculia'], {
+      mcq('c9-02', 'brain-lobes', 'A patient speaks fluently but cannot understand what is said to them. Which lobe is damaged?', 'Temporal — Wernicke’s aphasia', ['Frontal — Broca’s aphasia', 'Occipital — visual agnosia', 'Parietal — dyscalculia'], {
         explanation: 'The Brain, slide 10: difficulty understanding spoken words is Wernicke’s aphasia, a temporal lobe sign.',
         skill: 'application',
       })
     ),
     ask(
-      mcq('c9-03', 'brain-lobes', 'Only the visual association area of the occipital lobe is destroyed. What happens?', 'The person can see but cannot recognise what they see', ['Total blindness', 'Loss of the pupillary reflex', 'Loss of colour vision only, nothing else'], {
+      mcq('c9-03', 'brain-lobes', 'Only the visual association area of the occipital lobe is destroyed. What happens?', 'The person can see but cannot recognise what they see', ['Total blindness in both visual fields', 'Loss of the pupillary light reflex', 'Loss of colour vision only, nothing else'], {
         explanation: 'The Brain, slides 13–14. Destroying the visuosensory centre instead causes blindness.',
         skill: 'prediction',
       })
@@ -419,12 +419,12 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: br([18]),
     }),
     ask(
-      mcq('c9-04', 'brainstem', 'Damage to which part of the brainstem most directly disturbs the sleep–wake cycle and level of consciousness?', 'The pons (reticular activating system)', ['The medulla only', 'The midbrain only', 'The cerebellum'], {
+      mcq('c9-04', 'brainstem', 'Damage to which part of the brainstem most directly disturbs the sleep–wake cycle and level of consciousness?', 'The pons (reticular activating system)', ['The medulla only (cardiovascular centre)', 'The midbrain only (red nucleus)', 'The cerebellum (vermis)'], {
         explanation: 'The Brain, slide 18: the pons holds fibres of the reticular formation and reticular activating system.',
       })
     ),
     ask(
-      mcq('c9-05', 'cortex-dominance', 'A right-handed man has a stroke in his left hemisphere. Which problem is most likely?', 'Aphasia with weakness of the right side', ['Loss of spatial perception only', 'Weakness of the left side', 'Loss of smell only'], {
+      mcq('c9-05', 'cortex-dominance', 'A right-handed man has a stroke in his left hemisphere. Which problem is most likely?', 'Aphasia with weakness of the right side', ['Loss of spatial perception only', 'Weakness of the left side of the body', 'Loss of smell on both sides only'], {
         explanation: 'The Brain, slide 23: about 87% are left-hemisphere dominant; a left stroke usually brings aphasia, apraxia and right-sided difficulty.',
         skill: 'application',
         clinical: true,

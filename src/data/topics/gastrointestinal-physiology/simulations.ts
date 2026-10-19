@@ -250,7 +250,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s8-03', 'defecation', 'The pudendal nerve is damaged and the rectum fills. What happens?', 'The external sphincter cannot be held shut: incontinence', ['Nothing — the internal sphincter keeps continence', 'The urge is lost, so the rectum overfills'], {
+        question: mcq('s8-03', 'defecation', 'The pudendal nerve is damaged and the rectum fills. What happens?', 'The external sphincter cannot be held shut: incontinence', ['Nothing — the internal sphincter keeps continence', 'The urge is lost, so the rectum overfills silently'], {
           ...predict,
           explanation: 'The external anal sphincter is skeletal muscle supplied by the pudendal nerve; it is how the person holds on once the reflex relaxes the internal sphincter (slides 174, 182).',
         }),
