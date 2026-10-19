@@ -175,4 +175,58 @@ export const SCENES = {
     },
     view: { dir: [0.45, 0.05, 1], dist: 1.9 },
   },
+
+  // The urinary system with its blood supply: kidneys (and adrenals), renal arteries and veins
+  // from the aorta and vena cava, ureters and bladder.
+  urinary: {
+    label: 'The kidneys, renal arteries and veins, ureters and bladder',
+    files: ['VisceralSystem100', 'CardioVascular41'],
+    under: ['urinary system.g'],
+    names: [/^(suprarenal gland\.?(r|l))$/, /^(abdominal aorta|(right|left) renal (artery|vein)|anterior branch of renal artery\.?(r|l)|posterior branch of renal artery\.?(r|l)|intrarenal (arteries|veins) of (right|left) kidney|inferior vena cava \(abdominal part\)|common iliac (artery|vein)\.?(r|l))( \d+)?$/],
+    exclude: [/urethra/],
+    groups: {
+      kidneys: { match: /^[^/]*kidney\.?(r|l)|^kidney/ },
+      pelvis: { match: /renal pelvis|ureter/ },
+      bladder: { match: /urinary bladder/, move: true, pivotAt: 'bottom' },
+      arteries: { match: /arter|aorta/ },
+      veins: { match: /vein|vena/ },
+      adrenals: { match: /suprarenal/ },
+    },
+    view: { dir: [0, 0.1, 1], dist: 1.6 },
+  },
+
+  // The bladder in the pelvis: bladder and urethra, the pelvic floor (levator ani), the hip bones
+  // for context, and the pudendal nerves and the spinal cord.
+  bladder: {
+    label: 'The bladder, urethra and pelvic floor, with the pudendal nerves',
+    files: ['VisceralSystem100', 'MuscularSystem100', 'SkeletalSystem100', 'NervousSystem100'],
+    under: ['levator ani.g', 'bones of pelvic girdle.g'],
+    names: [/^(urinary bladder|urethra)( \d+)?$/, /^(ureter\.?(r|l))( \d+)?$/, /^pudendal nerve/, /^(sacrum|coccyx)$/],
+    groups: {
+      bladder: { match: /urinary bladder/, move: true, pivotAt: 'bottom' },
+      urethra: { match: /urethra/ },
+      floor: { match: /levator ani|tendinous arch/ },
+      bones: { match: /hip bone|sacrum|coccyx|pelvic girdle/, opacity: 0.22 },
+      pudendal: { match: /pudendal/ },
+      ureters: { match: /ureter/ },
+    },
+    focus: 'bladder',
+    view: { dir: [0.35, 0.15, 1], dist: 3.2 },
+  },
+
+  // Lungs and kidneys together, for acid–base balance.
+  'lungs-kidneys': {
+    label: 'The lungs and the kidneys',
+    files: ['VisceralSystem100'],
+    under: ['lungs.g', 'tracheobronchial tree.g', 'urinary system.g'],
+    names: [],
+    exclude: [/urethra/],
+    groups: {
+      lungs: { match: /lung/, move: true, pivotAt: 'top' },
+      airways: { match: /trachea|bronch/ },
+      kidneys: { match: /^[^/]*kidney|^kidney|renal pelvis/ },
+      bladder: { match: /urinary bladder|ureter/ },
+    },
+    view: { dir: [0, 0.05, 1], dist: 1.35 },
+  },
 };

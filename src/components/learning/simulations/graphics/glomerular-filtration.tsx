@@ -4,6 +4,8 @@ import { Circle, Defs, G, Path, RadialGradient, Stop } from 'react-native-svg';
 import { Anatomy as A } from '@/constants/theme';
 import { SYMPATHETIC, type FiltrationState } from '@/data/simulations/glomerular-filtration';
 
+import { Organ3D } from '../organ-3d';
+import { rounded } from '../organ-frames';
 import { mix } from './anatomy/cells';
 import { GlomerularTuft, Tube } from './anatomy/kidney';
 import { seeded, useSvgIds } from './anatomy/lungs';
@@ -27,8 +29,13 @@ export function GlomerularFiltrationGraphic({ state, time, reduceMotion }: Graph
   const filtrate = mix(A.urine, '#FFFFFF', 0.6);
   const nerve = state.sympathetic / 2;
 
+  const organ = {
+    glow: { kidneys: rounded(Math.min(1, state.gfr / 160) * 0.6, 0.05), arteries: rounded(Math.min(1, state.gbhp / 80) * 0.5, 0.05) },
+    glowColor: { kidneys: '#ffd25a', arteries: '#ff6a4a' },
+  };
   return (
-    <View>
+    <View style={{ gap: 10 }}>
+      <Organ3D scene="urinary" frame={organ} label={`The kidneys, filtering ${Math.round(state.gfr)} ml a minute`} />
       <Canvas width={W} height={H} label={`Glomerulus: GFR ${Math.round(state.gfr)} ml/min, net filtration pressure ${state.nfp.toFixed(0)} mmHg. Afferent arteriole ${state.afferent < 0.95 ? 'narrowed' : state.afferent > 1.05 ? 'widened' : 'normal'}. Sympathetic: ${SYMPATHETIC[state.sympathetic]}.`}>
         <Defs>
           <RadialGradient id={id('space')} cx="50%" cy="50%" r="50%">
