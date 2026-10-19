@@ -1,8 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Platform, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { useTabBarClearance } from '@/components/floating-tab-bar';
+import { closeSidePanel, openSidePanel, updateSidePanel, useSidePanel, useSidePanelAvailable } from '@/components/side-panel';
 import { type FlashcardLabels, FlashcardsPanel } from '@/components/learning/lesson-tools';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -33,9 +35,15 @@ const problemText = (problem: unknown) => (problem instanceof AiError ? problem.
 
 // ── Ask AI ──────────────────────────────────────────────────────────
 
-export function AskAiPanel({ lesson, focus, embedded = false }: { lesson: AiLesson; /** The section being read, offered as a first question. */ focus?: string; /** Inside the "Ask AI" sheet: the sheet shows the title. */ embedded?: boolean }) {
+export function AskAiPanel({ lesson, focus, embedded = false, docked = false }: {
+  lesson: AiLesson;
+  /** The section being read, offered as a first question. */ focus?: string;
+  /** Inside the "Ask AI" sheet: the sheet shows the title. */ embedded?: boolean;
+  /** In the right-hand side panel: the conversation scrolls and the question box stays at the bottom. */ docked?: boolean;
+}) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
+  const scroll = useRef<ScrollView>(null);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
@@ -67,9 +75,9 @@ export function AskAiPanel({ lesson, focus, embedded = false }: { lesson: AiLess
     }
   }
 
-  return (
-    <View style={styles.panel}>
-      {embedded ? null : <Text style={styles.panelTitle}>Ask AI</Text>}
+  const conversation = (
+    <>
+      {embedded || docked ? null : <Text style={styles.panelTitle}>Ask AI</Text>}
       <Text style={styles.panelText}>Ask anything about “{lesson.title}”. The answers come from this lesson first. AI can make mistakes, so check important details against your lecture notes.</Text>
 
       {turns.length === 0 ? (
@@ -103,7 +111,11 @@ export function AskAiPanel({ lesson, focus, embedded = false }: { lesson: AiLess
       )}
 
       {error ? <InlineNotice tone="error" message={error} /> : null}
+    </>
+  );
 
+  const composer = (
+    <>
       <View style={styles.composer}>
         <TextInput
           value={draft}
@@ -113,18 +125,42 @@ export function AskAiPanel({ lesson, focus, embedded = false }: { lesson: AiLess
           accessibilityLabel="Ask a question about this lesson"
           multiline
           maxLength={1000}
-          style={styles.input}
+          // In the side panel, Enter sends (Shift + Enter for a new line), like a chat.
+          onKeyPress={docked && Platform.OS === 'web' ? (event) => {
+            const native = event.nativeEvent as unknown as { key: string; shiftKey?: boolean };
+            if (native.key === 'Enter' && !native.shiftKey) { (event as unknown as { preventDefault?: () => void }).preventDefault?.(); void send(draft); }
+          } : undefined}
+          style={[styles.input, docked && styles.inputDocked]}
         />
         <Button label="Ask" icon={<Icon name="send" size={16} color={colors.onPrimary} />} onPress={() => void send(draft)} loading={busy} disabled={busy || !draft.trim()} />
       </View>
       {turns.length > 0 ? <Button label="Clear conversation" variant="ghost" size="sm" onPress={() => { setTurns([]); setError(null); }} disabled={busy} /> : null}
+    </>
+  );
+
+  if (docked) {
+    return (
+      <View style={styles.docked}>
+        <ScrollView ref={scroll} style={styles.dockedScroll} contentContainerStyle={styles.dockedBody} onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: true })}>
+          {conversation}
+        </ScrollView>
+        <View style={styles.dockedFooter}>{composer}</View>
+      </View>
+    );
+  }
+  return (
+    <View style={styles.panel}>
+      {conversation}
+      {composer}
     </View>
   );
 }
 
 // ── "Ask AI" while reading ──────────────────────────────────────────
-// A floating button over the reading page: opens Ask AI in a sheet, so the
-// learner can ask about what they are reading without leaving the page.
+// A floating button over the reading page, so the learner can ask about what
+// they are reading without leaving the page. On a computer it opens a panel
+// docked on the right (like Ask Gemini in Chrome: the page moves over and stays
+// scrollable); on a phone or a narrow window, a sheet.
 // Place it in a full-screen container (position: absolute, bottom right).
 
 export function AskAiFab({ lesson, focus }: { lesson: AiLesson | null; focus?: string }) {
@@ -133,20 +169,37 @@ export function AskAiFab({ lesson, focus }: { lesson: AiLesson | null; focus?: s
   const { width } = useWindowDimensions();
   const clearance = useTabBarClearance();
   const [open, setOpen] = useState(false);
+  const docked = useSidePanelAvailable();
+  const panelId = lesson ? `ask-ai:${lesson.id}` : '';
+  const sidePanel = useSidePanel();
+  const panelOpen = docked && sidePanel?.id === panelId;
+  const subtitle = lesson ? (focus ? `While reading: ${focus}` : lesson.title) : '';
+
+  // The panel belongs to this lesson: it closes when the learner leaves the page.
+  useFocusEffect(useCallback(() => () => closeSidePanel(panelId), [panelId]));
+  useEffect(() => () => closeSidePanel(panelId), [panelId]);
+  // Keep "While reading: …" in step with the section on screen.
+  useEffect(() => { updateSidePanel(panelId, { subtitle }); }, [panelId, subtitle]);
+
   if (!lesson) return null;
   const bottom = isDesktopWidth(width) ? 28 : clearance + 14;
+  const toggle = () => {
+    if (!docked) { setOpen(true); return; }
+    if (panelOpen) closeSidePanel(panelId);
+    else openSidePanel({ id: panelId, title: 'Ask AI', subtitle, content: <AskAiPanel lesson={lesson} focus={focus} docked /> });
+  };
   return (
     <>
       <Interactive
-        onPress={() => setOpen(true)}
+        onPress={toggle}
         accessibilityRole="button"
-        accessibilityLabel="Ask AI about what you are reading"
+        accessibilityLabel={panelOpen ? 'Close Ask AI' : 'Ask AI about what you are reading'}
         style={({ hovered, pressed }) => [styles.fab, { bottom }, elevation(colors, 3), hovered && styles.fabHover, pressed && styles.fabPressed]}
       >
-        <Icon name="sparkle" size={18} color={colors.onPrimary} />
-        <Text style={styles.fabText}>Ask AI</Text>
+        <Icon name={panelOpen ? 'close' : 'sparkle'} size={18} color={colors.onPrimary} />
+        <Text style={styles.fabText}>{panelOpen ? 'Close AI' : 'Ask AI'}</Text>
       </Interactive>
-      <Sheet visible={open} onClose={() => setOpen(false)} title="Ask AI" subtitle={focus ? `While reading: ${focus}` : lesson.title} width={640}>
+      <Sheet visible={open && !docked} onClose={() => setOpen(false)} title="Ask AI" subtitle={subtitle} width={640}>
         <AskAiPanel lesson={lesson} focus={focus} embedded />
       </Sheet>
     </>
@@ -400,6 +453,11 @@ function createStyles(colors: ThemeColors) {
     who: { ...Type.overline, color: colors.primaryText },
     message: { fontSize: 14.5, lineHeight: 22, color: colors.text },
     composer: { gap: 10 },
+    docked: { flex: 1, minHeight: 0 },
+    dockedScroll: { flex: 1 },
+    dockedBody: { gap: 12, padding: 18 },
+    dockedFooter: { gap: 6, paddingHorizontal: 18, paddingTop: 12, paddingBottom: 16, borderTopWidth: 1, borderTopColor: colors.divider },
+    inputDocked: { minHeight: 56, maxHeight: 160 },
     input: { minHeight: 74, borderWidth: 1, borderColor: colors.borderStrong, borderRadius: Radius.md, backgroundColor: colors.surfaceSunken, padding: 12, color: colors.text, fontSize: 14.5, textAlignVertical: 'top' },
     pickerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' },
     picker: { minWidth: 190 },

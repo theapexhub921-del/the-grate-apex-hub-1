@@ -198,7 +198,7 @@ Every lesson has an "Ask AI" tab (questions answered from the lesson's own text)
 * `tests/ai-study.test.mjs` checks every lesson produces text for the AI.
 * **AI while studying** (`src/components/learning/ai-explain.tsx`, `api/ai.mjs` mode `explain`):
   * Every wrong answer in a quiz, review, HB practice or past paper (`QuestionCard`) has "Explain my mistake with AI"; the results page has "Explain with AI" on every answer. It explains from the lesson's lecture text (`src/data/ai-context.ts` finds it from the question's `lessonId`), with follow-up questions.
-  * The Read page of both lesson screens has a floating "Ask AI" button (`AskAiFab` in `ai-study.tsx`) that opens Ask AI in a sheet without leaving the page.
+  * The Read page of both lesson screens has a floating "Ask AI" button (`AskAiFab` in `ai-study.tsx`) that opens Ask AI without leaving the page: on a computer (window 1024 px or wider) in a panel docked on the right, like Ask Gemini in Chrome (owner, 2026-10-19; `src/components/side-panel.tsx`, drawn by `SidePanelHost` in `app-tabs.web.tsx`; the page moves over and stays scrollable, and the panel closes when the learner leaves the lesson); on phones and narrow windows in a sheet.
   * Flashcards (term cards and AI cards) show "Ask AI about this card" once flipped.
 
 ## Study chat (general AI chat, outside lessons)

@@ -15,6 +15,7 @@ import { PageTitle } from '@/components/page-title';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import { DESKTOP_BREAKPOINT } from '@/constants/theme';
+import { SidePanelHost } from '@/components/side-panel';
 import { SidebarResizeHandle, useSidebarWidth } from '@/components/sidebar-resize';
 import { useTabBarLocked } from '@/components/tab-bar-visibility';
 import { useTabBarMode } from '@/data/navigation-settings';
@@ -69,6 +70,7 @@ export default function AppTabs() {
         {/* The original app's sidebar takes its own space beside the page. */}
         {useRail && originals ? <LegacySidebar onNavigate={(route) => router.navigate(NAV_PATHS[route] as Href)} /> : null}
         {useRail && originals && !originalAutoHide ? <SidebarResizeHandle fallback={250} /> : null}
+        <View style={[styles.tabs, styles.row]}>
         <View style={styles.tabs}>
         <Tabs
           backBehavior="history"
@@ -130,6 +132,9 @@ export default function AppTabs() {
           <Tabs.Screen name="learn/tutor" options={{ href: null }} />
           <Tabs.Screen name="learn/chat" options={{ href: null }} />
         </Tabs>
+        </View>
+        {/* Ask AI (and any other docked panel) on the right, like Ask Gemini in Chrome. */}
+        {isAuthRoute || isWidgetRoute ? null : <SidePanelHost />}
         </View>
       </View>
     </View>
