@@ -63,7 +63,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c1-06', 'protoporphyrin-ix', 'On protoporphyrin IX, which side chains are the longest?', 'The propionates (positions 6 and 7)', ['The methyls (1, 3, 5, 8)', 'The vinyls (2, 4)', 'All are the same length'], {
+      mcq('c1-06', 'protoporphyrin-ix', 'On protoporphyrin IX, which side chains are the longest?', 'The propionates (positions 6 and 7)', ['The methyls (positions 1, 3, 5 and 8)', 'The vinyls (positions 2 and 4)', 'All the side chains are the same length'], {
         explanation: 'Slide 12 asks this: propionates (–CH₂–CH₂–COO⁻) are the longest; methyls are the shortest.',
         skill: 'application',
       })
@@ -89,7 +89,7 @@ export const interactive: Record<string, Steps> = {
       'ALA synthase needs pyridoxal phosphate and works in the mitochondria. It catalyses the committed, regulated step.',
     ], { sourceRefs: syn([13, 14, 24]) }),
     ask(
-      mcq('c2-02', 'ala-formation', 'Which coenzyme does ALA synthase need?', 'Pyridoxal phosphate (vitamin B₆)', ['Biotin', 'Thiamine pyrophosphate', 'NADPH'], {
+      mcq('c2-02', 'ala-formation', 'Which coenzyme does ALA synthase need?', 'Pyridoxal phosphate (vitamin B₆)', ['Biotin (vitamin B₇)', 'Thiamine pyrophosphate (vitamin B₁)', 'NADPH (from vitamin B₃)'], {
         explanation: 'Slides 14 and 24: ALA synthase is a PLP (B₆PO₄) enzyme in the mitochondria.',
       })
     ),
@@ -112,7 +112,7 @@ export const interactive: Record<string, Steps> = {
       'Uroporphyrinogen III synthase (cosynthase) closes the ring and flips one pyrrole → asymmetric uroporphyrinogen III. Without it, hydroxymethylbilane cyclises spontaneously to uroporphyrinogen I.',
     ], { sourceRefs: syn([17, 18, 19, 20, 21, 25]) }),
     ask(
-      mcq('c2-05', 'urogen-iii-synthase', 'Uroporphyrinogen III synthase is missing. What does hydroxymethylbilane become?', 'Uroporphyrinogen I, by spontaneous cyclisation', ['Uroporphyrinogen III anyway', 'Protoporphyrin IX directly', 'Porphobilinogen again'], {
+      mcq('c2-05', 'urogen-iii-synthase', 'Uroporphyrinogen III synthase is missing. What does hydroxymethylbilane become?', 'Uroporphyrinogen I, by spontaneous cyclisation', ['Uroporphyrinogen III anyway, by spontaneous cyclisation', 'Protoporphyrin IX directly, skipping the middle steps', 'Porphobilinogen again, by hydrolysis of the chain'], {
         explanation: 'Slide 25: PBG deaminase alone makes hydroxymethylbilane, which cyclises spontaneously to uroporphyrinogen I; the cosynthase directs it to series III.',
         skill: 'prediction',
       })
@@ -135,7 +135,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 3 — Synthesis II ───────────────────────────────────────
   'heme-metabolism-3': [
     ask(
-      mcq('c3-01', 'urogen-decarboxylase', 'Uroporphyrinogen has acetate side chains; coproporphyrinogen has methyls in their place. What reaction makes that change?', 'Decarboxylation (removing CO₂)', ['Reduction with NADPH', 'Hydrolysis', 'Transamination'], {
+      mcq('c3-01', 'urogen-decarboxylase', 'Uroporphyrinogen has acetate side chains; coproporphyrinogen has methyls in their place. What reaction makes that change?', 'Decarboxylation (removing CO₂)', ['Reduction with NADPH', 'Hydrolysis by water', 'Transamination (PLP)'], {
         explanation: 'Slide 24: uroporphyrinogen decarboxylase removes CO₂ from the four acetate side chains, leaving methyl groups.',
         skill: 'prediction',
       })
@@ -193,7 +193,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 4 — Regulation ─────────────────────────────────────────
   'heme-metabolism-4': [
     ask(
-      mcq('c4-01', 'alas-regulation', 'Haem builds up in a liver cell. Which step would you expect it to slow?', 'ALA synthase — the first, committed step', ['Ferrochelatase — the last step', 'Uroporphyrinogen decarboxylase', 'PBG deaminase'], {
+      mcq('c4-01', 'alas-regulation', 'Haem builds up in a liver cell. Which step would you expect it to slow?', 'ALA synthase — the first, committed step', ['Ferrochelatase — the last step', 'Uroporphyrinogen decarboxylase — the fifth step', 'PBG deaminase — the third step'], {
         explanation: 'Slide 26: ALA synthase is the committed, usually rate-limiting step; haem represses transcription of its gene.',
         skill: 'prediction',
       }),
@@ -204,7 +204,7 @@ export const interactive: Record<string, Steps> = {
       'Developing red cells use a variant of ALA synthase regulated instead by iron (iron–sulphur clusters).',
     ], { sourceRefs: syn([24, 26, 40]) }),
     ask(
-      mcq('c4-02', 'alas-regulation', 'The red-cell variant of ALA synthase is regulated mainly by what?', 'Iron availability (iron–sulphur clusters)', ['Haem repression of its gene', 'Insulin', 'Bilirubin'], {
+      mcq('c4-02', 'alas-regulation', 'The red-cell variant of ALA synthase is regulated mainly by what?', 'Iron availability (iron–sulphur clusters)', ['Haem repression of its gene', 'Insulin acting on the erythroblast', 'Bilirubin feedback from the macrophage'], {
         explanation: 'Slide 26: the variant expressed only in developing erythrocytes is regulated by iron, in the form of iron–sulphur clusters.',
       })
     ),
@@ -220,14 +220,14 @@ export const interactive: Record<string, Steps> = {
       'Excess free haem is oxidised to hemin. Hemin represses ALA synthase and inhibits the kinase that would inactivate eIF2 — so globin synthesis continues and combines with the extra haem.',
     ], { sourceRefs: syn([29]) }),
     ask(
-      mcq('c4-04', 'hemin-globin-balance', 'Hemin inhibits the kinase that phosphorylates eIF2. What is the effect?', 'eIF2 stays active, so globin synthesis continues', ['eIF2 is inactivated, so globin synthesis stops', 'ALA synthase is activated', 'Haem is exported from the cell'], {
+      mcq('c4-04', 'hemin-globin-balance', 'Hemin inhibits the kinase that phosphorylates eIF2. What is the effect?', 'eIF2 stays active, so globin synthesis continues', ['eIF2 is inactivated, so globin synthesis stops', 'ALA synthase is activated, so more haem is made', 'Haem is exported from the cell into the plasma'], {
         explanation: 'Slide 29: phosphorylation inactivates eIF2; by inhibiting the kinase, hemin lets globin be made to combine with the excess haem.',
         skill: 'cause-effect',
         difficulty: 'advanced',
       })
     ),
     ask(
-      mcq('c4-05', 'hemin-drug', 'Why does intravenous hemin help in an attack of acute intermittent porphyria?', 'It gives negative feedback to the haem pathway, so precursors stop accumulating', ['It replaces the missing PBG deaminase', 'It binds and removes lead', 'It speeds up bilirubin conjugation'], {
+      mcq('c4-05', 'hemin-drug', 'Why does intravenous hemin help in an attack of acute intermittent porphyria?', 'It gives negative feedback to the haem pathway, so precursors stop accumulating', ['It replaces the missing PBG deaminase, so the pathway runs to completion again', 'It binds and removes lead that is blocking the pathway', 'It speeds up bilirubin conjugation so that the precursors are excreted'], {
         explanation: 'Slides 31–32 and 39: hemin is used in porphyria attacks; it provides negative feedback on the pathway, preventing precursor accumulation.',
         skill: 'application',
       })
@@ -273,7 +273,7 @@ export const interactive: Record<string, Steps> = {
       ], { explanation: 'Slide 40.' })
     ),
     ask(
-      mcq('c5-04', 'porphyria-cutanea-tarda', 'Why are patients with porphyria cutanea tarda photosensitive?', 'Accumulated porphyrinogens become porphyrins in light, which react with O₂ to form oxygen radicals that damage skin', ['Bilirubin deposits in the skin absorb UV light', 'They cannot make melanin', 'ALA blocks GABA receptors in the skin'], {
+      mcq('c5-04', 'porphyria-cutanea-tarda', 'Why are patients with porphyria cutanea tarda photosensitive?', 'Accumulated porphyrinogens become porphyrins in light, which react with O₂ to form oxygen radicals that damage skin', ['Bilirubin deposits in the skin absorb UV light and break down into toxic products that burn the skin', 'They cannot make melanin, so UV light penetrates the skin unopposed', 'ALA blocks GABA receptors in the skin nerves, making light painful'], {
         explanation: 'Slide 42: light converts porphyrinogens to porphyrins; porphyrins react with molecular oxygen to form oxygen radicals that can severely damage the skin.',
         skill: 'cause-effect',
       })
@@ -283,7 +283,7 @@ export const interactive: Record<string, Steps> = {
       'ALA may harm the brain because it resembles GABA and because its autoxidation generates reactive oxygen species.',
     ], { sourceRefs: syn([35, 36, 37]) }),
     ask(
-      mcq('c5-05', 'lead-poisoning', 'Which enzyme is MOST sensitive to lead?', 'ALA dehydrase (porphobilinogen synthase)', ['Uroporphyrinogen decarboxylase', 'Coproporphyrinogen oxidase', 'Biliverdin reductase'], {
+      mcq('c5-05', 'lead-poisoning', 'Which enzyme is MOST sensitive to lead?', 'ALA dehydrase (porphobilinogen synthase)', ['Uroporphyrinogen decarboxylase', 'Coproporphyrinogen oxidase', 'Biliverdin reductase (NADPH)'], {
         explanation: 'Slides 35–37: lead inhibits ALA dehydrase more than other enzymes; Pb²⁺ binds its zinc sites (cysteine S ligands). Ferrochelatase is also inhibited.',
       })
     ),
@@ -297,7 +297,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 6 — Haem to bilirubin ──────────────────────────────────
   'heme-metabolism-6': [
     ask(
-      mcq('c6-01', 'haem-sources', 'Where does most of the haem that is broken down each day come from?', 'Haemoglobin of senescent red cells', ['Dietary meat', 'Myoglobin of muscle', 'Mitochondrial cytochromes'], {
+      mcq('c6-01', 'haem-sources', 'Where does most of the haem that is broken down each day come from?', 'Haemoglobin of senescent red cells', ['Dietary meat and fish', 'Myoglobin of skeletal muscle', 'Mitochondrial cytochromes of the liver'], {
         explanation: 'Slide 2 and the textbook page on slide 4: about 85% of bilirubin comes from haemoglobin of senescent red cells removed by the reticuloendothelial system.',
         skill: 'prediction',
       }),
@@ -335,7 +335,7 @@ export const interactive: Record<string, Steps> = {
       'The red cell is broken down in the phagolysosome: globin → amino acids; iron → stored (ferritin, haemosiderin), added to proteins or released to transferrin (helped by ceruloplasmin); the porphyrin → unconjugated bilirubin, which leaves bound to albumin.',
     ], { sourceRefs: cat([12, 19]) }),
     ask(
-      mcq('c6-05', 'macrophage-handling', 'In the macrophage, what is iron from haem released to?', 'Transferrin, with the aid of ceruloplasmin', ['Albumin', 'Bilirubin', 'Glucuronic acid'], {
+      mcq('c6-05', 'macrophage-handling', 'In the macrophage, what is iron from haem released to?', 'Transferrin, with the aid of ceruloplasmin', ['Albumin, with the aid of ligandin', 'Bilirubin, which carries it to the liver', 'Glucuronic acid, in the endoplasmic reticulum'], {
         explanation: 'Slide 12: iron is stored (ferritin or haemosiderin), added to proteins, or released to transferrin with the aid of ceruloplasmin.',
       })
     ),
@@ -349,7 +349,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 7 — Conjugation, excretion and jaundice ────────────────
   'heme-metabolism-7': [
     ask(
-      mcq('c7-01', 'bilirubin-transport', 'Unconjugated bilirubin is poorly water-soluble. How does it travel in blood to the liver?', 'Bound to albumin (and α-globulins)', ['Dissolved freely in plasma', 'Inside red cells', 'Bound to transferrin'], {
+      mcq('c7-01', 'bilirubin-transport', 'Unconjugated bilirubin is poorly water-soluble. How does it travel in blood to the liver?', 'Bound to albumin (and α-globulins)', ['Dissolved freely in the plasma', 'Inside red cells, bound to haemoglobin', 'Bound to transferrin (and ferritin)'], {
         explanation: 'Slide 9: bilirubin is transported to the liver bound to albumin and α-globulins.',
         skill: 'prediction',
       })
@@ -358,7 +358,7 @@ export const interactive: Record<string, Steps> = {
       'UDP-glucuronyl transferase: bilirubin + 2 UDP-glucuronate → bilirubin diglucuronide + 2 UDP. Each propionic acid side chain is esterified to C-1 of glucuronic acid, making bilirubin water-soluble for excretion in bile.',
     ], { sourceRefs: cat([5, 8, 9]) }),
     ask(
-      mcq('c7-02', 'bilirubin-conjugation', 'Which side chains of bilirubin are joined to glucuronic acid?', 'The two propionic acid side chains', ['The two vinyl groups', 'The four methyl groups', 'The central methene bridge'], {
+      mcq('c7-02', 'bilirubin-conjugation', 'Which side chains of bilirubin are joined to glucuronic acid?', 'The two propionic acid side chains', ['The two vinyl groups on rings A and D', 'The four methyl groups', 'The central methene bridge'], {
         explanation: 'Slide 9: each propionic acid side chain is esterified to the hydroxyl at C-1 of glucuronic acid.',
       })
     ),
@@ -390,7 +390,7 @@ export const interactive: Record<string, Steps> = {
       ], { explanation: 'Slides 13–16.' })
     ),
     ask(
-      mcq('c7-05', 'phototherapy', 'How does phototherapy clear bilirubin in neonatal jaundice?', 'Blue light converts unconjugated bilirubin in the skin into water-soluble photoisomers excreted without conjugation', ['Light activates the baby’s UDP-glucuronyl transferase', 'Light destroys red cells so less haem is made', 'Light converts bilirubin back into haem'], {
+      mcq('c7-05', 'phototherapy', 'How does phototherapy clear bilirubin in neonatal jaundice?', 'Blue light converts unconjugated bilirubin in the skin into water-soluble photoisomers excreted without conjugation', ['Light activates the baby’s UDP-glucuronyl transferase so the liver conjugates faster', 'Light destroys red cells in the skin so that less haem is broken down', 'Light converts bilirubin in the skin back into haem for reuse'], {
         explanation: 'Slide 18.',
       })
     ),

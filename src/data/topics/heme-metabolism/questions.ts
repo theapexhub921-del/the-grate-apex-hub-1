@@ -27,7 +27,7 @@ const lesson1: Q[] = [
   multi('q1-01', 'haem-proteins', 'Which are haem-containing proteins in the lecture’s list? Select all that apply.', ['Haemoglobin', 'Myoglobin', 'Cytochromes', 'Catalase'], ['Collagen', 'Albumin'], {
     explanation: 'Slide 2: haemoglobin, myoglobin, cytochromes, catalase, some peroxidases, tryptophan pyrrolase, prostaglandin synthase, nitric oxide synthase and others.',
   }),
-  mcq('q1-02', 'haem-proteins', 'Where do the haem-containing cytochromes of slide 2 work?', 'In the respiratory chain', ['In the nucleus', 'In ribosomes', 'In lysosomes'], {
+  mcq('q1-02', 'haem-proteins', 'Where do the haem-containing cytochromes of slide 2 work?', 'In the respiratory chain', ['In the nucleus', 'In the ribosomes', 'In the lysosomes'], {
     explanation: 'Slide 2: “Cytochromes: in the respiratory chain”.',
   }),
   mcq('q1-03', 'haem-proteins', 'Where is myoglobin found (slide 2)?', 'Red muscle', ['Red blood cells', 'Liver', 'Bone'], {
@@ -50,7 +50,7 @@ const lesson1: Q[] = [
     explanation: 'Slide 4: four pyrrole rings bonded by four methene bridges (–CH=).',
     skill: 'terminology',
   }),
-  mcq('q1-08', 'porphin-structure', 'What is a pyrrole, as the lecture defines it?', 'A five-membered ring with a nitrogen at the apex', ['A six-membered ring with two nitrogens', 'A benzene ring carrying an –OH group', 'A four-membered ring containing oxygen'], {
+  mcq('q1-08', 'porphin-structure', 'What is a pyrrole, as the lecture defines it?', 'A five-membered ring with a nitrogen at the apex', ['A six-membered ring with two nitrogens', 'A benzene ring carrying an –OH group', 'A five-membered ring containing oxygen at the apex'], {
     explanation: 'Slide 4: pyrrole — a five-sided ring with nitrogen at the apex.',
   }),
   mcq('q1-09', 'porphin-structure', 'How many pyrrole rings make up porphin?', 'Four', ['Two', 'Three', 'Six'], {
@@ -81,13 +81,13 @@ const lesson1: Q[] = [
   mcq('q1-15', 'porphyrin-series', 'Which side chains does uroporphyrin carry?', 'Acetate and propionate', ['Methyl and propionate', 'Methyl and vinyl', 'Vinyl and acetate'], {
     explanation: 'Slides 9–10: each pyrrole of uroporphyrin carries an acetate (A) and a propionate (P).',
   }),
-  mcq('q1-16', 'porphyrin-series', 'How does coproporphyrin differ from uroporphyrin?', 'Its acetate side chains have become methyl groups', ['Its propionates have become vinyl groups', 'It has lost one pyrrole ring', 'It contains iron'], {
+  mcq('q1-16', 'porphyrin-series', 'How does coproporphyrin differ from uroporphyrin?', 'Its acetate side chains have become methyl groups', ['Its propionate side chains have become vinyl groups', 'It has lost one of its four pyrrole rings', 'It contains iron in the centre of the ring'], {
     explanation: 'Slide 10: converting all the acetate side chains to methyls gives coproporphyrin.',
   }),
   mcq('q1-17', 'porphyrin-series', 'How many isomeric forms of uroporphyrin are there?', 'Four', ['Two', 'Eight', 'Fifteen'], {
     explanation: 'Slide 10: four isomeric forms (types I–IV).',
   }),
-  mcq('q1-18', 'porphyrin-series', 'Slide 10 asks: if every acetate of uroporphyrin becomes a methyl, how many coproporphyrin isomers are possible?', 'Four — each pyrrole still carries two different groups', ['Fifteen', 'One', 'Eight'], {
+  mcq('q1-18', 'porphyrin-series', 'Slide 10 asks: if every acetate of uroporphyrin becomes a methyl, how many coproporphyrin isomers are possible?', 'Four — each pyrrole still carries two different groups', ['Fifteen — as for the protoporphyrins', 'One — the change removes all variation', 'Eight — two for each pyrrole ring'], {
     explanation: 'Methyl + propionate on each pyrrole gives the same four arrangements as acetate + propionate.',
     skill: 'pathway-reasoning',
     difficulty: 'advanced',
@@ -107,17 +107,17 @@ const lesson1: Q[] = [
     ['Vinyl', '2, 4'],
     ['Propionate', '6, 7'],
   ], { explanation: 'Slide 12: “Methyl: Cs 1,3,5,8. Vinyl: Cs 2,4. Propionate: Cs 6,7.”' }),
-  mcq('q1-22', 'protoporphyrin-ix', 'How many bonds can the haem iron form?', 'Six — four in the ring plane and one on each side', ['Four, all in the plane', 'Two, one on each side', 'Eight'], {
+  mcq('q1-22', 'protoporphyrin-ix', 'How many bonds can the haem iron form?', 'Six — four in the ring plane and one on each side', ['Four, all in the plane of the ring', 'Two, one on each side of the ring', 'Eight — two to each pyrrole nitrogen'], {
     explanation: 'Slide 12 (textbook page): the fifth and sixth coordination positions lie on either side of the haem plane.',
     difficulty: 'intermediate',
   }),
   fill('q1-23', 'protoporphyrin-ix', 'Haemoglobin containing ferric (Fe³⁺) iron is called ____.', ['methaemoglobin', 'methemoglobin'], {
     explanation: 'Slide 12 (textbook page): ferrihaemoglobin is also called methaemoglobin; only the ferrous form binds oxygen.',
   }),
-  mcq('q1-24', 'protoporphyrin-ix', 'Which atoms of protoporphyrin IX does the haem iron bind?', 'The four central nitrogens', ['The propionate oxygens', 'The vinyl carbons', 'The methene carbons'], {
+  mcq('q1-24', 'protoporphyrin-ix', 'Which atoms of protoporphyrin IX does the haem iron bind?', 'The four central nitrogens', ['The oxygens of the two propionates', 'The carbons of the two vinyl groups', 'The four methene bridge carbons'], {
     explanation: 'Slide 12 (textbook page): the iron binds the four nitrogens in the centre of the ring.',
   }),
-  mcq('q1-25', 'protoporphyrin-ix', 'Which side chains of protoporphyrin IX are the shortest?', 'The methyl groups', ['The propionates', 'The vinyl groups', 'The acetates'], {
+  mcq('q1-25', 'protoporphyrin-ix', 'Which side chains of protoporphyrin IX are the shortest?', 'The methyl groups', ['The propionates', 'The two vinyl groups', 'The acetates'], {
     explanation: 'Slide 12 asks this. Methyls (one carbon) are shortest; propionates (three carbons) are longest. Protoporphyrin has no acetates.',
     skill: 'application',
   }),
@@ -147,7 +147,7 @@ const lesson2: Q[] = [
     answer: true,
     explanation: 'Slide 14 (textbook page) and slide 26.',
   }),
-  mcq('q2-05', 'ala-formation', 'Slide 13 names ALA chemically as a derivative of which acid?', '4-Oxo-pentanoic acid', ['Glutaric acid', 'Butyric acid', 'Succinic acid'], {
+  mcq('q2-05', 'ala-formation', 'Slide 13 names ALA chemically as a derivative of which acid?', '4-Oxo-pentanoic acid', ['Pentanedioic (glutaric) acid', 'Butyric acid', 'Succinic acid'], {
     explanation: 'Slide 13: “(4 oxo pentanoic acid)” — ALA is 5-amino-4-oxopentanoic acid.',
     skill: 'terminology',
     difficulty: 'intermediate',
@@ -175,13 +175,13 @@ const lesson2: Q[] = [
   mcq('q2-10', 'haem-atom-origins', 'Which pathway supplies the succinyl-CoA for haem synthesis (slide 24)?', 'The TCA cycle', ['Glycolysis', 'The pentose phosphate pathway', 'The urea cycle'], {
     explanation: 'Slide 24: the TCA cycle in the mitochondrion provides succinyl-CoA.',
   }),
-  mcq('q2-11', 'pbg-formation', 'Which enzyme converts ALA to porphobilinogen?', 'ALA dehydrase (PBG synthase)', ['ALA synthase', 'PBG deaminase', 'Ferrochelatase'], {
+  mcq('q2-11', 'pbg-formation', 'Which enzyme converts ALA to porphobilinogen?', 'ALA dehydrase (PBG synthase)', ['ALA synthase (mitochondrial)', 'PBG deaminase (HMB synthase)', 'Ferrochelatase'], {
     explanation: 'Slide 16: δ-ALA dehydrase (PBG synthase).',
   }),
   mcq('q2-12', 'pbg-formation', 'How many ALA molecules make one porphobilinogen?', 'Two', ['One', 'Four', 'Eight'], {
     explanation: 'Slides 15–16: two molecules of ALA condense to form porphobilinogen.',
   }),
-  mcq('q2-13', 'pbg-formation', 'What is removed when two ALA condense to porphobilinogen?', 'Two molecules of water', ['Two CO₂', 'Ammonia', 'Coenzyme A'], {
+  mcq('q2-13', 'pbg-formation', 'What is removed when two ALA condense to porphobilinogen?', 'Two molecules of water', ['Two molecules of CO₂', 'One molecule of ammonia', 'A molecule of coenzyme A'], {
     explanation: 'Slide 15 (textbook page): a dehydration — 2 ALA → PBG + 2 H₂O + H⁺.',
     difficulty: 'intermediate',
   }),
@@ -198,7 +198,7 @@ const lesson2: Q[] = [
   fill('q2-16', 'pbg-deaminase', 'PBG deaminase releases the linear tetrapyrrole ____.', ['hydroxymethylbilane', 'HMB'], {
     explanation: 'Slide 19: hydrolysis of the link to the enzyme’s dipyrromethane releases hydroxymethylbilane.',
   }),
-  mcq('q2-17', 'pbg-deaminase', 'What prosthetic group does PBG deaminase carry?', 'A dipyrromethane, attached through a cysteine sulphur', ['Pyridoxal phosphate', 'Haem', 'Biotin'], {
+  mcq('q2-17', 'pbg-deaminase', 'What prosthetic group does PBG deaminase carry?', 'A dipyrromethane, attached through a cysteine sulphur', ['Pyridoxal phosphate, bound to a lysine', 'A haem group, attached through a histidine', 'Biotin, attached through a lysine amine'], {
     explanation: 'Slide 17.',
     difficulty: 'intermediate',
   }),
@@ -206,11 +206,11 @@ const lesson2: Q[] = [
     explanation: 'Slide 17: the enzyme itself catalyses formation of this prosthetic group.',
     difficulty: 'intermediate',
   }),
-  mcq('q2-19', 'pbg-deaminase', 'How long does the pyrrole chain on PBG deaminase grow before the tetrapyrrole is released?', 'A linear hexapyrrole (cofactor + four PBG)', ['A linear tetrapyrrole only', 'A dipyrrole', 'A cyclic octapyrrole'], {
+  mcq('q2-19', 'pbg-deaminase', 'How long does the pyrrole chain on PBG deaminase grow before the tetrapyrrole is released?', 'A linear hexapyrrole (cofactor + four PBG)', ['A linear tetrapyrrole only (cofactor + two PBG)', 'A dipyrrole (the cofactor alone)', 'A cyclic octapyrrole (cofactor + six PBG)'], {
     explanation: 'Slide 18: PBG units are added until a linear hexapyrrole has been formed; hydrolysis then releases the tetrapyrrole.',
     difficulty: 'advanced',
   }),
-  mcq('q2-20', 'pbg-deaminase', 'What is released for each methylene bridge formed as porphobilinogens join (slide 15)?', 'An ammonium ion (NH₄⁺)', ['CO₂', 'Water', 'Pyrophosphate'], {
+  mcq('q2-20', 'pbg-deaminase', 'What is released for each methylene bridge formed as porphobilinogens join (slide 15)?', 'An ammonium ion (NH₄⁺)', ['A molecule of CO₂', 'A molecule of water', 'A pyrophosphate (PPᵢ)'], {
     explanation: 'Slide 15 (textbook page): an ammonium ion is released for each methylene bridge formed.',
     difficulty: 'intermediate',
   }),
@@ -221,7 +221,7 @@ const lesson2: Q[] = [
     explanation: 'Slide 25: “Porphobilinogen deaminase (Uroporphyrinogen I synthase)”.',
     skill: 'terminology',
   }),
-  mcq('q2-22', 'urogen-iii-synthase', 'What does uroporphyrinogen III synthase do?', 'Closes hydroxymethylbilane into a ring, flipping one pyrrole', ['Inserts iron into the ring', 'Decarboxylates the acetates', 'Condenses two ALA'], {
+  mcq('q2-22', 'urogen-iii-synthase', 'What does uroporphyrinogen III synthase do?', 'Closes hydroxymethylbilane into a ring, flipping one pyrrole', ['Inserts ferrous iron into the closed ring', 'Decarboxylates all four acetate side chains', 'Condenses two ALA into porphobilinogen'], {
     explanation: 'Slides 20–21.',
   }),
   mcq('q2-23', 'urogen-iii-synthase', 'Through what kind of intermediate is the pyrrole flip thought to occur?', 'A spiro intermediate', ['A Schiff base with PLP', 'An acyl-enzyme thioester', 'A free radical on iron'], {
@@ -252,7 +252,7 @@ const lesson3: Q[] = [
   mcq('q3-01', 'urogen-decarboxylase', 'What does uroporphyrinogen decarboxylase produce?', 'Coproporphyrinogen III', ['Protoporphyrinogen IX', 'Protoporphyrin IX', 'Hydroxymethylbilane'], {
     explanation: 'Slides 24–25.',
   }),
-  mcq('q3-02', 'urogen-decarboxylase', 'How many CO₂ does uroporphyrinogen decarboxylase remove from one uroporphyrinogen III?', 'Four — one from each acetate', ['Two', 'One', 'Eight'], {
+  mcq('q3-02', 'urogen-decarboxylase', 'How many CO₂ does uroporphyrinogen decarboxylase remove from one uroporphyrinogen III?', 'Four — one from each acetate', ['Two — one from each propionate', 'One — from a single acetate', 'Eight — from every side chain'], {
     explanation: 'Slide 24 (textbook page): the four acetate side chains are decarboxylated in sequence.',
     difficulty: 'intermediate',
   }),
@@ -265,7 +265,7 @@ const lesson3: Q[] = [
     answer: true,
     explanation: 'Removing CO₂ from an acetate (–CH₂–COO⁻) leaves a methyl (slide 24).',
   }),
-  mcq('q3-05', 'coprogen-oxidase', 'Where is coproporphyrinogen oxidase located?', 'Mitochondria', ['Cytosol', 'Lysosomes', 'Peroxisomes'], {
+  mcq('q3-05', 'coprogen-oxidase', 'Where is coproporphyrinogen oxidase located?', 'Mitochondria', ['Cytosol', 'Lysosomes', 'Peroxisomes and lysosomes'], {
     explanation: 'Slide 24 (textbook page): coproporphyrinogen oxidase is a mitochondrial enzyme.',
   }),
   fill('q3-06', 'coprogen-oxidase', 'Coproporphyrinogen oxidase converts coproporphyrinogen III into ____.', ['protoporphyrinogen IX', 'protoporphyrinogen 9', 'protoporphyrinogen'], {
@@ -288,7 +288,7 @@ const lesson3: Q[] = [
   mcq('q3-10', 'ferrochelatase-step', 'What does protoporphyrinogen oxidase produce?', 'Protoporphyrin IX', ['Haem', 'Coproporphyrinogen III', 'Protoporphyrinogen IX'], {
     explanation: 'Slides 24–25.',
   }),
-  mcq('q3-11', 'ferrochelatase-step', 'Where is ferrochelatase located?', 'The inner mitochondrial membrane', ['The cytosol', 'The plasma membrane', 'The nucleus'], {
+  mcq('q3-11', 'ferrochelatase-step', 'Where is ferrochelatase located?', 'The inner mitochondrial membrane', ['The cytosol of the cell', 'The plasma membrane', 'The nuclear envelope'], {
     explanation: 'Slide 24 (textbook page).',
   }),
   mcq('q3-12', 'ferrochelatase-step', 'Which form of iron does ferrochelatase insert?', 'Ferrous iron (Fe²⁺)', ['Ferric iron (Fe³⁺)', 'Iron–sulphur clusters', 'Haemosiderin'], {
@@ -310,7 +310,7 @@ const lesson3: Q[] = [
     'Protoporphyrinogen IX → protoporphyrin IX',
     'Protoporphyrin IX + Fe²⁺ → haem',
   ], { explanation: 'Slide 25.' }),
-  mcq('q3-16', 'compartments', 'How many of the eight steps of haem synthesis happen in the cytosol?', 'Four (steps 2–5)', ['None', 'Two', 'All eight'], {
+  mcq('q3-16', 'compartments', 'How many of the eight steps of haem synthesis happen in the cytosol?', 'Four (steps 2–5)', ['None of them', 'Two (steps 2 and 3)', 'All eight steps'], {
     explanation: 'Slide 24: steps 2–5 are cytosolic; step 1 and steps 6–8 are mitochondrial.',
   }),
   multi('q3-17', 'compartments', 'Which enzymes work in the MITOCHONDRIA? Select all that apply.', ['ALA synthase', 'Coproporphyrinogen oxidase', 'Protoporphyrinogen oxidase', 'Ferrochelatase'], ['PBG deaminase', 'Uroporphyrinogen decarboxylase'], {
@@ -321,11 +321,11 @@ const lesson3: Q[] = [
     explanation: 'Slide 24 (textbook page): only porphobilinogen synthase requires a metal activator, namely zinc.',
     difficulty: 'intermediate',
   }),
-  mcq('q3-19', 'compartments', 'Mature red cells have no mitochondria. Which haem-pathway enzymes do they keep (slide 24)?', 'The four cytosolic enzymes', ['ALA synthase only', 'Ferrochelatase only', 'None at all'], {
+  mcq('q3-19', 'compartments', 'Mature red cells have no mitochondria. Which haem-pathway enzymes do they keep (slide 24)?', 'The four cytosolic enzymes', ['ALA synthase only', 'Ferrochelatase only', 'None of the enzymes at all'], {
     explanation: 'Slide 24 (textbook page): the four extramitochondrial enzymes are retained in erythrocytes after the mitochondria are lost.',
     difficulty: 'advanced',
   }),
-  mcq('q3-20', 'compartments', 'Why must the pathway return to the mitochondria at the end?', 'The last three enzymes, including ferrochelatase, are mitochondrial', ['Haem cannot exist in the cytosol', 'The cytosol contains no iron', 'Succinyl-CoA is needed again'], {
+  mcq('q3-20', 'compartments', 'Why must the pathway return to the mitochondria at the end?', 'The last three enzymes, including ferrochelatase, are mitochondrial', ['Haem cannot exist in the cytosol without being destroyed', 'The cytosol contains no iron for the final step', 'Succinyl-CoA is needed again to finish the ring'], {
     explanation: 'Slide 24: coproporphyrinogen oxidase, protoporphyrinogen oxidase and ferrochelatase are mitochondrial.',
     skill: 'pathway-reasoning',
   }),
@@ -341,7 +341,7 @@ const lesson3: Q[] = [
     ['Uroporphyrinogen III → coproporphyrinogen III', 'Cytosol'],
     ['Coproporphyrinogen III → protoporphyrinogen IX', 'Mitochondria'],
   ], { explanation: 'Slide 24.' }),
-  mcq('q3-23', 'compartments', 'Coproporphyrinogen III cannot enter the mitochondria. Which molecule builds up?', 'Coproporphyrinogen III', ['Protoporphyrin IX', 'Haem', 'Succinyl-CoA'], {
+  mcq('q3-23', 'compartments', 'Coproporphyrinogen III cannot enter the mitochondria. Which molecule builds up?', 'Coproporphyrinogen III', ['Protoporphyrin IX', 'Haem', 'Succinyl-CoA (in the mitochondrion)'], {
     explanation: 'The next enzyme (coproporphyrinogen oxidase) is mitochondrial, so its substrate accumulates in the cytosol.',
     skill: 'prediction',
     difficulty: 'intermediate',
@@ -353,12 +353,12 @@ const lesson3: Q[] = [
     explanation: 'It is mitochondrial (slide 24).',
     skill: 'misconception',
   }),
-  mcq('q3-25', 'coprogen-oxidase', 'In which order are the side chains changed on the way to protoporphyrin IX?', 'First acetates → methyls, then two propionates → vinyls', ['First propionates → vinyls, then acetates → methyls', 'Methyls → acetates, then vinyls → propionates', 'All at once, by ferrochelatase'], {
+  mcq('q3-25', 'coprogen-oxidase', 'In which order are the side chains changed on the way to protoporphyrin IX?', 'First acetates → methyls, then two propionates → vinyls', ['First propionates → vinyls, then acetates → methyls', 'Methyls → acetates first, then vinyls → propionates', 'All at once, by ferrochelatase as it inserts iron'], {
     explanation: 'Uroporphyrinogen decarboxylase acts first (acetates), then coproporphyrinogen oxidase (propionates at 2 and 4) (slides 24–25).',
     skill: 'sequence',
     difficulty: 'intermediate',
   }),
-  mcq('q3-26', 'compartments', 'Which intermediate is the first to leave the mitochondrion?', 'δ-Aminolevulinic acid (ALA)', ['Porphobilinogen', 'Succinyl-CoA', 'Coproporphyrinogen III'], {
+  mcq('q3-26', 'compartments', 'Which intermediate is the first to leave the mitochondrion?', 'δ-Aminolevulinic acid (ALA)', ['Porphobilinogen (PBG)', 'Succinyl-CoA', 'Coproporphyrinogen III'], {
     explanation: 'ALA is made in the mitochondria and converted to porphobilinogen in the cytosol (slide 24).',
     skill: 'pathway-reasoning',
     difficulty: 'intermediate',
@@ -383,7 +383,7 @@ const lesson4: Q[] = [
   fill('q4-04', 'alas-regulation', 'The red-cell variant of ALA synthase is regulated by the availability of ____.', ['iron', 'Fe', 'iron-sulphur clusters', 'iron-sulfur clusters'], {
     explanation: 'Slide 26: in the form of iron–sulphur clusters.',
   }),
-  mcq('q4-05', 'alas-regulation', 'Haem levels in a liver cell fall. What happens to transcription of the ALA synthase gene?', 'It increases (de-repression)', ['It decreases', 'It stops completely', 'It is unaffected'], {
+  mcq('q4-05', 'alas-regulation', 'Haem levels in a liver cell fall. What happens to transcription of the ALA synthase gene?', 'It increases (de-repression)', ['It decreases (repression)', 'It stops completely', 'It is unaffected by haem'], {
     explanation: 'Haem represses the gene (slide 26), so less haem relieves the repression.',
     skill: 'prediction',
     difficulty: 'intermediate',
@@ -391,7 +391,7 @@ const lesson4: Q[] = [
   mcq('q4-06', 'liver-vs-red-cells', 'What share of total haem synthesis occurs in immature red cells?', 'About 85%', ['About 15%', 'About 50%', 'Nearly 100%'], {
     explanation: 'Slide 28.',
   }),
-  mcq('q4-07', 'liver-vs-red-cells', 'What is liver haem mainly used for?', 'Cytochrome P450 enzymes involved in detoxification', ['Haemoglobin', 'Myoglobin', 'Bilirubin'], {
+  mcq('q4-07', 'liver-vs-red-cells', 'What is liver haem mainly used for?', 'Cytochrome P450 enzymes involved in detoxification', ['Haemoglobin for the red cells', 'Myoglobin for storage of O₂', 'Bilirubin for excretion in bile'], {
     explanation: 'Slide 27.',
   }),
   tf({
@@ -405,7 +405,7 @@ const lesson4: Q[] = [
     explanation: 'Slide 28.',
     difficulty: 'intermediate',
   }),
-  mcq('q4-10', 'liver-vs-red-cells', 'What does haem stimulate in reticulocytes (slide 28)?', 'Protein synthesis', ['Cell division', 'Glycolysis', 'Haem breakdown'], {
+  mcq('q4-10', 'liver-vs-red-cells', 'What does haem stimulate in reticulocytes (slide 28)?', 'Protein synthesis', ['Cell division', 'Glycolysis', 'Breakdown of haem'], {
     explanation: 'Slide 28: haem stimulates protein synthesis in reticulocytes.',
   }),
   mcq('q4-11', 'liver-vs-red-cells', 'Which organ is the main non-red-cell source of haem?', 'The liver', ['The spleen', 'The kidney', 'Skeletal muscle'], {
@@ -414,7 +414,7 @@ const lesson4: Q[] = [
   mcq('q4-12', 'hemin-globin-balance', 'What does free haem become when it accumulates (slide 29)?', 'Hemin, by spontaneous oxidation', ['Bilirubin, by haem oxygenase', 'Protoporphyrin IX, by losing its iron', 'Biliverdin, by reduction'], {
     explanation: 'Slide 29: if free haem accumulates, it is spontaneously oxidised to hemin.',
   }),
-  mcq('q4-13', 'hemin-globin-balance', 'What does phosphorylation of eIF2 do?', 'Inactivates it, blocking protein (globin) synthesis', ['Activates it, increasing globin synthesis', 'Targets it to the mitochondria', 'Converts it into hemin'], {
+  mcq('q4-13', 'hemin-globin-balance', 'What does phosphorylation of eIF2 do?', 'Inactivates it, blocking protein (globin) synthesis', ['Activates it, increasing the rate of globin synthesis', 'Targets it to the mitochondria to make haem', 'Converts it into hemin inside the reticulocyte'], {
     explanation: 'Slide 29: the kinase phosphorylates eIF2 to make it inactive.',
     difficulty: 'intermediate',
   }),
@@ -432,7 +432,7 @@ const lesson4: Q[] = [
     explanation: 'Slide 29: hemin represses formation of ALA synthase “and perhaps blocks its transfer from the cytosol into the mitochondrial matrix”.',
     difficulty: 'advanced',
   }),
-  mcq('q4-16', 'hemin-globin-balance', 'Why is it useful to link globin synthesis to haem levels?', 'Neither haem nor globin is made in excess of the other', ['It speeds up haem breakdown', 'It stops red cells from maturing', 'It increases iron absorption'], {
+  mcq('q4-16', 'hemin-globin-balance', 'Why is it useful to link globin synthesis to haem levels?', 'Neither haem nor globin is made in excess of the other', ['It speeds up haem breakdown in the macrophages', 'It stops red cells from maturing too early', 'It increases iron absorption from the gut'], {
     explanation: 'Slide 29: the result is a balance of porphyrin and globin synthesis.',
     skill: 'cause-effect',
   }),
@@ -443,13 +443,13 @@ const lesson4: Q[] = [
   mcq('q4-18', 'hemin-drug', 'What is hemin, chemically (slide 32)?', 'Protoporphyrin IX with ferric iron and a chloride ligand', ['Protoporphyrin IX with ferrous iron and oxygen', 'Uroporphyrin with zinc', 'Bilirubin bound to albumin'], {
     explanation: 'Slide 32: protoporphyrin IX containing a ferric iron ion (haem B) with a chloride ligand.',
   }),
-  mcq('q4-19', 'hemin-drug', 'How is hemin given?', 'Intravenous infusion', ['By mouth', 'By inhalation', 'On the skin'], {
+  mcq('q4-19', 'hemin-drug', 'How is hemin given?', 'Intravenous infusion', ['By mouth, as tablets', 'By inhalation', 'Applied on the skin'], {
     explanation: 'Slides 31 and 33: route of administration — intravenous infusion.',
   }),
   mcq('q4-20', 'hemin-drug', 'For which porphyria is hemin used in particular?', 'Acute intermittent porphyria', ['Porphyria cutanea tarda', 'Congenital erythropoietic porphyria', 'Gilbert’s syndrome'], {
     explanation: 'Slide 32: used in the management of porphyria attacks, particularly in acute intermittent porphyria.',
   }),
-  mcq('q4-21', 'hemin-drug', 'How does hematin differ from hemin?', 'It has a hydroxide in place of the chloride', ['It contains zinc instead of iron', 'It has no propionate side chains', 'It is a linear tetrapyrrole'], {
+  mcq('q4-21', 'hemin-drug', 'How does hematin differ from hemin?', 'It has a hydroxide in place of the chloride', ['It contains zinc in place of the iron', 'It has no propionate side chains at all', 'It is a linear tetrapyrrole, not a ring'], {
     explanation: 'Slide 32.',
     difficulty: 'intermediate',
   }),
@@ -469,12 +469,12 @@ const lesson4: Q[] = [
     explanation: 'Slide 32: hemin contains ferric iron (Fe³⁺) with a chloride ligand.',
     skill: 'misconception',
   }),
-  mcq('q4-25', 'alas-regulation', 'A developing red cell is short of iron. Which enzyme’s regulation does slide 26 tie directly to iron?', 'The red-cell variant of ALA synthase', ['Haem oxygenase', 'Biliverdin reductase', 'The liver form of ALA synthase'], {
+  mcq('q4-25', 'alas-regulation', 'A developing red cell is short of iron. Which enzyme’s regulation does slide 26 tie directly to iron?', 'The red-cell variant of ALA synthase', ['Haem oxygenase', 'Biliverdin reductase', 'The liver (housekeeping) form of ALA synthase'], {
     explanation: 'Slide 26: the variant expressed only in developing erythrocytes is regulated by iron availability.',
     skill: 'application',
     difficulty: 'intermediate',
   }),
-  mcq('q4-26', 'alas-regulation', 'Why is ALA synthase a sensible control point for the pathway?', 'It catalyses the first committed step, so control there stops material entering the pathway', ['It is the only mitochondrial enzyme', 'It is the last step', 'It is the only enzyme that needs zinc'], {
+  mcq('q4-26', 'alas-regulation', 'Why is ALA synthase a sensible control point for the pathway?', 'It catalyses the first committed step, so control there stops material entering the pathway', ['It is the only enzyme of the pathway found in the mitochondria', 'It catalyses the last step, so it controls how much haem is released', 'It is the only enzyme that needs zinc, so zinc can control it'], {
     explanation: 'Slides 14 and 26: the committed, rate-limiting step.',
     skill: 'pathway-reasoning',
   }),
@@ -496,11 +496,11 @@ const lesson5: Q[] = [
   mcq('q5-03', 'porphyria-basics', 'How are most porphyrias inherited?', 'Autosomal dominant', ['Autosomal recessive', 'X-linked recessive', 'Through mitochondrial DNA'], {
     explanation: 'Slide 39.',
   }),
-  mcq('q5-04', 'porphyria-basics', 'Why can people with an autosomal dominant porphyria still make some haem?', 'They have about 50% of normal enzyme levels', ['They make haem by another pathway', 'They absorb haem from food', 'The enzyme is not needed in adults'], {
+  mcq('q5-04', 'porphyria-basics', 'Why can people with an autosomal dominant porphyria still make some haem?', 'They have about 50% of normal enzyme levels', ['They make haem by a separate salvage pathway', 'They absorb enough haem from their food', 'The enzyme is no longer needed in adults'], {
     explanation: 'Slide 39.',
     skill: 'cause-effect',
   }),
-  mcq('q5-05', 'porphyria-basics', 'What accumulates in porphyrias?', 'Haem precursors (porphyrins), toxic at high concentrations', ['Bilirubin', 'Globin chains', 'Iron only'], {
+  mcq('q5-05', 'porphyria-basics', 'What accumulates in porphyrias?', 'Haem precursors (porphyrins), toxic at high concentrations', ['Bilirubin, from increased haem breakdown', 'Globin chains, without haem to bind', 'Iron only, in the mitochondria'], {
     explanation: 'Slide 39.',
   }),
   tf({
@@ -509,7 +509,7 @@ const lesson5: Q[] = [
     answer: true,
     explanation: 'Slide 39: attacks are triggered by certain drugs, chemicals and foods, and by exposure to sun.',
   }),
-  mcq('q5-07', 'porphyria-map', 'Deficiency of PBG deaminase causes which porphyria?', 'Acute intermittent porphyria', ['Porphyria cutanea tarda', 'Variegate porphyria', 'Hereditary coproporphyria'], {
+  mcq('q5-07', 'porphyria-map', 'Deficiency of PBG deaminase causes which porphyria?', 'Acute intermittent porphyria', ['Porphyria cutanea tarda', 'Variegate porphyria (South African)', 'Hereditary coproporphyria'], {
     explanation: 'Slides 40–41.',
   }),
   mcq('q5-08', 'porphyria-map', 'Deficiency of uroporphyrinogen decarboxylase causes which porphyria?', 'Porphyria cutanea tarda', ['Acute intermittent porphyria', 'Erythropoietic protoporphyria', 'Congenital erythropoietic porphyria'], {
@@ -527,7 +527,7 @@ const lesson5: Q[] = [
     explanation: 'Slide 40.',
     difficulty: 'intermediate',
   }),
-  mcq('q5-12', 'porphyria-map', 'Congenital erythropoietic porphyria results from a deficiency of which enzyme?', 'Uroporphyrinogen III cosynthase', ['Uroporphyrinogen decarboxylase', 'Ferrochelatase', 'ALA synthase'], {
+  mcq('q5-12', 'porphyria-map', 'Congenital erythropoietic porphyria results from a deficiency of which enzyme?', 'Uroporphyrinogen III cosynthase', ['Uroporphyrinogen decarboxylase', 'Ferrochelatase (haem synthase)', 'ALA synthase (erythroid form)'], {
     explanation: 'Slide 40.',
     difficulty: 'intermediate',
   }),
@@ -543,7 +543,7 @@ const lesson5: Q[] = [
   multi('q5-14', 'acute-intermittent-porphyria', 'In acute intermittent porphyria, which precursors accumulate in plasma and urine? Select all that apply.', ['Porphobilinogen (PBG)', '5-Aminolevulinic acid (ALA)'], ['Protoporphyrin IX', 'Bilirubin'], {
     explanation: 'Slide 41: PBG, uroporphyrin and 5-ALA accumulate. Protoporphyrin IX lies after the block.',
   }),
-  mcq('q5-15', 'acute-intermittent-porphyria', 'What are the typical symptoms of acute intermittent porphyria?', 'Neuropsychiatric symptoms and abdominal pain (neurovisceral)', ['Blistering, photosensitive skin', 'Jaundice with pale stools', 'Anaemia with target cells'], {
+  mcq('q5-15', 'acute-intermittent-porphyria', 'What are the typical symptoms of acute intermittent porphyria?', 'Neuropsychiatric symptoms and abdominal pain (neurovisceral)', ['Blistering, scarring and photosensitive skin', 'Jaundice with pale stools and dark urine', 'Anaemia with target cells and splenomegaly'], {
     explanation: 'Slide 41.',
   }),
   mcq('q5-16', 'acute-intermittent-porphyria', 'Is acute intermittent porphyria hepatic or erythropoietic?', 'Hepatic', ['Erythropoietic', 'Both equally', 'Neither — it is renal'], {
@@ -579,7 +579,7 @@ const lesson5: Q[] = [
   multi('q5-22', 'lead-poisoning', 'Which enzymes does lead clearly inhibit (slides 35–36)? Select all that apply.', ['ALA dehydrase (PBG synthase)', 'Ferrochelatase'], ['Uroporphyrinogen III cosynthase', 'Biliverdin reductase'], {
     explanation: 'Slides 35–36: lead inhibits ALA dehydrase (most strongly) and ferrochelatase, so ALA and protoporphyrin IX accumulate.',
   }),
-  mcq('q5-23', 'lead-poisoning', 'Why can lead bind ALA dehydrase (PBG synthase)?', 'Pb²⁺ binds its zinc sites, which include cysteine sulphur ligands', ['Pb²⁺ replaces the iron in its haem', 'Pb²⁺ binds its PLP cofactor', 'Pb²⁺ cleaves its peptide chain'], {
+  mcq('q5-23', 'lead-poisoning', 'Why can lead bind ALA dehydrase (PBG synthase)?', 'Pb²⁺ binds its zinc sites, which include cysteine sulphur ligands', ['Pb²⁺ replaces the iron in the enzyme’s own haem group', 'Pb²⁺ binds the enzyme’s pyridoxal phosphate cofactor', 'Pb²⁺ cleaves the enzyme’s peptide chain near its active site'], {
     explanation: 'Slide 37.',
     difficulty: 'intermediate',
   }),
@@ -593,7 +593,7 @@ const lesson5: Q[] = [
     explanation: 'Slide 37.',
     difficulty: 'intermediate',
   }),
-  mcq('q5-27', 'lead-poisoning', 'In lead poisoning, in what form does the excess protoporphyrin exist?', 'As a zinc chelate (zinc protoporphyrin)', ['As haem', 'As bilirubin', 'As an iron–sulphur cluster'], {
+  mcq('q5-27', 'lead-poisoning', 'In lead poisoning, in what form does the excess protoporphyrin exist?', 'As a zinc chelate (zinc protoporphyrin)', ['As haem, with iron inserted normally', 'As bilirubin, after breakdown', 'As an iron–sulphur cluster'], {
     explanation: 'Slide 36 (textbook page).',
     difficulty: 'advanced',
   }),
@@ -601,7 +601,7 @@ const lesson5: Q[] = [
     ['Decreased erythrocyte ALA dehydratase activity', 'Acute exposure to lead'],
     ['Increased erythrocyte protoporphyrin', 'Chronic exposure to lead'],
   ], { explanation: 'Slide 36 (textbook page).', difficulty: 'advanced' }),
-  mcq('q5-29', 'lead-poisoning', 'Besides the direct enzyme block, why does blood ALA rise in lead poisoning (slide 37)?', 'Impaired haem synthesis de-represses the ALA synthase gene', ['ALA is released from damaged red cells', 'The kidneys stop excreting ALA', 'Lead converts PBG back into ALA'], {
+  mcq('q5-29', 'lead-poisoning', 'Besides the direct enzyme block, why does blood ALA rise in lead poisoning (slide 37)?', 'Impaired haem synthesis de-represses the ALA synthase gene', ['ALA is released from the red cells that lead has damaged', 'The kidneys stop excreting ALA in the urine', 'Lead converts porphobilinogen back into ALA'], {
     explanation: 'Slide 37: impaired haem synthesis leads to de-repression of transcription of the ALA synthase gene.',
     skill: 'cause-effect',
     difficulty: 'advanced',
@@ -619,7 +619,7 @@ const lesson6: Q[] = [
   mcq('q6-03', 'haem-sources', 'Ineffective erythropoiesis contributes haem in which conditions (slide 2)?', 'Pernicious anaemia and thalassaemia', ['Gilbert’s and Rotor syndromes', 'Lead poisoning and porphyria cutanea tarda', 'Diabetes and gout'], {
     explanation: 'Slide 2.',
   }),
-  mcq('q6-04', 'haem-sources', 'About how much bilirubin is produced each day (textbook page on slide 4)?', '250–300 mg', ['2.5–3 mg', '25–30 g', '1–2 g'], {
+  mcq('q6-04', 'haem-sources', 'About how much bilirubin is produced each day (textbook page on slide 4)?', '250–300 mg', ['2.5–3 mg', '25–30 g', '1–2 g (1,000–2,000 mg)'], {
     explanation: 'Slide 4 (textbook page): daily bilirubin production averages 250–300 mg.',
     difficulty: 'intermediate',
   }),
@@ -627,7 +627,7 @@ const lesson6: Q[] = [
     explanation: 'Slide 4 (textbook page).',
     difficulty: 'intermediate',
   }),
-  mcq('q6-06', 'haem-oxygenase', 'Which bridge of haem does haem oxygenase cleave?', 'The methine bridge joining the two pyrroles that carry vinyl groups', ['The bridge joining the two propionate-bearing pyrroles', 'All four methene bridges', 'Only the iron–nitrogen bonds'], {
+  mcq('q6-06', 'haem-oxygenase', 'Which bridge of haem does haem oxygenase cleave?', 'The methine bridge joining the two pyrroles that carry vinyl groups', ['The methine bridge joining the two pyrroles that carry propionate groups', 'Each of the four methene bridges in turn', 'Only the bonds between the iron and the four nitrogens'], {
     explanation: 'Slide 3; slide 4 shows this as the α-methene bridge.',
     difficulty: 'intermediate',
   }),
@@ -653,14 +653,14 @@ const lesson6: Q[] = [
   mcq('q6-12', 'haem-oxygenase', 'Can haem oxygenase break down free protoporphyrin IX?', 'No — it acts only on haem', ['Yes — faster than haem', 'Only in the spleen', 'Only when iron is added afterwards'], {
     explanation: 'Slide 3: free protoporphyrin IX is not a substrate.',
   }),
-  mcq('q6-13', 'haem-oxygenase', 'How does slide 4 describe haem oxygenase’s location?', 'Microsomal', ['Cytosolic', 'Nuclear', 'Lysosomal'], {
+  mcq('q6-13', 'haem-oxygenase', 'How does slide 4 describe haem oxygenase’s location?', 'Microsomal', ['Cytosolic', 'Nuclear', 'Lysosomal (acid)'], {
     explanation: 'Slide 4 (textbook page): microsomal haem oxygenase; biliverdin reductase is the cytosolic enzyme.',
     difficulty: 'intermediate',
   }),
   mcq('q6-14', 'biliverdin-to-bilirubin', 'What colour is biliverdin?', 'Green', ['Orange-yellow', 'Red-brown', 'Colourless'], {
     explanation: 'Slide 4 (textbook page): the green pigment biliverdin.',
   }),
-  mcq('q6-15', 'biliverdin-to-bilirubin', 'What colour is bilirubin?', 'Orange-yellow', ['Green', 'Blue', 'Colourless'], {
+  mcq('q6-15', 'biliverdin-to-bilirubin', 'What colour is bilirubin?', 'Orange-yellow', ['Green', 'Blue', 'Colourless (white)'], {
     explanation: 'Slide 4 (textbook page): bilirubin IXα, the orange-yellow bile pigment.',
   }),
   mcq('q6-16', 'biliverdin-to-bilirubin', 'Which coenzyme does biliverdin reductase use?', 'NADPH', ['NADH', 'FAD', 'ATP'], {
@@ -684,17 +684,17 @@ const lesson6: Q[] = [
   mcq('q6-20', 'macrophage-handling', 'Where in the macrophage is the red cell degraded (slide 12)?', 'In the phagolysosome', ['In the nucleus', 'In the mitochondria', 'In the Golgi apparatus'], {
     explanation: 'Slide 12.',
   }),
-  mcq('q6-21', 'macrophage-handling', 'What happens to globin?', 'It is broken down to amino acids', ['It becomes bilirubin', 'It is excreted in bile', 'It is stored as ferritin'], {
+  mcq('q6-21', 'macrophage-handling', 'What happens to globin?', 'It is broken down to amino acids', ['It becomes bilirubin with the haem', 'It is excreted unchanged in bile', 'It is stored in the liver as ferritin'], {
     explanation: 'Slides 12 and 19.',
   }),
   multi('q6-22', 'macrophage-handling', 'What can happen to the iron released in the macrophage (slide 12)? Select all that apply.', ['Stored as ferritin or haemosiderin', 'Added to proteins', 'Released to transferrin'], ['Excreted in bile as bilirubin', 'Breathed out'], {
     explanation: 'Slide 12.',
   }),
-  mcq('q6-23', 'macrophage-handling', 'Which protein helps release iron to transferrin (slide 12)?', 'Ceruloplasmin', ['Albumin', 'Ligandin', 'Globin'], {
+  mcq('q6-23', 'macrophage-handling', 'Which protein helps release iron to transferrin (slide 12)?', 'Ceruloplasmin', ['Albumin', 'Ligandin (Y protein)', 'Globin'], {
     explanation: 'Slide 12: released to transferrin with the aid of ceruloplasmin.',
     difficulty: 'intermediate',
   }),
-  mcq('q6-24', 'macrophage-handling', 'In what form does bilirubin leave the macrophage?', 'Unconjugated bilirubin, bound to albumin', ['Bilirubin diglucuronide', 'Urobilinogen', 'Free biliverdin'], {
+  mcq('q6-24', 'macrophage-handling', 'In what form does bilirubin leave the macrophage?', 'Unconjugated bilirubin, bound to albumin', ['Bilirubin diglucuronide, free in plasma', 'Urobilinogen, bound to albumin', 'Free biliverdin, bound to ligandin'], {
     explanation: 'Slides 12 and 19.',
   }),
   tf({
@@ -738,11 +738,11 @@ const lesson7: Q[] = [
     explanation: 'Slide 9.',
     difficulty: 'intermediate',
   }),
-  mcq('q7-07', 'bilirubin-conjugation', 'What is the main purpose of conjugating bilirubin?', 'To make it water-soluble for excretion in bile', ['To make it fat-soluble for storage', 'To return it to haem synthesis', 'To help it bind albumin'], {
+  mcq('q7-07', 'bilirubin-conjugation', 'What is the main purpose of conjugating bilirubin?', 'To make it water-soluble for excretion in bile', ['To make it fat-soluble for storage in the liver', 'To return it to haem synthesis in the bone marrow', 'To help it bind albumin more tightly in the blood'], {
     explanation: 'Slide 9: conjugation forms the water-soluble bilirubin diglucuronide.',
     skill: 'cause-effect',
   }),
-  mcq('q7-08', 'bilirubin-conjugation', 'In which part of the hepatocyte is UDP-glucuronyl transferase (slide 5)?', 'Endoplasmic reticulum', ['Mitochondria', 'Nucleus', 'Bile canaliculus'], {
+  mcq('q7-08', 'bilirubin-conjugation', 'In which part of the hepatocyte is UDP-glucuronyl transferase (slide 5)?', 'Endoplasmic reticulum', ['Mitochondria (inner membrane)', 'Nucleus', 'Bile canaliculus membrane'], {
     explanation: 'Slide 5 (textbook figure).',
     difficulty: 'intermediate',
   }),
@@ -762,10 +762,10 @@ const lesson7: Q[] = [
   mcq('q7-12', 'intestinal-fate', 'According to slide 11, what removes the glucuronide residues in the gut?', 'Bacterial hydrolases', ['Pancreatic lipase', 'UDP-glucuronyl transferase', 'Stomach acid'], {
     explanation: 'Slide 11 (the pasted textbook page also names bacterial β-glucuronidase).',
   }),
-  mcq('q7-13', 'intestinal-fate', 'What are urobilinogens?', 'Colourless linear tetrapyrroles made by reducing bilirubin', ['Coloured cyclic porphyrins', 'Conjugated bilirubins', 'Iron-containing pigments'], {
+  mcq('q7-13', 'intestinal-fate', 'What are urobilinogens?', 'Colourless linear tetrapyrroles made by reducing bilirubin', ['Coloured cyclic porphyrins made by oxidising bilirubin', 'Conjugated bilirubins excreted in the urine', 'Iron-containing pigments of the stool'], {
     explanation: 'Slide 11.',
   }),
-  mcq('q7-14', 'intestinal-fate', 'Urobilinogens are oxidised to what?', 'Coloured urobilins (stercobilins)', ['Colourless bilirubin', 'Biliverdin', 'Haem'], {
+  mcq('q7-14', 'intestinal-fate', 'Urobilinogens are oxidised to what?', 'Coloured urobilins (stercobilins)', ['Colourless bilirubin', 'Green biliverdin', 'Haem (in the gut)'], {
     explanation: 'Slide 11.',
   }),
   fill('q7-15', 'intestinal-fate', 'Reabsorption of urobilinogen and its return to the liver is called ____ recirculation.', ['enterohepatic', 'entero-hepatic'], {
@@ -800,10 +800,10 @@ const lesson7: Q[] = [
   mcq('q7-22', 'jaundice-causes', 'Which syndromes are genetic errors of bilirubin UPTAKE and CONJUGATION (slide 14)?', 'Gilbert’s and Crigler–Najjar', ['Dubin–Johnson and Rotor', 'Wilson’s and α₁-antitrypsin deficiency', 'Sickle cell and thalassaemia'], {
     explanation: 'Slide 14. Dubin–Johnson and Rotor affect excretion of conjugated bilirubin (slide 15).',
   }),
-  mcq('q7-23', 'jaundice-causes', 'Dubin–Johnson and Rotor syndromes affect which step?', 'Excretion of conjugated bilirubin', ['Conjugation of bilirubin', 'Haem oxygenase activity', 'Red-cell survival'], {
+  mcq('q7-23', 'jaundice-causes', 'Dubin–Johnson and Rotor syndromes affect which step?', 'Excretion of conjugated bilirubin', ['Conjugation of bilirubin in the liver', 'Haem oxygenase activity in macrophages', 'Red-cell survival in the circulation'], {
     explanation: 'Slide 15: difficulty with excretion of conjugated bilirubin.',
   }),
-  mcq('q7-24', 'jaundice-causes', 'In viral hepatitis, what happens to conjugated bilirubin (slide 14)?', 'It regurgitates into the serum (intrahepatic cholestasis)', ['It is not formed at all', 'It is excreted only as urobilin', 'It is turned back into haem'], {
+  mcq('q7-24', 'jaundice-causes', 'In viral hepatitis, what happens to conjugated bilirubin (slide 14)?', 'It regurgitates into the serum (intrahepatic cholestasis)', ['It is not formed at all by the damaged liver', 'It is excreted only as urobilin in the stool', 'It is turned back into haem by the hepatocytes'], {
     explanation: 'Slide 14.',
     difficulty: 'intermediate',
   }),
@@ -816,7 +816,7 @@ const lesson7: Q[] = [
     ['Cholangiocarcinoma', 'Posthepatic'],
     ['Sickle haemoglobin', 'Prehepatic'],
   ], { explanation: 'Slides 13–16.' }),
-  mcq('q7-27', 'jaundice-causes', 'Oral contraceptives can cause jaundice through which structures (slide 16)?', 'Intrahepatic bile ducts (posthepatic)', ['Red cells (prehepatic)', 'Haem oxygenase', 'Albumin binding'], {
+  mcq('q7-27', 'jaundice-causes', 'Oral contraceptives can cause jaundice through which structures (slide 16)?', 'Intrahepatic bile ducts (posthepatic)', ['Red cells (prehepatic)', 'Haem oxygenase (prehepatic)', 'Albumin binding (hepatic)'], {
     explanation: 'Slide 16: posthepatic — intrahepatic bile ducts: drugs (oral contraceptives).',
     difficulty: 'intermediate',
   }),
@@ -829,7 +829,7 @@ const lesson7: Q[] = [
     answer: true,
     explanation: 'Slide 18.',
   }),
-  mcq('q7-30', 'phototherapy', 'Why are newborns prone to physiological jaundice (slide 13)?', 'Their conjugating system is immature', ['They have too much albumin', 'They lack haem oxygenase', 'Their bile ducts are blocked'], {
+  mcq('q7-30', 'phototherapy', 'Why are newborns prone to physiological jaundice (slide 13)?', 'Their conjugating system is immature', ['They have too much albumin in their blood', 'They lack haem oxygenase in their spleen', 'Their bile ducts are blocked at birth'], {
     explanation: 'Slide 13: physiological neonatal jaundice — immature conjugating system. Lehninger: not yet enough glucuronyl bilirubin transferase (p. 856).',
     clinical: true,
   }),

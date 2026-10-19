@@ -62,7 +62,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'chromosomes', equals: 23 }],
       },
       {
-        question: mcq('s2-02', 'sperm-maturation', 'Day 80: the sperm has been released from the tubule. Where is it, and what is happening?', 'In the epididymis, maturing and gaining motility', ['In the vas deferens, already able to fertilise', 'Still in the tubule, as a spermatid'], {
+        question: mcq('s2-02', 'sperm-maturation', 'Day 80: the sperm has been released from the tubule. Where is it, and what is happening?', 'In the epididymis, maturing and gaining motility', ['In the vas deferens, already able to fertilise', 'Still in the tubule, as an elongating spermatid'], {
           ...predict,
           explanation: 'Sperm pass into the epididymis, where they are stored for up to two weeks, mature and develop motility (slide 41).',
         }),
@@ -71,7 +71,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'place', equals: 3 }],
       },
       {
-        question: mcq('s2-03', 'capacitation', 'The sperm has just been ejaculated (1 hour in the female tract). Can it fertilise yet?', 'No — capacitation takes 5–7 hours', ['Yes, straight away', 'Only after several days'], {
+        question: mcq('s2-03', 'capacitation', 'The sperm has just been ejaculated (1 hour in the female tract). Can it fertilise yet?', 'No — capacitation takes 5–7 hours', ['Yes, straight away after ejaculation', 'Only after several days in the uterus'], {
           ...predict,
           explanation: 'Freshly ejaculated sperm can barely fertilise; capacitation in the female tract takes 5–7 hours (slide 42).',
         }),
@@ -281,7 +281,7 @@ export const simulations: Record<string, Step> = {
     sourceRefs: sr([40, 41, 43, 44, 49, 52, 55]),
     predictions: [
       {
-        question: mcq('s9-01', 'fertilisation', 'Where does fertilisation usually take place?', 'In the ampulla of the uterine tube', ['In the uterus', 'In the ovary'], {
+        question: mcq('s9-01', 'fertilisation', 'Where does fertilisation usually take place?', 'In the ampulla of the uterine tube', ['In the body of the uterus', 'On the surface of the ovary'], {
           ...predict,
           explanation: 'Fertilisation usually occurs in the ampulla; only about 1% of sperm get there (slides 40–41).',
         }),
