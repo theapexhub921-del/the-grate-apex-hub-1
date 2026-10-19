@@ -1,7 +1,8 @@
 // Quiz bank for Anatomy → Respiratory System (gross), built from the
 // lecture deck (Respiratory System 2026 v2). Includes 5 Assertion–Reason
 // questions per lesson.
-import { assertionReason as ar, fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { assertionReason as ar, fill, match, mcq, multi, order, tf, spotQuestion, type QuestionDraft } from '@/data/topics/build';
+import { thoracicJoints } from '@/data/figures/respiratory-system-gross';
 import type { ConceptId } from '@/data/topics/respiratory-system-gross/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -128,6 +129,10 @@ const lesson4: Q[] = [
   ar('ar4-03', 'thoracic-apertures', 'The diaphragm is higher on the right than on the left.', 'The right dome reaches the 5th costal cartilage and the left only the 6th.', 'explains', 'Both true; the cartilage levels describe the higher right dome (slides 172–173).'),
   ar('ar4-04', 'thoracic-muscles', 'The transversus thoracis belongs to the inner layer of intercostal muscles.', 'The serratus posterior muscles have migrated anteriorly.', 'a-true-r-false', 'Transversus thoracis is in the inner layer, but the serratus posterior muscles migrated POSTERIORLY (slides 150, 159).'),
   ar('ar4-05', 'thorax-components', 'The suprapleural membrane forms the floor of the thorax.', 'The diaphragm closes the thoracic outlet.', 'a-false-r-true', 'The suprapleural membrane closes the top; the diaphragm is the floor (slides 132, 172).'),
+  spotQuestion('q4-fig-manubriosternal', 'intercostal-space-joints', thoracicJoints, 'manubriosternal', ['xiphisternal', 'sternoclavicular', 'sternocostal']),
+  spotQuestion('q4-fig-costochondral', 'intercostal-space-joints', thoracicJoints, 'costochondral', ['interchondral', 'sternocostal', 'intervertebral']),
+  spotQuestion('q4-fig-interchondral', 'intercostal-space-joints', thoracicJoints, 'interchondral', ['costochondral', 'xiphisternal', 'sternocostal']),
+  spotQuestion('q4-fig-sternoclavicular', 'intercostal-space-joints', thoracicJoints, 'sternoclavicular', ['manubriosternal', 'sternocostal', 'costochondral']),
 ];
 
 // ─── Lesson 5: The Diaphragm ─────────────────────────────────────────

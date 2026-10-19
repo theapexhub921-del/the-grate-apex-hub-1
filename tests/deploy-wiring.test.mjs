@@ -41,6 +41,21 @@ describe('3D atlas wiring', () => {
     assert.match(html, /f \+ '\?m=' \+ MODEL_VERSION/, 'model addresses must end in ?m=<MODEL_VERSION>');
     assert.equal(/const MODEL_VERSION = '(\d+)'/.exec(html)?.[1], KNOWN_MODELS.version);
   });
+  // The 3D organs shown with the simulations (public/sim3d) load the same model files: they must ask for the
+  // same version, or browsers would download every model a second time.
+  it('the simulation 3D organs ask for models with the same version', () => {
+    const scenes = read('public/sim3d/scenes.js');
+    assert.equal(/export const MODEL_VERSION = '(\d+)'/.exec(scenes)?.[1], KNOWN_MODELS.version);
+    assert.match(read('public/sim3d/organ.html'), /'\.glb\?m=' \+ MODEL_VERSION/);
+    assert.match(read('public/sw.js'), /startsWith\('\/sim3d\/'\)\) return;/, 'the service worker must leave /sim3d/ alone, like /atlas/');
+  });
+  it('every 3D scene a simulation asks for exists', async () => {
+    const { SCENES } = await import('../public/sim3d/scenes.js');
+    const dir = 'src/components/learning/simulations/graphics';
+    for (const file of readdirSync(dir).filter((f) => f.endsWith('.tsx'))) {
+      for (const m of read(`${dir}/${file}`).matchAll(/scene="([\w-]+)"/g)) assert.ok(SCENES[m[1]], `${file} asks for 3D scene "${m[1]}", which public/sim3d/scenes.js does not have`);
+    }
+  });
   it('the model version was bumped whenever a model changed', () => {
     const files = [];
     const walk = (dir) => readdirSync(dir, { withFileTypes: true }).forEach((e) => (e.isDirectory() ? walk(`${dir}/${e.name}`) : files.push(`${dir}/${e.name}`)));
@@ -58,15 +73,21 @@ describe('3D atlas wiring', () => {
   });
 });
 
-describe('Med Term Scramble wiring', () => {
+const GAME_IDS = ['med-term-scramble', 'golden-hour'];
+
+describe('Study game wiring (Med Term Scramble, Golden Hour)', () => {
   it('the Vercel build joins the game engine from its parts first', () => {
     assert.match(vercel.buildCommand, /^node scripts\/assemble-games\.mjs && /);
   });
-  it('the game build has its engine parts and page', () => {
-    const files = readdirSync('public/game-builds/med-term-scramble');
-    assert.ok(files.some((file) => /^index\.wasm\.part\d+$/.test(file)), 'no index.wasm.partNN files');
-    for (const file of ['play.html', 'index.js', 'index.pck']) assert.ok(files.includes(file), `missing ${file}`);
-  });
+  for (const id of GAME_IDS) {
+    it(`${id}: the game build has its engine parts and page`, () => {
+      const files = readdirSync(`public/game-builds/${id}`);
+      assert.ok(files.some((file) => /^index\.wasm\.part\d+$/.test(file)), 'no index.wasm.partNN files');
+      for (const file of ['play.html', 'index.js', 'index.pck']) assert.ok(files.includes(file), `missing ${file}`);
+      const pck = readFileSync(`public/game-builds/${id}/index.pck`).length;
+      assert.match(readFileSync(`public/game-builds/${id}/play.html`, 'utf8'), new RegExp(`"index\\.pck":${pck}\\b`), 'play.html must list the real index.pck size');
+    });
+  }
   it('the service worker saves game builds for offline play, never a redirect', () => {
     const block = sw.slice(sw.indexOf("startsWith('/game-builds/')"));
     assert.ok(block.length < sw.length, 'no /game-builds/ handling in public/sw.js');
@@ -74,9 +95,11 @@ describe('Med Term Scramble wiring', () => {
     assert.match(block, /!response\.redirected/, 'a redirected reply must never be saved');
     assert.match(block, /OFFLINE_CACHE/, 'game files belong in the offline cache that app updates keep');
   });
-  it('the game page is hidden from the navigation tabs', () => {
+  it('every game page is hidden from the navigation tabs', () => {
     for (const file of ['src/components/app-tabs.web.tsx', 'src/components/app-tabs.tsx']) {
-      assert.match(read(file), /name="games\/med-term-scramble" options=\{\{ href: null \}\}/, file);
+      for (const id of GAME_IDS) {
+        assert.ok(read(file).includes(`name="games/${id}" options={{ href: null }}`), `${file}: games/${id}`);
+      }
     }
   });
 });

@@ -72,7 +72,7 @@ export default function StudyChatScreen() {
   }, []);
 
   useEffect(() => {
-    void refreshPast();
+    queueMicrotask(() => { void refreshPast(); });
   }, [refreshPast]);
 
   // Sends one message and saves the conversation. The learner's message stays in the thread

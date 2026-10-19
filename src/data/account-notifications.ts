@@ -4,7 +4,7 @@
 // bell (and as device alerts); follows come with a Follow back button. Read
 // marks are saved on the account (the rules let me change only `read`).
 import type { Href } from 'expo-router';
-import { collection, doc, getDocs, limit, orderBy, query, updateDoc } from 'firebase/firestore';
+import { collection, doc, limit, onSnapshot, orderBy, query, type QueryDocumentSnapshot, type Unsubscribe, updateDoc } from 'firebase/firestore';
 import { useSyncExternalStore } from 'react';
 
 import type { AppNotification } from '@/data/notifications';
@@ -28,40 +28,30 @@ const TITLES: Record<string, (name: string) => string> = {
 
 const millis = (value: unknown) => (typeof value === 'number' ? value : (value as { toMillis?: () => number } | null)?.toMillis?.() ?? 0);
 
-export async function refreshAccountNotifications() {
-  const uid = auth.currentUser?.uid;
-  if (!uid) {
-    if (items.length) { items = []; notify(); }
-    return;
-  }
-  try {
-    const snap = await getDocs(query(collection(db, 'users', uid, 'notifications'), orderBy('createdAt', 'desc'), limit(40)));
-    const next: AccountNotification[] = snap.docs.map((item) => {
-      const d = item.data();
-      const kind = String(d.type ?? '');
-      const name = d.fromName ? `@${d.fromName}` : 'Someone';
-      return {
-        id: `acct:${item.id}`,
-        docId: item.id,
-        kind,
-        from: String(d.from ?? ''),
-        fromName: (d.fromName as string) ?? null,
-        read: d.read === true,
-        group: 'updates',
-        title: (TITLES[kind] ?? (() => `${name} sent you a notification`))(name),
-        body: kind === 'follow' ? 'Follow back to become friends — then you can message and battle.' : String(d.text ?? ''),
-        at: millis(d.createdAt),
-        href: (kind === 'message' ? '/social/messages' : kind === 'follow' ? `/social/person?user=${encodeURIComponent(String(d.from ?? ''))}` : '/') as Href,
-        icon: kind === 'follow' ? 'profile' : kind === 'like' ? 'heart' : kind === 'reshare' ? 'repost' : kind === 'message' ? 'comment' : 'comment',
-        tone: kind === 'follow' ? 'gold' : 'primary',
-      };
-    });
-    if (JSON.stringify(next.map((n) => [n.id, n.read])) !== JSON.stringify(items.map((n) => [n.id, n.read]))) {
-      items = next;
-      notify();
-    }
-  } catch {
-    // offline: keep the last list
+function apply(docs: readonly QueryDocumentSnapshot[]) {
+  const next: AccountNotification[] = docs.map((item) => {
+    const d = item.data();
+    const kind = String(d.type ?? '');
+    const name = d.fromName ? `@${d.fromName}` : 'Someone';
+    return {
+      id: `acct:${item.id}`,
+      docId: item.id,
+      kind,
+      from: String(d.from ?? ''),
+      fromName: (d.fromName as string) ?? null,
+      read: d.read === true,
+      group: 'updates',
+      title: (TITLES[kind] ?? (() => `${name} sent you a notification`))(name),
+      body: kind === 'follow' ? 'Follow back to become friends — then you can message and battle.' : String(d.text ?? ''),
+      at: millis(d.createdAt),
+      href: (kind === 'message' ? '/social/messages' : kind === 'follow' ? `/social/person?user=${encodeURIComponent(String(d.from ?? ''))}` : '/') as Href,
+      icon: kind === 'follow' ? 'profile' : kind === 'like' ? 'heart' : kind === 'reshare' ? 'repost' : kind === 'message' ? 'comment' : 'comment',
+      tone: kind === 'follow' ? 'gold' : 'primary',
+    };
+  });
+  if (JSON.stringify(next.map((n) => [n.id, n.read])) !== JSON.stringify(items.map((n) => [n.id, n.read]))) {
+    items = next;
+    notify();
   }
 }
 
@@ -76,14 +66,41 @@ export async function markAccountNotificationsRead(ids: readonly string[]) {
   await Promise.all(targets.map((item) => updateDoc(doc(db, 'users', uid, 'notifications', item.docId), { read: true }).catch(() => {})));
 }
 
-let timer: ReturnType<typeof setInterval> | null = null;
+// Live: one listener on my newest 40 notifications, so Firebase sends only new
+// ones (reading all 40 every 30 seconds used a lot of the free plan's reads).
+let watching: string | null = null;
+let stop: Unsubscribe | null = null;
+let retry: ReturnType<typeof setTimeout> | null = null;
+
+function watch(uid: string | null) {
+  if (uid === watching) return;
+  stop?.();
+  stop = null;
+  if (retry) { clearTimeout(retry); retry = null; }
+  watching = uid;
+  if (!uid) {
+    if (items.length) { items = []; notify(); }
+    return;
+  }
+  stop = onSnapshot(
+    query(collection(db, 'users', uid, 'notifications'), orderBy('createdAt', 'desc'), limit(40)),
+    (snap) => apply(snap.docs),
+    () => {
+      // Offline or signing out: keep the last list and try again shortly.
+      if (watching !== uid) return;
+      stop = null;
+      watching = null;
+      retry = setTimeout(() => watch(auth.currentUser?.uid ?? null), 30_000);
+    }
+  );
+}
+
+let started = false;
 function start() {
-  if (timer) return;
-  // Right after sign-in too (the first check may run before the account is ready).
-  auth.onAuthStateChanged(() => void refreshAccountNotifications());
-  void refreshAccountNotifications();
-  timer = setInterval(() => void refreshAccountNotifications(), 30_000);
-  if (typeof document !== 'undefined') document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') void refreshAccountNotifications(); });
+  if (started) return;
+  started = true;
+  auth.onAuthStateChanged((user) => watch(user?.uid ?? null));
+  watch(auth.currentUser?.uid ?? null);
 }
 
 export function useAccountNotifications(): AccountNotification[] {

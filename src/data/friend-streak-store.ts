@@ -19,6 +19,12 @@ const CACHE_MS = 5 * 60_000;
 export const friendChatId = (a: string, b: string) => [a, b].sort().join('_');
 
 const cache = new Map<string, { at: number; status: FriendStreakStatus }>();
+
+// The chat's streak-relevant messages already read, so a reload asks Firebase
+// only for messages newer than the last one seen (the free plan counts every
+// document read; re-reading 400 days of messages each time added up fast).
+type StreakMessage = { sender_id: string; created_at: string; stump: boolean };
+const seenMessages = new Map<string, { messages: StreakMessage[]; newest: number }>();
 const listeners = new Set<() => void>();
 
 /** Called when a friend streak changes (sent message, freeze used), so screens can reload. */
@@ -50,16 +56,23 @@ export async function loadFriendStreak(friendId: string, options: { fresh?: bool
   const hit = cache.get(chatId);
   if (hit && !options.fresh && Date.now() - hit.at < CACHE_MS) return hit.status;
   try {
-    const since = Timestamp.fromMillis(Date.now() - STREAK_WINDOW_DAYS * 86_400_000);
+    const windowStart = Date.now() - STREAK_WINDOW_DAYS * 86_400_000;
+    const known = seenMessages.get(chatId);
+    const since = Math.max(windowStart, known?.newest ?? 0);
     const [snap, covered] = await Promise.all([
-      getDocs(query(collection(db, 'chats', chatId, 'messages'), where('createdAt', '>=', since), orderBy('createdAt', 'asc'))),
+      getDocs(query(collection(db, 'chats', chatId, 'messages'), where('createdAt', known ? '>' : '>=', Timestamp.fromMillis(since)), orderBy('createdAt', 'asc'))),
       coveredDays(chatId),
     ]);
-    const messages = snap.docs.map((item) => {
+    let newest = known?.newest ?? 0;
+    const fresh = snap.docs.flatMap((item) => {
       const d = item.data();
-      const at = d.createdAt?.toMillis ? d.createdAt.toMillis() : Date.now();
-      return { sender_id: String(d.from ?? ''), created_at: new Date(at).toISOString(), stump: d.share?.kind === 'stump' };
+      if (!d.createdAt?.toMillis) return []; // still being sent: counted on the next load
+      const at = d.createdAt.toMillis() as number;
+      newest = Math.max(newest, at);
+      return [{ sender_id: String(d.from ?? ''), created_at: new Date(at).toISOString(), stump: d.share?.kind === 'stump' }];
     });
+    const messages = [...(known?.messages ?? []).filter((message) => Date.parse(message.created_at) >= windowStart), ...fresh];
+    seenMessages.set(chatId, { messages, newest });
     const status = friendStreakStatus(messages, me, friendId, Date.now(), covered);
     cache.set(chatId, { at: Date.now(), status });
     return status;

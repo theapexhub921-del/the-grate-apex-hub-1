@@ -8,6 +8,7 @@
 //   QuestionFigure  with a quiz question: labels covered and the asked-about
 //                   part marked; once answered, its label is uncovered.
 //   QuestionImage   a plain picture with a question (past papers' diagrams).
+import { LIVE_SITE } from '@/lib/live-site';
 import { Image } from 'expo-image';
 import { useState, type ReactNode } from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -25,7 +26,7 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // Pictures are served from public/ by the website; the phone app loads
 // them from the live site.
-const SITE = 'https://grateapex.vercel.app';
+const SITE = LIVE_SITE;
 const figureUri = (src: string) => (Platform.OS === 'web' ? src : `${SITE}${src}`);
 const pct = (fraction: number) => `${fraction * 100}%` as const;
 

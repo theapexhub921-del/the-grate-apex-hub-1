@@ -11,13 +11,13 @@ import { Pill } from '@/components/ui/pill';
 import { Sheet } from '@/components/ui/sheet';
 import { Text, TextInput } from '@/components/ui/text';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
-import { addGroupMember, createGroup, deleteGroup, type GroupInfo, leaveGroup } from '@/data/group-chat';
+import { addGroupMember, createGroup, deleteGroup, GROUP_MAX_MEMBERS, type GroupInfo, leaveGroup } from '@/data/group-chat';
 import { personName, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { friendlyError } from '@/lib/errors';
 
-const MAX_MEMBERS = 10; // the shared rules allow up to 10 people in a group
+const MAX_MEMBERS = GROUP_MAX_MEMBERS; // you included
 
 /** Group info (like WhatsApp): name, description, members, add members (owner), leave, report. */
 export function GroupInfoSheet({ visible, group, onClose, onChanged, onReport }: { visible: boolean; group: GroupInfo; onClose: () => void; onChanged: () => void; onReport: () => void }) {

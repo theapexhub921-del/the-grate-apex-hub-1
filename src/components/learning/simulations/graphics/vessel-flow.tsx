@@ -1,17 +1,19 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
-import { Circle, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
+import { Defs, G, LinearGradient, Path, Stop } from 'react-native-svg';
 
+import { Anatomy as A } from '@/constants/theme';
 import type { FlowState } from '@/data/simulations/vessel-flow';
-import { useTheme } from '@/hooks/use-theme';
 
-import { Canvas, Legend, type GraphicProps } from './shared';
+import { mix, RedCell } from './anatomy/cells';
+import { Tag } from './kit';
+import { Canvas, type GraphicProps } from './shared';
 
 const W = 400;
-const H = 200;
+const H = 240;
 const X0 = 24;
 const X1 = W - 16;
-const CY = 90;
+const CY = 104;
 const NARROW_START = 190;
 const NARROW_END = 250;
 const TAPER = 24;
@@ -26,8 +28,7 @@ function halfWidthAt(x: number, half: number, narrowHalf: number) {
 }
 
 export function VesselFlowGraphic({ state, time, reduceMotion }: GraphicProps<FlowState>) {
-  const colors = useTheme();
-  const half = Math.min(64, 32 * state.radius);
+  const half = Math.min(76, 40 * state.radius);
   const narrowHalf = Math.max(3, half * (1 - state.stenosis));
 
   // Time to cross each slice of the vessel (faster where it is narrow), so
@@ -85,44 +86,59 @@ export function VesselFlowGraphic({ state, time, reduceMotion }: GraphicProps<Fl
     }
   });
 
-  const profileX = X0 + 44;
+  // the wall around the lumen: intima (thin, pale), media (smooth muscle), adventitia
+  const wallW = 10 + 4 * state.radius;
+  let outerTop = '';
+  let outerBottom = '';
+  for (let i = 0; i <= 80; i++) {
+    const x = X0 + ((X1 - X0) * i) / 80;
+    const h = half + wallW;
+    outerTop += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${(CY - h).toFixed(1)} `;
+    outerBottom = `L${x.toFixed(1)} ${(CY + h).toFixed(1)} ` + outerBottom;
+  }
+  const outer = `${outerTop}${outerBottom}Z`;
+  // a fatty plaque bulging into the lumen where it is narrowed
+  const plaque = (sign: 1 | -1) => {
+    let d = '';
+    for (let i = 0; i <= 30; i++) {
+      const x = NARROW_START - TAPER + ((NARROW_END - NARROW_START + 2 * TAPER) * i) / 30;
+      const h = halfWidthAt(x, half, narrowHalf);
+      d += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${(CY + sign * h).toFixed(1)} `;
+    }
+    return `${d}L${NARROW_END + TAPER} ${CY + sign * half} L${NARROW_START - TAPER} ${CY + sign * half} Z`;
+  };
   return (
     <View style={{ gap: 10 }}>
-      <Canvas width={W} height={H} label={`Blood vessel. Flow ${Math.round(state.flow)}% of normal, ${state.turbulent ? 'turbulent' : 'laminar'}.`}>
-        <Path d={outline} fill={colors.error} fillOpacity={0.12} stroke={colors.error} strokeWidth={2} />
-        {state.stenosis > 0 ? (
-          <SvgText x={(NARROW_START + NARROW_END) / 2} y={CY - narrowHalf - 10} fontSize={12} fontWeight="800" fill={colors.textSecondary} textAnchor="middle">
-            {`${Math.round(state.stenosis * 100)}% narrowed`}
-          </SvgText>
-        ) : null}
-        {LANES.map((lane) => {
-          const length = (state.turbulent ? 0.7 : 1 - lane * lane * 0.9) * 34;
-          const y = CY + lane * half * 0.9;
-          return (
-            <G key={`p${lane}`}>
-              <Line x1={profileX} x2={profileX + length} y1={y} y2={y} stroke={colors.primary} strokeWidth={2} />
-              <Path d={`M${profileX + length} ${y} l-6 -4 l0 8 Z`} fill={colors.primary} />
-            </G>
-          );
-        })}
-        <Line x1={profileX} x2={profileX} y1={CY - half} y2={CY + half} stroke={colors.primary} strokeWidth={1.5} strokeDasharray="3 3" />
-        {particles.map((p) => (
-          <Circle key={p.key} cx={p.x} cy={p.y} r={3.2} fill={colors.error} />
+      <Canvas width={W} height={H} label={`An artery cut along its length. Flow ${Math.round(state.flow)}% of normal, ${state.turbulent ? 'turbulent' : 'laminar'}.`}>
+        <Defs>
+          <LinearGradient id="vfWall" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={A.muscleDark} />
+            <Stop offset="0.5" stopColor={A.muscleLight} />
+            <Stop offset="1" stopColor={A.muscleDark} />
+          </LinearGradient>
+          <LinearGradient id="vfLumen" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={mix(A.artery, '#FFFFFF', 0.5)} />
+            <Stop offset="0.5" stopColor={mix(A.artery, '#FFFFFF', 0.68)} />
+            <Stop offset="1" stopColor={mix(A.artery, '#FFFFFF', 0.5)} />
+          </LinearGradient>
+        </Defs>
+        <Path d={outer} fill="url(#vfWall)" stroke={A.calyxShade} strokeWidth={3} />
+        {Array.from({ length: 24 }, (_, i) => (
+          <Path key={i} d={`M${X0 + 6 + i * 15} ${CY - half - wallW + 3} l8 ${wallW - 6} M${X0 + 6 + i * 15} ${CY + half + 3} l8 ${wallW - 6}`} stroke={A.muscleDark} strokeWidth={0.8} opacity={0.4} />
         ))}
-        <Rect x={X0} y={H - 30} width={150} height={22} rx={11} fill={state.turbulent ? colors.warningSubtle : colors.successSubtle} />
-        <SvgText x={X0 + 75} y={H - 15} fontSize={12} fontWeight="900" fill={state.turbulent ? colors.warningText : colors.successText} textAnchor="middle">
-          {state.turbulent ? 'Turbulent — bruit' : 'Laminar — silent'}
-        </SvgText>
-        <SvgText x={X1} y={H - 15} fontSize={12} fontWeight="800" fill={colors.textSecondary} textAnchor="end">
-          {`Flow ${Math.round(state.flow)}%`}
-        </SvgText>
+        <Path d={outline} fill="url(#vfLumen)" stroke={A.calyx} strokeWidth={2} />
+        {state.stenosis > 0 ? (
+          <G>
+            <Path d={plaque(-1)} fill={A.fat} stroke={A.urineDark} strokeWidth={1} />
+            <Path d={plaque(1)} fill={A.fat} stroke={A.urineDark} strokeWidth={1} />
+          </G>
+        ) : null}
+        {particles.map((p, i) => (
+          <RedCell key={p.key} x={p.x} y={p.y} r={Math.min(6, 2.5 + half / 12)} sat={0.97} tilt={state.turbulent ? time * 6 + i : i * 0.4} />
+        ))}
+        {state.stenosis > 0 ? <Tag x={(NARROW_START + NARROW_END) / 2} y={Math.max(10, CY - half - wallW - 10)} text={`Plaque: ${Math.round(state.stenosis * 100)}% narrowed`} size={10} /> : null}
+        <Tag x={X0 + 78} y={H - 12} text={state.turbulent ? 'Turbulent: a bruit is heard' : 'Laminar: silent'} tone={state.turbulent ? 'warning' : 'success'} size={10} />
       </Canvas>
-      <Legend
-        items={[
-          { label: 'Velocity profile', color: colors.primary },
-          { label: 'Red cells', color: colors.error },
-        ]}
-      />
     </View>
   );
 }

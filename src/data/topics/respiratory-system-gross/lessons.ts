@@ -475,6 +475,7 @@ const lesson4: Draft = {
     {
       title: 'Intercostal Spaces and Joints',
       kind: 'clinical',
+      figure: 'respiratory-system-gross:thoracic-joints',
       paragraphs: [
         'Between the internal and innermost intercostal muscles lies the neurovascular plane, carrying the intercostal vein, artery and nerve (VAN, from above down) in the costal groove under each rib.',
         'For pleural drainage the needle is inserted just above a rib, to avoid the neurovascular bundle running along the lower border of the rib above. An intercostal nerve block is given near the lower border of the rib, where the nerve runs.',

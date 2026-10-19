@@ -10,6 +10,7 @@ import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
+import { samePresenceAside } from '@/lib/presence';
 
 export interface AuthUser {
   id: string; // for compatibility with code referencing user.id
@@ -45,19 +46,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let unsubSnapshot: (() => void) | null = null;
+    let retry: ReturnType<typeof setTimeout> | null = null;
+    let lastProfile: Record<string, any> | null = null;
 
-    const unsubAuth = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+    const stopWatching = () => {
       if (unsubSnapshot) {
         unsubSnapshot();
         unsubSnapshot = null;
       }
-
-      if (!firebaseUser) {
-        setSession(null);
-        setLoading(false);
-        return;
+      if (retry) {
+        clearTimeout(retry);
+        retry = null;
       }
+    };
 
+    const watchProfile = (firebaseUser: FirebaseUser, attempt: number) => {
       // Read live Firestore profile
       const userRef = doc(db, 'users', firebaseUser.uid);
       // Writes made as the app starts (last seen, online…) are merged into the
@@ -72,6 +75,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         (snap) => {
           if (!snap.metadata.fromCache && !snap.metadata.hasPendingWrites) fromServer = true;
           const profile = snap.data() || {};
+          attempt = 0;
+          // Presence alone changed (written every 45 s while the app is open):
+          // keep the same learner, so the whole app doesn't redraw and reload.
+          if (lastProfile && samePresenceAside(lastProfile, profile)) return;
+          lastProfile = profile;
           const authUser: AuthUser = {
             id: firebaseUser.uid,
             uid: firebaseUser.uid,
@@ -90,25 +98,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setLoading(false);
         },
         () => {
-          // If Firestore is offline or document not yet created, still create basic auth state
-          const authUser: AuthUser = {
-            id: firebaseUser.uid,
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            created_at: firebaseUser.metadata.creationTime,
-            user_metadata: {},
-            profile: {},
-            profileLoaded: false,
-          };
-          setSession({ user: authUser });
-          setLoading(false);
+          // The read failed (e.g. a dropped connection while signing in). Until
+          // the profile has been read once, carry on with the basic sign-in;
+          // either way, listen again shortly (a failed listener never recovers).
+          unsubSnapshot = null;
+          if (!lastProfile) {
+            const authUser: AuthUser = {
+              id: firebaseUser.uid,
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName,
+              created_at: firebaseUser.metadata.creationTime,
+              user_metadata: {},
+              profile: {},
+              profileLoaded: false,
+            };
+            setSession({ user: authUser });
+            setLoading(false);
+          }
+          const wait = Math.min(60_000, 2_000 * 2 ** attempt);
+          retry = setTimeout(() => {
+            retry = null;
+            if (auth.currentUser?.uid === firebaseUser.uid) watchProfile(firebaseUser, attempt + 1);
+          }, wait);
         }
       );
+    };
+
+    const unsubAuth = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      stopWatching();
+      lastProfile = null;
+
+      if (!firebaseUser) {
+        setSession(null);
+        setLoading(false);
+        return;
+      }
+
+      watchProfile(firebaseUser, 0);
     });
 
     return () => {
-      if (unsubSnapshot) unsubSnapshot();
+      stopWatching();
       unsubAuth();
     };
   }, []);

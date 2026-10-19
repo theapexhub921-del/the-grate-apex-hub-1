@@ -10,7 +10,7 @@ import { MentionInput } from '@/components/social/mention-input';
 import { VoiceClipRecorder, type VoiceClip } from '@/components/social/voice-clip';
 import { VoiceNotePlayer } from '@/components/social/voice-note';
 import { PersonAvatar } from '@/components/social/profile-card';
-import { StumpCard } from '@/components/social/stump-card';
+import { StumpCard, useStumpQuestion } from '@/components/social/stump-card';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
 import { Sheet } from '@/components/ui/sheet';
@@ -21,7 +21,6 @@ import { VideoPlayer } from '@/components/ui/video-player';
 import { isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
 import { type CommunityPost, displayBody } from '@/data/community';
 import { personName, type SocialPerson } from '@/data/social';
-import { stumpQuestion } from '@/data/stumps';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { routes } from '@/lib/routes';
 
@@ -77,13 +76,13 @@ export function PostDetail({
   const [menu, setMenu] = useState<PostComment | null>(null);
   // A video post opens as a reel; the comment button switches to the comments view.
   const [showComments, setShowComments] = useState(false);
+  const stumped = useStumpQuestion(post?.stump?.qid);
   if (!post) return null;
 
   const desktop = isDesktopWidth(width);
   const friend = people.find((person) => person.userId === post.author_id);
   const name = friend ? personName(friend) : post.author_id === ownId ? ownName : post.author_name ? `@${post.author_name}` : 'Learner';
   const handle = post.author_name ? post.author_name : name;
-  const stumped = post.stump ? stumpQuestion(post.stump.qid) : null;
   const items = postMedia(post).filter((item) => item.type !== 'audio');
   const voiceClips = postMedia(post).filter((item) => item.type === 'audio');
   const hasMedia = items.length > 0;

@@ -11,6 +11,7 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { webStyle } from '@/components/ui/web';
 import { Type, type ThemeColors } from '@/constants/theme';
+import { usePageZoomPreference } from '@/data/settings';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // The part of the screen not covered by the phone keyboard (web only).
@@ -34,9 +35,16 @@ function useVisibleViewport() {
 export function ChatShell({ friendId, groupId, name }: { friendId?: string | null; groupId?: string | null; name?: string | null }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
-  const { width, height } = useWindowDimensions();
+  const { width, height: windowHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const visible = useVisibleViewport();
+  const viewportArea = useVisibleViewport();
+  // Settings → page zoom scales the whole page (CSS zoom), but the window's size is
+  // measured unzoomed: divide by the zoom, or a zoomed-in page is taller than the
+  // screen and the message bar falls off the bottom.
+  const pageZoom = usePageZoomPreference();
+  const zoom = Platform.OS === 'web' ? pageZoom / 100 : 1;
+  const height = windowHeight / zoom;
+  const visible = viewportArea ? { height: viewportArea.height / zoom, top: viewportArea.top / zoom } : null;
   const { goBack } = useBackNavigation();
   const wide = width >= 900;
   // An open chat needs a way back to the chats list (the chevron beside the profile picture).

@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Linking, Platform, ScrollView, StyleSheet, TextInput as RNTextInput, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
@@ -10,7 +10,7 @@ import { GroupInfoSheet } from '@/components/chat/group-info';
 import { canSwipe, SwipeToReply } from '@/components/chat/swipe-to-reply';
 import { Avatar } from '@/components/ui/avatar';
 import { router } from 'expo-router';
-import { deleteGroupMessage, getGroup, type GroupInfo, listGroupMessages, reactToGroupMessage, sendGroupMessage } from '@/data/group-chat';
+import { deleteGroupMessage, type GroupInfo, reactToGroupMessage, sendGroupMessage, watchGroup, watchGroupMessages } from '@/data/group-chat';
 import { clock, useVoiceRecorder, voiceNotesSupported, VoiceNotePlayer } from '@/components/social/voice-note';
 import { Button } from '@/components/ui/button';
 import { Icon, type IconName } from '@/components/ui/icon';
@@ -22,12 +22,12 @@ import { webStyle } from '@/components/ui/web';
 import { Radius, ReadReceiptBlues, Type, type ThemeColors } from '@/constants/theme';
 import { hideMessage, isHidden, isStarred, previewOf, REACTIONS, reactToMessage, type ReplyRef, sendChatMessage, setTyping, toggleStar, togglePin, uploadChatDocument, useChatPrefs } from '@/data/chat';
 import { contrastRatio } from '@/data/contrast';
-import { deleteCommunityMessage, getOrCreateFriendConversation, listConversationMessages, loadConversationMeta, markConversationSeen, messageStatus, sendVoiceNote, VOICE_NOTE_MAX_SECONDS, type CommunityMessage, type ConversationMeta, type MessageStatus } from '@/data/community';
+import { deleteCommunityMessage, getOrCreateFriendConversation, markConversationSeen, messageStatus, sendVoiceNote, VOICE_NOTE_MAX_SECONDS, watchConversationMessages, watchConversationMeta, type CommunityMessage, type ConversationMeta, type MessageStatus } from '@/data/community';
 import { FriendStreakNotice, useStreakNoticeHidden } from '@/components/chat/friend-streak-notice';
-import { StumpCard, StumpComposer, StumpUnavailable } from '@/components/social/stump-card';
+import { StumpById, StumpComposer, StumpUnavailable } from '@/components/social/stump-card';
 import type { ChoiceQuestion } from '@/data/questions';
-import { answerChatStump, chatStumpAnswers, pickStumpQuestion, stumpQuestion } from '@/data/stumps';
-import type { FriendStreakStatus } from '@/data/friend-streaks';
+import { answerChatStump, chatStumpAnswers, pickStumpQuestion, type StumpAnswer, watchGroupStumpAnswers } from '@/data/stumps';
+import { type FriendStreakStatus, todaysStreakKey } from '@/data/friend-streaks';
 import { loadFriendStreak } from '@/data/friend-streak-store';
 import { usePrivacyPreferences } from '@/data/settings';
 import { personName, useSocial } from '@/data/social';
@@ -95,41 +95,49 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
   const scroll = useRef<ScrollView>(null);
   const input = useRef<RNTextInput>(null);
 
-  const refresh = useCallback(async (id: string) => {
-    try {
-      if (groupId) {
-        const [list, info] = await Promise.all([listGroupMessages(id), getGroup(id)]);
-        setMessages(list);
-        setGroup(info);
-        setError(info ? null : 'This group could not be found.');
-        return;
-      }
-      const [list, info] = await Promise.all([listConversationMessages(id), loadConversationMeta(id, privacy).catch(() => null)]);
-      setMessages(list);
-      setMeta(info);
-      setError(null);
-      if (list.some((message) => message.sender_id !== user?.id)) void markConversationSeen(id, privacy.readReceipts);
-    } catch (caught) {
-      setError(friendlyError(caught, 'Could not load messages.'));
-    } finally {
-      setLoading(false);
-    }
-  }, [privacy, user?.id, groupId]);
-
   useEffect(() => {
     let live = true;
-    queueMicrotask(() => { if (live) { setLoading(true); setMessages([]); setReply(null); } });
+    queueMicrotask(() => { if (live) { setLoading(true); setMessages([]); setReply(null); setChatId(null); } });
     (groupId ? Promise.resolve(groupId) : getOrCreateFriendConversation(friendId))
-      .then(async (id) => { if (!live) return; setChatId(id); await refresh(id); })
+      .then((id) => { if (live) setChatId(id); })
       .catch((caught) => { if (live) { setError(friendlyError(caught, 'Could not open this conversation.')); setLoading(false); } });
     return () => { live = false; };
-  }, [friendId, groupId, refresh]);
+  }, [friendId, groupId]);
 
+  // Live: Firebase sends only new or changed messages. (Re-reading the whole
+  // chat every 4 seconds used up the free plan's daily reads.)
+  const me = user?.id ?? null;
+  const { readReceipts, shareOnlineStatus } = privacy;
   useEffect(() => {
-    if (!chatId) return;
-    const timer = setInterval(() => { if (typeof document === 'undefined' || document.visibilityState === 'visible') void refresh(chatId); }, 4000);
-    return () => clearInterval(timer);
-  }, [chatId, refresh]);
+    if (!chatId || !me) return;
+    const onList = (list: CommunityMessage[]) => { setMessages(list); setError(null); setLoading(false); };
+    const onFail = (caught: unknown) => { setError(friendlyError(caught, 'Could not load messages.')); setLoading(false); };
+    const stops = isGroup
+      ? [
+          watchGroupMessages(chatId, onList, onFail),
+          watchGroup(chatId, (info) => { setGroup(info); if (!info) { setError('This group could not be found.'); setLoading(false); } }),
+        ]
+      : [watchConversationMessages(chatId, onList, onFail), watchConversationMeta(chatId, me, { readReceipts, shareOnlineStatus }, setMeta)];
+    return () => stops.forEach((stop) => stop());
+  }, [chatId, isGroup, me, readReceipts, shareOnlineStatus]);
+
+  // A group's private stump answers (to my stumps, and my own), live.
+  const [groupAnswers, setGroupAnswers] = useState<ReadonlyMap<string, StumpAnswer[]>>(new Map());
+  useEffect(() => {
+    if (!chatId || !isGroup || !me) return;
+    return watchGroupStumpAnswers(chatId, me, setGroupAnswers);
+  }, [chatId, isGroup, me]);
+
+  // Opening the chat, and each new message from them while it is on screen, marks it seen (once, not on every update).
+  const lastFromThem = useMemo(() => [...messages].reverse().find((message) => message.sender_id !== me)?.id ?? null, [messages, me]);
+  useEffect(() => {
+    if (isGroup || !chatId || !lastFromThem) return;
+    const mark = () => { if (typeof document === 'undefined' || document.visibilityState === 'visible') void markConversationSeen(chatId, readReceipts); };
+    mark();
+    if (typeof document === 'undefined') return;
+    document.addEventListener('visibilitychange', mark);
+    return () => document.removeEventListener('visibilitychange', mark);
+  }, [isGroup, chatId, lastFromThem, readReceipts]);
 
   const readBlue = [...ReadReceiptBlues].sort((a, b) => contrastRatio(b, colors.primary) - contrastRatio(a, colors.primary))[0];
   // Answers to stumps are read by the stump's card, not shown as bubbles.
@@ -137,15 +145,17 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
   const shown = search.trim() ? visible.filter((message) => message.body.toLowerCase().includes(search.trim().toLowerCase())) : visible;
   const pinnedId = chatId ? prefs.pinned[chatId] : undefined;
   const pinned = pinnedId ? visible.find((message) => message.id === pinnedId) : undefined;
-  // Friend streak: from the chat's recent days (not just the messages on screen), reloaded when a message arrives.
+  // Friend streak: from the chat's recent days (not just the messages on screen),
+  // reloaded only when today's part changes (the first stump from either of you).
   const [streakInfo, setStreakInfo] = useState<FriendStreakStatus | null>(null);
   const [streakTick, setStreakTick] = useState(0);
+  const streakKey = useMemo(() => todaysStreakKey(messages, me), [messages, me]);
   useEffect(() => {
-    if (isGroup || !friendId || !user) return;
+    if (isGroup || !friendId || !me) return;
     let live = true;
     void loadFriendStreak(friendId, { fresh: true }).then((status) => { if (live) setStreakInfo(status); });
     return () => { live = false; };
-  }, [isGroup, friendId, user, messages.length, streakTick]);
+  }, [isGroup, friendId, me, streakKey, streakTick]);
   const streak = streakInfo?.streak ?? 0;
   const streakNotice = useStreakNoticeHidden(isGroup ? '' : friendId, streakInfo);
   const typing = Boolean(meta?.otherTyping && now() - meta.otherTyping < 7000);
@@ -167,7 +177,6 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
       const url = await uploadVoiceNote(note.blob);
       if (isGroup) { await sendGroupMessage(chatId, '', { audio: { url, seconds: note.seconds } }); void announceGroupMessage(chatId); }
       else { await sendVoiceNote(chatId, url, note.seconds); void announceMessage(chatId, friendId); }
-      await refresh(chatId);
     } catch (caught) {
       setNotice(friendlyError(caught, 'Could not send this recording.'));
     } finally {
@@ -185,7 +194,6 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
       else { await sendChatMessage(chatId, draft, { reply, ...extras }); void announceMessage(chatId, friendId); }
       setDraft('');
       setReply(null);
-      await refresh(chatId);
     } catch (caught) {
       setNotice(friendlyError(caught, 'Could not send this message.'));
     } finally {
@@ -245,11 +253,9 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
     setStumpQ(question);
   }
 
-  async function answerStumpHere(stumpMessageId: string, question: ChoiceQuestion, pick: number) {
+  async function answerStumpHere(stump: CommunityMessage, question: ChoiceQuestion, pick: number) {
     if (!chatId) throw new Error('This chat is not ready yet.');
-    const answer = await answerChatStump({ chatId, groupId: isGroup ? chatId : undefined, friendId }, stumpMessageId, question, pick, chatStumpAnswers(messages, stumpMessageId));
-    void refresh(chatId);
-    return answer;
+    return answerChatStump({ chatId, groupId: isGroup ? chatId : undefined, friendId, sharerId: stump.sender_id }, stump.id, question, pick, chatStumpAnswers(messages, stump.id, groupAnswers.get(stump.id)));
   }
 
   function startReply(message: CommunityMessage) {
@@ -274,7 +280,6 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
     try {
       if (isGroup) await deleteGroupMessage(chatId, message.id);
       else await deleteCommunityMessage(chatId, message.id);
-      await refresh(chatId);
     } catch {
       setNotice('That message could not be deleted.');
     }
@@ -286,7 +291,6 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
     const current = message.reactions?.[user.id];
     setMessages((list) => list.map((item) => (item.id === message.id ? { ...item, reactions: { ...(item.reactions ?? {}), ...(current === emoji ? { [user.id]: '' } : { [user.id]: emoji }) } } : item)));
     try { await (isGroup ? reactToGroupMessage : reactToMessage)(chatId, message.id, current === emoji ? null : emoji); } catch { setNotice('Your reaction could not be saved.'); }
-    void refresh(chatId);
   }
 
   function nameOfUid(uid: string) {
@@ -363,7 +367,6 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
           const lastOfGroup = !next || next.sender_id !== message.sender_id;
           const replied = message.reply ? byId.get(message.reply.mid) : undefined;
           const share = message.share?.kind === 'stump' ? message.share : null;
-          const stumpQuestionNow = share ? stumpQuestion(share.id) : null;
           return (
             <View key={message.id}>
               {newDay ? <Text style={styles.day}>{dayLabel(at)}</Text> : null}
@@ -374,18 +377,16 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
                     {isGroup && !mine && (!prev || prev.sender_id !== message.sender_id) ? <Text style={styles.sender}>{senderName(message)}</Text> : null}
                     {share ? (
                       <View style={styles.stumpWrap}>
-                        {stumpQuestionNow ? (
-                          <StumpCard
-                            postId={message.id}
-                            question={stumpQuestionNow}
-                            stump={{ qid: share.id, note: share.note ?? '' }}
-                            authorId={message.sender_id}
-                            authorName={senderName(message)}
-                            ownId={user?.id ?? null}
-                            people={social.people}
-                            chat={{ answers: chatStumpAnswers(messages, message.id), answer: (pick) => answerStumpHere(message.id, stumpQuestionNow, pick) }}
-                          />
-                        ) : <StumpUnavailable text={share.text} note={share.note} />}
+                        <StumpById
+                          postId={message.id}
+                          stump={{ qid: share.id, note: share.note ?? '' }}
+                          authorId={message.sender_id}
+                          authorName={senderName(message)}
+                          ownId={user?.id ?? null}
+                          people={social.people}
+                          chat={{ answers: chatStumpAnswers(messages, message.id, groupAnswers.get(message.id)), answer: (pick, question) => answerStumpHere(message, question, pick) }}
+                          fallback={<StumpUnavailable text={share.text} note={share.note} />}
+                        />
                         <Text style={styles.stumpTime}>{new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</Text>
                       </View>
                     ) : (
@@ -548,7 +549,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
       </Sheet>
 
       {/* Forward to a friend */}
-      {isGroup && group ? <GroupInfoSheet visible={groupInfo} group={group} onClose={() => setGroupInfo(false)} onChanged={() => chatId && void refresh(chatId)} onReport={() => { setGroupInfo(false); setReport({ type: 'user', id: group.ownerUid, label: `group “${group.name}”` }); }} /> : null}
+      {isGroup && group ? <GroupInfoSheet visible={groupInfo} group={group} onClose={() => setGroupInfo(false)} onChanged={() => {}} onReport={() => { setGroupInfo(false); setReport({ type: 'user', id: group.ownerUid, label: `group “${group.name}”` }); }} /> : null}
       <StumpComposer
         question={stumpQ}
         onClose={() => setStumpQ(null)}
@@ -556,7 +557,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
         friendIds={isGroup || !friendId ? [] : [friendId]}
         groupIds={isGroup && chatId ? [chatId] : []}
         onAnother={() => openStump(true)}
-        onSent={() => { if (chatId) void refresh(chatId); setStreakTick((n) => n + 1); }}
+        onSent={() => setStreakTick((n) => n + 1)}
       />
       <ForwardSheet message={forward} onClose={() => setForward(null)} onDone={(count) => { setForward(null); setNotice(`Forwarded to ${count} chat${count === 1 ? '' : 's'}.`); }} />
       <ReportSheet target={report} reporter={user?.profile?.username ?? null} onClose={() => setReport(null)} onHide={() => {}} onDone={() => { setReport(null); setNotice('Thanks — the team will review it.'); }} />

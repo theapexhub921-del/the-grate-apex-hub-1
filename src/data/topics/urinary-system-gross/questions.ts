@@ -1,7 +1,8 @@
 // Quiz bank for Anatomy → Urinary System (gross), built from the lecture
 // deck (Urinary System Gross 2026). Includes 5 Assertion–Reason questions
 // per lesson.
-import { assertionReason as ar, fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { assertionReason as ar, fill, match, mcq, multi, order, tf, spotQuestion, type QuestionDraft } from '@/data/topics/build';
+import { kidneyInternal } from '@/data/figures/urinary-system-gross';
 import type { ConceptId } from '@/data/topics/urinary-system-gross/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -66,6 +67,11 @@ const lesson2: Q[] = [
   ar('ar2-03', 'kidney-vessels', 'The line of Brödel is a good site for incisions into the kidney.', 'It separates the territories of the anterior and posterior divisions of the renal artery.', 'explains', 'Both true (slide 24).'),
   ar('ar2-04', 'suprarenal-glands', 'The suprarenal glands are large at birth.', 'The fetal cortex is present at birth.', 'explains', 'Both true (slide 32).'),
   ar('ar2-05', 'kidney-internal', 'The renal pyramids lie in the cortex.', 'The renal papillae open into the minor calyces.', 'a-false-r-true', 'Pyramids form the medulla (slide 19).'),
+  spotQuestion('q2-fig-renal-pyramid', 'kidney-internal', kidneyInternal, 'renal-pyramid', ['renal-columns', 'renal-papilla', 'minor-calyx']),
+  spotQuestion('q2-fig-renal-columns', 'kidney-internal', kidneyInternal, 'renal-columns', ['renal-pyramid', 'cortex', 'kidney-lobe']),
+  spotQuestion('q2-fig-renal-papilla', 'kidney-internal', kidneyInternal, 'renal-papilla', ['minor-calyx', 'renal-pyramid', 'major-calyx']),
+  spotQuestion('q2-fig-major-calyx', 'kidney-internal', kidneyInternal, 'major-calyx', ['minor-calyx', 'renal-pelvis', 'renal-sinus']),
+  spotQuestion('q2-fig-renal-pelvis', 'kidney-internal', kidneyInternal, 'renal-pelvis', ['major-calyx', 'ureter', 'hilum']),
 ];
 
 // ─── Lesson 3: The Ureters ───────────────────────────────────────────

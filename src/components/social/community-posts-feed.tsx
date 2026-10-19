@@ -1,3 +1,4 @@
+import { LIVE_SITE } from '@/lib/live-site';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
@@ -15,12 +16,11 @@ import { Pill } from '@/components/ui/pill';
 import { VideoPlayer } from '@/components/ui/video-player';
 import { routes } from '@/lib/routes';
 import { ReportSheet, type ReportTarget } from '@/components/social/report-sheet';
-import { StumpCard } from '@/components/social/stump-card';
+import { StumpCard, useStumpQuestion } from '@/components/social/stump-card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Sheet } from '@/components/ui/sheet';
 import { addPostComment, deletePostComment, createCommunityPost, createVoicePost, deleteCommunityPost, displayBody, listCommunityFeed, listPostsBy, listPostComments, recordPostView, togglePostLike, type CommunityMedia, type CommunityPost } from '@/data/community';
 import { personName, type SocialPerson, useSocial } from '@/data/social';
-import { stumpQuestion } from '@/data/stumps';
 import { useDisplayName } from '@/data/user';
 import { useAuth } from '@/hooks/use-auth';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
@@ -148,7 +148,7 @@ export function CommunityPostsFeed({ authorId, showComposer = true }: { authorId
   }
 
   async function sharePost(post: CommunityPost) {
-    const appUrl = 'https://grateapex.vercel.app/';
+    const appUrl = `${LIVE_SITE}/`;
     const message = `${post.body.trim() || 'A post from my GrAte Apex Hub community'}\n\n${appUrl}`;
     try {
       if (Platform.OS === 'web') {
@@ -367,7 +367,8 @@ function PostCard({ post, socialPeople, ownId, ownName, onOpen, onLike, onCommen
   const resharedFriend = socialPeople.find((person) => person.userId === post.reshared_author_id);
   const resharedName = post.reshared_author_id === ownId ? ownName : resharedFriend ? personName(resharedFriend) : 'Username pending';
   // A Stump a friend post shows its question card (the plain text is for the original app).
-  const stumped = post.stump ? stumpQuestion(post.stump.qid) : null;
+  // (A past-paper question loads its paper first; until then the post text shows.)
+  const stumped = useStumpQuestion(post.stump?.qid);
   const seenRef = useSeenOnScreen(onSeen);
   const views = typeof post.views === 'number' ? ` · ${viewsLabel(post.views)}` : '';
   return (

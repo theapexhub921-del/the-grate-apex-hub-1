@@ -1,6 +1,7 @@
 // Quiz bank for Anatomy → Gastrointestinal System (gross), built from the
 // three GIT lecture decks. Includes 5 Assertion–Reason questions per lesson.
-import { assertionReason as ar, fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { assertionReason as ar, fill, match, mcq, multi, order, tf, spotQuestion, type QuestionDraft } from '@/data/topics/build';
+import { portalVenousSystem } from '@/data/figures/gastrointestinal-system-gross';
 import type { ConceptId } from '@/data/topics/gastrointestinal-system-gross/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -313,6 +314,11 @@ const lesson10: Q[] = [
   ar('ar10-03', 'gi-innervation', 'The vagus carries pain fibres from the stomach.', 'The vagus supplies the foregut and midgut.', 'a-false-r-true', 'The vagus carries no pain fibres (slide 39); it does supply the foregut and midgut.'),
   ar('ar10-04', 'portal-system', 'The portal vein carries oxygen-rich blood to the liver.', 'The portal vein carries nutrient-rich blood from the gut.', 'a-false-r-true', 'Portal blood is deoxygenated but nutrient-rich (slide 18).'),
   ar('ar10-05', 'gi-innervation', 'The enteric nervous system can work independently of the CNS.', 'The enteric nervous system derives from the neural crest.', 'true-unrelated', 'Both true (slides 36–37), but its origin does not explain its independence.'),
+  spotQuestion('q10-fig-portal-vein', 'portal-system', portalVenousSystem, 'portal-vein', ['smv', 'splenic-vein', 'left-gastric-vein']),
+  spotQuestion('q10-fig-splenic-vein', 'portal-system', portalVenousSystem, 'splenic-vein', ['imv', 'portal-vein', 'smv']),
+  spotQuestion('q10-fig-smv', 'portal-system', portalVenousSystem, 'smv', ['imv', 'portal-vein', 'ileocolic-vein']),
+  spotQuestion('q10-fig-imv', 'portal-system', portalVenousSystem, 'imv', ['smv', 'splenic-vein', 'middle-colic-vein']),
+  spotQuestion('q10-fig-left-gastric-vein', 'portal-system', portalVenousSystem, 'left-gastric-vein', ['portal-vein', 'splenic-vein', 'imv']),
 ];
 
 export const questions: Q[] = [...lesson1, ...lesson2, ...lesson3, ...lesson4, ...lesson5, ...lesson6, ...lesson7, ...lesson8, ...lesson9, ...lesson10];

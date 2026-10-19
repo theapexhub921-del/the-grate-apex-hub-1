@@ -6,7 +6,7 @@
 import type { Href } from 'expo-router';
 import { useSyncExternalStore } from 'react';
 
-import { listMyConversations } from '@/data/community';
+import { listMyConversations, onMyChatsChanged } from '@/data/community';
 import type { AppNotification } from '@/data/notifications';
 import { auth } from '@/lib/firebase';
 
@@ -51,6 +51,9 @@ function start() {
   // Right after sign-in too (the first check may run before the account is ready).
   auth.onAuthStateChanged(() => void refreshMessageNotifications());
   void refreshMessageNotifications();
+  // The chats list is live (community.ts), so a new message shows at once; the
+  // timer only re-reads that live list, which costs no Firebase reads.
+  onMyChatsChanged(() => void refreshMessageNotifications());
   timer = setInterval(() => void refreshMessageNotifications(), 30_000);
   if (typeof document !== 'undefined') document.addEventListener('visibilitychange', onVisible);
 }

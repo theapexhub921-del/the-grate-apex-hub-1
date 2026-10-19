@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
@@ -93,7 +93,9 @@ export function FriendBattlesCard({ friends }: { friends: readonly SocialPerson[
   const social = useSocial();
   const [challenges, setChallenges] = useState<FriendChallenge[]>([]);
   const [results, setResults] = useState<Record<string, FriendBattleResults>>({});
-  const [friendId, setFriendId] = useState<string | null>(friends[0]?.userId ?? null);
+  const [pickedFriend, setFriendId] = useState<string | null>(null);
+  // The picked friend while they are still a friend; otherwise the first friend.
+  const friendId = friends.some((friend) => friend.userId === pickedFriend) ? pickedFriend : friends[0]?.userId ?? null;
   const [topicId, setTopicId] = useState<string | null>(publishedTopics[0]?.id ?? null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,10 +115,6 @@ export function FriendBattlesCard({ friends }: { friends: readonly SocialPerson[
     } catch (caught) { setError(friendlyError(caught, 'Friend battles are not available.')); }
   }, []);
   useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
-
-  useEffect(() => {
-    if (!friends.some((friend) => friend.userId === friendId)) setFriendId(friends[0]?.userId ?? null);
-  }, [friends, friendId]);
 
   async function challengeFriend() {
     if (!friendId || !topicId || busy) return;

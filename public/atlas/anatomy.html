@@ -2015,6 +2015,69 @@ bool inRegion(vec3 p) {
       for (let n = o; n; n = n.parent) if (n.userData && n.userData.name) return n.userData.name;
       return (o.name || 'Unnamed structure').replace(/_/g, ' ');
     }
+    // Closes open gaps in a mesh (the stomach in the source model has them). Vertices are welded by position first,
+    // so seams between normal/UV splits are not mistaken for holes. Each gap gets a centre vertex and a fan of triangles.
+    function fillOpenHoles(geo) {
+      const pos = geo.attributes.position;
+      const nrm = geo.attributes.normal || null;
+      const uv = geo.attributes.uv || null;
+      const oldIndex = geo.index ? geo.index.array : Uint32Array.from({ length: pos.count }, (_, i) => i);
+      const weld = new Map(), canon = new Uint32Array(pos.count), rep = [];
+      for (let i = 0; i < pos.count; i++) {
+        const k = pos.getX(i).toFixed(5) + ',' + pos.getY(i).toFixed(5) + ',' + pos.getZ(i).toFixed(5);
+        let w = weld.get(k);
+        if (w === undefined) { w = rep.length; weld.set(k, w); rep.push(i); }
+        canon[i] = w;
+      }
+      const edges = new Set();
+      for (let t = 0; t < oldIndex.length; t += 3) for (let k = 0; k < 3; k++) {
+        const a = canon[oldIndex[t + k]], b = canon[oldIndex[t + (k + 1) % 3]];
+        if (a !== b) edges.add(a + ',' + b);
+      }
+      const next = new Map();
+      for (const e of edges) {
+        const [a, b] = e.split(',').map(Number);
+        if (!edges.has(b + ',' + a) && !next.has(a)) next.set(a, b);
+      }
+      const used = new Set(), loops = [];
+      for (const start of next.keys()) {
+        if (used.has(start)) continue;
+        const loop = [];
+        let v = start;
+        while (v !== undefined && !used.has(v) && loop.length <= rep.length) { used.add(v); loop.push(v); v = next.get(v); }
+        if (loop.length >= 3 && v === start) loops.push(loop);
+      }
+      if (!loops.length) return 0;
+      const count = pos.count + loops.length;
+      const P = new Float32Array(count * 3); P.set(pos.array.subarray(0, pos.count * 3));
+      const N = nrm ? new Float32Array(count * 3) : null; if (N) N.set(nrm.array.subarray(0, nrm.count * 3));
+      const U = uv ? new Float32Array(count * 2) : null; if (U) U.set(uv.array.subarray(0, uv.count * 2));
+      const faces = [];
+      loops.forEach((loop, j) => {
+        const c = pos.count + j, n = loop.length;
+        let cx = 0, cy = 0, cz = 0, nx = 0, ny = 0, nz = 0, ux = 0, uy = 0;
+        for (const w of loop) {
+          const i = rep[w];
+          cx += pos.getX(i); cy += pos.getY(i); cz += pos.getZ(i);
+          if (N) { nx += nrm.getX(i); ny += nrm.getY(i); nz += nrm.getZ(i); }
+          if (U) { ux += uv.getX(i); uy += uv.getY(i); }
+        }
+        P[c * 3] = cx / n; P[c * 3 + 1] = cy / n; P[c * 3 + 2] = cz / n;
+        if (N) { const len = Math.hypot(nx, ny, nz) || 1; N[c * 3] = nx / len; N[c * 3 + 1] = ny / len; N[c * 3 + 2] = nz / len; }
+        if (U) { U[c * 2] = ux / n; U[c * 2 + 1] = uy / n; }
+        for (let i = 0; i < n; i++) faces.push(rep[loop[(i + 1) % n]], rep[loop[i]], c);
+      });
+      const idx = new Uint32Array(oldIndex.length + faces.length);
+      idx.set(oldIndex); idx.set(faces, oldIndex.length);
+      geo.setAttribute('position', new pos.constructor(P, 3));
+      if (N) geo.setAttribute('normal', new nrm.constructor(N, 3));
+      if (U) geo.setAttribute('uv', new uv.constructor(U, 2));
+      geo.setIndex(new THREE.BufferAttribute(idx, 1));
+      return loops.length;
+    }
+
+
+    
     function describe(mesh) {
       let raw = rawName(mesh).replace(/-mesh$/i, '');
       // muscle / tendon / ligament footprints on bones: ".or" = origin right, ".e2l" = insertion left, etc.
@@ -2029,6 +2092,7 @@ bool inRegion(vec3 p) {
       }
       const side = /\.l$/i.test(raw) ? 'Left' : /\.r$/i.test(raw) ? 'Right' : '';
       const name = raw.replace(/\.[a-z]{1,2}$/i, '').trim();
+      if (/^jejunum$/i.test(name)) return { name: 'Jejunum and ileum', side, note: 'In this model the ileum is not separated from the jejunum.' };
       return { name, side };
     }
 

@@ -1,7 +1,8 @@
 // Quiz bank for Anatomy → Neuroanatomy (gross), built from the lecture
 // decks (Central Nervous System; Meninges of the CNS). Includes 5
 // Assertion–Reason questions per lesson.
-import { assertionReason as ar, fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { assertionReason as ar, fill, match, mcq, multi, order, tf, spotQuestion, type QuestionDraft } from '@/data/topics/build';
+import { brainArteries } from '@/data/figures/neuroanatomy';
 import type { ConceptId } from '@/data/topics/neuroanatomy/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -159,6 +160,12 @@ const lesson5: Q[] = [
   ar('ar5-03', 'vascular-lesions', 'Brain tissue is very sensitive to loss of blood flow.', 'Neuronal function stops within about 1 minute of total arrest.', 'explains', 'Both true (CNS, slide 90).'),
   ar('ar5-04', 'brain-arteries', 'The posterior communicating artery is a branch of the basilar artery.', 'The posterior cerebral artery is a terminal branch of the basilar.', 'a-false-r-true', 'The posterior communicating is a branch of the internal carotid (CNS, slide 82).'),
   ar('ar5-05', 'basal-nuclei', 'The caudate nucleus is S-shaped and lies medial to the thalamus.', 'The caudate nucleus has a head, body and tail.', 'a-false-r-true', 'It is C-shaped and lies lateral to the thalamus (CNS, slides 79–80).'),
+  spotQuestion('q5-fig-basilar', 'brain-arteries', brainArteries, 'basilar', ['vertebral', 'asa', 'sca']),
+  spotQuestion('q5-fig-pca', 'brain-arteries', brainArteries, 'pca', ['sca', 'pcoa', 'mca']),
+  spotQuestion('q5-fig-mca', 'brain-arteries', brainArteries, 'mca', ['aca', 'ica', 'pcoa']),
+  spotQuestion('q5-fig-acoa', 'brain-arteries', brainArteries, 'acoa', ['aca', 'pcoa', 'ica']),
+  spotQuestion('q5-fig-pcoa', 'brain-arteries', brainArteries, 'pcoa', ['acoa', 'pca', 'ica']),
+  spotQuestion('q5-fig-vertebral', 'brain-arteries', brainArteries, 'vertebral', ['basilar', 'pica', 'asa']),
 ];
 
 // ─── Lesson 6: The Meninges and Dura Mater ───────────────────────────

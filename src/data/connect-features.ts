@@ -72,10 +72,22 @@ export async function claimWeeklyChallengeReward(): Promise<never> {
  * is no weekly XP in either app, so `weekly_xp` is the total until weekly
  * standings exist.
  */
+// The top 300 leaderboard entries are kept for 3 minutes: Connect reloads the
+// league every time it comes into view, and each load is 300 Firebase reads.
+let topScores: { at: number; rows: Promise<{ id: string; data: Record<string, any> }[]> } | null = null;
+
+function leaderboardTop() {
+  if (!topScores || Date.now() - topScores.at > 3 * 60_000) {
+    const entry = { at: Date.now(), rows: getDocs(query(collection(db, 'scores'), orderBy('xp', 'desc'), limit(300))).then((snap) => snap.docs.map((item) => ({ id: item.id, data: item.data() }))) };
+    entry.rows.catch(() => { if (topScores === entry) topScores = null; });
+    topScores = entry;
+  }
+  return topScores.rows;
+}
+
 export async function loadWeeklyLeague(): Promise<WeeklyLeagueEntry[]> {
   const viewerId = auth.currentUser?.uid ?? null;
-  const snap = await getDocs(query(collection(db, 'scores'), orderBy('xp', 'desc'), limit(300)));
-  const rows = snap.docs.map((item) => ({ id: item.id, data: item.data() }));
+  const rows = [...(await leaderboardTop())];
   if (viewerId && !rows.some((row) => row.id === viewerId)) {
     const mine = await getDoc(doc(db, 'scores', viewerId));
     if (mine.exists()) rows.push({ id: mine.id, data: mine.data() });

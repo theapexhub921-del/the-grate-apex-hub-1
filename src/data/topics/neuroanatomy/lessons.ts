@@ -541,6 +541,7 @@ const lesson5: Draft = {
     {
       title: 'Arteries of the Brain and the Circle of Willis',
       kind: 'structure',
+      figure: 'neuroanatomy:brain-arteries',
       paragraphs: [
         'The brain is supplied by the two internal carotid and two vertebral arteries, which run in the subarachnoid space and anastomose at the base of the brain as the circle of Willis.',
         'Intracranial branches of the internal carotid artery: ophthalmic, (anterior) choroidal, anterior cerebral, middle cerebral and posterior communicating arteries.',

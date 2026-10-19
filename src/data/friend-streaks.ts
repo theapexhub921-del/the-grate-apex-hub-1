@@ -97,6 +97,26 @@ export function friendStreakStatus(messages: readonly Message[], me: string, fri
   };
 }
 
+/**
+ * What today's streak depends on in a chat's messages: whether each of you has
+ * done today's part. It changes only when that does, so a chat reloads the
+ * streak on the first stump of the day, not on every message.
+ */
+export function todaysStreakKey(messages: readonly (Message & { share?: { kind: string } | null })[], me: string | null, now = Date.now()): string {
+  const today = dayKeyOf(now);
+  const stumpsOnly = stumpsNeededOn(today);
+  let mine = false;
+  let theirs = false;
+  for (const message of messages) {
+    const at = Date.parse(message.created_at);
+    if (!Number.isFinite(at) || dayKeyOf(at) !== today) continue;
+    if (stumpsOnly && !(message.stump || message.share?.kind === 'stump')) continue;
+    if (message.sender_id === me) mine = true;
+    else theirs = true;
+  }
+  return `${today}:${mine ? 1 : 0}${theirs ? 1 : 0}`;
+}
+
 /** The streak number alone. */
 export function friendStreak(messages: readonly Message[], me: string, friend: string, now = Date.now(), covered: Iterable<string> = []) {
   return friendStreakStatus(messages, me, friend, now, covered).streak;

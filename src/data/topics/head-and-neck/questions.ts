@@ -1,7 +1,8 @@
 // Quiz bank for Anatomy → Head and Neck (gross), built from the lecture
 // deck (Head and Neck HB2, June–July 2026). Includes 5 Assertion–Reason
 // questions per lesson.
-import { assertionReason as ar, fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { assertionReason as ar, fill, match, mcq, multi, order, tf, spotQuestion, type QuestionDraft } from '@/data/topics/build';
+import { auricle } from '@/data/figures/head-and-neck';
 import type { ConceptId } from '@/data/topics/head-and-neck/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -190,6 +191,10 @@ const lesson6: Q[] = [
   ar('ar6-03', 'inner-ear-development', 'The stapes develops from the 1st pharyngeal arch.', 'The malleus and incus develop from the 1st pharyngeal arch.', 'a-false-r-true', 'The stapes is from the 2nd arch (slide 343).'),
   ar('ar6-04', 'inner-ear-development', 'The ampullae of the semicircular ducts detect rotation.', 'The semicircular ducts contain endolymph.', 'true-unrelated', 'Both true (slides 329, 335), but containing endolymph does not on its own explain why they sense rotation.'),
   ar('ar6-05', 'external-ear', 'The cone of light is seen in the posterior–superior quadrant.', 'The tympanic membrane lies obliquely across the meatus.', 'a-false-r-true', 'It is in the anterior–inferior quadrant (slide 269).'),
+  spotQuestion('q6-fig-helix', 'external-ear', auricle, 'helix', ['antihelix', 'tragus', 'lobule']),
+  spotQuestion('q6-fig-antihelix', 'external-ear', auricle, 'antihelix', ['helix', 'antitragus', 'triangular']),
+  spotQuestion('q6-fig-tragus', 'external-ear', auricle, 'tragus', ['antitragus', 'notch', 'helix']),
+  spotQuestion('q6-fig-lobule', 'external-ear', auricle, 'lobule', ['antitragus', 'tragus', 'notch']),
 ];
 
 // ─── Lesson 7: Tongue and Salivary Glands ────────────────────────────

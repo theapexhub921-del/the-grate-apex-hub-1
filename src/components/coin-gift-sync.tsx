@@ -28,7 +28,7 @@ export function CoinGiftSync() {
   const uid = user?.uid ?? null;
   const [arrivals, setArrivals] = useState<Arrival[]>([]);
   const people = useRef(social.people);
-  people.current = social.people;
+  useEffect(() => { people.current = social.people; }, [social.people]);
 
   useEffect(() => {
     if (!uid) return;

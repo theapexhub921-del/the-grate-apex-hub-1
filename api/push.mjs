@@ -27,7 +27,8 @@
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import webpush from 'web-push';
 
-import { battleResultMessage, battleSide, BATTLE_ID, pushAddress, USER_ID } from './_push-logic.mjs';
+import { adminTokenOrNull } from './_admin.mjs';
+import { battleResultMessage, battleSide, BATTLE_ID, mergeDevices, pushAddress, USER_ID } from './_push-logic.mjs';
 
 const PROJECT = 'grate-apex';
 const FIRESTORE = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents`;
@@ -86,6 +87,9 @@ function tooSoon(key, ms) {
 }
 
 export default async function handler(req, res) {
+  // GET: whether this server can read private push addresses (pushDevices/{uid}).
+  // The app moves a device's address off the public profile only when it can.
+  if (req.method === 'GET') return res.status(200).json({ privateDevices: Boolean(await adminTokenOrNull()) });
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only.' });
   const publicKey = process.env.VAPID_PUBLIC_KEY;
   const privateKey = process.env.VAPID_PRIVATE_KEY;
@@ -107,6 +111,15 @@ export default async function handler(req, res) {
   const kind = String(body.kind ?? 'dm');
   const FRESH = 2 * 60_000;
   webpush.setVapidDetails('https://grateapex.vercel.app', publicKey, privateKey);
+  // Private push addresses (pushDevices/{uid}) are readable only with the service account.
+  const admin = await adminTokenOrNull();
+
+  /** A learner's profile (read with the sender's token) plus their devices from both places. */
+  async function person(uid) {
+    const [profile, own] = await Promise.all([read(`users/${uid}`, token), admin ? read(`pushDevices/${uid}`, admin) : null]);
+    if (!profile && !own) return null;
+    return { ...(profile ?? {}), webPush: mergeDevices(own?.webPush, profile?.webPush) };
+  }
 
   /** Sends one payload to everything a person has registered; returns how many pushes went out. */
   async function deliver(recipient, preference, payload, report) {
@@ -129,7 +142,7 @@ export default async function handler(req, res) {
   if (kind === 'test') {
     // A test push to the caller's own devices, with the push service's answer for each.
     if (tooSoon(`${sender}:test`, 5_000)) return res.status(429).json({ error: 'Slow down.' });
-    const me = await read(`users/${sender}`, token);
+    const me = await person(sender);
     const report = [];
     const sent = await deliver(me, '__none__', { title: 'Test notification', body: 'Push is working on this device.', tag: 'test', href: '/settings' }, report);
     return res.status(200).json({ sent, devices: report, registered: Array.isArray(me?.webPush) ? me.webPush.length : 0 });
@@ -156,7 +169,7 @@ export default async function handler(req, res) {
       href: `/social/message?group=${encodeURIComponent(groupId)}&name=${encodeURIComponent(String(group.name ?? 'Group'))}`,
     };
     const others = members.filter((uid) => uid !== sender && /^[A-Za-z0-9]{6,64}$/.test(uid));
-    const counts = await Promise.all(others.map(async (uid) => deliver(await read(`users/${uid}`, token), 'messages', payload)));
+    const counts = await Promise.all(others.map(async (uid) => deliver(await person(uid), 'messages', payload)));
     return res.status(200).json({ sent: counts.reduce((total, count) => total + count, 0) });
   }
 
@@ -167,7 +180,7 @@ export default async function handler(req, res) {
     // A challenge is sent once; a result is announced once per player.
     if (tooSoon(`${sender}:${kind}:${battleId}`, kind === 'battle' ? 30_000 : 10 * 60_000)) return res.status(429).json({ error: 'Slow down.' });
     // Both learners' documents are readable by any signed-in learner (the same reads the app does).
-    const [mine, other] = await Promise.all([read(`users/${sender}`, token), read(`users/${to}`, token)]);
+    const [mine, other] = await Promise.all([read(`users/${sender}`, token), person(to)]);
     const username = typeof mine?.username === 'string' ? mine.username : null;
     const href = `/social/battle?id=${encodeURIComponent(battleId)}`;
 
@@ -219,7 +232,7 @@ export default async function handler(req, res) {
     if (tooSoon(`${sender}:gift:${giftId}`, 60_000)) return res.status(429).json({ error: 'Slow down.' });
     const gift = await readWithTime(`${type === 'boost' ? 'boostTransfers' : 'coinTransfers'}/${giftId}`, token);
     if (!gift || gift.from !== sender || gift.to !== to || gift.status !== 'pending' || !(Date.now() - gift.__created < FRESH)) return res.status(409).json({ error: 'No new gift to announce.' });
-    const [recipient, profile] = await Promise.all([read(`users/${to}`, token), read(`users/${sender}`, token)]);
+    const [recipient, profile] = await Promise.all([person(to), read(`users/${sender}`, token)]);
     const username = typeof profile?.username === 'string' ? `@${profile.username}` : 'A friend';
     const what = type === 'boost'
       ? `a ×${Number(gift.multiplier) || 1.5} XP boost`
@@ -240,7 +253,7 @@ export default async function handler(req, res) {
     // The follow document's id is "<follower>_<followee>"; its creation time is Firestore's own.
     const follow = await readWithTime(`follows/${sender}_${to}`, token);
     if (!follow || follow.follower !== sender || follow.followee !== to || !(Date.now() - follow.__created < FRESH)) return res.status(409).json({ error: 'No new follow to announce.' });
-    const [recipient, profile] = await Promise.all([read(`users/${to}`, token), read(`users/${sender}`, token)]);
+    const [recipient, profile] = await Promise.all([person(to), read(`users/${sender}`, token)]);
     const username = typeof profile?.username === 'string' ? profile.username : null;
     const sent = await deliver(recipient, 'friendRequests', {
       title: username ? `@${username} started following you` : 'New follower',
@@ -259,7 +272,7 @@ export default async function handler(req, res) {
     if (tooSoon(`${sender}:${kind}:${postId}:${to}`, 30_000)) return res.status(429).json({ error: 'Slow down.' });
     const post = await read(`posts/${postId}`, token);
     if (!post) return res.status(404).json({ error: 'Post not found.' });
-    const [recipient, profile] = await Promise.all([read(`users/${to}`, token), read(`users/${sender}`, token)]);
+    const [recipient, profile] = await Promise.all([person(to), read(`users/${sender}`, token)]);
     const username = typeof profile?.username === 'string' ? `@${profile.username}` : 'Someone';
     const subject = String(post.title || post.body || '').slice(0, 100);
 
@@ -294,7 +307,7 @@ export default async function handler(req, res) {
   if (!members.includes(sender) || !members.includes(to)) return res.status(403).json({ error: 'Not your chat.' });
   if (chat.lastFrom !== sender || !(Date.now() - Number(chat.lastAt) < FRESH)) return res.status(409).json({ error: 'No new message to announce.' });
 
-  const [recipient, profile] = await Promise.all([read(`users/${to}`, token), read(`users/${sender}`, token)]);
+  const [recipient, profile] = await Promise.all([person(to), read(`users/${sender}`, token)]);
   const username = typeof profile?.username === 'string' ? profile.username : null;
   const text = chat.lastText === 'Voice note' ? 'Sent you a recording' : String(chat.lastText ?? '').slice(0, 140);
   const sent = await deliver(recipient, 'messages', {

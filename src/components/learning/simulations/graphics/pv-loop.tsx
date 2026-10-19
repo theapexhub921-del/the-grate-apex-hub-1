@@ -4,6 +4,9 @@ import { Circle, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { edpvr, type PvState } from '@/data/simulations/pv-loop';
 import { useTheme } from '@/hooks/use-theme';
 
+import { Organ3D } from '../organ-3d';
+import { heartFrame, rounded } from '../organ-frames';
+
 import { along, Axes, BeatBar, Canvas, Legend, linear, locate, pathOf, StatusRow, type GraphicProps } from './shared';
 
 const W = 400;
@@ -36,9 +39,11 @@ export function PvLoopGraphic({ state, baseline, time, reduceMotion }: GraphicPr
   const { segment, fraction, t } = locate(state.segments, time);
   const [dv, dp] = along(segment.points, fraction);
   const bracketY = T - 14;
+  const frame = heartFrame({ lv: rounded((dv - state.esv) / Math.max(1, state.edv - state.esv)), pressure: rounded(Math.min(1, dp / 140)), la: dv >= state.edv - 2 ? 0 : 1 });
 
   return (
     <View style={{ gap: 10 }}>
+      <Organ3D scene="heart" frame={frame} label={`The heart: left ventricle at ${Math.round(dv)} mL and ${Math.round(dp)} mmHg`} />
       <Canvas width={W} height={H} label={`Pressure–volume loop. Stroke volume ${Math.round(state.sv)} mL.`}>
         <Axes x={x} y={y} xTicks={[0, 50, 100, 150, 200]} yTicks={[0, 40, 80, 120, 160]} left={L} right={W - R} top={T} bottom={B} xLabel="Left ventricular volume (mL)" yLabel="Pressure (mmHg)" />
         <Path d={filling} stroke={colors.borderStrong} strokeWidth={2} fill="none" />

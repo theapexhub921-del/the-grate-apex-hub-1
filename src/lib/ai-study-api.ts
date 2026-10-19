@@ -1,10 +1,10 @@
 // Talks to /api/ai (api/ai.mjs) — the server that holds the Gemini key. The
 // learner's sign-in token proves who is asking; the key itself never reaches the app.
-import { Platform } from 'react-native';
+import { API_BASE, LIVE_SITE_LABEL } from '@/lib/live-site';
 
 import { auth } from '@/lib/firebase';
 
-const SERVER = process.env.EXPO_PUBLIC_API_BASE || (Platform.OS === 'web' ? '' : 'https://grateapex.vercel.app');
+const SERVER = API_BASE;
 
 export type ChatTurn = { role: 'user' | 'model'; text: string };
 export class AiError extends Error {}
@@ -20,7 +20,7 @@ async function call<T>(payload: Record<string, unknown>): Promise<T> {
   }
   const data = (await response.json().catch(() => null)) as (T & { error?: string }) | null;
   if (!response.ok || !data) {
-    if (response.status === 404 && !data) throw new AiError('AI study help runs on the live app (grateapex.vercel.app). It is not available in this local preview.');
+    if (response.status === 404 && !data) throw new AiError(`AI study help runs on the live app (${LIVE_SITE_LABEL}). It is not available in this local preview.`);
     throw new AiError(data?.error || 'The AI could not answer right now. Please try again.');
   }
   return data;

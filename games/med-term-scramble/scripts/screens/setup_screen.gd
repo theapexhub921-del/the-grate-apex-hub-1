@@ -16,7 +16,7 @@ var note: Label
 
 func build() -> void:
 	mode = String(params.get("mode", "classic"))
-	top_bar("← Back", "menu" if mode == "practice" else "modes")
+	top_bar("‹ Back", "menu" if mode == "practice" else "modes")
 	var titles := {"classic": "Classic Scramble", "rush": "Medical Rush", "practice": "Practice"}
 	content.add_child(UI.eyebrow("Set up your round"))
 	content.add_child(UI.title(String(titles.get(mode, "Play"))))

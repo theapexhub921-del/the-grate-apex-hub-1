@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type LayoutChangeEvent, PanResponder, StyleSheet, View } from 'react-native';
 
 import type { ThemeColors } from '@/constants/theme';
@@ -11,25 +11,24 @@ export function SimSlider({ value, min, max, step, disabled, onChange, accessibi
   const styles = useThemedStyles(createStyles);
   const [width, setWidth] = useState(0);
   const latest = useRef({ width, min, max, step, disabled, onChange });
-  latest.current = { width, min, max, step, disabled, onChange };
+  useEffect(() => { latest.current = { width, min, max, step, disabled, onChange }; }, [width, min, max, step, disabled, onChange]);
 
-  const responder = useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => !latest.current.disabled,
-        onMoveShouldSetPanResponder: () => !latest.current.disabled,
-        onPanResponderTerminationRequest: () => false,
-        onPanResponderGrant: (event) => move(event.nativeEvent.locationX),
-        onPanResponderMove: (event) => move(event.nativeEvent.locationX),
-      }),
-    []
-  );
-
-  function move(x: number) {
-    const { width: w, min: lo, max: hi, step: s, onChange: change } = latest.current;
-    if (w <= 0) return;
-    change(snap(lo + (Math.min(w, Math.max(0, x)) / w) * (hi - lo), lo, hi, s));
-  }
+  // Made once; the handlers read the latest props only while the finger moves.
+  // eslint-disable-next-line react-hooks/refs -- `latest` is read in the drag handlers, never while drawing
+  const [responder] = useState(() => {
+    const move = (x: number) => {
+      const { width: w, min: lo, max: hi, step: s, onChange: change } = latest.current;
+      if (w <= 0) return;
+      change(snap(lo + (Math.min(w, Math.max(0, x)) / w) * (hi - lo), lo, hi, s));
+    };
+    return PanResponder.create({
+      onStartShouldSetPanResponder: () => !latest.current.disabled,
+      onMoveShouldSetPanResponder: () => !latest.current.disabled,
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderGrant: (event) => move(event.nativeEvent.locationX),
+      onPanResponderMove: (event) => move(event.nativeEvent.locationX),
+    });
+  });
 
   const fraction = max > min ? (value - min) / (max - min) : 0;
   const nudge = (direction: 1 | -1) => onChange(snap(value + direction * step, min, max, step));

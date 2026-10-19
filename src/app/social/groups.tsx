@@ -13,7 +13,7 @@ import { InlineNotice, LoadingState } from '@/components/ui/state-views';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import { PersonAvatar } from '@/components/social/profile-card';
 import { Interactive } from '@/components/ui/interactive';
-import { createGroup, listMyGroups, type GroupSummary } from '@/data/group-chat';
+import { createGroup, GROUP_MAX_MEMBERS, listMyGroups, type GroupSummary } from '@/data/group-chat';
 import { personName, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -38,7 +38,7 @@ export default function StudyGroupsScreen() {
   const [notice, setNotice] = useState<string | null>(null);
   const social = useSocial();
   const [picked, setPicked] = useState<string[]>([]);
-  // Friends who follow each other can be added (shared rules), up to 9 besides you.
+  // Friends who follow each other can be added (shared rules), up to GROUP_MAX_MEMBERS − 1 besides you.
   const friends = social.people.filter((person) => person.relationship === 'friends');
   const nameOf = (group: GroupSummary, uid: string) => {
     if (uid === user?.uid) return 'You';
@@ -104,7 +104,7 @@ export default function StudyGroupsScreen() {
             {friends.map((person) => {
               const on = picked.includes(person.userId);
               return (
-                <Interactive key={person.userId} onPress={() => setPicked((list) => (on ? list.filter((id) => id !== person.userId) : list.length < 9 ? [...list, person.userId] : list))} accessibilityRole="checkbox" accessibilityState={{ checked: on }} accessibilityLabel={personName(person)} style={[styles.person, on && styles.personOn]}>
+                <Interactive key={person.userId} onPress={() => setPicked((list) => (on ? list.filter((id) => id !== person.userId) : list.length < GROUP_MAX_MEMBERS - 1 ? [...list, person.userId] : list))} accessibilityRole="checkbox" accessibilityState={{ checked: on }} accessibilityLabel={personName(person)} style={[styles.person, on && styles.personOn]}>
                   <PersonAvatar uid={person.userId} uri={person.avatarUrl} name={personName(person)} size={30} />
                   <Text style={styles.personName} numberOfLines={1}>{personName(person)}</Text>
                   <View style={[styles.check, on && styles.checkOn]}>{on ? <Icon name="check" size={11} color={colors.onPrimary} strokeWidth={3} /> : null}</View>
@@ -115,7 +115,7 @@ export default function StudyGroupsScreen() {
         ) : (
           <Text style={styles.label}>Friends who follow you back will appear here to add.</Text>
         )}
-        <Text style={styles.label}>Groups are private: only members can see them. You can add more friends later (up to 10 people).</Text>
+        <Text style={styles.label}>Groups are private: only members can see them. You can add more friends later (up to {GROUP_MAX_MEMBERS} people).</Text>
         <Button label="Create group" onPress={() => void create()} loading={busy} disabled={title.trim().length < 2 || busy} />
       </Card>
 

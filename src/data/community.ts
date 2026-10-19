@@ -16,6 +16,9 @@ import {
   where,
   writeBatch,
   limitToLast,
+  onSnapshot,
+  type DocumentData,
+  type Unsubscribe,
 } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
@@ -232,6 +235,20 @@ const iso = (value: any) => (value?.toDate ? value.toDate().toISOString() : type
 // Old-app posts have a separate title; show it above the body when it isn't just the body's start.
 /** A plain repost has no words of its own; the shared rules still need 3+ characters, so it carries this. */
 export const REPOST_TEXT = 'Reposted';
+/**
+ * A photo or video needs no caption (owner, 2026-10-19). The shared rules still need
+ * 3+ characters, so an uncaptioned post carries one of these words (it reads well
+ * in the original app) and this app hides it; a 1–2 letter caption is padded with
+ * invisible spaces.
+ */
+const MEDIA_ONLY_TEXT = ['Photo', 'Photos', 'Video', 'Videos', 'Media'];
+const PAD = ' '; // a no-break space
+function mediaOnlyText(media: readonly { t?: string; type?: string }[]) {
+  const videos = media.some((item) => (item.t ?? item.type) === 'video');
+  const photos = media.some((item) => (item.t ?? item.type) !== 'video');
+  if (videos && photos) return 'Media';
+  return videos ? (media.length > 1 ? 'Videos' : 'Video') : media.length > 1 ? 'Photos' : 'Photo';
+}
 
 const readStump = (d: Record<string, any>): StumpRef | null =>
   d.stump && typeof d.stump.qid === 'string' ? { qid: d.stump.qid, note: typeof d.stump.note === 'string' ? d.stump.note : '' } : null;
@@ -240,6 +257,7 @@ const postText = (d: Record<string, any>) => {
   const title = String(d.title ?? '').trim();
   const body = String(d.body ?? '').trim();
   if (d.resharedPostId && body === REPOST_TEXT) return '';
+  if (Array.isArray(d.media) && d.media.length && MEDIA_ONLY_TEXT.includes(body)) return '';
   return title && !body.startsWith(title) ? `${title}\n\n${body}` : body;
 };
 
@@ -257,9 +275,13 @@ export async function blockedLearners(): Promise<Set<string>> {
 
 export async function listCommunityFeed(limitCount = 50): Promise<CommunityPost[]> {
   await auth.authStateReady();
-  const userId = auth.currentUser?.uid ?? null;
   const [snap, blocked] = await Promise.all([getDocs(query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(limitCount))), blockedLearners()]);
-  const rows = snap.docs.filter((item) => !blocked.has(String(item.data().authorUid)));
+  return postsFrom(snap.docs.filter((item) => !blocked.has(String(item.data().authorUid))));
+}
+
+/** Post documents as shown: with my like, and the original of a reshare. */
+async function postsFrom(rows: readonly { id: string; data: () => DocumentData }[]): Promise<CommunityPost[]> {
+  const userId = auth.currentUser?.uid ?? null;
   const liked = await Promise.all(rows.map((item) => (userId ? getDoc(doc(db, 'posts', item.id, 'likes', userId)).then((like) => like.exists()).catch(() => false) : Promise.resolve(false))));
   const originals = new Map<string, Record<string, any>>();
   await Promise.all(
@@ -344,26 +366,29 @@ export async function recordPostView(postId: string, authorId: string): Promise<
   return true;
 }
 
-/** A learner's own posts, newest first (no composite index needed: sorted here). */
+/**
+ * A learner's own posts, newest first. Reads only their posts (up to 150,
+ * sorted here, so no composite index is needed) — it used to read the latest
+ * 200 posts of everyone, plus a like check for each, on every profile visit.
+ */
 export async function listPostsBy(uid: string, limitCount = 30): Promise<CommunityPost[]> {
-  const all = await listCommunityFeed(200);
-  const own = all.filter((post) => post.author_id === uid);
-  if (own.length >= Math.min(limitCount, 5) || all.length < 200) return own.slice(0, limitCount);
-  // Older posts beyond the recent feed.
-  const snap = await getDocs(query(collection(db, 'posts'), where('authorUid', '==', uid), limit(limitCount)));
-  const ids = new Set(own.map((post) => post.id));
-  const extra = snap.docs.filter((item) => !ids.has(item.id)).map((item) => ({ id: item.id, author_id: uid, author_name: item.data().authorName ?? null, author_avatar: null, body: postText(item.data()), media_path: null, media_type: null, media_url: null, reshared_post_id: null, created_at: iso(item.data().createdAt), reactions: Number(item.data().likeCount) || 0, comments: Number(item.data().replyCount) || 0, reshares: 0, my_reaction: null, stump: readStump(item.data()), views: readViews(item.data()) } as CommunityPost));
-  return [...own, ...extra].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, limitCount);
+  await auth.authStateReady();
+  const snap = await getDocs(query(collection(db, 'posts'), where('authorUid', '==', uid), limit(150)));
+  const millis = (value: unknown) => (value as { toMillis?: () => number } | null)?.toMillis?.() ?? 0;
+  const newest = [...snap.docs].sort((a, b) => millis(b.data().createdAt) - millis(a.data().createdAt)).slice(0, limitCount);
+  return postsFrom(newest);
 }
 
 export async function createCommunityPost(body: string, media?: CommunityMedia | readonly CommunityMedia[], resharedPostId?: string | null, stump?: StumpRef): Promise<CommunityPost> {
-  const text = body.trim() || (resharedPostId ? REPOST_TEXT : '');
-  if (text.length < 3) throw new Error('Posts need at least 3 characters.');
+  const files = (Array.isArray(media) ? media : media ? [media as CommunityMedia] : []).slice(0, 3);
+  let text = body.trim() || (resharedPostId ? REPOST_TEXT : '');
+  // A photo or video can go up with no words (or just one or two letters).
+  if (files.length && text.length < 3) text = text ? text.padEnd(3, PAD) : mediaOnlyText(files);
+  if (text.length < 3) throw new Error('Write something, or add a photo or video.');
   if (text.length > 2000) throw new Error('Posts can be up to 2,000 characters.');
   const me = await myUsername();
   // Uploaded to the original app's Cloudinary account first (lib/media.ts);
   // nothing is posted if the upload fails.
-  const files = (Array.isArray(media) ? media : media ? [media as CommunityMedia] : []).slice(0, 3);
   const uploaded = files.length ? cleanMedia(await Promise.all(files.map((file) => uploadMedia(file)))) : [];
   if (files.length && uploaded.length < files.length) throw new Error('One of the uploads failed. Please try again.');
   // The shared board needs a title (3–120 characters): the first line.
@@ -385,7 +410,7 @@ export async function createCommunityPost(body: string, media?: CommunityMedia |
     ...(stump ? { stump: { qid: stump.qid, note: stump.note.slice(0, 200) } } : {}),
   });
   return {
-    id: ref.id, author_id: me.uid, author_name: me.username, body: text, media_path: null,
+    id: ref.id, author_id: me.uid, author_name: me.username, body: uploaded.length && MEDIA_ONLY_TEXT.includes(text) ? '' : text.trim(), media_path: null,
     media_type: uploaded[0]?.t ?? null, media_url: uploaded[0]?.url ?? null, media_list: mediaList(uploaded),
     reshared_post_id: resharedPostId ?? null, created_at: new Date().toISOString(), reactions: 0, comments: 0, reshares: 0, my_reaction: null,
     stump: stump ?? null,
@@ -780,31 +805,85 @@ export async function getOrCreateFriendConversation(friendId: string): Promise<s
   return id;
 }
 
+function conversationMessageOf(conversationId: string, id: string, d: DocumentData): CommunityMessage {
+  const audio = d.audio && typeof d.audio.url === 'string' ? { url: d.audio.url as string, seconds: Number(d.audio.d) || 0 } : null;
+  return {
+    id, conversation_id: conversationId, sender_id: String(d.from ?? ''), body: String(d.text ?? ''), created_at: iso(d.createdAt), audio,
+    reply: d.reply && typeof d.reply === 'object' ? { mid: String(d.reply.mid ?? ''), from: String(d.reply.from ?? ''), text: String(d.reply.text ?? '') } : null,
+    reactions: d.reactions && typeof d.reactions === 'object' ? (d.reactions as Record<string, string>) : {},
+    media: cleanMedia(d.media),
+    doc: d.doc && typeof d.doc.url === 'string' && safeUrl(d.doc.url) ? { url: d.doc.url as string, name: String(d.doc.name ?? 'Document') } : null,
+    fwd: d.fwd === true,
+    share: shareOf(d.share),
+  };
+}
+
+const latestMessages = (conversationId: string) => query(collection(db, 'chats', conversationId, 'messages'), orderBy('createdAt', 'asc'), limitToLast(200));
+
 export async function listConversationMessages(conversationId: string): Promise<CommunityMessage[]> {
-  const snap = await getDocs(query(collection(db, 'chats', conversationId, 'messages'), orderBy('createdAt', 'asc'), limitToLast(200)));
-  return snap.docs.map((item) => {
-    const d = item.data();
-    const audio = d.audio && typeof d.audio.url === 'string' ? { url: d.audio.url as string, seconds: Number(d.audio.d) || 0 } : null;
-    return {
-      id: item.id, conversation_id: conversationId, sender_id: String(d.from ?? ''), body: String(d.text ?? ''), created_at: iso(d.createdAt), audio,
-      reply: d.reply && typeof d.reply === 'object' ? { mid: String(d.reply.mid ?? ''), from: String(d.reply.from ?? ''), text: String(d.reply.text ?? '') } : null,
-      reactions: d.reactions && typeof d.reactions === 'object' ? (d.reactions as Record<string, string>) : {},
-      media: cleanMedia(d.media),
-      doc: d.doc && typeof d.doc.url === 'string' && safeUrl(d.doc.url) ? { url: d.doc.url as string, name: String(d.doc.name ?? 'Document') } : null,
-      fwd: d.fwd === true,
-      share: shareOf(d.share),
-    };
-  });
+  const snap = await getDocs(latestMessages(conversationId));
+  return snap.docs.map((item) => conversationMessageOf(conversationId, item.id, item.data({ serverTimestamps: 'estimate' })));
+}
+
+/**
+ * The chat's newest 200 messages, live. Firebase sends only what changed, so an
+ * open chat costs one read per new message (the project is on the free plan,
+ * 50,000 reads a day; reading the whole chat every few seconds used it up).
+ */
+export function watchConversationMessages(conversationId: string, onList: (list: CommunityMessage[]) => void, onError: (error: unknown) => void): Unsubscribe {
+  return onSnapshot(
+    latestMessages(conversationId),
+    (snap) => onList(snap.docs.map((item) => conversationMessageOf(conversationId, item.id, item.data({ serverTimestamps: 'estimate' })))),
+    onError
+  );
+}
+
+// My chats, kept live by one listener and shared by the chats list, the bell
+// and the recent-messages card (they used to read every chat every 15–30 s).
+type ChatDoc = { id: string; data: DocumentData };
+type LiveChats = { uid: string; docs: ChatDoc[] | null; stop: Unsubscribe; waiting: ((ok: boolean) => void)[] };
+let liveChats: LiveChats | null = null;
+const myChatsListeners = new Set<() => void>();
+
+/** Called whenever one of my chats changes (a new message, a read mark). */
+export function onMyChatsChanged(listener: () => void) {
+  myChatsListeners.add(listener);
+  return () => { myChatsListeners.delete(listener); };
+}
+
+function myChatDocs(me: string): Promise<ChatDoc[] | null> {
+  if (!liveChats || liveChats.uid !== me) {
+    liveChats?.stop();
+    const entry: LiveChats = { uid: me, docs: null, stop: () => {}, waiting: [] };
+    liveChats = entry;
+    entry.stop = onSnapshot(
+      query(collection(db, 'chats'), where('members', 'array-contains', me), limit(100)),
+      (snap) => {
+        entry.docs = snap.docs.map((item) => ({ id: item.id, data: item.data({ serverTimestamps: 'estimate' }) }));
+        entry.waiting.splice(0).forEach((resolve) => resolve(true));
+        myChatsListeners.forEach((listener) => listener());
+      },
+      () => {
+        // Signed out, or offline before the first answer: start again next time.
+        entry.waiting.splice(0).forEach((resolve) => resolve(false));
+        if (liveChats === entry) liveChats = null;
+      }
+    );
+  }
+  const entry = liveChats;
+  if (entry.docs) return Promise.resolve(entry.docs);
+  return new Promise((resolve) => entry.waiting.push((ok) => resolve(ok ? entry.docs : null)));
 }
 
 /** My chats, most recent first (members contains me; sorted here so no extra index is needed). */
 export async function listMyConversations(max = 8): Promise<ConversationSummary[]> {
   const me = await signedInUserId();
-  const snap = await getDocs(query(collection(db, 'chats'), where('members', 'array-contains', me), limit(100)));
+  const docs = (await myChatDocs(me))
+    ?? (await getDocs(query(collection(db, 'chats'), where('members', 'array-contains', me), limit(100)))).docs.map((item) => ({ id: item.id, data: item.data() }));
   const millis = (value: unknown) => (value as { toMillis?: () => number } | null)?.toMillis?.() ?? 0;
-  return snap.docs
+  return docs
     .map((item) => {
-      const d = item.data();
+      const d = item.data;
       const otherId = ((d.members ?? []) as string[]).find((member) => member !== me) ?? '';
       const lastAt = millis(d.lastAt);
       const seenAt = millis((d.seen ?? {})[me]);
@@ -925,11 +1004,38 @@ const millisOf = (value: unknown) => {
   return v && typeof v.toMillis === 'function' ? v.toMillis() : null;
 };
 
-export async function loadConversationMeta(conversationId: string, mine: { readReceipts: boolean; shareOnlineStatus: boolean }): Promise<ConversationMeta> {
+type MetaPrefs = { readReceipts: boolean; shareOnlineStatus: boolean };
+
+export async function loadConversationMeta(conversationId: string, mine: MetaPrefs): Promise<ConversationMeta> {
   const me = await signedInUserId();
   const chat = (await getDoc(doc(db, 'chats', conversationId)).catch(() => null))?.data() ?? {};
   const otherId = ((chat.members ?? []) as string[]).find((member) => member !== me) ?? null;
   const other = otherId ? (await getDoc(doc(db, 'users', otherId)).catch(() => null))?.data() ?? {} : {};
+  return conversationMetaOf(otherId, chat, other, mine);
+}
+
+/** Read marks, typing and the friend's presence, live (the chat and the friend's profile). */
+export function watchConversationMeta(conversationId: string, me: string, mine: MetaPrefs, onMeta: (meta: ConversationMeta) => void): Unsubscribe {
+  let chat: DocumentData = {};
+  let other: DocumentData = {};
+  let otherId: string | null = null;
+  let stopOther: Unsubscribe = () => {};
+  const emit = () => onMeta(conversationMetaOf(otherId, chat, other, mine));
+  const stopChat = onSnapshot(doc(db, 'chats', conversationId), (snap) => {
+    chat = snap.data({ serverTimestamps: 'estimate' }) ?? {};
+    const next = ((chat.members ?? []) as string[]).find((member) => member !== me) ?? null;
+    if (next !== otherId) {
+      stopOther();
+      otherId = next;
+      other = {};
+      stopOther = next ? onSnapshot(doc(db, 'users', next), (user) => { other = user.data() ?? {}; emit(); }, () => {}) : () => {};
+    }
+    emit();
+  }, () => {});
+  return () => { stopChat(); stopOther(); };
+}
+
+function conversationMetaOf(otherId: string | null, chat: DocumentData, other: DocumentData, mine: MetaPrefs): ConversationMeta {
   const theirReceipts = other.readReceipts !== false;
   const lastSeen = typeof other.lastSeen === 'number' ? other.lastSeen : null;
   return {

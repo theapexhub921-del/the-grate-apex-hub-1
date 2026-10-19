@@ -402,10 +402,10 @@ export const Paper = '#FFFFFF';
 // (lungs, kidney, bladder, eye, ear...). Real tissue looks the same in
 // light and dark mode, so these do not change with the theme.
 export const Anatomy = {
-  lung: '#E9A3A1',
-  lungLight: '#F8D3CC',
-  lungDark: '#B9616A',
-  lungEdge: '#8E3F4C',
+  lung: '#CF959A',
+  lungLight: '#EDC4C4',
+  lungDark: '#93606C',
+  lungEdge: '#6E4050',
   cartilage: '#F2E7D6',
   cartilageShade: '#C8B394',
   lumen: '#5E1F2C',
@@ -428,13 +428,18 @@ export const Anatomy = {
   air: '#D8ECF7',
   airDeep: '#9CC7E2',
   pleura: '#CFE3EF',
-  kidney: '#A8443F',
-  kidneyLight: '#D07466',
-  kidneyDark: '#6E2420',
-  medulla: '#8E3434',
+  kidney: '#C98370',
+  kidneyLight: '#E2AE98',
+  kidneyDark: '#8A4A3E',
+  medulla: '#D9806E',
+  calyx: '#F1E4CC',
+  calyxShade: '#CDB896',
   urine: '#EBCB55',
   urineDark: '#C9A22A',
   mucosa: '#EFA7A0',
+  nucleus: '#6E4F8C',
+  mitochondria: '#D98B5F',
+  tracer: '#2F9E7A',
   outline: '#4A2A2E',
 } as const;
 

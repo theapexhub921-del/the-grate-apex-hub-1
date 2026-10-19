@@ -11,9 +11,9 @@
 //   Progress   the original app's section counts (progress/{uid}.lessons) are
 //              read, never rewritten; sections read here are kept on the device
 //              and a finished lesson is recorded as a completion.
+import { SITE_BASE } from '@/lib/live-site';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
-import { Platform } from 'react-native';
 
 import type { ClassSelection } from '@/data/class-curriculum';
 import { auth, db } from '@/lib/firebase';
@@ -191,7 +191,7 @@ export function loadLegacyImage(name: string): Promise<string | null> {
 export type LegacyBank = { id: string; name: string; sets: { id: string; name: string; questions: BankQuestion[] }[] };
 
 const banks = new Map<string, Promise<LegacyBank>>();
-const BASE = Platform.OS === 'web' ? '' : 'https://grateapex.vercel.app';
+const BASE = SITE_BASE;
 
 export function loadLegacyBank(courseId: string): Promise<LegacyBank> {
   const hit = banks.get(courseId);

@@ -4,10 +4,13 @@ import { Circle, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { CYCLE_PHASES, phaseAt, type CycleState } from '@/data/simulations/cardiac-cycle';
 import { useTheme } from '@/hooks/use-theme';
 
+import { Organ3D } from '../organ-3d';
+import { heartFrame, rounded } from '../organ-frames';
+
 import { BeatBar, Canvas, Legend, linear, pathOf, StatusRow, type GraphicProps } from './shared';
 
 const W = 400;
-const H = 360;
+const H = 310;
 const L = 46;
 const R = 12;
 const BAND = 26; // phase band at the top
@@ -15,10 +18,8 @@ const P_TOP = 44;
 const P_BOTTOM = 190;
 const V_TOP = 214;
 const V_BOTTOM = 296;
-const CONDUCTION_Y = 334;
 
 const SHORT = ['Atrial', 'IVC', 'Ejection', 'IVR', 'Filling'];
-const SHORT_NODE = ['SA node', 'Atria', 'AV node', 'His', 'Purkinje'];
 
 export function CardiacCycleGraphic({ state, values, time, reduceMotion }: GraphicProps<CycleState>) {
   const colors = useTheme();
@@ -31,13 +32,25 @@ export function CardiacCycleGraphic({ state, values, time, reduceMotion }: Graph
   const info = CYCLE_PHASES[phase];
   const series = (key: 'lv' | 'ao' | 'la') => pathOf(state.samples.map((s) => [s.t, s[key]] as [number, number]), x, yP);
   const volume = pathOf(state.samples.map((s) => [s.t, s.volume] as [number, number]), x, yV);
-  const nodeX = (i: number) => L + 20 + i * ((W - R - L - 40) / 4);
   const active = (window: { start: number; end: number }) =>
     window.start <= window.end ? moment >= window.start && moment < window.end : moment >= window.start || moment < window.end;
   const nearest = state.samples.reduce((best, s) => (Math.abs(s.t - moment) < Math.abs(best.t - moment) ? s : best), state.samples[0]);
 
+  // the real heart beats with the model: chambers fill and squeeze, the ventricle glows with its
+  // pressure, and the conduction system's wave shows as a glow over the atria, then the ventricles
+  const atrialWave = state.conduction.slice(0, 2).some(active) ? 1 : 0;
+  const ventricularWave = state.conduction.slice(3).some(active) ? 1 : 0;
+  const frame = heartFrame({
+    lv: rounded((nearest.volume - state.esv) / Math.max(1, state.edv - state.esv)),
+    la: phase === 0 ? 0 : 1,
+    pressure: rounded(nearest.lv / 130),
+    atria: atrialWave,
+    ventricles: ventricularWave,
+  });
+
   return (
     <View style={{ gap: 10 }}>
+      <Organ3D scene="heart" frame={frame} label={`The heart in ${info.name.toLowerCase()}`} />
       <Canvas width={W} height={H} label={`One heartbeat at ${Math.round(values.hr)} per minute. Now: ${info.name}.`}>
         {CYCLE_PHASES.map((p, i) => {
           const x0 = x(state.bounds[i]);
@@ -82,18 +95,6 @@ export function CardiacCycleGraphic({ state, values, time, reduceMotion }: Graph
         <Line x1={x(moment)} x2={x(moment)} y1={4} y2={V_BOTTOM} stroke={colors.accent} strokeWidth={2.5} />
         <Circle cx={x(moment)} cy={yP(nearest.lv)} r={5} fill={colors.accent} stroke={colors.surface} strokeWidth={2} />
         <Circle cx={x(moment)} cy={yV(nearest.volume)} r={5} fill={colors.accent} stroke={colors.surface} strokeWidth={2} />
-        <Line x1={nodeX(0)} x2={nodeX(4)} y1={CONDUCTION_Y - 6} y2={CONDUCTION_Y - 6} stroke={colors.border} strokeWidth={2} />
-        {state.conduction.map((node, i) => {
-          const on = active(node);
-          return (
-            <G key={node.name}>
-              <Circle cx={nodeX(i)} cy={CONDUCTION_Y - 6} r={on ? 8 : 5} fill={on ? colors.accent : colors.surfaceMuted} stroke={on ? colors.accentText : colors.borderStrong} strokeWidth={1.5} />
-              <SvgText x={nodeX(i)} y={CONDUCTION_Y + 18} fontSize={11} fontWeight="700" fill={on ? colors.text : colors.textTertiary} textAnchor="middle">
-                {SHORT_NODE[i]}
-              </SvgText>
-            </G>
-          );
-        })}
       </Canvas>
       <Legend
         items={[

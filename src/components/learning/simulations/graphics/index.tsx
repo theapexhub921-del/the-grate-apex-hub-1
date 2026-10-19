@@ -54,6 +54,20 @@ import { ShockGraphic } from './shock';
 import { SoundsJvpGraphic } from './sounds-jvp';
 import { StretchReflexGraphic } from './stretch-reflex';
 import { VesselFlowGraphic } from './vessel-flow';
+import { GlomerularFiltrationGraphic } from './glomerular-filtration';
+import type { FiltrationState } from '@/data/simulations/glomerular-filtration';
+import { GlucoseTmGraphic } from './glucose-tm';
+import type { GlucoseState } from '@/data/simulations/glucose-tm';
+import { UrineConcentrationGraphic } from './urine-concentration';
+import type { ConcentrationState } from '@/data/simulations/urine-concentration';
+import { RenalClearanceGraphic } from './renal-clearance';
+import type { ClearanceState } from '@/data/simulations/renal-clearance';
+import { MicturitionGraphic } from './micturition';
+import type { BladderState } from '@/data/simulations/micturition';
+import { AcidBaseGraphic } from './acid-base';
+import type { AcidBaseState } from '@/data/simulations/acid-base';
+import { RenalVesselsGraphic } from './renal-vessels';
+import type { VesselsState } from '@/data/simulations/renal-vessels';
 
 // The drawing for each simulation (models: data/simulations/).
 export function SimulationGraphic({ id, ...props }: GraphicProps<SimState> & { id: SimulationId }) {
@@ -110,6 +124,20 @@ export function SimulationGraphic({ id, ...props }: GraphicProps<SimState> & { i
       return <BreathingControlGraphic {...(props as GraphicProps<ControlState>)} />;
     case 'altitude-hypoxia':
       return <AltitudeHypoxiaGraphic {...(props as GraphicProps<AltitudeState>)} />;
+    case 'renal-vessels':
+      return <RenalVesselsGraphic {...(props as GraphicProps<VesselsState>)} />;
+    case 'glomerular-filtration':
+      return <GlomerularFiltrationGraphic {...(props as GraphicProps<FiltrationState>)} />;
+    case 'glucose-tm':
+      return <GlucoseTmGraphic {...(props as GraphicProps<GlucoseState>)} />;
+    case 'urine-concentration':
+      return <UrineConcentrationGraphic {...(props as GraphicProps<ConcentrationState>)} />;
+    case 'renal-clearance':
+      return <RenalClearanceGraphic {...(props as GraphicProps<ClearanceState>)} />;
+    case 'micturition':
+      return <MicturitionGraphic {...(props as GraphicProps<BladderState>)} />;
+    case 'acid-base':
+      return <AcidBaseGraphic {...(props as GraphicProps<AcidBaseState>)} />;
     default:
       return null;
   }

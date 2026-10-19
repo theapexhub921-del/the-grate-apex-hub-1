@@ -1,5 +1,12 @@
 // Every lesson simulation, by id. Models only (pure, testable); the
 // drawings are in components/learning/simulations/.
+import { acidBase } from '@/data/simulations/acid-base';
+import { glomerularFiltration } from '@/data/simulations/glomerular-filtration';
+import { glucoseTm } from '@/data/simulations/glucose-tm';
+import { micturition } from '@/data/simulations/micturition';
+import { renalClearance } from '@/data/simulations/renal-clearance';
+import { renalVessels } from '@/data/simulations/renal-vessels';
+import { urineConcentration } from '@/data/simulations/urine-concentration';
 import type { SimulationId } from '@/data/lesson-types';
 import { basalGanglia } from '@/data/simulations/basal-ganglia';
 import { baroreflex } from '@/data/simulations/baroreflex';
@@ -58,6 +65,14 @@ export const SIMULATIONS: Record<SimulationId, SimDefinition> = {
   'vq-matching': vqMatching,
   'breathing-control': breathingControl,
   'altitude-hypoxia': altitudeHypoxia,
+  // Renal Physiology
+  'renal-vessels': renalVessels,
+  'glomerular-filtration': glomerularFiltration,
+  'glucose-tm': glucoseTm,
+  'urine-concentration': urineConcentration,
+  'renal-clearance': renalClearance,
+  'micturition': micturition,
+  'acid-base': acidBase,
 };
 
 export function getSimulation(id: SimulationId): SimDefinition | undefined {

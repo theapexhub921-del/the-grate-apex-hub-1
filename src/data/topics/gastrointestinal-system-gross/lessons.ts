@@ -1205,6 +1205,7 @@ const lesson10: Draft = {
     {
       title: 'The Hepatic Portal Vein',
       kind: 'structure',
+      figure: 'gastrointestinal-system-gross:portal-venous-system',
       paragraphs: [
         'There are two venous systems in the abdomen: the systemic veins draining to the IVC, and the portal system. A portal system has capillaries at both ends.',
         'The hepatic portal vein carries nutrient-rich, deoxygenated blood from the GI tract (except the lower anal canal), pancreas, spleen and gallbladder to the liver for metabolism and detoxification. It is usually formed behind the neck of the pancreas at L1–L2 by the union of the superior mesenteric vein and the splenic vein (the IMV usually joins the splenic vein). It runs in the hepatoduodenal ligament to the porta hepatis, where it divides into right and left branches. It has no functioning valves, so obstruction raises pressure throughout the system.',

@@ -604,6 +604,7 @@ const lesson6: Draft = {
     {
       title: 'The External Ear',
       kind: 'structure',
+      figure: 'head-and-neck:auricle',
       paragraphs: [
         'The ear senses sound and the effects of gravity and motion. It lies in the temporal bone (squamous, petrous, mastoid and tympanic parts) and has external, middle and internal parts.',
         'The external ear is the auricle and the external acoustic meatus; it receives sound waves. The auricle is skin-covered cartilage attached by ligaments and muscles; it channels sound into the meatus. Its features include the helix (curved rim), the antihelix (dividing the scaphoid fossa from the concha), the concha (deep cavity in front of the antihelix), the tragus (projection in front of the concha) and the lobule (areolar tissue and fat, no cartilage). It is supplied by the vagus, facial, great auricular, auriculotemporal (V3) and lesser occipital nerves, and by the superficial temporal and posterior auricular arteries.',

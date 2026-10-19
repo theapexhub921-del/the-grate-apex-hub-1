@@ -325,7 +325,7 @@ export const EXPLORE_GUIDE: readonly ExploreGuideEntry[] = [
   { title: 'Study', detail: 'Follow the course structure, study lessons, answer quizzes and revisit concepts through spaced review.', status: 'available' },
   { title: 'Connect', detail: 'Opens on your messages: recent chats with unread ones marked, friends to start a chat with, or a quick way to find classmates. Below: your learning this week, the league, battles, study groups and friend activity.', status: 'available' },
   { title: 'You', detail: 'Show your name and avatar alongside your learning identity and achievements.', status: 'available' },
-  { title: 'Interfaces and themes', detail: 'Choose one of two interfaces — Legacy or Originate — and any newer or legacy theme. Each interface draws a theme its own way; legacy themes unlock as you level up.', status: 'available' },
+  { title: 'Interfaces and themes', detail: 'Choose one of two interfaces — Legacy or Originate — and any theme. Each interface draws a theme its own way; some themes unlock as you level up.', status: 'available' },
   { title: 'Apex Coin gifts', detail: 'Send Apex Coins to friends who follow you back — coins only, never XP. Switches on once the database rules are updated.', status: 'coming-soon' },
   { title: 'Settings', detail: 'Choose your theme, text size, web zoom, navigation, notification preferences and privacy choices. These controls are available in the app.', status: 'available' },
   { title: 'XP and ranks', detail: 'Earn XP from learning tasks and follow your progress through the rank ladder.', status: 'available' },
