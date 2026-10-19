@@ -123,3 +123,15 @@ describe('Android app wiring', () => {
     assert.equal(manifest.display, 'standalone');
   });
 });
+describe('Android app download', () => {
+  it('serves the APK the Settings link points to', () => {
+    const apk = readFileSync(new URL('../public/downloads/grateapex.apk', import.meta.url));
+    assert.ok(apk.length > 100_000, 'the APK is there');
+    assert.equal(apk.subarray(0, 2).toString('latin1'), 'PK', 'it is an Android package (a zip)');
+    assert.match(readFileSync(new URL('../src/lib/android-app.ts', import.meta.url), 'utf8'), /\/downloads\/grateapex\.apk/);
+  });
+
+  it('is never saved by the offline service worker', () => {
+    assert.match(readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8'), /startsWith\('\/downloads\/'\)\) return;/);
+  });
+});

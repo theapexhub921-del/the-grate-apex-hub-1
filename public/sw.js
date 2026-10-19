@@ -40,6 +40,8 @@ self.addEventListener('fetch', (event) => {
   if (new URL(request.url).pathname.startsWith('/atlas/')) return;
   // The 3D organs shown with the lesson simulations (/sim3d/...) use the atlas models: same rule.
   if (new URL(request.url).pathname.startsWith('/sim3d/')) return;
+  // The Android app download (public/downloads) goes straight to the network: never saved.
+  if (new URL(request.url).pathname.startsWith('/downloads/')) return;
   // Game builds (public/game-builds): played offline once played (or warmed up) online.
   // Online, every file comes from the network as usual (the browser's "has it changed?"
   // check keeps that cheap, so updates always show); a copy goes into the offline cache,
