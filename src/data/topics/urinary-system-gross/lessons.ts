@@ -148,6 +148,7 @@ const lesson2: Draft = {
     {
       title: 'Internal Structure',
       kind: 'structure',
+      figure: 'urinary-system-gross:kidney-internal',
       paragraphs: [
         'The hilum is the opening on the concave medial border for the ureter, renal vessels, lymphatics and nerves; it leads into the renal sinus, a fat-filled cavity lined by the capsule containing the renal pelvis, calyces, vessels and nerves. At the hilum, from front to back: vein, artery, pelvis (VAP); from above down: artery, vein, pelvis (AVP).',
         'The cortex is the reddish-brown outer layer; it projects inward between the pyramids as the renal columns (of Bertin). The medulla is the paler inner part containing the renal pyramids (of Malpighi). The apex of each pyramid, the renal papilla, fits into a minor calyx and has 10–25 openings of papillary ducts.',

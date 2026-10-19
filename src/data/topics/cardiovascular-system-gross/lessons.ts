@@ -405,6 +405,7 @@ const lesson4: Draft = {
     {
       title: 'The Right Atrium',
       kind: 'structure',
+      figure: 'cardiovascular-system-gross:right-atrium',
       paragraphs: [
         'The right atrium receives systemic blood from the superior and inferior venae cavae and from the coronary sinus. It has a smooth sinus part (where the venae cavae open) and a rough auricular part.',
         'Internal features: the openings of the SVC, IVC and coronary sinus; the right atrioventricular (tricuspid) opening; the fossa ovalis with its raised margin, the limbus fossae ovalis (annulus ovalis); the crista terminalis; and the musculi pectinati.',

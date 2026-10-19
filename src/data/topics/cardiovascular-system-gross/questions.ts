@@ -1,7 +1,8 @@
 // Quiz bank for Anatomy → Cardiovascular System (gross), built from the
 // lecture decks (Gross 1 and Gross 2). Includes 5 Assertion–Reason
 // questions per lesson.
-import { assertionReason as ar, fill, match, mcq, multi, order, tf, type QuestionDraft } from '@/data/topics/build';
+import { assertionReason as ar, fill, match, mcq, multi, order, tf, spotQuestion, type QuestionDraft } from '@/data/topics/build';
+import { rightAtrium } from '@/data/figures/cardiovascular-system-gross';
 import type { ConceptId } from '@/data/topics/cardiovascular-system-gross/sources';
 
 type Q = QuestionDraft<ConceptId>;
@@ -130,6 +131,11 @@ const lesson4: Q[] = [
   ar('ar4-03', 'left-heart-chambers', 'The left ventricle forms the apex of the heart.', 'The left ventricle has a crescentic cavity on cross-section.', 'a-true-r-false', 'It forms the apex, but its cavity is circular/oval; the RIGHT ventricle is crescentic (slides 118, 134).'),
   ar('ar4-04', 'cardiac-skeleton', 'The fibrous rings give attachment to the atrioventricular valves.', 'The fibrous rings are stronger on the right side than the left.', 'a-true-r-false', 'They anchor the valves, but are stronger on the LEFT (slide 140).'),
   ar('ar4-05', 'right-atrium', 'The coronary sinus opens into the left atrium.', 'The right atrium receives blood from the SVC and IVC.', 'a-false-r-true', 'The coronary sinus opens into the RIGHT atrium (slide 111); the reason is true.'),
+  spotQuestion('q4-fig-svc', 'right-atrium', rightAtrium, 'svc', ['ivc', 'coronary-sinus', 'crista']),
+  spotQuestion('q4-fig-fossa-ovalis', 'right-atrium', rightAtrium, 'fossa-ovalis', ['limbus', 'coronary-sinus', 'tricuspid']),
+  spotQuestion('q4-fig-crista', 'right-atrium', rightAtrium, 'crista', ['pectinati', 'limbus', 'auricle']),
+  spotQuestion('q4-fig-pectinati', 'right-atrium', rightAtrium, 'pectinati', ['crista', 'auricle', 'fossa-ovalis']),
+  spotQuestion('q4-fig-coronary-sinus', 'right-atrium', rightAtrium, 'coronary-sinus', ['ivc', 'tricuspid', 'fossa-ovalis']),
 ];
 
 // ─── Lesson 5: Conduction System and Coronary Circulation ────────────

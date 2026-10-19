@@ -17,6 +17,12 @@ import { figures as hormones } from '@/data/figures/hormones-endocrine-biochemis
 import { figures as inbornErrors } from '@/data/figures/inborn-errors-of-metabolism';
 import { figures as oxygenCarriers } from '@/data/figures/oxygen-carriers';
 import { figures as upperLimb } from '@/data/figures/upper-limb';
+import { figures as rightAtriumFigures } from '@/data/figures/cardiovascular-system-gross';
+import { figures as thoracicJointsFigures } from '@/data/figures/respiratory-system-gross';
+import { figures as portalVenousSystemFigures } from '@/data/figures/gastrointestinal-system-gross';
+import { figures as kidneyInternalFigures } from '@/data/figures/urinary-system-gross';
+import { figures as auricleFigures } from '@/data/figures/head-and-neck';
+import { figures as brainArteriesFigures } from '@/data/figures/neuroanatomy';
 import type { FigureSpot, LessonFigure } from '@/data/lesson-types';
 
 export const allFigures: LessonFigure[] = [
@@ -30,6 +36,12 @@ export const allFigures: LessonFigure[] = [
   ...hormones,
   ...collagen,
   ...inbornErrors,
+  ...rightAtriumFigures,
+  ...thoracicJointsFigures,
+  ...portalVenousSystemFigures,
+  ...kidneyInternalFigures,
+  ...auricleFigures,
+  ...brainArteriesFigures,
 ];
 
 const byId = new Map(allFigures.map((figure) => [figure.id, figure]));
