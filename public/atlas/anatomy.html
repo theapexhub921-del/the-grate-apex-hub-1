@@ -647,6 +647,44 @@
 
     #notice code { background: var(--glass); padding: 1px 5px; border-radius: 4px; }
 
+    /* Download status on the 3D view itself: progress while a model downloads, and what to do if it failed. */
+    #loadStatus {
+      position: fixed;
+      left: 50%;
+      top: 40%;
+      transform: translate(-50%, -50%);
+      display: none;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px 14px;
+      max-width: min(420px, calc(100% - 32px));
+      padding: 12px 16px;
+      border-radius: var(--r-md);
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.4;
+      text-align: center;
+      box-shadow: var(--shadow);
+      z-index: 5;
+    }
+
+    #loadStatus.err { background: var(--bad-bg); border-color: var(--bad); }
+    #loadStatus small { display: block; color: var(--ink-2); font-size: 12.5px; margin-top: 2px; }
+    #loadStatus button {
+      min-height: 38px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: var(--r-sm);
+      background: var(--cobalt);
+      color: var(--on-cobalt);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
     @media (pointer: coarse) {
       #hint .hint-mouse { display: none; }
       #hint .hint-touch { display: block; }
@@ -1131,6 +1169,7 @@
 
   <div id="tip"></div>
   <div id="notice" role="alert"></div>
+  <div id="loadStatus" role="status" aria-live="polite"></div>
 
   <script>
     // GRATEAPEX theme bridge: the app hands this page its colours (in the address as #theme=..., and again by
@@ -1830,6 +1869,57 @@ bool inRegion(vec3 p) {
 
     /* ---------- loading ---------- */
     const loader = new GLTFLoader();
+
+    // A model download that fails (a patchy connection) is tried twice more before giving up.
+    async function loadModel(url, onProgress) {
+      for (let attempt = 0; ; attempt++) {
+        try {
+          return await loader.loadAsync(url, onProgress);
+        } catch (err) {
+          if (attempt >= 2) throw err;
+          await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+        }
+      }
+    }
+
+    // What is downloading, and what failed, shown on the 3D view itself: without it a learner on a slow or
+    // broken connection sees an empty screen and thinks the atlas does not open.
+    const loadStatus = document.getElementById('loadStatus');
+    const downloading = new Map();   // system -> percent (or null while unknown)
+    const failedLoads = new Map();   // label -> retry
+    let downloadSince = 0;
+    function renderLoadStatus() {
+      if (failedLoads.size) {
+        const labels = [...failedLoads.keys()].join(', ');
+        loadStatus.className = 'err';
+        loadStatus.innerHTML = '<span>The 3D model could not download (' + labels + ').<small>Check your connection, then try again.</small></span><button type="button">Try again</button>';
+        loadStatus.querySelector('button').onclick = () => {
+          const retries = [...failedLoads.values()];
+          failedLoads.clear();
+          renderLoadStatus();
+          retries.forEach(retry => retry());
+        };
+        loadStatus.style.display = 'flex';
+        return;
+      }
+      if (downloading.size) {
+        if (!downloadSince) downloadSince = Date.now();
+        const known = [...downloading.values()].filter(p => p !== null);
+        const percent = known.length ? Math.round(known.reduce((a, b) => a + b, 0) / known.length) : null;
+        const slow = Date.now() - downloadSince > 12000 ? '<small>This can take a minute on a slow connection.</small>' : '';
+        loadStatus.className = '';
+        loadStatus.innerHTML = '<span>Loading the 3D model' + (percent !== null ? ' \u2026 ' + percent + '%' : '\u2026') + slow + '</span>';
+        loadStatus.style.display = 'flex';
+        return;
+      }
+      downloadSince = 0;
+      loadStatus.style.display = 'none';
+      loadStatus.innerHTML = '';
+    }
+    function loadFailed(s) {
+      failedLoads.set(s.label, () => { s.input.checked = true; setSystem(s, true); });
+      renderLoadStatus();
+    }
     loader.setMeshoptDecoder(MeshoptDecoder);
 
     const pickMat = patchRegion(new THREE.MeshStandardMaterial({
@@ -2144,7 +2234,7 @@ bool inRegion(vec3 p) {
           if (!p.loading) await setSystem(p, true);
           while (p.loading) await new Promise(r => setTimeout(r, 100));
         }
-        if (!s.group) { if (on) s.input.checked = false; return; }
+        if (!s.group) { if (on) { s.input.checked = false; loadFailed(s); } return; }
         s.group.visible = on && s.input.checked && !isPeeled(s);
         if (!on && selected && selected.userData.system === s) deselect();
         dirty = true;
@@ -2153,13 +2243,20 @@ bool inRegion(vec3 p) {
       if (on && !s.group && !s.loading) {
         s.loading = true;
         s.stat.classList.remove('err');
+        downloading.set(s, null);
+        renderLoadStatus();
+        setTimeout(renderLoadStatus, 12500);   // shows the slow-connection hint even if no progress arrives
         try {
           const files = s.files || [s.file];
           const parts = [];
           for (const f of files) {
             // multi-file systems (the female organs) ship at full detail only, so they skip the lite folder
-            const g = await loader.loadAsync(BASE + (s.files ? '' : MODEL_DIR) + f + '?m=' + MODEL_VERSION, e => {
-              if (e.total) s.stat.textContent = Math.round((e.loaded / e.total) * 100) + '%';
+            const g = await loadModel(BASE + (s.files ? '' : MODEL_DIR) + f + '?m=' + MODEL_VERSION, e => {
+              if (!e.total) return;
+              const percent = Math.round((e.loaded / e.total) * 100);
+              s.stat.textContent = percent + '%';
+              downloading.set(s, percent);
+              renderLoadStatus();
             });
             parts.push(g.scene);
           }
@@ -2209,9 +2306,12 @@ bool inRegion(vec3 p) {
           s.stat.textContent = 'Failed';
           s.stat.classList.add('err');
           s.input.checked = false;
-          showNotice(`Couldn't load <code>${s.file}</code>. Serve this folder over http (for example <code>npx serve .</code>) instead of opening the file directly, or set <code>?base=</code> to where the models are hosted.`);
+          if (location.protocol === 'file:') showNotice(`Couldn't load <code>${s.file}</code>. Serve this folder over http (for example <code>npx serve .</code>) instead of opening the file directly, or set <code>?base=</code> to where the models are hosted.`);
+          else if (!s.hidden) loadFailed(s);   // a hidden file (Organs) is reported by the system that asked for it
         }
         s.loading = false;
+        downloading.delete(s);
+        renderLoadStatus();
       }
       if (s.group) s.group.visible = on && s.input.checked && !isPeeled(s);
       if (!on && selected && selected.userData.system === s) deselect();
