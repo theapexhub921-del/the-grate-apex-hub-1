@@ -111,7 +111,7 @@ func build() -> void:
 		for r in results:
 			var row := UI.hbox(10)
 			var ok := bool(r["correct"])
-			row.add_child(UI.label("✓" if ok else "✗", 18, "good" if ok else "bad", "bold", false))
+			row.add_child(UI.mark(ok))
 			var term := String(r["term"])
 			var d: Dictionary = GameData.by_id.get(String(r.get("id", "")), {})
 			var tl := UI.label(term, 16, "fg", "mono", false)

@@ -207,3 +207,22 @@ static func line_edit(text: String, placeholder: String) -> LineEdit:
 	e.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	e.add_theme_font_size_override("font_size", 17)
 	return e
+
+
+## A small drawn tick (right) or cross (wrong). Drawn as lines because the game's fonts
+## have no tick or cross characters.
+static func mark(ok: bool, size: float = 18.0) -> Control:
+	var c := Control.new()
+	c.custom_minimum_size = Vector2(size, size)
+	c.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.draw.connect(func():
+		var s := c.size
+		var col := Style.c("good" if ok else "bad")
+		var w := maxf(2.0, s.x * 0.14)
+		if ok:
+			c.draw_polyline(PackedVector2Array([Vector2(0.15, 0.55) * s, Vector2(0.42, 0.8) * s, Vector2(0.88, 0.22) * s]), col, w, true)
+		else:
+			c.draw_line(Vector2(0.2, 0.2) * s, Vector2(0.8, 0.8) * s, col, w, true)
+			c.draw_line(Vector2(0.8, 0.2) * s, Vector2(0.2, 0.8) * s, col, w, true))
+	return c

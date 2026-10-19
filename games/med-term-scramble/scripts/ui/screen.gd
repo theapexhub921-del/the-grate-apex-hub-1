@@ -96,7 +96,7 @@ func build() -> void:
 	pass
 
 
-func top_bar(back_text: String = "← Menu", back_target: String = "menu") -> HBoxContainer:
+func top_bar(back_text: String = "‹ Menu", back_target: String = "menu") -> HBoxContainer:
 	var row := UI.hbox(10)
 	content.add_child(row)
 	var back := UI.button(back_text, "ghost", 38)

@@ -2,7 +2,7 @@ extends Screen
 
 
 func build() -> void:
-	top_bar("← Back", "modes")
+	top_bar("‹ Back", "modes")
 	content.add_child(UI.eyebrow("Case Mode"))
 	content.add_child(UI.title("Clinical Cases"))
 	content.add_child(UI.label("Each case chains several scrambles: symptoms, investigations, then the diagnosis.", 16, "muted"))
@@ -14,7 +14,7 @@ func build() -> void:
 		var stages: Array = []
 		for s in steps:
 			stages.append(String(s.get("stage", "")))
-		v.add_child(UI.label(" → ".join(PackedStringArray(stages)), 13, "eosin", "mono"))
+		v.add_child(UI.label(" › ".join(PackedStringArray(stages)), 13, "eosin", "mono"))
 		var b := UI.button("Start case", "primary", 46)
 		var id := String(c.get("id", ""))
 		b.pressed.connect(func(): Router.go("game", {"mode": "case", "case_id": id}))
