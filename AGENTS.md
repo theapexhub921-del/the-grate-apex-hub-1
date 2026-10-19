@@ -340,6 +340,7 @@ The full redesign rationale is in `docs/redesign-notes.md`.
   * `Type.*`, `Radius.*`, `elevation(colors, level)`
 * All durations, springs and curves come from `src/constants/motion.ts`.
 * Respect reduced motion: use `useReducedMotion()`.
+* **Sound and vibration** (owner, 2026-10-19): `src/lib/feedback.ts` — `tapFeedback` on every tap (the `Interactive` primitive and the navigation bars), `correctFeedback` / `wrongFeedback` when an answer is checked (`QuestionCard`; cards that open already answered stay quiet). Sounds are made with Web Audio (no files); vibration uses `navigator.vibrate` (Android; not iPhone) or React Native `Vibration`. Settings → Sounds and vibration switches each off, per device.
 * Never hard-code new colours in screens.
 
 ### Atmosphere
