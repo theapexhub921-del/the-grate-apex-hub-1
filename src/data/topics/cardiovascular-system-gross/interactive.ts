@@ -11,7 +11,7 @@ export const interactive: Record<string, Steps> = {
       'The cardiovascular system is the heart plus the blood vessels. Add the lymphatic system (lymph vessels and nodes) and you have the circulatory system.',
       'Lymph is tissue fluid returned to the venous blood; lymph nodes along the way clean it first.',
     ], { sourceRefs: c1([6, 7, 9]) }),
-    ask(mcq('i1-01', 'mediastinum-divisions', 'Which plane separates the superior from the inferior mediastinum?', 'From the sternal angle back to the lower border of the body of T4', ['From the xiphisternum back to T10', 'From the jugular notch back to T2', 'Along the upper border of the diaphragm'], { explanation: 'Slide 19: a slightly oblique plane from the sternal angle to the lower part of the body of T4 divides the mediastinum.' })),
+    ask(mcq('i1-01', 'mediastinum-divisions', 'Which plane separates the superior from the inferior mediastinum?', 'From the sternal angle back to the lower border of the body of T4', ['From the xiphisternal joint back to the body of T10', 'From the jugular notch back to the lower border of T2', 'Along the upper surface of the diaphragm to T12'], { explanation: 'Slide 19: a slightly oblique plane from the sternal angle to the lower part of the body of T4 divides the mediastinum.' })),
     learn('Three parts below the plane', [
       'The pericardium is the landmark: in front of it is the anterior mediastinum, the pericardium and heart are the middle mediastinum, and behind it is the posterior mediastinum.',
     ], { sourceRefs: c1([22]) }),
@@ -21,7 +21,7 @@ export const interactive: Record<string, Steps> = {
       ['Arch of the aorta', 'Superior mediastinum'],
       ['Branches of the internal thoracic artery and areolar tissue', 'Anterior mediastinum'],
     ], { explanation: 'Slides 25, 32, 34, 38.' })),
-    ask(mcq('i1-03', 'superior-mediastinum', 'Why does the superior mediastinum contain the left common carotid artery but not the right?', 'The right common carotid arises from the brachiocephalic trunk in the root of the neck', ['The right common carotid arises from the ascending aorta', 'The right common carotid is absent in most people', 'The right common carotid runs in the posterior mediastinum'], { explanation: 'Slide 25 asks this: the arch gives only the brachiocephalic trunk, left common carotid and left subclavian; the right common carotid comes off the brachiocephalic trunk.', skill: 'cause-effect' })),
+    ask(mcq('i1-03', 'superior-mediastinum', 'Why does the superior mediastinum contain the left common carotid artery but not the right?', 'The right common carotid arises from the brachiocephalic trunk in the root of the neck', ['The right common carotid arises from the ascending aorta inside the pericardium', 'The right common carotid is absent in most people and replaced by the vertebral', 'The right common carotid runs down into the posterior mediastinum instead'], { explanation: 'Slide 25 asks this: the arch gives only the brachiocephalic trunk, left common carotid and left subclavian; the right common carotid comes off the brachiocephalic trunk.', skill: 'cause-effect' })),
     recall('r1-01', 'inferior-mediastinum-contents', 'List the contents of the posterior mediastinum.', [
       'Descending thoracic aorta.',
       'Azygos and the two hemiazygos veins.',
@@ -62,7 +62,7 @@ export const interactive: Record<string, Steps> = {
       ['Sternocostal surface', 'Right ventricle'],
       ['Base (posterior surface)', 'Left atrium'],
     ], { explanation: 'Slides 81–84.' })),
-    ask(mcq('i3-02', 'heart-surface-marking', 'Where is the normal apex beat felt?', 'Left 5th intercostal space, about 8–9 cm from the midline', ['Right 2nd intercostal space at the sternal edge', 'Left 2nd costal cartilage', 'Left 7th intercostal space in the anterior axillary line'], { explanation: 'Slide 108: the apex lies behind the 5th left intercostal space, 8–9 cm from the mid-sternal line.', skill: 'application' })),
+    ask(mcq('i3-02', 'heart-surface-marking', 'Where is the normal apex beat felt?', 'Left 5th intercostal space, about 8–9 cm from the midline', ['Right 2nd intercostal space at the edge of the sternum', 'Left 2nd costal cartilage, 2 cm from the sternum', 'Left 7th intercostal space in the anterior axillary line'], { explanation: 'Slide 108: the apex lies behind the 5th left intercostal space, 8–9 cm from the mid-sternal line.', skill: 'application' })),
     learn('Three layers, four chambers', [
       'Epicardium (visceral pericardium), myocardium (thickest in the left ventricle) and endocardium (continuous with vessel endothelium, forms parts of the valves).',
       'The coronary (AV) sulcus marks atria from ventricles; the anterior and posterior interventricular sulci mark the two ventricles.',
@@ -113,7 +113,7 @@ export const interactive: Record<string, Steps> = {
       'Most veins join the coronary sinus: great, middle and small cardiac veins, the posterior vein of the left ventricle and the oblique vein of the left atrium.',
       'The anterior cardiac veins, venae cordis minimae and right marginal vein open directly into the right atrium.',
     ], { sourceRefs: c1([174, 178]) }),
-    ask(mcq('i5-03', 'right-coronary', 'In about 10% of hearts, the posterior interventricular artery comes from which vessel?', 'Circumflex branch of the left coronary artery', ['Right marginal artery', 'Anterior interventricular artery', 'Conus artery'], { explanation: 'Slide 168: when the right coronary is short, the circumflex continues as the posterior interventricular artery.', skill: 'recall' })),
+    ask(mcq('i5-03', 'right-coronary', 'In about 10% of hearts, the posterior interventricular artery comes from which vessel?', 'Circumflex branch of the left coronary artery', ['Right marginal branch of the right coronary artery', 'Anterior interventricular branch of the left coronary', 'Conus branch of the right coronary artery'], { explanation: 'Slide 168: when the right coronary is short, the circumflex continues as the posterior interventricular artery.', skill: 'recall' })),
     recall('r5-01', 'cardiac-veins', 'Name the five tributaries of the coronary sinus.', [
       'Great cardiac vein.',
       'Middle cardiac vein.',
@@ -127,7 +127,7 @@ export const interactive: Record<string, Steps> = {
     learn('Out and back', [
       'Heart → arteries → arterioles → capillaries → venules → veins → heart. There are three circulations: pulmonary, systemic (caval) and portal.',
     ], { sourceRefs: c2([3, 4]) }),
-    ask(mcq('i6-01', 'vessel-wall-arteries', 'Why is the aorta called an elastic artery?', 'Its wall has a very thick elastic layer that recoils during diastole', ['Its wall is mainly smooth muscle', 'It has no tunica adventitia', 'It contains valves'], { explanation: 'Slide 6: the thick elastic lamina produces elastic recoil during diastole.', skill: 'cause-effect' })),
+    ask(mcq('i6-01', 'vessel-wall-arteries', 'Why is the aorta called an elastic artery?', 'Its wall has a very thick elastic layer that recoils during diastole', ['Its wall is mainly smooth muscle that contracts with each beat', 'It has no tunica adventitia, so it stretches freely', 'It contains valves along its length that close in diastole'], { explanation: 'Slide 6: the thick elastic lamina produces elastic recoil during diastole.', skill: 'cause-effect' })),
     ask(match('i6-02', 'capillaries', 'Match each capillary type to a place it is found:', [
       ['Continuous', 'Central nervous system'],
       ['Fenestrated', 'Kidney'],

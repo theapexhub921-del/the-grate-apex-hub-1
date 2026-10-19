@@ -140,7 +140,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c2-04', 'hmg-coa-crossroads', 'Some HMG-CoA is made inside mitochondria. Following slide 8, what happens to it there?', 'A cleavage enzyme splits it into acetoacetate + acetyl-CoA', ['HMG-CoA reductase turns it into mevalonate', 'It is exported and becomes squalene', 'It is carboxylated to malonyl-CoA'], {
+      mcq('c2-04', 'hmg-coa-crossroads', 'Some HMG-CoA is made inside mitochondria. Following slide 8, what happens to it there?', 'A cleavage enzyme splits it into acetoacetate + acetyl-CoA', ['HMG-CoA reductase turns it into mevalonate with NADPH', 'It is exported to the cytosol and becomes squalene', 'It is carboxylated to malonyl-CoA for fatty acid synthesis'], {
         explanation: 'Slide 8: in mitochondria, a cleavage enzyme gives acetoacetate + acetyl-CoA; the reductase that makes mevalonate works in the cytosol.',
         skill: 'prediction',
       }),
@@ -204,7 +204,7 @@ export const interactive: Record<string, Steps> = {
       'Each round adds one IPP unit and releases PPi: geranyl pyrophosphate → farnesyl pyrophosphate → on to squalene.',
     ], { sourceRefs: [...ref([10, 12]), ...leh(818)] }),
     ask(
-      mcq('c3-03', 'prenyl-condensation', 'In each chain-building step (slide 10), what leaves the allylic substrate before IPP joins on?', 'Pyrophosphate (PPi)', ['CO₂', 'Water', 'Coenzyme A'], {
+      mcq('c3-03', 'prenyl-condensation', 'In each chain-building step (slide 10), what leaves the allylic substrate before IPP joins on?', 'Pyrophosphate (PPi)', ['CO₂ (carbon dioxide)', 'Water (H₂O)', 'Coenzyme A (CoA-SH)'], {
         explanation: 'The allylic pyrophosphate loses PPi, leaving a positively charged carbon that IPP attacks.',
       })
     ),
@@ -271,7 +271,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: [...ref([13]), ...leh(826)],
     }),
     ask(
-      mcq('c4-02', 'supply-mechanisms', 'Which enzyme deals with excess intracellular FREE cholesterol?', 'ACAT (acyl-CoA:cholesterol acyltransferase)', ['HMG-CoA reductase', '7α-Hydroxylase', 'AMP-activated protein kinase'], {
+      mcq('c4-02', 'supply-mechanisms', 'Which enzyme deals with excess intracellular FREE cholesterol?', 'ACAT (acyl-CoA:cholesterol acyltransferase)', ['HMG-CoA reductase (HMGR)', '7α-Hydroxylase (CYP7A1)', 'AMP-activated protein kinase'], {
         explanation: 'Slide 13: excess intracellular free cholesterol is regulated through ACAT. (Lehninger: ACAT esterifies cholesterol for storage.)',
       })
     ),
@@ -316,12 +316,12 @@ export const interactive: Record<string, Steps> = {
       'Slide 17 shows the inhibitory route: cAMP activates PKA → PKA phosphorylates PPI-1 into its active form → active PPI-1 blocks the phosphatases → HMGR stays phosphorylated (off). Insulin stimulates removal of the phosphates (on).',
     ], { sourceRefs: [...ref([16, 17]), ...leh(826)] }),
     ask(
-      mcq('c4-06', 'hormonal-control', 'What does insulin do to HMGR?', 'Stimulates removal of its phosphate, activating it', ['Phosphorylates it through PKA, inactivating it', 'Triggers its polyubiquitination', 'Converts it into acetoacetyl-CoA'], {
+      mcq('c4-06', 'hormonal-control', 'What does insulin do to HMGR?', 'Stimulates removal of its phosphate, activating it', ['Phosphorylates it through PKA, inactivating it', 'Triggers its polyubiquitination and destruction', 'Converts it into acetoacetyl-CoA in the cytosol'], {
         explanation: 'Slide 16: insulin stimulates the removal of phosphates and thereby activates HMGR.',
       })
     ),
     ask(
-      mcq('c4-07', 'hormonal-control', 'Glucagon raises the activity of PPI-1. Why does that switch HMGR off?', 'Active PPI-1 blocks the phosphatase that would remove HMGR’s phosphate', ['PPI-1 phosphorylates HMGR directly', 'PPI-1 sends HMGR to the proteasome', 'PPI-1 activates protein phosphatase 2C'], {
+      mcq('c4-07', 'hormonal-control', 'Glucagon raises the activity of PPI-1. Why does that switch HMGR off?', 'Active PPI-1 blocks the phosphatase that would remove HMGR’s phosphate', ['PPI-1 phosphorylates HMGR directly, inactivating it', 'PPI-1 sends HMGR to the proteasome for degradation', 'PPI-1 activates protein phosphatase 2C, which inhibits HMGR'], {
         explanation: 'Slide 17: PKA-phosphorylated PPI-1(a) inhibits HMG-CoA reductase phosphatase (and protein phosphatase 2C), so HMGR stays phosphorylated and inactive.',
         skill: 'pathway-reasoning',
         difficulty: 'advanced',
@@ -337,7 +337,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 5 — Bile acids ─────────────────────────────────────────
   'cholesterol-and-bile-biosynthesis-5': [
     ask(
-      mcq('c5-01', 'bile-acid-functions', 'Before you start: what does the lecture call the ONLY significant way the body eliminates excess cholesterol?', 'Making bile acids and excreting them in the faeces', ['Oxidising it to CO₂ for energy', 'Breathing it out through the lungs', 'Excreting it unchanged in the urine'], {
+      mcq('c5-01', 'bile-acid-functions', 'Before you start: what does the lecture call the ONLY significant way the body eliminates excess cholesterol?', 'Making bile acids and excreting them in the faeces', ['Oxidising it completely to CO₂ for energy', 'Breathing it out through the lungs', 'Excreting it unchanged in the urine'], {
         explanation: 'Slide 20: bile acid synthesis and subsequent excretion in the faeces is the only significant mechanism for eliminating excess cholesterol.',
         skill: 'prediction',
       }),
@@ -361,7 +361,7 @@ export const interactive: Record<string, Steps> = {
       'Both routes shorten the side chain, releasing propionyl-CoA, and end as a CoA thioester.',
     ], { sourceRefs: ref([18]) }),
     ask(
-      mcq('c5-04', 'bile-acid-synthesis', 'On the way from 7-hydroxycholesterol to cholyl-CoA, which molecule is RELEASED?', 'Propionyl-CoA', ['Acetyl-CoA', 'Malonyl-CoA', 'Succinyl-CoA'], {
+      mcq('c5-04', 'bile-acid-synthesis', 'On the way from 7-hydroxycholesterol to cholyl-CoA, which molecule is RELEASED?', 'Propionyl-CoA', ['Acetyl-CoA', 'Malonyl-CoA', 'Succinyl-CoA (from the side chain)'], {
         explanation: 'Slide 18: both routes release propionyl-CoA as the side chain is shortened.',
       })
     ),

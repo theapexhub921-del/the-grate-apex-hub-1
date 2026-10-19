@@ -80,7 +80,7 @@ const lesson1: Q[] = [
     answer: true,
     explanation: 'Slide 3: “Distribution: All cells — and synthesized from acetic acid in animal tissue.”',
   }),
-  mcq('q1-15', 'acetate-origin', 'All of cholesterol’s carbon atoms come from which precursor?', 'Acetate (as acetyl-CoA)', ['Glycerol', 'Malonyl-CoA', 'Propionyl-CoA'], {
+  mcq('q1-15', 'acetate-origin', 'All of cholesterol’s carbon atoms come from which precursor?', 'Acetate (as acetyl-CoA)', ['Glycerol (from fat)', 'Malonyl-CoA', 'Propionyl-CoA'], {
     explanation: 'Slide 5: cholesterol is synthesised from acetate precursors.',
   }),
   multi('q1-16', 'acetate-origin', 'Slide 5 colours cholesterol’s carbons by origin. Which parts of acetate supply them? Select all that apply.', ['The methyl carbon', 'The carbonyl carbon'], ['The oxygen atoms', 'CO₂ from the air'], {
@@ -102,7 +102,7 @@ const lesson1: Q[] = [
   mcq('q1-20', 'pyruvate-malate-supply', 'Which cytosolic enzyme releases acetyl-CoA from citrate?', 'ATP-citrate lyase', ['Citrate synthase', 'Malic enzyme', 'Pyruvate carboxylase'], {
     explanation: 'Slide 6: citrate + CoA + ATP → acetyl-CoA + oxaloacetate + ADP + Pi (ATP-citrate lyase).',
   }),
-  mcq('q1-21', 'pyruvate-malate-supply', 'What does ATP-citrate lyase spend for each citrate it splits?', 'One ATP (→ ADP + Pi)', ['One NADPH', 'One GTP', 'Nothing'], {
+  mcq('q1-21', 'pyruvate-malate-supply', 'What does ATP-citrate lyase spend for each citrate it splits?', 'One ATP (→ ADP + Pi)', ['One NADPH (→ NADP⁺)', 'One GTP (→ GDP + Pi)', 'Nothing at all'], {
     explanation: 'Slide 6: ATP → ADP + Pi at ATP-citrate lyase.',
   }),
   fill('q1-22', 'pyruvate-malate-supply', 'Malic enzyme converts malate to pyruvate, producing CO₂ and ____.', ['NADPH', 'NADPH + H+'], {
@@ -118,7 +118,7 @@ const lesson1: Q[] = [
     ['ATP-citrate lyase', 'Cytosol'],
     ['Malic enzyme', 'Cytosol'],
   ], { explanation: 'Citrate is made in the matrix and split in the cytosol; malate → pyruvate happens in the cytosol; pyruvate is carboxylated in the matrix.' }),
-  mcq('q1-25', 'pyruvate-malate-supply', 'Why does cholesterol synthesis depend on the Pyruvate–Malate cycle?', 'It supplies the cytosol with acetyl-CoA and NADPH', ['It supplies the mitochondria with ATP', 'It removes excess cholesterol from cells', 'It makes HMG-CoA inside the mitochondria'], {
+  mcq('q1-25', 'pyruvate-malate-supply', 'Why does cholesterol synthesis depend on the Pyruvate–Malate cycle?', 'It supplies the cytosol with acetyl-CoA and NADPH', ['It supplies the mitochondria with ATP and NADH', 'It removes excess cholesterol from the cells', 'It makes HMG-CoA inside the mitochondria'], {
     explanation: 'ATP-citrate lyase frees acetyl-CoA in the cytosol and malic enzyme makes NADPH — the carbon source and the reductant (HMG-CoA reductase uses 2 NADPH).',
     skill: 'pathway-reasoning',
     difficulty: 'intermediate',
@@ -145,10 +145,10 @@ const lesson2: Q[] = [
     'Squalene',
     'Cholesterol',
   ], { explanation: 'Slides 7 and 12: acetyl-CoA → acetoacetyl-CoA → HMG-CoA → mevalonate → IPP → squalene → cholesterol.' }),
-  mcq('q2-02', 'five-stages', 'In which stage is CO₂ lost?', 'Mevalonate → isopentenyl pyrophosphate', ['Acetyl-CoA → HMG-CoA', 'HMG-CoA → mevalonate', 'Squalene → cholesterol'], {
+  mcq('q2-02', 'five-stages', 'In which stage is CO₂ lost?', 'Mevalonate → isopentenyl pyrophosphate', ['Acetyl-CoA → HMG-CoA', 'HMG-CoA → mevalonate', 'Squalene → lanosterol → cholesterol'], {
     explanation: 'Slide 7: stage 3 converts mevalonate to IPP “with the concomitant loss of CO₂”.',
   }),
-  mcq('q2-03', 'five-stages', 'Which stage comes immediately after HMG-CoA → mevalonate?', 'Mevalonate → isopentenyl pyrophosphate', ['Isopentenyl pyrophosphate → squalene', 'Acetyl-CoA → HMG-CoA', 'Squalene → cholesterol'], {
+  mcq('q2-03', 'five-stages', 'Which stage comes immediately after HMG-CoA → mevalonate?', 'Mevalonate → isopentenyl pyrophosphate', ['Isopentenyl pyrophosphate → squalene', 'Acetyl-CoA → acetoacetyl-CoA → HMG-CoA', 'Squalene → cholesterol'], {
     explanation: 'Slide 7: stage 2 makes mevalonate; stage 3 turns it into isopentenyl pyrophosphate.',
   }),
   fill('q2-04', 'five-stages', 'Stage 3 converts mevalonate into the isoprene-based molecule isopentenyl ____.', ['pyrophosphate', 'diphosphate'], {
@@ -175,7 +175,7 @@ const lesson2: Q[] = [
     explanation: 'It starts with two acetyl-CoA condensing to acetoacetyl-CoA (slide 2). Malonyl-CoA belongs to fatty acid synthesis.',
     skill: 'misconception',
   }),
-  mcq('q2-09', 'hmg-coa-formation', 'Which reactants form HMG-CoA (slide 8)?', 'Acetoacetyl-CoA + acetyl-CoA + H₂O', ['Acetyl-CoA + malonyl-CoA', 'Acetoacetate + CoA', 'Two acetyl-CoA + CO₂'], {
+  mcq('q2-09', 'hmg-coa-formation', 'Which reactants form HMG-CoA (slide 8)?', 'Acetoacetyl-CoA + acetyl-CoA + H₂O', ['Acetyl-CoA + malonyl-CoA + CO₂', 'Acetoacetate + CoA-SH + ATP', 'Two acetyl-CoA + CO₂'], {
     explanation: 'Slide 8: acetoacetyl-CoA + acetyl-CoA + H₂O → 3-hydroxy-3-methylglutaryl-CoA.',
   }),
   mcq('q2-10', 'hmg-coa-formation', 'What does “HMG” in HMG-CoA stand for?', '3-Hydroxy-3-methylglutaryl', ['Hydroxymethylglycine', '3-Hydroxy-3-malonylglutamate', 'Hexamethylglucose'], {
@@ -193,7 +193,7 @@ const lesson2: Q[] = [
     explanation: 'Lehninger (p. 817): thiolase makes acetoacetyl-CoA; HMG-CoA synthase makes HMG-CoA; HMG-CoA reductase then makes mevalonate.',
     difficulty: 'intermediate',
   }),
-  mcq('q2-13', 'hmg-coa-crossroads', 'In the mitochondria, a cleavage enzyme splits HMG-CoA. What are the products?', 'Acetoacetate + acetyl-CoA', ['Mevalonate + CoA', 'Two acetyl-CoA + CO₂', 'Acetoacetyl-CoA + water'], {
+  mcq('q2-13', 'hmg-coa-crossroads', 'In the mitochondria, a cleavage enzyme splits HMG-CoA. What are the products?', 'Acetoacetate + acetyl-CoA', ['Mevalonate + CoA-SH', 'Two acetyl-CoA + CO₂', 'Acetoacetyl-CoA + water'], {
     explanation: 'Slide 8: “cleavage enzyme in mitochondria” → acetoacetate + acetyl-CoA.',
   }),
   mcq('q2-14', 'hmg-coa-crossroads', 'Where does slide 8 place the reductase that turns HMG-CoA into mevalonate?', 'In the cytosol', ['In the mitochondrial matrix', 'In the nucleus', 'In lysosomes'], {
@@ -210,10 +210,10 @@ const lesson2: Q[] = [
     explanation: 'In mitochondria a cleavage enzyme splits it into acetoacetate + acetyl-CoA. Mevalonate is made by the reductase outside the mitochondria.',
     skill: 'misconception',
   }),
-  mcq('q2-17', 'hmg-coa-crossroads', 'Slide 15 says HMGR is localised in which organelle?', 'Endoplasmic reticulum', ['Mitochondria', 'Golgi apparatus', 'Nucleus'], {
+  mcq('q2-17', 'hmg-coa-crossroads', 'Slide 15 says HMGR is localised in which organelle?', 'Endoplasmic reticulum', ['Mitochondria', 'Golgi apparatus (trans face)', 'Nucleus'], {
     explanation: 'Slide 15: “HMGR is localized in the ER”. Lehninger: an integral membrane protein of the smooth ER.',
   }),
-  mcq('q2-18', 'hmg-coa-crossroads', 'Lehninger links the mitochondrial HMG-CoA route (giving acetoacetate) to which process?', 'Ketone body formation', ['Fatty acid synthesis', 'Bile acid synthesis', 'Glycogen synthesis'], {
+  mcq('q2-18', 'hmg-coa-crossroads', 'Lehninger links the mitochondrial HMG-CoA route (giving acetoacetate) to which process?', 'Ketone body formation', ['Fatty acid synthesis', 'Bile acid synthesis', 'Glycogen synthesis in the liver'], {
     explanation: 'Lehninger (p. 817): the mitochondrial HMG-CoA synthase isozyme serves ketone body formation; the cytosolic one serves cholesterol synthesis.',
     difficulty: 'intermediate',
   }),
@@ -261,7 +261,7 @@ const lesson3: Q[] = [
   mcq('q3-01', 'mevalonate-to-ipp', 'How many ATP are used to turn one mevalonate into isopentenyl pyrophosphate?', 'Three', ['One', 'Two', 'Four'], {
     explanation: 'Slides 9 and 12: one ATP for each of the three steps — “(3) ATP”.',
   }),
-  mcq('q3-02', 'mevalonate-to-ipp', 'Which step of stage 3 releases CO₂?', '5-Pyrophosphomevalonate → isopentenyl pyrophosphate', ['Mevalonate → 5-phosphomevalonate', '5-Phosphomevalonate → 5-pyrophosphomevalonate', 'HMG-CoA → mevalonate'], {
+  mcq('q3-02', 'mevalonate-to-ipp', 'Which step of stage 3 releases CO₂?', '5-Pyrophosphomevalonate → isopentenyl pyrophosphate', ['Mevalonate → 5-phosphomevalonate', '5-Phosphomevalonate → 5-pyrophosphomevalonate', 'HMG-CoA → mevalonate (with 2 NADPH)'], {
     explanation: 'Slide 9: the last step uses ATP and releases ADP + Pi + CO₂.',
   }),
   fill('q3-03', 'mevalonate-to-ipp', 'The first product of stage 3, made from mevalonate with one ATP, is ____.', ['5-phosphomevalonate', 'phosphomevalonate'], {
@@ -277,10 +277,10 @@ const lesson3: Q[] = [
     answer: true,
     explanation: 'Slide 7: mevalonate is converted to the isoprene-based molecule isopentenyl pyrophosphate.',
   }),
-  mcq('q3-06', 'mevalonate-to-ipp', 'What is the immediate precursor of isopentenyl pyrophosphate?', '5-Pyrophosphomevalonate', ['5-Phosphomevalonate', 'Mevalonate', 'Geranyl pyrophosphate'], {
+  mcq('q3-06', 'mevalonate-to-ipp', 'What is the immediate precursor of isopentenyl pyrophosphate?', '5-Pyrophosphomevalonate', ['5-Phosphomevalonate (one phosphate)', 'Mevalonate', 'Geranyl pyrophosphate'], {
     explanation: 'Slide 9: 5-pyrophosphomevalonate → isopentenyl pyrophosphate.',
   }),
-  mcq('q3-07', 'prenyl-condensation', 'In the chain-building step (slide 10), what kind of carbon does isopentenyl pyrophosphate attack?', 'A positively charged carbon, left when PPi departs', ['A carbon carrying a CoA thioester', 'The carbonyl carbon of acetyl-CoA', 'A negatively charged carboxylate'], {
+  mcq('q3-07', 'prenyl-condensation', 'In the chain-building step (slide 10), what kind of carbon does isopentenyl pyrophosphate attack?', 'A positively charged carbon, left when PPi departs', ['A carbon carrying a CoA thioester bond', 'The carbonyl carbon of an acetyl-CoA', 'A negatively charged carboxylate carbon'], {
     explanation: 'Slide 10: the allylic substrate loses PPi, leaving a carbonium ion (C⁺) that IPP attacks.',
     skill: 'pathway-reasoning',
     difficulty: 'advanced',
@@ -288,10 +288,10 @@ const lesson3: Q[] = [
   fill('q3-08', 'prenyl-condensation', 'Each condensation releases ____ from the allylic substrate.', ['PPi', 'pyrophosphate', 'inorganic pyrophosphate'], {
     explanation: 'Slide 10: the allylic substrate loses PPi before IPP joins on.',
   }),
-  mcq('q3-09', 'prenyl-condensation', 'Which molecule is added in each chain-lengthening condensation?', 'Isopentenyl pyrophosphate', ['Acetyl-CoA', 'Malonyl-CoA', 'Mevalonate'], {
+  mcq('q3-09', 'prenyl-condensation', 'Which molecule is added in each chain-lengthening condensation?', 'Isopentenyl pyrophosphate', ['Acetyl-CoA', 'Malonyl-CoA', 'Dimethylallyl alcohol'], {
     explanation: 'Slide 10: IPP joins the allylic substrate each round.',
   }),
-  mcq('q3-10', 'prenyl-condensation', 'What forms when geranyl pyrophosphate condenses with one more IPP?', 'Farnesyl pyrophosphate', ['Squalene', 'Lanosterol', 'Dolichol'], {
+  mcq('q3-10', 'prenyl-condensation', 'What forms when geranyl pyrophosphate condenses with one more IPP?', 'Farnesyl pyrophosphate', ['Squalene', 'Lanosterol', 'Dolichol phosphate'], {
     explanation: 'Slides 10 and 12: geranyl pyrophosphate → farnesyl pyrophosphate.',
   }),
   tf({
@@ -321,17 +321,17 @@ const lesson3: Q[] = [
   mcq('q3-16', 'squalene-to-cholesterol', 'Which sequence is correct?', 'Squalene → lanosterol → cholesterol', ['Lanosterol → squalene → cholesterol', 'Cholesterol → lanosterol → squalene', 'Squalene → cholesterol → lanosterol'], {
     explanation: 'Slide 12 shows squalene → lanosterol → (several steps) → cholesterol.',
   }),
-  mcq('q3-17', 'squalene-to-cholesterol', 'Lehninger: what is the first step in turning squalene into the steroid ring system?', 'Squalene monooxygenase forms squalene 2,3-epoxide', ['HMG-CoA reductase reduces squalene', '7α-Hydroxylase adds an –OH at C-7', 'A kinase phosphorylates squalene'], {
+  mcq('q3-17', 'squalene-to-cholesterol', 'Lehninger: what is the first step in turning squalene into the steroid ring system?', 'Squalene monooxygenase forms squalene 2,3-epoxide', ['HMG-CoA reductase reduces squalene with NADPH', '7α-Hydroxylase adds an –OH group at carbon 7', 'A kinase phosphorylates squalene at both ends'], {
     explanation: 'Lehninger (pp. 819–820): squalene monooxygenase (O₂, NADPH) makes squalene 2,3-epoxide, which a cyclase closes into lanosterol.',
     difficulty: 'advanced',
   }),
-  mcq('q3-18', 'squalene-to-cholesterol', 'How does slide 12 show the conversion of lanosterol to cholesterol?', 'As a dotted arrow — several steps', ['As a single enzyme step', 'As a reversible equilibrium', 'It is not shown'], {
+  mcq('q3-18', 'squalene-to-cholesterol', 'How does slide 12 show the conversion of lanosterol to cholesterol?', 'As a dotted arrow — several steps', ['As a single enzyme step', 'As a reversible equilibrium', 'It is not shown on the slide'], {
     explanation: 'Slide 12: lanosterol ⋯→ cholesterol. Lehninger: about 20 reactions.',
   }),
-  mcq('q3-19', 'pathway-branches', 'Besides squalene, which molecules does slide 12 show branching off from farnesyl pyrophosphate?', 'Heme a, dolichol and ubiquinone (and prenylated proteins)', ['Bile salts and steroids', 'Acetoacetate and acetyl-CoA', 'Glycocholic and taurocholic acid'], {
+  mcq('q3-19', 'pathway-branches', 'Besides squalene, which molecules does slide 12 show branching off from farnesyl pyrophosphate?', 'Heme a, dolichol and ubiquinone (and prenylated proteins)', ['Bile salts and steroid hormones', 'Acetoacetate and acetyl-CoA', 'Glycocholic and taurocholic acid'], {
     explanation: 'Slide 12: farnesyl pyrophosphate → heme a, dolichol, ubiquinone, and prenylated proteins.',
   }),
-  mcq('q3-20', 'pathway-branches', 'Prenylated proteins are made from which intermediates (slide 12)?', 'Geranyl and farnesyl pyrophosphate', ['Squalene and lanosterol', 'Mevalonate and HMG-CoA', 'Cholesterol only'], {
+  mcq('q3-20', 'pathway-branches', 'Prenylated proteins are made from which intermediates (slide 12)?', 'Geranyl and farnesyl pyrophosphate', ['Squalene and lanosterol', 'Mevalonate and HMG-CoA', 'Cholesterol only, after it is made'], {
     explanation: 'Slide 12: arrows run from both geranyl and farnesyl pyrophosphate to prenylated proteins.',
     difficulty: 'intermediate',
   }),
@@ -341,7 +341,7 @@ const lesson3: Q[] = [
     ['Ubiquinone', 'Farnesyl pyrophosphate'],
     ['Dolichol', 'Farnesyl pyrophosphate'],
   ], { explanation: 'Slide 12 shows these branches.' }),
-  mcq('q3-22', 'pathway-branches', 'The adrenal glands and reproductive organs have high rates of cholesterol synthesis (slide 2). Which use of cholesterol on slide 12 fits these organs?', 'Making steroids in endocrine glands', ['Making bile salts', 'Making dolichol', 'Making heme a'], {
+  mcq('q3-22', 'pathway-branches', 'The adrenal glands and reproductive organs have high rates of cholesterol synthesis (slide 2). Which use of cholesterol on slide 12 fits these organs?', 'Making steroids in endocrine glands', ['Making bile salts for fat digestion', 'Making dolichol for glycoproteins', 'Making heme a for cytochrome oxidase'], {
     explanation: 'Slide 12: cholesterol → steroids in endocrine glands. Bile salts are made in the liver; dolichol and heme a come from farnesyl pyrophosphate.',
     skill: 'application',
     difficulty: 'intermediate',
@@ -383,7 +383,7 @@ const lesson4: Q[] = [
     explanation: 'Slide 13 lists HMGR, ACAT, LDL receptor / HDL transport, utilisation and cellular sterol content.',
     difficulty: 'intermediate',
   }),
-  mcq('q4-04', 'supply-mechanisms', 'Lehninger: what does ACAT do to cholesterol?', 'Esterifies it with a fatty acid for storage', ['Hydroxylates it at C-7', 'Phosphorylates it', 'Removes its side chain'], {
+  mcq('q4-04', 'supply-mechanisms', 'Lehninger: what does ACAT do to cholesterol?', 'Esterifies it with a fatty acid for storage', ['Hydroxylates it at carbon 7', 'Phosphorylates it at the 3-OH', 'Removes its side chain'], {
     explanation: 'Lehninger (pp. 820, 826): ACAT transfers a fatty acid from CoA to cholesterol, making cholesteryl esters for storage; high cholesterol activates it.',
     difficulty: 'intermediate',
   }),
@@ -394,7 +394,7 @@ const lesson4: Q[] = [
     explanation: 'Lehninger (p. 826) — one way plasma cholesterol uptake is matched to the cell’s needs.',
     difficulty: 'intermediate',
   }),
-  mcq('q4-06', 'hmgr-controls', 'According to slide 14, what is the PRIMARY cholesterol-regulating mechanism?', 'HMGR (HMG-CoA reductase)', ['ACAT', '7α-Hydroxylase', 'The LDL receptor'], {
+  mcq('q4-06', 'hmgr-controls', 'According to slide 14, what is the PRIMARY cholesterol-regulating mechanism?', 'HMGR (HMG-CoA reductase)', ['ACAT (acyl-CoA:cholesterol acyltransferase)', '7α-Hydroxylase (bile acid synthesis)', 'The LDL receptor on the cell surface'], {
     explanation: 'Slide 14: “HMGR is the primary chol. reg mechanism.”',
   }),
   mcq('q4-07', 'hmgr-controls', 'Which is NOT one of the four ways HMGR is controlled?', 'Allosteric activation by citrate', ['Feedback inhibition', 'Control of gene expression', 'Phosphorylation–dephosphorylation'], {
@@ -407,7 +407,7 @@ const lesson4: Q[] = [
     ['Degradation', 'Sets how fast HMGR is destroyed'],
     ['Phosphorylation', 'Switches HMGR off'],
   ], { explanation: 'Slide 14 lists the four controls; slides 14–16 describe each.' }),
-  mcq('q4-09', 'feedback-degradation', 'How does cholesterol cause HMGR to be degraded (slide 14)?', 'It induces polyubiquitination of HMGR, which is then degraded in the proteasome', ['It phosphorylates HMGR through AMPK', 'It converts HMGR into mevalonate', 'It exports HMGR to lysosomes'], {
+  mcq('q4-09', 'feedback-degradation', 'How does cholesterol cause HMGR to be degraded (slide 14)?', 'It induces polyubiquitination of HMGR, which is then degraded in the proteasome', ['It phosphorylates HMGR through AMPK, which then cuts it', 'It converts HMGR into mevalonate, using up the enzyme', 'It exports HMGR to the lysosomes, where it is digested'], {
     explanation: 'Slide 14: cholesterol-induced polyubiquitination of HMGR and its degradation in the proteasome.',
   }),
   fill('q4-10', 'feedback-degradation', 'Polyubiquitinated HMGR is degraded in the ____.', ['proteasome', 'proteosome'], {
@@ -433,7 +433,7 @@ const lesson4: Q[] = [
   mcq('q4-15', 'flux-ssd-statins', 'What happens to HMGR when sterol levels in the cell rise (slide 15)?', 'Its rate of degradation increases', ['Its rate of degradation decreases', 'It is dephosphorylated and activated', 'It moves from the ER into the nucleus'], {
     explanation: 'Slide 15: when sterol levels increase there is a corresponding increase in the rate of HMGR degradation.',
   }),
-  mcq('q4-16', 'flux-ssd-statins', 'Lehninger: how do statins inhibit HMG-CoA reductase?', 'They resemble mevalonate and inhibit the enzyme competitively', ['They phosphorylate it through AMPK', 'They trigger its polyubiquitination', 'They block NADPH production by malic enzyme'], {
+  mcq('q4-16', 'flux-ssd-statins', 'Lehninger: how do statins inhibit HMG-CoA reductase?', 'They resemble mevalonate and inhibit the enzyme competitively', ['They phosphorylate it through AMP-activated protein kinase', 'They trigger its polyubiquitination and proteasomal breakdown', 'They block the NADPH made by malic enzyme in the cytosol'], {
     explanation: 'Lehninger (p. 827): statins such as lovastatin resemble mevalonate and are competitive inhibitors of HMG-CoA reductase.',
     difficulty: 'intermediate',
   }),
@@ -467,7 +467,7 @@ const lesson4: Q[] = [
     explanation: 'HMGR is most active dephosphorylated; phosphorylation decreases its activity (slides 14, 16).',
     skill: 'misconception',
   }),
-  mcq('q4-23', 'hmgr-phosphorylation', 'Which enzyme removes the phosphate from HMGR, reactivating it?', 'HMG-CoA reductase phosphatase', ['Protein phosphatase 2C', 'AMPK kinase', 'Protein kinase A'], {
+  mcq('q4-23', 'hmgr-phosphorylation', 'Which enzyme removes the phosphate from HMGR, reactivating it?', 'HMG-CoA reductase phosphatase', ['Protein phosphatase 2C (PP2C)', 'AMPK kinase', 'Protein kinase A'], {
     explanation: 'Slide 17: HMG-CoA reductase phosphatase converts the phosphorylated (inactive) HMGR back to the active form.',
   }),
   mcq('q4-24', 'hmgr-phosphorylation', 'Protein phosphatase 2C dephosphorylates AMPK. What is the net effect on HMGR?', 'Less HMGR is phosphorylated, so more is active', ['More HMGR is phosphorylated, so less is active', 'HMGR is degraded faster', 'There is no effect on HMGR'], {
@@ -514,7 +514,7 @@ const lesson5: Q[] = [
     answer: true,
     explanation: 'Slide 12: cholesterol → bile salts, labelled “liver”.',
   }),
-  mcq('q5-03', 'bile-acid-synthesis', 'Which coenzyme is oxidised in the 7α-hydroxylase reaction?', 'NADPH (→ NADP⁺)', ['NADH (→ NAD⁺)', 'FADH₂ (→ FAD)', 'CoA-SH'], {
+  mcq('q5-03', 'bile-acid-synthesis', 'Which coenzyme is oxidised in the 7α-hydroxylase reaction?', 'NADPH (→ NADP⁺)', ['NADH (→ NAD⁺)', 'FADH₂ (→ FAD)', 'CoA-SH (→ acyl-CoA)'], {
     explanation: 'Slide 18: NADPH + H⁺ and O₂ are used; NADP⁺ is formed.',
   }),
   mcq('q5-04', 'bile-acid-synthesis', 'Which two bile acid–CoA products are formed from 7-hydroxycholesterol (slide 18)?', 'Cholyl-CoA and chenodeoxycholyl-CoA', ['Glycocholic acid and taurocholic acid', 'Acetyl-CoA and propionyl-CoA', 'Lanosterol and squalene'], {
@@ -524,7 +524,7 @@ const lesson5: Q[] = [
     explanation: 'Slide 18: cholyl-CoA has three –OH groups; chenodeoxycholyl-CoA has two.',
     difficulty: 'intermediate',
   }),
-  mcq('q5-06', 'bile-acid-synthesis', 'How does chenodeoxycholyl-CoA differ from cholyl-CoA on slide 18?', 'It has one fewer –OH group (two instead of three)', ['It has one more –OH group', 'It keeps the full cholesterol side chain', 'It carries glycine instead of CoA'], {
+  mcq('q5-06', 'bile-acid-synthesis', 'How does chenodeoxycholyl-CoA differ from cholyl-CoA on slide 18?', 'It has one fewer –OH group (two instead of three)', ['It has one more –OH group (four instead of three)', 'It keeps the full eight-carbon cholesterol side chain', 'It carries glycine instead of coenzyme A'], {
     explanation: 'Slide 18: chenodeoxycholyl-CoA carries two –OH groups; cholyl-CoA carries three.',
     skill: 'comparison',
     difficulty: 'intermediate',
@@ -535,7 +535,7 @@ const lesson5: Q[] = [
     answer: true,
     explanation: 'Slide 18: NADPH + H⁺, O₂ and 2 CoA-SH are used; propionyl-CoA is released.',
   }),
-  mcq('q5-08', 'bile-acid-synthesis', 'What happens to the cholesterol side chain on the way to cholyl-CoA?', 'It is shortened (propionyl-CoA is released) and ends as a CoA thioester', ['It is lengthened by two carbons', 'It is removed completely', 'It is phosphorylated'], {
+  mcq('q5-08', 'bile-acid-synthesis', 'What happens to the cholesterol side chain on the way to cholyl-CoA?', 'It is shortened (propionyl-CoA is released) and ends as a CoA thioester', ['It is lengthened by two carbons from malonyl-CoA', 'It is removed completely, leaving the bare ring system', 'It is phosphorylated and ends as a pyrophosphate'], {
     explanation: 'Slide 18: propionyl-CoA leaves and the shortened side chain ends –CO–S-CoA.',
     difficulty: 'intermediate',
   }),
@@ -576,7 +576,7 @@ const lesson5: Q[] = [
     explanation: 'Slide 19: both structures show –C(=O)–NH– joining the side chain to glycine or taurine.',
     difficulty: 'intermediate',
   }),
-  mcq('q5-17', 'bile-acid-conjugation', 'Which feature shows that a conjugated bile acid carries glycine rather than taurine?', 'Its side chain ends in –COOH, not –SO₃H', ['It has four –OH groups', 'It contains a phosphate', 'It lacks the steroid nucleus'], {
+  mcq('q5-17', 'bile-acid-conjugation', 'Which feature shows that a conjugated bile acid carries glycine rather than taurine?', 'Its side chain ends in –COOH, not –SO₃H', ['It has four –OH groups on its steroid rings', 'It contains a phosphate group at its side chain', 'It lacks the steroid nucleus that taurine conjugates keep'], {
     explanation: 'Slide 19: glycocholic acid ends –CH₂–COOH; taurocholic acid ends –(CH₂)₂–SO₃H.',
     skill: 'comparison',
   }),
@@ -586,10 +586,10 @@ const lesson5: Q[] = [
     answer: true,
     explanation: 'Slide 20, function 1.',
   }),
-  mcq('q5-19', 'bile-acid-functions', 'How do bile acids help digest dietary triacylglycerols?', 'They emulsify fats, making them accessible to pancreatic lipases', ['They hydrolyse triacylglycerols themselves', 'They phosphorylate fatty acids', 'They carry fats in the blood as lipoproteins'], {
+  mcq('q5-19', 'bile-acid-functions', 'How do bile acids help digest dietary triacylglycerols?', 'They emulsify fats, making them accessible to pancreatic lipases', ['They hydrolyse the triacylglycerols themselves into fatty acids', 'They phosphorylate the fatty acids so they can be absorbed', 'They carry fats in the blood as lipoproteins after absorption'], {
     explanation: 'Slide 20: bile acids act as emulsifying agents that render fats accessible to pancreatic lipases.',
   }),
-  mcq('q5-20', 'bile-acid-functions', 'What prevents cholesterol from precipitating in the gall bladder?', 'Bile acids and phospholipids keeping it dissolved in bile', ['ACAT esterifying it in the gall bladder', 'HMGR breaking it down', 'Pancreatic lipase digesting it'], {
+  mcq('q5-20', 'bile-acid-functions', 'What prevents cholesterol from precipitating in the gall bladder?', 'Bile acids and phospholipids keeping it dissolved in bile', ['ACAT esterifying it inside the gall bladder wall', 'HMG-CoA reductase breaking it down in the bile', 'Pancreatic lipase digesting it before it settles'], {
     explanation: 'Slide 20: bile acids and phospholipids solubilise cholesterol in the bile.',
   }),
   fill('q5-21', 'bile-acid-functions', 'Bile acids help the intestine absorb ____-soluble vitamins.', ['fat', 'lipid'], {
@@ -598,13 +598,13 @@ const lesson5: Q[] = [
   multi('q5-22', 'bile-acid-functions', 'Which molecules keep cholesterol dissolved in bile? Select all that apply.', ['Bile acids', 'Phospholipids'], ['Pancreatic lipase', 'Propionyl-CoA'], {
     explanation: 'Slide 20: bile acids and phospholipids solubilise cholesterol in the bile.',
   }),
-  mcq('q5-23', 'bile-acid-functions', 'If too little bile acid reached the gut, which absorption would suffer, according to the lecture’s list of functions?', 'Fat-soluble vitamins (and dietary fat)', ['Water-soluble vitamins', 'Glucose', 'Amino acids'], {
+  mcq('q5-23', 'bile-acid-functions', 'If too little bile acid reached the gut, which absorption would suffer, according to the lecture’s list of functions?', 'Fat-soluble vitamins (and dietary fat)', ['Water-soluble vitamins (B and C)', 'Glucose and galactose', 'Amino acids and peptides'], {
     explanation: 'Slide 20: bile acids emulsify dietary fat and help absorb fat-soluble vitamins.',
     skill: 'application',
     clinical: true,
     difficulty: 'intermediate',
   }),
-  mcq('q5-24', 'bile-acid-functions', 'Bile with too little bile acid for its cholesterol is a risk. Which problem does the lecture’s function 2 point to?', 'Cholesterol precipitating in the gall bladder', ['Cholesterol being oxidised to CO₂', 'Too much fat-soluble vitamin absorption', 'Faster HMGR degradation'], {
+  mcq('q5-24', 'bile-acid-functions', 'Bile with too little bile acid for its cholesterol is a risk. Which problem does the lecture’s function 2 point to?', 'Cholesterol precipitating in the gall bladder', ['Cholesterol being oxidised to CO₂ in the liver', 'Too much fat-soluble vitamin being absorbed', 'Faster degradation of HMGR in the hepatocytes'], {
     explanation: 'Slide 20: bile acids and phospholipids keep cholesterol in solution, preventing precipitation in the gall bladder.',
     skill: 'application',
     clinical: true,
