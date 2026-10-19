@@ -41,7 +41,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: c1([20]),
     }),
     ask(
-      mcq('c1-05', 'fast-heart-rate', 'Why is a very fast heart rate dangerous to the myocardium?', 'Diastole, when coronary flow occurs, is shortened much more than systole', ['Systole becomes longer than diastole', 'The heart becomes tetanised', 'The SA node stops firing'], {
+      mcq('c1-05', 'fast-heart-rate', 'Why is a very fast heart rate dangerous to the myocardium?', 'Diastole, when coronary flow occurs, is shortened much more than systole', ['Systole lengthens until it takes up most of each cardiac cycle, starving the muscle', 'The heart muscle becomes tetanised, like skeletal muscle', 'The SA node stops firing and the AV node takes over'], {
         explanation: 'Slide 20. Cardiac muscle cannot be tetanised because of its long refractory period.',
         skill: 'cause-effect',
       })
@@ -73,7 +73,7 @@ export const interactive: Record<string, Steps> = {
       ], { explanation: 'Slide 27.' })
     ),
     ask(
-      mcq('c2-03', 'jvp-clinical', 'In complete heart block a “giant a wave” appears in the JVP. Why?', 'The atrium contracts against a closed tricuspid valve', ['The tricuspid valve leaks', 'Venous return falls', 'The right ventricle fails'], {
+      mcq('c2-03', 'jvp-clinical', 'In complete heart block a “giant a wave” appears in the JVP. Why?', 'The atrium contracts against a closed tricuspid valve', ['The tricuspid valve leaks during ventricular systole', 'Venous return falls because the ventricles beat slowly', 'The right ventricle fails and backs blood into the neck'], {
         explanation: 'Slide 28. A big c wave suggests tricuspid incompetence instead.',
         skill: 'cause-effect',
       })
@@ -117,7 +117,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: c1([50, 51, 52]),
     }),
     ask(
-      mcq('c3-03', 'contractility', 'How do caffeine and theophylline increase myocardial contractility?', 'They prevent the breakdown of cAMP', ['They block β1 receptors', 'They stimulate the vagus', 'They lower afterload'], {
+      mcq('c3-03', 'contractility', 'How do caffeine and theophylline increase myocardial contractility?', 'They prevent the breakdown of cAMP', ['They block β1 receptors on the myocytes', 'They stimulate the vagus nerve to the heart', 'They lower afterload by dilating arterioles'], {
         explanation: 'Slide 52.',
         skill: 'cause-effect',
       })
@@ -137,7 +137,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 4 — Vessels, flow and pressure ─────────────────────────
   'cardiovascular-physiology-4': [
     ask(
-      mcq('c4-01', 'flow-pressure-resistance', 'An arteriole doubles its radius. Roughly what happens to its resistance?', 'It falls to about 1/16', ['It halves', 'It doubles', 'It falls to about 1/4'], {
+      mcq('c4-01', 'flow-pressure-resistance', 'An arteriole doubles its radius. Roughly what happens to its resistance?', 'It falls to about 1/16', ['It halves, as resistance follows the radius', 'It doubles', 'It falls to about 1/4'], {
         explanation: 'Resistance = 8ηL/πr⁴, so resistance varies with 1/r⁴ (slides 74–76).',
         skill: 'prediction',
       })
@@ -169,7 +169,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c4-05', 'arterial-pressure', 'A cuff that is too small for the arm gives…', 'A falsely high reading', ['A falsely low reading', 'An accurate reading', 'No Korotkov sounds'], {
+      mcq('c4-05', 'arterial-pressure', 'A cuff that is too small for the arm gives…', 'A falsely high reading', ['A falsely low reading in every patient', 'An accurate reading', 'No Korotkov sounds'], {
         explanation: 'Slide 87: big cuff → falsely low; small cuff → falsely high.',
       })
     ),
@@ -183,7 +183,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 5 — Capillaries, oedema, lymph, veins ──────────────────
   'cardiovascular-physiology-5': [
     ask(
-      mcq('c5-01', 'starling-forces', 'Plasma proteins fall in liver disease. Which way does fluid tend to move?', 'Out of capillaries into the tissues, causing oedema', ['Into the capillaries from the tissues', 'No change', 'Into the lymphatics only'], {
+      mcq('c5-01', 'starling-forces', 'Plasma proteins fall in liver disease. Which way does fluid tend to move?', 'Out of capillaries into the tissues, causing oedema', ['Into the capillaries from the tissues, raising blood volume', 'No change, because hydrostatic pressure falls as well', 'Into the lymphatics only, never into the tissues'], {
         explanation: 'Slide 102: a low plasma oncotic pressure reduces the force drawing fluid back in.',
         skill: 'prediction',
       })
@@ -208,7 +208,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: c1([107, 109]),
     }),
     ask(
-      mcq('c5-04', 'venous-circulation', 'Why is opening a dural sinus with the head raised dangerous?', 'Its rigid walls keep it open at subatmospheric pressure, so air can be sucked in', ['It has the highest venous pressure in the body', 'It collapses and blocks venous drainage', 'It contains arterial blood'], {
+      mcq('c5-04', 'venous-circulation', 'Why is opening a dural sinus with the head raised dangerous?', 'Its rigid walls keep it open at subatmospheric pressure, so air can be sucked in', ['It has the highest venous pressure in the body, so it bleeds heavily and cannot be clamped', 'It collapses when opened and blocks venous drainage of the brain', 'It contains arterial blood under high pressure from the carotids'], {
         explanation: 'Slide 110: air embolism.',
         skill: 'cause-effect',
       })
@@ -224,7 +224,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 6 — Regulation ─────────────────────────────────────────
   'cardiovascular-physiology-6': [
     ask(
-      mcq('c6-01', 'autoregulation-metabolic', 'A muscle starts working hard. What happens to its arterioles, and why?', 'They dilate as metabolites (low O₂, high CO₂, H⁺, K⁺) accumulate', ['They constrict to save blood', 'Nothing — flow is set only by the heart', 'They dilate because the vagus is stimulated'], {
+      mcq('c6-01', 'autoregulation-metabolic', 'A muscle starts working hard. What happens to its arterioles, and why?', 'They dilate as metabolites (low O₂, high CO₂, H⁺, K⁺) accumulate', ['They constrict as sympathetic discharge to working muscle rises sharply', 'Nothing changes: muscle flow is set only by the heart', 'They dilate because the vagus nerve to them is stimulated'], {
         explanation: 'Slides 6–7: metabolic autoregulation.',
         skill: 'prediction',
       })
@@ -246,7 +246,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c6-04', 'vasomotor-centre', 'Atropine increases heart rate. What does this tell you about resting heart rate?', 'It is controlled mainly by tonic vagal discharge', ['It is controlled mainly by sympathetic tone', 'The SA node is inactive at rest', 'The heart has no parasympathetic supply'], {
+      mcq('c6-04', 'vasomotor-centre', 'Atropine increases heart rate. What does this tell you about resting heart rate?', 'It is controlled mainly by tonic vagal discharge', ['It is controlled mainly by tonic sympathetic discharge', 'The SA node is inactive at rest', 'The heart has no parasympathetic supply'], {
         explanation: 'Slide 21: vagotomy and atropine both raise HR.',
         skill: 'cause-effect',
       })
@@ -268,7 +268,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 7 — Gravity, shock and heart failure ───────────────────
   'cardiovascular-physiology-7': [
     ask(
-      mcq('c7-01', 'gravity-effects', 'You stand up quickly. What is the first stimulus for compensation?', 'A fall in pressure at the carotid sinus and aortic arch', ['A rise in cerebral blood flow', 'A rise in venous return', 'Stretch of the atrial receptors'], {
+      mcq('c7-01', 'gravity-effects', 'You stand up quickly. What is the first stimulus for compensation?', 'A fall in pressure at the carotid sinus and aortic arch', ['A rise in cerebral blood flow as the head moves up', 'A rise in venous return from the legs, stretching the right atrium', 'Stretch of the atrial receptors by the extra blood'], {
         explanation: 'Slide 4.',
         skill: 'prediction',
       })
@@ -285,7 +285,7 @@ export const interactive: Record<string, Steps> = {
       ], { explanation: 'Slides 13–17.' })
     ),
     ask(
-      mcq('c7-03', 'shock-features', 'Why is the skin pale and cool in haemorrhagic shock?', 'Sympathetic vasoconstriction is marked in the skin', ['The skin is warmed by lactic acid', 'Skin vessels dilate', 'The heart stops pumping to the skin'], {
+      mcq('c7-03', 'shock-features', 'Why is the skin pale and cool in haemorrhagic shock?', 'Sympathetic vasoconstriction is marked in the skin', ['Lactic acid warms the skin while the core cools', 'Skin vessels dilate to let heat escape from the body core', 'The heart stops pumping any blood to the skin'], {
         explanation: 'Slide 20: generalised vasoconstriction, sparing heart and brain, marked in the skin.',
         skill: 'cause-effect',
       })
@@ -347,7 +347,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 9 — The ECG ───────────────────────────────────────────
   'cardiovascular-physiology-9': [
     ask(
-      mcq('c9-01', 'ecg-waves', 'Which part of the ECG shows ventricular depolarisation?', 'The QRS complex', ['The P wave', 'The T wave', 'The ST segment'], {
+      mcq('c9-01', 'ecg-waves', 'Which part of the ECG shows ventricular depolarisation?', 'The QRS complex', ['The P wave', 'The T wave', 'The ST segment and T wave'], {
         explanation: 'Slide 10.',
         skill: 'prediction',
       })
@@ -373,7 +373,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: c5([21, 23, 24, 26]),
     }),
     ask(
-      mcq('c9-04', 'heart-block', 'The PR interval gets longer with each beat until a P wave is not followed by a QRS. This is…', 'Mobitz type I (Wenckebach) second-degree block', ['First-degree block', 'Mobitz type II block', 'Complete heart block'], {
+      mcq('c9-04', 'heart-block', 'The PR interval gets longer with each beat until a P wave is not followed by a QRS. This is…', 'Mobitz type I (Wenckebach) second-degree block', ['First-degree block with a fixed long PR interval', 'Mobitz type II second-degree block', 'Complete (third-degree) heart block'], {
         explanation: 'Slide 23.',
         skill: 'application',
       })

@@ -161,7 +161,7 @@ export const simulations: Record<string, Step> = {
     sourceRefs: c1([66, 70, 71, 72, 73, 74, 76, 77]),
     predictions: [
       {
-        question: mcq('s4-01', 'flow-pressure-resistance', 'A vessel’s radius halves; the pressure drop stays the same. Flow becomes about…', 'One-sixteenth of normal', ['Half of normal', 'One-quarter of normal', 'Twice normal'], {
+        question: mcq('s4-01', 'flow-pressure-resistance', 'A vessel’s radius halves; the pressure drop stays the same. Flow becomes about…', 'One-sixteenth of normal', ['Half of normal', 'One-quarter of normal (radius squared)', 'Twice normal'], {
           ...predict,
           explanation: 'Flow varies with r⁴ (Poiseuille), so halving the radius cuts flow to (½)⁴ = 1/16 — about 6% of normal (slides 74–76).',
         }),
@@ -344,7 +344,7 @@ export const simulations: Record<string, Step> = {
           'heart-block',
           'Complete heart block: the SA node still fires at 75 /min. The ventricles beat…',
           'Slower, unrelated to the P waves',
-          ['At 75 /min, after every P wave', 'Faster than the atria'],
+          ['At 75 /min, after every P wave, with a long PR', 'Faster than the atria'],
           {
             ...predict,
             explanation: 'Conduction is interrupted, so atria and ventricles beat independently. The ventricles beat slowly from their own pacemaker (idioventricular rhythm) — P–P and R–R are each regular but unrelated (slides 24–26).',

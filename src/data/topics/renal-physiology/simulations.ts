@@ -32,7 +32,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s1-03', 'nephron-types', 'You switch to a juxtamedullary nephron. Which vessels does its efferent arteriole form?', 'Peritubular capillaries and vasa recta', ['Peritubular capillaries only', 'A second glomerulus'], {
+        question: mcq('s1-03', 'nephron-types', 'You switch to a juxtamedullary nephron. Which vessels does its efferent arteriole form?', 'Peritubular capillaries and vasa recta', ['Peritubular capillaries only', 'A second glomerulus in the medulla'], {
           ...predict,
           explanation: 'Juxtamedullary nephrons (about 15%) have long loops deep into the medulla, and their efferent arterioles form the vasa recta as well as peritubular capillaries (slides 10, 13).',
         }),

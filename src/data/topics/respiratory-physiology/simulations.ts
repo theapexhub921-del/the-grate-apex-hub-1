@@ -26,7 +26,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s1-02', 'intrapleural-pressure', 'A stab wound lets air into the pleural space (pneumothorax). What happens to the lung?', 'It collapses: intrapleural pressure becomes atmospheric', ['It over-expands', 'Nothing — the airways still bring in air'], {
+        question: mcq('s1-02', 'intrapleural-pressure', 'A stab wound lets air into the pleural space (pneumothorax). What happens to the lung?', 'It collapses: intrapleural pressure becomes atmospheric', ['It over-expands as air rushes into the chest', 'Nothing — the airways still bring air into it'], {
           ...predict,
           explanation: 'The negative intrapleural pressure is what holds the lung against the chest wall; without it the lung recoils and collapses (slides 11, 125).',
         }),
@@ -68,7 +68,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'vc', change: 'down' }],
       },
       {
-        question: mcq('s2-03', 'lung-capacities', 'The person breathes with a tidal volume of 1000 ml instead of 500 ml. What happens to the vital capacity?', 'It stays the same — the extra tidal air comes out of the inspiratory reserve', ['It rises by 500 ml', 'It falls by 500 ml'], {
+        question: mcq('s2-03', 'lung-capacities', 'The person breathes with a tidal volume of 1000 ml instead of 500 ml. What happens to the vital capacity?', 'It stays the same — the extra tidal air comes out of the inspiratory reserve', ['It rises by 500 ml, because each breath is bigger', 'It falls by 500 ml, as the reserves are used up'], {
           ...predict,
           explanation: 'VC = IRV + TV + ERV. A bigger ordinary breath uses part of the inspiratory reserve; the maximum that can be breathed out is unchanged (slide 20).',
         }),
@@ -152,7 +152,7 @@ export const simulations: Record<string, Step> = {
     sourceRefs: rs([45, 47, 50, 51, 52, 53, 54, 55]),
     predictions: [
       {
-        question: mcq('s5-01', 'dissociation-curve', 'Arterial PO₂ falls from 100 to 60 mmHg. What happens to haemoglobin saturation?', 'It falls only a little (about 97% → 90%)', ['It halves', 'It falls to zero'], {
+        question: mcq('s5-01', 'dissociation-curve', 'Arterial PO₂ falls from 100 to 60 mmHg. What happens to haemoglobin saturation?', 'It falls only a little (about 97% → 90%)', ['It halves, in step with the PO₂', 'It falls to zero below 70 mmHg'], {
           ...predict,
           explanation: 'Above about 60 mmHg the curve is flat: O₂ content changes little even with large changes in PO₂ (slide 51).',
         }),
@@ -161,7 +161,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'sat', change: 'down' }],
       },
       {
-        question: mcq('s5-02', 'dissociation-curve', 'In the tissues the PO₂ falls further, from 40 to 20 mmHg. Now what happens to saturation?', 'It falls steeply — O₂ is unloaded readily', ['It barely changes', 'It rises'], {
+        question: mcq('s5-02', 'dissociation-curve', 'In the tissues the PO₂ falls further, from 40 to 20 mmHg. Now what happens to saturation?', 'It falls steeply — O₂ is unloaded readily', ['It barely changes on the flat part', 'It rises as the tissues need more'], {
           ...predict,
           explanation: 'Below about 60 mmHg the curve is steep: small falls in PO₂ release a lot of O₂ (slide 52).',
         }),
@@ -204,7 +204,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'p50', change: 'down' }],
       },
       {
-        question: mcq('s6-03', 'carbon-monoxide', 'The blood now contains 40% carboxyhaemoglobin. What happens to the O₂ released to the tissues?', 'It falls: less Hb carries O₂ and the rest holds on tighter', ['It rises, because the curve shifts right', 'It is unchanged, because PO₂ is normal'], {
+        question: mcq('s6-03', 'carbon-monoxide', 'The blood now contains 40% carboxyhaemoglobin. What happens to the O₂ released to the tissues?', 'It falls: less Hb carries O₂ and the rest holds on tighter', ['It rises, because the curve shifts right', 'It is unchanged, because the PO₂ stays normal'], {
           ...predict,
           explanation: 'CO binds haemoglobin about 210 times more avidly than O₂ and shifts the curve of the remaining haemoglobin to the left, so less O₂ is carried and less released (slide 66).',
         }),
@@ -244,7 +244,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'alvO2', change: 'up' }],
       },
       {
-        question: mcq('s7-03', 'diffusing-capacity', 'The respiratory membrane thickens with fibrosis. Which gas is affected first?', 'O₂ uptake falls, while CO₂ removal barely changes', ['CO₂ removal fails first', 'Both fail equally'], {
+        question: mcq('s7-03', 'diffusing-capacity', 'The respiratory membrane thickens with fibrosis. Which gas is affected first?', 'O₂ uptake falls, while CO₂ removal barely changes', ['CO₂ removal fails first, while O₂ uptake barely changes', 'Both gases fail equally'], {
           ...predict,
           explanation: 'Diffusion falls as the membrane thickens; when it is damaged, O₂ fails to get in before CO₂ fails to get out (slides 79, 81).',
         }),
@@ -314,7 +314,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'content', change: 'up' }],
       },
       {
-        question: mcq('s9-03', 'cyanosis', 'Back at sea level, a patient has severe anaemia (Hb 7 g/dl). Will they be cyanosed?', 'No — too little haemoglobin to make 5 g/dl reduced', ['Yes — they are hypoxic', 'Only on the tongue'], {
+        question: mcq('s9-03', 'cyanosis', 'Back at sea level, a patient has severe anaemia (Hb 7 g/dl). Will they be cyanosed?', 'No — too little haemoglobin to make 5 g/dl reduced', ['Yes — they are hypoxic, so they must be blue', 'Only on the tongue and lips'], {
           ...predict,
           explanation: 'Cyanosis needs about 5 g/dl of reduced haemoglobin; in anaemic hypoxia there is too little haemoglobin to reach that (slides 117–118).',
         }),
