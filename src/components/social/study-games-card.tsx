@@ -18,12 +18,12 @@ export function StudyGamesCard() {
   useGameWarmUp();
   return (
     <>
-      {STUDY_GAMES.map((game) => (
+      {STUDY_GAMES.filter((game) => game.connectText).map((game) => (
         <PressableCard key={game.id} onPress={() => router.push(game.href as Href)} accessibilityLabel={game.title} style={styles.entry}>
           <View style={styles.entryIcon}><Icon name="sparkle" size={22} color={colors.primaryText} /></View>
           <View style={styles.flex}>
             <Text style={styles.entryTitle}>{game.title}</Text>
-            <Text style={styles.entryText}>Race your classmates to unscramble medical terms in a live room, or play solo.</Text>
+            <Text style={styles.entryText}>{game.connectText}</Text>
           </View>
           <Pill label="New" tone="gold" />
         </PressableCard>

@@ -49,6 +49,9 @@ var advanced_for := -1
 var host_accum := 0.0
 var recent_ids: Array = []
 var pending_next: Callable = Callable()
+## Phones: a box that opens the phone's keyboard; what is typed goes onto the tiles.
+var type_box: LineEdit
+var _typing_sync := false
 
 var q_label: Label
 var cat_tag: Label
@@ -169,6 +172,16 @@ func _build_ui() -> void:
 	content.add_child(tiles_box)
 	slots_box = UI.flow(8, true)
 	content.add_child(slots_box)
+	# Touch screens have no keys to press, so this box opens the phone's keyboard.
+	# (A computer types straight onto the tiles, so it is only shown on touch screens.)
+	if DisplayServer.is_touchscreen_available():
+		type_box = UI.line_edit("", "Tap here to type the answer")
+		type_box.alignment = HORIZONTAL_ALIGNMENT_CENTER
+		type_box.add_theme_font_override("font", Style.font("mono"))
+		type_box.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_DEFAULT
+		type_box.text_changed.connect(_on_typed)
+		type_box.text_submitted.connect(_on_type_submit)
+		content.add_child(type_box)
 
 	var clue_card := UI.card(content, 6)
 	clue_card.add_child(UI.eyebrow("Clue"))
@@ -215,7 +228,7 @@ func _build_ui() -> void:
 		tc.add_child(ticker_box)
 		_update_ticker(Net.room.get("players", {}))
 
-	content.add_child(UI.label("Type letters or tap the tiles. Backspace deletes, Enter checks, Esc clears.", 13, "muted"))
+	content.add_child(UI.label("Tap the tiles or type the letters on your keyboard. Delete removes the last letter, Enter checks.", 13, "muted"))
 
 
 # ---------------------------------------------------------------- question flow
@@ -362,6 +375,59 @@ func _refresh_slots() -> void:
 		else:
 			s.text = ""
 			_style_slot(s, "empty")
+	_show_typed()
+
+
+## The letters placed so far, as a word.
+func _picked_word() -> String:
+	var word := ""
+	for i in picked:
+		word += String(letters[i])
+	return word
+
+
+## The type box always shows the letters on the tiles (tapping a tile updates it too).
+func _show_typed() -> void:
+	if type_box == null or _typing_sync:
+		return
+	var word := _picked_word()
+	if type_box.text != word:
+		type_box.text = word
+		type_box.caret_column = word.length()
+
+
+## Phone keyboard: the box's new text decides the answer. Letters that already match
+## stay; the rest are taken back and the new ones are placed on unused tiles.
+func _on_typed(text: String) -> void:
+	if answered or not running:
+		_show_typed()
+		return
+	var wanted := ""
+	for ch in text.to_upper():
+		if ch >= "A" and ch <= "Z":
+			wanted += ch
+	_typing_sync = true
+	var current_word := _picked_word()
+	var same := 0
+	while same < mini(current_word.length(), wanted.length()) and current_word[same] == wanted[same]:
+		same += 1
+	while picked.size() > same:
+		_delete_last()
+	for k in range(same, wanted.length()):
+		if answered or picked.size() >= term.length():
+			break
+		_type_letter(wanted[k])
+	_typing_sync = false
+	_show_typed()
+
+
+## Enter on the phone keyboard: check the answer, or go on once it is answered.
+func _on_type_submit(_text: String) -> void:
+	if answered:
+		if pending_next.is_valid():
+			pending_next.call()
+	else:
+		_check()
 
 
 func _pop_in(node: Control, delay: float) -> void:

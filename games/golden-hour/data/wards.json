@@ -1,0 +1,1231 @@
+{
+ "_help": "3D ward scenarios for shifts 2-6 (shift 1 has its own vitals scenario in prove_screen.gd). Penalties: safety/dignity points lost; positions are metres in the ward.",
+ "wards": {
+  "2": {
+   "intro": "Mr Amoah needs his bed freshened and some help with washing. Tap the gold dots and do it with care.",
+   "props": [
+    {
+     "shape": "box",
+     "color": "9aa5ad",
+     "pos": [
+      1.5,
+      0.5,
+      1.45
+     ],
+     "size": [
+      0.7,
+      0.9,
+      0.5
+     ]
+    },
+    {
+     "shape": "box",
+     "color": "ffffff",
+     "pos": [
+      1.5,
+      1,
+      1.45
+     ],
+     "size": [
+      0.6,
+      0.06,
+      0.4
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "id": "wash",
+     "label": "Wash hands",
+     "at": [
+      3.2,
+      1.3,
+      -2.1
+     ],
+     "view": "sink",
+     "type": "bar",
+     "text": "Scrubbing: palms, backs of hands, between fingers, thumbs, fingertips.",
+     "ms": 3000
+    },
+    {
+     "id": "curtain",
+     "label": "Curtain",
+     "at": [
+      2,
+      2.2,
+      0.6
+     ],
+     "view": "cur",
+     "type": "bar",
+     "text": "Closing the curtain.",
+     "ms": 900
+    },
+    {
+     "id": "greet",
+     "label": "Greet",
+     "at": "forehead",
+     "view": "head",
+     "type": "choice",
+     "question": "Mr Amoah is awake. What do you say?",
+     "options": [
+      {
+       "text": "Good afternoon Mr Amoah. I will freshen your bed and help you wash. Is that all right?",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "He agrees and relaxes."
+      },
+      {
+       "text": "Roll over, we are cleaning.",
+       "safety": 0,
+       "dignity": 20,
+       "feedback": "Rushing him costs dignity."
+      }
+     ]
+    },
+    {
+     "id": "bed",
+     "label": "Bed",
+     "at": [
+      0.95,
+      1.2,
+      0
+     ],
+     "view": "over",
+     "type": "choice",
+     "question": "How do you change an occupied bed?",
+     "options": [
+      {
+       "text": "Roll him to one side, work one half, then roll him to the other side.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "The bed is made with him covered and supported."
+      },
+      {
+       "text": "Ask him to stand up.",
+       "safety": 20,
+       "dignity": 0,
+       "feedback": "Not safe after surgery."
+      },
+      {
+       "text": "Pull the sheet from under him.",
+       "safety": 15,
+       "dignity": 10,
+       "feedback": "That risks his skin and comfort."
+      }
+     ],
+     "needs": [
+      "wash",
+      "curtain",
+      "greet"
+     ],
+     "warn": "Hands, curtain and permission first!",
+     "warn_safety": 10,
+     "warn_dignity": 15
+    },
+    {
+     "id": "bath",
+     "label": "Bed bath",
+     "at": "upper_arm",
+     "view": "arm",
+     "type": "choice",
+     "question": "Start the bed bath.",
+     "options": [
+      {
+       "text": "Uncover one area at a time, face first, and keep him warm.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Good: warm, covered and in order."
+      },
+      {
+       "text": "Uncover him fully to go faster.",
+       "safety": 0,
+       "dignity": 25,
+       "feedback": "That exposes him."
+      },
+      {
+       "text": "Use cold water, it is quicker.",
+       "safety": 0,
+       "dignity": 15,
+       "feedback": "Water should be comfortably warm."
+      }
+     ],
+     "needs": [
+      "wash",
+      "curtain",
+      "greet"
+     ],
+     "warn": "Hands, curtain and permission first!",
+     "warn_safety": 10,
+     "warn_dignity": 15
+    },
+    {
+     "id": "teeth",
+     "label": "Mouth care",
+     "at": "mouth",
+     "view": "head",
+     "type": "choice",
+     "question": "He cannot hold a toothbrush. What do you do?",
+     "options": [
+      {
+       "text": "Sit him up if safe and gently clean teeth and gums with a soft brush.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Oral care done safely."
+      },
+      {
+       "text": "Skip it.",
+       "safety": 10,
+       "dignity": 15,
+       "feedback": "Oral care matters."
+      },
+      {
+       "text": "Lay him flat and use lots of paste.",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "That is a choking risk."
+      }
+     ],
+     "needs": [
+      "wash",
+      "curtain",
+      "greet"
+     ],
+     "warn": "Hands, curtain and permission first!",
+     "warn_safety": 10,
+     "warn_dignity": 15
+    }
+   ],
+   "final": [
+    {
+     "question": "He says he feels cold during the bath. What do you do?",
+     "options": [
+      {
+       "text": "Cover him, warm the room and carry on gently.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Comfort comes first."
+      },
+      {
+       "text": "Finish quickly, he will warm up later.",
+       "safety": 0,
+       "dignity": 20,
+       "feedback": "Rushing costs comfort."
+      },
+      {
+       "text": "Ignore it.",
+       "safety": 0,
+       "dignity": 25,
+       "feedback": "Always respond to comfort."
+      }
+     ]
+    }
+   ]
+  },
+  "3": {
+   "intro": "Mr Amoah needs a cannula and an injection. Take it step by step.",
+   "props": [
+    {
+     "shape": "box",
+     "color": "9aa5ad",
+     "pos": [
+      1.5,
+      0.5,
+      1.45
+     ],
+     "size": [
+      0.7,
+      0.9,
+      0.5
+     ]
+    },
+    {
+     "shape": "box",
+     "color": "ffffff",
+     "pos": [
+      1.5,
+      1,
+      1.45
+     ],
+     "size": [
+      0.6,
+      0.06,
+      0.4
+     ]
+    },
+    {
+     "shape": "cylinder",
+     "color": "d94b4b",
+     "pos": [
+      1.95,
+      0.55,
+      1.2
+     ],
+     "radius": 0.18,
+     "height": 0.2
+    }
+   ],
+   "tasks": [
+    {
+     "id": "wash",
+     "label": "Wash hands",
+     "at": [
+      3.2,
+      1.3,
+      -2.1
+     ],
+     "view": "sink",
+     "type": "bar",
+     "text": "Scrubbing: palms, backs of hands, between fingers, thumbs, fingertips.",
+     "ms": 3000
+    },
+    {
+     "id": "equip",
+     "label": "Equipment",
+     "at": [
+      1.5,
+      1.3,
+      1.45
+     ],
+     "view": "over",
+     "type": "choice",
+     "question": "Which equipment do you gather?",
+     "options": [
+      {
+       "text": "Gloves, tourniquet, swabs, cannula, dressing, flush and sharps bin.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Everything is ready."
+      },
+      {
+       "text": "Just the cannula.",
+       "safety": 15,
+       "dignity": 0,
+       "feedback": "You need the full set."
+      },
+      {
+       "text": "Gloves and a bandage.",
+       "safety": 15,
+       "dignity": 0,
+       "feedback": "Missing key items."
+      }
+     ],
+     "needs": [
+      "wash"
+     ],
+     "warn": "Wash your hands first!",
+     "warn_safety": 15,
+     "warn_dignity": 0
+    },
+    {
+     "id": "vein",
+     "label": "Vein site",
+     "at": "forearm",
+     "view": "arm",
+     "type": "choice",
+     "question": "Choose the site.",
+     "options": [
+      {
+       "text": "A soft, straight forearm vein away from the joint.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Good site."
+      },
+      {
+       "text": "Over the elbow bend.",
+       "safety": 20,
+       "dignity": 0,
+       "feedback": "Joints are a poor site."
+      },
+      {
+       "text": "A bruised area.",
+       "safety": 20,
+       "dignity": 0,
+       "feedback": "Avoid bruised areas."
+      }
+     ],
+     "needs": [
+      "equip"
+     ],
+     "warn": "Gather equipment first!",
+     "warn_safety": 10,
+     "warn_dignity": 0
+    },
+    {
+     "id": "insert",
+     "label": "Insert",
+     "at": "wrist",
+     "view": "wrist",
+     "type": "bar",
+     "text": "Tourniquet on, skin cleaned and dried, cannula in at a shallow angle…",
+     "ms": 3200,
+     "needs": [
+      "equip",
+      "vein"
+     ],
+     "warn": "Follow the sequence!",
+     "warn_safety": 15,
+     "warn_dignity": 0
+    },
+    {
+     "id": "secure",
+     "label": "Secure and flush",
+     "at": "hand",
+     "view": "wrist",
+     "type": "choice",
+     "question": "The cannula is in. What next?",
+     "options": [
+      {
+       "text": "Release the tourniquet, secure and flush gently while watching the site.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Done in order."
+      },
+      {
+       "text": "Leave the tourniquet on.",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "Release it first."
+      },
+      {
+       "text": "Flush hard without checking.",
+       "safety": 20,
+       "dignity": 0,
+       "feedback": "Flush gently and watch."
+      }
+     ],
+     "needs": [
+      "insert"
+     ],
+     "warn": "Insert first!",
+     "warn_safety": 10,
+     "warn_dignity": 0
+    },
+    {
+     "id": "im",
+     "label": "Injection",
+     "at": "shoulder",
+     "view": "arm",
+     "type": "choice",
+     "question": "He needs an IM injection. Where and at what angle?",
+     "options": [
+      {
+       "text": "Deltoid or ventrogluteal, about 90 degrees.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Correct."
+      },
+      {
+       "text": "Belly fat at 10 degrees.",
+       "safety": 15,
+       "dignity": 0,
+       "feedback": "That is not an IM site."
+      },
+      {
+       "text": "Any muscle at any angle.",
+       "safety": 15,
+       "dignity": 0,
+       "feedback": "Site and angle matter."
+      }
+     ],
+     "needs": [
+      "wash"
+     ],
+     "warn": "Wash your hands first!",
+     "warn_safety": 15,
+     "warn_dignity": 0
+    },
+    {
+     "id": "bin",
+     "label": "Sharps bin",
+     "at": [
+      1.95,
+      1.05,
+      1.2
+     ],
+     "view": "over",
+     "type": "choice",
+     "question": "Where does the used needle go?",
+     "options": [
+      {
+       "text": "Straight into the sharps bin, not recapped.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Safe disposal."
+      },
+      {
+       "text": "Recap it first.",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "Never recap."
+      },
+      {
+       "text": "Back on the tray.",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "Needles go in the bin."
+      }
+     ],
+     "needs": [
+      "insert"
+     ],
+     "warn": "Use the needle first!",
+     "warn_safety": 10,
+     "warn_dignity": 0
+    }
+   ],
+   "final": [
+    {
+     "question": "The site swells and he says it hurts as you flush. What now?",
+     "options": [
+      {
+       "text": "Stop, tell the nurse in charge and check the site.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Correct."
+      },
+      {
+       "text": "Flush faster to clear it.",
+       "safety": 30,
+       "dignity": 0,
+       "feedback": "That can cause harm."
+      },
+      {
+       "text": "Ignore it.",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "Never ignore pain or swelling."
+      }
+     ]
+    }
+   ]
+  },
+  "4": {
+   "intro": "The medication trolley is ready. Check everything, every time.",
+   "props": [
+    {
+     "shape": "box",
+     "color": "9aa5ad",
+     "pos": [
+      1.5,
+      0.5,
+      1.45
+     ],
+     "size": [
+      0.7,
+      0.9,
+      0.5
+     ]
+    },
+    {
+     "shape": "box",
+     "color": "ffffff",
+     "pos": [
+      1.5,
+      1,
+      1.45
+     ],
+     "size": [
+      0.6,
+      0.06,
+      0.4
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "id": "wash",
+     "label": "Wash hands",
+     "at": [
+      3.2,
+      1.3,
+      -2.1
+     ],
+     "view": "sink",
+     "type": "bar",
+     "text": "Scrubbing: palms, backs of hands, between fingers, thumbs, fingertips.",
+     "ms": 3000
+    },
+    {
+     "id": "rights",
+     "label": "Five rights",
+     "at": [
+      1.5,
+      1.3,
+      1.45
+     ],
+     "view": "over",
+     "type": "choice",
+     "question": "The chart says paracetamol 1 g oral. What do you check?",
+     "options": [
+      {
+       "text": "All five rights against the chart.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Right patient, drug, dose, route, time."
+      },
+      {
+       "text": "Just the drug name.",
+       "safety": 20,
+       "dignity": 0,
+       "feedback": "Check all five."
+      },
+      {
+       "text": "Trust memory.",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "Never rely on memory."
+      }
+     ],
+     "needs": [
+      "wash"
+     ],
+     "warn": "Wash your hands first!",
+     "warn_safety": 15,
+     "warn_dignity": 0
+    },
+    {
+     "id": "band",
+     "label": "Wristband",
+     "at": "wrist",
+     "view": "arm",
+     "type": "choice",
+     "question": "How do you confirm the patient?",
+     "options": [
+      {
+       "text": "Check the wristband against the chart and ask his name.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Identity confirmed."
+      },
+      {
+       "text": "Assume from the bed.",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "Beds get swapped."
+      }
+     ],
+     "needs": [
+      "rights"
+     ],
+     "warn": "Check the rights first!",
+     "warn_safety": 10,
+     "warn_dignity": 0
+    },
+    {
+     "id": "allergy",
+     "label": "Allergy",
+     "at": "forehead",
+     "view": "head",
+     "type": "choice",
+     "question": "He says he is allergic to penicillin. The next drug is amoxicillin.",
+     "options": [
+      {
+       "text": "Hold it and tell the nurse in charge.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Correct."
+      },
+      {
+       "text": "Give half the dose.",
+       "safety": 35,
+       "dignity": 0,
+       "feedback": "Any dose can harm."
+      },
+      {
+       "text": "Give it anyway.",
+       "safety": 40,
+       "dignity": 0,
+       "feedback": "Dangerous."
+      }
+     ],
+     "needs": [
+      "band"
+     ],
+     "warn": "Confirm identity first!",
+     "warn_safety": 10,
+     "warn_dignity": 0
+    },
+    {
+     "id": "dose",
+     "label": "Dose",
+     "at": [
+      1.95,
+      1.05,
+      1.2
+     ],
+     "view": "over",
+     "type": "choice",
+     "question": "Prescribed 500 mg, tablets are 250 mg. How many?",
+     "options": [
+      {
+       "text": "2 tablets",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "500 ÷ 250 = 2."
+      },
+      {
+       "text": "1 tablet",
+       "safety": 20,
+       "dignity": 0,
+       "feedback": "500 ÷ 250 = 2."
+      },
+      {
+       "text": "4 tablets",
+       "safety": 20,
+       "dignity": 0,
+       "feedback": "500 ÷ 250 = 2."
+      }
+     ],
+     "needs": [
+      "rights"
+     ],
+     "warn": "Check the rights first!",
+     "warn_safety": 10,
+     "warn_dignity": 0
+    },
+    {
+     "id": "drip",
+     "label": "Drip rate",
+     "at": [
+      -1.8,
+      1.15,
+      0.8
+     ],
+     "view": "over",
+     "type": "choice",
+     "question": "1000 ml over 8 hours. What rate?",
+     "options": [
+      {
+       "text": "125 ml per hour",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "1000 ÷ 8 = 125."
+      },
+      {
+       "text": "100 ml per hour",
+       "safety": 15,
+       "dignity": 0,
+       "feedback": "1000 ÷ 8 = 125."
+      },
+      {
+       "text": "250 ml per hour",
+       "safety": 15,
+       "dignity": 0,
+       "feedback": "1000 ÷ 8 = 125."
+      }
+     ],
+     "needs": [
+      "rights"
+     ],
+     "warn": "Check the rights first!",
+     "warn_safety": 10,
+     "warn_dignity": 0
+    },
+    {
+     "id": "rec",
+     "label": "Record",
+     "at": [
+      0.95,
+      1.2,
+      0
+     ],
+     "view": "over",
+     "type": "choice",
+     "question": "You have given the medicine. What next?",
+     "options": [
+      {
+       "text": "Record it straight away.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Documented."
+      },
+      {
+       "text": "Record it at the end of the day.",
+       "safety": 20,
+       "dignity": 0,
+       "feedback": "Delayed records risk double doses."
+      }
+     ],
+     "needs": [
+      "dose"
+     ],
+     "warn": "Give it first!",
+     "warn_safety": 10,
+     "warn_dignity": 0
+    }
+   ],
+   "final": [
+    {
+     "question": "You notice his BP is very low before the next dose. What do you do?",
+     "options": [
+      {
+       "text": "Hold the dose and escalate to the nurse in charge.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Skills come back: always escalate."
+      },
+      {
+       "text": "Give it, it is prescribed.",
+       "safety": 35,
+       "dignity": 0,
+       "feedback": "Check before giving."
+      }
+     ]
+    }
+   ]
+  },
+  "5": {
+   "intro": "Three patients are waiting. Sort them before the waiting room overflows.",
+   "props": [
+    {
+     "shape": "person",
+     "pose": "clutch_chest",
+     "color": "d94b4b",
+     "pos": [
+      -1.4,
+      0,
+      1.9
+     ],
+     "mood": "pain",
+     "sweat": true,
+     "breath": 26,
+     "hair": "2a2a2a"
+    },
+    {
+     "shape": "chair",
+     "pos": [
+      0,
+      0,
+      1.9
+     ],
+     "color": "6b7a86"
+    },
+    {
+     "shape": "person",
+     "pose": "sit_ankle",
+     "color": "4b7bd9",
+     "pos": [
+      0,
+      0,
+      1.9
+     ],
+     "mood": "neutral",
+     "bandage": true,
+     "female": true,
+     "skin": "6e4630",
+     "hair": "161616"
+    },
+    {
+     "shape": "chair",
+     "pos": [
+      1.4,
+      0,
+      1.9
+     ],
+     "color": "6b7a86"
+    },
+    {
+     "shape": "person",
+     "pose": "sit",
+     "color": "6ab04c",
+     "pos": [
+      1.4,
+      0,
+      1.9
+     ],
+     "mood": "worried",
+     "breath": 24,
+     "skin": "a26b48",
+     "hair": "3a2a1e"
+    }
+   ],
+   "tasks": [
+    {
+     "id": "a",
+     "label": "Patient A",
+     "at": [
+      -1.4,
+      1.95,
+      1.9
+     ],
+     "view": [
+      [
+       -0.6,
+       2.2,
+       4.4
+      ],
+      [
+       -1.4,
+       0.95,
+       1.9
+      ]
+     ],
+     "type": "choice",
+     "question": "Patient A: chest pain, sweating, BP 78/50, pulse 138. Triage level?",
+     "options": [
+      {
+       "text": "Immediate",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Correct."
+      },
+      {
+       "text": "Urgent",
+       "safety": 35,
+       "dignity": 0,
+       "feedback": "Under-triaged a critical patient."
+      },
+      {
+       "text": "Routine",
+       "safety": 45,
+       "dignity": 0,
+       "feedback": "Under-triaged a critical patient."
+      }
+     ]
+    },
+    {
+     "id": "b",
+     "label": "Patient B",
+     "at": [
+      0,
+      1.5,
+      1.9
+     ],
+     "view": [
+      [
+       0.4,
+       1.9,
+       4.2
+      ],
+      [
+       0,
+       0.7,
+       1.9
+      ]
+     ],
+     "type": "choice",
+     "question": "Patient B: sprained ankle, vitals normal. Triage level?",
+     "options": [
+      {
+       "text": "Routine",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Correct."
+      },
+      {
+       "text": "Urgent",
+       "safety": 10,
+       "dignity": 0,
+       "feedback": "Over-triaging wastes resources."
+      },
+      {
+       "text": "Immediate",
+       "safety": 15,
+       "dignity": 0,
+       "feedback": "Over-triaging wastes resources."
+      }
+     ]
+    },
+    {
+     "id": "c",
+     "label": "Patient C",
+     "at": [
+      1.4,
+      1.5,
+      1.9
+     ],
+     "view": [
+      [
+       1.9,
+       1.9,
+       4.2
+      ],
+      [
+       1.4,
+       0.7,
+       1.9
+      ]
+     ],
+     "type": "choice",
+     "question": "Patient C: wheeze, SpO₂ 92%, full sentences. Triage level?",
+     "options": [
+      {
+       "text": "Urgent",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Correct."
+      },
+      {
+       "text": "Routine",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "Under-triaged."
+      },
+      {
+       "text": "Immediate",
+       "safety": 10,
+       "dignity": 0,
+       "feedback": "Over-triaged."
+      }
+     ]
+    }
+   ],
+   "final": [
+    {
+     "question": "Who do you tell the nurse in charge about first?",
+     "options": [
+      {
+       "text": "Patient A.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "The most unstable patient goes first."
+      },
+      {
+       "text": "Patient B, he is easiest.",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "Never order by ease."
+      },
+      {
+       "text": "Patient C.",
+       "safety": 15,
+       "dignity": 0,
+       "feedback": "A needs help before C."
+      }
+     ]
+    },
+    {
+     "question": "Patient B asks how long he will wait.",
+     "options": [
+      {
+       "text": "Explain the wait and say you will recheck him.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Good communication."
+      },
+      {
+       "text": "Ignore him.",
+       "safety": 0,
+       "dignity": 20,
+       "feedback": "People deserve information."
+      }
+     ]
+    }
+   ]
+  },
+  "6": {
+   "intro": "The full night shift. Vitals, medicines, a new admission and a patient getting worse.",
+   "props": [
+    {
+     "shape": "box",
+     "color": "9aa5ad",
+     "pos": [
+      1.5,
+      0.5,
+      1.45
+     ],
+     "size": [
+      0.7,
+      0.9,
+      0.5
+     ]
+    },
+    {
+     "shape": "box",
+     "color": "ffffff",
+     "pos": [
+      1.5,
+      1,
+      1.45
+     ],
+     "size": [
+      0.6,
+      0.06,
+      0.4
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "id": "wash",
+     "label": "Wash hands",
+     "at": [
+      3.2,
+      1.3,
+      -2.1
+     ],
+     "view": "sink",
+     "type": "bar",
+     "text": "Scrubbing: palms, backs of hands, between fingers, thumbs, fingertips.",
+     "ms": 3000
+    },
+    {
+     "id": "vitals",
+     "label": "Vitals round",
+     "at": "wrist",
+     "view": "wrist",
+     "type": "bar",
+     "text": "Taking a full set of vitals on Mr Amoah…",
+     "ms": 3000,
+     "needs": [
+      "wash"
+     ],
+     "warn": "Wash your hands first!",
+     "warn_safety": 15,
+     "warn_dignity": 0
+    },
+    {
+     "id": "meds",
+     "label": "Medicines due",
+     "at": [
+      1.5,
+      1.3,
+      1.45
+     ],
+     "view": "over",
+     "type": "choice",
+     "question": "A medicine is due. What do you check?",
+     "options": [
+      {
+       "text": "Five rights, wristband and allergies.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Safe."
+      },
+      {
+       "text": "Just the dose.",
+       "safety": 20,
+       "dignity": 0,
+       "feedback": "Check everything."
+      },
+      {
+       "text": "Nothing, you know him.",
+       "safety": 30,
+       "dignity": 0,
+       "feedback": "Never skip checks."
+      }
+     ],
+     "needs": [
+      "wash"
+     ],
+     "warn": "Wash your hands first!",
+     "warn_safety": 15,
+     "warn_dignity": 0
+    },
+    {
+     "id": "admit",
+     "label": "New admission",
+     "at": [
+      1.95,
+      1.05,
+      1.2
+     ],
+     "view": "over",
+     "type": "choice",
+     "question": "A new patient arrives. What do you do first?",
+     "options": [
+      {
+       "text": "Welcome her, check identity and take baseline vitals.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Good start."
+      },
+      {
+       "text": "Leave her waiting.",
+       "safety": 0,
+       "dignity": 20,
+       "feedback": "Welcome her."
+      },
+      {
+       "text": "Skip the wristband.",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "Identity first."
+      }
+     ]
+    },
+    {
+     "id": "prior",
+     "label": "Priorities",
+     "at": "forehead",
+     "view": "head",
+     "type": "choice",
+     "question": "Mr Amoah is getting worse and a bath is due. Who first?",
+     "options": [
+      {
+       "text": "Mr Amoah. Escalate first, bath later.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Prioritised well."
+      },
+      {
+       "text": "The bath, it is scheduled.",
+       "safety": 35,
+       "dignity": 0,
+       "feedback": "The unstable patient comes first."
+      }
+     ],
+     "needs": [
+      "vitals"
+     ],
+     "warn": "Do his vitals first!",
+     "warn_safety": 10,
+     "warn_dignity": 0
+    },
+    {
+     "id": "sbar",
+     "label": "SBAR",
+     "at": "chest",
+     "view": "arm",
+     "type": "choice",
+     "question": "Which handover is correct?",
+     "options": [
+      {
+       "text": "Mr Amoah, post-op. BP falling and breathing fast. I think he is deteriorating. I recommend urgent review.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Clear SBAR."
+      },
+      {
+       "text": "He is fine, nothing to say.",
+       "safety": 30,
+       "dignity": 0,
+       "feedback": "Never hide a concern."
+      },
+      {
+       "text": "A long story with no recommendation.",
+       "safety": 15,
+       "dignity": 0,
+       "feedback": "Finish with a recommendation."
+      }
+     ],
+     "needs": [
+      "prior"
+     ],
+     "warn": "Decide priorities first!",
+     "warn_safety": 10,
+     "warn_dignity": 0
+    }
+   ],
+   "final": [
+    {
+     "question": "Hand over to the morning nurse. What do you include?",
+     "options": [
+      {
+       "text": "What is new, what was done, what is due and what to watch.",
+       "safety": 0,
+       "dignity": 0,
+       "feedback": "Clear handover keeps patients safe."
+      },
+      {
+       "text": "Nothing, they will read the notes.",
+       "safety": 25,
+       "dignity": 0,
+       "feedback": "Always hand over verbally too."
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

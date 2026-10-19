@@ -1,0 +1,658 @@
+{
+ "_help": "Six shifts. Each: learn cards, drill questions (answer = index into choices), hands-on checklist.",
+ "shifts": [
+  {
+   "id": 1,
+   "name": "First Rounds",
+   "skills": "Vital signs: pulse, blood pressure, breathing rate, temperature, oxygen saturation",
+   "skill": "Vital signs",
+   "badge": "Vitals",
+   "learn_label": "Normal adult:",
+   "intro": "Vitals tell us how a patient is doing before they can. Hints are on, so read each one carefully.",
+   "checkpoint": "Take a full set of vitals on a partner. They score you with this checklist.",
+   "learn": [
+    {
+     "title": "Pulse",
+     "key": "60–100 beats/min",
+     "text": "Use two fingers on the radial artery. Count for a full 60 seconds if the rhythm is irregular, and note the strength."
+    },
+    {
+     "title": "Blood pressure",
+     "key": "About 100–140 / 60–90 mmHg",
+     "text": "Right cuff size, arm at heart level, patient seated and calm. A reading far below their usual means act."
+    },
+    {
+     "title": "Breathing rate",
+     "key": "12–20 breaths/min",
+     "text": "Count it while it looks like you are still taking the pulse, so the patient does not change how they breathe."
+    },
+    {
+     "title": "Temperature",
+     "key": "36.1–37.2 °C",
+     "text": "Choose the route that suits the patient and clean the thermometer between patients."
+    },
+    {
+     "title": "Oxygen saturation",
+     "key": "95–100%",
+     "text": "Warm, clean finger without nail polish. Below 90% is urgent."
+    }
+   ],
+   "drill": [
+    {
+     "label": "Pulse",
+     "prompt": "76 beats/min",
+     "choices": [
+      "Normal",
+      "Abnormal",
+      "Urgent"
+     ],
+     "answer": 0,
+     "keep_order": true
+    },
+    {
+     "label": "Oxygen saturation",
+     "prompt": "94%",
+     "choices": [
+      "Normal",
+      "Abnormal",
+      "Urgent"
+     ],
+     "answer": 1,
+     "keep_order": true
+    },
+    {
+     "label": "Temperature",
+     "prompt": "37.1 °C",
+     "choices": [
+      "Normal",
+      "Abnormal",
+      "Urgent"
+     ],
+     "answer": 0,
+     "keep_order": true
+    },
+    {
+     "label": "Breathing rate",
+     "prompt": "22 breaths/min",
+     "choices": [
+      "Normal",
+      "Abnormal",
+      "Urgent"
+     ],
+     "answer": 1,
+     "keep_order": true
+    },
+    {
+     "label": "Oxygen saturation",
+     "prompt": "88%",
+     "choices": [
+      "Normal",
+      "Abnormal",
+      "Urgent"
+     ],
+     "answer": 2,
+     "keep_order": true
+    },
+    {
+     "label": "Blood pressure",
+     "prompt": "82/50 mmHg, patient drowsy",
+     "choices": [
+      "Normal",
+      "Abnormal",
+      "Urgent"
+     ],
+     "answer": 2,
+     "keep_order": true
+    }
+   ],
+   "checklist": [
+    "Wash hands and explain the check to your partner.",
+    "Take pulse for 60 seconds and record rate and rhythm.",
+    "Measure blood pressure with the correct cuff size.",
+    "Count breathing rate without telling your partner.",
+    "Record temperature and oxygen saturation.",
+    "Record all values accurately and say who you would call."
+   ]
+  },
+  {
+   "id": 2,
+   "name": "Comfort Round",
+   "skills": "Bed making, bathing, teeth brushing",
+   "skill": "Bed care and comfort",
+   "badge": "Comfort",
+   "learn_label": "Key point:",
+   "intro": "Comfort is care. Watch the comfort meter: rushing or exposing a patient makes it drop.",
+   "checkpoint": "Make an occupied bed with a partner and talk through a bed bath and oral care on a mannequin or partner.",
+   "learn": [
+    {
+     "title": "Occupied bed",
+     "key": "Order matters",
+     "text": "Explain, close the curtain, roll the patient to one side, work one half of the bed, then roll him to the other side. Keep him covered."
+    },
+    {
+     "title": "Bed bath",
+     "key": "Privacy and warmth",
+     "text": "Uncover and wash one part at a time. Face first, then arms, chest, legs and back. Use comfortably warm water and ask how he feels."
+    },
+    {
+     "title": "Oral care",
+     "key": "Soft brush, small paste",
+     "text": "Sit the patient up if it is safe. If he cannot help, gently clean teeth and gums and watch for choking."
+    },
+    {
+     "title": "Comfort meter",
+     "key": "Rushing costs comfort",
+     "text": "Exposing a patient, cold water or hurrying all lower comfort and dignity."
+    }
+   ],
+   "drill": [
+    {
+     "label": "Bed making",
+     "prompt": "What do you do first for an occupied bed?",
+     "choices": [
+      "Explain and close the curtain",
+      "Strip the bed at once",
+      "Roll him to the edge"
+     ],
+     "answer": 0,
+     "keep_order": false
+    },
+    {
+     "label": "Bed bath",
+     "prompt": "How much do you uncover at once?",
+     "choices": [
+      "Everything",
+      "Only the part being washed",
+      "Just the face"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Bed bath",
+     "prompt": "Which area do you usually wash first?",
+     "choices": [
+      "Face",
+      "Feet",
+      "Back"
+     ],
+     "answer": 0,
+     "keep_order": false
+    },
+    {
+     "label": "Oral care",
+     "prompt": "He cannot help with his mouth. Best action?",
+     "choices": [
+      "Skip it",
+      "Gently clean teeth and gums with a soft brush",
+      "Use lots of paste"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Comfort",
+     "prompt": "He says the water is too cold. You…",
+     "choices": [
+      "Carry on",
+      "Warm it and apologise",
+      "Tell him to bear it"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Bed making",
+     "prompt": "When rolling a patient you…",
+     "choices": [
+      "Pull him by the arm",
+      "Explain, support and roll gently",
+      "Lift him alone"
+     ],
+     "answer": 1,
+     "keep_order": false
+    }
+   ],
+   "checklist": [
+    "Wash hands, explain and close the curtain or screen.",
+    "Strip and remake one half of an occupied bed, then roll and finish the other half.",
+    "Keep the patient covered and warm during the bed bath.",
+    "Wash in the right order, one area at a time.",
+    "Do oral care on a mannequin or partner, talking through each step.",
+    "Leave the patient comfortable and the bed tidy."
+   ]
+  },
+  {
+   "id": 3,
+   "name": "Sharps Room",
+   "skills": "IV cannulation, injections",
+   "skill": "IV cannulation and injections",
+   "badge": "Sharps",
+   "learn_label": "Key point:",
+   "intro": "Sharps need full focus. Learn the sequence, then drill it until it is automatic.",
+   "checkpoint": "Practise cannulation and injections on a training arm or model while a peer scores you on the checklist.",
+   "learn": [
+    {
+     "title": "Prepare",
+     "key": "Hands, gloves, equipment",
+     "text": "Wash hands, explain, and gather cannula, tourniquet, swabs, dressing, flush and a sharps bin before you start."
+    },
+    {
+     "title": "Vein site",
+     "key": "Straight, soft vein",
+     "text": "Forearm veins are often good. Avoid bent joints, bruised areas and arms that should not be used."
+    },
+    {
+     "title": "Cannulation",
+     "key": "Clean, insert, secure, flush",
+     "text": "Tourniquet on, clean the skin and let it dry, insert at a shallow angle, release the tourniquet, secure and flush gently. Stop if there is pain or swelling."
+    },
+    {
+     "title": "Injections",
+     "key": "Right site and angle",
+     "text": "IM is about 90 degrees into a large muscle such as the deltoid or ventrogluteal. SC is 45 to 90 degrees into fatty tissue. Never recap needles."
+    }
+   ],
+   "drill": [
+    {
+     "label": "Cannulation",
+     "prompt": "Before you start you…",
+     "choices": [
+      "Wash hands and gather equipment",
+      "Insert straight away",
+      "Skip explaining"
+     ],
+     "answer": 0,
+     "keep_order": false
+    },
+    {
+     "label": "Vein site",
+     "prompt": "Which site do you avoid?",
+     "choices": [
+      "Soft straight forearm vein",
+      "Over a bent joint",
+      "Forearm"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Skin prep",
+     "prompt": "After cleaning the skin you…",
+     "choices": [
+      "Insert while wet",
+      "Let it dry",
+      "Touch the site again"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Flushing",
+     "prompt": "Pain and swelling as you flush. You…",
+     "choices": [
+      "Flush faster",
+      "Stop and tell the nurse in charge",
+      "Ignore it"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Sharps",
+     "prompt": "A used needle goes…",
+     "choices": [
+      "Recapped",
+      "In the sharps bin, not recapped",
+      "Back on the tray"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Injections",
+     "prompt": "An IM injection goes in at about…",
+     "choices": [
+      "10 degrees",
+      "90 degrees",
+      "Any angle"
+     ],
+     "answer": 1,
+     "keep_order": false
+    }
+   ],
+   "checklist": [
+    "Wash hands, explain and gather equipment on a training arm.",
+    "Choose a suitable vein site and apply the tourniquet.",
+    "Clean the skin, let it dry and insert at the correct angle.",
+    "Secure the cannula and flush gently while watching the site.",
+    "Name the correct sites and angles for IM and SC injections.",
+    "Dispose of sharps without recapping and wash hands."
+   ]
+  },
+  {
+   "id": 4,
+   "name": "Medication Round",
+   "skills": "Oral, IM, IV, SC medicines and dose calculations",
+   "skill": "Medicines and dose maths",
+   "badge": "Medicines",
+   "learn_label": "Key point:",
+   "intro": "Safe medicines mean checking every time. The five rights never get skipped.",
+   "checkpoint": "Prepare and check a mock medication round with labelled empty containers, and solve dose calculations on paper.",
+   "learn": [
+    {
+     "title": "Five rights",
+     "key": "Patient, drug, dose, route, time",
+     "text": "Check all five against the prescription and the wristband every time."
+    },
+    {
+     "title": "Allergies",
+     "key": "Ask and check",
+     "text": "Ask about allergies and read the chart. If a drug matches an allergy, hold it and tell the nurse in charge."
+    },
+    {
+     "title": "Dose maths",
+     "key": "Wanted ÷ stock",
+     "text": "Example: 500 mg wanted with 250 mg tablets: 500 ÷ 250 = 2 tablets. Always show your working."
+    },
+    {
+     "title": "Drip rate",
+     "key": "Volume ÷ time",
+     "text": "Example: 1000 ml over 8 hours = 125 ml per hour."
+    }
+   ],
+   "drill": [
+    {
+     "label": "Five rights",
+     "prompt": "Which is NOT one of the five rights?",
+     "choices": [
+      "Right dose",
+      "Right colour",
+      "Right route"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Check",
+     "prompt": "How do you confirm the patient?",
+     "choices": [
+      "Ask the bed number",
+      "Wristband against the chart",
+      "Guess"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Dose",
+     "prompt": "Wanted 500 mg. Tablets are 250 mg. How many?",
+     "choices": [
+      "1",
+      "2",
+      "4"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Drip",
+     "prompt": "1000 ml over 8 hours. Rate?",
+     "choices": [
+      "100 ml/h",
+      "125 ml/h",
+      "250 ml/h"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Allergy",
+     "prompt": "Penicillin allergy, drug is amoxicillin. You…",
+     "choices": [
+      "Give it",
+      "Hold it and tell the nurse in charge",
+      "Halve the dose"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Records",
+     "prompt": "After giving a medicine you…",
+     "choices": [
+      "Record straight away",
+      "Record at the end of the day",
+      "Do not record"
+     ],
+     "answer": 0,
+     "keep_order": false
+    }
+   ],
+   "checklist": [
+    "Check the five rights on a mock prescription with labelled containers.",
+    "Check the wristband against the chart.",
+    "Solve two dose calculations on paper with working.",
+    "Calculate one drip rate on paper.",
+    "Describe what you do when an allergy is found.",
+    "Record the mock dose correctly."
+   ]
+  },
+  {
+   "id": 5,
+   "name": "Front Door",
+   "skills": "Triage",
+   "skill": "Triage",
+   "badge": "Triage",
+   "learn_label": "Key point:",
+   "intro": "Patients arrive faster than we can see them. Sort them by urgency before the waiting room overflows.",
+   "checkpoint": "Triage role-play with classmates using printed case cards. Explain your reasoning aloud.",
+   "learn": [
+    {
+     "title": "Triage",
+     "key": "Urgency, not arrival",
+     "text": "The sickest patient is seen first. Under-triaging a critical patient is the most dangerous mistake."
+    },
+    {
+     "title": "Immediate",
+     "key": "Life-threatening",
+     "text": "Airway, breathing or circulation problems, such as chest pain with very low blood pressure and a fast pulse."
+    },
+    {
+     "title": "Urgent",
+     "key": "Serious, soon",
+     "text": "Breathless but talking, significant pain, abnormal vitals that are not yet critical."
+    },
+    {
+     "title": "Routine",
+     "key": "Stable",
+     "text": "Normal vitals and minor problems. They can wait, but tell them what to expect and recheck."
+    }
+   ],
+   "drill": [
+    {
+     "label": "Triage",
+     "prompt": "Who is seen first?",
+     "choices": [
+      "First to arrive",
+      "The sickest patient",
+      "The loudest patient"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Triage",
+     "prompt": "BP 78/50, pulse 138, sweating, chest pain",
+     "choices": [
+      "Immediate",
+      "Urgent",
+      "Routine"
+     ],
+     "answer": 0,
+     "keep_order": false
+    },
+    {
+     "label": "Triage",
+     "prompt": "Sprained ankle, vitals normal",
+     "choices": [
+      "Immediate",
+      "Urgent",
+      "Routine"
+     ],
+     "answer": 2,
+     "keep_order": false
+    },
+    {
+     "label": "Triage",
+     "prompt": "Wheeze, SpO₂ 92%, full sentences",
+     "choices": [
+      "Immediate",
+      "Urgent",
+      "Routine"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Waiting",
+     "prompt": "A routine patient asks how long. You…",
+     "choices": [
+      "Ignore him",
+      "Explain and recheck regularly",
+      "Send him home"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Mistakes",
+     "prompt": "Which costs the most?",
+     "choices": [
+      "Over-triaging",
+      "Under-triaging a critical patient",
+      "Neat writing"
+     ],
+     "answer": 1,
+     "keep_order": false
+    }
+   ],
+   "checklist": [
+    "Explain your triage reasoning aloud on a printed case card.",
+    "Sort three case cards from most to least urgent.",
+    "Name one sign that makes a patient Immediate.",
+    "Tell a waiting patient what to expect.",
+    "Recheck a waiting patient and record it.",
+    "Hand over the order of urgency to a partner."
+   ]
+  },
+  {
+   "id": 6,
+   "name": "Golden Hour",
+   "skills": "Everything together, ending with an SBAR handover",
+   "skill": "A full shift",
+   "badge": "Full shift",
+   "learn_label": "Key point:",
+   "intro": "The full night shift. Skills from every shift come back. Prioritise well, then hand over.",
+   "checkpoint": "Do a supervised practical assessment covering vitals, care, cannulation, medication and handover, signed off by a lecturer or clinician.",
+   "learn": [
+    {
+     "title": "Prioritise",
+     "key": "Airway, breathing, circulation",
+     "text": "See the most unstable patient first, then scheduled tasks."
+    },
+    {
+     "title": "Medicines due",
+     "key": "Five rights again",
+     "text": "Check wristband, allergies and dose before any medicine."
+    },
+    {
+     "title": "New admission",
+     "key": "Welcome and check",
+     "text": "Check identity, take baseline vitals and make the patient comfortable."
+    },
+    {
+     "title": "SBAR",
+     "key": "Situation, Background, Assessment, Recommendation",
+     "text": "Say who the patient is and the problem, the background, your assessment, and what you recommend."
+    }
+   ],
+   "drill": [
+    {
+     "label": "Priority",
+     "prompt": "Who needs you first?",
+     "choices": [
+      "Falling BP and fast breathing",
+      "A routine bath",
+      "A request for water"
+     ],
+     "answer": 0,
+     "keep_order": false
+    },
+    {
+     "label": "SBAR",
+     "prompt": "What does S stand for?",
+     "choices": [
+      "Situation",
+      "Sleep",
+      "Symptoms"
+     ],
+     "answer": 0,
+     "keep_order": false
+    },
+    {
+     "label": "SBAR",
+     "prompt": "What does R stand for?",
+     "choices": [
+      "Review",
+      "Recommendation",
+      "Record"
+     ],
+     "answer": 1,
+     "keep_order": false
+    },
+    {
+     "label": "Medicines",
+     "prompt": "Before a medicine you check…",
+     "choices": [
+      "Five rights and allergies",
+      "Only the dose",
+      "Nothing if rushed"
+     ],
+     "answer": 0,
+     "keep_order": false
+    },
+    {
+     "label": "Admission",
+     "prompt": "A new admission arrives. First you…",
+     "choices": [
+      "Check identity and take baseline vitals",
+      "Leave her",
+      "Skip the wristband"
+     ],
+     "answer": 0,
+     "keep_order": false
+    },
+    {
+     "label": "Handover",
+     "prompt": "Handover should be…",
+     "choices": [
+      "Long and vague",
+      "Clear and structured",
+      "Skipped"
+     ],
+     "answer": 1,
+     "keep_order": false
+    }
+   ],
+   "checklist": [
+    "Take a full set of vitals and record them.",
+    "Give personal care with privacy and dignity.",
+    "Do cannulation on a model with the checklist.",
+    "Prepare and check a mock medication round.",
+    "Triage three case cards aloud.",
+    "Give an SBAR handover, signed off by a lecturer or clinician."
+   ]
+  }
+ ]
+}
