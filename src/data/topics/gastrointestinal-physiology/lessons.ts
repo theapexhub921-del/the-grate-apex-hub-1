@@ -3,6 +3,7 @@
 import type { LessonDraft } from '@/data/topics/build';
 import { ds, type ConceptId } from '@/data/topics/gastrointestinal-physiology/sources';
 import { interactive, readingExtras } from '@/data/topics/gastrointestinal-physiology/interactive';
+import { withSimulation } from '@/data/topics/gastrointestinal-physiology/simulations';
 
 type Draft = LessonDraft<ConceptId>;
 
@@ -866,5 +867,5 @@ const lesson9: Draft = {
 export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7, lesson8, lesson9].map((lesson) => ({
   ...lesson,
   ...readingExtras[lesson.id],
-  interactive: interactive[lesson.id],
+  interactive: withSimulation(lesson.id, interactive[lesson.id]),
 }));

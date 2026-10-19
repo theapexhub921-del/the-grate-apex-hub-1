@@ -49,8 +49,8 @@ const NECK_VESSELS = /^(internal jugular vein\.?(r|l)|external jugular vein\.?(r
 const NECK_ARTERIES = /^(right common carotid artery|left common carotid artery|external carotid artery\.?(r|l)|internal carotid artery\.?(r|l)|brachiocephalic trunk.*|aortic arch.*)( \d+)?$/;
 
 
-// Muscle and ligament attachment areas drawn on the bones ("Frontalis muscle.or").
-const BONE_MARKERS = /^[^/]*(muscle|ligament|tendon|fascia|retinaculum|aponeurosis|membrane)/;
+// Muscle and ligament attachment areas drawn on the bones ("Frontalis muscle.or", ".e1r").
+const BONE_MARKERS = /^[^/]*\.(o|e|i)\d*(r|l)?( \d+)?( \/|$)/;
 const BODY_BONES = ['cranium.g', 'extracranial bones of head.g', 'vertebral column.g', 'thoracic skeleton.g', 'bones of pelvic girdle.g'];
 function endocrineScene(label, focus, view) {
   return {
@@ -93,7 +93,74 @@ function endocrineScenes() {
   };
 }
 
+// The digestive tract and its glands, in a faint skeleton; each GI scene frames it differently.
+function gutScene(label, focus, view, fade = []) {
+  const scene = {
+    label,
+    files: ['VisceralSystem100', 'SkeletalSystem100'],
+    under: ['digestive system.g', ...BODY_BONES],
+    names: [],
+    exclude: [BONE_MARKERS, /teeth|gingiva|costal cartilage|accessory parotid/],
+    groups: {
+      bones: { match: new RegExp(BODY_BONES.map(b => b.replace('.', '\\.')).join('|')), opacity: 0.06, color: '#e9dcc4' },
+      mouth: { match: /tongue|palate|uvula/ },
+      salivary: { match: /salivary|parotid|submandibular|sublingual/, color: '#e2b07a', move: true },
+      pharynx: { match: /pharynx/ },
+      oesophagus: { match: /oesophagus/ },
+      stomach: { match: /^stomach/, move: true },
+      duodenum: { match: /duodenum/ },
+      jejunum: { match: /jejunum/ },
+      colon: { match: /colon|appendix|taenia/ },
+      sigmoid: { match: /sigmoid|descending colon/ },
+      liver: { match: /liver/, opacity: 0.4 },
+      gallbladder: { match: /gallbladder/, color: '#5f8a3a', move: true },
+      bileduct: { match: /bile duct/, color: '#7da04a' },
+      pancreas: { match: /pancrea/, color: '#e2b36f' },
+      upper: { match: /^stomach|duodenum|pancrea|gallbladder|bile duct/ },
+      head: { match: /salivary|parotid|submandibular|sublingual|tongue|pharynx/ },
+    },
+    focus,
+    view,
+  };
+  for (const g of fade) scene.groups[g] = { ...scene.groups[g], opacity: 0.18 };
+  return scene;
+}
+function gutScenes() {
+  return {
+    // Mouth to anus, with the liver, gallbladder and pancreas.
+    gut: gutScene('The digestive tract with the liver, gallbladder and pancreas', null, { dir: [0.3, 0.05, 1], dist: 1.95 }),
+    // The stomach, duodenum, pancreas, liver and gallbladder.
+    'gut-upper': gutScene('The stomach, duodenum, pancreas, liver and gallbladder', 'upper', { dir: [0.2, -0.05, 1], dist: 1.9 }, ['jejunum', 'colon', 'liver']),
+    // The mouth, salivary glands and pharynx, from the side.
+    mouth: gutScene('The mouth, salivary glands and pharynx', 'head', { dir: [-1, 0.1, 0.45], dist: 1.9 }),
+  };
+}
+
 export const SCENES = {
+
+  // ─── Gastrointestinal ──────────────────────────────────────────────
+  ...gutScenes(),
+  // The descending and sigmoid colon in the pelvis with the pelvic floor (levator ani) and the
+  // external anal sphincter — the muscles of continence and defecation.
+  'pelvic-colon': {
+    label: 'The sigmoid colon, pelvic floor and external anal sphincter',
+    files: ['VisceralSystem100', 'MuscularSystem100', 'SkeletalSystem100'],
+    under: ['levator ani.g', 'perineal muscles.g', 'bones of pelvic girdle.g', 'sacrum'],
+    names: [/^coccyx/, /^(sigmoid colon|descending colon)( \d+)?$/],
+    exclude: [BONE_MARKERS, /taenia|appendix|transverse|bulbospongiosus|ischiocavernosus|transverse perine|tendinous arch/],
+    groups: {
+      bones: { match: /pelvic girdle|sacrum|coccyx/, opacity: 0.3, color: '#eadfca' },
+      colon: { match: /colon/, move: true, pivotAt: 'bottom' },
+      sigmoid: { match: /sigmoid/ },
+      floor: { match: /levator ani|pubo-analis|pubococcygeus|iliococcygeus/, color: '#a8433f' },
+      puborectalis: { match: /pubo-analis/ },
+      external: { match: /external anal sphincter/, color: '#b9443f' },
+      low: { match: /sigmoid|levator ani|pubo-analis|external anal/ },
+    },
+    focus: 'low',
+    view: { dir: [-0.6, -0.15, 1], dist: 2.3 },
+  },
+
   // ─── Endocrinology ─────────────────────────────────────────────────
   // The endocrine glands in place: a see-through brain with the hypothalamus, the pituitary, the
   // thyroid and parathyroids, the adrenals on the kidneys, the pancreas and liver, inside a faint
@@ -106,7 +173,7 @@ export const SCENES = {
     files: ['SkeletalSystem100', 'VisceralSystem100'],
     under: ['cranium.g', 'extracranial bones of head.g', 'vertebral column.g', 'thoracic skeleton.g', 'bones of upper limb.g', 'bones of lower limb.g', 'hypophysis.g', 'liver'],
     names: [],
-    exclude: [BONE_MARKERS, /teeth/],
+    exclude: [BONE_MARKERS, /teeth|sinus/],
     groups: {
       body: { match: /./, move: true, pivotAt: 'bottom' },
       skull: { match: /cranium\.g/, opacity: 0.4 },

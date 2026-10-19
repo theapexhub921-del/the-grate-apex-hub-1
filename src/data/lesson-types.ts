@@ -337,7 +337,17 @@ export type SimulationId =
   | 'thyroid-axis'
   | 'adrenal-axis'
   | 'glucose-insulin'
-  | 'calcium';
+  | 'calcium'
+  // Gastrointestinal Physiology
+  | 'gut-transit'
+  | 'nutrient-digestion'
+  | 'gut-water'
+  | 'saliva'
+  | 'pancreatic-secretion'
+  | 'gastric-phases'
+  | 'gut-muscle'
+  | 'defecation'
+  | 'bilirubin';
 
 // What the model must show after a prediction is run (checked by
 // tests/simulations.test.mjs, so a prediction's answer always matches

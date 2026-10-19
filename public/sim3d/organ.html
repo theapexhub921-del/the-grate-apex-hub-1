@@ -99,6 +99,7 @@
         });
       }
       if (!keep.length) { msg.textContent = 'This part of the model could not be found.'; return; }
+      window.__kept = keep.map(chain); // for checking scenes in a test browser
       const root = new THREE.Group();
       scene.add(root);
       for (const o of keep) {

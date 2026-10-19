@@ -14,6 +14,15 @@ import { thyroidAxis } from '@/data/simulations/thyroid-axis';
 import { adrenalAxis } from '@/data/simulations/adrenal-axis';
 import { glucoseInsulin } from '@/data/simulations/glucose-insulin';
 import { calcium } from '@/data/simulations/calcium';
+import { gutTransit } from '@/data/simulations/gut-transit';
+import { nutrientDigestion } from '@/data/simulations/nutrient-digestion';
+import { gutWater } from '@/data/simulations/gut-water';
+import { saliva } from '@/data/simulations/saliva';
+import { pancreaticSecretion } from '@/data/simulations/pancreatic-secretion';
+import { gastricPhases } from '@/data/simulations/gastric-phases';
+import { gutMuscle } from '@/data/simulations/gut-muscle';
+import { defecation } from '@/data/simulations/defecation';
+import { bilirubin } from '@/data/simulations/bilirubin';
 import type { SimulationId } from '@/data/lesson-types';
 import { basalGanglia } from '@/data/simulations/basal-ganglia';
 import { baroreflex } from '@/data/simulations/baroreflex';
@@ -88,6 +97,16 @@ export const SIMULATIONS: Record<SimulationId, SimDefinition> = {
   'adrenal-axis': adrenalAxis,
   'glucose-insulin': glucoseInsulin,
   'calcium': calcium,
+  // Gastrointestinal Physiology
+  'gut-transit': gutTransit,
+  'nutrient-digestion': nutrientDigestion,
+  'gut-water': gutWater,
+  'saliva': saliva,
+  'pancreatic-secretion': pancreaticSecretion,
+  'gastric-phases': gastricPhases,
+  'gut-muscle': gutMuscle,
+  'defecation': defecation,
+  'bilirubin': bilirubin,
 };
 
 export function getSimulation(id: SimulationId): SimDefinition | undefined {

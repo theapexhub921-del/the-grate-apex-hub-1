@@ -84,9 +84,46 @@ import type { GlucoseInsulinState } from '@/data/simulations/glucose-insulin';
 import { CalciumGraphic } from './calcium';
 import type { CalciumState } from '@/data/simulations/calcium';
 
+import { GutTransitGraphic } from './gut-transit';
+import type { TransitState } from '@/data/simulations/gut-transit';
+import { NutrientDigestionGraphic } from './nutrient-digestion';
+import type { NutrientState } from '@/data/simulations/nutrient-digestion';
+import { GutWaterGraphic } from './gut-water';
+import type { WaterState } from '@/data/simulations/gut-water';
+import { SalivaGraphic } from './saliva';
+import type { SalivaState } from '@/data/simulations/saliva';
+import { PancreaticSecretionGraphic } from './pancreatic-secretion';
+import type { PancreasState } from '@/data/simulations/pancreatic-secretion';
+import { GastricPhasesGraphic } from './gastric-phases';
+import type { GastricState } from '@/data/simulations/gastric-phases';
+import { GutMuscleGraphic } from './gut-muscle';
+import type { MuscleState } from '@/data/simulations/gut-muscle';
+import { DefecationGraphic } from './defecation';
+import type { DefecationState } from '@/data/simulations/defecation';
+import { BilirubinGraphic } from './bilirubin';
+import type { BilirubinState } from '@/data/simulations/bilirubin';
+
 // The drawing for each simulation (models: data/simulations/).
 export function SimulationGraphic({ id, ...props }: GraphicProps<SimState> & { id: SimulationId }) {
   switch (id) {
+    case 'gut-transit':
+      return <GutTransitGraphic {...(props as GraphicProps<TransitState>)} />;
+    case 'nutrient-digestion':
+      return <NutrientDigestionGraphic {...(props as GraphicProps<NutrientState>)} />;
+    case 'gut-water':
+      return <GutWaterGraphic {...(props as GraphicProps<WaterState>)} />;
+    case 'saliva':
+      return <SalivaGraphic {...(props as GraphicProps<SalivaState>)} />;
+    case 'pancreatic-secretion':
+      return <PancreaticSecretionGraphic {...(props as GraphicProps<PancreasState>)} />;
+    case 'gastric-phases':
+      return <GastricPhasesGraphic {...(props as GraphicProps<GastricState>)} />;
+    case 'gut-muscle':
+      return <GutMuscleGraphic {...(props as GraphicProps<MuscleState>)} />;
+    case 'defecation':
+      return <DefecationGraphic {...(props as GraphicProps<DefecationState>)} />;
+    case 'bilirubin':
+      return <BilirubinGraphic {...(props as GraphicProps<BilirubinState>)} />;
     case 'feedback-axis':
       return <FeedbackAxisGraphic {...(props as GraphicProps<FeedbackState>)} />;
     case 'adh-water':
