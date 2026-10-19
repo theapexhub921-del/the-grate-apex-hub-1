@@ -412,6 +412,7 @@ The full redesign rationale is in `docs/redesign-notes.md`.
   * XP: `XP_RULES.atlasQuiz` / `atlasQuizXp` (10, +10 at 90%, +5 at 75%, no penalty), paid once per day (award key `practice:atlas-quiz:<day>`, like the Question of the Day). Every round still counts for the streak. The app replies `{ type: 'quizXp', amount }` and the score card shows it.
   * On phones the atlas opens in the in-app browser, which has no link back to the app, so scores are not recorded there yet.
 * Phones: the quiz card is compact, full width, at the bottom; the camera aims a little below the structure so it sits above the card.
+* Slow or broken connections (owner: "the atlas was not opening", 2026-10-19): a failed model download is retried twice (`loadModel`), the 3D view shows "Loading the 3D model … %" while downloading, and a lasting "could not download" message with **Try again** if it still fails (`#loadStatus`, `renderLoadStatus`). Before this a failure left an empty screen.
 
 ### Locked elements
 
