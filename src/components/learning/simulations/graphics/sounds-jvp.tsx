@@ -4,6 +4,9 @@ import { G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { BEAT, TIMES, type MurmurBand, type SoundsState } from '@/data/simulations/sounds-jvp';
 import { useTheme } from '@/hooks/use-theme';
 
+import { Organ3D } from '../organ-3d';
+import { heartFrame, rounded } from '../organ-frames';
+
 import { Canvas, Legend, linear, pathOf, type GraphicProps } from './shared';
 
 const W = 400;
@@ -56,9 +59,26 @@ export function SoundsJvpGraphic({ state, time, reduceMotion }: GraphicProps<Sou
     </G>
   );
   const split = state.split > 0.02;
+  // the neck veins swell with the JVP waves; the ventricles squeeze in systole; the valves
+  // closing (S1, S2) flash on the heart and great arteries
+  const jvpNow = state.jvp.reduce((best, p) => (Math.abs(p[0] - moment) < Math.abs(best[0] - moment) ? p : best), state.jvp[0])[1];
+  const systole = moment >= TIMES.s1 && moment < TIMES.a2;
+  const sv = systole ? 1 - (moment - TIMES.s1) / (TIMES.a2 - TIMES.s1) : Math.min(1, (moment - TIMES.a2) / 0.35);
+  const near = (t: number) => Math.abs(moment - t) < 0.05;
+  const vein = 1 + rounded(jvpNow / 40, 0.01);
+  const frame = heartFrame({
+    lv: rounded(moment < TIMES.s1 ? 1 : sv),
+    la: moment < TIMES.s1 ? 0 : 1,
+    extra: {
+      move: { ijv: [vein, 1, vein] },
+      glow: { ventricles: near(TIMES.s1) ? 1 : 0, semilunar: near(TIMES.a2) || (split && near(TIMES.a2 + state.split)) ? 1 : 0 },
+      glowColor: { ventricles: '#fff2b0', semilunar: '#fff2b0' },
+    },
+  });
 
   return (
     <View style={{ gap: 10 }}>
+      <Organ3D scene="neck-heart" frame={frame} label="The heart and the jugular veins of the neck, pulsing with each beat" />
       <Canvas width={W} height={H} label="Heart sounds, murmur and jugular venous pulse over one beat.">
         <Rect x={x(TIMES.s1)} y={6} width={x(TIMES.a2) - x(TIMES.s1)} height={22} rx={4} fill={colors.primary} />
         <SvgText x={(x(TIMES.s1) + x(TIMES.a2)) / 2} y={21} fontSize={11} fontWeight="800" fill={colors.onPrimary} textAnchor="middle">

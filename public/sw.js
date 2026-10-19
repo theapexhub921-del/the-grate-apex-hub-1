@@ -38,6 +38,8 @@ self.addEventListener('fetch', (event) => {
   // the connection was slow) left phones stuck on an old, broken version. The browser's normal checks keep it fresh:
   // the page is revalidated on every open (vercel.json) and its address carries a fresh ?v= stamp (src/lib/atlas-theme.ts).
   if (new URL(request.url).pathname.startsWith('/atlas/')) return;
+  // The 3D organs shown with the lesson simulations (/sim3d/...) use the atlas models: same rule.
+  if (new URL(request.url).pathname.startsWith('/sim3d/')) return;
   // Game builds (public/game-builds): played offline once played (or warmed up) online.
   // Online, every file comes from the network as usual (the browser's "has it changed?"
   // check keeps that cheap, so updates always show); a copy goes into the offline cache,

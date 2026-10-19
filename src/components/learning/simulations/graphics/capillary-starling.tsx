@@ -1,95 +1,85 @@
 import { View } from 'react-native';
-import { Circle, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
+import { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
+import { Anatomy as A } from '@/constants/theme';
 import type { StarlingState } from '@/data/simulations/capillary-starling';
-import { useTheme } from '@/hooks/use-theme';
 
-import { Canvas, Legend, type GraphicProps } from './shared';
+import { Capillary, mix } from './anatomy/cells';
+import { Tube } from './anatomy/kidney';
+import { seeded } from './anatomy/lungs';
+import { Tag } from './kit';
+import { Canvas, type GraphicProps } from './shared';
 
 const W = 400;
-const H = 260;
-const X0 = 40;
-const X1 = 318;
-const TISSUE_TOP = 16;
-const TISSUE_BOTTOM = 112;
-const TUBE_TOP = 128;
-const TUBE_BOTTOM = 160;
-const POSITIONS = [0.06, 0.2, 0.34, 0.5, 0.66, 0.8, 0.94];
+const H = 280;
+const X0 = 20;
+const X1 = 320;
+const CAP_Y = 196; // top of the capillary
+const CAP_H = 30;
 
 const signed = (v: number) => `${v > 0 ? '+' : ''}${v.toFixed(1)}`;
 
+// A capillary in its tissue, magnified: blood flows from the arteriole (left) to the venule
+// (right); drops of fluid leave at the arterial end and return at the venous end; what is left
+// drains into a lymphatic vessel. When filtration outruns drainage the tissue swells (oedema):
+// the cells drift apart in pale fluid.
 export function CapillaryStarlingGraphic({ state, time, reduceMotion }: GraphicProps<StarlingState>) {
-  const colors = useTheme();
-  const level = Math.min(1, state.oedema / 60);
-  const fluidTop = TISSUE_BOTTOM - 12 - level * (TISSUE_BOTTOM - TISSUE_TOP - 24);
-  const lymphWidth = 4 + Math.min(14, state.lymph * 0.6);
+  const t = reduceMotion ? 0 : time;
+  const swell = Math.min(1, state.oedema / 60);
+  const rand = seeded(12);
+  const cells = Array.from({ length: 14 }, (_, i) => ({ x: X0 + 18 + (i % 7) * 42 + rand() * 10, y: 50 + Math.floor(i / 7) * 62 + rand() * 10, r: 16 + rand() * 4 }));
+  const spread = 1 + 0.16 * swell;
+  const outDrops = Math.round(Math.min(10, state.filtered * 0.9));
+  const inDrops = Math.round(Math.min(10, state.reabsorbed * 0.9));
   const blocked = state.lymphCapacity < 2;
+  const drop = (x: number, y: number, k: number) => <Ellipse key={k} cx={x} cy={y} rx={3} ry={4} fill={A.pleura} stroke={A.airDeep} strokeWidth={0.8} opacity={0.95} />;
 
   return (
-    <View style={{ gap: 10 }}>
-      <Canvas width={W} height={H} label={`Capillary. Net pressure ${signed(state.netArterial)} mmHg at the arterial end, ${signed(state.netVenous)} at the venous end.`}>
-        <Rect x={X0 - 10} y={TISSUE_TOP} width={X1 - X0 + 20} height={TISSUE_BOTTOM - TISSUE_TOP} rx={12} fill={colors.surfaceMuted} stroke={colors.border} />
-        <Rect x={X0 - 10} y={fluidTop} width={X1 - X0 + 20} height={TISSUE_BOTTOM - fluidTop} rx={12} fill={colors.info} opacity={0.18 + level * 0.35} />
-        <SvgText x={X0} y={TISSUE_TOP + 18} fontSize={12} fontWeight="800" fill={colors.textSecondary}>
-          {level > 0 ? 'Tissue fluid — building up (oedema)' : 'Tissue fluid (interstitium)'}
-        </SvgText>
-        <Rect x={X0} y={TUBE_TOP} width={X1 - X0} height={TUBE_BOTTOM - TUBE_TOP} rx={16} fill={colors.error} fillOpacity={0.14} stroke={colors.error} strokeWidth={2} />
-        <SvgText x={X0} y={TUBE_BOTTOM + 20} fontSize={12} fontWeight="800" fill={colors.textSecondary}>
-          {`Arterial end ${Math.round(state.pc)} mmHg`}
-        </SvgText>
-        <SvgText x={X1} y={TUBE_BOTTOM + 20} fontSize={12} fontWeight="800" fill={colors.textSecondary} textAnchor="end">
-          {`Venous end ${Math.round(state.pc - 20)} mmHg`}
-        </SvgText>
-        {POSITIONS.map((p) => {
-          const net = state.netArterial + (state.netVenous - state.netArterial) * p;
-          const x = X0 + (X1 - X0) * p;
-          const out = net > 0;
-          const length = Math.min(70, Math.abs(net) * 2.4 + (Math.abs(net) > 0.2 ? 6 : 0));
-          if (length < 2) return null;
-          const color = out ? colors.warning : colors.primary;
-          const yStart = out ? TUBE_TOP - 2 : TUBE_TOP - 2 - length;
-          const yEnd = out ? TUBE_TOP - 2 - length : TUBE_TOP - 2;
-          const phase = reduceMotion ? 0.5 : (time * 1.5 + p) % 1;
+    <View>
+      <Canvas width={W} height={H} label={`A capillary in its tissue. Net pressure ${signed(state.netArterial)} mmHg at the arterial end, ${signed(state.netVenous)} at the venous end.${swell > 0.2 ? ' The tissue is swollen with fluid (oedema).' : ''}`}>
+        <Defs>
+          <LinearGradient id="csTissue" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={mix(A.mucosa, '#FFFFFF', 0.55 + 0.2 * swell)} />
+            <Stop offset="1" stopColor={mix(A.mucosa, A.pleura, 0.3 + 0.5 * swell)} />
+          </LinearGradient>
+        </Defs>
+        {/* tissue and interstitial fluid */}
+        <Rect x={0} y={10} width={W} height={CAP_Y - 4} rx={12} fill="url(#csTissue)" />
+        {swell > 0.05 ? <Rect x={0} y={10} width={W} height={CAP_Y - 4} rx={12} fill={A.pleura} opacity={0.35 * swell} /> : null}
+        {cells.map((c, i) => {
+          const cx = X0 + (c.x - X0) * spread - 10 * swell;
           return (
-            <G key={p}>
-              <Line x1={x} x2={x} y1={yStart} y2={yEnd} stroke={color} strokeWidth={3 + Math.min(4, Math.abs(net) * 0.2)} strokeLinecap="round" />
-              <Path d={out ? `M${x - 6} ${yEnd + 7} L${x} ${yEnd - 1} L${x + 6} ${yEnd + 7} Z` : `M${x - 6} ${yEnd - 7} L${x} ${yEnd + 1} L${x + 6} ${yEnd - 7} Z`} fill={color} />
-              <Circle cx={x} cy={yStart + (yEnd - yStart) * phase} r={2.5} fill={colors.surface} />
+            <G key={i}>
+              <Path d={`M${cx - c.r} ${c.y} Q${cx - c.r} ${c.y - c.r} ${cx} ${c.y - c.r * 0.9} Q${cx + c.r} ${c.y - c.r} ${cx + c.r * 0.95} ${c.y} Q${cx + c.r} ${c.y + c.r} ${cx} ${c.y + c.r * 0.9} Q${cx - c.r} ${c.y + c.r} ${cx - c.r} ${c.y} Z`} fill={mix(A.mucosa, '#FFFFFF', 0.25)} stroke={mix(A.mucosa, '#000000', 0.2)} strokeWidth={1} />
+              <Circle cx={cx + 2} cy={c.y} r={c.r * 0.33} fill={A.nucleus} opacity={0.8} />
             </G>
           );
         })}
-        <SvgText x={X0} y={TUBE_BOTTOM + 40} fontSize={12} fontWeight="900" fill={state.netArterial > 0 ? colors.warningText : colors.primaryText}>
-          {`Net ${signed(state.netArterial)} mmHg`}
-        </SvgText>
-        <SvgText x={X1} y={TUBE_BOTTOM + 40} fontSize={12} fontWeight="900" fill={state.netVenous > 0 ? colors.warningText : colors.primaryText} textAnchor="end">
-          {`Net ${signed(state.netVenous)} mmHg`}
-        </SvgText>
-        <Rect x={W - 58} y={TISSUE_TOP + 30} width={lymphWidth} height={TUBE_BOTTOM + 40 - TISSUE_TOP - 30} rx={lymphWidth / 2} fill={colors.success} opacity={blocked ? 0.35 : 0.8} />
-        <SvgText x={W - 58 + lymphWidth / 2} y={TISSUE_TOP + 22} fontSize={12} fontWeight="800" fill={colors.successText} textAnchor="middle">
-          Lymph
-        </SvgText>
-        {blocked ? (
-          <G>
-            <Line x1={W - 70} x2={W - 34} y1={TUBE_TOP - 18} y2={TUBE_TOP + 18} stroke={colors.error} strokeWidth={4} strokeLinecap="round" />
-            <Line x1={W - 34} x2={W - 70} y1={TUBE_TOP - 18} y2={TUBE_TOP + 18} stroke={colors.error} strokeWidth={4} strokeLinecap="round" />
-          </G>
-        ) : null}
-        <SvgText x={W - 58 + lymphWidth / 2} y={TUBE_BOTTOM + 58} fontSize={11} fontWeight="700" fill={colors.textTertiary} textAnchor="middle">
-          {`${state.lymph.toFixed(1)} L/day`}
-        </SvgText>
-        {state.leaky ? (
-          <SvgText x={(X0 + X1) / 2} y={TUBE_BOTTOM - 10} fontSize={11} fontWeight="800" fill={colors.error} textAnchor="middle">
-            leaky wall
-          </SvgText>
-        ) : null}
+        {/* lymphatic vessel draining the tissue */}
+        <Tube d={`M352 20 C344 80 360 140 352 ${CAP_Y + 70}`} width={blocked ? 8 : 12 + Math.min(10, state.lymph * 0.6)} wall={mix(A.fat, '#FFFFFF', 0.3)} fluid={mix(A.fat, '#FFFFFF', 0.6)} time={t} flow={blocked ? 0 : 0.6} />
+        {blocked ? <Path d="M340 110 L364 122 M340 122 L364 110" stroke={A.muscleDark} strokeWidth={3} strokeLinecap="round" /> : null}
+        {/* the capillary: arteriole (red) to venule (bluer) */}
+        <Capillary x={X0 - 20} y={CAP_Y} w={X1 - X0 + 40} h={CAP_H} time={t} speed={1} satAt={(f) => 0.97 - 0.25 * f} count={9} />
+        {state.leaky
+          ? [0.2, 0.45, 0.7].map((f) => <Rect key={f} x={X0 + (X1 - X0) * f} y={CAP_Y - 2} width={6} height={4} fill="url(#csTissue)" />)
+          : null}
+        {/* fluid out at the arterial end, back in at the venous end */}
+        {Array.from({ length: outDrops }, (_, k) => {
+          const f = ((k / Math.max(1, outDrops) + t * 0.35) % 1 + 1) % 1;
+          return drop(X0 + 20 + (k % 4) * 22, CAP_Y - 6 - f * 70, k);
+        })}
+        {Array.from({ length: inDrops }, (_, k) => {
+          const f = ((k / Math.max(1, inDrops) + t * 0.35) % 1 + 1) % 1;
+          return drop(X1 - 80 + (k % 4) * 22, CAP_Y - 76 + f * 70, 100 + k);
+        })}
+        {state.leaky
+          ? Array.from({ length: 6 }, (_, k) => <Circle key={`p${k}`} cx={X0 + 60 + k * 36} cy={CAP_Y - 10 - ((t * 20 + k * 13) % 50)} r={2.2} fill={A.urine} stroke={A.urineDark} strokeWidth={0.6} />)
+          : null}
+        <Tag x={80} y={CAP_Y + CAP_H + 18} text={`Arterial end: net ${signed(state.netArterial)} mmHg`} size={10} tone={state.netArterial > 0 ? 'warning' : 'primary'} />
+        <Tag x={256} y={CAP_Y + CAP_H + 18} text={`Venous end: net ${signed(state.netVenous)} mmHg`} size={10} tone={state.netVenous < 0 ? 'success' : 'warning'} />
+        <Tag x={352} y={14} text={blocked ? 'Lymphatic blocked' : 'Lymphatic'} size={10} tone={blocked ? 'error' : 'primary'} />
+        {swell > 0.2 ? <Tag x={160} y={22} text="Oedema: tissue swollen with fluid" size={10} tone="error" /> : null}
       </Canvas>
-      <Legend
-        items={[
-          { label: 'Fluid pushed out', color: colors.warning },
-          { label: 'Fluid drawn back in', color: colors.primary },
-          { label: 'Lymph', color: colors.success },
-        ]}
-      />
     </View>
   );
 }

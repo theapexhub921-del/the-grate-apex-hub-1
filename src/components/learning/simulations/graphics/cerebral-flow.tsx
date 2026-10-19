@@ -4,6 +4,9 @@ import { Circle, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { autoregulated, co2Factor, PLATEAU_HIGH, PLATEAU_LOW, type CerebralState } from '@/data/simulations/cerebral-flow';
 import { useTheme } from '@/hooks/use-theme';
 
+import { Organ3D } from '../organ-3d';
+import { rounded } from '../organ-frames';
+
 import { Axes, Canvas, Legend, linear, pathOf, type GraphicProps } from './shared';
 
 const W = 400;
@@ -26,9 +29,17 @@ export function CerebralFlowGraphic({ state, baseline }: GraphicProps<CerebralSt
   const [cx, cy] = point(state);
   const [bx, by] = point(baseline);
   const changedCo2 = Math.abs(state.co2 - 40) > 0.5;
+  // the brain's arteries glow with the flow through them; a starved brain turns pale and grey
+  const flow = Math.max(0, Math.min(1.6, state.flow / 100));
+  const frame = {
+    glow: { arteries: rounded(0.15 + 0.5 * Math.min(1, flow / 1.4), 0.05) },
+    glowColor: { arteries: '#ff6a4a' },
+    color: { brain: flow < 0.6 ? '#b9b7c9' : flow > 1.3 ? '#e6a4a0' : '#ddb5b0' },
+  };
 
   return (
     <View style={{ gap: 10 }}>
+      <Organ3D scene="brain-arteries" frame={frame} label={`The brain and its arteries: blood flow ${Math.round(state.flow)}% of normal`} />
       <Canvas width={W} height={H} label={`Cerebral blood flow ${Math.round(state.flow)}% of normal at a perfusion pressure of ${Math.round(state.cpp)} mmHg.`}>
         <Rect x={x(PLATEAU_LOW)} y={T} width={x(PLATEAU_HIGH) - x(PLATEAU_LOW)} height={B - T} fill={colors.successSubtle} opacity={0.6} />
         <SvgText x={(x(PLATEAU_LOW) + x(PLATEAU_HIGH)) / 2} y={T + 16} fontSize={11} fontWeight="800" fill={colors.successText} textAnchor="middle">

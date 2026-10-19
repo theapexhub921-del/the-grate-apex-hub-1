@@ -120,6 +120,7 @@ export const ecg: SimDefinition<EcgState> = {
     { key: 'rhythm', label: 'Rhythm', hidden: true, noDelta: true, text: (v) => RHYTHMS[v] ?? '' },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'sinus', label: 'Sinus rhythm', values: SINUS, caption: 'Each P is followed by a QRS after a normal PR (0.12–0.20 s). 20 small squares between R waves: 1500 ÷ 20 = 75 /min (slides 15–18).' },
     { id: 'tachy', label: 'Sinus tachycardia', values: { ...SINUS, hr: 120 }, caption: 'Faster than normal, every beat still from the SA node (slide 18).' },

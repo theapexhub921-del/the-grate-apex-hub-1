@@ -4,6 +4,9 @@ import { G, Line, Path, Text as SvgText } from 'react-native-svg';
 import { STRIP_SECONDS, type EcgState } from '@/data/simulations/ecg';
 import { useTheme } from '@/hooks/use-theme';
 
+import { Organ3D } from '../organ-3d';
+import { heartFrame, rounded } from '../organ-frames';
+
 import { Canvas, Legend, type GraphicProps } from './shared';
 
 const MM = 2.5; // px per millimetre of ECG paper
@@ -18,7 +21,7 @@ const H = TOP + MM_TALL * MM + 40;
 const xAt = (seconds: number) => LEFT + seconds * 25 * MM;
 const yAt = (mv: number) => BASE - mv * 10 * MM;
 
-export function EcgGraphic({ state }: GraphicProps<EcgState>) {
+export function EcgGraphic({ state, time, reduceMotion }: GraphicProps<EcgState>) {
   const colors = useTheme();
   const smallLines: string[] = [];
   const bigLines: string[] = [];
@@ -38,12 +41,29 @@ export function EcgGraphic({ state }: GraphicProps<EcgState>) {
   const regular = state.readouts.rhythm === 0 || state.readouts.rhythm === 1;
   const caliperY = TOP + MM_TALL * MM + 14;
 
+  // The heart follows the strip as it is drawn: the atria light up with each P wave, the
+  // ventricles with each QRS and then squeeze; dropped beats leave the ventricles still.
+  const t = reduceMotion ? (first?.qrs ?? 0) + 0.02 : ((time % STRIP_SECONDS) + STRIP_SECONDS) % STRIP_SECONDS;
+  const qrsTimes = [...conducted.map((b) => b.qrs as number), ...state.escape].sort((a, b) => a - b);
+  const lastQrs = qrsTimes.filter((q) => q <= t).pop();
+  const since = lastQrs === undefined ? 9 : t - lastQrs;
+  const atrial = state.beats.some((b) => t >= b.p && t < b.p + 0.1);
+  const frame = heartFrame({
+    lv: rounded(since < 0.3 ? 1 - since / 0.3 : Math.min(1, (since - 0.3) / 0.35)),
+    la: atrial ? 0 : 1,
+    pressure: since < 0.3 ? 0.7 : 0,
+    atria: atrial ? 1 : 0,
+    ventricles: since < 0.12 ? 1 : 0,
+  });
+
   return (
     <View style={{ gap: 10 }}>
+      <Organ3D scene="heart" frame={frame} label="The heart, lit by each wave of the ECG as it passes" />
       <Canvas width={W} height={H} label={`ECG strip, ${STRIP_SECONDS} seconds. Heart rate ${Math.round(state.readouts.ventricularRate)} per minute.`}>
         <Path d={smallLines.join(' ')} stroke={colors.error} strokeOpacity={0.14} strokeWidth={0.6} />
         <Path d={bigLines.join(' ')} stroke={colors.error} strokeOpacity={0.35} strokeWidth={1} />
         <Path d={trace} stroke={colors.text} strokeWidth={1.8} fill="none" strokeLinejoin="round" />
+        <Line x1={xAt(t)} x2={xAt(t)} y1={TOP} y2={TOP + MM_TALL * MM} stroke={colors.accent} strokeWidth={2} opacity={0.8} />
         {first ? (
           <G>
             <SvgText x={xAt(first.p + 0.045)} y={yAt(0.15) - 6} fontSize={11} fontWeight="900" fill={colors.primaryText} textAnchor="middle">

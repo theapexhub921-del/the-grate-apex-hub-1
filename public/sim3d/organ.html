@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GRATEAPEX — 3D organ</title>
+  <!--
+    The 3D organ shown with a lesson simulation (src/components/learning/simulations/organ-3d.web.tsx).
+    /sim3d/organ.html?scene=<id> — the scenes (which atlas models, which parts, how they move) are in
+    scenes.js. The models are the atlas's (Z-Anatomy / BodyParts3D, CC BY-SA 4.0, /atlas/ATTRIBUTION.md).
+    The app moves the organ with messages:
+      { type: 'grateapex-organ', move: { group: number | [x, y, z] }, glow: { group: 0–1 },
+        glowColor: { group: '#hex' }, color: { group: '#hex' }, opacity: { group: 0–1 } }
+    A 'move' value scales that group about its pivot (1 = as modelled).
+  -->
+  <style>
+    html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+    canvas { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
+    #msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 500 13px system-ui, sans-serif; color: #8a8a8a; pointer-events: none; text-align: center; padding: 16px; }
+    #credit { position: absolute; right: 8px; bottom: 6px; font: 10px system-ui, sans-serif; color: #9a9a9a; }
+    #credit a { color: inherit; }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/atlas/vendor/three/build/three.module.min.js",
+      "three/addons/": "/atlas/vendor/three/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="c" aria-label="3D model"></canvas>
+  <div id="msg">Loading the 3D model…</div>
+  <div id="credit">Model: <a href="/atlas/ATTRIBUTION.md" target="_blank" rel="noopener">Z-Anatomy, CC BY-SA</a></div>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import { SCENES, colourFor, MODEL_VERSION } from './scenes.js';
+
+    const params = new URLSearchParams(location.search);
+    const scene3 = SCENES[params.get('scene') || 'heart'];
+    const msg = document.getElementById('msg');
+    if (!scene3) { msg.textContent = 'Unknown scene.'; throw new Error('scene'); }
+    document.getElementById('c').setAttribute('aria-label', scene3.label || '3D model');
+
+    const LITE = matchMedia('(max-width: 700px), (pointer: coarse)').matches;
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canvas = document.getElementById('c');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, LITE ? 1.5 : 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.95;
+
+    const scene = new THREE.Scene();
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    const key = new THREE.DirectionalLight(0xffffff, 1.6);
+    key.position.set(1.5, 2.5, 3);
+    scene.add(key, new THREE.HemisphereLight(0xfff4ee, 0x402020, 0.5));
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 50);
+    scene.add(camera);
+    camera.add(key);
+    key.position.set(0.6, 1.0, 0.4);
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.autoRotate = !reduceMotion && !!scene3.spin;
+    controls.autoRotateSpeed = 0.8;
+    canvas.addEventListener('pointerdown', () => { controls.autoRotate = false; });
+
+    const label = o => ((o.userData && o.userData.name) || o.name || '').replace(/_/g, ' ');
+    const chain = o => { const s = []; for (let n = o; n; n = n.parent) s.push(label(n).toLowerCase()); return s.join(' / '); };
+
+    const groups = {}; // key -> { meshes: [], pivot: Group|null, base: Material props }
+    for (const k of Object.keys(scene3.groups || {})) groups[k] = { meshes: [], pivot: null };
+
+    const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
+    const load = f => loader.loadAsync((LITE ? '/atlas/lite/' : '/atlas/') + f + '.glb?m=' + MODEL_VERSION);
+
+    Promise.all(scene3.files.map(load)).then(gltfs => {
+      const keep = [];
+      for (const g of gltfs) {
+        g.scene.updateMatrixWorld(true);
+        g.scene.traverse(o => {
+          if (!o.isMesh) return;
+          const c = chain(o);
+          const own = (label(o) || label(o.parent || o)).toLowerCase();
+          const inside = (scene3.under || []).some(u => c.split(' / ').includes(u.toLowerCase()));
+          const named = (scene3.names || []).some(r => r.test(own));
+          const excluded = (scene3.exclude || []).some(r => r.test(c));
+          if ((inside || named) && !excluded) keep.push(o);
+        });
+      }
+      if (!keep.length) { msg.textContent = 'This part of the model could not be found.'; return; }
+      const root = new THREE.Group();
+      scene.add(root);
+      for (const o of keep) {
+        const c = chain(o);
+        let colour = colourFor(c);
+        let opacity = 1;
+        for (const [k, spec] of Object.entries(scene3.groups || {})) {
+          if (spec.match.test(c)) {
+            groups[k].meshes.push(o);
+            if (spec.color) colour = spec.color;
+            if (spec.opacity !== undefined) opacity = spec.opacity;
+          }
+        }
+        o.material = new THREE.MeshPhysicalMaterial({
+          color: colour, roughness: 0.5, metalness: 0, clearcoat: 0.45, clearcoatRoughness: 0.3, envMapIntensity: 0.6,
+          transparent: opacity < 1, opacity, depthWrite: opacity >= 1, side: opacity < 1 ? THREE.DoubleSide : THREE.FrontSide,
+        });
+        o.userData.baseColour = o.material.color.clone();
+        o.userData.baseOpacity = opacity;
+        root.attach(o);
+      }
+      root.updateMatrixWorld(true);
+      const box = new THREE.Box3();
+      const focus = scene3.focus ? groups[scene3.focus]?.meshes : keep;
+      (focus && focus.length ? focus : keep).forEach(o => box.expandByObject(o));
+      const centre = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3()).length();
+
+      // Groups that move get a pivot (their own centre, or another group's centre), first match wins.
+      const moved = new Set();
+      for (const [k, spec] of Object.entries(scene3.groups || {})) {
+        if (!spec.move) continue;
+        const pivotBox = new THREE.Box3();
+        const from = spec.pivot ? groups[spec.pivot]?.meshes || [] : groups[k].meshes;
+        from.forEach(o => pivotBox.expandByObject(o));
+        if (pivotBox.isEmpty()) continue;
+        const pivot = new THREE.Group();
+        pivot.position.copy(spec.pivotAt ? new THREE.Vector3(...spec.pivotAt).add(pivotBox.getCenter(new THREE.Vector3())) : pivotBox.getCenter(new THREE.Vector3()));
+        root.add(pivot);
+        pivot.updateMatrixWorld(true);
+        for (const o of groups[k].meshes) if (!moved.has(o)) { pivot.attach(o); moved.add(o); }
+        groups[k].pivot = pivot;
+      }
+
+      const v = scene3.view || {};
+      const dir = new THREE.Vector3(...(v.dir || [0.07, 0.05, 1])).normalize();
+      controls.target.copy(centre);
+      camera.position.copy(centre).addScaledVector(dir, size * (v.dist || 1.75));
+      controls.minDistance = size * 0.6;
+      controls.maxDistance = size * 4;
+      controls.update();
+      msg.style.display = 'none';
+      ready = true;
+    }).catch(() => { msg.textContent = 'The 3D model could not load.'; });
+
+    let ready = false;
+    let frame = null;
+    addEventListener('message', e => {
+      if (e.origin !== location.origin) return;
+      const d = typeof e.data === 'string' ? (() => { try { return JSON.parse(e.data); } catch { return null; } })() : e.data;
+      if (d && d.type === 'grateapex-organ') frame = d;
+    });
+
+    let allMeshes = [];
+    function apply(f) {
+      if (!allMeshes.length) for (const g of Object.values(groups)) for (const o of g.meshes) if (!allMeshes.includes(o)) allMeshes.push(o);
+      for (const o of allMeshes) {
+        o.material.color.copy(o.userData.baseColour);
+        o.material.emissiveIntensity = 0;
+        o.userData.glow = 0;
+      }
+      for (const [k, g] of Object.entries(groups)) {
+        const mv = f.move && f.move[k];
+        if (g.pivot) {
+          if (Array.isArray(mv)) g.pivot.scale.set(mv[0], mv[1], mv[2]);
+          else g.pivot.scale.setScalar(typeof mv === 'number' ? mv : 1);
+        }
+        const glow = (f.glow && f.glow[k]) || 0;
+        const col = f.color && f.color[k];
+        const op = f.opacity && f.opacity[k];
+        for (const o of g.meshes) {
+          const m = o.material;
+          if (col) m.color.set(col);
+          if (glow > o.userData.glow) {
+            o.userData.glow = glow;
+            m.emissive.set((f.glowColor && f.glowColor[k]) || '#ff3a1e');
+            m.emissiveIntensity = 0.9 * glow;
+          }
+          if (op !== undefined) { m.opacity = op; m.transparent = op < 1; m.depthWrite = op >= 1; m.side = op < 1 ? THREE.DoubleSide : THREE.FrontSide; }
+        }
+      }
+    }
+
+    function resize() {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      if (canvas.width !== Math.round(w * renderer.getPixelRatio()) || canvas.height !== Math.round(h * renderer.getPixelRatio())) {
+        renderer.setSize(w, h, false);
+        camera.aspect = w / Math.max(1, h);
+        camera.updateProjectionMatrix();
+      }
+    }
+    renderer.setAnimationLoop(() => {
+      resize();
+      if (ready && frame) apply(frame);
+      controls.update();
+      renderer.render(scene, camera);
+    });
+  </script>
+</body>
+</html>

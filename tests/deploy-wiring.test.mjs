@@ -41,6 +41,21 @@ describe('3D atlas wiring', () => {
     assert.match(html, /f \+ '\?m=' \+ MODEL_VERSION/, 'model addresses must end in ?m=<MODEL_VERSION>');
     assert.equal(/const MODEL_VERSION = '(\d+)'/.exec(html)?.[1], KNOWN_MODELS.version);
   });
+  // The 3D organs shown with the simulations (public/sim3d) load the same model files: they must ask for the
+  // same version, or browsers would download every model a second time.
+  it('the simulation 3D organs ask for models with the same version', () => {
+    const scenes = read('public/sim3d/scenes.js');
+    assert.equal(/export const MODEL_VERSION = '(\d+)'/.exec(scenes)?.[1], KNOWN_MODELS.version);
+    assert.match(read('public/sim3d/organ.html'), /'\.glb\?m=' \+ MODEL_VERSION/);
+    assert.match(read('public/sw.js'), /startsWith\('\/sim3d\/'\)\) return;/, 'the service worker must leave /sim3d/ alone, like /atlas/');
+  });
+  it('every 3D scene a simulation asks for exists', async () => {
+    const { SCENES } = await import('../public/sim3d/scenes.js');
+    const dir = 'src/components/learning/simulations/graphics';
+    for (const file of readdirSync(dir).filter((f) => f.endsWith('.tsx'))) {
+      for (const m of read(`${dir}/${file}`).matchAll(/scene="([\w-]+)"/g)) assert.ok(SCENES[m[1]], `${file} asks for 3D scene "${m[1]}", which public/sim3d/scenes.js does not have`);
+    }
+  });
   it('the model version was bumped whenever a model changed', () => {
     const files = [];
     const walk = (dir) => readdirSync(dir, { withFileTypes: true }).forEach((e) => (e.isDirectory() ? walk(`${dir}/${e.name}`) : files.push(`${dir}/${e.name}`)));
