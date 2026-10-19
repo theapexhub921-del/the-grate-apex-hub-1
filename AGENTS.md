@@ -393,6 +393,10 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * The bell and centre UI are in `src/components/notifications.tsx`.
 * Phone and computer alerts that arrive when the app is closed (messages, follows, likes, comments, **battle challenges and results**) go through `api/push.mjs`; **streak-at-risk, review-due, weekly league and Sunday weekly-summary pushes** are sent on a daily schedule by `api/reminders.mjs` (needs `FIREBASE_SERVICE_ACCOUNT` and `CRON_SECRET` in Vercel). Shared rules are in `api/_push-logic.mjs`, checked by `tests/push-logic.test.mjs`. Setup, switches and a safe dry run: `docs/push-notifications.md`.
 
+### Android app (2026-10-19)
+
+* The APK is a Trusted Web Activity around the live site (built with PWABuilder, package `com.grateapex.app`), so every push to master reaches installed apps with no new APK. `public/.well-known/assetlinks.json` must keep the signing key's fingerprint (`tests/deploy-wiring.test.mjs`). The signing key is NOT in the repo. See `docs/android-app.md`.
+
 ### Offline study
 
 * `public/sw.js` keeps the app shell, scripts, pages already visited, question banks (`/curriculum/*.json`, shown from the saved copy and refreshed in the background) and lecture diagrams (`/figures/*`). Banks and diagrams live in the `grateapex-offline-v1` cache, which app updates never delete.
