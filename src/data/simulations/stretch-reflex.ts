@@ -83,6 +83,7 @@ export const stretchReflex: SimDefinition<ReflexState> = {
     { key: 'hamstrings', label: 'Hamstring activity', unit: '%' },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'normal', label: 'Normal knee jerk', values: START, caption: 'Tap → spindle stretched → Ia → α-motor neuron → quadriceps contracts. One synapse.' },
     { id: 'anxious', label: 'Anxious patient', values: { ...START, gamma: 80 }, caption: 'Descending signals raise γ discharge: the spindle is more sensitive, so the same tap gives a brisk jerk (Sensory I, p. 25).' },

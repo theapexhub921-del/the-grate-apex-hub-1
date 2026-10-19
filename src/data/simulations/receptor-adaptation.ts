@@ -100,6 +100,7 @@ export const receptorAdaptation: SimDefinition<AdaptationState> = {
     { key: 'remaining', label: 'Firing vs onset', unit: '%', hidden: true },
   ],
   model,
+  animated: true,
   scenarios: [
     { id: 'onset', label: 'Touch begins', values: START, caption: 'At onset the generator potential is high above threshold, so the fibre fires fast.' },
     { id: 'held', label: 'Touch held 5 s', values: { ...START, t: 5 }, caption: 'Same stimulus, but the touch receptor has adapted: the generator potential has fallen below threshold.' },

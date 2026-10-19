@@ -1,18 +1,19 @@
 import { View } from 'react-native';
-import { Circle, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
+import { Circle, Line, Path, Rect } from 'react-native-svg';
 
 import { SPAN, type ReachState } from '@/data/simulations/cerebellar-reach';
 import { useTheme } from '@/hooks/use-theme';
 
+import { Organ3D } from '../organ-3d';
+import { rounded } from '../organ-frames';
 import { along, Axes, Canvas, Legend, linear, pathOf, type GraphicProps } from './shared';
 
 const W = 400;
-const H = 300;
+const H = 230;
 const L = 48;
 const R = 14;
-const T = 84;
-const B = 250;
-const TRACK_Y = 40;
+const T = 20;
+const B = 190;
 const PAUSE = 0.8;
 
 export function CerebellarReachGraphic({ state, baseline, time, reduceMotion }: GraphicProps<ReachState>) {
@@ -26,22 +27,20 @@ export function CerebellarReachGraphic({ state, baseline, time, reduceMotion }: 
   const loop = SPAN * 2 + PAUSE;
   const t = reduceMotion ? SPAN : Math.min(SPAN, (((time % loop) + loop) % loop) / 2);
   const [, position] = along(state.path, t / SPAN);
-  const track = linear([0, 1.6], [L, W - R]);
+
+  // the real brain from the left: the cerebellum glows with how well it is working and greys
+  // out when damaged
+  const fn = Math.max(0, Math.min(1, state.cerebellum / 100));
+  const organ = {
+    glow: { cerebellum: rounded(0.15 + 0.45 * fn, 0.05) },
+    glowColor: { cerebellum: '#9fd0ff' },
+    color: { cerebellum: fn < 0.6 ? '#9c9090' : '#c99a95' },
+  };
 
   return (
     <View style={{ gap: 10 }}>
+      <Organ3D scene="brain" frame={organ} label={`The brain from the left: cerebellar function ${Math.round(state.cerebellum)}%`} />
       <Canvas width={W} height={H} label={`Cerebellar function ${Math.round(state.cerebellum)}%. The finger overshoots the target by ${Math.round(state.overshoot)}% and swings past it ${state.swings} times.`}>
-        {/* The reach, seen from above */}
-        <Rect x={L} y={TRACK_Y - 3} width={W - R - L} height={6} rx={3} fill={colors.track} />
-        <Rect x={track(0.95)} y={TRACK_Y - 16} width={track(1.05) - track(0.95)} height={32} rx={6} fill={colors.successSubtle} stroke={colors.successBorder} />
-        <SvgText x={track(1)} y={TRACK_Y - 22} fontSize={11} fontWeight="800" fill={colors.successText} textAnchor="middle">
-          Target
-        </SvgText>
-        <SvgText x={L} y={TRACK_Y - 12} fontSize={11} fontWeight="800" fill={colors.textTertiary}>
-          Start
-        </SvgText>
-        <Circle cx={track(Math.max(0, Math.min(1.6, position)))} cy={TRACK_Y} r={9} fill={colors.accent} stroke={colors.surface} strokeWidth={2.5} />
-
         {/* Position over time */}
         <Rect x={L} y={y(1.05)} width={W - R - L} height={y(0.95) - y(1.05)} fill={colors.successSubtle} />
         <Axes x={x} y={y} xTicks={[0, 1, 2, 3]} yTicks={[0, 0.5, 1, 1.5]} left={L} right={W - R} top={T} bottom={B} xLabel="Time (s)" yLabel="Finger position" />

@@ -9,7 +9,7 @@
     /sim3d/organ.html?scene=<id> — the scenes (which atlas models, which parts, how they move) are in
     scenes.js. The models are the atlas's (Z-Anatomy / BodyParts3D, CC BY-SA 4.0, /atlas/ATTRIBUTION.md).
     The app moves the organ with messages:
-      { type: 'grateapex-organ', move: { group: number | [x, y, z] }, glow: { group: 0–1 },
+      { type: 'grateapex-organ', move: { group: number | [x, y, z] }, turn: { group: degrees }, glow: { group: 0–1 },
         glowColor: { group: '#hex' }, color: { group: '#hex' }, opacity: { group: 0–1 } }
     A 'move' value scales that group about its pivot (1 = as modelled).
   -->
@@ -55,6 +55,7 @@
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.95;
+    renderer.localClippingEnabled = true;
 
     const scene = new THREE.Scene();
     const pmrem = new THREE.PMREMGenerator(renderer);
@@ -120,9 +121,38 @@
         root.attach(o);
       }
       root.updateMatrixWorld(true);
+      // Scene-wide slab: show only a band of the model's height (e.g. a segment of spinal cord).
+      const whole = new THREE.Box3();
+      keep.forEach(o => whole.expandByObject(o));
+      const yAt = f => whole.min.y + (whole.max.y - whole.min.y) * f;
+      const slabPlanes = scene3.slab ? [new THREE.Plane(new THREE.Vector3(0, 1, 0), -yAt(scene3.slab[0])), new THREE.Plane(new THREE.Vector3(0, -1, 0), yAt(scene3.slab[1]))] : [];
+      if (slabPlanes.length) for (const o of keep) { o.material.clippingPlanes = slabPlanes; o.material.side = THREE.DoubleSide; }
+      // Groups limited to one side (right = −x) or to a band of height get their own copies of the
+      // parts, clipped to that side or band, drawn just in front of the originals.
+      for (const [k, spec] of Object.entries(scene3.groups || {})) {
+        if (!spec.side && !spec.level) continue;
+        const planes = [...slabPlanes];
+        if (spec.side === 'r') planes.push(new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0));
+        if (spec.side === 'l') planes.push(new THREE.Plane(new THREE.Vector3(1, 0, 0), 0));
+        if (spec.level) planes.push(new THREE.Plane(new THREE.Vector3(0, 1, 0), -yAt(spec.level[0])), new THREE.Plane(new THREE.Vector3(0, -1, 0), yAt(spec.level[1])));
+        groups[k].meshes = groups[k].meshes.map(o => {
+          const copy = new THREE.Mesh(o.geometry, o.material.clone());
+          copy.material.clippingPlanes = planes;
+          copy.material.side = THREE.DoubleSide;
+          copy.material.polygonOffset = true;
+          copy.material.polygonOffsetFactor = -1;
+          copy.material.polygonOffsetUnits = -1;
+          copy.userData.baseColour = o.userData.baseColour.clone();
+          copy.userData.baseOpacity = o.userData.baseOpacity;
+          copy.position.copy(o.position); copy.quaternion.copy(o.quaternion); copy.scale.copy(o.scale);
+          o.parent.add(copy);
+          return copy;
+        });
+      }
       const box = new THREE.Box3();
       const focus = scene3.focus ? groups[scene3.focus]?.meshes : keep;
       (focus && focus.length ? focus : keep).forEach(o => box.expandByObject(o));
+      if (scene3.slab) { box.min.y = Math.max(box.min.y, yAt(scene3.slab[0])); box.max.y = Math.min(box.max.y, yAt(scene3.slab[1])); }
       const centre = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3()).length();
 
@@ -178,6 +208,9 @@
         if (g.pivot) {
           if (Array.isArray(mv)) g.pivot.scale.set(mv[0], mv[1], mv[2]);
           else g.pivot.scale.setScalar(typeof mv === 'number' ? mv : 1);
+          const deg = (f.turn && f.turn[k]) || 0;
+          const axis = (scene3.groups[k] && scene3.groups[k].axis) || 'x';
+          g.pivot.rotation.set(axis === 'x' ? deg * Math.PI / 180 : 0, axis === 'y' ? deg * Math.PI / 180 : 0, axis === 'z' ? deg * Math.PI / 180 : 0);
         }
         const glow = (f.glow && f.glow[k]) || 0;
         const col = f.color && f.color[k];

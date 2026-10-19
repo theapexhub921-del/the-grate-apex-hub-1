@@ -1,27 +1,22 @@
 import { View } from 'react-native';
-import { Circle, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
+import { Circle, Line, Path, Text as SvgText } from 'react-native-svg';
 
 import type { BasalState } from '@/data/simulations/basal-ganglia';
 import { useTheme } from '@/hooks/use-theme';
 
+import { Organ3D } from '../organ-3d';
+import { rounded } from '../organ-frames';
 import { Canvas, Legend, linear, pathOf, type GraphicProps } from './shared';
 
 const W = 400;
-const H = 340;
+const H = 150;
 const TRACE_T = 4; // seconds of movement drawn
 const PLOT_L = 40;
 const PLOT_R = W - 14;
-const PLOT_T = 232;
-const PLOT_B = 312;
+const PLOT_T = 44;
+const PLOT_B = 124;
 
-type Box = { x: number; y: number; w: number; h: number; title: string; sub?: string };
 
-const CORTEX: Box = { x: 140, y: 8, w: 120, h: 34, title: 'Motor cortex' };
-const STRIATUM: Box = { x: 20, y: 72, w: 140, h: 40, title: 'Striatum', sub: 'caudate + putamen' };
-const GP: Box = { x: 240, y: 72, w: 140, h: 40, title: 'Globus pallidus' };
-const THALAMUS: Box = { x: 240, y: 150, w: 140, h: 34, title: 'Thalamus' };
-const SN: Box = { x: 20, y: 150, w: 140, h: 34, title: 'Substantia nigra' };
-const STN: Box = { x: 160, y: 118, w: 80, h: 28, title: 'Subthalamic' };
 
 // Hand position while trying to make one smooth movement from 0 to 1.
 export function handTrace(s: BasalState): [number, number][] {
@@ -39,24 +34,9 @@ export function handTrace(s: BasalState): [number, number][] {
   return points;
 }
 
-const width = (activity: number) => 1.5 + Math.min(7, activity / 22);
-
 export function BasalGangliaGraphic({ state, baseline, time, reduceMotion }: GraphicProps<BasalState>) {
   const colors = useTheme();
 
-  const box = (b: Box, fill: string) => (
-    <G key={b.title}>
-      <Rect x={b.x} y={b.y} width={b.w} height={b.h} rx={10} fill={fill} stroke={colors.borderStrong} />
-      <SvgText x={b.x + b.w / 2} y={b.y + (b.sub ? 17 : 21)} fontSize={12} fontWeight="900" fill={colors.text} textAnchor="middle">
-        {b.title}
-      </SvgText>
-      {b.sub ? (
-        <SvgText x={b.x + b.w / 2} y={b.y + 31} fontSize={10} fontWeight="700" fill={colors.textTertiary} textAnchor="middle">
-          {b.sub}
-        </SvgText>
-      ) : null}
-    </G>
-  );
 
   const x = linear([0, TRACE_T], [PLOT_L, PLOT_R]);
   const y = linear([-0.3, 1.3], [PLOT_B, PLOT_T]);
@@ -65,38 +45,21 @@ export function BasalGangliaGraphic({ state, baseline, time, reduceMotion }: Gra
   const loop = TRACE_T + 1;
   const t = reduceMotion ? TRACE_T : Math.min(TRACE_T, ((time % loop) + loop) % loop);
   const dot = trace[Math.round((t / TRACE_T) * 200)];
-  const brakeColor = state.brake > 110 ? colors.error : state.brake < 90 ? colors.warning : colors.success;
+
+  // the real basal nuclei inside a see-through brain: the striatum (caudate, putamen) glows with
+  // its activity, the midbrain (substantia nigra) with its dopamine, the subthalamic nucleus with
+  // its drive, and the thalamus dims as the pallidal brake on it rises
+  const g = (v: number) => rounded(Math.max(0, Math.min(1, v)), 0.05);
+  const organ = {
+    glow: { caudate: g((state.striatalActivity - 60) / 120), putamen: g((state.striatalActivity - 60) / 120), midbrain: g(state.dopamine / 140), subthalamic: g(state.stn / 140), pallidus: g((state.brake - 60) / 120), thalamus: g((180 - state.brake) / 200) },
+    glowColor: { caudate: '#ff8a6a', putamen: '#ff8a6a', midbrain: '#ffd25a', subthalamic: '#ffd25a', pallidus: '#ff5a4a', thalamus: '#9fd0ff' },
+    color: { caudate: state.striatum < 80 ? '#8f8580' : '#c98a7a', midbrain: state.dopamine < 60 ? '#a39a96' : '#6f5f5c' },
+  };
 
   return (
     <View style={{ gap: 10 }}>
+      <Organ3D scene="brain-deep" frame={organ} label={`Basal nuclei: dopamine ${Math.round(state.dopamine)}%, striatal activity ${Math.round(state.striatalActivity)}%, brake on the thalamus ${Math.round(state.brake)}%`} />
       <Canvas width={W} height={H} label={`Brake ${Math.round(state.brake)}% of normal. Speed ${Math.round(state.speed)}%, rigidity ${Math.round(state.rigidity)}%, unwanted movements ${Math.round(state.involuntary)}%.`}>
-        {/* Connections */}
-        <Path d={`M${CORTEX.x + 10} ${CORTEX.y + CORTEX.h} L${STRIATUM.x + 100} ${STRIATUM.y}`} stroke={colors.success} strokeWidth={3} />
-        <Path d={`M${SN.x + 70} ${SN.y} L${STRIATUM.x + 70} ${STRIATUM.y + STRIATUM.h}`} stroke={colors.error} strokeWidth={width(state.dopamine)} strokeDasharray="6 3" opacity={0.4 + state.dopamine / 170} />
-        <Path d={`M${STRIATUM.x + STRIATUM.w} ${STRIATUM.y + 20} L${GP.x} ${GP.y + 20}`} stroke={colors.error} strokeWidth={width(state.striatalActivity * 0.8)} />
-        <Path d={`M${STN.x + STN.w} ${STN.y + 6} L${GP.x + 20} ${GP.y + GP.h}`} stroke={colors.success} strokeWidth={width(state.stn * 0.8)} opacity={0.4 + state.stn / 170} />
-        <Path d={`M${GP.x + 70} ${GP.y + GP.h} L${THALAMUS.x + 70} ${THALAMUS.y}`} stroke={brakeColor} strokeWidth={width(state.brake)} />
-        <Path d={`M${THALAMUS.x + THALAMUS.w} ${THALAMUS.y + 17} Q${W - 2} 90 ${CORTEX.x + CORTEX.w} ${CORTEX.y + 17}`} stroke={colors.success} strokeWidth={3} fill="none" />
-        <SvgText x={GP.x + 62} y={136} fontSize={11} fontWeight="900" fill={brakeColor} textAnchor="end">
-          {`Brake ${Math.round(state.brake)}%`}
-        </SvgText>
-        <SvgText x={SN.x + 76} y={140} fontSize={10} fontWeight="800" fill={colors.textTertiary}>
-          dopamine
-        </SvgText>
-        <SvgText x={(STRIATUM.x + STRIATUM.w + GP.x) / 2} y={STRIATUM.y + 14} fontSize={10} fontWeight="800" fill={colors.textTertiary} textAnchor="middle">
-          GABA
-        </SvgText>
-        <SvgText x={CORTEX.x - 8} y={CORTEX.y + 50} fontSize={10} fontWeight="800" fill={colors.textTertiary} textAnchor="end">
-          ACh
-        </SvgText>
-
-        {box(CORTEX, colors.surfaceMuted)}
-        {box(STRIATUM, state.striatalActivity > 115 ? colors.errorSubtle : state.striatum < 80 ? colors.warningSubtle : colors.surfaceMuted)}
-        {box(GP, colors.surfaceMuted)}
-        {box(THALAMUS, colors.surfaceMuted)}
-        {box(SN, state.dopamine < 80 ? colors.warningSubtle : colors.surfaceMuted)}
-        {box(STN, state.stn < 80 ? colors.warningSubtle : colors.surfaceMuted)}
-
         {/* Hand trace */}
         <SvgText x={PLOT_L} y={PLOT_T - 22} fontSize={11} fontWeight="800" fill={colors.textSecondary}>
           Trying to move the hand smoothly from A to B
@@ -118,8 +81,6 @@ export function BasalGangliaGraphic({ state, baseline, time, reduceMotion }: Gra
       </Canvas>
       <Legend
         items={[
-          { label: 'Excites', color: colors.success },
-          { label: 'Inhibits', color: colors.error },
           { label: 'Hand position', color: colors.primary },
           ...(changed ? [{ label: 'Before', color: colors.textTertiary, dashed: true }] : []),
         ]}

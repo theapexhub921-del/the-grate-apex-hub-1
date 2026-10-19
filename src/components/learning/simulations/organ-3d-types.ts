@@ -3,6 +3,7 @@
 // scene's (public/sim3d/scenes.js).
 export type OrganFrame = {
   move?: Record<string, number | [number, number, number]>;
+  turn?: Record<string, number>; // degrees about the group's axis (scenes.js), e.g. a knee bending
   glow?: Record<string, number>;
   glowColor?: Record<string, string>;
   color?: Record<string, string>;

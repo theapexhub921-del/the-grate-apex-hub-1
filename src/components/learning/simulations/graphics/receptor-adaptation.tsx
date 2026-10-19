@@ -1,9 +1,14 @@
 import { View } from 'react-native';
-import { Circle, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
+import { Circle, Ellipse, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 
 import { frequencyFrom, RECEPTORS, SPAN, THRESHOLD, type AdaptationState } from '@/data/simulations/receptor-adaptation';
 import { useTheme } from '@/hooks/use-theme';
 
+import { Anatomy as A } from '@/constants/theme';
+
+import { mix } from './anatomy/cells';
+import { Tube } from './anatomy/kidney';
+import { Tag } from './kit';
 import { Axes, Canvas, Legend, linear, pathOf, type GraphicProps } from './shared';
 
 const W = 400;
@@ -36,7 +41,56 @@ function spikeTimes(trace: [number, number][]) {
   return times;
 }
 
-export function ReceptorAdaptationGraphic({ state, baseline }: GraphicProps<AdaptationState>) {
+// The receptor itself: for touch, a Pacinian corpuscle (layers like an onion) deep in the skin
+// under a pressing fingertip; for blood pressure, the stretched wall of the carotid sinus with
+// nerve endings in it. Impulses travel up the nerve fibre as fast as the receptor fires.
+function ReceptorPicture({ state, time }: { state: AdaptationState; time: number }) {
+  const press = state.strength / 100;
+  const spacing = 300 / Math.max(1, state.frequency * 0.6);
+  const spikes = state.frequency > 0.5 ? Array.from({ length: Math.min(30, Math.ceil(300 / spacing) + 1) }, (_, k) => ((k * spacing + time * 90) % 300)) : [];
+  const fibre = 'M150 128 C200 128 220 96 260 96 L400 96';
+  if (state.receptor === 1) {
+    const stretch = 1 + 0.35 * press;
+    return (
+      <Canvas width={400} height={170} label="The carotid sinus wall, stretched by blood pressure, with its nerve endings firing up the fibre.">
+        <Tube d={`M20 86 L140 86`} width={44 * stretch} wall={mix(A.artery, '#000000', 0.15)} fluid={mix(A.artery, '#FFFFFF', 0.2)} time={time} flow={1} />
+        {[30, 60, 90, 120].map((x) => (
+          <Tube key={x} d={`M${x} ${86 - 24 * stretch} C${x + 6} ${70 - 30 * stretch} ${x + 30} 120 150 128`} width={2.4} wall={A.nerve} fluid={mix(A.nerve, '#FFFFFF', 0.4)} shine={false} />
+        ))}
+        <Tube d={fibre} width={7} wall={A.nerve} fluid={mix(A.nerve, '#FFFFFF', 0.45)} />
+        {spikes.map((x, i) => (
+          <Circle key={i} cx={260 + x * 0.47} cy={96} r={4.2} fill="#FFF3A8" stroke={A.nerveDark} strokeWidth={1} />
+        ))}
+        <Tag x={80} y={20} text={`Carotid sinus wall · stretch ${Math.round(press * 100)}%`} size={10} />
+        <Tag x={320} y={140} text={`${Math.round(state.frequency)} impulses a second`} size={10} />
+      </Canvas>
+    );
+  }
+  return (
+    <Canvas width={400} height={170} label="Skin with a Pacinian corpuscle under a pressing fingertip; impulses travel up its nerve fibre.">
+      {/* fingertip pressing on the skin */}
+      <Ellipse cx={80} cy={8 + 14 * press} rx={46} ry={22} fill={mix(A.skin, '#FFFFFF', 0.1)} stroke={A.skinShade} strokeWidth={1.4} />
+      {/* skin layers */}
+      <Path d={`M0 30 Q80 ${30 + 12 * press} 160 30 L400 30 L400 52 L0 52 Z`} fill={mix(A.skin, '#FFFFFF', 0.3)} stroke={A.skinShade} />
+      <Path d="M0 52 L400 52 L400 110 L0 110 Z" fill={mix(A.mucosa, '#FFFFFF', 0.45)} />
+      <Path d="M0 110 L400 110 L400 170 L0 170 Z" fill={mix(A.fat, '#FFFFFF', 0.35)} />
+      {/* Pacinian corpuscle: concentric lamellae around the nerve ending */}
+      {[1, 0.82, 0.64, 0.48, 0.32].map((k) => (
+        <Ellipse key={k} cx={100} cy={128} rx={46 * k * (1 - 0.12 * press)} ry={22 * k * (1 + 0.1 * press)} fill={mix(A.calyx, '#FFFFFF', 0.4 * k)} stroke={A.calyxShade} strokeWidth={1} opacity={0.95} />
+      ))}
+      <Tube d="M90 128 L150 128" width={4} wall={A.nerve} fluid={mix(A.nerve, '#FFFFFF', 0.45)} shine={false} />
+      <Tube d={fibre} width={7} wall={A.nerve} fluid={mix(A.nerve, '#FFFFFF', 0.45)} />
+      {spikes.map((x, i) => (
+        <Circle key={i} cx={150 + x * 0.83} cy={x < 110 ? 128 - (x / 110) * 32 : 96} r={4.2} fill="#FFF3A8" stroke={A.nerveDark} strokeWidth={1} />
+      ))}
+      <Tag x={300} y={20} text="Epidermis · dermis · fat" size={9} />
+      <Tag x={100} y={160} text="Pacinian corpuscle" size={10} />
+      <Tag x={320} y={140} text={`${Math.round(state.frequency)} impulses a second`} size={10} />
+    </Canvas>
+  );
+}
+
+export function ReceptorAdaptationGraphic({ state, baseline, time, reduceMotion }: GraphicProps<AdaptationState>) {
   const colors = useTheme();
   const x = linear([0, SPAN], [L, W - R]);
   const y = linear([0, 32], [B, T]);
@@ -47,6 +101,7 @@ export function ReceptorAdaptationGraphic({ state, baseline }: GraphicProps<Adap
 
   return (
     <View style={{ gap: 10 }}>
+      <ReceptorPicture state={state} time={reduceMotion ? 0 : time} />
       <Canvas width={W} height={H} label={`${RECEPTORS[state.receptor]}. After ${state.t.toFixed(1)} s the generator potential is ${state.generator.toFixed(1)} mV and the fibre fires ${Math.round(state.frequency)} times a second.`}>
         <SvgText x={L} y={18} fontSize={12} fontWeight="800" fill={colors.textSecondary}>
           {`${RECEPTORS[state.receptor]} · stimulus ${Math.round(state.strength)}%, held steady`}

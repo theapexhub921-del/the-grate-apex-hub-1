@@ -229,4 +229,115 @@ export const SCENES = {
     },
     view: { dir: [0, 0.05, 1], dist: 1.35 },
   },
+
+  // The brain seen from the left, its lobes tinted, with regions that can light up when damaged.
+  brain: {
+    label: 'The brain, seen from the left',
+    files: ['NervousSystem100'],
+    under: ['brain.g'],
+    names: [],
+    groups: {
+      frontal: { match: /frontal lobe/, color: '#e2b2a8' },
+      parietal: { match: /parietal lobe/, color: '#d8c0a2' },
+      temporal: { match: /temporal lobe/, color: '#c9b4cf' },
+      occipital: { match: /occipital lobe/, color: '#b4c7d8' },
+      cerebellum: { match: /cerebellum\.g/, color: '#c99a95' },
+      brainstem: { match: /brainstem\.g/ },
+      broca: { match: /(opercular|triangular) part of inferior frontal gyrus/, side: 'l' },
+      prefrontal: { match: /superior frontal gyrus|middle frontal gyrus|orbital (gyri|part)|frontopolar|gyrus rectus|straight gyrus/ },
+      wernicke: { match: /superior temporal gyrus|transverse temporal/, side: 'l' },
+      parietalL: { match: /parietal lobe/, side: 'l' },
+      parietalR: { match: /parietal lobe/, side: 'r' },
+      v1: { match: /occipital pole|calcarine|cuneus|lingual gyrus/ },
+      visual: { match: /lateral occipital|superior occipital|inferior occipital|occipitotemporal/ },
+      hippocampi: { match: /hippocamp|dentate gyrus|parahippocampal/ },
+      callosum: { match: /corpus callosum/ },
+      pons: { match: /^[^/]*pons/ },
+      precentral: { match: /precentral gyrus/ },
+    },
+    view: { dir: [1, 0.15, 0.25], dist: 1.6 },
+  },
+
+  // Deep inside the brain: a see-through cortex around the basal nuclei, thalamus and midbrain.
+  'brain-deep': {
+    label: 'The basal nuclei, thalamus and midbrain inside a see-through brain',
+    files: ['NervousSystem100'],
+    under: ['brain.g'],
+    names: [],
+    exclude: [/sulcus|sulci|fissure|meninges|dura|arachnoid|pia/],
+    groups: {
+      cortex: { match: /brain\.g/, opacity: 0.018 },
+      caudate: { match: /caudate/, opacity: 1, color: '#c98a7a' },
+      putamen: { match: /putamen/, opacity: 1, color: '#b9837f' },
+      pallidus: { match: /pallidus/, opacity: 1, color: '#c7b7a5' },
+      thalamus: { match: /^[^/]*thalamus/, opacity: 1, color: '#9fa7c9' },
+      midbrain: { match: /midbrain|red nucleus|nigra|cerebral peduncle/, opacity: 1, color: '#6f5f5c' },
+      subthalamic: { match: /subthalam/, opacity: 1, color: '#c4a37a' },
+    },
+    focus: 'caudate',
+    view: { dir: [0.6, 0.55, 1], dist: 1.9 },
+  },
+
+  // A segment of the spinal cord around T10, with its tracts and grey matter; tracts can light up
+  // on one side, and a band can mark a lesion.
+  cord: {
+    label: 'A segment of the spinal cord with its tracts',
+    files: ['NervousSystem100'],
+    under: ['spinal cord.g'],
+    names: [],
+    slab: [0.245, 0.285],
+    groups: {
+      white: { match: /^white matter of spinal cord( \/|$)|fasciculus proprius|reticulospinal|vestibulospinal|tectospinal|rubrospinal|spinocerebellar|posterolateral tract|spinotectal/, opacity: 0.1 },
+      grey: { match: /horn|intermedi|central canal|nucleus proprius|spinal reticular/, color: '#b7a69f' },
+      dorsal: { match: /posterior horn|nucleus proprius|spinal reticular/ },
+      ventral: { match: /anterior horn/ },
+      dc: { match: /gracile|cuneate/, color: '#7aa7d9' },
+      st: { match: /spinothalamic/, color: '#e3a25f' },
+      cs: { match: /corticospinal/, color: '#7fbf8a' },
+      dcR: { match: /gracile|cuneate/, side: 'r' },
+      dcL: { match: /gracile|cuneate/, side: 'l' },
+      stR: { match: /spinothalamic/, side: 'r' },
+      stL: { match: /spinothalamic/, side: 'l' },
+      csR: { match: /corticospinal/, side: 'r' },
+      csL: { match: /corticospinal/, side: 'l' },
+      lesion: { match: /spinal cord\.g/, level: [0.255, 0.27] },
+      lesionR: { match: /spinal cord\.g/, level: [0.255, 0.27], side: 'r' },
+    },
+    view: { dir: [0.6, 0.9, 1], dist: 1.0 },
+  },
+
+  // The right knee seen from the side: thigh muscles, femoral nerve and the bones of the leg,
+  // which swing about the knee.
+  knee: {
+    label: 'The right thigh and leg: quadriceps, hamstrings, femoral nerve and the knee',
+    files: ['SkeletalSystem100', 'MuscularSystem100', 'NervousSystem100'],
+    under: [],
+    names: [/^(femur|patella|tibia|fibula|talus|calcaneus)\.?r( \d+)?$/, /^(rectus femoris muscle|vastus (lateralis|medialis|intermedius) muscle|long head of biceps femoris|short head of biceps femoris|semitendinosus muscle)\.?r( \d+)?$/, /^patellar ligament\.?[oe]?r/, /^femoral nerve\.?r( \d+)?$/],
+    groups: {
+      leg: { match: /tibia|fibula|talus|calcane|patellar ligament/, move: true, pivotAt: 'top', axis: 'x' },
+      quads: { match: /rectus femoris|vastus/ },
+      hams: { match: /biceps femoris|semitend/ },
+      nerve: { match: /femoral nerve/ },
+    },
+    view: { dir: [-1, 0.1, 0.35], dist: 1.25 },
+  },
+
+  // The motor pathway: motor cortex, spinal cord (corticospinal tracts), the right femoral nerve
+  // and the right quadriceps.
+  motor: {
+    label: 'The motor cortex, spinal cord, femoral nerve and quadriceps',
+    files: ['NervousSystem100', 'MuscularSystem100'],
+    under: ['brain.g', 'spinal cord.g'],
+    names: [/^femoral nerve\.?r( \d+)?$/, /^(rectus femoris muscle|vastus (lateralis|medialis|intermedius) muscle)\.?r( \d+)?$/],
+    groups: {
+      brain: { match: /brain\.g/ },
+      precentralL: { match: /precentral gyrus/, side: 'l' },
+      cs: { match: /corticospinal/ },
+      cordLesion: { match: /spinal cord\.g/, level: [0.5, 0.53] },
+      cordLesionR: { match: /spinal cord\.g/, level: [0.5, 0.53], side: 'r' },
+      femoral: { match: /femoral nerve/ },
+      quads: { match: /rectus femoris|vastus/, move: true },
+    },
+    view: { dir: [0.35, 0.05, 1], dist: 2.05 },
+  },
 };
