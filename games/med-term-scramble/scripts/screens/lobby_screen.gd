@@ -9,7 +9,7 @@ var leaving := false
 func build() -> void:
 	var row := UI.hbox(10)
 	content.add_child(row)
-	var back := UI.button("← Leave room", "ghost", 38)
+	var back := UI.button("‹ Leave room", "ghost", 38)
 	back.pressed.connect(func():
 		leaving = true
 		Net.leave()
@@ -21,7 +21,7 @@ func build() -> void:
 	cc.add_child(UI.label("ROOM CODE", 13, "muted", "mono"))
 	var code := UI.label(" ".join(PackedStringArray(Array(Net.code.split("")))), 54, "hema", "mono", false)
 	cc.add_child(code)
-	cc.add_child(UI.label("Share this code. Friends choose Multiplayer → Join a room.", 15, "muted"))
+	cc.add_child(UI.label("Share this code. Friends choose Multiplayer › Join a room.", 15, "muted"))
 	var settings: Dictionary = Net.room.get("settings", {})
 	var diff := int(settings.get("difficulty", 0))
 	cc.add_child(UI.label("%s · %s · %d questions" % [settings.get("category", "All"), "Mixed" if diff == 0 else GameData.difficulty_name(diff), (Net.room.get("questions", []) as Array).size()], 14, "eosin", "mono"))

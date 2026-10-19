@@ -115,7 +115,7 @@ func _prepare_questions() -> void:
 func _build_ui() -> void:
 	var top := UI.hbox(10)
 	content.add_child(top)
-	var back := UI.button("← Leave" if mode == "multi" else "← Menu", "ghost", 38)
+	var back := UI.button("‹ Leave" if mode == "multi" else "‹ Menu", "ghost", 38)
 	back.focus_mode = Control.FOCUS_NONE
 	back.pressed.connect(_quit)
 	top.add_child(back)
@@ -689,7 +689,7 @@ func _show_info(extended: bool, next_text: String) -> void:
 		if not rel.is_empty():
 			info_box.add_child(UI.label("Related: " + ", ".join(PackedStringArray(rel)), 14, "eosin", "mono"))
 	if next_text != "":
-		var b := UI.button(next_text + "  →", "primary", 46)
+		var b := UI.button(next_text + "  ›", "primary", 46)
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(_go_next)
 		info_box.add_child(b)
@@ -758,7 +758,7 @@ func _on_rush_choice(n: int) -> void:
 		Audio.play("wrong")
 		_set_feedback("Out of time on the challenge." if n < 0 else "Not the best answer.", "bad")
 	info_box.add_child(UI.label(String(r.get("why", "")), 16, "muted"))
-	var b2 := UI.button("Next  →", "primary", 46)
+	var b2 := UI.button("Next  ›", "primary", 46)
 	b2.focus_mode = Control.FOCUS_NONE
 	b2.pressed.connect(_go_next)
 	info_box.add_child(b2)
