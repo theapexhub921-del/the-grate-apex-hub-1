@@ -11,6 +11,10 @@ export type StudyGame = {
   /** Path of the web build's page (inside public/). */
   buildPath: string;
   tags: readonly string[];
+  /** The game page's own background (shown while it loads), so the frame never flashes another colour. */
+  loadingColor: string;
+  /** Short line for the Connect page; only games you can play with classmates are listed there. */
+  connectText?: string;
 };
 
 export const STUDY_GAMES: readonly StudyGame[] = [
@@ -23,6 +27,19 @@ export const STUDY_GAMES: readonly StudyGame[] = [
     href: '/games/med-term-scramble',
     buildPath: '/game-builds/med-term-scramble/play.html',
     tags: ['112 terms', '14 subjects', 'Single player', 'Multiplayer'],
+    loadingColor: '#14101e',
+    connectText: 'Race your classmates to unscramble medical terms in a live room, or play solo.',
+  },
+  {
+    id: 'golden-hour',
+    title: 'Golden Hour',
+    tagline: 'A night shift on a short-staffed ward. Can you keep every patient safe?',
+    description:
+      'Six nursing shifts in a 3D ward: vital signs, comfort rounds, cannulas and injections, medicines, triage and handover. Learn each skill, drill it against the clock, then prove it at the bedside while Sister Rebecca watches your safety and dignity scores.',
+    href: '/games/golden-hour',
+    buildPath: '/game-builds/golden-hour/play.html',
+    tags: ['6 shifts', '3D ward', 'Nursing skills', 'Single player'],
+    loadingColor: '#1144C3',
   },
 ];
 

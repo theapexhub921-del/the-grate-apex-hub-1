@@ -58,15 +58,21 @@ describe('3D atlas wiring', () => {
   });
 });
 
-describe('Med Term Scramble wiring', () => {
+const GAME_IDS = ['med-term-scramble', 'golden-hour'];
+
+describe('Study game wiring (Med Term Scramble, Golden Hour)', () => {
   it('the Vercel build joins the game engine from its parts first', () => {
     assert.match(vercel.buildCommand, /^node scripts\/assemble-games\.mjs && /);
   });
-  it('the game build has its engine parts and page', () => {
-    const files = readdirSync('public/game-builds/med-term-scramble');
-    assert.ok(files.some((file) => /^index\.wasm\.part\d+$/.test(file)), 'no index.wasm.partNN files');
-    for (const file of ['play.html', 'index.js', 'index.pck']) assert.ok(files.includes(file), `missing ${file}`);
-  });
+  for (const id of GAME_IDS) {
+    it(`${id}: the game build has its engine parts and page`, () => {
+      const files = readdirSync(`public/game-builds/${id}`);
+      assert.ok(files.some((file) => /^index\.wasm\.part\d+$/.test(file)), 'no index.wasm.partNN files');
+      for (const file of ['play.html', 'index.js', 'index.pck']) assert.ok(files.includes(file), `missing ${file}`);
+      const pck = readFileSync(`public/game-builds/${id}/index.pck`).length;
+      assert.match(readFileSync(`public/game-builds/${id}/play.html`, 'utf8'), new RegExp(`"index\\.pck":${pck}\\b`), 'play.html must list the real index.pck size');
+    });
+  }
   it('the service worker saves game builds for offline play, never a redirect', () => {
     const block = sw.slice(sw.indexOf("startsWith('/game-builds/')"));
     assert.ok(block.length < sw.length, 'no /game-builds/ handling in public/sw.js');
@@ -74,9 +80,11 @@ describe('Med Term Scramble wiring', () => {
     assert.match(block, /!response\.redirected/, 'a redirected reply must never be saved');
     assert.match(block, /OFFLINE_CACHE/, 'game files belong in the offline cache that app updates keep');
   });
-  it('the game page is hidden from the navigation tabs', () => {
+  it('every game page is hidden from the navigation tabs', () => {
     for (const file of ['src/components/app-tabs.web.tsx', 'src/components/app-tabs.tsx']) {
-      assert.match(read(file), /name="games\/med-term-scramble" options=\{\{ href: null \}\}/, file);
+      for (const id of GAME_IDS) {
+        assert.ok(read(file).includes(`name="games/${id}" options={{ href: null }}`), `${file}: games/${id}`);
+      }
     }
   });
 });
