@@ -3,6 +3,7 @@
 // decks (vs, av, cs in sources.ts). References name the deck.
 import type { LessonDraft } from '@/data/topics/build';
 import { interactive, readingExtras } from '@/data/topics/special-senses/interactive';
+import { withSimulation } from '@/data/topics/special-senses/simulations';
 import { av, cs, vs, type ConceptId } from '@/data/topics/special-senses/sources';
 
 type Draft = LessonDraft<ConceptId>;
@@ -830,5 +831,5 @@ const lesson10: Draft = {
 export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7, lesson8, lesson9, lesson10].map((lesson) => ({
   ...lesson,
   ...readingExtras[lesson.id],
-  interactive: interactive[lesson.id],
+  interactive: withSimulation(lesson.id, interactive[lesson.id]),
 }));

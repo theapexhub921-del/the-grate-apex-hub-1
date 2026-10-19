@@ -460,6 +460,22 @@ export const Anatomy = {
   zona: '#F9F3EC',
   luteum: '#E8C25A',
   albicans: '#F2EDE4',
+  // Eye and ear (illustrated views)
+  sclera: '#F7F3EC',
+  scleraShade: '#D9D0C2',
+  iris: '#5E7A55',
+  irisDark: '#3F5638',
+  pupil: '#141414',
+  cornea: '#DCEFF7',
+  lens: '#F4EBCF',
+  retina: '#D9806E',
+  aqueous: '#CDE7F3',
+  rhodopsin: '#8A5AA8',
+  bleached: '#EFD9A8',
+  endolymph: '#D7ECF6',
+  cupula: '#EAF3E2',
+  hairCell: '#E7B9A6',
+  basilar: '#E9C7A8',
 } as const;
 
 export const Radius = {

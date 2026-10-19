@@ -358,7 +358,18 @@ export type SimulationId =
   | 'ovulation-disorders'
   | 'lifespan'
   | 'fertilisation'
-  | 'labour-lactation';
+  | 'labour-lactation'
+  // Special Senses
+  | 'aqueous-humour'
+  | 'accommodation'
+  | 'phototransduction'
+  | 'visual-fields'
+  | 'pupil-reflex'
+  | 'sound-transmission'
+  | 'hearing-loss'
+  | 'vestibular'
+  | 'taste'
+  | 'smell';
 
 // What the model must show after a prediction is run (checked by
 // tests/simulations.test.mjs, so a prediction's answer always matches

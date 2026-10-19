@@ -33,6 +33,16 @@ import { ovulationDisorders } from '@/data/simulations/ovulation-disorders';
 import { lifespan } from '@/data/simulations/lifespan';
 import { fertilisation } from '@/data/simulations/fertilisation';
 import { labourLactation } from '@/data/simulations/labour-lactation';
+import { aqueousHumour } from '@/data/simulations/aqueous-humour';
+import { accommodation } from '@/data/simulations/accommodation';
+import { phototransduction } from '@/data/simulations/phototransduction';
+import { visualFields } from '@/data/simulations/visual-fields';
+import { pupilReflex } from '@/data/simulations/pupil-reflex';
+import { soundTransmission } from '@/data/simulations/sound-transmission';
+import { hearingLoss } from '@/data/simulations/hearing-loss';
+import { vestibular } from '@/data/simulations/vestibular';
+import { taste } from '@/data/simulations/taste';
+import { smell } from '@/data/simulations/smell';
 import type { SimulationId } from '@/data/lesson-types';
 import { basalGanglia } from '@/data/simulations/basal-ganglia';
 import { baroreflex } from '@/data/simulations/baroreflex';
@@ -128,6 +138,17 @@ export const SIMULATIONS: Record<SimulationId, SimDefinition> = {
   'lifespan': lifespan,
   'fertilisation': fertilisation,
   'labour-lactation': labourLactation,
+  // Special Senses
+  'aqueous-humour': aqueousHumour,
+  'accommodation': accommodation,
+  'phototransduction': phototransduction,
+  'visual-fields': visualFields,
+  'pupil-reflex': pupilReflex,
+  'sound-transmission': soundTransmission,
+  'hearing-loss': hearingLoss,
+  'vestibular': vestibular,
+  'taste': taste,
+  'smell': smell,
 };
 
 export function getSimulation(id: SimulationId): SimDefinition | undefined {

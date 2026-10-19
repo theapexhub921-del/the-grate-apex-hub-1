@@ -124,9 +124,50 @@ import type { FertilisationState } from '@/data/simulations/fertilisation';
 import { LabourLactationGraphic } from './labour-lactation';
 import type { LabourState } from '@/data/simulations/labour-lactation';
 
+import { AqueousHumourGraphic } from './aqueous-humour';
+import type { AqueousState } from '@/data/simulations/aqueous-humour';
+import { AccommodationGraphic } from './accommodation';
+import type { AccommodationState } from '@/data/simulations/accommodation';
+import { PhototransductionGraphic } from './phototransduction';
+import type { PhotoState } from '@/data/simulations/phototransduction';
+import { VisualFieldsGraphic } from './visual-fields';
+import type { FieldState } from '@/data/simulations/visual-fields';
+import { PupilReflexGraphic } from './pupil-reflex';
+import type { PupilState } from '@/data/simulations/pupil-reflex';
+import { SoundTransmissionGraphic } from './sound-transmission';
+import type { SoundState } from '@/data/simulations/sound-transmission';
+import { HearingLossGraphic } from './hearing-loss';
+import type { HearingState } from '@/data/simulations/hearing-loss';
+import { VestibularGraphic } from './vestibular';
+import type { VestibularState } from '@/data/simulations/vestibular';
+import { TasteGraphic } from './taste';
+import type { TasteState } from '@/data/simulations/taste';
+import { SmellGraphic } from './smell';
+import type { SmellState } from '@/data/simulations/smell';
+
 // The drawing for each simulation (models: data/simulations/).
 export function SimulationGraphic({ id, ...props }: GraphicProps<SimState> & { id: SimulationId }) {
   switch (id) {
+    case 'aqueous-humour':
+      return <AqueousHumourGraphic {...(props as GraphicProps<AqueousState>)} />;
+    case 'accommodation':
+      return <AccommodationGraphic {...(props as GraphicProps<AccommodationState>)} />;
+    case 'phototransduction':
+      return <PhototransductionGraphic {...(props as GraphicProps<PhotoState>)} />;
+    case 'visual-fields':
+      return <VisualFieldsGraphic {...(props as GraphicProps<FieldState>)} />;
+    case 'pupil-reflex':
+      return <PupilReflexGraphic {...(props as GraphicProps<PupilState>)} />;
+    case 'sound-transmission':
+      return <SoundTransmissionGraphic {...(props as GraphicProps<SoundState>)} />;
+    case 'hearing-loss':
+      return <HearingLossGraphic {...(props as GraphicProps<HearingState>)} />;
+    case 'vestibular':
+      return <VestibularGraphic {...(props as GraphicProps<VestibularState>)} />;
+    case 'taste':
+      return <TasteGraphic {...(props as GraphicProps<TasteState>)} />;
+    case 'smell':
+      return <SmellGraphic {...(props as GraphicProps<SmellState>)} />;
     case 'male-tract':
       return <MaleTractGraphic {...(props as GraphicProps<MaleTractState>)} />;
     case 'spermatogenesis':

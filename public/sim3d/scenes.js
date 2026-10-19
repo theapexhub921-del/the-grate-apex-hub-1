@@ -226,6 +226,147 @@ export const SCENES = {
     view: { dir: [0.35, 0.1, 1], dist: 1.4 },
   },
 
+
+  // ─── Special senses ────────────────────────────────────────────────
+  // The right eye, from the side and a little in front: a see-through sclera and vitreous show the
+  // cornea, iris, lens, zonules and retina; the optic nerve and extraocular muscles behind.
+  eye: {
+    label: 'The right eye: cornea, iris, lens, retina and optic nerve',
+    files: ['NervousSystem100', 'MuscularSystem100'],
+    under: [],
+    names: [/^(retina|sclera|lens|iris|cornea|anterior chamber of eyeball|vitreous body|zonular fibres|suspensory ligament of eyeball)\.?r( \d+)?$/, /^optic nerve \(ii\)\.?r( \d+)?$/, /^(lateral|medial|superior|inferior) rectus muscle\.?r( \d+)?$/, /^(superior|inferior) oblique muscle\.?r( \d+)?$/],
+    groups: {
+      sclera: { match: /^sclera/, opacity: 0.22, color: '#f3eee6' },
+      cornea: { match: /^cornea/, opacity: 0.35, color: '#dcecf4' },
+      chamber: { match: /anterior chamber/, opacity: 0.3, color: '#cfe6f2' },
+      iris: { match: /^iris/, color: '#6a7f5a' },
+      lens: { match: /^lens/, color: '#f2ead0', opacity: 0.85, move: true },
+      zonules: { match: /zonular|suspensory/, color: '#e9dcc0', opacity: 0.7 },
+      vitreous: { match: /vitreous/, opacity: 0.08, color: '#e8f2f6' },
+      retina: { match: /^retina/, color: '#d97a6a' },
+      nerve: { match: /optic nerve/, color: '#e8c95a' },
+      muscles: { match: /rectus|oblique/, color: '#a8433f', opacity: 0.22 },
+      globe: { match: /^(sclera|cornea|lens|iris|retina)/ },
+    },
+    focus: 'globe',
+    view: { dir: [-0.75, 0.12, 1], dist: 1.9 },
+  },
+  // The visual pathway from below: both eyes, optic nerves, chiasm (two halves), optic tracts,
+  // lateral geniculate bodies and the visual cortex (cuneus and lingual gyrus), with the
+  // oculomotor nerves and their accessory (Edinger–Westphal) nuclei for the pupil reflex.
+  'visual-pathway': {
+    label: 'The visual pathway seen from below, with the pupillary reflex pathway',
+    files: ['NervousSystem100'],
+    under: ['brain.g'],
+    names: [/^(sclera|cornea|iris|lens)\.?(r|l)( \d+)?$/, /^(optic nerve \(ii\)|oculomotor nerve \(iii\))\.?(r|l)( \d+)?$/],
+    exclude: [/sulcus|sulci|fissure|meninges|dura|arachnoid|pia/],
+    groups: {
+      brain: { match: /brain\.g/, opacity: 0.05 },
+      eyes: { match: /^(sclera|cornea|iris|lens)/, color: '#f3eee6' },
+      irises: { match: /^iris/, color: '#6a7f5a' },
+      eyeR: { match: /^(sclera|cornea|iris|lens)\.?r/ },
+      eyeL: { match: /^(sclera|cornea|iris|lens)\.?l/ },
+      nerveR: { match: /^optic nerve \(ii\)\.?r/, color: '#e8c95a', opacity: 1 },
+      nerveL: { match: /^optic nerve \(ii\)\.?l/, color: '#e8c95a', opacity: 1 },
+      chiasm: { match: /optic chiasm/, color: '#e8c95a', opacity: 1 },
+      tractR: { match: /^optic tract\.?r/, color: '#e8c95a', opacity: 1 },
+      tractL: { match: /^optic tract\.?l/, color: '#e8c95a', opacity: 1 },
+      lgn: { match: /lateral geniculate/, color: '#c9a35a', opacity: 1 },
+      cortexR: { match: /\/ (cuneus|lingual gyrus)\.r/, color: '#d98f8a', opacity: 0.85 },
+      cortexL: { match: /\/ (cuneus|lingual gyrus)\.l/, color: '#d98f8a', opacity: 0.85 },
+      cnIII: { match: /oculomotor nerve/, color: '#e8b04a', opacity: 1 },
+      ew: { match: /accessory nucleus of oculomotor/, color: '#c98a3a', opacity: 1 },
+      midbrain: { match: /midbrain|cerebral peduncle/, opacity: 0.18 },
+    },
+    view: { dir: [0, -1, 0.35], dist: 1.35 },
+  },
+  // The right ear: eardrum, ossicles, cochlea, vestibule, auditory tube and VIII, in a faint
+  // temporal bone.
+  ear: {
+    label: 'The right middle and inner ear: eardrum, ossicles, cochlea and vestibule',
+    files: ['NervousSystem100', 'SkeletalSystem100'],
+    under: [],
+    names: [/^(tympanic membrane|cochlea|vestibule|auditory tube)\.?r( \d+)?$/, /^(malleus|incus|stapes)\.?r( \d+)?$/, /^(cochlear nerve|vestibular nerve\.?r)( \d+)?$/, /^temporal bone\.?r( \d+)?$/],
+    // the left ossicles and temporal bone reuse the right meshes' names: drop them by their parent
+    exclude: [BONE_MARKERS, /\/ (malleus|incus|stapes|temporal bone)\.l \//],
+    groups: {
+      bone: { match: /temporal bone/, opacity: 0.1, color: '#eadfca' },
+      drum: { match: /tympanic membrane/, color: '#e7c9b8', move: true },
+      ossicles: { match: /malleus|incus|stapes/, color: '#efe3cc' },
+      stapes: { match: /stapes/ },
+      cochlea: { match: /^cochlea\b|^cochlea\.?r/, color: '#e2b8a8' },
+      vestibule: { match: /vestibule/, color: '#d8c0a0' },
+      tube: { match: /auditory tube/, color: '#d9a49a', opacity: 0.1 },
+      cochlearNerve: { match: /^cochlear nerve/, color: '#e8c95a' },
+      vestibularNerve: { match: /vestibular nerve/, color: '#e8c95a' },
+      inner: { match: /tympanic|malleus|incus|stapes|cochlea|vestibule/ },
+    },
+    focus: 'inner',
+    view: { dir: [-0.6, 0.25, 1], dist: 1.65 },
+  },
+  // The central auditory pathway, from behind: both cochleae and VIII nerves, inferior colliculi,
+  // medial geniculate bodies and the transverse temporal (primary auditory) gyri.
+  'hearing-pathway': {
+    label: 'The auditory pathway: cochleae, VIII, inferior colliculi, medial geniculate and auditory cortex',
+    files: ['NervousSystem100'],
+    under: ['brain.g'],
+    names: [/^cochlea\.?(r|l)( \d+)?$/, /^(cochlear nerve|cochlear nerve\.?l|vestibular nerve\.?(r|l))( \d+)?$/],
+    exclude: [/sulcus|sulci|fissure|meninges|dura|arachnoid|pia/],
+    groups: {
+      brain: { match: /brain\.g/, opacity: 0.05 },
+      cochleaR: { match: /^cochlea\.?r/, color: '#e2b8a8' },
+      cochleaL: { match: /^cochlea\.?l/, color: '#e2b8a8' },
+      nerveR: { match: /^(cochlear nerve( \d+)?|vestibular nerve\.?r)( \/|$)/, color: '#e8c95a' },
+      nerveL: { match: /^(cochlear nerve\.?l|vestibular nerve\.?l)/, color: '#e8c95a' },
+      nuclei: { match: /cochlear nucleus/, color: '#c9a35a', opacity: 1 },
+      colliculi: { match: /inferior colliculus/, color: '#c9a35a', opacity: 1 },
+      mgb: { match: /medial geniculate/, color: '#c9a35a', opacity: 1 },
+      cortexR: { match: /transverse temporal gyri\.r/, color: '#d98f8a', opacity: 1 },
+      cortexL: { match: /transverse temporal gyri\.l/, color: '#d98f8a', opacity: 1 },
+      stem: { match: /brainstem|pons|medulla|midbrain/, opacity: 0.15 },
+    },
+    view: { dir: [0.1, 0.9, -1], dist: 1.05 },
+  },
+  // Taste: the tongue and its nerves (chorda tympani of VII, IX, X) to the nucleus of the solitary
+  // tract, the thalamus and the insula, in a faint brain.
+  taste: {
+    label: 'The tongue, its taste nerves and the taste pathway in the brain',
+    files: ['VisceralSystem100', 'NervousSystem100'],
+    under: ['brain.g'],
+    names: [/^tongue( \d+)?$/, /^chorda tympani\.?(r|l)( \d+)?$/, /^glossopharyngeal nerve \(ix\)\.?(r|l)( \d+)?$/],
+    exclude: [/sulcus|sulci|fissure|meninges|dura|arachnoid|pia/],
+    groups: {
+      brain: { match: /brain\.g/, opacity: 0.04 },
+      tongue: { match: /^tongue/, color: '#d98a86' },
+      vii: { match: /chorda tympani/, color: '#e8c95a', opacity: 1 },
+      ix: { match: /glossopharyngeal/, color: '#e8c95a', opacity: 1 },
+      nts: { match: /nucleus of solitary tract/, color: '#c9a35a', opacity: 1 },
+      thalamus: { match: /^[^/]*thalamus/, color: '#9fa7c9', opacity: 0.8 },
+      insula: { match: /^insula/, color: '#d98f8a', opacity: 0.8 },
+      stem: { match: /brainstem|pons|medulla|midbrain/, opacity: 0.12 },
+    },
+    view: { dir: [-1, 0.1, 0.45], dist: 1.55 },
+  },
+  // Smell: the nasal mucosa, the olfactory nerves and the limbic structures (amygdala,
+  // hippocampus, parahippocampal gyrus) in a faint brain, with the ethmoid bone.
+  smell: {
+    label: 'The nasal cavity, olfactory nerves and the limbic system',
+    files: ['VisceralSystem100', 'NervousSystem100', 'SkeletalSystem100'],
+    under: ['brain.g', 'ethmoid bone'],
+    names: [/^mucosa of nasal cavity( \d+)?$/, /^olfactory nerve \(i\)\.?(r|l)( \d+)?$/],
+    exclude: [BONE_MARKERS, /sulcus|sulci|fissure|meninges|dura|arachnoid|pia|cells of ethmoid/],
+    groups: {
+      brain: { match: /brain\.g/, opacity: 0.04 },
+      bone: { match: /ethmoid/, opacity: 0.25, color: '#eadfca' },
+      mucosa: { match: /mucosa of nasal/, color: '#e6a0a0', opacity: 0.85 },
+      nerves: { match: /olfactory nerve/, color: '#e8c95a' },
+      amygdala: { match: /amygdal/, color: '#c98a7a', opacity: 1 },
+      hippocampus: { match: /^hippocampus/, color: '#c9a35a', opacity: 1 },
+      parahippocampal: { match: /parahippocampal/, color: '#d98f8a', opacity: 0.7 },
+    },
+    view: { dir: [-1, -0.05, 0.4], dist: 1.6 },
+  },
+
   // ─── Endocrinology ─────────────────────────────────────────────────
   // The endocrine glands in place: a see-through brain with the hypothalamus, the pituitary, the
   // thyroid and parathyroids, the adrenals on the kidneys, the pancreas and liver, inside a faint

@@ -18,7 +18,7 @@ export const specialSenses = buildTopic({
   emoji: '👁️',
   source: 'Lectures: Visual System, Auditory and Vestibular Systems, Chemical Senses',
   sourceFileIds: contentTopics.find((topic) => topic.id === TOPIC_ID)?.sourceFileIds ?? [],
-  contentVersion: 1,
+  contentVersion: 2, // 2: a simulation in every lesson
   concepts,
   lessons,
   questions,
