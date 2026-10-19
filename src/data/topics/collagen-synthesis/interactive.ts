@@ -31,7 +31,7 @@ export const interactive: Record<string, Steps> = {
       'Fibronectin helps cells attach to the matrix; its cell-binding domain carries the RGD sequence. Integrins span the membrane and link the matrix outside to actin filaments inside.',
     ], { sourceRefs: ref([7, 8]) }),
     ask(
-      mcq('c1-03', 'matrix-adhesion', 'What do integrins connect?', 'The extracellular matrix to the cell’s cytoskeleton', ['Two neighbouring nuclei', 'Collagen to elastin only', 'Ribosomes to the ER'], {
+      mcq('c1-03', 'matrix-adhesion', 'What do integrins connect?', 'The extracellular matrix to the cell’s cytoskeleton', ['Two neighbouring nuclei through the nuclear pores', 'Collagen fibres to elastin fibres only', 'Ribosomes to the endoplasmic reticulum'], {
         explanation: 'Slide 8.',
       })
     ),
@@ -108,7 +108,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 3 — Hydroxylation and glycosylation ────────────────────
   'collagen-synthesis-3': [
     ask(
-      mcq('c3-01', 'hydroxylated-residues', 'Before you start: is hydroxyproline built into collagen as a free amino acid?', 'No — proline is incorporated first, then hydroxylated in the chain', ['Yes — free hydroxyproline is added by the ribosome', 'Yes — but only in type IV collagen', 'No — hydroxyproline is made by bacteria'], {
+      mcq('c3-01', 'hydroxylated-residues', 'Before you start: is hydroxyproline built into collagen as a free amino acid?', 'No — proline is incorporated first, then hydroxylated in the chain', ['Yes — free hydroxyproline is added by the ribosome from its own tRNA', 'Yes — but only in type IV collagen of basement membranes', 'No — hydroxyproline is made by gut bacteria and absorbed'], {
         explanation: 'Slide 36: free hydroxyproline is not incorporated into the nascent chain.',
         skill: 'prediction',
       })
@@ -133,7 +133,7 @@ export const interactive: Record<string, Steps> = {
       'Only prolines and lysines already in the chain, before the helix forms, and only on the amino side of a glycine (C-4 of proline, C-5 of lysine). A few prolines are hydroxylated at C-3 by prolyl-3-hydroxylase.',
     ], { sourceRefs: ref([44, 46]) }),
     ask(
-      mcq('c3-04', 'hydroxylation-rules', 'α,α′-Bipyridyl removes iron from prolyl hydroxylase. What happens to the collagen made?', 'It is unhydroxylated and does not form a triple helix at 37 °C', ['It is over-hydroxylated and very stable', 'It forms extra cross-links', 'It is secreted faster'], {
+      mcq('c3-04', 'hydroxylation-rules', 'α,α′-Bipyridyl removes iron from prolyl hydroxylase. What happens to the collagen made?', 'It is unhydroxylated and does not form a triple helix at 37 °C', ['It is over-hydroxylated and very stable at body temperature', 'It forms extra cross-links and becomes brittle', 'It is secreted faster than normal collagen'], {
         explanation: 'Slide 45: it only becomes helical below 24 °C.',
         skill: 'cause-effect',
       })
@@ -161,7 +161,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 4 — Fibre assembly and cross-links ─────────────────────
   'collagen-synthesis-4': [
     ask(
-      mcq('c4-01', 'procollagen-processing', 'Before you start: collagen fibres form outside the cell. What stops them forming too early inside it?', 'Extension peptides on procollagen, removed only outside the cell', ['Low temperature inside the cell', 'Cross-links that form inside the cell', 'Lack of glycine inside the cell'], {
+      mcq('c4-01', 'procollagen-processing', 'Before you start: collagen fibres form outside the cell. What stops them forming too early inside it?', 'Extension peptides on procollagen, removed only outside the cell', ['The low temperature inside the cell, which stops fibre assembly', 'Cross-links that form inside the cell and hold molecules apart', 'A lack of glycine inside the cell until the chains are secreted'], {
         explanation: 'Slide 54: the extra peptides prevent premature fibre formation; procollagen peptidases cut them off in the extracellular space.',
         skill: 'prediction',
       })
@@ -170,7 +170,7 @@ export const interactive: Record<string, Steps> = {
       'Procollagen peptidases remove the N- and C-terminal extensions outside the cell. The extensions prevent premature fibres and may guide transport across the membrane; C-terminal disulfides help start the helix.',
     ], { sourceRefs: ref([34, 54]) }),
     ask(
-      mcq('c4-02', 'procollagen-processing', 'Where are the extension peptides of procollagen removed?', 'In the extracellular space', ['In the nucleus', 'In the rough ER lumen', 'In lysosomes'], {
+      mcq('c4-02', 'procollagen-processing', 'Where are the extension peptides of procollagen removed?', 'In the extracellular space', ['In the nucleus', 'In the rough ER lumen', 'In lysosomes after secretion'], {
         explanation: 'Slide 54.',
       })
     ),
@@ -195,7 +195,7 @@ export const interactive: Record<string, Steps> = {
       ], { explanation: 'Slides 28 and 56–59.' })
     ),
     ask(
-      mcq('c4-05', 'collagen-crosslinks', 'Which rat tendon is more highly cross-linked?', 'The Achilles tendon of mature rats', ['The flexible tail tendon', 'Both are equally cross-linked', 'Neither has cross-links'], {
+      mcq('c4-05', 'collagen-crosslinks', 'Which rat tendon is more highly cross-linked?', 'The Achilles tendon of mature rats', ['The flexible tail tendon of mature rats', 'Both tendons are equally cross-linked', 'Neither tendon has any cross-links'], {
         explanation: 'Slide 28: cross-linking varies with function and age.',
         skill: 'comparison',
       })
@@ -211,7 +211,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 5 — Collagen disorders ─────────────────────────────────
   'collagen-synthesis-5': [
     ask(
-      mcq('c5-01', 'scurvy', 'Before you start: a sailor has had no fresh fruit for months. Which step of collagen synthesis fails?', 'Hydroxylation of proline, because prolyl hydroxylase’s iron is not kept reduced', ['Cleavage of procollagen extensions', 'Glycine incorporation', 'Desmosine formation'], {
+      mcq('c5-01', 'scurvy', 'Before you start: a sailor has had no fresh fruit for months. Which step of collagen synthesis fails?', 'Hydroxylation of proline, because prolyl hydroxylase’s iron is not kept reduced', ['Cleavage of the procollagen extension peptides outside the cell', 'Incorporation of glycine at every third position of the chain', 'Formation of desmosine cross-links between the chains'], {
         explanation: 'Slide 61: scurvy is a dietary deficiency of ascorbic acid.',
         skill: 'prediction',
       })
@@ -238,12 +238,12 @@ export const interactive: Record<string, Steps> = {
       'Osteogenesis imperfecta: a single glycine change (Gly988 → Cys) in type I collagen disrupts the helix; brittle bones and fractures.',
     ], { sourceRefs: ref([70, 71, 72]) }),
     ask(
-      mcq('c5-04', 'lathyrism', 'What does β-aminopropionitrile inhibit?', 'The conversion of lysyl side chains into aldehydes', ['The hydroxylation of proline', 'The cleavage of procollagen', 'The glycosylation of hydroxylysine'], {
+      mcq('c5-04', 'lathyrism', 'What does β-aminopropionitrile inhibit?', 'The conversion of lysyl side chains into aldehydes', ['The hydroxylation of proline residues in the chain', 'The cleavage of the procollagen extension peptides', 'The glycosylation of hydroxylysine side chains'], {
         explanation: 'Slide 70.',
       })
     ),
     ask(
-      mcq('c5-05', 'osteogenesis-imperfecta', 'Why is the osteogenesis imperfecta mutant allele dominant?', 'Its aberrant chain is built into the triple helix and spoils the whole molecule', ['It doubles the amount of collagen made', 'It switches off the normal allele', 'It blocks ascorbate uptake'], {
+      mcq('c5-05', 'osteogenesis-imperfecta', 'Why is the osteogenesis imperfecta mutant allele dominant?', 'Its aberrant chain is built into the triple helix and spoils the whole molecule', ['It doubles the amount of collagen that is made, overloading the bone', 'It switches off transcription of the normal allele in the same cell', 'It blocks the uptake of ascorbate, so no chain is hydroxylated'], {
         explanation: 'Slide 73.',
         skill: 'cause-effect',
       })
@@ -271,7 +271,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: ref([76, 77]),
     }),
     ask(
-      mcq('c6-02', 'elastin-composition', 'Which amino acid does elastin lack completely?', 'Hydroxylysine', ['Glycine', 'Proline', 'Valine'], {
+      mcq('c6-02', 'elastin-composition', 'Which amino acid does elastin lack completely?', 'Hydroxylysine', ['Glycine', 'Proline', 'Valine (hydrophobic)'], {
         explanation: 'Slide 76.',
         skill: 'comparison',
       })

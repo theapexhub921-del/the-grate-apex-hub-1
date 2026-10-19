@@ -8,7 +8,7 @@ type Steps = InteractiveDraft<ConceptId>[];
 
 export const interactive: Record<string, Steps> = {
   'immunology-1': [
-    ask(mcq('c1-01', 'vaccination-history', 'What did Jenner inoculate to protect against smallpox?', 'Fluid from a cowpox pustule', ['Attenuated rabies virus', 'Heat-killed anthrax', 'Serum from immune horses'], { explanation: 'IN slide 8.' })),
+    ask(mcq('c1-01', 'vaccination-history', 'What did Jenner inoculate to protect against smallpox?', 'Fluid from a cowpox pustule', ['Attenuated rabies virus from rabbits', 'Heat-killed anthrax bacilli', 'Serum from horses immune to smallpox'], { explanation: 'IN slide 8.' })),
     learn('Attenuation', ['Pasteur found that an aged culture made chickens ill but they recovered — and were then protected. Weakening a pathogen gives a vaccine.'], { sourceRefs: intro([9, 10]) }),
     ask(match('c1-02', 'cellular-humoral-debate', 'Match each scientist to the discovery.', [
       ['Metchnikoff', 'Phagocytes (cellular immunity)'],
@@ -35,7 +35,7 @@ export const interactive: Record<string, Steps> = {
     ], intro([32, 54, 55])),
   ],
   'immunology-3': [
-    ask(mcq('c3-01', 'pamps-prrs', 'Why do PAMPs rarely mutate away?', 'They are essential to microbial survival', ['They are made by the host', 'They are proteins', 'They are hidden inside the microbe'], { explanation: 'IN slide 44.', skill: 'cause-effect' })),
+    ask(mcq('c3-01', 'pamps-prrs', 'Why do PAMPs rarely mutate away?', 'They are essential to microbial survival', ['They are made by the host, not the microbe', 'They are proteins that cannot change shape', 'They are hidden inside the microbe from the host'], { explanation: 'IN slide 44.', skill: 'cause-effect' })),
     ask(match('c3-02', 'pamps-prrs', 'Match each PRR family to where it is found.', [
       ['TLRs', 'Plasma membrane and endosomes'],
       ['NLRs', 'Cytoplasm (peptidoglycan fragments)'],
@@ -73,10 +73,10 @@ export const interactive: Record<string, Steps> = {
     ], cy([19, 23])),
   ],
   'immunology-6': [
-    ask(mcq('c6-01', 'antigen-terms', 'A hapten becomes immunogenic when…', 'Coupled to a carrier protein', ['It is heated', 'It is given orally', 'It binds complement'], { explanation: 'AG slides 15–16.' })),
-    ask(mcq('c6-02', 'immunogenicity-factors', 'Which molecule is most likely to be immunogenic?', 'A foreign protein of 50,000 Da', ['A 500 Da drug alone', 'A D-amino acid polymer', 'A self lipid'], { explanation: 'AG22 slides 16–17, 21.' })),
+    ask(mcq('c6-01', 'antigen-terms', 'A hapten becomes immunogenic when…', 'Coupled to a carrier protein', ['It is heated to change its shape', 'It is given orally with food', 'It binds complement in the blood'], { explanation: 'AG slides 15–16.' })),
+    ask(mcq('c6-02', 'immunogenicity-factors', 'Which molecule is most likely to be immunogenic?', 'A foreign protein of 50,000 Da', ['A 500 Da drug given on its own', 'A polymer of D-amino acids', 'A lipid made by the body itself'], { explanation: 'AG22 slides 16–17, 21.' })),
     learn('Two routes to T cells', ['Exogenous antigens go to MHC II and CD4 helper cells; endogenous antigens (e.g. viral proteins) to MHC I and CD8 cytotoxic cells.'], { sourceRefs: ag([28, 31]) }),
-    ask(mcq('c6-03', 'antigen-classes', 'A pneumococcal capsule polysaccharide stimulates B cells without T-cell help. Which antibody results?', 'IgM only, with no memory', ['IgG with memory', 'IgE', 'IgA with memory'], { explanation: 'AG slide 42.', skill: 'cause-effect' })),
+    ask(mcq('c6-03', 'antigen-classes', 'A pneumococcal capsule polysaccharide stimulates B cells without T-cell help. Which antibody results?', 'IgM only, with no memory', ['IgG, with memory B cells', 'IgE, with mast-cell sensitisation', 'IgA, with memory B cells'], { explanation: 'AG slide 42.', skill: 'cause-effect' })),
     recall('r6-01', 'adjuvants-mitogens', 'Describe adjuvants and how they work.', [
       'Substances that non-specifically enhance or change the immune response, given before or with antigen.',
       'They alter the antigen’s physical form, improve macrophage processing, stimulate lymphocytes and release antigen slowly.',
@@ -100,7 +100,7 @@ export const interactive: Record<string, Steps> = {
     ], [...ab([6]), ...ig22([11, 12, 27, 32])]),
   ],
   'immunology-8': [
-    ask(mcq('c8-01', 'mab-basics', 'Why are hybridomas grown in HAT medium?', 'Only fused hybridoma cells survive in it', ['It makes antibodies human', 'It kills hybridomas', 'It speeds B-cell division'], { explanation: 'AB slide 35.', skill: 'cause-effect' })),
+    ask(mcq('c8-01', 'mab-basics', 'Why are hybridomas grown in HAT medium?', 'Only fused hybridoma cells survive in it', ['It turns mouse antibodies into human ones', 'It kills the hybridoma cells selectively', 'It speeds the division of the B cells'], { explanation: 'AB slide 35.', skill: 'cause-effect' })),
     ask(match('c8-02', 'mab-types', 'Match each name ending to its type.', [
       ['-omab', 'Murine'],
       ['-ximab', 'Chimeric'],
@@ -108,7 +108,7 @@ export const interactive: Record<string, Steps> = {
       ['-umab', 'Human'],
     ], { explanation: 'AB slides 22–25.' })),
     learn('Why humanise?', ['Mouse antibodies provoke human anti-mouse antibodies (HAMA) that clear the drug and can cause serum sickness. Replacing mouse parts with human ones reduces this.'], { sourceRefs: ab([23, 24, 38]) }),
-    ask(mcq('c8-03', 'mab-uses', 'Blinatumomab binds CD19 and CD3. It is a…', 'Bispecific monoclonal antibody', ['Radiolabelled antibody', 'Naked antibody', 'Chemolabelled antibody'], { explanation: 'AB slide 32.' })),
+    ask(mcq('c8-03', 'mab-uses', 'Blinatumomab binds CD19 and CD3. It is a…', 'Bispecific monoclonal antibody', ['Radiolabelled monoclonal antibody', 'Naked (unconjugated) monoclonal antibody', 'Chemolabelled monoclonal antibody'], { explanation: 'AB slide 32.' })),
     recall('r8-01', 'mab-basics', 'Outline how monoclonal antibodies are produced.', [
       'Immunise a mouse repeatedly with the antigen; take B cells from its spleen.',
       'Fuse them with myeloma cells to make hybridomas.',
@@ -128,10 +128,10 @@ export const interactive: Record<string, Steps> = {
     ], cm([39, 40, 41, 42, 43])),
   ],
   'immunology-10': [
-    ask(mcq('c10-01', 'antiviral-immunity', 'Which defence acts earliest against a virus, before antibody appears?', 'Interferons and NK cells', ['IgG', 'Memory B cells', 'Th2 cells'], { explanation: 'IF slide 8.' })),
-    ask(mcq('c10-02', 'antibacterial-immunity', 'Why does eliminating intracellular bacteria require cell-mediated immunity?', 'They hide inside phagocytes, beyond antibody', ['They lack antigens', 'They activate complement', 'They are too small'], { explanation: 'IF slide 16.', skill: 'cause-effect' })),
+    ask(mcq('c10-01', 'antiviral-immunity', 'Which defence acts earliest against a virus, before antibody appears?', 'Interferons and NK cells', ['IgG from plasma cells', 'Memory B cells', 'Th2 cells and IgE'], { explanation: 'IF slide 8.' })),
+    ask(mcq('c10-02', 'antibacterial-immunity', 'Why does eliminating intracellular bacteria require cell-mediated immunity?', 'They hide inside phagocytes, beyond antibody', ['They lack any antigens that antibody could bind', 'They activate complement, which protects them', 'They are too small for antibodies to reach'], { explanation: 'IF slide 16.', skill: 'cause-effect' })),
     learn('Drift and shift', ['Influenza changes its haemagglutinin slightly (drift) or radically (shift), so antibodies made earlier no longer fit.'], { sourceRefs: inf([11]) }),
-    ask(mcq('c10-03', 'fungi-parasites', 'Which response defends against helminths?', 'Th2 → IgE, eosinophils and mast cells', ['Th1 → IFN-γ alone', 'Complement only', 'CD8 CTLs alone'], { explanation: 'IF slides 21, 23.' })),
+    ask(mcq('c10-03', 'fungi-parasites', 'Which response defends against helminths?', 'Th2 → IgE, eosinophils and mast cells', ['Th1 → IFN-γ and macrophages alone', 'Complement only, without any T cells', 'CD8 cytotoxic T cells alone'], { explanation: 'IF slides 21, 23.' })),
     recall('r10-01', 'antibacterial-immunity', 'Describe the immune response to Mycobacterium tuberculosis and how it evades it.', [
       'Th1 cells recognise mycobacterial peptides and release IFN-γ.',
       'Activated macrophages kill TB mainly with nitric oxide; exhausted macrophages are killed by CTLs and NK cells.',

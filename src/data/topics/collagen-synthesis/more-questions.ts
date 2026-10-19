@@ -8,7 +8,7 @@ type Q = QuestionDraft<ConceptId>;
 
 // ─── Lesson 4 — Fibre assembly and cross-links ──────────────────────
 const lesson4: Q[] = [
-  mcq('q4-01', 'fibre-formation', 'Why can collagen molecules aggregate into fibres?', 'Their elongated triple helix leaves many side chains on the surface to bond with neighbouring molecules', ['They fold into compact globules that stick together', 'They are joined end to end by peptide bonds', 'Their sugars glue them together'], {
+  mcq('q4-01', 'fibre-formation', 'Why can collagen molecules aggregate into fibres?', 'Their elongated triple helix leaves many side chains on the surface to bond with neighbouring molecules', ['They fold into compact globules that stick together through hydrophobic patches', 'They are joined end to end by peptide bonds between neighbouring molecules', 'Their sugar chains glue them together into fibres outside the cell'], {
     explanation: 'Slide 53.',
     skill: 'cause-effect',
   }),
@@ -22,14 +22,14 @@ const lesson4: Q[] = [
   mcq('q4-03', 'fibre-formation', 'What gap separates consecutive tropocollagen molecules along a row in a fibre (slide 60)?', 'About 400 Å', ['About 3000 Å', 'About 15 Å', 'There is no gap'], {
     explanation: 'Slide 60 figure.',
   }),
-  mcq('q4-04', 'fibre-formation', 'What may the gaps between tropocollagen molecules serve as?', 'Nucleation sites in bone formation', ['Binding sites for haemoglobin', 'Sites where sugars attach', 'Disulfide bridges'], {
+  mcq('q4-04', 'fibre-formation', 'What may the gaps between tropocollagen molecules serve as?', 'Nucleation sites in bone formation', ['Binding sites for haemoglobin', 'Sites where the sugars attach', 'Disulfide bridges between molecules'], {
     explanation: 'Slide 60 figure.',
   }),
   fill('q4-05', 'fibre-formation', 'In a fibre, tropocollagen molecules form a quarter-____ array.', ['staggered'], {
     explanation: 'Slide 60.',
     skill: 'terminology',
   }),
-  mcq('q4-06', 'fibre-formation', 'Where does tropocollagen assemble into fibres (slide 33)?', 'Near the cell surface', ['In the nucleus', 'In lysosomes', 'In the bloodstream'], {
+  mcq('q4-06', 'fibre-formation', 'Where does tropocollagen assemble into fibres (slide 33)?', 'Near the cell surface', ['In the nucleus', 'In the lysosomes', 'In the bloodstream'], {
     explanation: 'Slide 33: step 6, assembly near the cell surface.',
   }),
   mcq('q4-07', 'procollagen-processing', 'Which enzymes cut the extension peptides off procollagen?', 'Procollagen peptidases', ['Lysyl oxidases', 'Prolyl hydroxylases', 'Glycosyl transferases'], {
@@ -48,7 +48,7 @@ const lesson4: Q[] = [
     explanation: 'Slide 54: excision takes place in the extracellular space.',
     skill: 'misconception',
   }),
-  mcq('q4-11', 'procollagen-processing', 'In slide 34’s figure, where are the procollagen chains made?', 'On ribosomes on the endoplasmic reticulum', ['In the extracellular space', 'In mitochondria', 'In the nucleus'], {
+  mcq('q4-11', 'procollagen-processing', 'In slide 34’s figure, where are the procollagen chains made?', 'On ribosomes on the endoplasmic reticulum', ['Free in the extracellular space', 'On ribosomes in the mitochondria', 'In the nucleus, beside the genes'], {
     explanation: 'Slide 34 figure.',
   }),
   mcq('q4-12', 'procollagen-processing', 'Which part of the procollagen chains carries the cysteines whose disulfide bonds first hold the three chains together?', 'The C-terminal extensions', ['The N-terminal extensions', 'The middle of the triple helix', 'The hydroxylysine sugars'], {
@@ -60,7 +60,7 @@ const lesson4: Q[] = [
     'The triple helix forms',
     'The N- and C-terminal extensions are cut off',
   ], { explanation: 'Slide 34 figure.' }),
-  mcq('q4-14', 'procollagen-processing', 'What would happen if a procollagen peptidase were missing?', 'Propeptides would be retained and collagen bundles disorganised, as in dermatoparaxis', ['Collagen would lack hydroxyproline', 'Desmosine would build up', 'Glycine would be replaced by cysteine'], {
+  mcq('q4-14', 'procollagen-processing', 'What would happen if a procollagen peptidase were missing?', 'Propeptides would be retained and collagen bundles disorganised, as in dermatoparaxis', ['Collagen would lack hydroxyproline, as in scurvy', 'Desmosine would build up in the tissues', 'Glycine would be replaced by cysteine in the chains'], {
     explanation: 'Slides 54 and 68.',
     skill: 'application',
   }),
@@ -115,10 +115,10 @@ const lesson4: Q[] = [
 
 // ─── Lesson 5 — Collagen disorders ──────────────────────────────────
 const lesson5: Q[] = [
-  mcq('q5-01', 'scurvy', 'What causes scurvy?', 'A dietary deficiency of ascorbic acid', ['A mutation in type I collagen', 'Eating sweet pea seeds', 'Absence of procollagen peptidase'], {
+  mcq('q5-01', 'scurvy', 'What causes scurvy?', 'A dietary deficiency of ascorbic acid', ['A mutation in the gene for type I collagen', 'Eating the seeds of the sweet pea', 'Absence of procollagen peptidase'], {
     explanation: 'Slide 61.',
   }),
-  mcq('q5-02', 'scurvy', 'Why is collagen defective in scurvy?', 'Prolyl hydroxylase’s iron is not kept reduced, so collagen is under-hydroxylated', ['Lysyl oxidase is inhibited', 'Procollagen peptidase is absent', 'Glycine is replaced by cysteine'], {
+  mcq('q5-02', 'scurvy', 'Why is collagen defective in scurvy?', 'Prolyl hydroxylase’s iron is not kept reduced, so collagen is under-hydroxylated', ['Lysyl oxidase is inhibited, so the chains cannot be cross-linked', 'Procollagen peptidase is absent, so the propeptides stay on', 'Glycine is replaced by cysteine in the collagen chains'], {
     explanation: 'Slide 61.',
     skill: 'cause-effect',
   }),
@@ -146,7 +146,7 @@ const lesson5: Q[] = [
   mcq('q5-08', 'scurvy', 'Why must humans get ascorbic acid from their diet (slide 43)?', 'Primates cannot synthesise it', ['Humans lack prolyl hydroxylase', 'Humans make no collagen', 'Ascorbate is destroyed in the liver'], {
     explanation: 'Slide 43: primates and guinea pigs cannot synthesise ascorbic acid.',
   }),
-  mcq('q5-09', 'ehlers-danlos', 'What is Ehlers-Danlos syndrome?', 'A group of rare hereditary disorders in which collagen synthesis is impaired', ['A dietary vitamin deficiency', 'A disease of cattle', 'A poisoning by sweet pea seeds'], {
+  mcq('q5-09', 'ehlers-danlos', 'What is Ehlers-Danlos syndrome?', 'A group of rare hereditary disorders in which collagen synthesis is impaired', ['A dietary vitamin deficiency that weakens collagen', 'A hereditary disease of cattle (dermatoparaxis)', 'A poisoning caused by eating sweet pea seeds'], {
     explanation: 'Slide 65.',
   }),
   multi('q5-10', 'ehlers-danlos', 'Which defects can underlie Ehlers-Danlos syndrome? Select all that apply.', ['Defective type III collagen synthesis', 'Deficiency of procollagen peptidases', 'Defective hydroxylation of lysine', 'Deficiency of lysyl oxidase'], ['A glycine-to-cysteine change at residue 988', 'Lack of dietary ascorbate'], {
@@ -155,10 +155,10 @@ const lesson5: Q[] = [
   multi('q5-11', 'ehlers-danlos', 'Which are features of Ehlers-Danlos syndrome? Select all that apply.', ['Hyperextensible joints', 'Excessive stretching of the skin', 'Ready bruising and easy tearing of skin', 'Short stature'], ['Bleeding gums', 'Blue sclerae'], {
     explanation: 'Slide 66.',
   }),
-  mcq('q5-12', 'ehlers-danlos', 'On slide 67’s gel, what does Ehlers-Danlos syndrome type VII collagen show that normal collagen does not?', 'Pro-α1 and pro-α2 chains', ['No α2 chains at all', 'Desmosine', 'Extra glycine'], {
+  mcq('q5-12', 'ehlers-danlos', 'On slide 67’s gel, what does Ehlers-Danlos syndrome type VII collagen show that normal collagen does not?', 'Pro-α1 and pro-α2 chains', ['No α2 chains at all', 'Bands of desmosine', 'Extra glycine in each band'], {
     explanation: 'Slide 67.',
   }),
-  mcq('q5-13', 'ehlers-danlos', 'What do the pro-α chains on the type VII gel tell you?', 'The propeptides are not being removed from procollagen', ['Proline is over-hydroxylated', 'There are too many cross-links', 'Ascorbate is lacking'], {
+  mcq('q5-13', 'ehlers-danlos', 'What do the pro-α chains on the type VII gel tell you?', 'The propeptides are not being removed from procollagen', ['Proline is over-hydroxylated in the chains', 'There are too many cross-links between the molecules', 'Ascorbate is lacking in the patient’s diet'], {
     explanation: 'Slides 65 and 67: deficiency of procollagen peptidases is one EDS defect.',
     skill: 'cause-effect',
   }),
@@ -174,13 +174,13 @@ const lesson5: Q[] = [
     answer: true,
     explanation: 'Slide 68.',
   }),
-  mcq('q5-17', 'lathyrism', 'What is the toxic agent in lathyrism?', 'β-Aminopropionitrile', ['α,α′-Bipyridyl', 'Ascorbic acid', 'Desmosine'], {
+  mcq('q5-17', 'lathyrism', 'What is the toxic agent in lathyrism?', 'β-Aminopropionitrile', ['α,α′-Bipyridyl', 'Ascorbic acid', 'Desmosine (cross-link)'], {
     explanation: 'Slide 70.',
   }),
   mcq('q5-18', 'lathyrism', 'Animals develop lathyrism by eating the seeds of which plant?', 'The sweet pea', ['The fava bean', 'The peanut', 'The soybean'], {
     explanation: 'Slide 69.',
   }),
-  mcq('q5-19', 'lathyrism', 'Why is collagen extremely fragile in lathyrism?', 'Lysyl side chains are not converted to aldehydes, so cross-links cannot form', ['Proline is not hydroxylated', 'Procollagen is not cleaved', 'Glycine is replaced by cysteine'], {
+  mcq('q5-19', 'lathyrism', 'Why is collagen extremely fragile in lathyrism?', 'Lysyl side chains are not converted to aldehydes, so cross-links cannot form', ['Proline is not hydroxylated, so the triple helix melts at body temperature', 'Procollagen is not cleaved, so the fibres cannot assemble properly', 'Glycine is replaced by cysteine in the chains, which kinks the helix'], {
     explanation: 'Slides 28 and 70.',
     skill: 'cause-effect',
   }),
@@ -190,7 +190,7 @@ const lesson5: Q[] = [
   mcq('q5-21', 'osteogenesis-imperfecta', 'In the lecture’s example of osteogenesis imperfecta, residue 988 changes from glycine to:', 'Cysteine', ['Alanine', 'Proline', 'Serine'], {
     explanation: 'Slide 72.',
   }),
-  mcq('q5-22', 'osteogenesis-imperfecta', 'What does the glycine 988 change do to the collagen?', 'It disrupts the helix near its carboxyl end, so the collagen is over-hydroxylated, over-glycosylated and partly unfolded at body temperature', ['It stops hydroxylation completely', 'It adds extra cross-links', 'It prevents secretion of procollagen'], {
+  mcq('q5-22', 'osteogenesis-imperfecta', 'What does the glycine 988 change do to the collagen?', 'It disrupts the helix near its carboxyl end, so the collagen is over-hydroxylated, over-glycosylated and partly unfolded at body temperature', ['It stops hydroxylation of the chain completely, so the helix never forms at body temperature', 'It adds extra cross-links between neighbouring molecules, making the bone brittle and dense', 'It prevents secretion of procollagen, so collagen builds up inside the osteoblasts'], {
     explanation: 'Slide 72.',
     skill: 'cause-effect',
   }),
@@ -220,7 +220,7 @@ const lesson6: Q[] = [
   mcq('q6-01', 'elastin-distribution', 'Elastin is the major component of:', 'Elastic fibres', ['Collagen fibrils', 'The basal lamina', 'Keratin filaments'], {
     explanation: 'Slide 74.',
   }),
-  mcq('q6-02', 'elastin-distribution', 'What can elastic fibres do?', 'Stretch to several times their length, then rapidly return to their original size and shape', ['Resist all stretching', 'Mineralise into bone', 'Contract using ATP like muscle'], {
+  mcq('q6-02', 'elastin-distribution', 'What can elastic fibres do?', 'Stretch to several times their length, then rapidly return to their original size and shape', ['Resist all stretching, like the collagen of tendons', 'Mineralise into bone when they are stretched repeatedly', 'Contract actively using ATP, like the actin and myosin of muscle'], {
     explanation: 'Slide 74.',
   }),
   multi('q6-03', 'elastin-distribution', 'Where are large amounts of elastin found? Select all that apply.', ['Blood vessel walls, especially the arch of the aorta', 'Ligaments'], ['Tendon', 'Loose connective tissue'], {
@@ -232,13 +232,13 @@ const lesson6: Q[] = [
     answer: false,
     explanation: 'Slide 75: there is relatively little elastin in skin, tendon and loose connective tissue.',
   }),
-  mcq('q6-05', 'elastin-distribution', 'In most connective tissues, elastin is found together with:', 'Collagen and polysaccharides', ['Haemoglobin', 'Keratin', 'Actin and myosin'], {
+  mcq('q6-05', 'elastin-distribution', 'In most connective tissues, elastin is found together with:', 'Collagen and polysaccharides', ['Haemoglobin and myoglobin', 'Keratin and fibronectin', 'Actin and myosin'], {
     explanation: 'Slide 74.',
   }),
-  mcq('q6-06', 'elastin-distribution', 'In slide 6’s elastic network, how does each elastin molecule behave?', 'It expands and contracts like a coil', ['It stays rigid', 'It breaks and re-forms', 'It dissolves'], {
+  mcq('q6-06', 'elastin-distribution', 'In slide 6’s elastic network, how does each elastin molecule behave?', 'It expands and contracts like a coil', ['It stays rigid like a rod', 'It breaks and then re-forms', 'It dissolves into the matrix'], {
     explanation: 'Slide 6 figure.',
   }),
-  mcq('q6-07', 'elastin-distribution', 'The arch of the aorta is rich in elastin. What does this give the vessel wall?', 'The ability to stretch and recoil', ['Rigidity', 'Mineralisation', 'Impermeability to water'], {
+  mcq('q6-07', 'elastin-distribution', 'The arch of the aorta is rich in elastin. What does this give the vessel wall?', 'The ability to stretch and recoil', ['Rigidity under high pressure', 'Mineralisation with calcium', 'Impermeability to water'], {
     explanation: 'Slides 74–75.',
     skill: 'application',
   }),
@@ -264,17 +264,17 @@ const lesson6: Q[] = [
     answer: false,
     explanation: 'Slide 76: elastin has few polar amino acids.',
   }),
-  mcq('q6-13', 'elastin-composition', 'Why is mature elastin difficult to analyse?', 'Its many cross-links make it highly insoluble', ['It is too small to detect', 'It falls apart at room temperature', 'It is found only in fish'], {
+  mcq('q6-13', 'elastin-composition', 'Why is mature elastin difficult to analyse?', 'Its many cross-links make it highly insoluble', ['It is too small to detect by any method', 'It falls apart at room temperature', 'It is found only in fish, not in mammals'], {
     explanation: 'Slide 77.',
   }),
-  mcq('q6-14', 'elastin-composition', 'Which statement about hydroxylysine is correct?', 'Collagen contains it; elastin contains none', ['Both contain plenty', 'Elastin contains it; collagen does not', 'Neither contains any'], {
+  mcq('q6-14', 'elastin-composition', 'Which statement about hydroxylysine is correct?', 'Collagen contains it; elastin contains none', ['Both contain plenty of it', 'Elastin contains it; collagen does not', 'Neither collagen nor elastin contains any'], {
     explanation: 'Slides 30 and 76.',
     skill: 'comparison',
   }),
   mcq('q6-15', 'elastin-composition', 'Which imino acid is elastin rich in?', 'Proline', ['Hydroxyproline', 'Tryptophan', 'Histidine'], {
     explanation: 'Slide 76: rich in proline, but very little hydroxyproline.',
   }),
-  mcq('q6-16', 'elastin-crosslinks', 'Which repeating sequence is found in elastin?', 'Lys-Ala-Ala-Lys (or Lys-Ala-Ala-Ala-Lys)', ['Gly-Pro-Hyp', 'Arg-Gly-Asp', 'Gly-Gly-Gly'], {
+  mcq('q6-16', 'elastin-crosslinks', 'Which repeating sequence is found in elastin?', 'Lys-Ala-Ala-Lys (or Lys-Ala-Ala-Ala-Lys)', ['Gly-Pro-Hyp (or Gly-X-Hyp)', 'Arg-Gly-Asp (the RGD motif)', 'Gly-Gly-Gly-Gly'], {
     explanation: 'Slide 78. Gly-Pro-Hyp is collagen’s repeat; Arg-Gly-Asp is fibronectin’s cell-binding sequence.',
     skill: 'comparison',
   }),
@@ -287,7 +287,7 @@ const lesson6: Q[] = [
   multi('q6-19', 'elastin-crosslinks', 'Which cross-links occur in both collagen and elastin? Select all that apply.', ['Aldol cross-link', 'Lysinonorleucine'], ['Desmosine', 'Disulfide bonds between C-terminal extensions'], {
     explanation: 'Slide 78.',
   }),
-  mcq('q6-20', 'elastin-crosslinks', 'What may elastin’s cross-links help elastic fibres do?', 'Return to their original size and shape after stretching', ['Mineralise', 'Bind oxygen', 'Dissolve in water'], {
+  mcq('q6-20', 'elastin-crosslinks', 'What may elastin’s cross-links help elastic fibres do?', 'Return to their original size and shape after stretching', ['Mineralise into rigid, bone-like tissue', 'Bind and store oxygen like myoglobin', 'Dissolve in water when they are not stretched'], {
     explanation: 'Slide 79.',
   }),
   mcq('q6-21', 'elastin-crosslinks', 'The regions of elastin between cross-links are rich in:', 'Glycine, proline and valine', ['Hydroxyproline and hydroxylysine', 'Cysteine and methionine', 'Aspartate and glutamate'], {
