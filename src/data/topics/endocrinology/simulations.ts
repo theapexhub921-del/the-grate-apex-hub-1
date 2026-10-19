@@ -108,7 +108,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s3-03', 'gh-disorders', 'The same tumour appears in an adult. What happens?', 'The bones widen — hands, feet, jaw — but height does not increase', ['The person grows taller again', 'Nothing, because adults do not respond to GH'], {
+        question: mcq('s3-03', 'gh-disorders', 'The same tumour appears in an adult. What happens?', 'The bones widen — hands, feet, jaw — but height does not increase', ['The person grows taller again as the growth plates reopen', 'Nothing, because adults no longer respond to GH at all'], {
           ...predict,
           explanation: 'After puberty the epiphyses have fused, so bones cannot lengthen; they widen by subperiosteal growth instead: acromegaly (Introduction, pp. 36–37).',
         }),
@@ -214,7 +214,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s6-02', 'diabetes', 'The same drink is given to someone with type 1 diabetes. Compared with a healthy person, what happens?', 'Glucose climbs above the tubular maximum and appears in the urine', ['Glucose rises a little and falls back within two hours', 'Glucose falls, because no insulin is released'], {
+        question: mcq('s6-02', 'diabetes', 'The same drink is given to someone with type 1 diabetes. Compared with a healthy person, what happens?', 'Glucose climbs above the tubular maximum and appears in the urine', ['Glucose rises a little and falls back within two hours', 'Glucose falls, because no insulin is released to stop it'], {
           ...predict,
           explanation: 'Without insulin, glucose is not taken up and the liver keeps releasing it: blood glucose exceeds the tubular maximum, causing glycosuria and osmotic diuresis (Pancreas, p. 16).',
         }),

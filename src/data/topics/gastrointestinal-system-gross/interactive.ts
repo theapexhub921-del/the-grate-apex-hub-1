@@ -10,7 +10,7 @@ export const interactive: Record<string, Steps> = {
     learn('Mapping the abdomen', [
       'Four quadrants come from the median and transumbilical (L3/L4) planes. Nine regions come from the two midclavicular planes and the subcostal (L3) and transtubercular (L5) planes.',
     ], { sourceRefs: aw([4, 5]) }),
-    ask(mcq('i1-01', 'surface-points', 'McBurney’s point lies:', 'One-third of the way from the right ASIS to the umbilicus', ['Below the right costal margin at the midclavicular line', 'At the midpoint of the inguinal ligament', 'Two-thirds of the way from the umbilicus to the pubis'], { explanation: 'Slide 7: it marks the base of the appendix.' })),
+    ask(mcq('i1-01', 'surface-points', 'McBurney’s point lies:', 'One-third of the way from the right ASIS to the umbilicus', ['Below the right costal margin at the midclavicular line', 'At the midpoint of the right inguinal ligament', 'Two-thirds of the way from the umbilicus to the pubis'], { explanation: 'Slide 7: it marks the base of the appendix.' })),
     ask(order('i1-02', 'wall-layers-fascia', 'Order the layers of the anterolateral wall below the umbilicus from outside in:', ['Skin', 'Camper’s fascia', 'Scarpa’s fascia', 'Muscles and aponeuroses', 'Transversalis fascia', 'Extraperitoneal fat', 'Parietal peritoneum'], { explanation: 'Slides 10, 12.' })),
     learn('Where does leaked urine go?', [
       'Scarpa’s fascia is fused to the fascia lata 2.5 cm below the inguinal ligament and continues as Colles’ and dartos fascia, so fluid deep to it spreads into the scrotum, penis and lower wall — not the thigh.',
@@ -52,7 +52,7 @@ export const interactive: Record<string, Steps> = {
     learn('The canal in four walls', [
       'MALT: roof — 2 Muscles (internal oblique, transversus); front — 2 Aponeuroses; floor — 2 Ligaments (inguinal, lacunar); back — 2 Ts (transversalis fascia, conjoint tendon).',
     ], { sourceRefs: aw([54]) }),
-    ask(mcq('i3-01', 'inguinal-canal', 'The deep inguinal ring lies:', 'Lateral to the inferior epigastric vessels, 1.25 cm above the midpoint of the inguinal ligament', ['Medial to the inferior epigastric vessels', 'Above and lateral to the pubic tubercle in the external oblique', 'Below the inguinal ligament'], { explanation: 'Slide 52.' })),
+    ask(mcq('i3-01', 'inguinal-canal', 'The deep inguinal ring lies:', 'Lateral to the inferior epigastric vessels, 1.25 cm above the midpoint of the inguinal ligament', ['Medial to the inferior epigastric vessels, just above the pubic tubercle', 'Above and lateral to the pubic tubercle, in the external oblique aponeurosis', 'Below the inguinal ligament, medial to the femoral vein'], { explanation: 'Slide 52.' })),
     ask(match('i3-02', 'spermatic-cord', 'Match each covering of the spermatic cord to its origin:', [
       ['External spermatic fascia', 'External oblique aponeurosis'],
       ['Cremasteric muscle and fascia', 'Internal oblique'],
@@ -105,7 +105,7 @@ export const interactive: Record<string, Steps> = {
     learn('Two kinds of hiatal hernia', [
       'Sliding (90%): the oesophagogastric junction slides up; reflux is common. Rolling: the fundus rolls up beside an intact LES; no regurgitation.',
     ], { sourceRefs: gi([16]) }),
-    ask(mcq('i5-03', 'hiatal-hernia', 'Which hiatal hernia leaves the cardiac mechanism intact, so there is no regurgitation?', 'Rolling (para-oesophageal) hernia', ['Sliding hernia', 'Bochdalek hernia', 'Morgagni hernia'], { explanation: 'Slide 16.' })),
+    ask(mcq('i5-03', 'hiatal-hernia', 'Which hiatal hernia leaves the cardiac mechanism intact, so there is no regurgitation?', 'Rolling (para-oesophageal) hernia', ['Sliding (axial) hernia', 'Bochdalek (posterolateral) hernia', 'Morgagni (retrosternal) hernia'], { explanation: 'Slide 16.' })),
     recall('r5-01', 'stomach', 'List the posterior relations (stomach bed) of the stomach.', [
       'Body of the pancreas and splenic vessels.',
       'Left kidney and suprarenal gland; spleen.',
@@ -139,7 +139,7 @@ export const interactive: Record<string, Steps> = {
     learn('Spot the colon', [
       'Teniae coli, haustra and epiploic appendices mark the colon. All three are absent from the rectum.',
     ], { sourceRefs: gi([39, 48]) }),
-    ask(mcq('i7-01', 'colon-features', 'How can the base of the appendix be found at operation?', 'Follow any of the teniae coli on the caecum', ['Follow the ileocaecal valve upward', 'Follow the right colic artery', 'Feel for the sigmoid mesocolon'], { explanation: 'Slides 39, 41.', skill: 'application' })),
+    ask(mcq('i7-01', 'colon-features', 'How can the base of the appendix be found at operation?', 'Follow any of the teniae coli on the caecum', ['Follow the ileocaecal valve upward', 'Follow the right colic artery down', 'Feel for the root of the sigmoid mesocolon'], { explanation: 'Slides 39, 41.', skill: 'application' })),
     ask(match('i7-02', 'colon-features', 'Match each part of the colon to its approximate length:', [
       ['Ascending colon', '15 cm'],
       ['Transverse colon', '45 cm'],
@@ -157,7 +157,7 @@ export const interactive: Record<string, Steps> = {
   ],
 
   [L(8)]: [
-    ask(mcq('i8-01', 'liver', 'Cantlie’s line divides the liver into functional lobes. Which lobes belong to the functional LEFT lobe?', 'Quadrate and caudate lobes', ['Right lobe only', 'None — both are right', 'Bare area'], { explanation: 'Slide 61.' })),
+    ask(mcq('i8-01', 'liver', 'Cantlie’s line divides the liver into functional lobes. Which lobes belong to the functional LEFT lobe?', 'Quadrate and caudate lobes', ['The anatomical right lobe only', 'None — both belong to the functional right lobe', 'The bare area and the right lobe'], { explanation: 'Slide 61.' })),
     learn('Fetal remnants on the liver', [
       'Ligamentum teres = left umbilical vein (in the falciform edge). Ligamentum venosum = ductus venosus (between caudate lobe and left lobe).',
     ], { sourceRefs: gi([61, 66]) }),
@@ -185,7 +185,7 @@ export const interactive: Record<string, Steps> = {
     learn('Weak spots', [
       'Griffith’s point (splenic flexure) and Sudeck’s point (rectosigmoid) are watershed zones where the marginal artery is poorly developed.',
     ], { sourceRefs: nv([2, 3]) }),
-    ask(mcq('i9-02', 'coeliac-trunk', 'A penetrating ulcer of the posterior first part of the duodenum bleeds heavily. Which artery is eroded?', 'Gastroduodenal artery', ['Left gastric artery', 'Splenic artery', 'Middle colic artery'], { explanation: 'Slide 10.', skill: 'application' })),
+    ask(mcq('i9-02', 'coeliac-trunk', 'A penetrating ulcer of the posterior first part of the duodenum bleeds heavily. Which artery is eroded?', 'Gastroduodenal artery', ['Left gastric artery (lesser curve)', 'Splenic artery', 'Middle colic artery'], { explanation: 'Slide 10.', skill: 'application' })),
     learn('Three coeliac branches', [
       'Left gastric, splenic and common hepatic arteries; the common hepatic gives the proper hepatic, right gastric and gastroduodenal arteries.',
     ], { sourceRefs: nv([6]) }),

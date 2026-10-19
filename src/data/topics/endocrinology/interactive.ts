@@ -38,7 +38,7 @@ export const interactive: Record<string, Steps> = {
 
   'endocrinology-2': [
     ask(
-      mcq('c2-01', 'posterior-pituitary', 'Where are ADH and oxytocin actually made?', 'In the hypothalamus (paraventricular and supraoptic nuclei)', ['In the posterior pituitary', 'In the anterior pituitary', 'In the kidney'], { explanation: 'Introduction, pp. 10–11: they are made in the hypothalamus and stored in the posterior pituitary.' })
+      mcq('c2-01', 'posterior-pituitary', 'Where are ADH and oxytocin actually made?', 'In the hypothalamus (paraventricular and supraoptic nuclei)', ['In the posterior pituitary (pars nervosa)', 'In the anterior pituitary (pars distalis)', 'In the kidney (collecting ducts)'], { explanation: 'Introduction, pp. 10–11: they are made in the hypothalamus and stored in the posterior pituitary.' })
     ),
     learn('The portal system', ['Hypothalamic releasing and inhibiting hormones reach the anterior pituitary through the hypothalamo-pituitary portal system, not the general circulation.'], { sourceRefs: intro([19]) }),
     ask(
@@ -61,14 +61,14 @@ export const interactive: Record<string, Steps> = {
 
   'endocrinology-3': [
     ask(
-      mcq('c3-01', 'gh-actions', 'Growth hormone mostly acts through which mediators?', 'Somatomedins (insulin-like growth factors) from the liver', ['Thyroxine', 'Cortisol', 'Prolactin'], { explanation: 'Introduction, p. 32.' })
+      mcq('c3-01', 'gh-actions', 'Growth hormone mostly acts through which mediators?', 'Somatomedins (insulin-like growth factors) from the liver', ['Thyroxine released from the thyroid', 'Cortisol from the adrenal cortex', 'Prolactin from the anterior pituitary'], { explanation: 'Introduction, p. 32.' })
     ),
     learn('GH and glucose', ['GH spares glucose: less glucose used for energy, less uptake by muscle, more output by the liver. It is diabetogenic.'], { sourceRefs: intro([30]) }),
     ask(
       multi('c3-02', 'gh-control', 'Which stimulate GH secretion? Select all that apply.', ['Fasting (low blood sugar)', 'Sleep', 'A protein meal', 'Stress'], ['Hyperglycaemia', 'Somatostatin'], { explanation: 'Introduction, pp. 33–34.' })
     ),
     ask(
-      mcq('c3-03', 'gh-disorders', 'An adult develops a GH-secreting tumour. Which change is expected?', 'Widening of the hands, feet and jaw, with no increase in height', ['A big increase in height', 'Short stature', 'Loss of all bone growth'], { explanation: 'Introduction, p. 36: after the epiphyses fuse, growth is subperiosteal — acromegaly.', skill: 'application', clinical: true })
+      mcq('c3-03', 'gh-disorders', 'An adult develops a GH-secreting tumour. Which change is expected?', 'Widening of the hands, feet and jaw, with no increase in height', ['A big increase in height as the long bones lengthen', 'Short stature as the growth plates close early', 'Loss of all bone growth throughout the skeleton'], { explanation: 'Introduction, p. 36: after the epiphyses fuse, growth is subperiosteal — acromegaly.', skill: 'application', clinical: true })
     ),
     learn('Prolactin', ['Dopamine is the main brake on prolactin. A prolactin-secreting adenoma causes galactorrhoea, amenorrhoea and impotence.'], { sourceRefs: intro([41, 43]) }),
     ask(
@@ -89,7 +89,7 @@ export const interactive: Record<string, Steps> = {
     ),
     learn('Thyroid hormone raises the metabolic rate', ['More O₂ consumption, heat and gluconeogenesis; more LDL receptors so cholesterol falls; more protein breakdown and weight loss.'], { sourceRefs: th([7, 8]) }),
     ask(
-      mcq('c4-02', 'thyroid-systems', 'Why does a hyperthyroid patient have a fast, forceful heartbeat?', 'Thyroid hormone increases β1 and β2 receptors, so the heart is more sensitive to catecholamines', ['Thyroid hormone blocks the vagus', 'Thyroid hormone is a catecholamine', 'Thyroid hormone lowers blood volume'], { explanation: 'Thyroid, p. 9.', skill: 'cause-effect' })
+      mcq('c4-02', 'thyroid-systems', 'Why does a hyperthyroid patient have a fast, forceful heartbeat?', 'Thyroid hormone increases β1 and β2 receptors, so the heart is more sensitive to catecholamines', ['Thyroid hormone blocks the vagus nerve to the SA node directly', 'Thyroid hormone is itself a catecholamine that acts on the heart', 'Thyroid hormone lowers blood volume, so the heart must beat harder'], { explanation: 'Thyroid, p. 9.', skill: 'cause-effect' })
     ),
     learn('The axis', ['TRH → TSH → T3/T4 → negative feedback. Test the thyroid with TSH and the pituitary with TRH.'], { sourceRefs: th([12, 13]) }),
     ask(
@@ -126,7 +126,7 @@ export const interactive: Record<string, Steps> = {
       mcq('c5-04', 'adrenal-disorders', 'A patient has low BP, low Na⁺, high K⁺ and darkened skin. Which disorder?', 'Addison’s disease', ['Cushing’s syndrome', 'Conn’s syndrome', 'Phaeochromocytoma'], { explanation: 'Adrenal, p. 15.', skill: 'application', clinical: true })
     ),
     ask(
-      mcq('c5-05', 'adrenal-medulla', 'Which finding points to a phaeochromocytoma?', 'Episodic hypertension with VMA in the urine', ['Hyperkalaemia and hypotension', 'Moon face and striae', 'Hypoglycaemia and pigmentation'], { explanation: 'Adrenal, p. 22.', clinical: true })
+      mcq('c5-05', 'adrenal-medulla', 'Which finding points to a phaeochromocytoma?', 'Episodic hypertension with VMA in the urine', ['Hyperkalaemia with hypotension and salt craving', 'Moon face, central obesity and purple striae', 'Hypoglycaemia with skin and mucosal pigmentation'], { explanation: 'Adrenal, p. 22.', clinical: true })
     ),
     recall('r5-01', 'adrenal-disorders', 'Compare Addison’s disease, Cushing’s syndrome and Conn’s syndrome.', [
       'Addison’s: primary adrenal failure — too little glucocorticoid and often mineralocorticoid: hyponatraemia, hyperkalaemia, acidosis, low BP, hyperpigmentation, hypoglycaemia.',
@@ -144,7 +144,7 @@ export const interactive: Record<string, Steps> = {
       mcq('c6-02', 'insulin-actions', 'What does insulin do to gluconeogenesis?', 'Inhibits it', ['Stimulates it', 'No effect', 'Only stimulates it in muscle'], { explanation: 'Pancreas, p. 7.' })
     ),
     ask(
-      mcq('c6-03', 'insulin-secretion', 'Why are thiazide diuretics called diabetogenic?', 'They cause hypokalaemia, which reduces insulin secretion', ['They destroy β cells', 'They raise glucagon', 'They block insulin receptors'], { explanation: 'Pancreas, pp. 6 and 10.', skill: 'cause-effect' })
+      mcq('c6-03', 'insulin-secretion', 'Why are thiazide diuretics called diabetogenic?', 'They cause hypokalaemia, which reduces insulin secretion', ['They destroy the β cells of the islets', 'They raise glucagon secretion from α cells', 'They block insulin receptors in muscle and fat'], { explanation: 'Pancreas, pp. 6 and 10.', skill: 'cause-effect' })
     ),
     learn('From no insulin to coma', ['High glucose exceeds the renal Tm → osmotic diuresis → loss of water and electrolytes → dehydration → hypotension. Fat breakdown → ketones → acidosis → Kussmaul breathing.'], { sourceRefs: pa([14, 15, 16]) }),
     ask(
@@ -174,10 +174,10 @@ export const interactive: Record<string, Steps> = {
     ),
     learn('PTH versus calcitonin', ['PTH raises Ca²⁺ and lowers phosphate (bone resorption, renal Ca²⁺ reabsorption, phosphaturia, more active vitamin D). Calcitonin lowers Ca²⁺ by inhibiting osteoclasts.'], { sourceRefs: ca([15, 19]) }),
     ask(
-      mcq('c7-04', 'pth', 'What does PTH do to urinary phosphate?', 'Increases it, by reducing tubular reabsorption', ['Decreases it', 'No effect', 'Converts it to calcium'], { explanation: 'Calcium, p. 15.' })
+      mcq('c7-04', 'pth', 'What does PTH do to urinary phosphate?', 'Increases it, by reducing tubular reabsorption', ['Decreases it, by increasing tubular reabsorption', 'No effect on phosphate excretion', 'Converts it to calcium in the tubule'], { explanation: 'Calcium, p. 15.' })
     ),
     ask(
-      mcq('c7-05', 'pth', 'A patient has hypercalcaemia, kidney stones, bone cysts and raised alkaline phosphatase. Which is most likely?', 'Primary hyperparathyroidism', ['Hypoparathyroidism', 'Vitamin D deficiency', 'Excess calcitonin'], { explanation: 'Calcium, p. 17.', skill: 'application', clinical: true })
+      mcq('c7-05', 'pth', 'A patient has hypercalcaemia, kidney stones, bone cysts and raised alkaline phosphatase. Which is most likely?', 'Primary hyperparathyroidism', ['Hypoparathyroidism', 'Vitamin D deficiency (osteomalacia)', 'Excess calcitonin secretion'], { explanation: 'Calcium, p. 17.', skill: 'application', clinical: true })
     ),
     recall('r7-01', 'pth', 'Explain how PTH raises plasma calcium, acting on bone, kidney and gut.', [
       'Bone: increases resorption, mobilising Ca²⁺.',
