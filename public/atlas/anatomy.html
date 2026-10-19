@@ -2029,6 +2029,7 @@ bool inRegion(vec3 p) {
       }
       const side = /\.l$/i.test(raw) ? 'Left' : /\.r$/i.test(raw) ? 'Right' : '';
       const name = raw.replace(/\.[a-z]{1,2}$/i, '').trim();
+      if (/^jejunum$/i.test(name)) return { name: 'Jejunum and ileum', side, note: 'In this model the ileum is not separated from the jejunum.' };
       return { name, side };
     }
 
