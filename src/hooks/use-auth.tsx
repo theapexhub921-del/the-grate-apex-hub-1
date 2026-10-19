@@ -60,9 +60,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Read live Firestore profile
       const userRef = doc(db, 'users', firebaseUser.uid);
+      // Writes made as the app starts (last seen, online…) are merged into the
+      // profile and shown at once as a preview holding only those fields, sometimes
+      // even marked as from the server. The profile only counts as loaded once a
+      // complete copy has arrived (from the server, nothing unconfirmed in it), or
+      // the route guard would think the learner has no interface, username or class
+      // yet and send them to set it up again.
+      let fromServer = false;
       unsubSnapshot = onSnapshot(
         userRef,
         (snap) => {
+          if (!snap.metadata.fromCache && !snap.metadata.hasPendingWrites) fromServer = true;
           const profile = snap.data() || {};
           const authUser: AuthUser = {
             id: firebaseUser.uid,
@@ -76,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               full_name: profile.displayName || profile.username || firebaseUser.displayName || '',
             },
             profile,
-            profileLoaded: true,
+            profileLoaded: fromServer,
           };
           setSession({ user: authUser });
           setLoading(false);

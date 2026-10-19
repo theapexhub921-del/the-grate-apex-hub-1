@@ -25,7 +25,7 @@ export function PathwaySteps({ steps }: { steps: LessonStep[] }) {
 
             <View style={styles.body}>
               <Text style={styles.label}>{step.label}</Text>
-              {step.detail && <Text style={styles.detail}>{step.detail}</Text>}
+              {step.detail ? <Text style={styles.detail}>{step.detail}</Text> : null}
             </View>
           </View>
         );

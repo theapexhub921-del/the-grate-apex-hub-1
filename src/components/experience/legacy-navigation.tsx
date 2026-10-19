@@ -163,7 +163,10 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
   const displayName = useDisplayName();
   const avatarUrl = useAvatarUrl();
   const rank = legacyRank(progress.xp);
-  const username = typeof user?.profile?.username === 'string' ? user.profile.username : displayName;
+  const savedUsername = typeof user?.profile?.username === 'string' ? user.profile.username.trim() : '';
+  const username = savedUsername || displayName;
+  // "@" only goes in front of a real username, never a full name or nothing.
+  const handle = savedUsername ? `@${savedUsername}` : displayName;
 
   const autoHide = useOriginalAutoHide();
   const [hovered, setHovered] = useState(false);
@@ -246,7 +249,7 @@ export function LegacySidebar({ onNavigate }: { onNavigate: (route: string) => v
           <View style={[{ flex: 1 }, collapsed && styles.hidden]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
             <Text style={[styles.meName, { color: C.text }]} numberOfLines={1}>
-              @{username}
+              {handle}
             </Text>
             <VerifiedBadge username={username} uid={user?.uid} size={13} />
             </View>

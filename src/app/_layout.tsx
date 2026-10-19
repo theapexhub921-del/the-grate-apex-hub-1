@@ -17,8 +17,9 @@ import { LearningSync } from '@/components/learning/learning-sync';
 import { DeviceNotificationBridge } from '@/components/notifications';
 import { PageTitle } from '@/components/page-title';
 import { StreakCelebrationWatcher } from '@/components/streak-celebration-watcher';
-import { EXPERIENCES_ENABLED, heldExperience, needsExperience } from '@/data/experience';
+import { EXPERIENCES_ENABLED, heldExperience, needsExperience, saveHeldExperience } from '@/data/experience';
 import { needsOnboarding, saveHeldSignUpConsent, useOnboardingState } from '@/data/onboarding';
+import { syncProfileWithCloud } from '@/data/user';
 import { useFontSizePreference, usePageZoomPreference } from '@/data/settings';
 import { applyWebFontScale } from '@/lib/web-font-scaling';
 import { readClassSelection } from '@/data/class-curriculum';
@@ -51,12 +52,16 @@ function AppGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
   const onboarding = useOnboardingState();
 
-  // A Terms tick given on the sign-up form before "Continue with Google" is
-  // saved once the new account has a username (and so a users document).
+  // Once a new account has a username (and so a users document): save a Terms
+  // tick given before "Continue with Google", and read the name again (the
+  // first read happens as the login is created, before the profile exists).
   const accountReady = !!session && session.user.profileLoaded && !needsUsername(session.user.profile?.username);
   const accountUid = session?.user.id;
   useEffect(() => {
-    if (accountReady) void saveHeldSignUpConsent();
+    if (!accountReady) return;
+    void saveHeldExperience().catch(() => undefined);
+    void saveHeldSignUpConsent();
+    void syncProfileWithCloud();
   }, [accountReady, accountUid]);
 
   useEffect(() => {
@@ -83,6 +88,10 @@ function AppGuard({ children }: { children: ReactNode }) {
 
     // Authenticated on a password-recovery link: stay to set the password.
     if (onLoginScreen && isRecoveryUrl()) return;
+
+    // Nothing below is decided until the account itself has been read (never from
+    // a half-loaded profile, or while offline).
+    if (!session.user.profileLoaded) return;
 
     // A new learner's first steps, in this order (owner's request, 2026-10-18):
     // 1. the interface (no default) — only while EXPERIENCES_ENABLED is on. A choice
