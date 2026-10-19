@@ -18,7 +18,7 @@ export const endocrinology = buildTopic({
   emoji: '🦋',
   source: 'Lectures: Endocrinology, Thyroid, Adrenals, Endocrine Pancreas, Calcium Metabolism',
   sourceFileIds: contentTopics.find((topic) => topic.id === TOPIC_ID)?.sourceFileIds ?? [],
-  contentVersion: 1,
+  contentVersion: 2, // 2: a simulation in every lesson
   concepts,
   lessons,
   questions,

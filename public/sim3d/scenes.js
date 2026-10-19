@@ -48,7 +48,93 @@ const NECK_VESSELS = /^(internal jugular vein\.?(r|l)|external jugular vein\.?(r
 
 const NECK_ARTERIES = /^(right common carotid artery|left common carotid artery|external carotid artery\.?(r|l)|internal carotid artery\.?(r|l)|brachiocephalic trunk.*|aortic arch.*)( \d+)?$/;
 
+
+// Muscle and ligament attachment areas drawn on the bones ("Frontalis muscle.or").
+const BONE_MARKERS = /^[^/]*(muscle|ligament|tendon|fascia|retinaculum|aponeurosis|membrane)/;
+const BODY_BONES = ['cranium.g', 'extracranial bones of head.g', 'vertebral column.g', 'thoracic skeleton.g', 'bones of pelvic girdle.g'];
+function endocrineScene(label, focus, view) {
+  return {
+    label,
+    files: ['NervousSystem100', 'VisceralSystem100', 'SkeletalSystem100'],
+    under: ['brain.g', 'endocrine glands.g', 'urinary system.g', 'liver', 'pancreas', 'gallbladder', ...BODY_BONES],
+    names: [],
+    exclude: [BONE_MARKERS, /sulcus|sulci|fissure|meninges|dura|arachnoid|pia|urethra|teeth|costal cartilage/],
+    groups: {
+      bones: { match: new RegExp(BODY_BONES.map(b => b.replace('.', '\\.')).join('|')), opacity: 0.05, color: '#e9dcc4' },
+      brain: { match: /brain\.g/, opacity: 0.06 },
+      hypothalamus: { match: /hypothalamus/, opacity: 1, color: '#d9906b' },
+      anterior: { match: /adenohypophysis/, color: '#c46f4f', move: true },
+      posterior: { match: /neurohypophysis/, color: '#e0b38c' },
+      thyroid: { match: /^thyroid gland/, color: '#b5563f', move: true },
+      parathyroids: { match: /parathyroid/, color: '#d9a35b' },
+      adrenals: { match: /suprarenal/, color: '#d9a04e', move: true },
+      kidneys: { match: /kidney|renal pelvis|ureter/, opacity: 0.55 },
+      bladder: { match: /urinary bladder/, move: true, pivotAt: 'bottom', opacity: 0.7 },
+      liver: { match: /liver/, opacity: 0.16 },
+      pancreas: { match: /pancrea/, color: '#e2b36f' },
+      gallbladder: { match: /gallbladder/, opacity: 0.35 },
+      neckAxis: { match: /hypothalamus|hypophysis|^thyroid gland|parathyroid/ },
+      abdomen: { match: /suprarenal|kidney|pancrea/ },
+    },
+    focus,
+    view,
+  };
+}
+function endocrineScenes() {
+  return {
+    // The whole axis, brain to kidneys.
+    endocrine: endocrineScene('The endocrine glands: hypothalamus, pituitary, thyroid, adrenals and pancreas', null, { dir: [0.35, 0.08, 1], dist: 1.6 }),
+    // Head and neck: hypothalamus, pituitary, thyroid.
+    'endocrine-neck': endocrineScene('The hypothalamus, pituitary and thyroid', 'neckAxis', { dir: [0.9, 0.05, 1], dist: 2.05 }),
+    // Abdomen: adrenals, kidneys, pancreas, liver.
+    'endocrine-abdomen': endocrineScene('The pancreas, liver, kidneys and adrenal glands', 'abdomen', { dir: [0.15, -0.1, 1], dist: 2.1 }),
+    // From behind: the adrenal glands capping the kidneys.
+    adrenals: endocrineScene('The adrenal glands on top of the kidneys, seen from behind', 'abdomen', { dir: [0.25, 0.3, -1], dist: 1.9 }),
+  };
+}
+
 export const SCENES = {
+  // ─── Endocrinology ─────────────────────────────────────────────────
+  // The endocrine glands in place: a see-through brain with the hypothalamus, the pituitary, the
+  // thyroid and parathyroids, the adrenals on the kidneys, the pancreas and liver, inside a faint
+  // skeleton. The same parts are framed differently by each endocrine scene (endocrineScene()).
+  ...endocrineScenes(),
+  // The whole skeleton with the pituitary and liver (growth hormone → somatomedins). The skeleton
+  // can grow taller (gigantism); the bones that widen in acromegaly can be marked.
+  skeleton: {
+    label: 'The skeleton, with the pituitary and the liver',
+    files: ['SkeletalSystem100', 'VisceralSystem100'],
+    under: ['cranium.g', 'extracranial bones of head.g', 'vertebral column.g', 'thoracic skeleton.g', 'bones of upper limb.g', 'bones of lower limb.g', 'hypophysis.g', 'liver'],
+    names: [],
+    exclude: [BONE_MARKERS, /teeth/],
+    groups: {
+      body: { match: /./, move: true, pivotAt: 'bottom' },
+      skull: { match: /cranium\.g/, opacity: 0.4 },
+      thorax: { match: /thoracic skeleton/, opacity: 0.45 },
+      acral: { match: /of hand|carpal|metacarpal|bones of foot|mandible|frontal bone|nasal bone|zygomatic|maxilla/ },
+      pituitary: { match: /hypophysis/, color: '#c46f4f' },
+      liver: { match: /liver/ },
+    },
+    view: { dir: [0.25, 0.05, 1], dist: 2.3 },
+  },
+
+  // Calcium: the parathyroids on the thyroid, the kidneys, the small intestine and the bones.
+  calcium: {
+    label: 'The parathyroid glands, kidneys, small intestine and skeleton',
+    files: ['VisceralSystem100', 'SkeletalSystem100'],
+    under: ['thyroid gland', 'parathyroid glands.g', 'urinary system.g', 'small intestine.g', 'vertebral column.g', 'thoracic skeleton.g', 'bones of pelvic girdle.g'],
+    names: [],
+    exclude: [BONE_MARKERS, /urethra|costal cartilage/],
+    groups: {
+      bones: { match: /vertebral|thoracic skeleton|pelvic girdle/, opacity: 0.28, color: '#eadfca' },
+      thyroid: { match: /^thyroid gland/, opacity: 0.55, color: '#b5563f' },
+      parathyroids: { match: /parathyroid/, color: '#e0a24a' },
+      kidneys: { match: /kidney|renal pelvis|ureter|bladder/ },
+      gut: { match: /duoden|jejun|ileum|small intestine/ },
+    },
+    view: { dir: [0.2, 0.05, 1], dist: 1.75 },
+  },
+
   // The heart with its great vessels. Ventricles and atria shrink towards the valve plane.
   heart: {
     label: 'The heart',

@@ -69,9 +69,38 @@ import type { AcidBaseState } from '@/data/simulations/acid-base';
 import { RenalVesselsGraphic } from './renal-vessels';
 import type { VesselsState } from '@/data/simulations/renal-vessels';
 
+import { FeedbackAxisGraphic } from './feedback-axis';
+import type { FeedbackState } from '@/data/simulations/feedback-axis';
+import { AdhWaterGraphic } from './adh-water';
+import type { AdhState } from '@/data/simulations/adh-water';
+import { GrowthHormoneGraphic } from './growth-hormone';
+import type { GhState } from '@/data/simulations/growth-hormone';
+import { ThyroidAxisGraphic } from './thyroid-axis';
+import type { ThyroidState } from '@/data/simulations/thyroid-axis';
+import { AdrenalAxisGraphic } from './adrenal-axis';
+import type { AdrenalState } from '@/data/simulations/adrenal-axis';
+import { GlucoseInsulinGraphic } from './glucose-insulin';
+import type { GlucoseInsulinState } from '@/data/simulations/glucose-insulin';
+import { CalciumGraphic } from './calcium';
+import type { CalciumState } from '@/data/simulations/calcium';
+
 // The drawing for each simulation (models: data/simulations/).
 export function SimulationGraphic({ id, ...props }: GraphicProps<SimState> & { id: SimulationId }) {
   switch (id) {
+    case 'feedback-axis':
+      return <FeedbackAxisGraphic {...(props as GraphicProps<FeedbackState>)} />;
+    case 'adh-water':
+      return <AdhWaterGraphic {...(props as GraphicProps<AdhState>)} />;
+    case 'growth-hormone':
+      return <GrowthHormoneGraphic {...(props as GraphicProps<GhState>)} />;
+    case 'thyroid-axis':
+      return <ThyroidAxisGraphic {...(props as GraphicProps<ThyroidState>)} />;
+    case 'adrenal-axis':
+      return <AdrenalAxisGraphic {...(props as GraphicProps<AdrenalState>)} />;
+    case 'glucose-insulin':
+      return <GlucoseInsulinGraphic {...(props as GraphicProps<GlucoseInsulinState>)} />;
+    case 'calcium':
+      return <CalciumGraphic {...(props as GraphicProps<CalciumState>)} />;
     case 'cardiac-cycle':
       return <CardiacCycleGraphic {...(props as GraphicProps<CycleState>)} />;
     case 'sounds-jvp':

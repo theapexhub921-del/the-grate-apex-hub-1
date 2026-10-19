@@ -329,7 +329,15 @@ export type SimulationId =
   | 'urine-concentration'
   | 'renal-clearance'
   | 'micturition'
-  | 'acid-base';
+  | 'acid-base'
+  // Endocrinology
+  | 'feedback-axis'
+  | 'adh-water'
+  | 'growth-hormone'
+  | 'thyroid-axis'
+  | 'adrenal-axis'
+  | 'glucose-insulin'
+  | 'calcium';
 
 // What the model must show after a prediction is run (checked by
 // tests/simulations.test.mjs, so a prediction's answer always matches

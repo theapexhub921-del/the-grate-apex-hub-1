@@ -3,6 +3,7 @@
 // sources.ts). References name the lecture and page: "Introduction, p. 6".
 import type { LessonDraft } from '@/data/topics/build';
 import { interactive, readingExtras } from '@/data/topics/endocrinology/interactive';
+import { withSimulation } from '@/data/topics/endocrinology/simulations';
 import { ad, ca, GUYTON, intro, pa, th, type ConceptId } from '@/data/topics/endocrinology/sources';
 
 type Draft = LessonDraft<ConceptId>;
@@ -820,5 +821,5 @@ const lesson7: Draft = {
 export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7].map((lesson) => ({
   ...lesson,
   ...readingExtras[lesson.id],
-  interactive: interactive[lesson.id],
+  interactive: withSimulation(lesson.id, interactive[lesson.id]),
 }));

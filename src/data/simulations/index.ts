@@ -7,6 +7,13 @@ import { micturition } from '@/data/simulations/micturition';
 import { renalClearance } from '@/data/simulations/renal-clearance';
 import { renalVessels } from '@/data/simulations/renal-vessels';
 import { urineConcentration } from '@/data/simulations/urine-concentration';
+import { feedbackAxis } from '@/data/simulations/feedback-axis';
+import { adhWater } from '@/data/simulations/adh-water';
+import { growthHormone } from '@/data/simulations/growth-hormone';
+import { thyroidAxis } from '@/data/simulations/thyroid-axis';
+import { adrenalAxis } from '@/data/simulations/adrenal-axis';
+import { glucoseInsulin } from '@/data/simulations/glucose-insulin';
+import { calcium } from '@/data/simulations/calcium';
 import type { SimulationId } from '@/data/lesson-types';
 import { basalGanglia } from '@/data/simulations/basal-ganglia';
 import { baroreflex } from '@/data/simulations/baroreflex';
@@ -73,6 +80,14 @@ export const SIMULATIONS: Record<SimulationId, SimDefinition> = {
   'renal-clearance': renalClearance,
   'micturition': micturition,
   'acid-base': acidBase,
+  // Endocrinology
+  'feedback-axis': feedbackAxis,
+  'adh-water': adhWater,
+  'growth-hormone': growthHormone,
+  'thyroid-axis': thyroidAxis,
+  'adrenal-axis': adrenalAxis,
+  'glucose-insulin': glucoseInsulin,
+  'calcium': calcium,
 };
 
 export function getSimulation(id: SimulationId): SimDefinition | undefined {

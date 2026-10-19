@@ -45,3 +45,8 @@ export function chestFrame({ inflate, collapseRight = 0, collapseLeft = 0, extra
     opacity: extra?.opacity,
   };
 }
+
+// A hormone level (1 = normal) as a glow: faint when low, bright when high.
+export function levelGlow(level: number) {
+  return rounded(Math.max(0, Math.min(1, 0.35 + 0.3 * Math.log2(Math.max(level, 0.01)))), 0.05);
+}
