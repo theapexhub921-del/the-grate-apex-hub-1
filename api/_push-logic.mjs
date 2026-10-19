@@ -178,7 +178,8 @@ export function leagueWeek(time) {
 /** 'promoted' | 'stays' | 'relegated' for a position (1 = best) among `size` learners. */
 export function leagueOutcome(position, size, weeklyXp = 1) {
   if (size <= 0 || position < 1 || position > size) return 'stays';
-  const promoted = Math.floor(size * LEAGUE_SHARE.promotion);
+  // At least one moves up whenever there are two or more (same rule as src/data/ranks.ts).
+  const promoted = size >= 2 ? Math.max(1, Math.floor(size * LEAGUE_SHARE.promotion)) : 0;
   const relegated = Math.floor(size * LEAGUE_SHARE.relegation);
   if (position <= promoted) return weeklyXp <= 0 ? 'stays' : 'promoted';
   if (position > size - relegated) return 'relegated';
