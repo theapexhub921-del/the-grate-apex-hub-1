@@ -48,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let unsubSnapshot: (() => void) | null = null;
     let retry: ReturnType<typeof setTimeout> | null = null;
     let lastProfile: Record<string, any> | null = null;
+    let lastLoaded = false;
 
     const stopWatching = () => {
       if (unsubSnapshot) {
@@ -78,8 +79,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           attempt = 0;
           // Presence alone changed (written every 45 s while the app is open):
           // keep the same learner, so the whole app doesn't redraw and reload.
-          if (lastProfile && samePresenceAside(lastProfile, profile)) return;
+          // (Never skip the copy that first makes the profile count as loaded.)
+          if (lastProfile && lastLoaded === fromServer && samePresenceAside(lastProfile, profile)) return;
           lastProfile = profile;
+          lastLoaded = fromServer;
           const authUser: AuthUser = {
             id: firebaseUser.uid,
             uid: firebaseUser.uid,
@@ -128,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubAuth = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
       stopWatching();
       lastProfile = null;
+      lastLoaded = false;
 
       if (!firebaseUser) {
         setSession(null);
