@@ -235,6 +235,20 @@ const iso = (value: any) => (value?.toDate ? value.toDate().toISOString() : type
 // Old-app posts have a separate title; show it above the body when it isn't just the body's start.
 /** A plain repost has no words of its own; the shared rules still need 3+ characters, so it carries this. */
 export const REPOST_TEXT = 'Reposted';
+/**
+ * A photo or video needs no caption (owner, 2026-10-19). The shared rules still need
+ * 3+ characters, so an uncaptioned post carries one of these words (it reads well
+ * in the original app) and this app hides it; a 1–2 letter caption is padded with
+ * invisible spaces.
+ */
+const MEDIA_ONLY_TEXT = ['Photo', 'Photos', 'Video', 'Videos', 'Media'];
+const PAD = ' '; // a no-break space
+function mediaOnlyText(media: readonly { t?: string; type?: string }[]) {
+  const videos = media.some((item) => (item.t ?? item.type) === 'video');
+  const photos = media.some((item) => (item.t ?? item.type) !== 'video');
+  if (videos && photos) return 'Media';
+  return videos ? (media.length > 1 ? 'Videos' : 'Video') : media.length > 1 ? 'Photos' : 'Photo';
+}
 
 const readStump = (d: Record<string, any>): StumpRef | null =>
   d.stump && typeof d.stump.qid === 'string' ? { qid: d.stump.qid, note: typeof d.stump.note === 'string' ? d.stump.note : '' } : null;
@@ -243,6 +257,7 @@ const postText = (d: Record<string, any>) => {
   const title = String(d.title ?? '').trim();
   const body = String(d.body ?? '').trim();
   if (d.resharedPostId && body === REPOST_TEXT) return '';
+  if (Array.isArray(d.media) && d.media.length && MEDIA_ONLY_TEXT.includes(body)) return '';
   return title && !body.startsWith(title) ? `${title}\n\n${body}` : body;
 };
 
@@ -360,13 +375,15 @@ export async function listPostsBy(uid: string, limitCount = 30): Promise<Communi
 }
 
 export async function createCommunityPost(body: string, media?: CommunityMedia | readonly CommunityMedia[], resharedPostId?: string | null, stump?: StumpRef): Promise<CommunityPost> {
-  const text = body.trim() || (resharedPostId ? REPOST_TEXT : '');
-  if (text.length < 3) throw new Error('Posts need at least 3 characters.');
+  const files = (Array.isArray(media) ? media : media ? [media as CommunityMedia] : []).slice(0, 3);
+  let text = body.trim() || (resharedPostId ? REPOST_TEXT : '');
+  // A photo or video can go up with no words (or just one or two letters).
+  if (files.length && text.length < 3) text = text ? text.padEnd(3, PAD) : mediaOnlyText(files);
+  if (text.length < 3) throw new Error('Write something, or add a photo or video.');
   if (text.length > 2000) throw new Error('Posts can be up to 2,000 characters.');
   const me = await myUsername();
   // Uploaded to the original app's Cloudinary account first (lib/media.ts);
   // nothing is posted if the upload fails.
-  const files = (Array.isArray(media) ? media : media ? [media as CommunityMedia] : []).slice(0, 3);
   const uploaded = files.length ? cleanMedia(await Promise.all(files.map((file) => uploadMedia(file)))) : [];
   if (files.length && uploaded.length < files.length) throw new Error('One of the uploads failed. Please try again.');
   // The shared board needs a title (3–120 characters): the first line.
@@ -388,7 +405,7 @@ export async function createCommunityPost(body: string, media?: CommunityMedia |
     ...(stump ? { stump: { qid: stump.qid, note: stump.note.slice(0, 200) } } : {}),
   });
   return {
-    id: ref.id, author_id: me.uid, author_name: me.username, body: text, media_path: null,
+    id: ref.id, author_id: me.uid, author_name: me.username, body: uploaded.length && MEDIA_ONLY_TEXT.includes(text) ? '' : text.trim(), media_path: null,
     media_type: uploaded[0]?.t ?? null, media_url: uploaded[0]?.url ?? null, media_list: mediaList(uploaded),
     reshared_post_id: resharedPostId ?? null, created_at: new Date().toISOString(), reactions: 0, comments: 0, reshares: 0, my_reaction: null,
     stump: stump ?? null,
