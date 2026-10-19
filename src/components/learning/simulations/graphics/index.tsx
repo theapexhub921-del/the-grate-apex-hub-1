@@ -103,9 +103,50 @@ import type { DefecationState } from '@/data/simulations/defecation';
 import { BilirubinGraphic } from './bilirubin';
 import type { BilirubinState } from '@/data/simulations/bilirubin';
 
+import { MaleTractGraphic } from './male-tract';
+import type { MaleTractState } from '@/data/simulations/male-tract';
+import { SpermatogenesisGraphic } from './spermatogenesis';
+import type { SpermState } from '@/data/simulations/spermatogenesis';
+import { TestisControlGraphic } from './testis-control';
+import type { TestisState } from '@/data/simulations/testis-control';
+import { AndrogensGraphic } from './androgens';
+import type { AndrogenState } from '@/data/simulations/androgens';
+import { OvarianCycleGraphic } from './ovarian-cycle';
+import type { OvaryState } from '@/data/simulations/ovarian-cycle';
+import { MenstrualCycleGraphic } from './menstrual-cycle';
+import type { MenstrualState } from '@/data/simulations/menstrual-cycle';
+import { OvulationDisordersGraphic } from './ovulation-disorders';
+import type { DisorderState } from '@/data/simulations/ovulation-disorders';
+import { LifespanGraphic } from './lifespan';
+import type { LifespanState } from '@/data/simulations/lifespan';
+import { FertilisationGraphic } from './fertilisation';
+import type { FertilisationState } from '@/data/simulations/fertilisation';
+import { LabourLactationGraphic } from './labour-lactation';
+import type { LabourState } from '@/data/simulations/labour-lactation';
+
 // The drawing for each simulation (models: data/simulations/).
 export function SimulationGraphic({ id, ...props }: GraphicProps<SimState> & { id: SimulationId }) {
   switch (id) {
+    case 'male-tract':
+      return <MaleTractGraphic {...(props as GraphicProps<MaleTractState>)} />;
+    case 'spermatogenesis':
+      return <SpermatogenesisGraphic {...(props as GraphicProps<SpermState>)} />;
+    case 'testis-control':
+      return <TestisControlGraphic {...(props as GraphicProps<TestisState>)} />;
+    case 'androgens':
+      return <AndrogensGraphic {...(props as GraphicProps<AndrogenState>)} />;
+    case 'ovarian-cycle':
+      return <OvarianCycleGraphic {...(props as GraphicProps<OvaryState>)} />;
+    case 'menstrual-cycle':
+      return <MenstrualCycleGraphic {...(props as GraphicProps<MenstrualState>)} />;
+    case 'ovulation-disorders':
+      return <OvulationDisordersGraphic {...(props as GraphicProps<DisorderState>)} />;
+    case 'lifespan':
+      return <LifespanGraphic {...(props as GraphicProps<LifespanState>)} />;
+    case 'fertilisation':
+      return <FertilisationGraphic {...(props as GraphicProps<FertilisationState>)} />;
+    case 'labour-lactation':
+      return <LabourLactationGraphic {...(props as GraphicProps<LabourState>)} />;
     case 'gut-transit':
       return <GutTransitGraphic {...(props as GraphicProps<TransitState>)} />;
     case 'nutrient-digestion':

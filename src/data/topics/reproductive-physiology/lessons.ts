@@ -3,6 +3,7 @@
 // sources.ts). References name the deck: "Male, slide 22".
 import type { LessonDraft } from '@/data/topics/build';
 import { interactive, readingExtras } from '@/data/topics/reproductive-physiology/interactive';
+import { withSimulation } from '@/data/topics/reproductive-physiology/simulations';
 import { fe, ma, sr, type ConceptId } from '@/data/topics/reproductive-physiology/sources';
 
 type Draft = LessonDraft<ConceptId>;
@@ -850,5 +851,5 @@ const lesson10: Draft = {
 export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7, lesson8, lesson9, lesson10].map((lesson) => ({
   ...lesson,
   ...readingExtras[lesson.id],
-  interactive: interactive[lesson.id],
+  interactive: withSimulation(lesson.id, interactive[lesson.id]),
 }));

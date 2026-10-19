@@ -82,7 +82,13 @@
 
     const loader = new GLTFLoader();
     loader.setMeshoptDecoder(MeshoptDecoder);
-    const load = f => loader.loadAsync((LITE ? '/atlas/lite/' : '/atlas/') + f + '.glb?m=' + MODEL_VERSION);
+    // Files in a subfolder (e.g. 'reproductive/breasts') have no lite copy; a scene's `offsets` place
+    // them as the atlas does.
+    const load = f => loader.loadAsync((LITE && !f.includes('/') ? '/atlas/lite/' : '/atlas/') + f + '.glb?m=' + MODEL_VERSION).then(g => {
+      const at = scene3.offsets && scene3.offsets[f];
+      if (at) g.scene.position.set(at[0], at[1], at[2]);
+      return g;
+    });
 
     Promise.all(scene3.files.map(load)).then(gltfs => {
       const keep = [];

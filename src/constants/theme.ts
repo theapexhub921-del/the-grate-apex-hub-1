@@ -441,6 +441,25 @@ export const Anatomy = {
   mitochondria: '#D98B5F',
   tracer: '#2F9E7A',
   outline: '#4A2A2E',
+  // Testis and ovary (microscopic views)
+  germCell: '#E9C4B8',
+  germEdge: '#B98A80',
+  sertoli: '#F7E7D8',
+  sertoliEdge: '#D2B29E',
+  sertoliNucleus: '#9B6F8A',
+  tubuleWall: '#F3D9CF',
+  basalLamina: '#A0705F',
+  interstitium: '#EFE0CC',
+  lumenFluid: '#F6EFE6',
+  spermTail: '#8A6A5A',
+  stroma: '#EFC9BC',
+  granulosa: '#E8B7A6',
+  theca: '#C98A7A',
+  antrum: '#F6EBD6',
+  oocyte: '#F4DCD0',
+  zona: '#F9F3EC',
+  luteum: '#E8C25A',
+  albicans: '#F2EDE4',
 } as const;
 
 export const Radius = {

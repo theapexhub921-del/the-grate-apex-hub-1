@@ -161,6 +161,71 @@ export const SCENES = {
     view: { dir: [-0.6, -0.15, 1], dist: 2.3 },
   },
 
+
+  // ─── Reproductive ──────────────────────────────────────────────────
+  // The male tract: testes, epididymis, ductus deferens, seminal glands, prostate, ejaculatory
+  // ducts and penis, with the bladder and a faint pelvis.
+  male: {
+    label: 'The male reproductive organs',
+    files: ['VisceralSystem100', 'SkeletalSystem100'],
+    under: ['male genital system.g', 'bones of pelvic girdle.g', 'sacrum'],
+    names: [/^urinary bladder$/, /^urethra$/],
+    exclude: [BONE_MARKERS],
+    groups: {
+      bones: { match: /pelvic girdle|sacrum/, opacity: 0.12, color: '#eadfca' },
+      testes: { match: /^testis/, color: '#d9a49a', move: true },
+      epididymis: { match: /epididym/, color: '#c98a7a' },
+      vas: { match: /ductus deferens/, color: '#e2c9a0' },
+      seminal: { match: /seminal gland/, color: '#d8b07a', move: true },
+      prostate: { match: /prostate/, color: '#c9847a', move: true },
+      ejaculatory: { match: /ejaculatory/, color: '#e2c9a0' },
+      penis: { match: /penis|glans/, color: '#d7988c' },
+      bladder: { match: /urinary bladder/, opacity: 0.45 },
+      urethra: { match: /urethra/, color: '#e3cfae' },
+      organs: { match: /genital/ },
+    },
+    focus: 'organs',
+    view: { dir: [-1, 0.15, 0.6], dist: 2.15 },
+  },
+  // The female organs: ovaries, uterine tubes, uterus, cervix and vagina, with a faint pelvis.
+  female: {
+    label: 'The female reproductive organs',
+    files: ['VisceralSystem100', 'SkeletalSystem100'],
+    under: ['bones of pelvic girdle.g', 'sacrum'],
+    names: [/^vh f (right|left) ovary|^vh f (body|fundus|cornua|lower uterine|posterior wall|anterior wall) |^vh f (internal|external) cervical|^vh f cervix|^vh f cervicovaginal|^vh f vagina|^vh f (ampulla|isthmus|fibria|uterine tube infundibulum|abdominal ostium)|^vh f ovarian ligament/],
+    exclude: [BONE_MARKERS],
+    groups: {
+      bones: { match: /pelvic girdle|sacrum/, opacity: 0.12, color: '#eadfca' },
+      uterus: { match: /uter(us|ine segment)|body of uterus|fundus|cornua|wall of uterus/, color: '#c9776e', move: true },
+      cervix: { match: /cervi/, color: '#d7988c' },
+      vagina: { match: /vagina/, color: '#d8a49a' },
+      ovaryR: { match: /right ovary/, color: '#e8c3b0', move: true },
+      ovaryL: { match: /left ovary/, color: '#e8c3b0', move: true },
+      ovaries: { match: /ovary/ },
+      tubes: { match: /ampulla|isthmus|fibria|infundibulum|ostium/, color: '#d99a8a' },
+      ampulla: { match: /ampulla/ },
+      ligaments: { match: /ligament/, color: '#e6d3b8', opacity: 0.6 },
+      organs: { match: /^vh f/ },
+    },
+    focus: 'organs',
+    view: { dir: [0.05, 0.2, 1], dist: 1.45 },
+  },
+  // The breasts with their lobes and ducts (HuBMAP models, placed as the atlas places them).
+  breasts: {
+    label: 'The breasts: lobes, lactiferous ducts and fat',
+    files: ['reproductive/breasts'],
+    offsets: { 'reproductive/breasts': [0.0125, 0.866, 0.098] },
+    under: ['vh f mammary gland'],
+    names: [],
+    groups: {
+      fat: { match: /fat/, color: '#f0d8a0', opacity: 0.25 },
+      lobes: { match: /lobes/, color: '#e2a0a8', move: true },
+      ducts: { match: /lactiferous|areolar/, color: '#c0606e' },
+      ligaments: { match: /suspensory/, opacity: 0.2 },
+    },
+    view: { dir: [0.35, 0.1, 1], dist: 1.4 },
+  },
+
   // ─── Endocrinology ─────────────────────────────────────────────────
   // The endocrine glands in place: a see-through brain with the hypothalamus, the pituitary, the
   // thyroid and parathyroids, the adrenals on the kidneys, the pancreas and liver, inside a faint

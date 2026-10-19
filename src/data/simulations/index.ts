@@ -23,6 +23,16 @@ import { gastricPhases } from '@/data/simulations/gastric-phases';
 import { gutMuscle } from '@/data/simulations/gut-muscle';
 import { defecation } from '@/data/simulations/defecation';
 import { bilirubin } from '@/data/simulations/bilirubin';
+import { maleTract } from '@/data/simulations/male-tract';
+import { spermatogenesis } from '@/data/simulations/spermatogenesis';
+import { testisControl } from '@/data/simulations/testis-control';
+import { androgens } from '@/data/simulations/androgens';
+import { ovarianCycle } from '@/data/simulations/ovarian-cycle';
+import { menstrualCycle } from '@/data/simulations/menstrual-cycle';
+import { ovulationDisorders } from '@/data/simulations/ovulation-disorders';
+import { lifespan } from '@/data/simulations/lifespan';
+import { fertilisation } from '@/data/simulations/fertilisation';
+import { labourLactation } from '@/data/simulations/labour-lactation';
 import type { SimulationId } from '@/data/lesson-types';
 import { basalGanglia } from '@/data/simulations/basal-ganglia';
 import { baroreflex } from '@/data/simulations/baroreflex';
@@ -107,6 +117,17 @@ export const SIMULATIONS: Record<SimulationId, SimDefinition> = {
   'gut-muscle': gutMuscle,
   'defecation': defecation,
   'bilirubin': bilirubin,
+  // Reproductive Physiology
+  'male-tract': maleTract,
+  'spermatogenesis': spermatogenesis,
+  'testis-control': testisControl,
+  'androgens': androgens,
+  'ovarian-cycle': ovarianCycle,
+  'menstrual-cycle': menstrualCycle,
+  'ovulation-disorders': ovulationDisorders,
+  'lifespan': lifespan,
+  'fertilisation': fertilisation,
+  'labour-lactation': labourLactation,
 };
 
 export function getSimulation(id: SimulationId): SimDefinition | undefined {

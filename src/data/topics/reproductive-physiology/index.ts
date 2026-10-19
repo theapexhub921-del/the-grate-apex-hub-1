@@ -18,7 +18,7 @@ export const reproductivePhysiology = buildTopic({
   emoji: '🧬',
   source: 'Lectures: Male, Female, Sexual Response',
   sourceFileIds: contentTopics.find((topic) => topic.id === TOPIC_ID)?.sourceFileIds ?? [],
-  contentVersion: 1,
+  contentVersion: 2, // 2: a simulation in every lesson
   concepts,
   lessons,
   questions,

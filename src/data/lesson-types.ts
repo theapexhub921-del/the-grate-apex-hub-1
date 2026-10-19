@@ -347,7 +347,18 @@ export type SimulationId =
   | 'gastric-phases'
   | 'gut-muscle'
   | 'defecation'
-  | 'bilirubin';
+  | 'bilirubin'
+  // Reproductive Physiology
+  | 'male-tract'
+  | 'spermatogenesis'
+  | 'testis-control'
+  | 'androgens'
+  | 'ovarian-cycle'
+  | 'menstrual-cycle'
+  | 'ovulation-disorders'
+  | 'lifespan'
+  | 'fertilisation'
+  | 'labour-lactation';
 
 // What the model must show after a prediction is run (checked by
 // tests/simulations.test.mjs, so a prediction's answer always matches
