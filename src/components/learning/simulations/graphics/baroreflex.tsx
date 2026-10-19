@@ -24,7 +24,7 @@ export function BaroreflexGraphic({ state, time, reduceMotion }: GraphicProps<Ba
         sympathetic: level(state.sympathetic),
         medulla: state.reflexIntact ? 0.35 : 0,
       },
-      glowColor: { sinus: '#ffd25a', ix: '#fff2b0', vagus: '#9fd0ff', sympathetic: '#ffb347', medulla: '#fff2b0' },
+      glowColor: { sinus: '#ff9a7a', ix: '#fff2b0', vagus: '#9fd0ff', sympathetic: '#ffb347', medulla: '#fff2b0' },
     },
   });
   return (

@@ -46,6 +46,8 @@ const HEART_VESSELS = [
 
 const NECK_VESSELS = /^(internal jugular vein\.?(r|l)|external jugular vein\.?(r|l)|right common carotid artery|left common carotid artery|external carotid artery\.?(r|l)|internal carotid artery\.?(r|l)|right brachiocephalic vein.*|left brachiocephalic vein.*|brachiocephalic trunk.*|aortic arch.*)( \d+)?$|^(branches|carotid sinus|carotid body)/;
 
+const NECK_ARTERIES = /^(right common carotid artery|left common carotid artery|external carotid artery\.?(r|l)|internal carotid artery\.?(r|l)|brachiocephalic trunk.*|aortic arch.*)( \d+)?$/;
+
 export const SCENES = {
   // The heart with its great vessels. Ventricles and atria shrink towards the valve plane.
   heart: {
@@ -89,8 +91,8 @@ export const SCENES = {
     label: 'Carotid arteries, aortic arch, the glossopharyngeal and vagus nerves, the medulla and the heart',
     files: ['CardioVascular41', 'NervousSystem100'],
     under: ['heart.g', 'medulla oblongata.l', 'medulla oblongata.r', 'pons.l', 'pons.r'],
-    names: [...HEART_VESSELS, NECK_VESSELS, /^(glossopharyngeal nerve|vagus nerve)/, /^sympathetic trunk/],
-    exclude: [/abdominal|thoracic aorta|renal|gastric|hepatic|coeliac|celiac/],
+    names: [...HEART_VESSELS, NECK_ARTERIES, /^(glossopharyngeal nerve|vagus nerve)/, /^sympathetic trunk/],
+    exclude: [/vein|vena|abdominal|thoracic aorta|renal|gastric|hepatic|coeliac|celiac/],
     groups: {
       valves: { match: /valv|leaflet/ },
       ventricles: { match: /ventricle|papillary|interventricular|cardiac vein|vein of left ventricle|coronary artery|circumflex|inferolateral|valv|leaflet/, move: true, pivot: 'valves' },
@@ -101,8 +103,7 @@ export const SCENES = {
       sympathetic: { match: /sympathetic trunk/ },
       medulla: { match: /medulla oblongata|pons/ },
     },
-    focus: 'sinus',
-    view: { dir: [0.35, 0.05, 1], dist: 1.6 },
+    view: { dir: [0.3, 0.05, 1], dist: 1.25 },
   },
 
   // The whole circulation, for shock: arteries, veins and the heart.
