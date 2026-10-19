@@ -8,6 +8,8 @@ export const MODEL_VERSION = '1';
 
 // Tissue colours, from the part's name.
 const RULES = [
+  [/pleura/, '#cfe3ef'],
+  [/lung|lobe of/, '#c9878e'],
   [/leaflet|cusp|chorda/, '#efe2cc'],
   [/^(left |right )?(ventricle|atrium)|^[^/]*papillary|^[^/]*auricle/, '#7e2422'],
   [/pulmonary vein/, '#b01e24'],
@@ -20,8 +22,6 @@ const RULES = [
   [/cerebell/, '#c99a95'],
   [/pons|medulla|midbrain|brainstem|peduncle/, '#d8b8a8'],
   [/cerebr|gyrus|lobe|brain|cortex/, '#ddb5b0'],
-  [/pleura/, '#cfe3ef'],
-  [/lung|lobe of/, '#c9878e'],
   [/trachea|bronch|larynx/, '#eadfcc'],
   [/kidney|renal/, '#8f3b32'],
   [/ureter|urethra/, '#e3cfae'],
@@ -133,5 +133,46 @@ export const SCENES = {
     },
     focus: 'brain',
     view: { dir: [0.55, 0.25, 0.8], dist: 1.6 },
+  },
+
+  // The chest: lungs, airways and pleura inside the rib cage, the diaphragm below and the heart
+  // between the lungs. The lungs swell downwards and outwards as they fill; either lung can collapse.
+  chest: {
+    label: 'The lungs, airways, rib cage, diaphragm and heart',
+    files: ['VisceralSystem100', 'SkeletalSystem100', 'MuscularSystem100', 'CardioVascular41'],
+    under: ['lungs.g', 'tracheobronchial tree.g', 'thoracic cavity.g', 'ribs.g', 'sternum.g', 'heart.g'],
+    names: [/^diaphragm( \d+)?$/, ...HEART_VESSELS],
+    groups: {
+      rightLung: { match: /right lung/, move: true, pivotAt: 'medial' },
+      leftLung: { match: /left lung/, move: true, pivotAt: 'medial' },
+      airways: { match: /trachea|bronch/ },
+      pleura: { match: /pleura/, opacity: 0.05, color: '#cfe3ef' },
+      ribs: { match: /rib|sternum|costal|xiphoid|manubrium/, opacity: 0.14 },
+      diaphragm: { match: /^diaphragm/, move: true, pivotAt: 'bottom' },
+      heart: { match: /heart\.g|aort|pulmonary trunk|vena|pulmonary vein|coronary|cardiac vein|interventricular|circumflex|sinus/ },
+      bloodRed: { match: /aort|pulmonary vein|left ventricle|left atrium/ },
+      lungsAll: { match: /lung|trachea/ },
+    },
+    focus: 'lungsAll',
+    view: { dir: [0, 0.05, 1], dist: 1.75 },
+  },
+
+  // Breathing control: the brainstem (central chemoreceptors), the carotid arteries (carotid
+  // bodies at their fork), the phrenic nerves, the diaphragm and the lungs.
+  'breath-control': {
+    label: 'The brainstem, carotid arteries, phrenic nerves, diaphragm and lungs',
+    files: ['VisceralSystem100', 'NervousSystem100', 'CardioVascular41', 'MuscularSystem100'],
+    under: ['lungs.g', 'tracheobronchial tree.g', 'brainstem.g'],
+    names: [NECK_ARTERIES, /^phrenic nerve/, /^diaphragm( \d+)?$/],
+    exclude: [/vein|vena/],
+    groups: {
+      lungs: { match: /lung/, move: true, pivotAt: 'top' },
+      airways: { match: /trachea|bronch/ },
+      medulla: { match: /medulla oblongata|pons|midbrain|brainstem/ },
+      carotid: { match: /carotid/ },
+      phrenic: { match: /phrenic/ },
+      diaphragm: { match: /^diaphragm/, move: true, pivotAt: 'bottom' },
+    },
+    view: { dir: [0.45, 0.05, 1], dist: 1.9 },
   },
 };

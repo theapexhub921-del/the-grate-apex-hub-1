@@ -28,3 +28,20 @@ export function beatAt(time: number, hr: number) {
   const atria = f > 0.88 ? 0 : 1;
   return { lv: rounded(lv, 0.05), la: atria, systole: f < 0.33 ? 1 : 0 };
 }
+
+// The chest scene: inflate 0 (after a quiet breath out) – 1 (deep breath in). Lungs swell
+// outwards and down while the diaphragm flattens; a collapsed lung shrinks to its root.
+export function chestFrame({ inflate, collapseRight = 0, collapseLeft = 0, extra }: { inflate: number; collapseRight?: number; collapseLeft?: number; extra?: OrganFrame }): OrganFrame {
+  const i = Math.max(-0.4, Math.min(1.3, inflate));
+  const lung = (c: number): [number, number, number] => {
+    const k = 1 - 0.45 * c;
+    return [rounded((0.97 + 0.07 * i) * k, 0.01), rounded((0.95 + 0.11 * i) * k, 0.01), rounded((0.97 + 0.07 * i) * k, 0.01)];
+  };
+  return {
+    move: { rightLung: lung(collapseRight), leftLung: lung(collapseLeft), diaphragm: [1, rounded(1 - 0.18 * Math.max(0, i), 0.01), 1], lungs: lung(0), ...(extra?.move ?? {}) },
+    glow: extra?.glow,
+    glowColor: extra?.glowColor,
+    color: extra?.color,
+    opacity: extra?.opacity,
+  };
+}

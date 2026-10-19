@@ -135,7 +135,11 @@
         from.forEach(o => pivotBox.expandByObject(o));
         if (pivotBox.isEmpty()) continue;
         const pivot = new THREE.Group();
-        pivot.position.copy(spec.pivotAt ? new THREE.Vector3(...spec.pivotAt).add(pivotBox.getCenter(new THREE.Vector3())) : pivotBox.getCenter(new THREE.Vector3()));
+        const at = pivotBox.getCenter(new THREE.Vector3());
+        if (spec.pivotAt === 'top') at.y = pivotBox.max.y;
+        if (spec.pivotAt === 'bottom') at.y = pivotBox.min.y;
+        if (spec.pivotAt === 'medial') at.x = Math.abs(pivotBox.max.x) < Math.abs(pivotBox.min.x) ? pivotBox.max.x : pivotBox.min.x;
+        pivot.position.copy(at);
         root.add(pivot);
         pivot.updateMatrixWorld(true);
         for (const o of groups[k].meshes) if (!moved.has(o)) { pivot.attach(o); moved.add(o); }
