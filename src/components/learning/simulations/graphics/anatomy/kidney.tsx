@@ -19,7 +19,7 @@ type Pyramid = { apex: [number, number]; left: [number, number]; right: [number,
 // Seven pyramids fanning out from the sinus towards the cortex.
 const PYRAMIDS: Pyramid[] = [-118, -146, -172, 164, 138, 112, -92].map((deg) => {
   const t = (deg * Math.PI) / 180;
-  const spread = 0.25;
+  const spread = 0.3;
   const at = (a: number, rx: number, ry: number): [number, number] => [100 + Math.cos(a) * rx, 136 + Math.sin(a) * ry];
   const apex: [number, number] = [SINUS[0] + Math.cos(t) * 30, SINUS[1] + Math.sin(t) * 34];
   return { apex, left: at(t - spread, 60, 104), right: at(t + spread, 60, 104), mid: at(t, 64, 110) };
@@ -50,9 +50,9 @@ export function KidneySection({ urine = A.urine, arteryTint = A.artery, veinTint
           <Stop offset="0" stopColor={A.medulla} />
           <Stop offset="1" stopColor={mix(A.medulla, '#000000', 0.25)} />
         </LinearGradient>
-        <LinearGradient id={id('urine')} x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor={mix(urine, '#FFFFFF', 0.35)} />
-          <Stop offset="1" stopColor={urine} />
+        <LinearGradient id={id('urine')} x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0" stopColor={mix(A.calyx, urine, urine === A.urine ? 0 : 0.55)} />
+          <Stop offset="1" stopColor={mix(A.calyxShade, urine, urine === A.urine ? 0 : 0.55)} />
         </LinearGradient>
         <LinearGradient id={id('art')} x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0" stopColor={mix(arteryTint, '#FFFFFF', 0.25)} />
@@ -73,15 +73,15 @@ export function KidneySection({ urine = A.urine, arteryTint = A.artery, veinTint
       </G>
       <Path d={CORTEX_INNER} fill="none" stroke={A.kidneyDark} strokeWidth={0.8} opacity={0.35} />
       {/* fat in the sinus */}
-      <Path d="M120 92 C140 84 160 104 160 130 C160 156 142 180 122 176 C104 170 100 104 120 92 Z" fill={A.fat} opacity={0.9} />
+      <Path d="M114 84 C142 76 162 104 162 132 C162 162 142 190 116 184 C96 176 92 96 114 84 Z" fill={mix(A.fat, '#FFFFFF', 0.45)} />
       {/* pyramids with striations (collecting ducts) */}
       {PYRAMIDS.map((p, i) => (
         <G key={i}>
-          <Path d={`M${p.apex[0]} ${p.apex[1]} L${p.left[0]} ${p.left[1]} Q${p.mid[0]} ${p.mid[1]} ${p.right[0]} ${p.right[1]} Z`} fill={`url(#${id('pyr')})`} stroke={highlight === i ? A.urine : A.kidneyDark} strokeWidth={highlight === i ? 2.4 : 0.8} />
+          <Path d={`M${p.apex[0]} ${p.apex[1]} C${(p.apex[0] * 2 + p.left[0]) / 3} ${(p.apex[1] * 2 + p.left[1]) / 3} ${p.left[0]} ${p.left[1]} ${p.left[0]} ${p.left[1]} Q${p.mid[0]} ${p.mid[1]} ${p.right[0]} ${p.right[1]} C${p.right[0]} ${p.right[1]} ${(p.apex[0] * 2 + p.right[0]) / 3} ${(p.apex[1] * 2 + p.right[1]) / 3} ${p.apex[0]} ${p.apex[1]} Z`} fill={`url(#${id('pyr')})`} stroke={highlight === i ? A.urine : A.kidneyDark} strokeWidth={highlight === i ? 2.4 : 0.8} />
           {[0.2, 0.4, 0.6, 0.8].map((f) => {
             const bx = p.left[0] + (p.right[0] - p.left[0]) * f;
             const by = p.left[1] + (p.right[1] - p.left[1]) * f;
-            return <Path key={f} d={`M${p.apex[0]} ${p.apex[1]} L${bx} ${by}`} stroke={A.kidneyLight} strokeWidth={0.7} opacity={0.35} />;
+            return <Path key={f} d={`M${p.apex[0]} ${p.apex[1]} L${bx} ${by}`} stroke={A.kidneyDark} strokeWidth={0.6} opacity={0.35} />;
           })}
         </G>
       ))}
@@ -103,13 +103,13 @@ export function KidneySection({ urine = A.urine, arteryTint = A.artery, veinTint
             key={`c${i}`}
             d={`M${cx + nx * 9} ${cy + ny * 9} Q${p.apex[0] - (dx / len) * 2} ${p.apex[1] - (dy / len) * 2} ${cx - nx * 9} ${cy - ny * 9} L${SINUS[0] + 6 - nx * 4} ${SINUS[1] - ny * 4} L${SINUS[0] + 6 + nx * 4} ${SINUS[1] + ny * 4} Z`}
             fill={`url(#${id('urine')})`}
-            stroke={A.urineDark}
+            stroke={A.calyxShade}
             strokeWidth={0.8}
           />
         );
       })}
       {/* renal pelvis and ureter */}
-      <Path d="M130 116 C150 112 168 122 176 136 C184 150 190 170 192 200 L194 270 L184 270 L182 204 C180 178 172 160 158 156 C142 154 126 150 124 138 C122 126 124 118 130 116 Z" fill={`url(#${id('urine')})`} stroke={A.urineDark} strokeWidth={1.2} />
+      <Path d="M130 116 C150 112 168 122 176 136 C184 150 190 170 192 200 L194 270 L184 270 L182 204 C180 178 172 160 158 156 C142 154 126 150 124 138 C122 126 124 118 130 116 Z" fill={`url(#${id('urine')})`} stroke={A.calyxShade} strokeWidth={1.2} />
       {/* renal vein and artery at the hilum */}
       <Path d="M218 118 C196 118 176 120 160 124" stroke={mix(veinTint, '#000000', 0.25)} strokeWidth={13} strokeLinecap="round" fill="none" />
       <Path d="M218 118 C196 118 176 120 160 124" stroke={veinTint} strokeWidth={10} strokeLinecap="round" fill="none" />
