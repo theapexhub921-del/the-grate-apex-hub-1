@@ -1,16 +1,17 @@
 import { View } from 'react-native';
-import { Circle, G, Line, Path } from 'react-native-svg';
+import { Circle, Line, Path } from 'react-native-svg';
 
 import { PEOPLE, POSTURES, type SpiroState } from '@/data/simulations/spirometry';
 import { useTheme } from '@/hooks/use-theme';
 
-import { Diaphragm, Heart, Lungs } from './anatomy/lungs';
+import { Organ3D } from '../organ-3d';
+import { chestFrame, rounded } from '../organ-frames';
 import { Caption, Tag } from './kit';
 import { Axes, Canvas, linear, pathOf, type GraphicProps } from './shared';
 
 const W = 400;
 const H = 300;
-const L = 232;
+const L = 60;
 const R = 390;
 const T = 30;
 const B = 250;
@@ -47,15 +48,12 @@ export function SpirometryGraphic({ state, baseline, time, reduceMotion }: Graph
   const tlc = state.rv + state.erv + state.tv + state.irv;
   const inflate = -0.45 + 1.7 * ((vol - state.rv) / Math.max(1, 6000 - state.rv));
 
+  const frame = chestFrame({ inflate: rounded(inflate, 0.02), extra: state.person === 2 ? { color: { rightLung: '#bfa3a3', leftLung: '#bfa3a3' } } : undefined });
+
   return (
-    <View>
+    <View style={{ gap: 10 }}>
+      <Organ3D scene="chest" frame={frame} label={`The lungs holding ${Math.round(vol)} ml: ${PEOPLE[state.person].toLowerCase()}, ${POSTURES[state.posture].toLowerCase()}`} />
       <Canvas width={W} height={H} label={`${PEOPLE[state.person]}, ${POSTURES[state.posture].toLowerCase()}: vital capacity ${Math.round(state.readouts.vc)} ml; total lung capacity ${Math.round(tlc)} ml.`}>
-        <G transform="translate(0 64) scale(0.72)">
-          <Diaphragm inflate={inflate} />
-          <Heart />
-          <Lungs inflate={inflate} stiff={state.person === 2 ? 1 : 0} />
-        </G>
-        <Tag x={86} y={36} text={`${Math.round(vol)} ml in the lungs`} />
         <Axes x={x} y={y} xTicks={[0, 4, 8, 12]} yTicks={[0, 2000, 4000, 6000]} left={L} right={R} top={T} bottom={B} xLabel="Time (s)" />
         <Caption x={L} y={T - 6} text="Lung volume (ml)" tone="tertiary" size={10} />
         {changed ? <Path d={pathOf(trace(baseline), x, y)} stroke={colors.textTertiary} strokeWidth={2} strokeDasharray="5 4" fill="none" /> : null}
@@ -63,7 +61,7 @@ export function SpirometryGraphic({ state, baseline, time, reduceMotion }: Graph
         <Line x1={L} x2={R} y1={y(state.rv)} y2={y(state.rv)} stroke={colors.textTertiary} strokeDasharray="3 3" />
         <Caption x={L + 4} y={y(state.rv) + 13} text="Residual volume" tone="tertiary" size={10} />
         <Circle cx={x(tc)} cy={y(vol)} r={5} fill={colors.primary} stroke={colors.surface} strokeWidth={2} />
-        <Tag x={86} y={288} text={`${PEOPLE[state.person]} · ${POSTURES[state.posture]}`} size={10} tone={state.person >= 2 ? 'error' : 'primary'} />
+        <Tag x={R - 70} y={T + 8} text={`${Math.round(vol)} ml in the lungs`} size={10} />
       </Canvas>
     </View>
   );
