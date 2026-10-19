@@ -11,7 +11,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 1 — The cascade ────────────────────────────────────────
   'blood-coagulation-and-fibrinolysis-1': [
     ask(
-      mcq('c1-01', 'cascade-principles', 'Before you start: why might the body use a chain of enzymes, each activating the next, to make a clot?', 'Each step amplifies the last, giving a rapid, large response from a tiny trigger', ['It makes clotting slower and safer', 'Each enzyme can only act once', 'It avoids needing any inhibitors'], {
+      mcq('c1-01', 'cascade-principles', 'Before you start: why might the body use a chain of enzymes, each activating the next, to make a clot?', 'Each step amplifies the last, giving a rapid, large response from a tiny trigger', ['It makes clotting slower and safer, so that a clot never forms too quickly', 'Each enzyme can only act once, so many are needed to make enough fibrin', 'It avoids the need for any inhibitors to control the clotting process'], {
         explanation: 'Slides 2–3: each step amplifies the preceding one, so trace amounts of initial factors convert large amounts of fibrinogen — and the response is rapid.',
         skill: 'prediction',
       }),
@@ -38,7 +38,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c1-04', 'intrinsic-extrinsic', 'What starts the extrinsic pathway?', 'Tissue factor released by trauma, acting with factor VII', ['Contact of factor XII with glass', 'Thrombin cleaving fibrinogen', 'Vitamin K'], {
+      mcq('c1-04', 'intrinsic-extrinsic', 'What starts the extrinsic pathway?', 'Tissue factor released by trauma, acting with factor VII', ['Contact of factor XII with glass or collagen', 'Thrombin cleaving fibrinogen to fibrin', 'Vitamin K activating factor VII in the plasma'], {
         explanation: 'Slides 8 and 56.',
       })
     ),
@@ -89,7 +89,7 @@ export const interactive: Record<string, Steps> = {
       'Fibrinogen (340 kDa) has six chains: 2(Aα, Bβ, γ). Thrombin cuts four Arg–Gly bonds, releasing fibrinopeptides A and B. The fibrin monomer (αβγ)₂ then assembles into fibrin.',
     ], { sourceRefs: ref([18, 24]) }),
     ask(
-      mcq('c2-03', 'fibrinopeptides', 'Why do fibrinogen molecules not stick together before thrombin acts?', 'Their negatively charged fibrinopeptides repel each other', ['They are bound to albumin', 'They lack polypeptide chains', 'Calcium holds them apart'], {
+      mcq('c2-03', 'fibrinopeptides', 'Why do fibrinogen molecules not stick together before thrombin acts?', 'Their negatively charged fibrinopeptides repel each other', ['They are bound to albumin in the plasma until thrombin acts', 'They lack the polypeptide chains that would join them', 'Calcium ions hold them apart until they are removed'], {
         explanation: 'Slides 25–26: fibrinopeptides are rich in Asp and Glu (and B has tyrosine-O-sulphate); these negative charges keep fibrinogen molecules apart.',
         skill: 'cause-effect',
       })
@@ -117,7 +117,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 3 — Prothrombin, vitamin K, bleeding disorders ─────────
   'blood-coagulation-and-fibrinolysis-3': [
     ask(
-      mcq('c3-01', 'phospholipid-calcium', 'Blood is collected into a tube containing citrate. Why does it not clot?', 'Citrate removes the Ca²⁺ that clotting needs', ['Citrate destroys platelets', 'Citrate inhibits vitamin K', 'Citrate digests fibrinogen'], {
+      mcq('c3-01', 'phospholipid-calcium', 'Blood is collected into a tube containing citrate. Why does it not clot?', 'Citrate removes the Ca²⁺ that clotting needs', ['Citrate destroys the platelets in the sample', 'Citrate inhibits vitamin K in the blood', 'Citrate digests the fibrinogen in the tube'], {
         explanation: 'Slide 36: anything that removes or sequesters Ca²⁺ — oxalate, citrate, EDTA — prevents clotting.',
         skill: 'prediction',
       })
@@ -126,7 +126,7 @@ export const interactive: Record<string, Steps> = {
       'Factors II, VII, IX and X must be anchored through Ca²⁺ to platelet phospholipid to be activated. Their Ca²⁺-binding comes from γ-carboxyglutamate residues made by a vitamin K-dependent enzyme system after translation.',
     ], { sourceRefs: ref([37, 38, 39]) }),
     ask(
-      mcq('c3-02', 'vitamin-k-gla', 'What does vitamin K do for factors II, VII, IX and X?', 'Enables γ-carboxylation of glutamate residues so they bind Ca²⁺ strongly', ['Activates them by cleavage', 'Makes them in the liver', 'Cross-links them to fibrin'], {
+      mcq('c3-02', 'vitamin-k-gla', 'What does vitamin K do for factors II, VII, IX and X?', 'Enables γ-carboxylation of glutamate residues so they bind Ca²⁺ strongly', ['Activates them by cleaving off an inhibitory peptide', 'Makes them in the liver from amino acids', 'Cross-links them to fibrin in the clot'], {
         explanation: 'Slides 38–39.',
       })
     ),
@@ -161,7 +161,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 4 — Control and fibrinolysis ───────────────────────────
   'blood-coagulation-and-fibrinolysis-4': [
     ask(
-      mcq('c4-01', 'clot-limitation', 'As a clot forms, fibrin adsorbs thrombin. What is the effect?', 'It removes the last active factor, helping limit clotting to the injury', ['It activates more thrombin', 'It dissolves the clot', 'It releases vitamin K'], {
+      mcq('c4-01', 'clot-limitation', 'As a clot forms, fibrin adsorbs thrombin. What is the effect?', 'It removes the last active factor, helping limit clotting to the injury', ['It activates more thrombin, spreading the clot along the vessel', 'It dissolves the clot by turning plasminogen into plasmin', 'It releases vitamin K so that more clotting factors are made'], {
         explanation: 'Slide 59.',
         skill: 'prediction',
       })
@@ -170,7 +170,7 @@ export const interactive: Record<string, Steps> = {
       'Antithrombin III irreversibly inactivates thrombin and also IXa, Xa, XIa and plasmin. Heparin, a negatively charged glycosaminoglycan from mast cells, increases this affinity about a hundred-fold.',
     ], { sourceRefs: ref([61, 62, 63]) }),
     ask(
-      mcq('c4-02', 'antithrombin-heparin', 'How does heparin act as an anticoagulant?', 'It speeds the formation of the irreversible thrombin–antithrombin III complex', ['It blocks vitamin K', 'It digests fibrin', 'It removes calcium'], {
+      mcq('c4-02', 'antithrombin-heparin', 'How does heparin act as an anticoagulant?', 'It speeds the formation of the irreversible thrombin–antithrombin III complex', ['It blocks vitamin K, so the liver makes inactive factors', 'It digests fibrin into small soluble fragments', 'It removes calcium from the plasma, like citrate'], {
         explanation: 'Slides 62–63.',
       })
     ),
@@ -186,7 +186,7 @@ export const interactive: Record<string, Steps> = {
       ], { explanation: 'Slides 69–71.' })
     ),
     ask(
-      mcq('c4-04', 'antiplatelet-thrombolytics', 'How does low-dose aspirin prevent clots?', 'It irreversibly acetylates COX-1, stopping platelet thromboxane A₂ production', ['It activates plasminogen', 'It blocks vitamin K', 'It inhibits antithrombin III'], {
+      mcq('c4-04', 'antiplatelet-thrombolytics', 'How does low-dose aspirin prevent clots?', 'It irreversibly acetylates COX-1, stopping platelet thromboxane A₂ production', ['It activates plasminogen, so clots dissolve as soon as they form', 'It blocks vitamin K, so the liver makes inactive clotting factors', 'It inhibits antithrombin III, leaving thrombin unopposed'], {
         explanation: 'Slides 74–75.',
       })
     ),

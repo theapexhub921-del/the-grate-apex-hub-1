@@ -26,7 +26,7 @@ export const interactive: Record<string, Steps> = {
   'amino-acid-metabolism-2': [
     ask(multi('c2-01', 'r-group-classes', 'Which are the positively charged (basic) amino acids? Select all that apply.', ['Lysine', 'Arginine', 'Histidine'], ['Aspartate', 'Glutamine'], { explanation: 'AA1 slide 38.' })),
     learn('What we must eat', ['Humans make ten amino acids and must eat the other ten. Arginine, histidine, tyrosine and cysteine are conditionally essential.'], { sourceRefs: a1([39, 44]) }),
-    ask(mcq('c2-02', 'essential-aa', 'Why is tyrosine essential in a child with PKU?', 'They cannot make it from phenylalanine', ['It is destroyed in the gut', 'It is lost in urine', 'The child needs more for growth'], { explanation: 'AA1 slide 44.', skill: 'cause-effect' })),
+    ask(mcq('c2-02', 'essential-aa', 'Why is tyrosine essential in a child with PKU?', 'They cannot make it from phenylalanine', ['It is destroyed in the gut before absorption', 'It is lost in the urine with phenylalanine', 'The child needs much more of it for growth'], { explanation: 'AA1 slide 44.', skill: 'cause-effect' })),
     ask(multi('c2-03', 'glucogenic-ketogenic', 'Which amino acids are purely ketogenic? Select all that apply.', ['Leucine', 'Lysine'], ['Isoleucine', 'Valine', 'Tyrosine'], { explanation: 'AA1 slide 48.' })),
     recall('r2-01', 'glucogenic-ketogenic', 'Distinguish glucogenic from ketogenic amino acids, with examples.', [
       'Glucogenic amino acids give pyruvate, succinyl-CoA, α-ketoglutarate, fumarate or oxaloacetate — e.g. alanine, aspartate, valine, methionine.',
@@ -47,7 +47,7 @@ export const interactive: Record<string, Steps> = {
   ],
   'amino-acid-metabolism-4': [
     ask(mcq('c4-01', 'glu-gln', 'Which enzyme adds ammonium to glutamate using ATP?', 'Glutamine synthetase', ['Glutaminase', 'Glutamate dehydrogenase', 'Alanine aminotransferase'], { explanation: 'AA3 slide 8.' })),
-    ask(mcq('c4-02', 'kidney-ammonia', 'In acidosis, why is glutamine sent to the kidney rather than the liver?', 'Making urea in the liver uses bicarbonate; renal NH₄⁺ excretion conserves it', ['The liver cannot take up glutamine in acidosis', 'The kidney makes urea faster', 'Glutamine is toxic to the liver'], { explanation: 'AA3 slide 12.', skill: 'cause-effect' })),
+    ask(mcq('c4-02', 'kidney-ammonia', 'In acidosis, why is glutamine sent to the kidney rather than the liver?', 'Making urea in the liver uses bicarbonate; renal NH₄⁺ excretion conserves it', ['The liver cannot take up glutamine at all when the blood is acidic', 'The kidney makes urea faster than the liver during acidosis', 'Glutamine is toxic to the liver once the blood pH falls'], { explanation: 'AA3 slide 12.', skill: 'cause-effect' })),
     learn('Muscle uses alanine', ['Muscle transaminates pyruvate to alanine. The liver turns it back to pyruvate, sends the nitrogen to urea and makes glucose that returns to muscle.'], { sourceRefs: a3([15, 18]) }),
     ask(order('c4-03', 'alanine-glucose', 'Order the alanine–glucose cycle, starting in muscle.', ['Pyruvate transaminated to alanine in muscle', 'Alanine carried in blood to the liver', 'Alanine transaminated to pyruvate; nitrogen to urea', 'Pyruvate made into glucose', 'Glucose returns to muscle'], { explanation: 'AA3 slides 15, 18.' })),
     recall('r4-01', 'ammonia-toxicity', 'Explain why ammonia is toxic to the brain.', [
@@ -57,7 +57,7 @@ export const interactive: Record<string, Steps> = {
     ], a3([16, 17])),
   ],
   'amino-acid-metabolism-5': [
-    ask(mcq('c5-01', 'urea-cycle-steps', 'Which two urea cycle steps occur in the mitochondria?', 'Carbamoyl phosphate synthetase I and ornithine transcarbamoylase', ['Argininosuccinate synthetase and lyase', 'Arginase and ornithine transcarbamoylase', 'All five'], { explanation: 'AA3 slides 23–25.' })),
+    ask(mcq('c5-01', 'urea-cycle-steps', 'Which two urea cycle steps occur in the mitochondria?', 'Carbamoyl phosphate synthetase I and ornithine transcarbamoylase', ['Argininosuccinate synthetase and argininosuccinate lyase', 'Arginase and ornithine transcarbamoylase', 'All five steps of the cycle'], { explanation: 'AA3 slides 23–25.' })),
     ask(order('c5-02', 'urea-cycle-steps', 'Order the urea cycle intermediates from ammonia.', ['Carbamoyl phosphate', 'Citrulline', 'Argininosuccinate', 'Arginine', 'Urea + ornithine'], { explanation: 'AA3 slides 24–26.' })),
     learn('The switch', ['Carbamoyl phosphate synthetase I only works with N-acetylglutamate, made from acetyl-CoA and glutamate and stimulated by arginine — so the cycle speeds up when amino acids are plentiful.'], { sourceRefs: a3([24, 33]) }),
     ask(mcq('c5-03', 'urea-cycle-link', 'Fumarate from the urea cycle becomes which compound that can re-enter the cycle as aspartate?', 'Oxaloacetate', ['Citrulline', 'Pyruvate', 'Succinyl-CoA'], { explanation: 'AA3 slide 27.' })),
@@ -75,7 +75,7 @@ export const interactive: Record<string, Steps> = {
       ['Isoleucine', 'Both glucogenic and ketogenic'],
     ], { explanation: 'AA2 slide 10.' })),
     learn('One enzyme, three keto acids', ['A single branched-chain α-keto acid dehydrogenase handles all three keto acids. If it fails, they pile up — maple syrup urine disease.'], { sourceRefs: a2([9, 11]) }),
-    ask(mcq('c6-03', 'pku', 'A baby with PKU has normal phenylalanine hydroxylase. What else could be defective?', 'Tetrahydrobiopterin or the reductase that regenerates it', ['Tyrosinase', 'Homogentisate dioxygenase', 'Branched-chain aminotransferase'], { explanation: 'AA2 slide 20.', clinical: true })),
+    ask(mcq('c6-03', 'pku', 'A baby with PKU has normal phenylalanine hydroxylase. What else could be defective?', 'Tetrahydrobiopterin or the reductase that regenerates it', ['Tyrosinase in the melanocytes', 'Homogentisate dioxygenase in the liver', 'Branched-chain aminotransferase in muscle'], { explanation: 'AA2 slide 20.', clinical: true })),
     recall('r6-01', 'msud', 'Describe maple syrup urine disease.', [
       'Defect of the branched-chain α-keto acid dehydrogenase complex.',
       'α-Keto acids accumulate in blood and are excreted; urine and sweat smell of maple syrup.',
@@ -104,7 +104,7 @@ export const interactive: Record<string, Steps> = {
     ask(mcq('c8-01', 'methionine', 'Which sulfur amino acids are incorporated into proteins?', 'Methionine and cysteine', ['Homocysteine and taurine', 'Methionine and taurine', 'Cysteine and homocysteine'], { explanation: 'AA4 slide 5.' })),
     ask(order('c8-02', 'methionine', 'Order the trans-sulfuration pathway.', ['Methionine', 'S-Adenosylmethionine', 'S-Adenosylhomocysteine', 'Homocysteine', 'Cystathionine', 'Cysteine'], { explanation: 'AA4 slides 9–10.' })),
     learn('Where the block is', ['Homocystinuria blocks cystathionine β-synthase, so homocysteine and methionine build up. Cystathioninuria blocks the next enzyme, γ-lyase.'], { sourceRefs: a4([11, 14]) }),
-    ask(mcq('c8-03', 'homocystinuria', 'Why does homocystinuria cause connective tissue defects?', 'Homocysteine interferes with collagen cross-linking via lysyl semialdehydes', ['It blocks vitamin C', 'It destroys elastin', 'It inhibits collagen gene transcription'], { explanation: 'AA4 slide 12.', skill: 'cause-effect' })),
+    ask(mcq('c8-03', 'homocystinuria', 'Why does homocystinuria cause connective tissue defects?', 'Homocysteine interferes with collagen cross-linking via lysyl semialdehydes', ['It blocks vitamin C, so proline cannot be hydroxylated', 'It destroys elastin in the vessel walls and ligaments', 'It inhibits transcription of the collagen genes'], { explanation: 'AA4 slide 12.', skill: 'cause-effect' })),
     recall('r8-01', 'cysteine', 'Describe the catabolic fates of cysteine.', [
       'Main route: a three-step pathway to pyruvate.',
       'Sulfite and pyruvate; sulfite oxidase makes sulfate, which becomes PAPS.',
@@ -118,7 +118,7 @@ export const interactive: Record<string, Steps> = {
       ['Tetrahydrofolate', 'Formyl, methylene or methyl'],
       ['SAM', 'Methyl only'],
     ], { explanation: 'AA4 slide 21.' })),
-    ask(mcq('c9-02', 'thf', 'What is the major source of one-carbon units for tetrahydrofolate?', 'Conversion of serine to glycine', ['Formate', 'Histidine', 'Methionine'], { explanation: 'AA4 slides 33, 35.' })),
+    ask(mcq('c9-02', 'thf', 'What is the major source of one-carbon units for tetrahydrofolate?', 'Conversion of serine to glycine', ['Formate from tryptophan', 'Histidine breakdown', 'Methionine (via SAM)'], { explanation: 'AA4 slides 33, 35.' })),
     learn('Why sulfonamides spare us', ['Bacteria build folate from PABA via dihydropteroate synthetase; humans get folate from the diet. Sulfonamides block that bacterial enzyme.'], { sourceRefs: a4([39]) }),
     ask(mcq('c9-03', 'folate-disorders', 'Impaired folate leads to more uracil in DNA because of a shortage of…', 'Thymidylate', ['Purines', 'SAM', 'Biotin'], { explanation: 'AA4 slide 40.', skill: 'cause-effect' })),
     recall('r9-01', 'thf', 'Describe tetrahydrofolate and how it is formed.', [
