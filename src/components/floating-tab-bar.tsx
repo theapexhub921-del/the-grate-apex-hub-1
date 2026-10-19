@@ -13,6 +13,7 @@ import { elevation, TAB_BAR_HEIGHT, TAB_BAR_INSET, type ThemeColors } from '@/co
 import { useTabBarMode } from '@/data/navigation-settings';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { tapFeedback } from '@/lib/feedback';
 
 const MAX_BAR_WIDTH = 520;
 
@@ -70,7 +71,7 @@ function DockedTabBar({ onNavigate }: { onNavigate: (route: string) => void }) {
         return (
           <Pressable
             key={item.route}
-            onPress={() => onNavigate(item.route)}
+            onPress={() => { tapFeedback(); onNavigate(item.route); }}
             accessibilityRole="tab"
             accessibilityState={{ selected }}
             accessibilityLabel={item.accessibilityLabel}
@@ -152,7 +153,7 @@ function FloatingBar({ onNavigate }: { onNavigate: (route: string) => void }) {
           return (
             <Pressable
               key={item.route}
-              onPress={() => onNavigate(item.route)}
+              onPress={() => { tapFeedback(); onNavigate(item.route); }}
               accessibilityRole="tab"
               accessibilityState={{ selected }}
               accessibilityLabel={item.accessibilityLabel}

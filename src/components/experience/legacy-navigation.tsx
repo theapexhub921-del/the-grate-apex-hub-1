@@ -19,6 +19,7 @@ import { legacyRank } from '@/data/legacy-theme-colors';
 import { useProgress } from '@/data/progress';
 import { useAvatarUrl, useDisplayName } from '@/data/user';
 import { useAuth } from '@/hooks/use-auth';
+import { tapFeedback } from '@/lib/feedback';
 
 // The Originals' navigation, ported from the original app (screens/Tabs.tsx):
 //   phones   — a floating pill with a raised Study button; only the active
@@ -123,6 +124,7 @@ export function LegacyFloatingBar({ onNavigate }: { onNavigate: (route: string) 
           {MOBILE_NAV_ITEMS.map((item) => {
             const focused = item.path === active;
             const go = () => {
+              tapFeedback();
               if (!focused) onNavigate(item.route);
             };
             if (item.path === '/learn') {

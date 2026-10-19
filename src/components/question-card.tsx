@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Text, TextInput } from '@/components/ui/text';
 import Animated, {
@@ -15,6 +15,7 @@ import { QuestionFigure, QuestionImage } from '@/components/learning/figure-view
 import { Icon } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
+import { correctFeedback, wrongFeedback } from '@/lib/feedback';
 import { webStyle } from '@/components/ui/web';
 import { SPRING } from '@/constants/motion';
 import { elevation, Type, type ThemeColors } from '@/constants/theme';
@@ -130,6 +131,14 @@ export function QuestionCard({
   const answerBounceEnabled = useAnswerBouncePreference();
   const correct = revealed && isAnswerCorrect(question, value);
   const seed = shuffleSeed ?? question.id;
+
+  // A chime or a soft "bonk" (and a buzz) the moment an answer is checked; a card
+  // that opens already answered (results, looking back) stays quiet.
+  const wasRevealed = useRef(revealed);
+  useEffect(() => {
+    if (revealed && !wasRevealed.current) (correct ? correctFeedback : wrongFeedback)();
+    wasRevealed.current = revealed;
+  }, [revealed, correct]);
 
   // Feedback motion: a small pop and a springing check when right; a
   // quiet settle when wrong (clear, but never punishing — no shaking).

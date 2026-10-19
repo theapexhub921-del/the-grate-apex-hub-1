@@ -16,6 +16,7 @@ import { type ExperienceId } from '@/data/experience';
 import { ORadius, OSpace } from '@/constants/originate';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { tapFeedback } from '@/lib/feedback';
 
 // The GRATEAPEX interaction language, shared by every clickable surface:
 //   hover    — slight lift + stronger border (pointer devices only)
@@ -63,7 +64,8 @@ export function Interactive({
 
   return (
     <Pressable
-      onPress={disabled ? undefined : onPress}
+      // Every tap clicks and buzzes softly (Settings → Sounds and vibration).
+      onPress={disabled || !onPress ? undefined : () => { tapFeedback(); onPress(); }}
       onLongPress={disabled ? undefined : onLongPress}
       disabled={disabled}
       onHoverIn={() => setHovered(true)}

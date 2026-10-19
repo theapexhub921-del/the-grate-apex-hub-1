@@ -18,6 +18,7 @@ import { useProgress } from '@/data/progress';
 import { getRankProgress } from '@/data/ranks';
 import { useAvatarUrl, useDisplayName } from '@/data/user';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { tapFeedback } from '@/lib/feedback';
 
 /**
  * GRATEAPEX desktop navigation rail.
@@ -163,7 +164,7 @@ export function DesktopSidebar({ docked }: { docked: boolean }) {
             return (
               <Pressable
                 key={item.route}
-                onPress={() => go(item.path)}
+                onPress={() => { tapFeedback(); go(item.path); }}
                 onHoverIn={() => setHovered(item.route)}
                 onHoverOut={() => setHovered(null)}
                 accessibilityRole="link"

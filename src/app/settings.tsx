@@ -66,6 +66,7 @@ import { auth } from '@/lib/firebase';
 import { enableDeviceNotifications } from '@/lib/device-notifications';
 import { registerWebPush, sendTestPush, unregisterWebPush } from '@/lib/web-push';
 import { friendlyError } from '@/lib/errors';
+import { setFeedbackPref, useFeedbackPrefs } from '@/lib/feedback';
 
 const HOME_HREF = '/' as Href;
 const formatHour = (hour: number) => `${hour % 12 === 0 ? 12 : hour % 12}:00 ${hour < 12 ? 'AM' : 'PM'}`;
@@ -116,6 +117,7 @@ export default function SettingsScreen() {
   const pushNotificationsEnabled = usePushNotificationsPreference();
   const streakReminderHour = useStreakReminderHour();
   const answerBounceEnabled = useAnswerBouncePreference();
+  const feedbackPrefs = useFeedbackPrefs();
   const notificationPreferences = useNotificationPreferences();
   const tabBarMode = useTabBarMode();
   const systemScheme = useColorScheme();
@@ -352,6 +354,35 @@ export default function SettingsScreen() {
             trackColor={{ false: colors.track, true: colors.primary }}
             thumbColor={colors.surface}
             accessibilityLabel="Bounce after a quiz answer"
+          />
+        </View>
+      </SettingsSection>
+
+      <SettingsSection title="Sounds and vibration">
+        <View style={styles.optionRow}>
+          <View style={styles.flex}>
+            <Text style={styles.optionLabel}>Sound effects</Text>
+            <Text style={styles.optionDescription}>A soft click when you tap, and a chime or a low note when you answer. Saved on this device.</Text>
+          </View>
+          <Switch
+            value={feedbackPrefs.sound}
+            onValueChange={(on) => setFeedbackPref('sound', on)}
+            trackColor={{ false: colors.track, true: colors.primary }}
+            thumbColor={colors.surface}
+            accessibilityLabel="Sound effects"
+          />
+        </View>
+        <View style={styles.optionRow}>
+          <View style={styles.flex}>
+            <Text style={styles.optionLabel}>Vibration</Text>
+            <Text style={styles.optionDescription}>A small buzz when you tap and answer, on phones that allow it (most Android phones; iPhones do not let websites vibrate).</Text>
+          </View>
+          <Switch
+            value={feedbackPrefs.vibration}
+            onValueChange={(on) => setFeedbackPref('vibration', on)}
+            trackColor={{ false: colors.track, true: colors.primary }}
+            thumbColor={colors.surface}
+            accessibilityLabel="Vibration"
           />
         </View>
       </SettingsSection>
