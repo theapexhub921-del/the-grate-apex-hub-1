@@ -275,9 +275,13 @@ export async function blockedLearners(): Promise<Set<string>> {
 
 export async function listCommunityFeed(limitCount = 50): Promise<CommunityPost[]> {
   await auth.authStateReady();
-  const userId = auth.currentUser?.uid ?? null;
   const [snap, blocked] = await Promise.all([getDocs(query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(limitCount))), blockedLearners()]);
-  const rows = snap.docs.filter((item) => !blocked.has(String(item.data().authorUid)));
+  return postsFrom(snap.docs.filter((item) => !blocked.has(String(item.data().authorUid))));
+}
+
+/** Post documents as shown: with my like, and the original of a reshare. */
+async function postsFrom(rows: readonly { id: string; data: () => DocumentData }[]): Promise<CommunityPost[]> {
+  const userId = auth.currentUser?.uid ?? null;
   const liked = await Promise.all(rows.map((item) => (userId ? getDoc(doc(db, 'posts', item.id, 'likes', userId)).then((like) => like.exists()).catch(() => false) : Promise.resolve(false))));
   const originals = new Map<string, Record<string, any>>();
   await Promise.all(
@@ -362,16 +366,17 @@ export async function recordPostView(postId: string, authorId: string): Promise<
   return true;
 }
 
-/** A learner's own posts, newest first (no composite index needed: sorted here). */
+/**
+ * A learner's own posts, newest first. Reads only their posts (up to 150,
+ * sorted here, so no composite index is needed) — it used to read the latest
+ * 200 posts of everyone, plus a like check for each, on every profile visit.
+ */
 export async function listPostsBy(uid: string, limitCount = 30): Promise<CommunityPost[]> {
-  const all = await listCommunityFeed(200);
-  const own = all.filter((post) => post.author_id === uid);
-  if (own.length >= Math.min(limitCount, 5) || all.length < 200) return own.slice(0, limitCount);
-  // Older posts beyond the recent feed.
-  const snap = await getDocs(query(collection(db, 'posts'), where('authorUid', '==', uid), limit(limitCount)));
-  const ids = new Set(own.map((post) => post.id));
-  const extra = snap.docs.filter((item) => !ids.has(item.id)).map((item) => ({ id: item.id, author_id: uid, author_name: item.data().authorName ?? null, author_avatar: null, body: postText(item.data()), media_path: null, media_type: null, media_url: null, reshared_post_id: null, created_at: iso(item.data().createdAt), reactions: Number(item.data().likeCount) || 0, comments: Number(item.data().replyCount) || 0, reshares: 0, my_reaction: null, stump: readStump(item.data()), views: readViews(item.data()) } as CommunityPost));
-  return [...own, ...extra].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, limitCount);
+  await auth.authStateReady();
+  const snap = await getDocs(query(collection(db, 'posts'), where('authorUid', '==', uid), limit(150)));
+  const millis = (value: unknown) => (value as { toMillis?: () => number } | null)?.toMillis?.() ?? 0;
+  const newest = [...snap.docs].sort((a, b) => millis(b.data().createdAt) - millis(a.data().createdAt)).slice(0, limitCount);
+  return postsFrom(newest);
 }
 
 export async function createCommunityPost(body: string, media?: CommunityMedia | readonly CommunityMedia[], resharedPostId?: string | null, stump?: StumpRef): Promise<CommunityPost> {

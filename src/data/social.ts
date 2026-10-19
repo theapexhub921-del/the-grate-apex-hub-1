@@ -129,9 +129,9 @@ const DISMISSED_KEY = 'grateapex_dismissed_follow_requests';
 
 type FollowEdge = { uid: string; username: string | null; since: number | null };
 
-async function followEdges(uid: string, direction: 'following' | 'followers'): Promise<FollowEdge[]> {
+async function followEdges(uid: string, direction: 'following' | 'followers', max = 500): Promise<FollowEdge[]> {
   const mine = direction === 'following';
-  const snap = await getDocs(query(collection(db, 'follows'), where(mine ? 'follower' : 'followee', '==', uid), limit(500)));
+  const snap = await getDocs(query(collection(db, 'follows'), where(mine ? 'follower' : 'followee', '==', uid), limit(max)));
   return snap.docs.map((item) => {
     const d = item.data();
     return {
@@ -243,6 +243,7 @@ async function loadSocial(userId: string, attempt = 0): Promise<void> {
 }
 
 export async function refreshSocial() {
+  suggestions = null; // a follow changed: suggestions are rebuilt next time
   if (!state.userId) return;
   await loadSocial(state.userId);
 }
@@ -437,9 +438,25 @@ export async function searchLearners(searchQuery: string): Promise<SocialPerson[
  * your follows follow, classmates in your hall, and top students (scores).
  * People you already follow and yourself are left out.
  */
-export async function getRecommendedFriends(): Promise<SocialRecommendation[]> {
+let suggestions: { uid: string; at: number; list: Promise<SocialRecommendation[]> } | null = null;
+
+/**
+ * Suggestions are rebuilt at most every 10 minutes (shared by Profile and the
+ * feed's side panel): building them reads many follows and profiles, and the
+ * project is on the free plan's daily read allowance.
+ */
+export function getRecommendedFriends(): Promise<SocialRecommendation[]> {
   const me = auth.currentUser?.uid;
-  if (!me) return [];
+  if (!me) return Promise.resolve([]);
+  if (!suggestions || suggestions.uid !== me || Date.now() - suggestions.at > 10 * 60_000) {
+    const entry = { uid: me, at: Date.now(), list: buildRecommendedFriends(me) };
+    entry.list.catch(() => { if (suggestions === entry) suggestions = null; });
+    suggestions = entry;
+  }
+  return suggestions.list;
+}
+
+async function buildRecommendedFriends(me: string): Promise<SocialRecommendation[]> {
   const [mine, following, followers, top] = await Promise.all([
     getDoc(doc(db, 'users', me)),
     followEdges(me, 'following'),
@@ -449,7 +466,7 @@ export async function getRecommendedFriends(): Promise<SocialRecommendation[]> {
       .catch(() => []),
   ]);
   const secondDegree = await Promise.all(
-    following.slice(0, 6).map((via) => followEdges(via.uid, 'following').then((follows) => ({ via, follows })).catch(() => ({ via, follows: [] })))
+    following.slice(0, 6).map((via) => followEdges(via.uid, 'following', 100).then((follows) => ({ via, follows })).catch(() => ({ via, follows: [] })))
   );
   const profile = mine.data() ?? {};
   const ranked = rankSuggestions({ me: { uid: me, hall: profile.hall || null, semester: profile.semester ?? null }, following, followers, secondDegree, top });
