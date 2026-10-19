@@ -230,6 +230,22 @@ export function isAnswerCorrect(
   }
 }
 
+/** The correct answer itself (e.g. to show an earlier question already answered). */
+export function correctAnswerOf(question: Question): Answer {
+  switch (question.type) {
+    case 'choice':
+      return question.answer;
+    case 'multi':
+      return [...question.answers];
+    case 'type':
+      return question.accept[0];
+    case 'order':
+      return question.items.map((_, index) => index);
+    case 'match':
+      return question.pairs.map((_, index) => index);
+  }
+}
+
 // The correct answer, written out for feedback.
 export function correctAnswerText(question: Question) {
   switch (question.type) {

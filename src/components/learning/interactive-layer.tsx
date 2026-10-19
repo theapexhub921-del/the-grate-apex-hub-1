@@ -7,6 +7,7 @@ import { SimulationStepView } from '@/components/learning/simulations/simulation
 import { PathwaySteps } from '@/components/pathway-steps';
 import { QuestionCard } from '@/components/question-card';
 import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/interactive';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { isWeb } from '@/components/ui/web';
@@ -14,9 +15,9 @@ import type { ThemeColors } from '@/constants/theme';
 import type { InteractiveStep, Lesson } from '@/data/lesson-types';
 import { recordAnswer, recordRecall } from '@/data/learning/actions';
 import { type LessonSession, saveLessonSession } from '@/data/learning/lesson-sessions';
-import { type Answer, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
+import { type Answer, correctAnswerOf, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
-import { useThemedStyles } from '@/hooks/use-theme';
+import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // Layer 1 of a lesson: learn by thinking and doing.
 //
@@ -28,6 +29,11 @@ import { useThemedStyles } from '@/hooks/use-theme';
 // (spaced retrieval inside the lesson), and every answer feeds the memory
 // model, so missed concepts return in Review. Progress is saved after
 // every step, so leaving half-way never loses the learner's place.
+//
+// "Previous" looks back at earlier steps, read-only (owner's request,
+// 2026-10-19): explanations and model answers are shown, nothing is answered
+// or counted again, and "Next" returns to the step the learner was on, with
+// anything already chosen there kept.
 
 export function InteractiveLayer({
   lesson,
@@ -39,6 +45,7 @@ export function InteractiveLayer({
   onFinished: () => void;
 }) {
   const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
   const reduceMotion = useReducedMotion();
   const steps = lesson.interactive ?? [];
   const [answer, setAnswer] = useState<Answer | undefined>(undefined);
@@ -46,11 +53,18 @@ export function InteractiveLayer({
   const [recallShown, setRecallShown] = useState(false);
   const [busy, setBusy] = useState(false);
   const [simReady, setSimReady] = useState(false);
+  // How many steps back the learner is looking (0 = the current step).
+  const [back, setBack] = useState(0);
 
   const { queue, position } = session;
   const finished = position >= queue.length;
   const entry = finished ? null : queue[position];
   const step: InteractiveStep | undefined = entry ? steps[entry.step] : undefined;
+  const lookingBack = back > 0 && !finished;
+  const pastEntry = lookingBack ? queue[position - back] : null;
+  const pastStep: InteractiveStep | undefined = pastEntry ? steps[pastEntry.step] : undefined;
+  const previous = () => setBack((value) => Math.min(position, value + 1));
+  const next = () => setBack((value) => Math.max(0, value - 1));
   const sessionId = `lesson:${lesson.id}:${session.startedAt}`;
 
   function advance(patch: Partial<LessonSession> = {}) {
@@ -114,6 +128,7 @@ export function InteractiveLayer({
   useKeyboardShortcuts(
     {
       Enter: () => {
+        if (lookingBack) return next();
         if (!step) return;
         if (step.type === 'ask') {
           if (!revealed && canCheck) void check();
@@ -160,7 +175,62 @@ export function InteractiveLayer({
   }
 
   const progressValue = queue.length ? position / queue.length : 0;
-  const stepLabel = entry?.retry ? 'One more try' : `Step ${Math.min(position + 1, queue.length)} of ${queue.length}`;
+  const stepLabel = lookingBack
+    ? `Step ${position - back + 1} of ${queue.length} · looking back`
+    : entry?.retry ? 'One more try' : `Step ${Math.min(position + 1, queue.length)} of ${queue.length}`;
+  const previousButton = position - back > 0 ? (
+    <Button label="Previous" variant="secondary" icon={<Icon name="chevronLeft" size={16} color={colors.text} strokeWidth={2.2} />} onPress={previous} />
+  ) : null;
+
+  if (lookingBack && pastStep && pastEntry) {
+    return (
+      <View>
+        <View style={styles.progressRow}>
+          <ProgressBar value={progressValue} style={styles.flex} label="Interactive lesson progress" />
+          <Text style={styles.progressText}>{stepLabel}</Text>
+        </View>
+        <Animated.View key={`back:${position - back}`} entering={reduceMotion ? undefined : FadeInDown.duration(220)}>
+          {pastStep.type === 'learn' ? <LearnCard step={pastStep} styles={styles} /> : null}
+          {pastStep.type === 'ask' ? (
+            <>
+              <QuestionCard
+                question={pastStep.question}
+                value={correctAnswerOf(pastStep.question)}
+                onChange={() => undefined}
+                revealed
+                heading="ALREADY ANSWERED · THE ANSWER"
+                shuffleSeed={`${lesson.id}:${pastStep.question.id}:${pastEntry.retry ? 'retry' : 'first'}`}
+                reviewNote={null}
+              />
+              {pastStep.reveal ? (
+                <Card tone="primary" style={styles.revealCard}>
+                  {pastStep.reveal.map((paragraph, index) => <Text key={index} style={styles.body}>{paragraph}</Text>)}
+                </Card>
+              ) : null}
+            </>
+          ) : null}
+          {pastStep.type === 'simulate' ? (
+            // Looking back: the model to explore again; predictions here are not recorded.
+            <SimulationStepView step={pastStep} shuffleSeed={`${lesson.id}:${pastEntry.step}:back`} onPredict={() => undefined} onPredictionsDone={() => undefined} />
+          ) : null}
+          {pastStep.type === 'recall' ? (
+            <Card style={styles.learnCard}>
+              <Text style={styles.kicker}>RECALL · FROM MEMORY</Text>
+              <Text style={styles.learnTitle}>{pastStep.recall.prompt}</Text>
+              <View style={styles.modelAnswer}>
+                <Text style={styles.modelTitle}>MODEL ANSWER</Text>
+                {pastStep.recall.answer.map((point, index) => <Text key={index} style={styles.modelPoint}>• {point}</Text>)}
+              </View>
+            </Card>
+          ) : null}
+        </Animated.View>
+        <View style={styles.actions}>
+          {previousButton}
+          <Button label={back === 1 ? 'Back to where I was' : 'Next'} trailing="→" onPress={next} shortcut={isWeb ? 'Enter' : undefined} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View>
@@ -170,33 +240,7 @@ export function InteractiveLayer({
       </View>
 
       <Animated.View key={`${position}`} entering={reduceMotion ? undefined : FadeInDown.duration(220)}>
-        {step?.type === 'learn' ? (
-          <Card style={styles.learnCard}>
-            <Text style={styles.kicker}>LEARN</Text>
-            <Text style={styles.learnTitle}>{step.title}</Text>
-            {step.body.map((paragraph, index) => (
-              <Text key={index} style={styles.body}>
-                {paragraph}
-              </Text>
-            ))}
-            {step.steps ? <PathwaySteps steps={step.steps} /> : null}
-            {step.terms ? (
-              <View style={styles.terms}>
-                {step.terms.map((term) => (
-                  <View key={term.term} style={styles.term}>
-                    <Text style={styles.termName}>{term.term}</Text>
-                    <Text style={styles.termMeaning}>{term.meaning}</Text>
-                  </View>
-                ))}
-              </View>
-            ) : null}
-            {step.keyPoint ? (
-              <View style={styles.keyPoint}>
-                <Text style={styles.keyPointText}>★ {step.keyPoint}</Text>
-              </View>
-            ) : null}
-          </Card>
-        ) : null}
+        {step?.type === 'learn' ? <LearnCard step={step} styles={styles} /> : null}
 
         {step?.type === 'ask' ? (
           <>
@@ -260,6 +304,7 @@ export function InteractiveLayer({
       </Animated.View>
 
       <View style={styles.actions}>
+        {previousButton}
         {step?.type === 'learn' ? (
           <Button label="Continue" trailing="→" onPress={() => advance()} shortcut={isWeb ? 'Enter' : undefined} />
         ) : null}
@@ -284,6 +329,37 @@ export function InteractiveLayer({
         ) : null}
       </View>
     </View>
+  );
+}
+
+/** A teaching card (the current step, or an earlier one when looking back). */
+function LearnCard({ step, styles }: { step: Extract<InteractiveStep, { type: 'learn' }>; styles: ReturnType<typeof createStyles> }) {
+  return (
+    <Card style={styles.learnCard}>
+      <Text style={styles.kicker}>LEARN</Text>
+      <Text style={styles.learnTitle}>{step.title}</Text>
+      {step.body.map((paragraph, index) => (
+        <Text key={index} style={styles.body}>
+          {paragraph}
+        </Text>
+      ))}
+      {step.steps ? <PathwaySteps steps={step.steps} /> : null}
+      {step.terms ? (
+        <View style={styles.terms}>
+          {step.terms.map((term) => (
+            <View key={term.term} style={styles.term}>
+              <Text style={styles.termName}>{term.term}</Text>
+              <Text style={styles.termMeaning}>{term.meaning}</Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
+      {step.keyPoint ? (
+        <View style={styles.keyPoint}>
+          <Text style={styles.keyPointText}>★ {step.keyPoint}</Text>
+        </View>
+      ) : null}
+    </Card>
   );
 }
 
