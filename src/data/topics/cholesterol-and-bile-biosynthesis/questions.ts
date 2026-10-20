@@ -68,7 +68,7 @@ const lesson1: Q[] = [
     explanation: 'The side chain is on carbon 17 of ring D. Ring A carries the –OH at carbon 3.',
     skill: 'misconception',
   }),
-  mcq('q1-12', 'synthesis-sites', 'Which two sites of cholesterol synthesis does slide 3 name?', 'Liver and intestinal mucosa', ['Lungs and kidneys', 'Brain and skeletal muscle', 'Spleen and bone marrow'], {
+  mcq('q1-12', 'synthesis-sites', 'Which two sites of cholesterol synthesis does slide 3 name?', 'Liver and intestinal mucosa', ['Lungs and kidneys', 'Brain, skeletal muscle and skin', 'Spleen and bone marrow'], {
     explanation: 'Slide 3: distribution — all cells; synthesised from acetic acid in animal tissue; liver and intestinal mucosa.',
   }),
   multi('q1-13', 'synthesis-sites', 'Besides the liver, which sites does the lecture name for high rates of cholesterol synthesis? Select all that apply.', ['Intestines', 'Adrenal glands', 'Reproductive organs'], ['Lungs', 'Kidneys'], {
@@ -80,7 +80,7 @@ const lesson1: Q[] = [
     answer: true,
     explanation: 'Slide 3: “Distribution: All cells — and synthesized from acetic acid in animal tissue.”',
   }),
-  mcq('q1-15', 'acetate-origin', 'All of cholesterol’s carbon atoms come from which precursor?', 'Acetate (as acetyl-CoA)', ['Glycerol (from fat)', 'Malonyl-CoA', 'Propionyl-CoA'], {
+  mcq('q1-15', 'acetate-origin', 'All of cholesterol’s carbon atoms come from which precursor?', 'Acetate (as acetyl-CoA)', ['Glycerol (from fat)', 'Malonyl-CoA', 'Propionyl-CoA (odd chains)'], {
     explanation: 'Slide 5: cholesterol is synthesised from acetate precursors.',
   }),
   multi('q1-16', 'acetate-origin', 'Slide 5 colours cholesterol’s carbons by origin. Which parts of acetate supply them? Select all that apply.', ['The methyl carbon', 'The carbonyl carbon'], ['The oxygen atoms', 'CO₂ from the air'], {
@@ -118,7 +118,7 @@ const lesson1: Q[] = [
     ['ATP-citrate lyase', 'Cytosol'],
     ['Malic enzyme', 'Cytosol'],
   ], { explanation: 'Citrate is made in the matrix and split in the cytosol; malate → pyruvate happens in the cytosol; pyruvate is carboxylated in the matrix.' }),
-  mcq('q1-25', 'pyruvate-malate-supply', 'Why does cholesterol synthesis depend on the Pyruvate–Malate cycle?', 'It supplies the cytosol with acetyl-CoA and NADPH', ['It supplies the mitochondria with ATP and NADH', 'It removes excess cholesterol from the cells', 'It makes HMG-CoA inside the mitochondria'], {
+  mcq('q1-25', 'pyruvate-malate-supply', 'Why does cholesterol synthesis depend on the Pyruvate–Malate cycle?', 'It supplies the cytosol with acetyl-CoA and NADPH', ['It supplies the mitochondria with ATP and NADH', 'It removes excess cholesterol from the cells', 'It makes HMG-CoA inside the mitochondria for the cytosol'], {
     explanation: 'ATP-citrate lyase frees acetyl-CoA in the cytosol and malic enzyme makes NADPH — the carbon source and the reductant (HMG-CoA reductase uses 2 NADPH).',
     skill: 'pathway-reasoning',
     difficulty: 'intermediate',
@@ -145,7 +145,7 @@ const lesson2: Q[] = [
     'Squalene',
     'Cholesterol',
   ], { explanation: 'Slides 7 and 12: acetyl-CoA → acetoacetyl-CoA → HMG-CoA → mevalonate → IPP → squalene → cholesterol.' }),
-  mcq('q2-02', 'five-stages', 'In which stage is CO₂ lost?', 'Mevalonate → isopentenyl pyrophosphate', ['Acetyl-CoA → HMG-CoA', 'HMG-CoA → mevalonate', 'Squalene → lanosterol → cholesterol'], {
+  mcq('q2-02', 'five-stages', 'In which stage is CO₂ lost?', 'Mevalonate → isopentenyl pyrophosphate', ['Acetyl-CoA → HMG-CoA', 'HMG-CoA → mevalonate (with 2 NADPH)', 'Squalene → lanosterol → cholesterol'], {
     explanation: 'Slide 7: stage 3 converts mevalonate to IPP “with the concomitant loss of CO₂”.',
   }),
   mcq('q2-03', 'five-stages', 'Which stage comes immediately after HMG-CoA → mevalonate?', 'Mevalonate → isopentenyl pyrophosphate', ['Isopentenyl pyrophosphate → squalene', 'Acetyl-CoA → acetoacetyl-CoA → HMG-CoA', 'Squalene → cholesterol'], {
@@ -164,7 +164,7 @@ const lesson2: Q[] = [
   fill('q2-06', 'acetoacetyl-coa-step', 'Two molecules of acetyl-CoA condense to form ____.', ['acetoacetyl-CoA', 'acetoacetyl coenzyme A'], {
     explanation: 'Slide 2: the mevalonate pathway starts when two acetyl-CoA condense to form acetoacetyl-CoA.',
   }),
-  mcq('q2-07', 'acetoacetyl-coa-step', 'How many acetyl-CoA units go into one HMG-CoA in total?', 'Three', ['Two', 'Four', 'Six'], {
+  mcq('q2-07', 'acetoacetyl-coa-step', 'How many acetyl-CoA units go into one HMG-CoA in total?', 'Three', ['Two', 'Four (two pairs)', 'Six'], {
     explanation: 'Two acetyl-CoA make acetoacetyl-CoA (slide 2); a third joins it to make HMG-CoA (slide 8).',
     difficulty: 'intermediate',
   }),
@@ -175,7 +175,7 @@ const lesson2: Q[] = [
     explanation: 'It starts with two acetyl-CoA condensing to acetoacetyl-CoA (slide 2). Malonyl-CoA belongs to fatty acid synthesis.',
     skill: 'misconception',
   }),
-  mcq('q2-09', 'hmg-coa-formation', 'Which reactants form HMG-CoA (slide 8)?', 'Acetoacetyl-CoA + acetyl-CoA + H₂O', ['Acetyl-CoA + malonyl-CoA + CO₂', 'Acetoacetate + CoA-SH + ATP', 'Two acetyl-CoA + CO₂'], {
+  mcq('q2-09', 'hmg-coa-formation', 'Which reactants form HMG-CoA (slide 8)?', 'Acetoacetyl-CoA + acetyl-CoA + H₂O', ['Acetyl-CoA + malonyl-CoA + CO₂', 'Acetoacetate + CoA-SH + ATP', 'Two acetyl-CoA + CO₂ + biotin'], {
     explanation: 'Slide 8: acetoacetyl-CoA + acetyl-CoA + H₂O → 3-hydroxy-3-methylglutaryl-CoA.',
   }),
   mcq('q2-10', 'hmg-coa-formation', 'What does “HMG” in HMG-CoA stand for?', '3-Hydroxy-3-methylglutaryl', ['Hydroxymethylglycine', '3-Hydroxy-3-malonylglutamate', 'Hexamethylglucose'], {
@@ -193,7 +193,7 @@ const lesson2: Q[] = [
     explanation: 'Lehninger (p. 817): thiolase makes acetoacetyl-CoA; HMG-CoA synthase makes HMG-CoA; HMG-CoA reductase then makes mevalonate.',
     difficulty: 'intermediate',
   }),
-  mcq('q2-13', 'hmg-coa-crossroads', 'In the mitochondria, a cleavage enzyme splits HMG-CoA. What are the products?', 'Acetoacetate + acetyl-CoA', ['Mevalonate + CoA-SH', 'Two acetyl-CoA + CO₂', 'Acetoacetyl-CoA + water'], {
+  mcq('q2-13', 'hmg-coa-crossroads', 'In the mitochondria, a cleavage enzyme splits HMG-CoA. What are the products?', 'Acetoacetate + acetyl-CoA', ['Mevalonate + CoA-SH', 'Two acetyl-CoA + CO₂ + NADH', 'Acetoacetyl-CoA + water'], {
     explanation: 'Slide 8: “cleavage enzyme in mitochondria” → acetoacetate + acetyl-CoA.',
   }),
   mcq('q2-14', 'hmg-coa-crossroads', 'Where does slide 8 place the reductase that turns HMG-CoA into mevalonate?', 'In the cytosol', ['In the mitochondrial matrix', 'In the nucleus', 'In lysosomes'], {
@@ -258,7 +258,7 @@ const lesson2: Q[] = [
 
 // ─── Lesson 3 — Mevalonate to cholesterol ───────────────────────────
 const lesson3: Q[] = [
-  mcq('q3-01', 'mevalonate-to-ipp', 'How many ATP are used to turn one mevalonate into isopentenyl pyrophosphate?', 'Three', ['One', 'Two', 'Four'], {
+  mcq('q3-01', 'mevalonate-to-ipp', 'How many ATP are used to turn one mevalonate into isopentenyl pyrophosphate?', 'Three', ['One', 'Two (with one GTP)', 'Four'], {
     explanation: 'Slides 9 and 12: one ATP for each of the three steps — “(3) ATP”.',
   }),
   mcq('q3-02', 'mevalonate-to-ipp', 'Which step of stage 3 releases CO₂?', '5-Pyrophosphomevalonate → isopentenyl pyrophosphate', ['Mevalonate → 5-phosphomevalonate', '5-Phosphomevalonate → 5-pyrophosphomevalonate', 'HMG-CoA → mevalonate (with 2 NADPH)'], {
@@ -288,10 +288,10 @@ const lesson3: Q[] = [
   fill('q3-08', 'prenyl-condensation', 'Each condensation releases ____ from the allylic substrate.', ['PPi', 'pyrophosphate', 'inorganic pyrophosphate'], {
     explanation: 'Slide 10: the allylic substrate loses PPi before IPP joins on.',
   }),
-  mcq('q3-09', 'prenyl-condensation', 'Which molecule is added in each chain-lengthening condensation?', 'Isopentenyl pyrophosphate', ['Acetyl-CoA', 'Malonyl-CoA', 'Dimethylallyl alcohol'], {
+  mcq('q3-09', 'prenyl-condensation', 'Which molecule is added in each chain-lengthening condensation?', 'Isopentenyl pyrophosphate', ['Acetyl-CoA', 'Malonyl-CoA (as in fatty acids)', 'Dimethylallyl alcohol'], {
     explanation: 'Slide 10: IPP joins the allylic substrate each round.',
   }),
-  mcq('q3-10', 'prenyl-condensation', 'What forms when geranyl pyrophosphate condenses with one more IPP?', 'Farnesyl pyrophosphate', ['Squalene', 'Lanosterol', 'Dolichol phosphate'], {
+  mcq('q3-10', 'prenyl-condensation', 'What forms when geranyl pyrophosphate condenses with one more IPP?', 'Farnesyl pyrophosphate', ['Squalene', 'Lanosterol (the first sterol)', 'Dolichol phosphate'], {
     explanation: 'Slides 10 and 12: geranyl pyrophosphate → farnesyl pyrophosphate.',
   }),
   tf({
@@ -321,11 +321,11 @@ const lesson3: Q[] = [
   mcq('q3-16', 'squalene-to-cholesterol', 'Which sequence is correct?', 'Squalene → lanosterol → cholesterol', ['Lanosterol → squalene → cholesterol', 'Cholesterol → lanosterol → squalene', 'Squalene → cholesterol → lanosterol'], {
     explanation: 'Slide 12 shows squalene → lanosterol → (several steps) → cholesterol.',
   }),
-  mcq('q3-17', 'squalene-to-cholesterol', 'Lehninger: what is the first step in turning squalene into the steroid ring system?', 'Squalene monooxygenase forms squalene 2,3-epoxide', ['HMG-CoA reductase reduces squalene with NADPH', '7α-Hydroxylase adds an –OH group at carbon 7', 'A kinase phosphorylates squalene at both ends'], {
+  mcq('q3-17', 'squalene-to-cholesterol', 'Lehninger: what is the first step in turning squalene into the steroid ring system?', 'Squalene monooxygenase forms squalene 2,3-epoxide', ['HMG-CoA reductase reduces squalene with NADPH', '7α-Hydroxylase adds an –OH group at carbon 7', 'A kinase phosphorylates squalene at both ends of the chain'], {
     explanation: 'Lehninger (pp. 819–820): squalene monooxygenase (O₂, NADPH) makes squalene 2,3-epoxide, which a cyclase closes into lanosterol.',
     difficulty: 'advanced',
   }),
-  mcq('q3-18', 'squalene-to-cholesterol', 'How does slide 12 show the conversion of lanosterol to cholesterol?', 'As a dotted arrow — several steps', ['As a single enzyme step', 'As a reversible equilibrium', 'It is not shown on the slide'], {
+  mcq('q3-18', 'squalene-to-cholesterol', 'How does slide 12 show the conversion of lanosterol to cholesterol?', 'As a dotted arrow — several steps', ['As a single enzyme step', 'As a reversible equilibrium between the two', 'It is not shown on the slide'], {
     explanation: 'Slide 12: lanosterol ⋯→ cholesterol. Lehninger: about 20 reactions.',
   }),
   mcq('q3-19', 'pathway-branches', 'Besides squalene, which molecules does slide 12 show branching off from farnesyl pyrophosphate?', 'Heme a, dolichol and ubiquinone (and prenylated proteins)', ['Bile salts, steroid hormones and vitamin D (and lipoproteins)', 'Acetoacetate and acetyl-CoA', 'Glycocholic and taurocholic acid'], {
@@ -520,7 +520,7 @@ const lesson5: Q[] = [
   mcq('q5-04', 'bile-acid-synthesis', 'Which two bile acid–CoA products are formed from 7-hydroxycholesterol (slide 18)?', 'Cholyl-CoA and chenodeoxycholyl-CoA', ['Glycocholic acid and taurocholic acid', 'Acetyl-CoA and propionyl-CoA', 'Lanosterol and squalene'], {
     explanation: 'Slide 18: 7-hydroxycholesterol → cholyl-CoA or chenodeoxycholyl-CoA.',
   }),
-  mcq('q5-05', 'bile-acid-synthesis', 'How many hydroxyl groups does cholyl-CoA carry (slide 18)?', 'Three', ['One', 'Two', 'Four'], {
+  mcq('q5-05', 'bile-acid-synthesis', 'How many hydroxyl groups does cholyl-CoA carry (slide 18)?', 'Three', ['One', 'Two (at C3 and C7)', 'Four'], {
     explanation: 'Slide 18: cholyl-CoA has three –OH groups; chenodeoxycholyl-CoA has two.',
     difficulty: 'intermediate',
   }),
@@ -586,7 +586,7 @@ const lesson5: Q[] = [
     answer: true,
     explanation: 'Slide 20, function 1.',
   }),
-  mcq('q5-19', 'bile-acid-functions', 'How do bile acids help digest dietary triacylglycerols?', 'They emulsify fats, making them accessible to pancreatic lipases', ['They hydrolyse the triacylglycerols themselves into fatty acids', 'They phosphorylate the fatty acids so they can be absorbed', 'They carry fats in the blood as lipoproteins after absorption'], {
+  mcq('q5-19', 'bile-acid-functions', 'How do bile acids help digest dietary triacylglycerols?', 'They emulsify fats, making them accessible to pancreatic lipases', ['They hydrolyse the triacylglycerols themselves into fatty acids', 'They phosphorylate the fatty acids so they can be absorbed', 'They carry fats in the blood as lipoproteins after absorption from the gut'], {
     explanation: 'Slide 20: bile acids act as emulsifying agents that render fats accessible to pancreatic lipases.',
   }),
   mcq('q5-20', 'bile-acid-functions', 'What prevents cholesterol from precipitating in the gall bladder?', 'Bile acids and phospholipids keeping it dissolved in bile', ['ACAT esterifying it inside the gall bladder wall', 'HMG-CoA reductase breaking it down in the bile', 'Pancreatic lipase digesting it before it settles'], {

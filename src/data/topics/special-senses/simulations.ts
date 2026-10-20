@@ -28,7 +28,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'iop', change: 'down' }],
       },
       {
-        question: mcq('s1-03', 'aqueous-humour', 'The iris suddenly closes the filtration angle. What happens to the optic nerve?', 'It is put at risk of damage as the pressure climbs', ['Nothing: the vitreous absorbs all the extra fluid', 'The pressure falls and the eyeball softens'], {
+        question: mcq('s1-03', 'aqueous-humour', 'The iris suddenly closes the filtration angle. What happens to the optic nerve?', 'It is put at risk of damage as the pressure climbs', ['Nothing: the vitreous absorbs all the extra fluid', 'The pressure falls as the aqueous drains away and the eyeball softens'], {
           ...predict,
           explanation: 'Aqueous can no longer reach the trabecular meshwork and canal of Schlemm; the raised pressure damages the retina and optic nerve — glaucoma (slides 11–12).',
         }),
@@ -52,7 +52,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'used', change: 'up' }],
       },
       {
-        question: mcq('s2-02', 'refractive-errors', 'In a myopic eye, where does light from a distant object focus?', 'In front of the retina', ['On the retina', 'Behind the retina'], {
+        question: mcq('s2-02', 'refractive-errors', 'In a myopic eye, where does light from a distant object focus?', 'In front of the retina', ['On the retina', 'Behind the retina, as in hyperopia'], {
           ...predict,
           explanation: 'The eye has too much power (too long, or the cornea or lens too strong), so light focuses in front of the retina; a biconcave lens corrects it (slides 23–24).',
         }),
@@ -288,7 +288,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'firing', change: 'same' }],
       },
       {
-        question: mcq('s9-03', 'taste-pathway', 'A bitter drug touches the back third of the tongue. Which nerve carries the taste?', 'Glossopharyngeal (IX)', ['Facial (VII)', 'Hypoglossal (XII)'], {
+        question: mcq('s9-03', 'taste-pathway', 'A bitter drug touches the back third of the tongue. Which nerve carries the taste?', 'Glossopharyngeal (IX)', ['Facial (VII), chorda tympani', 'Hypoglossal (XII)'], {
           ...predict,
           explanation: 'Taste from the front two-thirds runs in the facial nerve, from the back third in the glossopharyngeal, and from further back in the vagus — all to the nucleus of the solitary tract (slide 24).',
         }),

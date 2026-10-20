@@ -8,10 +8,10 @@ type Steps = InteractiveDraft<ConceptId>[];
 
 export const interactive: Record<string, Steps> = {
   'special-senses-1': [
-    ask(mcq('c1-01', 'eye-coats', 'Which coat of the eye contains melanin to stop light reflecting inside the eyeball?', 'The choroid', ['The sclera', 'The retina', 'The cornea'], { explanation: 'Visual System, slide 3.' })),
+    ask(mcq('c1-01', 'eye-coats', 'Which coat of the eye contains melanin to stop light reflecting inside the eyeball?', 'The choroid', ['The sclera (white coat)', 'The retina', 'The cornea'], { explanation: 'Visual System, slide 3.' })),
     learn('Inside the eye', ['The lens divides it into the posterior cavity (vitreous humour) and the anterior cavity (aqueous humour), which has an anterior chamber (cornea–iris) and a posterior chamber (iris–lens).'], { sourceRefs: vs([6, 7]) }),
     ask(order('c1-02', 'aqueous-humour', 'Order the flow of aqueous humour.', ['Ciliary epithelium', 'Posterior chamber', 'Pupil', 'Anterior chamber', 'Trabecular meshwork', 'Canal of Schlemm'], { explanation: 'Visual System, slide 11.' })),
-    ask(mcq('c1-03', 'aqueous-humour', 'The trabecular meshwork becomes blocked. What happens?', 'Intraocular pressure rises — glaucoma', ['The lens becomes cloudy — cataract', 'The pupil dilates and stays fixed', 'Tears stop being produced'], { explanation: 'Visual System, slides 11–12.', skill: 'prediction', clinical: true })),
+    ask(mcq('c1-03', 'aqueous-humour', 'The trabecular meshwork becomes blocked. What happens?', 'Intraocular pressure rises — glaucoma', ['The lens becomes cloudy — cataract', 'The pupil dilates and stays fixed in bright light', 'Tears stop being produced'], { explanation: 'Visual System, slides 11–12.', skill: 'prediction', clinical: true })),
     recall('r1-01', 'eye-coats', 'Describe the three coats of the eye and the parts of each.', [
       'Sclera: outer, fibrous, white; protects and gives rigidity; its front is the transparent cornea; pierced by the optic nerve.',
       'Choroid: middle, vascular, with melanin; in front forms the iris, ciliary body and zonules.',
@@ -19,7 +19,7 @@ export const interactive: Record<string, Steps> = {
     ], vs([2, 3, 4, 5])),
   ],
   'special-senses-2': [
-    ask(mcq('c2-01', 'refraction', 'Where does most of the eye’s refraction take place?', 'The cornea (about 80%)', ['The lens (about 80%)', 'The vitreous humour', 'The retina'], { explanation: 'Visual System, slides 15–16.' })),
+    ask(mcq('c2-01', 'refraction', 'Where does most of the eye’s refraction take place?', 'The cornea (about 80%)', ['The lens (about 80% of the power)', 'The vitreous humour', 'The retina'], { explanation: 'Visual System, slides 15–16.' })),
     learn('Near and far', ['Near: ciliary muscle contracts, zonules slacken, the lens rounds up. Far: ciliary muscle relaxes, zonules tighten, the lens thins.'], { sourceRefs: vs([18, 19]) }),
     ask(mcq('c2-02', 'accommodation', 'You look up from a book at a distant hill. What does the ciliary muscle do?', 'Relaxes, so the zonules tighten and the lens thins', ['Contracts, so the zonules slacken and the lens rounds up', 'Nothing — the cornea changes its curve instead', 'Contracts, so the zonules tighten and the lens thins'], { explanation: 'Visual System, slide 19.', skill: 'application' })),
     ask(match('c2-03', 'refractive-errors', 'Match each error to its correcting lens.', [
@@ -37,7 +37,7 @@ export const interactive: Record<string, Steps> = {
     ask(mcq('c3-01', 'rods-cones', 'Which photoreceptors give night (scotopic) vision?', 'Rods', ['Cones', 'Ganglion cells', 'Bipolar cells'], { explanation: 'Visual System, slides 43–44.' })),
     learn('The dark current', ['In the dark cGMP holds CNG channels open; Na⁺ flows in, the cell sits at about −30 mV and releases glutamate.'], { sourceRefs: vs([48, 49]) }),
     ask(order('c3-02', 'phototransduction', 'Order the events after light hits a rod.', ['11-cis retinal becomes all-trans', 'Metarhodopsin II activates transducin', 'Phosphodiesterase hydrolyses cGMP', 'CNG channels close', 'The cell hyperpolarises', 'Glutamate release falls'], { explanation: 'Visual System, slides 51–52.' })),
-    ask(mcq('c3-03', 'phototransduction', 'What does light do to a photoreceptor’s membrane potential?', 'Hyperpolarises it, from about −30 to −90 mV', ['Depolarises it, from about −90 to −30 mV', 'Fires a burst of action potentials', 'No change in membrane potential'], { explanation: 'Visual System, slide 52.', skill: 'prediction' })),
+    ask(mcq('c3-03', 'phototransduction', 'What does light do to a photoreceptor’s membrane potential?', 'Hyperpolarises it, from about −30 to −90 mV', ['Depolarises it, from about −90 to −30 mV', 'Fires a burst of action potentials down its axon', 'No change in membrane potential'], { explanation: 'Visual System, slide 52.', skill: 'prediction' })),
     recall('r3-01', 'phototransduction', 'Explain phototransduction in a rod, in the dark and in the light.', [
       'Dark: high cGMP keeps CNG channels open; Na⁺ (and Ca²⁺) enter — the dark current; the cell is depolarised and releases glutamate.',
       'Light: 11-cis retinal → all-trans; metarhodopsin II activates transducin, which activates phosphodiesterase.',

@@ -120,7 +120,7 @@ export const interactive: Record<string, Steps> = {
     ], { explanation: 'AA4 slide 21.' })),
     ask(mcq('c9-02', 'thf', 'What is the major source of one-carbon units for tetrahydrofolate?', 'Conversion of serine to glycine', ['Formate from tryptophan', 'Histidine breakdown', 'Methionine (via SAM)'], { explanation: 'AA4 slides 33, 35.' })),
     learn('Why sulfonamides spare us', ['Bacteria build folate from PABA via dihydropteroate synthetase; humans get folate from the diet. Sulfonamides block that bacterial enzyme.'], { sourceRefs: a4([39]) }),
-    ask(mcq('c9-03', 'folate-disorders', 'Impaired folate leads to more uracil in DNA because of a shortage of…', 'Thymidylate', ['Purines', 'SAM', 'Biotin'], { explanation: 'AA4 slide 40.', skill: 'cause-effect' })),
+    ask(mcq('c9-03', 'folate-disorders', 'Impaired folate leads to more uracil in DNA because of a shortage of…', 'Thymidylate', ['Purines (adenine and guanine)', 'SAM', 'Biotin'], { explanation: 'AA4 slide 40.', skill: 'cause-effect' })),
     recall('r9-01', 'thf', 'Describe tetrahydrofolate and how it is formed.', [
       'A pteridine ring, para-aminobenzoate and glutamate (vitamin B9).',
       'Dihydrofolate reductase reduces folate to FH₂ then FH₄, using NADPH.',

@@ -122,7 +122,7 @@ export const interactive: Record<string, Steps> = {
     learn('Where fluid collects', [
       'Below the lung edge, costal and diaphragmatic pleura are separated only by the costodiaphragmatic recess — the site for thoracocentesis.',
     ], { sourceRefs: rs([247]) }),
-    ask(mcq('i6-03', 'pleural-recesses-lines', 'Where does a pleural effusion collect in the upright patient?', 'Costodiaphragmatic recess', ['Cupola (cervical pleura)', 'Cardiac notch', 'Oblique fissure'], { explanation: 'Slide 247.', skill: 'application' })),
+    ask(mcq('i6-03', 'pleural-recesses-lines', 'Where does a pleural effusion collect in the upright patient?', 'Costodiaphragmatic recess', ['Cupola (cervical pleura) at the apex', 'Cardiac notch', 'Oblique fissure'], { explanation: 'Slide 247.', skill: 'application' })),
     recall('r6-01', 'pleural-reflections', 'Trace the surface marking of the pleura from the cupola to T12.', [
       'Cupola 2.5 cm above the clavicle.',
       'Meets the other pleura at the 2nd costal cartilage; left diverges at the 4th.',

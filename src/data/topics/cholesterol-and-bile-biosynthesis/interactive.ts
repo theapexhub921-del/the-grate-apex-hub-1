@@ -316,7 +316,7 @@ export const interactive: Record<string, Steps> = {
       'Slide 17 shows the inhibitory route: cAMP activates PKA → PKA phosphorylates PPI-1 into its active form → active PPI-1 blocks the phosphatases → HMGR stays phosphorylated (off). Insulin stimulates removal of the phosphates (on).',
     ], { sourceRefs: [...ref([16, 17]), ...leh(826)] }),
     ask(
-      mcq('c4-06', 'hormonal-control', 'What does insulin do to HMGR?', 'Stimulates removal of its phosphate, activating it', ['Phosphorylates it through PKA, inactivating it', 'Triggers its polyubiquitination and destruction', 'Converts it into acetoacetyl-CoA in the cytosol'], {
+      mcq('c4-06', 'hormonal-control', 'What does insulin do to HMGR?', 'Stimulates removal of its phosphate, activating it', ['Phosphorylates it through PKA, inactivating it', 'Triggers its polyubiquitination and destruction in the proteasome', 'Converts it into acetoacetyl-CoA in the cytosol'], {
         explanation: 'Slide 16: insulin stimulates the removal of phosphates and thereby activates HMGR.',
       })
     ),
