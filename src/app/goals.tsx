@@ -9,13 +9,15 @@ import { InlineNotice } from '@/components/ui/state-views';
 import { PageHeader, Screen, SectionHeader } from '@/components/ui/screen';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import { createPersonalGoal, deletePersonalGoal, listPersonalGoals, refreshProgressGoals, type PersonalGoal } from '@/data/planning';
+import { totalFocusMinutes } from '@/data/focus';
 import { getProgressSnapshot } from '@/data/progress';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { friendlyError } from '@/lib/errors';
 
 const GOAL_TYPES: { value: PersonalGoal['goal_type']; label: string }[] = [
-  { value: 'lessons', label: 'Lessons' }, { value: 'xp', label: 'XP' }, { value: 'streak', label: 'Streak days' },
+  { value: 'lessons', label: 'Lessons' }, { value: 'xp', label: 'XP' }, { value: 'streak', label: 'Streak days' }, { value: 'focus', label: 'Focus minutes' },
 ];
+const UNIT: Partial<Record<PersonalGoal['goal_type'], string>> = { focus: 'focus minutes', streak: 'streak days' };
 
 export default function GoalsScreen() {
   const styles = useThemedStyles(createStyles);
@@ -32,7 +34,7 @@ export default function GoalsScreen() {
     setBusy(true);
     try {
       const progress = getProgressSnapshot();
-      await refreshProgressGoals({ lessonsCompleted: progress.lessonsCompleted, xp: progress.xp, streak: progress.streak });
+      await refreshProgressGoals({ lessonsCompleted: progress.lessonsCompleted, xp: progress.xp, streak: progress.streak, focusMinutes: await totalFocusMinutes() });
       setGoals(await listPersonalGoals());
       setError('');
     } catch (e) { setError(friendlyError(e, 'Could not load your goals.')); }
@@ -73,10 +75,10 @@ export default function GoalsScreen() {
     </Card>
     <SectionHeader title="Your goals" subtitle="Progress is private to you." style={styles.section} />
     {busy ? <Text style={styles.muted}>Loading goals…</Text> : goals.length ? goals.map((goal) => {
-      const current = goal.goal_type === 'lessons' || goal.goal_type === 'xp' || goal.goal_type === 'streak' ? goal.current : Number(goal.current);
+      const current = goal.goal_type === 'lessons' || goal.goal_type === 'xp' || goal.goal_type === 'streak' || goal.goal_type === 'focus' ? goal.current : Number(goal.current);
       const pct = Math.min(100, Math.round(current / Number(goal.target) * 100));
       return <Card key={goal.id} style={styles.goalCard}>
-        <View style={styles.goalTop}><View style={styles.flex}><Text style={styles.title}>{goal.title}</Text><Text style={styles.muted}>{current} / {goal.target} {goal.goal_type}{goal.deadline ? ` · due ${goal.deadline}` : ''}</Text></View><Button label="Remove" variant="ghost" size="sm" onPress={() => void remove(goal.id)} /></View>
+        <View style={styles.goalTop}><View style={styles.flex}><Text style={styles.title}>{goal.title}</Text><Text style={styles.muted}>{current} / {goal.target} {UNIT[goal.goal_type] ?? goal.goal_type}{goal.deadline ? ` · due ${goal.deadline}` : ''}</Text></View><Button label="Remove" variant="ghost" size="sm" onPress={() => void remove(goal.id)} /></View>
         <View style={styles.track}><View style={[styles.fill, { width: `${pct}%` }]} /></View>
         <Text style={styles.pct}>{goal.completed_at || pct >= 100 ? 'Completed' : `${pct}% complete`}</Text>
       </Card>;

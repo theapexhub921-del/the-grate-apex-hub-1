@@ -44,7 +44,7 @@ export type PersonalGoal = {
   id: string;
   user_id: string;
   title: string;
-  goal_type: 'lessons' | 'xp' | 'questions' | 'streak' | 'topic' | 'study_plan';
+  goal_type: 'lessons' | 'xp' | 'questions' | 'streak' | 'topic' | 'study_plan' | 'focus';
   target: number;
   current: number;
   deadline: string | null;
@@ -213,9 +213,10 @@ export async function updatePersonalGoal(id: string, current: number) {
   await upsert('goals', { ...existing, current, completed_at: current >= existing.target ? now : null, updated_at: now });
 }
 
-export async function refreshProgressGoals(progress: { lessonsCompleted: number; xp: number; streak: number }) {
+export async function refreshProgressGoals(progress: { lessonsCompleted: number; xp: number; streak: number; focusMinutes?: number }) {
   try {
     const supported: Record<string, number> = { lessons: progress.lessonsCompleted, xp: progress.xp, streak: progress.streak };
+    if (progress.focusMinutes !== undefined) supported.focus = progress.focusMinutes;
     const goals = await readAll<PersonalGoal>('goals');
     let changed = false;
     const next = goals.map((goal) => {
