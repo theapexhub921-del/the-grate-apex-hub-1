@@ -13,7 +13,7 @@ export const interactive: Record<string, Steps> = {
         'bones-pectoral-arm',
         'Where is the clavicle most commonly fractured?',
         'At the junction of the medial two-thirds and lateral third (middle third)',
-        ['At the sternal end', 'At the acromial end', 'Along the conoid tubercle'],
+        ['At the sternal end, near the sternoclavicular joint', 'At the acromial end, near the acromioclavicular joint', 'Along the conoid tubercle on the inferior surface'],
         { explanation: 'Slide 8 & 9: The middle third is the thinnest part of the bone and where the curvatures meet, making it the most frequent fracture site.', skill: 'prediction' }
       )
     ),
@@ -96,7 +96,7 @@ export const interactive: Record<string, Steps> = {
         'glenohumeral-joint',
         'What provides the primary dynamic stability to the glenohumeral (shoulder) joint?',
         'The rotator cuff muscles compressing the humeral head into the glenoid cavity',
-        ['The coracoacromial arch', 'The coracohumeral ligament', 'The fibrous joint capsule alone'],
+        ['The coracoacromial arch pressing down on the humeral head', 'The coracohumeral ligament holding the head in place', 'The fibrous joint capsule alone, without any muscles'],
         { explanation: 'Slides 73 & 85: Dynamic stabilization is provided by the rotator cuff muscles (supraspinatus, infraspinatus, teres minor, subscapularis) actively compressing the head against the shallow glenoid.', skill: 'prediction' }
       )
     ),
@@ -442,7 +442,7 @@ export const interactive: Record<string, Steps> = {
         'subclavian-axillary-arteries',
         'How many branches arise from the second part of the axillary artery, and what muscle defines it?',
         'Two branches (thoracoacromial and lateral thoracic); defined by pectoralis minor',
-        ['One branch (superior thoracic); defined by subclavius', 'Three branches; defined by teres major', 'Two branches; defined by pectoralis major'],
+        ['One branch (superior thoracic); defined by subclavius', 'Three branches (subscapular and both circumflex humerals); defined by teres major', 'Two branches (thoracoacromial and lateral thoracic); defined by pectoralis major'],
         { explanation: 'Slides 201–203: Pectoralis minor divides the axillary artery into 3 parts. Part 1 has 1 branch, Part 2 has 2 branches, Part 3 has 3 branches.', skill: 'prediction' }
       )
     ),
@@ -504,7 +504,7 @@ export const interactive: Record<string, Steps> = {
         'ulnar-nerve-course',
         'Where is the ulnar nerve most vulnerable to compression or direct trauma at the elbow?',
         'Posterior to the medial epicondyle in the cubital tunnel',
-        ['Anterior to the lateral epicondyle', 'Within the radial groove', 'Between the heads of pronator teres'],
+        ['Anterior to the lateral epicondyle, beside the radial head', 'Within the radial (spiral) groove of the humerus', 'Between the two heads of pronator teres'],
         { explanation: 'Slide 238: The ulnar nerve passes directly posterior to the medial epicondyle of the humerus ("funny bone"), entering the forearm between the two heads of FCU.', skill: 'recall' }
       )
     ),

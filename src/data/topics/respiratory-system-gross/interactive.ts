@@ -11,7 +11,7 @@ export const interactive: Record<string, Steps> = {
       'Function: a conducting division (nasal cavity to bronchioles) and a respiratory division (lungs/alveoli).',
       'Clinically: an upper tract (nasal cavity, pharynx, larynx, trachea) and a lower tract (bronchi, bronchioles, lungs).',
     ], { sourceRefs: rs([16, 17]) }),
-    ask(mcq('i1-01', 'nasal-cavity-resp', 'Which bones form the bony (posterior) half of the nasal septum?', 'Vomer and perpendicular plate of the ethmoid', ['Nasal bones and maxilla', 'Palatine bones and sphenoid', 'Inferior conchae'], { explanation: 'Slide 24.' })),
+    ask(mcq('i1-01', 'nasal-cavity-resp', 'Which bones form the bony (posterior) half of the nasal septum?', 'Vomer and perpendicular plate of the ethmoid', ['Nasal bones and the frontal process of the maxilla', 'Palatine bones and the body of the sphenoid', 'Inferior conchae and the lacrimal bones'], { explanation: 'Slide 24.' })),
     ask(order('i1-02', 'pharynx-parts', 'Order the parts of the pharynx from above downward:', ['Nasopharynx', 'Oropharynx', 'Laryngopharynx'], { explanation: 'Slide 30.' })),
     learn('Landmarks of each part', [
       'Nasopharynx ends at the soft palate (C1) and has the auditory tube opening. Oropharynx ends at the epiglottis (C3) and holds the palatine tonsil. Laryngopharynx ends at the lower border of the cricoid (C6) and has the laryngeal inlet with piriform recesses.',
@@ -51,7 +51,7 @@ export const interactive: Record<string, Steps> = {
   ],
 
   [L(3)]: [
-    ask(mcq('i3-01', 'trachea-extent', 'At what level does the trachea divide at the carina?', 'Upper border of T5', ['C6', 'T2', 'T8'], { explanation: 'Slide 98.' })),
+    ask(mcq('i3-01', 'trachea-extent', 'At what level does the trachea divide at the carina?', 'Upper border of T5', ['Lower border of C6', 'Upper border of T2', 'Lower border of T8'], { explanation: 'Slide 98.' })),
     learn('Neck relations', [
       'In front: thyroid isthmus, inferior thyroid veins, thyroidea ima artery, strap muscles. At the sides: common carotids, thyroid lobes, inferior thyroid arteries, recurrent laryngeal nerves. Behind: oesophagus.',
     ], { sourceRefs: rs([101, 102]) }),
@@ -79,7 +79,7 @@ export const interactive: Record<string, Steps> = {
     learn('The neurovascular plane', [
       'Vein, artery and nerve run between the internal and innermost intercostals under the lower border of each rib — so a pleural drain goes in just above a rib.',
     ], { sourceRefs: rs([199]) }),
-    ask(mcq('i4-03', 'intercostal-space-joints', 'Why is a pleural drainage needle inserted just above a rib?', 'To avoid the intercostal vessels and nerve running along the lower border of the rib above', ['Because the pleura is thinnest there', 'To enter the costodiaphragmatic recess', 'Because the rib protects the lung'], { explanation: 'Slide 199.', skill: 'application' })),
+    ask(mcq('i4-03', 'intercostal-space-joints', 'Why is a pleural drainage needle inserted just above a rib?', 'To avoid the intercostal vessels and nerve running along the lower border of the rib above', ['Because the parietal pleura is thinnest just above each rib', 'To enter the costodiaphragmatic recess at its lowest point', 'Because the rib below protects the lung from the needle tip'], { explanation: 'Slide 199.', skill: 'application' })),
     recall('r4-01', 'thoracic-muscles', 'Compare serratus posterior superior and inferior.', [
       'Superior: from spines C6–T2 to ribs 2–5; elevates the upper ribs (inspiration).',
       'Inferior: from spines T11–L2 to the lowest four ribs; depresses the lower ribs (expiration).',
@@ -100,7 +100,7 @@ export const interactive: Record<string, Steps> = {
     learn('C3, 4, 5', [
       'The phrenic nerves (C3–C5) are the motor supply. Diaphragmatic irritation is referred to the shoulder through C4.',
     ], { sourceRefs: rs([188, 198]) }),
-    ask(mcq('i5-03', 'diaphragm-development-clinical', 'A newborn has bowel in the left chest through a posterolateral defect. Which embryonic structure failed?', 'Pleuroperitoneal membrane', ['Septum transversum', 'Cervical myotomes', 'Dorsal mesentery'], { explanation: 'Slide 195: Bochdalek hernia.', skill: 'application' })),
+    ask(mcq('i5-03', 'diaphragm-development-clinical', 'A newborn has bowel in the left chest through a posterolateral defect. Which embryonic structure failed?', 'Pleuroperitoneal membrane', ['Septum transversum', 'Cervical myotomes (C3–C5)', 'Dorsal mesentery of the oesophagus'], { explanation: 'Slide 195: Bochdalek hernia.', skill: 'application' })),
     recall('r5-01', 'diaphragm-development-clinical', 'Name the four embryological sources of the diaphragm.', [
       'Septum transversum (central tendon).',
       'Pleuroperitoneal membranes.',
@@ -122,7 +122,7 @@ export const interactive: Record<string, Steps> = {
     learn('Where fluid collects', [
       'Below the lung edge, costal and diaphragmatic pleura are separated only by the costodiaphragmatic recess — the site for thoracocentesis.',
     ], { sourceRefs: rs([247]) }),
-    ask(mcq('i6-03', 'pleural-recesses-lines', 'Where does a pleural effusion collect in the upright patient?', 'Costodiaphragmatic recess', ['Cupola', 'Cardiac notch', 'Oblique fissure'], { explanation: 'Slide 247.', skill: 'application' })),
+    ask(mcq('i6-03', 'pleural-recesses-lines', 'Where does a pleural effusion collect in the upright patient?', 'Costodiaphragmatic recess', ['Cupola (cervical pleura)', 'Cardiac notch', 'Oblique fissure'], { explanation: 'Slide 247.', skill: 'application' })),
     recall('r6-01', 'pleural-reflections', 'Trace the surface marking of the pleura from the cupola to T12.', [
       'Cupola 2.5 cm above the clavicle.',
       'Meets the other pleura at the 2nd costal cartilage; left diverges at the 4th.',
@@ -131,7 +131,7 @@ export const interactive: Record<string, Steps> = {
   ],
 
   [L(7)]: [
-    ask(mcq('i7-01', 'main-bronchi', 'An inhaled peanut usually lodges in the right main bronchus because it is:', 'Wider, shorter and more vertical', ['Narrower and longer', 'More horizontal', 'Lined by cilia'], { explanation: 'Slide 207 (and Gray’s).', skill: 'application' })),
+    ask(mcq('i7-01', 'main-bronchi', 'An inhaled peanut usually lodges in the right main bronchus because it is:', 'Wider, shorter and more vertical', ['Narrower, longer and more horizontal', 'More horizontal than the left', 'Lined by stronger cilia'], { explanation: 'Slide 207 (and Gray’s).', skill: 'application' })),
     learn('Fissures and lobes', [
       'Right lung: oblique and horizontal fissures, three lobes. Left lung: oblique fissure only, two lobes and a lingula.',
     ], { sourceRefs: rs([273]) }),
