@@ -13,7 +13,7 @@ type Q = QuestionDraft<ConceptId>;
 
 export const moreQuestions: Q[] = [
   // ─── Lesson 1 ──────────────────────────────────────────────────────
-  mcq('q1-14', 'hydratase-vs-dehydratase', 'Which enzyme type REMOVES water from its substrate?', 'Dehydratase', ['Hydratase', 'Hydrolase', 'Kinase'], {
+  mcq('q1-14', 'hydratase-vs-dehydratase', 'Which enzyme type REMOVES water from its substrate?', 'Dehydratase', ['Hydratase', 'Hydrolase (adds water)', 'Kinase'], {
     explanation: 'A dehydratase removes water, creating a C=C double bond. “De-” means removal.',
     skill: 'terminology',
   }),
@@ -95,7 +95,7 @@ export const moreQuestions: Q[] = [
     skill: 'comparison',
     difficulty: 'intermediate',
   }),
-  mcq('q2-25', 'synthesis-stages', 'In one turn of the cycle, what happens at the “elongation” stage?', 'Two carbons are added to the chain', ['Water is removed', 'The finished chain is released', 'A keto group is reduced'], {
+  mcq('q2-25', 'synthesis-stages', 'In one turn of the cycle, what happens at the “elongation” stage?', 'Two carbons are added to the chain', ['Water is removed', 'The finished chain is released from ACP', 'A keto group is reduced'], {
     explanation: 'Elongation is the condensation step that adds two carbons from malonyl.',
   }),
 
@@ -104,7 +104,7 @@ export const moreQuestions: Q[] = [
     explanation: 'Lehninger: CO₂ is attached to biotin (using ATP), then transferred to acetyl-CoA.',
     difficulty: 'intermediate',
   }),
-  mcq('q3-21', 'acc-energy', 'Where does fatty acid synthesis spend its ATP?', 'Making malonyl-CoA, at acetyl-CoA carboxylase', ['In each reduction step', 'When the thioesterase releases palmitate', 'When ACP₂ is loaded'], {
+  mcq('q3-21', 'acc-energy', 'Where does fatty acid synthesis spend its ATP?', 'Making malonyl-CoA, at acetyl-CoA carboxylase', ['In each reduction step', 'When the thioesterase releases palmitate from ACP', 'When ACP₂ is loaded'], {
     explanation: 'Lehninger: one ATP per malonyl-CoA; the reductions use NADPH, not ATP.',
     skill: 'pathway-reasoning',
   }),
@@ -176,7 +176,7 @@ export const moreQuestions: Q[] = [
     explanation: 'It releases its chain at 16 carbons — palmitate. Other lengths come from β-oxidation or elongation.',
     skill: 'misconception',
   }),
-  mcq('q7-21', 'other-fatty-acids', 'A cell needs a 14-carbon fatty acid. Which route does the lecture give for chains shorter than palmitate?', 'Shortening palmitate by β-oxidation', ['ER elongation of palmitate', 'Mitochondrial elongation', 'Stopping the synthase at C14'], {
+  mcq('q7-21', 'other-fatty-acids', 'A cell needs a 14-carbon fatty acid. Which route does the lecture give for chains shorter than palmitate?', 'Shortening palmitate by β-oxidation', ['ER elongation of palmitate', 'Mitochondrial elongation by two carbons', 'Stopping the synthase at C14'], {
     explanation: 'Slide 13: palmitate can be shortened by β-oxidation.',
     skill: 'application',
   }),
@@ -190,7 +190,7 @@ export const moreQuestions: Q[] = [
     answer: true,
     explanation: 'Slide 13: unsaturated fatty acids of 20, 22 and 24 carbons are made; most longer ones are polyunsaturated.',
   }),
-  mcq('q7-24', 'mitochondrial-elongation', 'Where is the second fatty acid elongation system?', 'In the mitosol (mitochondrial matrix)', ['In the nucleus', 'In the Golgi apparatus (cis face)', 'In the lysosomes'], {
+  mcq('q7-24', 'mitochondrial-elongation', 'Where is the second fatty acid elongation system?', 'In the mitosol (mitochondrial matrix)', ['In the nucleus', 'In the Golgi apparatus (cis face)', 'In the lysosomes and peroxisomes'], {
     explanation: 'Slide 14: a second elongation system exists in the mitosol.',
   }),
   match('q7-25', 'er-elongation', 'Match each system to its features.', [

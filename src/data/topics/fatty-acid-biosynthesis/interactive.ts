@@ -43,7 +43,7 @@ export const interactive: Record<string, Steps> = {
       ], { explanation: 'These four reaction words come from the lecture’s nomenclature slide (hydratase as settled in the reading).' })
     ),
     ask(
-      mcq('c1-03', 'synthase-vs-synthetase', 'An enzyme cannot join two molecules unless it hydrolyses ATP. Which name fits it?', 'Synthetase', ['Synthase', 'Hydratase', 'Kinase'], {
+      mcq('c1-03', 'synthase-vs-synthetase', 'An enzyme cannot join two molecules unless it hydrolyses ATP. Which name fits it?', 'Synthetase', ['Synthase', 'Hydratase (adds water)', 'Kinase'], {
         explanation: 'By definition, synthetases must cleave (hydrolyse) ATP to function; synthases do not.',
         skill: 'application',
       }),
@@ -95,7 +95,7 @@ export const interactive: Record<string, Steps> = {
       ['It runs in the cytosol — separated from β-oxidation, which runs in the mitochondria.']
     ),
     ask(
-      mcq('c2-02', 'synthesis-location-state', 'In which nutritional state is fatty acid synthesis switched on?', 'The fed state, after a meal', ['Overnight fasting state', 'Prolonged starvation', 'During intense exercise'], {
+      mcq('c2-02', 'synthesis-location-state', 'In which nutritional state is fatty acid synthesis switched on?', 'The fed state, after a meal', ['Overnight fasting state', 'Prolonged starvation and fasting', 'During intense exercise'], {
         explanation: 'Slide 4: it occurs under fed conditions — extra fuel is stored as fat.',
       })
     ),
@@ -153,7 +153,7 @@ export const interactive: Record<string, Steps> = {
       'It also runs in a different place: the cytosol.',
     ]),
     ask(
-      mcq('c2-06', 'synthesis-stages', 'The cycle repeats until which product is formed?', 'Palmitoyl-ACP (16 carbons)', ['Stearoyl-CoA (18 carbons)', 'Butyryl-ACP (4 carbons)', 'Malonyl-ACP (3 carbons)'], {
+      mcq('c2-06', 'synthesis-stages', 'The cycle repeats until which product is formed?', 'Palmitoyl-ACP (16 carbons)', ['Stearoyl-CoA (18 carbons)', 'Myristoyl-ACP (14 carbons only)', 'Malonyl-ACP (3 carbons)'], {
         explanation: 'Slide 4: the cycle continues until palmitoyl-ACP.',
       })
     ),
@@ -182,7 +182,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c3-03', 'malonyl-coa', 'Which formula is malonyl-CoA?', '⁻OOC–CH₂–CO–S-CoA', ['CH₃–CO–S-CoA', 'CH₃CH₂CO–S-CoA', '⁻OOC–CO–S-CoA'], {
+      mcq('c3-03', 'malonyl-coa', 'Which formula is malonyl-CoA?', '⁻OOC–CH₂–CO–S-CoA', ['CH₃–CO–S-CoA', '⁻OOC–CH₂–CH₂–CO–S-CoA', '⁻OOC–CO–S-CoA'], {
         explanation: 'Malonyl-CoA carries the added carboxyl group (deck A’s formula, confirmed by Lehninger). CH₃–CO–S-CoA is acetyl-CoA.',
         difficulty: 'intermediate',
       })
@@ -215,7 +215,7 @@ export const interactive: Record<string, Steps> = {
       'None of the added CO₂ ends up in the finished fatty acid.',
     ]),
     ask(
-      mcq('c3-06', 'malonyl-coa', 'How many carbons are in the acyl part of malonyl-CoA?', 'Three', ['Two', 'Four', 'One'], {
+      mcq('c3-06', 'malonyl-coa', 'How many carbons are in the acyl part of malonyl-CoA?', 'Three', ['Two', 'Four (as in succinyl-CoA)', 'One'], {
         explanation: 'Acetyl (2 C) plus the added carboxyl carbon gives a three-carbon malonyl group.',
       })
     ),
@@ -280,7 +280,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 5 — Reduce, dehydrate, reduce ──────────────────────────
   'fatty-acid-biosynthesis-5': [
     ask(
-      mcq('c5-01', 'keto-reduction', 'Condensation leaves a keto group (C=O) on the β-carbon. What is the FIRST step that deals with it?', 'Reduction to an alcohol, using NADPH', ['Removal of water', 'Oxidation by FAD', 'Hydrolysis by a thioesterase'], {
+      mcq('c5-01', 'keto-reduction', 'Condensation leaves a keto group (C=O) on the β-carbon. What is the FIRST step that deals with it?', 'Reduction to an alcohol, using NADPH', ['Removal of water', 'Oxidation by FAD to a double bond', 'Hydrolysis by a thioesterase'], {
         explanation: 'Slide 9: the keto group is reduced to an alcohol using NADPH (β-ketoacyl-ACP reductase).',
         skill: 'prediction',
       })
@@ -301,7 +301,7 @@ export const interactive: Record<string, Steps> = {
       ], { explanation: 'Slide 12: KR, DH and ER act in sequence after each condensation.' })
     ),
     ask(
-      mcq('c5-03', 'dehydration-step', 'What kind of double bond does the dehydration step form?', 'A trans double bond', ['A cis double bond', 'A C=O double bond', 'No double bond'], {
+      mcq('c5-03', 'dehydration-step', 'What kind of double bond does the dehydration step form?', 'A trans double bond', ['A cis double bond', 'A C=O double bond', 'No double bond at all'], {
         explanation: 'The lecture diagram and Lehninger agree: trans (trans-Δ²-enoyl). Slide 9’s “cis” is clarified in the reading.',
         difficulty: 'intermediate',
         skill: 'misconception',
@@ -321,7 +321,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: [...ref([8, 9, 12], [5, 6, 9]), ...leh(793)],
     }),
     ask(
-      mcq('c5-05', 'acyl-transfer', 'After the second reduction, what frees ACP₂ for the next malonyl group?', 'ACP-acyltransferase moves the chain to the cysteinyl-S of ACP₁', ['The thioesterase releases the finished chain from ACP₂', 'The chain is transferred onto coenzyme A in the cytosol', 'Malonyl-CoA displaces the chain directly from ACP₂'], {
+      mcq('c5-05', 'acyl-transfer', 'After the second reduction, what frees ACP₂ for the next malonyl group?', 'ACP-acyltransferase moves the chain to the cysteinyl-S of ACP₁', ['The thioesterase releases the finished chain from ACP₂ into the cytosol', 'The chain is transferred onto coenzyme A in the cytosol', 'Malonyl-CoA displaces the chain directly from ACP₂'], {
         explanation: 'Slide 9: the acyl group moves from ACP₂ to ACP₁, leaving ACP₂ available.',
         skill: 'pathway-reasoning',
       })
@@ -466,7 +466,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 8 — The Pyruvate–Malate cycle ──────────────────────────
   'fatty-acid-biosynthesis-8': [
     ask(
-      mcq('c8-01', 'transport-problem', 'Acetyl-CoA is made in the mitochondria; synthesis happens in the cytosol. Why can’t acetyl-CoA simply leave?', 'It cannot cross the inner mitochondrial membrane', ['It is consumed instantly by the TCA cycle', 'It is too unstable outside the mitochondria', 'It is permanently bound to ACP'], {
+      mcq('c8-01', 'transport-problem', 'Acetyl-CoA is made in the mitochondria; synthesis happens in the cytosol. Why can’t acetyl-CoA simply leave?', 'It cannot cross the inner mitochondrial membrane', ['It is consumed instantly by the TCA cycle', 'It is too unstable outside the mitochondria to survive', 'It is permanently bound to ACP'], {
         explanation: 'Slide 15: acetyl-CoA is made in the mitochondria and can’t cross the inner membrane.',
         skill: 'cause-effect',
       }),
