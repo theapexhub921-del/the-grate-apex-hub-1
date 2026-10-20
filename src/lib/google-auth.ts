@@ -1,6 +1,7 @@
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 import { auth } from '@/lib/firebase';
+import { track } from '@/lib/analytics';
 
 export type GoogleResult =
   | { status: 'redirecting' }
@@ -46,6 +47,7 @@ export async function signInWithGoogle(): Promise<GoogleResult> {
     // so the route guard sends the learner to /choose-username, which reserves
     // one and creates the profile (lib/accounts.ts).
     await signInWithPopup(auth, provider);
+    track('login', { method: 'google' });
 
     return { status: 'signed-in' };
   } catch (error: any) {

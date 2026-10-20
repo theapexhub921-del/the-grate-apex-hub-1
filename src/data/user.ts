@@ -96,8 +96,6 @@ export async function syncProfileWithCloud(): Promise<void> {
   return syncPromise;
 }
 
-export const syncProfileWithSupabase = syncProfileWithCloud;
-
 function ensureLoaded() {
   if (!loadPromise) {
     loadPromise = (async () => {
@@ -107,8 +105,8 @@ function ensureLoaded() {
       cachedAvatar = stored.avatarUrl?.trim() || null;
       notify();
 
-      // 2. Synchronize with Supabase as persistent source of truth
-      await syncProfileWithSupabase();
+      // 2. Synchronize with the cloud (Firebase) as persistent source of truth
+      await syncProfileWithCloud();
     })();
   }
   return loadPromise;
@@ -118,7 +116,7 @@ function ensureLoaded() {
 if (typeof window !== 'undefined') {
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      void syncProfileWithSupabase();
+      void syncProfileWithCloud();
     } else {
       cachedName = null;
       cachedAvatar = null;

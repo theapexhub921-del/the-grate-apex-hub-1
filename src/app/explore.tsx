@@ -18,7 +18,7 @@ import { isDesktopWidth, Type, type ThemeColors } from '@/constants/theme';
 import { POWERUP_MULTIPLIERS, XP_RULES } from '@/data/learning/xp-rules';
 import { useProgress } from '@/data/progress';
 import { getRankProgress, LEAGUE_RULES, RANKS } from '@/data/ranks';
-import { CONTACT_EMAIL, openContactEmail } from '@/lib/contact';
+import { CONTACT_EMAIL, openContactEmail, openWhatsAppGroup, WHATSAPP_HELP_GROUPS } from '@/lib/contact';
 import { routes } from '@/lib/routes';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { EXPLORE_TEAM, getExploreAnnouncements, getItemsByCategory, type ExploreAnnouncement, type ExploreItem } from '@/data/explore';
@@ -222,6 +222,12 @@ export default function ExploreScreen() {
           {noEmailApp ? 'No email app could be opened on this device. ' : 'Or write to us at '}
           <Text selectable style={styles.contactAddress}>{CONTACT_EMAIL}</Text>
         </Text>
+        <Text style={styles.featureDescription}>Need help fast? Join our WhatsApp help groups:</Text>
+        {WHATSAPP_HELP_GROUPS.map((group) => (
+          <Interactive key={group.url} onPress={() => void openWhatsAppGroup(group.url)} accessibilityRole="link" accessibilityLabel={`Join ${group.label} on WhatsApp`} style={styles.guideLink}>
+            <Icon name="comment" size={16} color={colors.primaryText} /><Text style={styles.guideLinkText}>{group.label}</Text>
+          </Interactive>
+        ))}
       </Card>
 
       <Journey />

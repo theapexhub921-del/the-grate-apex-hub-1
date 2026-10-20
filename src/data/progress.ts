@@ -35,6 +35,7 @@ import {
   restoredState,
   weekKeyOf,
 } from '@/data/learning/streak-rules';
+import { track } from '@/lib/analytics';
 
 // XP, level, streak and completed lessons — persisted with AsyncStorage
 // (account-scoped) and synced with cloud progress.
@@ -78,7 +79,7 @@ export type ProgressData = {
   lessonCompletedAt: Record<string, number>;
   xpLedger: XpEntry[]; // newest first
   awardedKeys: string[]; // every reward key ever given (milestones, quizzes…)
-  pendingPenalty: number; // negative XP not yet stored in Supabase (≥ 0)
+  pendingPenalty: number; // negative XP not yet stored in the cloud (≥ 0)
   // Streak protection (rules: data/learning/streak-rules.ts).
   streakFreezes: number; // 0..MAX_FREEZES, used automatically for missed days
   freezeWeeks: string[]; // weeks (Monday keys) that already earned a freeze
@@ -624,6 +625,8 @@ export async function completeLesson(lessonId: string, _subject: Subject, xp: nu
   await saveProgress();
   notify();
   void saveCloudProgress(cloudLessonRows(), cloudStats());
+  track('lesson_complete', { lesson_id: lessonId });
+  if (progress.lessonsCompleted === 1) track('first_lesson_complete', { lesson_id: lessonId });
   return true;
 }
 

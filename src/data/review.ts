@@ -16,7 +16,7 @@ import type { LegacySchedule, MemoryModel } from '@/data/learning/memory';
 // The memory model (data/learning/memory.ts) is now the single source of
 // truth for spaced repetition. This module only:
 //   1. loads schedules created by the earlier system (local
-//      'grateapex_review' and Supabase `review_schedule`) so the memory
+//      'grateapex_review' and the old cloud `review_schedule`) so the memory
 //      model can carry them over for concepts with no answer history;
 //   2. writes the memory model's concept schedule back to
 //      `review_schedule` (a projection, in the table's existing shape),
@@ -151,7 +151,7 @@ function serialize(row: CloudReviewItem) {
   return `${row.stage}|${row.dueAt}|${row.misses}|${row.lastReviewedAt}|${row.reason}`;
 }
 
-// Writes changed concept schedules to Supabase (debounced).
+// Writes changed concept schedules to the cloud (debounced).
 export function projectScheduleToCloud(model: MemoryModel, force = false) {
   if (projectTimer) clearTimeout(projectTimer);
   projectTimer = setTimeout(() => {

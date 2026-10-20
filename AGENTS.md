@@ -132,7 +132,7 @@ Social (real friends) is in `src/data/social.ts`, backed by Firestore:
 
 **Firebase reads (free plan, owner 2026-10-18):** the project is on Firebase's free Spark plan (50,000 document reads a day for everyone). Never poll Firestore with `getDocs` on a timer: use `onSnapshot` listeners, which are charged only for changed documents. Open chats (`watchConversationMessages`, `watchConversationMeta`, `watchGroupMessages`, `watchGroup`), the chats list (`myChatDocs` in `community.ts`, shared by the chats list, the bell and the recent-messages card), the groups list (`listMyGroups`) and the bell's account notifications are all live. The friend streak reads only messages newer than the last load. `tests/firebase-reads.test.mjs` checks this, and that every collection the app uses has a rule.
 
-"Stump a friend" (`src/data/stumps.ts`, `src/components/social/stump-card.tsx`): a multiple-choice question sent from quiz results or from the stump button in any chat (`pickStumpQuestion` picks only questions the learner has answered, owner 2026-10-18). The composer sends it to any mix of the feed, friends (each in the private chat) and groups (`sendStump`). Answers are saved to question history as practice, no XP. Only the sender sees who got it right or wrong; others see only their own result, and the database enforces it (owner: answers must be private).
+"Stamp a friend" (renamed from "Stump a friend" on screen, owner 2026-10-20; the code, files and database names keep "stump" so existing posts and answers keep working — only text learners see says "Stamp") (`src/data/stumps.ts`, `src/components/social/stump-card.tsx`): a multiple-choice question sent from quiz results or from the stump button in any chat (`pickStumpQuestion` picks only questions the learner has answered, owner 2026-10-18). The composer sends it to any mix of the feed, friends (each in the private chat) and groups (`sendStump`). Answers are saved to question history as practice, no XP. Only the sender sees who got it right or wrong; others see only their own result, and the database enforces it (owner: answers must be private).
 
 * **Feed:** a post with `stump: { qid, note }`; answers are private documents `posts/{id}/stumpAnswers/{uid}` (readable by the answerer and the post's author). Older answers were public `replies` with `stump: { pick, ok }` and are still read.
 * **Chats and groups:** a message with `share: { kind: 'stump', uid, username, id: <question id>, text, note }` (the original app's shared-post shape, so it shows there as a shared post). In a direct chat an answer is a message with `share: { kind: 'stumpAnswer', id: <stump message id>, pick, ok }` (only the two of you can read it). In a group an answer is a private document `groups/{gid}/stumpAnswers/{stump message id}_{uid}` (`from`, `to` = the sharer), read live by `watchGroupStumpAnswers`. Answer messages are never drawn as bubbles: the stump card reads them (`chatStumpAnswers`).
@@ -402,6 +402,15 @@ The full redesign rationale is in `docs/redesign-notes.md`.
   * `preset:<id>`
   * a small resized photo data URI (`src/lib/avatar-upload.ts`)
   * nothing, which shows initials
+
+### Usage analytics (owner, 2026-10-20)
+
+* **Google Analytics for Firebase** (web, so the Android app too): `src/lib/analytics.ts` (`initAnalytics` in `_layout.tsx`, `track`, `setAnalyticsUser` in `use-auth.tsx`). Page views are automatic; events: `sign_up`, `login`, `lesson_complete`, `first_lesson_complete`, `quiz_complete`, `apex_challenge_complete`, `battle_start`, `battle_finish`, `stamp_sent`. Never send names, emails or answers. Every call is fire-and-forget and does nothing on native or with the emulators.
+* **Vercel Web Analytics**: the script tag in `src/app/+html.tsx` (served by Vercel, no package); `public/sw.js` lets `/_vercel/` go straight to the network. Switched on in Vercel → Analytics.
+
+### Help and contact
+
+* Explore → Contact us shows the team email and the two WhatsApp help groups (`WHATSAPP_HELP_GROUPS` in `src/lib/contact.ts`).
 
 ### Notifications
 

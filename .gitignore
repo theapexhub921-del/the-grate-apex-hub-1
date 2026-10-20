@@ -50,7 +50,6 @@ example
 # Course content stays local and is not published to GitHub
 /content/
 /dist-mobile-fix/
-/supabase/.temp/
 /old-reference/
 
 # Emulator logs (tests/emulator)

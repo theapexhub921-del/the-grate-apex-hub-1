@@ -18,7 +18,6 @@ dist/
 dist-verify/
 web-build/
 .expo/
-supabase/.temp/
 
 # Editor / tool folders
 .claude/

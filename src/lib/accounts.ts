@@ -40,6 +40,7 @@ import {
   needsUsername,
   validateUsername,
 } from '@/lib/login-identifier';
+import { track } from '@/lib/analytics';
 
 export const USERNAME_TAKEN = 'That username isn’t available. Try another one.';
 const ACCOUNT_NOT_CREATED =
@@ -128,6 +129,7 @@ export async function registerWithEmail(input: { email: string; password: string
 
   // A fresh, empty progress document (owner-only rule).
   await setDoc(doc(db, 'progress', user.uid), { xp: 0, updatedAt: Date.now(), savedAt: serverTimestamp() }, { merge: true }).catch(() => undefined);
+  track('sign_up', { method: 'email' });
   return user;
 }
 
@@ -166,6 +168,8 @@ export async function chooseUsername(raw: string) {
     }
     throw error;
   }
+  // A first username for a new Google account is when that account is created.
+  if (!current) track('sign_up', { method: 'google' });
   return username;
 }
 

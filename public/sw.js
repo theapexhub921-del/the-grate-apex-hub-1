@@ -38,6 +38,8 @@ self.addEventListener('fetch', (event) => {
   // the connection was slow) left phones stuck on an old, broken version. The browser's normal checks keep it fresh:
   // the page is revalidated on every open (vercel.json) and its address carries a fresh ?v= stamp (src/lib/atlas-theme.ts).
   if (new URL(request.url).pathname.startsWith('/atlas/')) return;
+  // Vercel Web Analytics (/_vercel/insights/...) always goes straight to the network.
+  if (new URL(request.url).pathname.startsWith('/_vercel/')) return;
   // The 3D organs shown with the lesson simulations (/sim3d/...) use the atlas models: same rule.
   if (new URL(request.url).pathname.startsWith('/sim3d/')) return;
   // The Android app download (public/downloads) goes straight to the network: never saved.

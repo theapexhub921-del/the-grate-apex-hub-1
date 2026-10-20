@@ -29,12 +29,13 @@ import { needsUsername } from '@/lib/login-identifier';
 import { useResolvedColorScheme, useTheme } from '@/hooks/use-theme';
 import { loadWebFonts } from '@/lib/web-fonts';
 import { routes } from '@/lib/routes';
+import { initAnalytics } from '@/lib/analytics';
 
 SplashScreen.preventAutoHideAsync();
 
-// Returns true if the current URL contains a Supabase password-recovery
+// Returns true if the current URL contains a password-recovery
 // token (e.g. "?type=recovery" or "#type=recovery").  These params are
-// set by Supabase when the user opens a reset link and are read at
+// set by the password-reset link and are read at
 // module load time in login.tsx.  We check here so the guard never
 // bounces the user away from /login while a recovery is in progress.
 function isRecoveryUrl(): boolean {
@@ -162,9 +163,11 @@ export default function TabLayout() {
   const pageZoom = usePageZoomPreference();
   const fontSize = useFontSizePreference();
 
-  // Web: fetch the display font once the app is running (never blocks paint).
+  // Web: fetch the display font once the app is running (never blocks paint),
+  // and start usage analytics (lib/analytics.ts).
   useEffect(() => {
     loadWebFonts();
+    initAnalytics();
   }, []);
 
   useEffect(() => {

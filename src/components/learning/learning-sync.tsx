@@ -18,7 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // - Subscribing through useLearning() loads every learning store early,
 //   so the first screen the learner opens already has their history.
 // - Whenever the memory model changes, the concept schedule is projected
-//   to Supabase `review_schedule` (debounced; only changed rows).
+//   to the cloud (debounced; only changed rows).
 export function LearningSync() {
   const { session } = useAuth();
   const { memory, historyReady } = useLearning();

@@ -73,7 +73,7 @@ function FriendStreaksCard({ friends }: { friends: SocialPerson[] }) {
             <Text style={styles.boardXp}>{streak} day{streak === 1 ? '' : 's'}</Text>
           </View>
         );
-      }) : <Text style={styles.note}>Add friends and stump each other with a question every day to start a friend streak.</Text>}
+      }) : <Text style={styles.note}>Add friends and stamp each other with a question every day to start a friend streak.</Text>}
       <Text style={styles.note}>A friend streak grows each day you both send each other a message. A missed day ends it at midnight, unless you cover it with a streak freeze or restore it for {RESTORE_COST} Apex Coins (open the chat).</Text>
     </Card>
   );

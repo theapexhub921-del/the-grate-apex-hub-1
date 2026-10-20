@@ -91,7 +91,7 @@ export function FriendStreakNotice({ status, friendId, friendName, onChanged, hi
       <View style={styles.box}>
         <View style={styles.row}>
           <Icon name="streak" size={16} color={colors.warningStrong} />
-          <Text style={styles.text}>Your {status.lost.streak}-day streak with {friendName} ended: {days === 1 ? 'a day' : `${days} days`} without you both stumping each other.</Text>
+          <Text style={styles.text}>Your {status.lost.streak}-day streak with {friendName} ended: {days === 1 ? 'a day' : `${days} days`} without you both stamping each other.</Text>
           {close(onHide)}
         </View>
         <View style={styles.actions}>
@@ -105,12 +105,12 @@ export function FriendStreakNotice({ status, friendId, friendName, onChanged, hi
   }
 
   if (status.atRisk && status.stumpsNeeded && !hidden) {
-    const waiting = !status.meToday ? `Stump ${friendName} today` : !status.friendToday ? `${friendName} hasn’t stumped you today yet` : '';
+    const waiting = !status.meToday ? `Stamp ${friendName} today` : !status.friendToday ? `${friendName} hasn’t stamped you today yet` : '';
     return (
       <View style={[styles.box, styles.soft]}>
         <View style={styles.row}>
           <Icon name="streak" size={16} color={colors.accentText} />
-          <Text style={styles.text}>Keep your {status.streak}-day streak: you both need to stump each other today. {waiting}.</Text>
+          <Text style={styles.text}>Keep your {status.streak}-day streak: you both need to stamp each other today. {waiting}.</Text>
           {close(onHide)}
         </View>
       </View>
@@ -125,7 +125,7 @@ export function FriendStreakNotice({ status, friendId, friendName, onChanged, hi
           <Icon name="challenge" size={16} color={colors.primaryText} />
           <Text style={styles.text}>
             {status.atRisk ? `Keep your ${status.streak}-day streak: you both need to message today. ` : ''}
-            From {switchDay}, friend streaks are kept by stumping each other every day. Tap the stump button beside the message box to send {friendName} a question.
+            From {switchDay}, friend streaks are kept by stamping each other every day. Tap the stamp button beside the message box to send {friendName} a question.
           </Text>
           {close(onHide)}
         </View>

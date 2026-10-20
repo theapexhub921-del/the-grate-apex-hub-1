@@ -101,7 +101,7 @@ export function StumpCard({ postId, question, stump, authorId, authorName, ownId
     <View style={styles.card}>
       <View style={styles.head}>
         <Icon name="challenge" size={16} color={colors.primaryText} />
-        <Text style={styles.kicker}>STUMP A FRIEND</Text>
+        <Text style={styles.kicker}>STAMP A FRIEND</Text>
         <Pill label={question.concept} style={styles.concept} />
       </View>
       {stump.note ? <Text style={styles.note}>{stump.note}</Text> : null}
@@ -191,7 +191,7 @@ export function StumpLoading() {
     <View style={styles.card}>
       <View style={styles.head}>
         <Icon name="challenge" size={16} color={colors.primaryText} />
-        <Text style={styles.kicker}>STUMP A FRIEND</Text>
+        <Text style={styles.kicker}>STAMP A FRIEND</Text>
       </View>
       <Text style={styles.muted}>Loading the question…</Text>
     </View>
@@ -206,7 +206,7 @@ export function StumpUnavailable({ text, note }: { text: string; note?: string }
     <View style={styles.card}>
       <View style={styles.head}>
         <Icon name="challenge" size={16} color={colors.primaryText} />
-        <Text style={styles.kicker}>STUMP A FRIEND</Text>
+        <Text style={styles.kicker}>STAMP A FRIEND</Text>
       </View>
       {note ? <Text style={styles.note}>{note}</Text> : null}
       <Text style={styles.optionText}>{text}</Text>
@@ -293,7 +293,7 @@ export function StumpComposer({ question, onClose, feed = true, friendIds = [], 
   const order = question ? stumpOptionOrder(question) : [];
 
   return (
-    <Sheet visible={open} onClose={onClose} title="Stump a friend" subtitle="Send this question to the feed, to friends or to groups. Stumping a friend in your chat keeps your friend streak.">
+    <Sheet visible={open} onClose={onClose} title="Stamp a friend" subtitle="Send this question to the feed, to friends or to groups. Stamping a friend in your chat keeps your friend streak.">
       {question ? (
         <View style={styles.composer}>
           <View style={styles.preview}>
@@ -325,7 +325,7 @@ export function StumpComposer({ question, onClose, feed = true, friendIds = [], 
               {(groups ?? []).map((group) => (
                 <PickRow key={group.id} label={group.name} detail={`${group.memberUids.length} members`} on={pickedGroups.includes(group.id)} onPress={() => setPickedGroups((list) => toggle(list, group.id))} leading={<Avatar name={group.name} size={32} />} />
               ))}
-              {!friends.length ? <Text style={styles.muted}>Friends who follow you back appear here, so you can stump them in your chat.</Text> : null}
+              {!friends.length ? <Text style={styles.muted}>Friends who follow you back appear here, so you can stamp them in your chat.</Text> : null}
               <TextInput
                 value={note}
                 onChangeText={setNote}

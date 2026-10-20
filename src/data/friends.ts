@@ -1,4 +1,4 @@
-// Real friends now come from Supabase — see data/social.ts. The sample
+// Real friends now come from Firebase — see data/social.ts. The sample
 // friends that used to live here have been removed; only the initials
 // helper (used by the Avatar component) remains.
 

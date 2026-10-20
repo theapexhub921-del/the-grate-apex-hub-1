@@ -507,7 +507,7 @@ function QuestionReview({ row, index, onStump }: { row: Row; index: number; onSt
       </Text>
       {row.question.explanation ? <Text style={styles.reviewExplanation}>{row.question.explanation}</Text> : null}
       <AiExplain item={{ ...explainItem(row.question, row.answer), ...(row.correct ? { picked: null } : {}) }} getLesson={() => aiLessonForQuestion(row.question)} />
-      {onStump ? <Button label="Stump a friend" size="sm" variant="ghost" onPress={onStump} style={styles.stumpButton} accessibilityLabel="Send this question to the feed, friends or groups for them to answer" /> : null}
+      {onStump ? <Button label="Stamp a friend" size="sm" variant="ghost" onPress={onStump} style={styles.stumpButton} accessibilityLabel="Send this question to the feed, friends or groups for them to answer" /> : null}
     </Card>
   );
 }

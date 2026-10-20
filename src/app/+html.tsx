@@ -52,6 +52,11 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
+        {/* Vercel Web Analytics (visitors and page views; switch it on in Vercel → Analytics).
+            The script is served by Vercel itself, so nothing is installed. */}
+        <script dangerouslySetInnerHTML={{ __html: 'window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };' }} />
+        <script defer src="/_vercel/insights/script.js" />
+
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
       </head>

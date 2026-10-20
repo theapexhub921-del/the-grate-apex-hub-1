@@ -13,6 +13,7 @@ import {
   subscribeToLearningAuthChanges,
   writeLearningCache,
 } from '@/data/learning-sync';
+import { track } from '@/lib/analytics';
 
 // One saved record per finished quiz / review / Apex run, so learners can
 // revisit results (missed questions, explanations, XP) after leaving the
@@ -285,6 +286,11 @@ export async function recordQuizAttempt(
   notify();
   await saveLocalHistory();
   void saveCloudQuizAttempt(toCloudAttempt(savedAttempt));
+  track(savedAttempt.kind === 'apex' ? 'apex_challenge_complete' : 'quiz_complete', {
+    kind: savedAttempt.kind,
+    percentage: Math.round(savedAttempt.percentage),
+    questions: savedAttempt.total,
+  });
   return savedAttempt;
 }
 

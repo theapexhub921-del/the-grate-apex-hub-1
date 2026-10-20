@@ -38,8 +38,8 @@ const me = () => {
 
 /** A short preview of a message for replies, the chat list and notifications. */
 export function previewOf(message: { body: string; media?: Media[] | null; doc?: ChatDoc | null; audio?: unknown; share?: MessageShare | null }) {
-  if (message.share?.kind === 'stump') return 'Stump a friend question';
-  if (message.share?.kind === 'stumpAnswer') return 'Answered a Stump a friend question';
+  if (message.share?.kind === 'stump') return 'Stamp a friend question';
+  if (message.share?.kind === 'stumpAnswer') return 'Answered a Stamp a friend question';
   if (message.body.trim()) return message.body.trim().slice(0, 120);
   if (message.media?.length) return message.media.length > 1 ? `${message.media.length} photos` : message.media[0].t === 'video' ? 'Video' : 'Photo';
   if (message.doc) return `Document: ${message.doc.name}`.slice(0, 120);

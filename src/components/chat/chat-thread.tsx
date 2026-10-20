@@ -246,7 +246,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
     if (!another) offered.current = new Set();
     const question = pickStumpQuestion(offered.current);
     if (!question) {
-      setNotice(another ? 'No other questions to choose from yet.' : 'Answer a few lesson questions first — then you can stump your friends with them.');
+      setNotice(another ? 'No other questions to choose from yet.' : 'Answer a few lesson questions first — then you can stamp your friends with them.');
       return;
     }
     offered.current.add(question.id);
@@ -354,7 +354,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
           <View style={styles.hello}>
             {isGroup ? <Avatar name={title} size={88} ring="gold" /> : <PersonAvatar uid={friendId} uri={friend?.avatarUrl ?? null} name={title} size={88} ring="gold" />}
             <Text style={styles.helloName}>{title}</Text>
-            <Text style={styles.empty}>{isGroup ? 'Say hello or share what you’re studying.' : `Stump ${title} with a question to start a friend streak: tap the stump button beside the message box.`}</Text>
+            <Text style={styles.empty}>{isGroup ? 'Say hello or share what you’re studying.' : `Stamp ${title} with a question to start a friend streak: tap the stamp button beside the message box.`}</Text>
           </View>
         ) : null}
         {search.trim() ? <Text style={styles.searchCount}>{shown.length} message{shown.length === 1 ? '' : 's'} found</Text> : null}
@@ -478,7 +478,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
       ) : (
         <View style={styles.composer}>
           <Interactive onPress={() => setEmojiOpen((value) => !value)} accessibilityLabel="Emoji" style={styles.tool}><Text style={styles.emojiButton}>🙂</Text></Interactive>
-          <Interactive onPress={() => openStump()} disabled={!chatId} accessibilityRole="button" accessibilityLabel={isGroup ? 'Stump the group with a question' : `Stump ${title} with a question (keeps your friend streak)`} style={styles.tool}><Icon name="challenge" size={21} color={colors.primaryText} /></Interactive>
+          <Interactive onPress={() => openStump()} disabled={!chatId} accessibilityRole="button" accessibilityLabel={isGroup ? 'Stamp the group with a question' : `Stamp ${title} with a question (keeps your friend streak)`} style={styles.tool}><Icon name="challenge" size={21} color={colors.primaryText} /></Interactive>
           <TextInput
             ref={input}
             value={draft}

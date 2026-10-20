@@ -31,6 +31,7 @@ import {
 import { registerWithEmail, resolveSignInEmail } from '@/lib/accounts';
 import { auth } from '@/lib/firebase';
 import { cleanUsername, parseLoginIdentifier, validateUsername } from '@/lib/login-identifier';
+import { track } from '@/lib/analytics';
 
 
 const HOME_HREF = '/' as Href;
@@ -38,9 +39,9 @@ const HOME_HREF = '/' as Href;
 const EXPIRED_LINK_MESSAGE =
   'This password reset link is invalid or has expired. Please request a new one below.';
 
-// Details Supabase adds to the address when the user opens a reset link
+// Details the old sign-in system added to the address when a reset link was opened
 // (e.g. "#access_token=...&type=recovery", or "#error_code=otp_expired").
-// Supabase removes them shortly after the page opens, so read them once,
+// They disappear shortly after the page opens, so read them once,
 // as soon as this file loads.
 const linkParams = readLinkParams();
 
@@ -60,7 +61,7 @@ type Mode = 'signIn' | 'signUp' | 'checkEmail' | 'reset' | 'newPassword';
 const MIN_PASSWORD = 8;
 const ONBOARDING_HREF = '/onboarding' as Href;
 
-// Email/password sign-in using Supabase.
+// Email/password sign-in using Firebase Authentication.
 // Hidden from the tab bar; open it at /login.
 //
 // Modes:
@@ -111,10 +112,10 @@ export default function LoginScreen() {
   useEffect(() => {
     let active = true;
 
-    // (No Supabase listener: the router handles password recovery links.)
+    // (No auth listener here: the router handles password recovery links.)
 
     // Back from Google: a successful return carries the session in the
-    // address (Supabase picks it up by itself); an error is already shown.
+    // address (the auth library picks it up by itself); an error is already shown.
     if (oauthReturn) {
       if (oauthReturn.error) {
         // Google errors arrive as query parameters, which the router keeps
@@ -136,7 +137,7 @@ export default function LoginScreen() {
       };
     }
 
-    // (No Supabase reset link handling: the router updates the mode via the
+    // (No reset link handling here: the router updates the mode via the
     // PASSWORD_RECOVERY event, which we no longer listen to.)
 
     return () => {
@@ -207,6 +208,7 @@ export default function LoginScreen() {
     const identifier = parseLoginIdentifier(email);
     try {
       await signInWithEmailAndPassword(auth, await resolveSignInEmail(identifier), password);
+      track('login', { method: 'email' });
       setPassword('');
       router.replace(HOME_HREF);
     } catch (err: any) {

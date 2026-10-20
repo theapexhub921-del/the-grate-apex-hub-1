@@ -11,6 +11,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
 import { samePresenceAside } from '@/lib/presence';
+import { setAnalyticsUser } from '@/lib/analytics';
 
 export interface AuthUser {
   id: string; // for compatibility with code referencing user.id
@@ -129,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const unsubAuth = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      setAnalyticsUser(firebaseUser?.uid ?? null);
       stopWatching();
       lastProfile = null;
       lastLoaded = false;

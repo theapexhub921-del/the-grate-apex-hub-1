@@ -31,7 +31,7 @@ import { friendlyError } from '@/lib/errors';
 // generated route types can lag behind newly added routes.
 const SOCIAL_HREF = '/social' as Href;
 
-// Real friends, backed by Supabase (data/social.ts): your username, search
+// Real friends, backed by Firebase (data/social.ts): your username, search
 // for classmates, requests in and out, and your friends' weekly progress.
 export default function FriendsScreen() {
   const styles = useThemedStyles(createStyles);

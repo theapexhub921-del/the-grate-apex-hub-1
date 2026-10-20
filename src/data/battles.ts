@@ -13,6 +13,7 @@
 import { arrayUnion, collection, doc, getDoc, getDocs, limit, query, setDoc, where } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
+import { track } from '@/lib/analytics';
 
 export type BattleCourse = { kind: 'hb' | 'topic'; id: string; name: string };
 export type BattleSide = { score: number; total: number; seconds: number };
@@ -133,6 +134,7 @@ export async function createBattle(opponent: { userId: string; username: string 
     .sort((a, b) => (b[1].createdAt ?? 0) - (a[1].createdAt ?? 0))
     .slice(0, KEEP - 1);
   await setDoc(ref, { battlesOut: { ...Object.fromEntries(kept), [id]: entry }, battleTo: arrayUnion(opponent.userId) }, { merge: true });
+  track('battle_start', { course: course.id });
   return fromOut(id, uid, data.username ?? null, entry, undefined);
 }
 
@@ -148,6 +150,7 @@ export async function submitBattleResult(battle: Battle, result: BattleSide) {
   } else {
     await setDoc(ref, { battleResults: { [battle.id]: result } }, { merge: true });
   }
+  track('battle_finish', { score: result.score, total: result.total });
 }
 
 export async function declineBattle(battle: Battle) {

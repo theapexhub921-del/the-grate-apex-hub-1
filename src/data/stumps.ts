@@ -33,6 +33,7 @@ import { getQuestionHistory, recordQuestionAttempts } from '@/data/question-hist
 import { type ChoiceQuestion, type Question, stableShuffle } from '@/data/questions';
 import { db } from '@/lib/firebase';
 import { announceGroupMessage, announceMessage } from '@/lib/web-push';
+import { track } from '@/lib/analytics';
 
 export const STUMP_NOTE_MAX = 200;
 export const LETTERS = 'ABCDEFGH';
@@ -75,7 +76,7 @@ export function stumpOptionOrder(question: ChoiceQuestion): number[] {
 /** The post text: what the original app and reposts show. */
 function stumpPostText(question: ChoiceQuestion, note: string) {
   const options = stumpOptionOrder(question).map((index, position) => `${LETTERS[position]}. ${question.options[index]}`);
-  const text = [note, `Stump a friend: ${question.prompt}`, options.join('\n'), 'Answer it on GrAte Apex Hub.'].filter(Boolean).join('\n\n');
+  const text = [note, `Stamp a friend: ${question.prompt}`, options.join('\n'), 'Answer it on GrAte Apex Hub.'].filter(Boolean).join('\n\n');
   return text.slice(0, 2000);
 }
 
@@ -137,7 +138,7 @@ export async function answerStump(postId: string, question: ChoiceQuestion, pick
     if (!denied(error)) throw error;
     // The private rules are not published yet: the old public way.
     await setDoc(doc(collection(db, 'posts', postId, 'replies')), {
-      body: 'Answered this Stump a friend question.',
+      body: 'Answered this Stamp a friend question.',
       authorUid: me.uid,
       authorName: me.username,
       createdAt: serverTimestamp(),
@@ -177,7 +178,7 @@ export type StumpSendResult = { feed: boolean; friends: number; groups: number; 
 /** The stump's share text: what the original app and chat previews show. */
 function stumpShareText(question: ChoiceQuestion) {
   const options = stumpOptionOrder(question).map((index, position) => `${LETTERS[position]}. ${question.options[index]}`);
-  return [`Stump a friend: ${question.prompt}`, options.join('\n')].join('\n').slice(0, 280);
+  return [`Stamp a friend: ${question.prompt}`, options.join('\n')].join('\n').slice(0, 280);
 }
 
 /** Sends one question wherever the learner chose. Partly failing sends still report what went out. */
@@ -212,6 +213,7 @@ export async function sendStump(question: ChoiceQuestion, note: string, targets:
     }
   }
   if (!result.feed && !result.friends && !result.groups) throw new Error('The question could not be sent. Check your connection and try again.');
+  track('stamp_sent', { feed: result.feed, friends: result.friends, groups: result.groups });
   return result;
 }
 
@@ -269,7 +271,7 @@ export async function answerChatStump(
   const mine = earlier.find((answer) => answer.userId === me.uid);
   if (mine) return mine;
   const ok = pick === question.answer;
-  const share: MessageShare = { kind: 'stumpAnswer', uid: me.uid, username: me.username, id: stumpMessageId, text: 'Answered a Stump a friend question.', pick, ok };
+  const share: MessageShare = { kind: 'stumpAnswer', uid: me.uid, username: me.username, id: stumpMessageId, text: 'Answered a Stamp a friend question.', pick, ok };
   if (place.groupId) {
     try {
       await setDoc(doc(db, 'groups', place.groupId, 'stumpAnswers', `${stumpMessageId}_${me.uid}`), {

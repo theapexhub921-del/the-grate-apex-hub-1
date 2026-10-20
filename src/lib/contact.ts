@@ -12,6 +12,25 @@ import { EXPLORE_CONTACT } from '@/data/explore';
 
 export const CONTACT_EMAIL = EXPLORE_CONTACT.email;
 
+/** WhatsApp help groups, shown beside the email in Explore → Contact us. */
+export const WHATSAPP_HELP_GROUPS = [
+  { label: 'WhatsApp help group 1', url: 'https://chat.whatsapp.com/H42YpFvUdI10At4ocTl40g' },
+  { label: 'WhatsApp help group 2', url: 'https://chat.whatsapp.com/LtkiajX8snQ7SD2kYC46Xe' },
+] as const;
+
+/** Opens a WhatsApp group invite (the WhatsApp app if installed, otherwise the browser). */
+export async function openWhatsAppGroup(url: string): Promise<void> {
+  if (Platform.OS === 'web') {
+    if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
+    return;
+  }
+  try {
+    await Linking.openURL(url);
+  } catch {
+    // Nothing else to do: the link is also shown on screen.
+  }
+}
+
 export const CONTACT_MAILTO = `mailto:${EXPLORE_CONTACT.email}?subject=${encodeURIComponent(EXPLORE_CONTACT.subject)}`;
 
 /** Opens the email app. Resolves false when no email app could be opened. */
