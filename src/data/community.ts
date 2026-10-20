@@ -1,3 +1,4 @@
+import { saveSynced, syncedValue, unionIds } from '@/data/account-sync';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   collection,
@@ -339,6 +340,8 @@ async function viewedPosts(uid: string) {
     } catch {
       // nothing saved yet
     }
+    // Posts viewed on my other devices (data/account-sync.ts).
+    ids = new Set(unionIds([...ids], await syncedValue<string[]>('viewedPosts').catch(() => undefined), 1000));
     viewed = { uid, ids };
   }
   return viewed.ids;
@@ -363,6 +366,7 @@ export async function recordPostView(postId: string, authorId: string): Promise<
   }
   seen.add(postId);
   void AsyncStorage.setItem(`${VIEWED_KEY}:${uid}`, JSON.stringify([...seen].slice(-2000))).catch(() => {});
+  saveSynced('viewedPosts', [...seen].slice(-1000));
   return true;
 }
 

@@ -39,16 +39,19 @@ type Inputs = {
   lastActivityDate: string | null;
   xp: number;
   now: number;
+  /** A review was done today: the "reinforcement is ready" reminder stops for the day. */
+  reviewedToday?: boolean;
 };
 
-export function buildNotifications({ memory, events, streak, lastActivityDate, xp, now }: Inputs): AppNotification[] {
+export function buildNotifications({ memory, events, streak, lastActivityDate, xp, now, reviewedToday = false }: Inputs): AppNotification[] {
   const items: AppNotification[] = [];
   const today = startOfDay(now);
   const concepts = Array.from(memory.concepts.values()).filter((concept) => concept.dueAt !== null);
   const dueToday = concepts.filter((concept) => concept.dueAt! <= endOfDay(now));
   const overdue = dueToday.filter((concept) => concept.dueAt! < today);
 
-  if (dueToday.length > 0) {
+  // Once a review was done today, today's reminder is gone (owner, 2026-10-19).
+  if (dueToday.length > 0 && !reviewedToday) {
     items.push({
       id: `due-${dayKey(now)}`,
       group: 'learning',

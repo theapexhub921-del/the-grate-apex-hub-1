@@ -24,11 +24,14 @@ import { useMessageNotifications } from '@/data/message-notifications';
 import { markAccountNotificationsRead, useAccountNotifications } from '@/data/account-notifications';
 import { sendFriendRequest } from '@/data/social';
 import { usePromotionNotifications } from '@/components/league-promotion';
+import { saveSynced, syncedValue } from '@/data/account-sync';
 
 type Filter = 'all' | 'learning' | 'updates';
 
 export function useNotifications() {
-  const { memory, progress, now } = useLearning();
+  const { memory, progress, now, attempts } = useLearning();
+  const startOfToday = startOfDay(now);
+  const reviewedToday = useMemo(() => attempts.some((item) => item.mode === 'review' && item.attemptedAt >= startOfToday), [attempts, startOfToday]);
   const events = useLearningEvents();
   const localRead = useReadNotifications();
   const preferences = useNotificationPreferences();
@@ -50,9 +53,10 @@ export function useNotifications() {
           lastActivityDate: progress.lastActivityDate,
           xp: progress.xp,
           now,
+          reviewedToday,
         }),
       ].filter((item) => preferences[preferenceFor(item)]).sort((a, b) => b.at - a.at),
-    [messages, promotions, account, social.notifications, memory, events, progress.streak, progress.lastActivityDate, progress.xp, now, preferences]
+    [messages, promotions, account, social.notifications, memory, events, progress.streak, progress.lastActivityDate, progress.xp, now, reviewedToday, preferences]
   );
   const read = useMemo(() => new Set([...localRead, ...readSocialNotificationIds(social.notifications), ...account.filter((item) => item.read).map((item) => item.id)]), [localRead, social.notifications, account]);
   const unread = items.filter((item) => !read.has(item.id)).length;
@@ -93,11 +97,14 @@ function loadSeen(): Set<string> {
 }
 
 function saveSeen(seen: Set<string>) {
+  const list = [...seen].slice(-SEEN_LIMIT);
   try {
-    localStorage.setItem(SEEN_KEY, JSON.stringify([...seen].slice(-SEEN_LIMIT)));
+    localStorage.setItem(SEEN_KEY, JSON.stringify(list));
   } catch {
     // storage is optional
   }
+  // Seen on one device = seen on all of them (data/account-sync.ts).
+  saveSynced('seenAlerts', list);
 }
 
 // Delivers an alert at device level while the web app is in the background.
@@ -110,6 +117,20 @@ export function DeviceNotificationBridge() {
   const { items, read } = useNotifications();
   const enabled = usePushNotificationsPreference();
   const seen = useRef<Set<string> | null>(null);
+
+  // Alerts already seen on my other devices are not shown again here.
+  useEffect(() => {
+    let live = true;
+    void syncedValue<string[]>('seenAlerts').then((remote) => {
+      if (!live || !remote?.length) return;
+      const known = seen.current ?? loadSeen();
+      const before = known.size;
+      for (const id of remote) if (typeof id === 'string') known.add(id);
+      seen.current = known;
+      if (known.size !== before) saveSeen(known);
+    }).catch(() => {});
+    return () => { live = false; };
+  }, []);
   const [toast, setToast] = useState<AppNotification | null>(null);
 
   // Opening the app (or coming back to it) clears the number on the app icon and

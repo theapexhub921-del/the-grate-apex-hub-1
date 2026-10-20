@@ -13,6 +13,7 @@ import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import type { AiLessonText } from '@/data/ai-context';
 import { cardCounts, type CardState, type Flashcard, nextLabel, rateCard, type Rating, studyQueue } from '@/data/flashcards';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { saveSynced, syncedValue } from '@/data/account-sync';
 
 // A lesson's study tools, from the original app (in this app's look): read it,
 // flashcards with spaced repetition, the glossary, mnemonics, key facts and the
@@ -112,6 +113,17 @@ export function StepsPanel({ steps }: { steps: { title: string; items: readonly 
 // ── Flashcards ──────────────────────────────────────────────────────
 
 const STORE = 'grateapex_flashcards';
+
+/** Two devices' card schedules together: for each card, the copy reviewed more often (then the later one). */
+function mergeCardStates(a: Record<string, CardState>, b: Record<string, CardState>) {
+  const out: Record<string, CardState> = { ...b };
+  for (const [id, mine] of Object.entries(a)) {
+    const theirs = out[id];
+    const count = (state: CardState) => (state.reps ?? 0) + (state.lapses ?? 0);
+    if (!theirs || count(mine) > count(theirs) || (count(mine) === count(theirs) && mine.due >= theirs.due)) out[id] = mine;
+  }
+  return out;
+}
 // Card text can hold the original mini-markup (<b>, <term …>): the AI gets plain words.
 const plain = (value: string) => value.replace(/<[^>]+>/g, '').trim();
 // Event-time helpers (kept outside the component: rendering itself stays pure).
@@ -145,9 +157,16 @@ export function FlashcardsPanel({ cards, labels = TERM_LABELS, aiLesson }: { car
 
   useEffect(() => {
     let live = true;
-    AsyncStorage.getItem(STORE)
-      .then((saved) => { if (live && saved) setStates(JSON.parse(saved) as Record<string, CardState>); })
-      .catch(() => {});
+    void (async () => {
+      const local = JSON.parse((await AsyncStorage.getItem(STORE).catch(() => null)) ?? '{}') as Record<string, CardState>;
+      if (live) setStates(local);
+      // Cards studied on my other devices: for each card, the copy with more reviews (data/account-sync.ts).
+      const remote = await syncedValue<Record<string, CardState>>('flashcards').catch(() => undefined);
+      if (!remote || !live) return;
+      const merged = mergeCardStates(local, remote);
+      setStates(merged);
+      void AsyncStorage.setItem(STORE, JSON.stringify(merged)).catch(() => {});
+    })();
     return () => { live = false; };
   }, []);
 
@@ -176,6 +195,7 @@ export function FlashcardsPanel({ cards, labels = TERM_LABELS, aiLesson }: { car
       const all = { ...states, [card.id]: next };
       setStates(all);
       void AsyncStorage.setItem(STORE, JSON.stringify(all)).catch(() => {});
+      saveSynced('flashcards', all);
       // Like Anki: a card still in learning comes back later in this session.
       if (next.learning && next.due - at <= 20 * 60_000) queue = [...queue, card];
     }
