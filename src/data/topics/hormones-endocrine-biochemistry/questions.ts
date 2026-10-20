@@ -30,7 +30,7 @@ const lesson1: Q[] = [
   mcq('q1-05', 'endocrine-glands', 'Which two parts of the pituitary does the lecture name?', 'Anterior and posterior', ['Upper and lower', 'Cortex and medulla', 'Left and right'], {
     explanation: 'Slide 5.',
   }),
-  mcq('q1-06', 'hormone-definition', 'Which definition of a hormone matches the lecture?', 'An organic substance secreted by a ductless gland into the ECF that regulates metabolic function', ['A protein secreted through a duct onto an epithelial surface', 'A neurotransmitter released at a synapse', 'Any molecule found in blood'], {
+  mcq('q1-06', 'hormone-definition', 'Which definition of a hormone matches the lecture?', 'An organic substance secreted by a ductless gland into the ECF that regulates metabolic function', ['A protein secreted through a duct onto an epithelial surface to aid digestion', 'A neurotransmitter released at a synapse that acts on the next neuron', 'Any molecule found in the blood, whatever its source or effect'], {
     explanation: 'Slide 8.',
     skill: 'terminology',
   }),
@@ -46,7 +46,7 @@ const lesson1: Q[] = [
     answer: true,
     explanation: 'Slide 8.',
   }),
-  mcq('q1-10', 'hormone-definition', 'How does the endocrine system relate to the CNS (slide 8)?', 'It is the body’s other controlling system and works with the CNS to coordinate the body', ['It replaces the CNS', 'It is part of the CNS', 'It works independently of the CNS'], {
+  mcq('q1-10', 'hormone-definition', 'How does the endocrine system relate to the CNS (slide 8)?', 'It is the body’s other controlling system and works with the CNS to coordinate the body', ['It replaces the CNS in controlling the internal organs', 'It is part of the CNS, inside the brain and cord', 'It works independently of the CNS, with no link between them'], {
     explanation: 'Slide 8.',
   }),
   tf({
@@ -56,13 +56,13 @@ const lesson1: Q[] = [
     explanation: 'Slide 8: hormones are secreted by ductless glands into the extracellular fluid.',
     skill: 'misconception',
   }),
-  mcq('q1-12', 'target-specificity', 'What makes a cell a target for a hormone?', 'It has specific protein receptors for that hormone', ['It is near the gland', 'It has a nucleus', 'It is in the bloodstream'], {
+  mcq('q1-12', 'target-specificity', 'What makes a cell a target for a hormone?', 'It has specific protein receptors for that hormone', ['It lies close to the gland that secretes the hormone', 'It has a nucleus, unlike mature red cells', 'It is in the bloodstream with the hormone'], {
     explanation: 'Slide 9.',
   }),
-  mcq('q1-13', 'target-specificity', 'Where are ACTH receptors normally found (slide 9)?', 'On certain cells of the adrenal cortex', ['On nearly all body cells', 'On red blood cells', 'In the thyroid only'], {
+  mcq('q1-13', 'target-specificity', 'Where are ACTH receptors normally found (slide 9)?', 'On certain cells of the adrenal cortex', ['On nearly all body cells, like thyroxine receptors', 'On red blood cells', 'In the thyroid gland only'], {
     explanation: 'Slide 9.',
   }),
-  mcq('q1-14', 'target-specificity', 'Why do nearly all cells respond to thyroxine?', 'Nearly all cells have thyroxine receptors', ['Thyroxine needs no receptor', 'Thyroxine is made in every cell', 'Thyroxine is a second messenger'], {
+  mcq('q1-14', 'target-specificity', 'Why do nearly all cells respond to thyroxine?', 'Nearly all cells have thyroxine receptors', ['Thyroxine needs no receptor to act', 'Thyroxine is made in every cell', 'Thyroxine is itself a second messenger'], {
     explanation: 'Slide 9: thyroxine is the principal hormonal stimulant of cellular metabolism, and nearly all cells have its receptors.',
   }),
   fill('q1-15', 'target-specificity', 'Hormone–receptor ____ is the crucial first step in hormonal reactions.', ['binding'], {
@@ -101,7 +101,7 @@ const lesson1: Q[] = [
   mcq('q1-23', 'endocrine-glands', 'Which gland is listed only for females?', 'Ovaries', ['Thymus', 'Pineal', 'Adrenals'], {
     explanation: 'Slide 5: ovaries (females), testes (males).',
   }),
-  mcq('q1-24', 'hormone-definition', 'What kind of drainage does the endocrine system have (slide 8)?', 'A rich vascular and lymphatic drainage', ['Ducts opening onto the skin', 'Drainage into the gut', 'None'], {
+  mcq('q1-24', 'hormone-definition', 'What kind of drainage does the endocrine system have (slide 8)?', 'A rich vascular and lymphatic drainage', ['Ducts that open onto the skin', 'Drainage into the lumen of the gut', 'None at all'], {
     explanation: 'Slide 8.',
   }),
   mcq('q1-25', 'target-specificity', 'A drug lowers a hormone receptor’s affinity for its hormone. What happens to the response?', 'It weakens', ['It strengthens', 'Nothing', 'The hormone becomes a second messenger'], {
@@ -167,14 +167,14 @@ const lesson2: Q[] = [
     answer: true,
     explanation: 'Slide 16.',
   }),
-  mcq('q2-17', 'camp-pathway', 'What can an inhibitory G protein do (slide 17)?', 'Inhibit adenylate cyclase', ['Activate DAG', 'Release calcium', 'Bind DNA'], {
+  mcq('q2-17', 'camp-pathway', 'What can an inhibitory G protein do (slide 17)?', 'Inhibit adenylate cyclase', ['Activate diacylglycerol', 'Release calcium from the ER', 'Bind DNA in the nucleus'], {
     explanation: 'Slide 17.',
     difficulty: 'intermediate',
   }),
   multi('q2-18', 'camp-pathway', 'Which responses can protein phosphorylation trigger (slides 15, 17)? Select all that apply.', ['Enzyme activation', 'Cellular secretion', 'Membrane permeability changes', 'Gene activation'], ['Cell death in all cases'], {
     explanation: 'Slides 15 and 17.',
   }),
-  mcq('q2-19', 'ip3-dag-calcium', 'Which molecule does the phospholipase split?', 'PIP₂ (phosphatidylinositol bisphosphate)', ['ATP', 'cAMP', 'Cholesterol'], {
+  mcq('q2-19', 'ip3-dag-calcium', 'Which molecule does the phospholipase split?', 'PIP₂ (phosphatidylinositol bisphosphate)', ['ATP (adenosine triphosphate)', 'cAMP (cyclic AMP)', 'Cholesterol'], {
     explanation: 'Slide 18.',
   }),
   multi('q2-20', 'ip3-dag-calcium', 'Which second messengers come from PIP₂? Select all that apply.', ['DAG', 'IP₃'], ['cAMP', 'Calmodulin'], {
@@ -202,7 +202,7 @@ const lesson2: Q[] = [
     answer: true,
     explanation: 'Slide 18.',
   }),
-  mcq('q2-26', 'hormone-effects', 'Catecholamines appear on both slide 17 and slide 19. What does that suggest?', 'They can act through both cAMP and the PIP₂–calcium system', ['They are steroids', 'They need no receptor', 'They act only on the nucleus'], {
+  mcq('q2-26', 'hormone-effects', 'Catecholamines appear on both slide 17 and slide 19. What does that suggest?', 'They can act through both cAMP and the PIP₂–calcium system', ['They are steroids that act on DNA through nuclear receptors', 'They need no receptor to act', 'They act only on the nucleus'], {
     explanation: 'Slides 17 and 19 list catecholamines for both second-messenger systems.',
     skill: 'pathway-reasoning',
     difficulty: 'advanced',
@@ -223,7 +223,7 @@ const lesson3: Q[] = [
   multi('q3-04', 'steroid-classes', 'What do glucocorticoids do (slide 20)? Select all that apply.', ['Promote protein degradation', 'Promote gluconeogenesis', 'Promote glycogen synthesis', 'Have anti-inflammatory properties'], ['Regulate Na⁺/K⁺ balance (their main role)'], {
     explanation: 'Slide 20. Na⁺/K⁺ balance is the mineralocorticoids’ role.',
   }),
-  mcq('q3-05', 'steroid-classes', 'What do mineralocorticoids regulate?', 'The balance of sodium and potassium in the ECF', ['Blood glucose', 'Sexual differentiation', 'Metabolic rate'], {
+  mcq('q3-05', 'steroid-classes', 'What do mineralocorticoids regulate?', 'The balance of sodium and potassium in the ECF', ['Blood glucose concentration between meals', 'Sexual differentiation', 'The basal metabolic rate'], {
     explanation: 'Slide 20.',
   }),
   match('q3-06', 'steroid-classes', 'Match each hormone to its class.', [
@@ -280,7 +280,7 @@ const lesson3: Q[] = [
     explanation: 'Guyton (p. 956): cholesterol desmolase in the mitochondria.',
     difficulty: 'intermediate',
   }),
-  mcq('q3-19', 'steroid-mechanism', 'How do steroid hormones cross the cell membrane?', 'By simple diffusion — they are small and hydrophobic', ['Through a specific channel', 'By binding a surface G protein', 'By endocytosis only'], {
+  mcq('q3-19', 'steroid-mechanism', 'How do steroid hormones cross the cell membrane?', 'By simple diffusion — they are small and hydrophobic', ['Through a specific protein channel in the membrane', 'By binding a G protein on the cell surface', 'By endocytosis only, in coated vesicles'], {
     explanation: 'Slide 23.',
   }),
   order('q3-20', 'steroid-mechanism', 'Order how a steroid hormone changes a cell.', [

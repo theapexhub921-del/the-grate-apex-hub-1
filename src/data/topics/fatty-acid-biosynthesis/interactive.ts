@@ -95,7 +95,7 @@ export const interactive: Record<string, Steps> = {
       ['It runs in the cytosol — separated from β-oxidation, which runs in the mitochondria.']
     ),
     ask(
-      mcq('c2-02', 'synthesis-location-state', 'In which nutritional state is fatty acid synthesis switched on?', 'The fed state, after a meal', ['Overnight fasting', 'Prolonged starvation', 'Intense exercise'], {
+      mcq('c2-02', 'synthesis-location-state', 'In which nutritional state is fatty acid synthesis switched on?', 'The fed state, after a meal', ['Overnight fasting state', 'Prolonged starvation', 'During intense exercise'], {
         explanation: 'Slide 4: it occurs under fed conditions — extra fuel is stored as fat.',
       })
     ),
@@ -162,7 +162,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 3 — Malonyl-CoA ────────────────────────────────────────
   'fatty-acid-biosynthesis-3': [
     ask(
-      mcq('c3-01', 'acetyl-coa-carboxylase', 'Read the name: what should “acetyl-CoA carboxylase” do?', 'Add a carboxyl group (CO₂) to acetyl-CoA', ['Remove CO₂ from acetyl-CoA', 'Move acetyl-CoA onto ACP', 'Hydrolyse acetyl-CoA'], {
+      mcq('c3-01', 'acetyl-coa-carboxylase', 'Read the name: what should “acetyl-CoA carboxylase” do?', 'Add a carboxyl group (CO₂) to acetyl-CoA', ['Remove CO₂ from acetyl-CoA', 'Move acetyl-CoA onto ACP', 'Hydrolyse acetyl-CoA to acetate'], {
         explanation: 'A carboxylase adds a carboxyl group — the first step activates acetyl-CoA this way.',
         skill: 'prediction',
       }),
@@ -201,7 +201,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c3-05', 'co2-fate', 'What happens to the CO₂ that acetyl-CoA carboxylase added?', 'It leaves again at condensation, driving the new C–C bond', ['It becomes the carboxyl end of palmitate', 'It is released by the thioesterase', 'It stays in the growing chain'], {
+      mcq('c3-05', 'co2-fate', 'What happens to the CO₂ that acetyl-CoA carboxylase added?', 'It leaves again at condensation, driving the new C–C bond', ['It becomes the carboxyl end of palmitate', 'It is released by the thioesterase at the end', 'It stays in the growing chain as a side group'], {
         explanation: 'Slide 7: the CO₂ leaves the malonyl group, and the electrons from its bond attack the acyl group.',
         skill: 'cause-effect',
         difficulty: 'intermediate',
@@ -224,7 +224,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 4 — The synthase complex ───────────────────────────────
   'fatty-acid-biosynthesis-4': [
     ask(
-      mcq('c4-01', 'fas-carriers', 'During synthesis, where is the growing chain?', 'Attached to the fatty acid synthase complex the whole time', ['Free in the cytosol between steps', 'Carried on coenzyme A', 'Bound to the ER membrane'], {
+      mcq('c4-01', 'fas-carriers', 'During synthesis, where is the growing chain?', 'Attached to the fatty acid synthase complex the whole time', ['Free in the cytosol between each step', 'Carried on coenzyme A, released and re-bound between enzymes', 'Bound to the ER membrane throughout'], {
         explanation: 'The chain stays on the synthase’s carriers throughout chain building.',
         skill: 'prediction',
       })
@@ -259,7 +259,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: [...ref([7, 8], [4, 6]), ...leh(791)],
     }),
     ask(
-      mcq('c4-04', 'condensation', 'Acetyl (2 C) + malonyl (3 C) condense and CO₂ is lost. How many carbons does the first product have?', 'Four — acetoacetyl-ACP', ['Five', 'Three', 'Six'], {
+      mcq('c4-04', 'condensation', 'Acetyl (2 C) + malonyl (3 C) condense and CO₂ is lost. How many carbons does the first product have?', 'Four — acetoacetyl-ACP', ['Five — malonyl-acetyl-ACP', 'Three — malonyl-ACP', 'Six — hexanoyl-ACP'], {
         explanation: '2 + 3 − 1 (CO₂) = 4 carbons: acetoacetyl-ACP.',
         skill: 'application',
       })
@@ -321,7 +321,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: [...ref([8, 9, 12], [5, 6, 9]), ...leh(793)],
     }),
     ask(
-      mcq('c5-05', 'acyl-transfer', 'After the second reduction, what frees ACP₂ for the next malonyl group?', 'ACP-acyltransferase moves the chain to the cysteinyl-S of ACP₁', ['The thioesterase releases the chain', 'The chain is transferred to coenzyme A', 'Malonyl-CoA displaces the chain'], {
+      mcq('c5-05', 'acyl-transfer', 'After the second reduction, what frees ACP₂ for the next malonyl group?', 'ACP-acyltransferase moves the chain to the cysteinyl-S of ACP₁', ['The thioesterase releases the finished chain from ACP₂', 'The chain is transferred onto coenzyme A in the cytosol', 'Malonyl-CoA displaces the chain directly from ACP₂'], {
         explanation: 'Slide 9: the acyl group moves from ACP₂ to ACP₁, leaving ACP₂ available.',
         skill: 'pathway-reasoning',
       })
@@ -439,7 +439,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c7-04', 'unsaturated-elongation', 'Why can unsaturated chains longer than C16 still be elongated?', 'A cis double bond kinks the chain, making it effectively shorter', ['They are carried on ACP instead of CoA', 'Unsaturated chains bind NADPH more tightly', 'They are elongated in the nucleus'], {
+      mcq('c7-04', 'unsaturated-elongation', 'Why can unsaturated chains longer than C16 still be elongated?', 'A cis double bond kinks the chain, making it effectively shorter', ['They are carried on ACP instead of coenzyme A', 'Unsaturated chains bind NADPH more tightly', 'They are elongated in the nucleus instead'], {
         explanation: 'Slide 13: the kink of the cis double bond makes them effectively shorter, so they still bind.',
         skill: 'cause-effect',
         difficulty: 'intermediate',
@@ -451,7 +451,7 @@ export const interactive: Record<string, Steps> = {
       'It uses most of the same activities as β-oxidation — but an NADPH-dependent enoyl-CoA reductase replaces the FAD-dependent dehydrogenase.',
     ], { sourceRefs: [...ref([14], [11]), ...leh(797)] }),
     ask(
-      mcq('c7-05', 'mitochondrial-elongation', 'In mitochondrial elongation, what replaces β-oxidation’s FAD-dependent dehydrogenase?', 'An NADPH-dependent enoyl-CoA reductase', ['Ketoacyl-ACP synthase', 'A thioesterase', 'An NAD⁺-dependent hydratase'], {
+      mcq('c7-05', 'mitochondrial-elongation', 'In mitochondrial elongation, what replaces β-oxidation’s FAD-dependent dehydrogenase?', 'An NADPH-dependent enoyl-CoA reductase', ['Ketoacyl-ACP synthase', 'A long-chain thioesterase', 'An NAD⁺-dependent hydratase'], {
         explanation: 'Slide 14: an NADPH-dependent enoyl-CoA reductase replaces the FAD-dependent dehydrogenase.',
       })
     ),

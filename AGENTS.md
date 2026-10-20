@@ -312,6 +312,8 @@ Learning remarks use persistent usage tracking so the same remark should not unn
 
 ## Course content rules
 
+**Answer options must not give the answer away** (owner, 2026-10-20: "the most worded answers tend to be the correct answers"). Write every wrong option as long and specific as the right one (same structure, a swapped term, a plausible qualifier) and vary which option is longest. `tests/question-option-lengths.test.mjs` fails if a correct option is 1.5× longer than every wrong one, if the answer is the longest option in more than half of a topic's questions (35% overall), or if a question repeats an option. Diagram questions use the diagram's own labels and are exempt.
+
 All supplied files for a topic are merged; none is treated as the single authoritative file. Where sources disagree, keep both versions (topic `discrepancies` and a "check" note) instead of correcting them. Material added to a deck after the lecture (speaker notes, comments, pasted images) is labelled as an annotation and is not used in quizzes until confirmed.
 
 ## Navigation

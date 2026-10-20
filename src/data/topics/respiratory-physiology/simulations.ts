@@ -68,7 +68,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'vc', change: 'down' }],
       },
       {
-        question: mcq('s2-03', 'lung-capacities', 'The person breathes with a tidal volume of 1000 ml instead of 500 ml. What happens to the vital capacity?', 'It stays the same — the extra tidal air comes out of the inspiratory reserve', ['It rises by 500 ml, because each breath is bigger', 'It falls by 500 ml, as the reserves are used up'], {
+        question: mcq('s2-03', 'lung-capacities', 'The person breathes with a tidal volume of 1000 ml instead of 500 ml. What happens to the vital capacity?', 'It stays the same — the extra tidal air comes out of the inspiratory reserve', ['It rises by 500 ml, because each breath now moves 500 ml more air into the lungs', 'It falls by 500 ml, as the reserves are used up'], {
           ...predict,
           explanation: 'VC = IRV + TV + ERV. A bigger ordinary breath uses part of the inspiratory reserve; the maximum that can be breathed out is unchanged (slide 20).',
         }),

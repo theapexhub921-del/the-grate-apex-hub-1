@@ -96,7 +96,7 @@ export const interactive: Record<string, Steps> = {
     ], av([43, 44])),
   ],
   'special-senses-8': [
-    ask(mcq('c8-01', 'vestibular-overview', 'Which part of the vestibular system detects angular acceleration (turning the head)?', 'The semicircular canals', ['The utricle', 'The saccule', 'The cochlea'], { explanation: 'Auditory, slide 52.' })),
+    ask(mcq('c8-01', 'vestibular-overview', 'Which part of the vestibular system detects angular acceleration (turning the head)?', 'The semicircular canals', ['The utricle and saccule', 'The saccule', 'The cochlea'], { explanation: 'Auditory, slide 52.' })),
     learn('Why rotation is sensed', ['When the head turns, the endolymph lags behind because of inertia and pushes the cupula, bending the hair cells.'], { sourceRefs: av([56]) }),
     ask(mcq('c8-02', 'semicircular-canals', 'A hair cell’s cilia bend away from the kinocilium. What happens to its nerve fibre?', 'Its resting firing rate falls', ['It fires faster than at rest', 'It stays silent, as it was before', 'It fires only a single spike'], { explanation: 'Auditory, slides 56–57: hair cells release transmitter at rest, so firing can go up or down.', skill: 'prediction' })),
     ask(match('c8-03', 'otolith-organs', 'Match each organ to the motion it senses.', [

@@ -187,7 +187,7 @@ const lesson10: Q[] = [
 
 const lesson11: Q[] = [
   multi('q11-01', 'eukaryotic-control-levels', 'At which levels can eukaryotic gene expression be controlled? Select all that apply.', ['Chromatin', 'Transcription', 'mRNA degradation', 'Post-translational modification'], ['Operon induction'], { explanation: 'GE slide 61.' }),
-  mcq('q11-02', 'eukaryotic-control-levels', 'Cells of a multicellular organism rarely use more than…', '5–10% of their genes at a time', ['50% of their genes', 'All of their genes', 'One gene at a time'], { explanation: 'GE slide 79.' }),
+  mcq('q11-02', 'eukaryotic-control-levels', 'Cells of a multicellular organism rarely use more than…', '5–10% of their genes at a time', ['About 50% of their genes at a time', 'All of their genes', 'One gene at a time'], { explanation: 'GE slide 79.' }),
   mcq('q11-03', 'eukaryotic-control-levels', 'Hox genes…', 'Are master genes controlling development of body parts', ['Encode the histone proteins of chromatin', 'Are found only in bacteria, not in animals', 'Code for the ribosomal RNAs of the cell'], { explanation: 'GE slide 79.' }),
   mcq('q11-04', 'eukaryotic-control-levels', 'Steroid hormone–receptor complexes bind…', 'Hormone response elements in DNA', ['Ribosomes in the cytoplasm', 'The operator of an operon', 'The 5′ caps of mRNA'], { explanation: 'GE slide 80.' }),
   mcq('q11-05', 'chromatin-epigenetics', 'DNase I digests transcriptionally active DNA readily because…', 'It is not shielded by histones', ['It is heavily methylated', 'It is single-stranded', 'It lies in the cytoplasm'], { explanation: 'GE slide 66.', skill: 'cause-effect' }),
@@ -253,7 +253,7 @@ const lesson14: Q[] = [
     ['Minisatellites (VNTRs)', '5 to a few tens of bp'],
   ], { explanation: 'RD slide 35.' }),
   mcq('q14-12', 'gene-therapy', 'Which kind of gene therapy is used in humans?', 'Somatic cell therapy', ['Germ-line cell therapy', 'Enhancement therapy', 'None'], { explanation: 'RD slide 41.' }),
-  mcq('q14-13', 'gene-therapy', 'The SCID gene therapy vector is based on…', 'Moloney murine leukaemia virus (a retrovirus)', ['Adenovirus only (a DNA virus)', 'A yeast artificial chromosome', 'Bacteriophage λ (lambda)'], { explanation: 'RD slide 71.' }),
+  mcq('q14-13', 'gene-therapy', 'The SCID gene therapy vector is based on…', 'Moloney murine leukaemia virus (a retrovirus)', ['Adenovirus only (a non-integrating DNA virus)', 'A yeast artificial chromosome', 'Bacteriophage λ (lambda)'], { explanation: 'RD slide 71.' }),
   multi('q14-14', 'gene-therapy', 'Which are limits of gene therapy? Select all that apply.', ['Retroviral vectors integrate only in dividing cells', 'Vectors can provoke an immune response', 'Insertion can inactivate genes'], ['Vectors carry unlimited DNA'], { explanation: 'RD slide 73.' }),
 ];
 

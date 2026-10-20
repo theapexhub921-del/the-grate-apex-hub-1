@@ -93,11 +93,11 @@ export const interactive: Record<string, Steps> = {
     learn('Narrowest and widest', [
       'Prostatic: widest and most dilatable. Membranous: narrowest, least dilatable and most easily injured.',
     ], { sourceRefs: ur([71]) }),
-    ask(mcq('i5-02', 'male-urethra', 'What opens on the seminal colliculus (verumontanum)?', 'The ejaculatory ducts and prostatic utricle', ['The bulbourethral glands', 'The two ureters', 'The prostatic ducts only'], { explanation: 'Slide 72.' })),
+    ask(mcq('i5-02', 'male-urethra', 'What opens on the seminal colliculus (verumontanum)?', 'The ejaculatory ducts and prostatic utricle', ['The bulbourethral glands and prostatic ducts', 'The two ureters', 'The prostatic ducts only'], { explanation: 'Slide 72.' })),
     learn('Why women get more UTIs', [
       'The female urethra is only 3–4 cm and distensible, so bacteria reach the bladder easily — but catheterisation is easier.',
     ], { sourceRefs: ur([70]) }),
-    ask(mcq('i5-03', 'urethra-supply-incontinence', 'Why are infants physiologically incontinent?', 'Their corticospinal tracts to the external sphincter are not yet myelinated', ['Their bladder has no detrusor muscle yet', 'They lack a trigone until about two years', 'Their pudendal nerve is absent at birth'], { explanation: 'Slide 75.', skill: 'cause-effect' })),
+    ask(mcq('i5-03', 'urethra-supply-incontinence', 'Why are infants physiologically incontinent?', 'Their corticospinal tracts to the external sphincter are not yet myelinated', ['Their bladder has no detrusor muscle yet, so it cannot contract on demand', 'They lack a trigone until about two years', 'Their pudendal nerve is absent at birth'], { explanation: 'Slide 75.', skill: 'cause-effect' })),
     recall('r5-01', 'urethra-supply-incontinence', 'Describe the lymph drainage of the male urethra.', [
       'Prostatic and membranous parts: internal iliac nodes.',
       'Spongy part: inguinal nodes, with some to the external iliac nodes.',

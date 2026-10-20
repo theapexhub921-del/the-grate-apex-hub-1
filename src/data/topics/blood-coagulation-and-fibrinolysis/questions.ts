@@ -281,7 +281,7 @@ const lesson3: Q[] = [
     answer: true,
     explanation: 'Slide 39.',
   }),
-  mcq('q3-12', 'vitamin-k-gla', 'When does γ-carboxylation of these factors happen?', 'After translation (post-translational)', ['During transcription', 'After the clot forms', 'Inside the platelet'], {
+  mcq('q3-12', 'vitamin-k-gla', 'When does γ-carboxylation of these factors happen?', 'After translation (post-translational)', ['During transcription of the factor genes', 'After the clot forms', 'Inside the platelet'], {
     explanation: 'Slide 38.',
   }),
   multi('q3-13', 'vitamin-k-gla', 'What are dicoumarol and warfarin used as (slide 41)? Select all that apply.', ['Anticoagulants', 'Rat poisons'], ['Thrombolytics', 'Vitamin K supplements'], {
@@ -375,7 +375,7 @@ const lesson4: Q[] = [
   mcq('q4-10', 'plasmin-activators', 'What is the inactive precursor of plasmin?', 'Plasminogen', ['Prothrombin', 'Fibrinogen', 'Prekallikrein'], {
     explanation: 'Slide 65.',
   }),
-  mcq('q4-11', 'plasmin-activators', 'What does plasmin do to fibrin?', 'Breaks it into small soluble peptides (fibrin degradation products)', ['Cross-links it with factor XIIIa', 'Converts it back into fibrinogen', 'Adds calcium to strengthen it'], {
+  mcq('q4-11', 'plasmin-activators', 'What does plasmin do to fibrin?', 'Breaks it into small soluble peptides (fibrin degradation products)', ['Cross-links it with factor XIIIa', 'Converts it back into soluble fibrinogen, which re-enters the blood', 'Adds calcium to strengthen it'], {
     explanation: 'Slides 68–69.',
   }),
   multi('q4-12', 'plasmin-activators', 'Which are plasminogen activators (slides 66, 69)? Select all that apply.', ['Tissue plasminogen activator (TPA)', 'Urokinase', 'Streptokinase', 'Factor XIIa + kallikrein'], ['Heparin', 'Warfarin'], {
@@ -427,7 +427,7 @@ const lesson4: Q[] = [
     'PGH₂',
     'Thromboxane A₂',
   ], { explanation: 'Slide 74: COX converts arachidonic acid to PGG₂ and PGH₂; then TXA₂.' }),
-  mcq('q4-25', 'antiplatelet-thrombolytics', 'When is streptokinase given (slide 77)?', 'Soon after a heart attack, and for pulmonary embolism or deep venous thrombosis', ['To reverse the effect of warfarin before surgery', 'To treat bleeding in haemophilia A and B', 'To prevent vitamin K deficiency in newborn babies'], {
+  mcq('q4-25', 'antiplatelet-thrombolytics', 'When is streptokinase given (slide 77)?', 'Soon after a heart attack, and for pulmonary embolism or deep venous thrombosis', ['To reverse the effect of warfarin before surgery', 'To treat bleeding in haemophilia A and B', 'To prevent bleeding from vitamin K deficiency in newborn babies and after liver disease'], {
     explanation: 'Slide 77.',
     clinical: true,
   }),

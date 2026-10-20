@@ -271,7 +271,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: [...ref([13]), ...leh(826)],
     }),
     ask(
-      mcq('c4-02', 'supply-mechanisms', 'Which enzyme deals with excess intracellular FREE cholesterol?', 'ACAT (acyl-CoA:cholesterol acyltransferase)', ['HMG-CoA reductase (HMGR)', '7α-Hydroxylase (CYP7A1)', 'AMP-activated protein kinase'], {
+      mcq('c4-02', 'supply-mechanisms', 'Which enzyme deals with excess intracellular FREE cholesterol?', 'ACAT (acyl-CoA:cholesterol acyltransferase)', ['HMG-CoA reductase (HMGR)', '7α-Hydroxylase (CYP7A1)', 'AMP-activated protein kinase (AMPK)'], {
         explanation: 'Slide 13: excess intracellular free cholesterol is regulated through ACAT. (Lehninger: ACAT esterifies cholesterol for storage.)',
       })
     ),

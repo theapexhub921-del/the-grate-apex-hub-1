@@ -10,7 +10,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 1 — The endocrine system ───────────────────────────────
   'hormones-endocrine-biochemistry-1': [
     ask(
-      mcq('c1-01', 'hormone-definition', 'Before you start: how does a hormone reach its target?', 'It is secreted by a ductless gland into the extracellular fluid and carried in the blood', ['It travels along a nerve fibre', 'It passes through a duct onto a surface', 'It stays inside the cell that made it'], {
+      mcq('c1-01', 'hormone-definition', 'Before you start: how does a hormone reach its target?', 'It is secreted by a ductless gland into the extracellular fluid and carried in the blood', ['It travels along a nerve fibre and is released onto the target at a synapse', 'It passes through a duct onto an epithelial surface such as the gut lining', 'It stays inside the cell that made it and acts only on that cell'], {
         explanation: 'Slide 8: hormones are secreted by ductless glands into the extracellular fluid; the endocrine system has a rich vascular and lymphatic drainage.',
         skill: 'prediction',
       })
@@ -57,7 +57,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 2 — Classes and second messengers ──────────────────────
   'hormones-endocrine-biochemistry-2': [
     ask(
-      mcq('c2-01', 'hormone-effects', 'Peptide hormones cannot easily cross the cell membrane. How do you expect them to act?', 'Through receptors on the cell surface that trigger second messengers inside', ['By diffusing into the nucleus', 'By dissolving the membrane', 'By being taken up and stored in the cell'], {
+      mcq('c2-01', 'hormone-effects', 'Peptide hormones cannot easily cross the cell membrane. How do you expect them to act?', 'Through receptors on the cell surface that trigger second messengers inside', ['By diffusing through the membrane into the nucleus', 'By dissolving part of the membrane to enter the cell', 'By being taken up and stored in the cell until needed'], {
         explanation: 'Slide 14: peptide hormones use G proteins and second messengers; lipid-soluble steroids act on genes directly.',
         skill: 'prediction',
       })
@@ -95,7 +95,7 @@ export const interactive: Record<string, Steps> = {
       'A phospholipase splits PIP₂ into DAG and IP₃. DAG activates protein kinases; IP₃ releases Ca²⁺ from the ER; Ca²⁺ (alone or with calmodulin) is the third messenger.',
     ], { sourceRefs: ref([18, 19]) }),
     ask(
-      mcq('c2-04', 'ip3-dag-calcium', 'What does IP₃ do?', 'Releases Ca²⁺ from the endoplasmic reticulum', ['Activates adenylate cyclase', 'Binds DNA', 'Hydrolyses GTP'], {
+      mcq('c2-04', 'ip3-dag-calcium', 'What does IP₃ do?', 'Releases Ca²⁺ from the endoplasmic reticulum', ['Activates adenylate cyclase in the membrane', 'Binds DNA and switches on transcription', 'Hydrolyses GTP on the G protein'], {
         explanation: 'Slide 18.',
       })
     ),
@@ -150,7 +150,7 @@ export const interactive: Record<string, Steps> = {
       ], { explanation: 'Slides 25–26.' })
     ),
     ask(
-      mcq('c3-05', 'steroid-mechanism', 'How do steroid hormones mainly change a cell’s behaviour?', 'The hormone–receptor complex binds chromatin and switches on transcription', ['They raise cAMP', 'They open ion channels on the surface', 'They split PIP₂'], {
+      mcq('c3-05', 'steroid-mechanism', 'How do steroid hormones mainly change a cell’s behaviour?', 'The hormone–receptor complex binds chromatin and switches on transcription', ['They raise cAMP through a surface G protein, which then activates protein kinase A', 'They open ion channels on the cell surface', 'They split PIP₂ through phospholipase C'], {
         explanation: 'Slide 23.',
       })
     ),

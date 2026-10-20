@@ -391,7 +391,7 @@ const lesson4: Q[] = [
   mcq('q4-06', 'liver-vs-red-cells', 'What share of total haem synthesis occurs in immature red cells?', 'About 85%', ['About 15%', 'About 50%', 'Nearly 100%'], {
     explanation: 'Slide 28.',
   }),
-  mcq('q4-07', 'liver-vs-red-cells', 'What is liver haem mainly used for?', 'Cytochrome P450 enzymes involved in detoxification', ['Haemoglobin for the red cells', 'Myoglobin for storage of O₂', 'Bilirubin for excretion in bile'], {
+  mcq('q4-07', 'liver-vs-red-cells', 'What is liver haem mainly used for?', 'Cytochrome P450 enzymes involved in detoxification', ['Haemoglobin for the red cells made in the bone marrow', 'Myoglobin for storage of O₂', 'Bilirubin for excretion in bile'], {
     explanation: 'Slide 27.',
   }),
   tf({
@@ -765,7 +765,7 @@ const lesson7: Q[] = [
   mcq('q7-13', 'intestinal-fate', 'What are urobilinogens?', 'Colourless linear tetrapyrroles made by reducing bilirubin', ['Coloured cyclic porphyrins made by oxidising bilirubin', 'Conjugated bilirubins excreted in the urine', 'Iron-containing pigments of the stool'], {
     explanation: 'Slide 11.',
   }),
-  mcq('q7-14', 'intestinal-fate', 'Urobilinogens are oxidised to what?', 'Coloured urobilins (stercobilins)', ['Colourless bilirubin', 'Green biliverdin', 'Haem (in the gut)'], {
+  mcq('q7-14', 'intestinal-fate', 'Urobilinogens are oxidised to what?', 'Coloured urobilins (stercobilins)', ['Colourless bilirubin', 'Green biliverdin (in the colon)', 'Haem (in the gut)'], {
     explanation: 'Slide 11.',
   }),
   fill('q7-15', 'intestinal-fate', 'Reabsorption of urobilinogen and its return to the liver is called ____ recirculation.', ['enterohepatic', 'entero-hepatic'], {

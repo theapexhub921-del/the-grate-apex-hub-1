@@ -135,7 +135,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 3 — Synthesis II ───────────────────────────────────────
   'heme-metabolism-3': [
     ask(
-      mcq('c3-01', 'urogen-decarboxylase', 'Uroporphyrinogen has acetate side chains; coproporphyrinogen has methyls in their place. What reaction makes that change?', 'Decarboxylation (removing CO₂)', ['Reduction with NADPH', 'Hydrolysis by water', 'Transamination (PLP)'], {
+      mcq('c3-01', 'urogen-decarboxylase', 'Uroporphyrinogen has acetate side chains; coproporphyrinogen has methyls in their place. What reaction makes that change?', 'Decarboxylation (removing CO₂)', ['Reduction (adding hydrogen from NADPH)', 'Hydrolysis by water', 'Transamination (PLP)'], {
         explanation: 'Slide 24: uroporphyrinogen decarboxylase removes CO₂ from the four acetate side chains, leaving methyl groups.',
         skill: 'prediction',
       })

@@ -195,7 +195,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c4-06', 'referred-pain', 'A patient with a headache asks why “the brain hurts”. Which statement is correct?', 'The brain itself is insensitive; the pain comes from structures like the venous sinuses, tentorium and meninges', ['Neurons in the cerebral cortex carry many pain receptors of their own', 'Headache is always caused by a tumour pressing on the brain tissue', 'Headache travels to the cortex in the dorsal columns of the cord'], {
+      mcq('c4-06', 'referred-pain', 'A patient with a headache asks why “the brain hurts”. Which statement is correct?', 'The brain itself is insensitive; the pain comes from structures like the venous sinuses, tentorium and meninges', ['Neurons in the cerebral cortex carry many pain receptors of their own, so any swelling of the brain itself hurts', 'Headache is always caused by a tumour pressing on the brain tissue', 'Headache travels to the cortex in the dorsal columns of the cord'], {
         explanation: 'Sensory II, p. 28: headache is usually referred pain from deep structures.',
         clinical: true,
       })

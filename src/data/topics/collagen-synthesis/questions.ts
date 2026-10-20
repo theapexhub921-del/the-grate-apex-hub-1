@@ -212,7 +212,7 @@ const lesson2: Q[] = [
 
 // ─── Lesson 3 — Hydroxylation and glycosylation ─────────────────────
 const lesson3: Q[] = [
-  mcq('q3-01', 'synthesis-overview', 'Which steps of collagen synthesis happen inside the fibroblast (slide 33)?', 'Polypeptide synthesis, hydroxylation and glycosylation, triple-helix formation, then secretion', ['Cross-linking and the assembly of molecules into fibres', 'Hydrolysis of the procollagen extension peptides only', 'All seven steps, from translation to cross-linking'], {
+  mcq('q3-01', 'synthesis-overview', 'Which steps of collagen synthesis happen inside the fibroblast (slide 33)?', 'Polypeptide synthesis, hydroxylation and glycosylation, triple-helix formation, then secretion', ['Cross-linking by lysyl oxidase, cleavage of the propeptides and assembly into fibres', 'Hydrolysis of the procollagen extension peptides only', 'All seven steps, from translation to cross-linking'], {
     explanation: 'Slide 33.',
   }),
   mcq('q3-02', 'synthesis-overview', 'What is formed when the extra peptide bonds of procollagen are hydrolysed?', 'Tropocollagen', ['Elastin', 'Gelatin', 'Fibronectin (a glycoprotein)'], {

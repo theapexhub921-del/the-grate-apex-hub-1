@@ -61,7 +61,7 @@ export const interactive: Record<string, Steps> = {
 
   'endocrinology-3': [
     ask(
-      mcq('c3-01', 'gh-actions', 'Growth hormone mostly acts through which mediators?', 'Somatomedins (insulin-like growth factors) from the liver', ['Thyroxine released from the thyroid', 'Cortisol from the adrenal cortex', 'Prolactin from the anterior pituitary'], { explanation: 'Introduction, p. 32.' })
+      mcq('c3-01', 'gh-actions', 'Growth hormone mostly acts through which mediators?', 'Somatomedins (insulin-like growth factors) from the liver', ['Thyroxine released from the thyroid', 'Cortisol (glucocorticoid) from the adrenal cortex', 'Prolactin from the anterior pituitary'], { explanation: 'Introduction, p. 32.' })
     ),
     learn('GH and glucose', ['GH spares glucose: less glucose used for energy, less uptake by muscle, more output by the liver. It is diabetogenic.'], { sourceRefs: intro([30]) }),
     ask(

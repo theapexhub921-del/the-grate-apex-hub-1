@@ -75,7 +75,7 @@ const lesson4: Q[] = [
 ];
 
 const lesson5: Q[] = [
-  mcq('q5-01', 'female-organs', 'What connects the ovaries to the uterus?', 'The fallopian (uterine) tubes', ['The vagina', 'The cervix', 'The broad ligament'], { explanation: 'Female, slide 1.' }),
+  mcq('q5-01', 'female-organs', 'What connects the ovaries to the uterus?', 'The fallopian (uterine) tubes', ['The vagina', 'The cervix', 'The broad ligament (mesovarium)'], { explanation: 'Female, slide 1.' }),
   multi('q5-02', 'female-organs', 'Which make up the vulva? Select all that apply.', ['Mons pubis', 'Labia majora and minora', 'Clitoris', 'Greater vestibular glands'], ['Cervix'], { explanation: 'Female, slide 2.' }),
   mcq('q5-03', 'ovary', 'The ovary is covered by…', 'Simple cuboidal germinal epithelium', ['Stratified squamous epithelium', 'Peritoneum only, with no epithelium', 'Ciliated simple columnar epithelium'], { explanation: 'Female, slide 5.' }),
   mcq('q5-04', 'ovary', 'Where are the follicles?', 'In the ovarian cortex', ['In the medulla', 'In the tunica albuginea', 'In the fallopian tube'], { explanation: 'Female, slides 5–6.' }),
@@ -138,7 +138,7 @@ const lesson8: Q[] = [
   mcq('q8-11', 'erection', 'NO causes erection by activating…', 'Guanylate cyclase, raising cGMP', ['Adenylate cyclase, raising cAMP', 'Phospholipase C', 'Myosin light-chain kinase'], { explanation: 'Sexual Response, slides 32–33.' }),
   multi('q8-12', 'erection', 'Which raise cAMP in cavernous smooth muscle? Select all that apply.', ['VIP', 'PGE1'], ['NO', 'Noradrenaline'], { explanation: 'Sexual Response, slide 34.' }),
   mcq('q8-13', 'erection', 'Why is blood trapped in the corpora cavernosa?', 'Venules are compressed against the tunica albuginea', ['Valves close in the deep dorsal vein', 'The helicine arteries constrict', 'Blood clots in the sinusoids'], { explanation: 'Sexual Response, slide 27.' }),
-  mcq('q8-14', 'erection', 'How does erection end?', 'Increased adrenergic activity constricting the smooth muscle', ['More NO release from the nerves', 'Increased parasympathetic activity', 'Rising cGMP in the smooth muscle'], { explanation: 'Sexual Response, slide 38.' }),
+  mcq('q8-14', 'erection', 'How does erection end?', 'Increased adrenergic activity constricting the smooth muscle', ['More NO release from the nerves, relaxing the smooth muscle further', 'Increased parasympathetic activity', 'Rising cGMP in the smooth muscle'], { explanation: 'Sexual Response, slide 38.' }),
 ];
 
 const lesson9: Q[] = [

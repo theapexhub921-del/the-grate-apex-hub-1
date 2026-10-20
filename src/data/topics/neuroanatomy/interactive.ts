@@ -168,7 +168,7 @@ export const interactive: Record<string, Steps> = {
       ['Subdural space', 'Bridging veins'],
       ['Subarachnoid space', 'Cerebrospinal fluid'],
     ], { explanation: 'Slides 56–57.' })),
-    ask(mcq('i8-02', 'meningeal-spaces-cisterns', 'Which cistern can be tapped for CSF by suboccipital puncture?', 'Cerebellomedullary cistern (cisterna magna)', ['Pontine (prepontine) cistern', 'Interpeduncular cistern', 'Ambient (superior) cistern'], { explanation: 'Slide 62.' })),
+    ask(mcq('i8-02', 'meningeal-spaces-cisterns', 'Which cistern can be tapped for CSF by suboccipital puncture?', 'Cerebellomedullary cistern (cisterna magna)', ['Pontine cistern (in front of the pons)', 'Interpeduncular cistern', 'Ambient (superior) cistern'], { explanation: 'Slide 62.' })),
     learn('Arterial vs venous bleeds', [
       'Epidural haematoma: torn meningeal artery after a skull fracture. Subdural haematoma: torn bridging veins after severe head trauma.',
     ], { sourceRefs: men([67, 70]) }),

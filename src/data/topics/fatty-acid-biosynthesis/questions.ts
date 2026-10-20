@@ -258,7 +258,7 @@ const lesson2: Q[] = [
     options: [
       'It is reversed — NADPH is used, as the more powerful reducing agent',
       'Nothing — the statement is correct',
-      'Synthesis uses no reducing agent',
+      'It is reversed — synthesis uses no reducing agent; β-oxidation uses FADH₂',
       'Synthesis uses ATP as its reducing agent',
     ],
     answer: 0,
@@ -421,7 +421,7 @@ const lesson3: Q[] = [
     id: 'q3-14', type: 'choice', conceptId: 'co2-fate', skill: 'recall', label: 'Recall',
     prompt: 'What happens later to the CO₂ added in the first step?',
     options: [
-      'It becomes carbon 1 of palmitate',
+      'It stays in the chain and becomes carbon 1 of palmitate',
       'It is used to make citrate',
       'It leaves again when malonyl condenses with the acyl group',
       'It is stored on ACP₁',
@@ -578,7 +578,7 @@ const lesson4: Q[] = [
     options: [
       'Acetyl-CoA:ACP transacylase loads acetyl onto ACP₁; the malonyl enzyme loads malonyl onto ACP₂',
       'Nothing — the statement is correct',
-      'Acetyl groups are loaded onto ACP₂',
+      'Acetyl groups are loaded onto ACP₂ by the malonyl enzyme, and malonyl onto ACP₁',
       'Acetyl groups are not loaded at all',
     ],
     answer: 0,
@@ -624,7 +624,7 @@ const lesson4: Q[] = [
     prompt: 'Acetyl is on ACP₁ and malonyl is on ACP₂. What happens next?',
     options: [
       'CO₂ leaves the malonyl group and a C–C bond forms with the acyl group on ACP₁',
-      'The acetyl group is released as acetate',
+      'The acetyl group is released as acetate and the malonyl group moves onto ACP₁',
       'NADPH reduces the malonyl group',
       'Thioesterase releases palmitate',
     ],
@@ -701,7 +701,7 @@ const lesson5: Q[] = [
     options: [
       'Dehydration removes water; the two reductions use NADPH',
       'Nothing — the statement is correct',
-      'Dehydration uses FADH₂',
+      'Dehydration uses FADH₂; the reductions use NADH',
       'Dehydration adds CO₂',
     ],
     answer: 0,
@@ -758,7 +758,7 @@ const lesson5: Q[] = [
     prompt: 'Why is the acyl group moved back to ACP₁?',
     options: [
       'To leave ACP₂ free to pick up the next malonyl group',
-      'To release the fatty acid',
+      'To release the finished fatty acid from the complex',
       'To reduce it with NADPH',
       'To export it from the cell',
     ],
@@ -792,7 +792,7 @@ const lesson5: Q[] = [
       'Reduces the double bond, giving a fully saturated chain',
       'Releases the finished chain',
       'Adds the malonyl group',
-      'Reduces the β-keto group',
+      'Reduces the β-keto group, giving a β-hydroxy chain',
     ],
     answer: 0,
     explanation: 'Enoyl reductase gives the fully saturated carbon chain.',
@@ -802,7 +802,7 @@ const lesson5: Q[] = [
     prompt: 'While moving between active sites, the growing chain is attached to…',
     options: [
       'The phosphopantetheine prosthetic group of the acyl carrier protein',
-      'Coenzyme A',
+      'The coenzyme A bound to the ketoacyl synthase',
       'Citrate',
       'The thioesterase',
     ],
@@ -834,7 +834,7 @@ const lesson5: Q[] = [
     prompt: 'According to the diagram, where does palmitoyl-ACP go in E. coli?',
     options: [
       'To triacylglycerol and phospholipid synthesis',
-      'To β-oxidation',
+      'To β-oxidation in the mitochondria',
       'To the ER for elongation',
       'To citrate formation',
     ],
@@ -869,7 +869,7 @@ const lesson5: Q[] = [
     prompt: 'If NADPH ran out, which steps of the cycle would stop?',
     options: [
       'Both reductions (the β-keto group and the enoyl group)',
-      'Only the dehydration',
+      'Only the dehydration (removing water)',
       'Only the condensation',
       'Only the release by thioesterase',
     ],
@@ -904,7 +904,7 @@ const lesson6: Q[] = [
   {
     id: 'q6-04', type: 'choice', conceptId: 'beta-oxidation-reactions', skill: 'recall', label: 'Recall',
     prompt: 'Which intermediate does L-3-hydroxyacyl-CoA dehydrogenase produce?',
-    options: ['2-trans-Enoyl-CoA', 'Acyl-CoA', '3-Oxoacyl-CoA (β-ketoacyl-CoA)', 'Malonyl-CoA'],
+    options: ['2-trans-Enoyl-CoA (Δ²-enoyl)', 'Acyl-CoA', '3-Oxoacyl-CoA (β-ketoacyl-CoA)', 'Malonyl-CoA'],
     answer: 2,
     explanation: '3-Oxoacyl-CoA, also called β-ketoacyl-CoA.',
   },
@@ -979,7 +979,7 @@ const lesson6: Q[] = [
     prompt: 'Which describes the direction of each pathway?',
     options: [
       'β-Oxidation removes two carbons as acetyl-CoA; synthesis adds two carbons per cycle from malonyl',
-      'Both add two carbons per cycle',
+      'Both add two carbons per cycle, from malonyl-CoA in synthesis and acetyl-CoA in β-oxidation',
       'β-Oxidation adds carbons; synthesis removes them',
       'Both remove carbons as CO₂',
     ],
@@ -1177,7 +1177,7 @@ const lesson7: Q[] = [
     options: [
       'The kink of the cis double bond makes them effectively shorter',
       'They lack a carboxyl group',
-      'They are activated by biotin',
+      'They are activated by biotin, like acetyl-CoA carboxylase',
       'They are elongated in the nucleus instead',
     ],
     answer: 0,
@@ -1200,14 +1200,14 @@ const lesson7: Q[] = [
   {
     id: 'q7-16', type: 'choice', conceptId: 'mitochondrial-elongation', skill: 'recall', label: 'Recall',
     prompt: 'What is the mitochondrial elongation system probably for?',
-    options: ['Providing long fatty acids for mitochondrial structure', 'Making palmitate', 'Making NADPH', 'Exporting citrate'],
+    options: ['Providing long fatty acids for mitochondrial structure', 'Making palmitate for export to the cytosol', 'Making NADPH', 'Exporting citrate'],
     answer: 0,
     explanation: 'Probably for long fatty acids for mitochondrial structure.',
   },
   {
     id: 'q7-17', type: 'choice', conceptId: 'mitochondrial-elongation', skill: 'comparison', label: 'Compare',
     prompt: 'In mitochondrial elongation, what replaces the FAD-dependent dehydrogenase of β-oxidation?',
-    options: ['An NADPH-dependent enoyl-CoA reductase', 'Malic enzyme', 'Thioesterase', 'Citrate synthase'],
+    options: ['An NADPH-dependent enoyl-CoA reductase', 'An FAD-dependent acyl-CoA dehydrogenase', 'Thioesterase', 'Citrate synthase'],
     answer: 0,
     explanation: 'An NADPH-dependent enoyl-CoA reductase.',
   },
@@ -1231,7 +1231,7 @@ const lesson8: Q[] = [
   {
     id: 'q8-01', type: 'choice', conceptId: 'transport-problem', skill: 'recall', label: 'Recall',
     prompt: 'Why can’t mitochondrial acetyl-CoA be used directly for fatty acid synthesis?',
-    options: ['It can’t cross the inner mitochondrial membrane', 'It is destroyed by malic enzyme', 'It is only made on the ER', 'It must first become palmitate'],
+    options: ['It can’t cross the inner mitochondrial membrane', 'It is destroyed by malic enzyme in the cytosol', 'It is only made on the ER', 'It must first become palmitate'],
     answer: 0,
     explanation: 'Acetyl-CoA is made in the mitochondria and can’t cross the inner membrane.',
   },
@@ -1307,7 +1307,7 @@ const lesson8: Q[] = [
     prompt: 'Why must the oxaloacetate left in the cytosol be regenerated?',
     options: [
       'It must be returned to the mitosol to accept more acetyl-CoA',
-      'It is toxic in the cytosol',
+      'It is toxic in the cytosol and must be removed',
       'It is needed to make NADH',
       'It is the substrate of thioesterase',
     ],

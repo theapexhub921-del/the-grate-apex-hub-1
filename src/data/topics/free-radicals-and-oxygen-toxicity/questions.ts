@@ -25,7 +25,7 @@ const lesson1: Q[] = [
 ];
 
 const lesson2: Q[] = [
-  mcq('q2-01', 'radical-reactions', 'Most superoxide in the body is…', 'Dismutated to hydrogen peroxide, non-enzymatically or by SOD', ['Excreted unchanged in the urine', 'Converted to ATP in the mitochondria', 'Stored in lysosomes until needed'], { explanation: 'HB slide 15.' }),
+  mcq('q2-01', 'radical-reactions', 'Most superoxide in the body is…', 'Dismutated to hydrogen peroxide, non-enzymatically or by SOD', ['Excreted unchanged in the urine', 'Converted to ATP in the mitochondria by cytochrome oxidase', 'Stored in lysosomes until needed'], { explanation: 'HB slide 15.' }),
   mcq('q2-02', 'radical-reactions', 'Why does a radical in the body usually react with a non-radical?', 'Most molecules in the body are not radicals', ['Radicals repel each other', 'Non-radicals are charged', 'Antioxidants prevent radical–radical reactions'], { explanation: 'HB slide 21.' }),
   mcq('q2-03', 'radical-reactions', 'Radical attack on DNA causes…', 'Mutation', ['Lipid peroxidation', 'Foam cells', 'Haemolysis'], { explanation: 'HB slide 21.' }),
   match('q2-04', 'major-ros', 'Match each symbol to its name.', [
@@ -34,7 +34,7 @@ const lesson2: Q[] = [
     ['¹O₂', 'Singlet oxygen'],
     ['ONOO⁻', 'Peroxynitrite'],
   ], { explanation: 'HB slide 34.' }),
-  mcq('q2-05', 'major-ros', 'The major source of superoxide in vivo is…', 'Electron leakage from the mitochondrial transport chain', ['Catalase in the peroxisomes', 'Fat in the diet', 'The kidney tubules'], { explanation: 'HB slide 35.' }),
+  mcq('q2-05', 'major-ros', 'The major source of superoxide in vivo is…', 'Electron leakage from the mitochondrial transport chain', ['Catalase activity in the peroxisomes of the liver', 'Fat in the diet', 'The kidney tubules'], { explanation: 'HB slide 35.' }),
   tf({ id: 'q2-06', conceptId: 'major-ros', statement: 'Hydrogen peroxide is a free radical.', answer: false, explanation: 'HB slide 35: it is a ROS but not a radical.', skill: 'misconception' }),
   mcq('q2-07', 'major-ros', 'The main significance of hydrogen peroxide is that it…', 'Is the main source of hydroxyl radicals in the presence of transition metals', ['Is extremely reactive itself and attacks DNA directly', 'Is an antioxidant that protects the membranes', 'Makes ATP when it is broken down by catalase'], { explanation: 'HB slide 35.' }),
   multi('q2-08', 'major-ros', 'How is singlet oxygen generated? Select all that apply.', ['Input of energy such as radiation', 'Peroxidases or lipoxygenases', 'The respiratory burst'], ['Catalase'], { explanation: 'HB slide 36.' }),
@@ -62,7 +62,7 @@ const lesson3: Q[] = [
 
 const lesson4: Q[] = [
   mcq('q4-01', 'antioxidant-action', 'An antioxidant neutralises a free radical by…', 'Donating an electron while staying stable itself', ['Accepting a proton from the radical', 'Splitting water into H and OH', 'Binding oxygen so it cannot react'], { explanation: 'HB slide 47.' }),
-  mcq('q4-02', 'antioxidant-action', 'Serum antioxidant activity is measured as…', '% inhibition of lipid peroxidation in a standard brain homogenate', ['The vitamin C level in the blood', 'Malondialdehyde measured in the urine', 'The red cell count and haemoglobin'], { explanation: 'HB slide 38.' }),
+  mcq('q4-02', 'antioxidant-action', 'Serum antioxidant activity is measured as…', '% inhibition of lipid peroxidation in a standard brain homogenate', ['The vitamin C level in the blood', 'Malondialdehyde measured in the urine over 24 hours', 'The red cell count and haemoglobin'], { explanation: 'HB slide 38.' }),
   multi('q4-03', 'antioxidant-action', 'What makes a good antioxidant? Select all that apply.', ['Relatively unreactive as a radical', 'Repaired rapidly', 'Decays to harmless products'], ['Highly reactive'], { explanation: 'HB slide 50.' }),
   mcq('q4-04', 'antioxidant-action', 'α-Tocopherol works mainly by…', 'Chain breaking in the lipid phase', ['Chelating iron in the plasma', 'Dismutating superoxide', 'Removing H₂O₂ in the cytosol'], { explanation: 'HB slide 39.' }),
   mcq('q4-05', 'antioxidant-action', 'Which protein sequesters copper?', 'Caeruloplasmin', ['Transferrin', 'Ferritin', 'Lactoferrin'], { explanation: 'HB slides 39, 43.' }),

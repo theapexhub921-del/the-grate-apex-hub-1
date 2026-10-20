@@ -13,7 +13,7 @@ type Q = QuestionDraft<ConceptId>;
 const lesson1: Q[] = [
   mcq('q1-01', 'immunity-definition', 'The word immunity comes from the Latin immunis, meaning…', 'Exempt', ['Defence', 'Blood', 'Cell'], { explanation: 'IN slide 3.', skill: 'terminology' }),
   mcq('q1-02', 'immunity-definition', 'The earliest recorded observation of immunity (430 BC, Athens) was that…', 'People who recovered from plague could nurse the sick without reinfection', ['Milkmaids who caught cowpox were protected from smallpox', 'Serum from immune animals neutralised bacterial toxins', 'Phagocytes were seen engulfing and digesting bacteria'], { explanation: 'IN slide 3.' }),
-  mcq('q1-03', 'vaccination-history', 'Who introduced variolation to Britain after seeing it in Constantinople?', 'Lady Mary Wortley Montagu', ['Edward Jenner', 'Louis Pasteur', 'Robert Koch'], { explanation: 'IN slide 8.' }),
+  mcq('q1-03', 'vaccination-history', 'Who introduced variolation to Britain after seeing it in Constantinople?', 'Lady Mary Wortley Montagu', ['Edward Jenner (a country doctor)', 'Louis Pasteur', 'Robert Koch'], { explanation: 'IN slide 8.' }),
   mcq('q1-04', 'vaccination-history', 'Who is called the Father of Immunology?', 'Edward Jenner', ['Louis Pasteur', 'Paul Ehrlich', 'Elie Metchnikoff'], { explanation: 'IN slide 21.' }),
   mcq('q1-05', 'vaccination-history', 'Pasteur’s 1881 Pouilly-le-Fort experiment used a vaccine against…', 'Anthrax', ['Rabies', 'Smallpox', 'Diphtheria'], { explanation: 'IN slide 11.' }),
   mcq('q1-06', 'vaccination-history', 'Joseph Meister was the first human given Pasteur’s vaccine against…', 'Rabies', ['Anthrax', 'Fowl cholera', 'Smallpox'], { explanation: 'IN slide 11.' }),
@@ -131,7 +131,7 @@ const lesson6: Q[] = [
 
 const lesson7: Q[] = [
   mcq('q7-01', 'ig-structure', 'Each light chain weighs about…', '23 kDa', ['50 kDa', '150 kDa', '5 kDa'], { explanation: 'AB slide 6; IG22 slide 11.' }),
-  mcq('q7-02', 'ig-structure', 'The antigen-binding site is formed by the…', 'Hypervariable regions (CDRs)', ['Hinge region', 'Fc region', 'J chain'], { explanation: 'IG22 slide 32.' }),
+  mcq('q7-02', 'ig-structure', 'The antigen-binding site is formed by the…', 'Hypervariable regions (CDRs)', ['Hinge region', 'Fc region (constant domains)', 'J chain'], { explanation: 'IG22 slide 32.' }),
   mcq('q7-03', 'ig-structure', 'Papain cuts an antibody into…', 'Two Fab fragments and one Fc', ['One F(ab′)₂ and small Fc pieces', 'Four separate polypeptide chains', 'Two Fc fragments and one Fab'], { explanation: 'IG22 slide 27.' }),
   mcq('q7-04', 'ig-structure', 'Variation in the antigen-binding region that gives specificity is the…', 'Idiotype', ['Isotype', 'Allotype', 'Subclass'], { explanation: 'AB slide 7.', skill: 'terminology' }),
   mcq('q7-05', 'ig-structure', 'Antibody class (isotype) is set by the…', 'Heavy chain', ['Light chain', 'Hinge', 'Antigen'], { explanation: 'AB slide 7; IG22 slide 14.' }),

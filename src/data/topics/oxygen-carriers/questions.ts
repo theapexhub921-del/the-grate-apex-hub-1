@@ -98,7 +98,7 @@ const lesson1: Q[] = [
     explanation: 'Slide 12.',
     difficulty: 'intermediate',
   }),
-  mcq('q1-20', 'helix-termination', 'Besides proline, what can end an α-helix (slide 12)?', 'The –OH of serine or threonine interacting with a main-chain carbonyl', ['A disulfide bond between two cysteines', 'Binding of the haem group', 'Glycosylation of an asparagine'], {
+  mcq('q1-20', 'helix-termination', 'Besides proline, what can end an α-helix (slide 12)?', 'The –OH of serine or threonine interacting with a main-chain carbonyl', ['A disulfide bond between two cysteines at the helix end', 'Binding of the haem group', 'Glycosylation of an asparagine'], {
     explanation: 'Slide 12.',
     difficulty: 'intermediate',
   }),
@@ -124,12 +124,12 @@ const lesson1: Q[] = [
     explanation: 'Slide 13: glutamate, aspartate, glutamine, asparagine, lysine and arginine are not found inside.',
     skill: 'misconception',
   }),
-  mcq('q1-26', 'residue-distribution', 'A mutation places a lysine in myoglobin’s interior. Why would that be unusual?', 'Charged side chains like lysine are not found inside myoglobin', ['Lysine is too small to fill the space', 'Lysine would bind to the haem iron', 'Lysine always ends an α-helix'], {
+  mcq('q1-26', 'residue-distribution', 'A mutation places a lysine in myoglobin’s interior. Why would that be unusual?', 'Charged side chains like lysine are not found inside myoglobin', ['Lysine is too small to fill the space between the helices', 'Lysine would bind to the haem iron', 'Lysine always ends an α-helix'], {
     explanation: 'Slide 13: the interior is nonpolar.',
     skill: 'application',
     difficulty: 'intermediate',
   }),
-  mcq('q1-27', 'residue-distribution', 'Why are the two interior histidines important?', 'They have a critical function at the active site', ['They anchor the C-terminus', 'They bind 2,3-BPG', 'They end helix A'], {
+  mcq('q1-27', 'residue-distribution', 'Why are the two interior histidines important?', 'They have a critical function at the active site', ['They anchor the C-terminus', 'They bind 2,3-BPG in the central cavity', 'They end helix A'], {
     explanation: 'Slide 16.',
   }),
 ];
@@ -178,7 +178,7 @@ const lesson2: Q[] = [
     answer: true,
     explanation: 'Slide 19.',
   }),
-  mcq('q2-12', 'preventing-oxidation', 'What does the polypeptide chain create around the haem?', 'A hindered environment that lets haem bind O₂ reversibly for long periods', ['An open channel that lets water reach the iron', 'A positively charged cavity that binds 2,3-BPG', 'A binding site for haem oxygenase to degrade it'], {
+  mcq('q2-12', 'preventing-oxidation', 'What does the polypeptide chain create around the haem?', 'A hindered environment that lets haem bind O₂ reversibly for long periods', ['An open channel that lets water reach the iron and oxidise it quickly', 'A positively charged cavity that binds 2,3-BPG', 'A binding site for haem oxygenase to degrade it'], {
     explanation: 'Slide 20.',
   }),
   mcq('q2-13', 'preventing-oxidation', 'A mutation removes the distal histidine and its neighbours. What would you predict?', 'Faster oxidation to methaem and loss of O₂ binding', ['Stronger, longer-lasting O₂ binding', 'No change in O₂ binding at all', 'Myoglobin would start binding 2,3-BPG'], {
@@ -209,7 +209,7 @@ const lesson2: Q[] = [
   mcq('q2-19', 'conserved-residues', 'How many positions are the same in (nearly) all haemoglobins studied?', 'Nine', ['Twenty', 'Two', 'Forty'], {
     explanation: 'Slide 26.',
   }),
-  mcq('q2-20', 'conserved-residues', 'Why is B6 almost always glycine?', 'There is no room for a larger side chain where helices B and E cross', ['Glycine binds the haem at that point', 'Glycine ends helix B at the corner', 'Glycine binds 2,3-BPG in the cavity'], {
+  mcq('q2-20', 'conserved-residues', 'Why is B6 almost always glycine?', 'There is no room for a larger side chain where helices B and E cross', ['Glycine binds the haem at that point', 'Glycine ends helix B at the corner where it meets helix C', 'Glycine binds 2,3-BPG in the cavity'], {
     explanation: 'Slides 28–29.',
     skill: 'cause-effect',
   }),
@@ -252,7 +252,7 @@ const lesson3: Q[] = [
   mcq('q3-03', 'haemoglobin-structure', 'How many amino acids are in each β chain?', '146', ['141', '153', '574'], {
     explanation: 'Slide 25.',
   }),
-  mcq('q3-04', 'haemoglobin-structure', 'Where are the haems in haemoglobin?', 'In crevices near the outside, far apart from each other', ['Clustered together at the centre', 'Between the two α chains only', 'Outside the protein, on its surface'], {
+  mcq('q3-04', 'haemoglobin-structure', 'Where are the haems in haemoglobin?', 'In crevices near the outside, far apart from each other', ['Clustered together at the centre of the tetramer', 'Between the two α chains only', 'Outside the protein, on its surface'], {
     explanation: 'Slide 24.',
   }),
   tf({
@@ -290,7 +290,7 @@ const lesson3: Q[] = [
     explanation: 'Slide 33.',
     difficulty: 'advanced',
   }),
-  mcq('q3-13', 't-r-switch', 'What stabilises the T state of deoxyhaemoglobin (slide 34)?', 'Ion pairs (salt bridges) within and between subunits', ['Disulfide bonds between chains', 'Oxygen bound to each haem', 'Covalent links to the haems'], {
+  mcq('q3-13', 't-r-switch', 'What stabilises the T state of deoxyhaemoglobin (slide 34)?', 'Ion pairs (salt bridges) within and between subunits', ['Disulfide bonds between the α and β chains', 'Oxygen bound to each haem', 'Covalent links to the haems'], {
     explanation: 'Slide 34.',
   }),
   tf({
@@ -383,7 +383,7 @@ const lesson4: Q[] = [
     'Haemoglobin’s curve shifts right',
     'More O₂ is released to the muscle',
   ], { explanation: 'Slides 40 and 42.' }),
-  mcq('q4-08', 'bohr-mechanism', 'Which residues carry the Bohr effect?', 'Those that bind H⁺ at the tissues and release it in the lungs', ['Those too basic to release H⁺ at any pH', 'Those too acidic to bind H⁺ at any pH', 'The haem propionates only'], {
+  mcq('q4-08', 'bohr-mechanism', 'Which residues carry the Bohr effect?', 'Those that bind H⁺ at the tissues and release it in the lungs', ['Those too basic to release H⁺ at any pH found in the body', 'Those too acidic to bind H⁺ at any pH', 'The haem propionates only'], {
     explanation: 'Slide 43.',
   }),
   tf({
@@ -411,7 +411,7 @@ const lesson4: Q[] = [
     explanation: 'Slides 47 and 50.',
     difficulty: 'advanced',
   }),
-  mcq('q4-15', 'bpg-binding', 'How does 2,3-BPG lower haemoglobin’s oxygen affinity?', 'It cross-links the β chains, stabilising the deoxy (T) structure', ['It oxidises the haem iron to Fe³⁺', 'It binds the haem in place of O₂', 'It cross-links the α chains in the R state'], {
+  mcq('q4-15', 'bpg-binding', 'How does 2,3-BPG lower haemoglobin’s oxygen affinity?', 'It cross-links the β chains, stabilising the deoxy (T) structure', ['It oxidises the haem iron to Fe³⁺', 'It binds the haem iron in place of O₂ at each subunit', 'It cross-links the α chains in the R state'], {
     explanation: 'Slide 51; Lehninger p. 172.',
     skill: 'cause-effect',
   }),
@@ -466,7 +466,7 @@ const lesson4: Q[] = [
     answer: true,
     explanation: 'Slides 56 and 58.',
   }),
-  mcq('q4-28', 'fetal-haemoglobin', 'Why is a higher O₂ affinity useful for the fetus?', 'Oxygen passes from maternal haemoglobin to fetal haemoglobin', ['It stores oxygen in the fetal muscles', 'It prevents carbon monoxide poisoning', 'It removes CO₂ from the fetal blood'], {
+  mcq('q4-28', 'fetal-haemoglobin', 'Why is a higher O₂ affinity useful for the fetus?', 'Oxygen passes from maternal haemoglobin to fetal haemoglobin', ['It stores oxygen in the fetal muscles for use after birth', 'It prevents carbon monoxide poisoning', 'It removes CO₂ from the fetal blood'], {
     explanation: 'Slides 56 and 58.',
     skill: 'cause-effect',
   }),

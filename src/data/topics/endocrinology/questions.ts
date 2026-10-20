@@ -66,7 +66,7 @@ const lesson3: Q[] = [
   multi('q3-14', 'prolactin', 'A prolactin-secreting adenoma can cause… Select all that apply.', ['Galactorrhoea', 'Amenorrhoea', 'Impotence'], ['Acromegaly'], { explanation: 'Introduction, p. 43.', clinical: true }),
   mcq('q3-15', 'prolactin', 'Why does high prolactin cause amenorrhoea?', 'It blocks gonadotropin synthesis and release, preventing ovulation', ['It destroys the ovarian follicles directly', 'It raises oestrogen until the cycle stops', 'It contracts the uterus and expels the lining'], { explanation: 'Introduction, p. 43.', skill: 'cause-effect' }),
   mcq('q3-16', 'prolactin', 'After delivery, prolactin acts with which hormones to stimulate milk secretion?', 'Insulin and cortisol', ['Oestrogen and progesterone', 'GH and thyroxine', 'Oxytocin and ADH'], { explanation: 'Introduction, p. 42.' }),
-  mcq('q3-17', 'msh', 'MSH comes from which precursor?', 'Pro-opiomelanocortin (POMC)', ['Proinsulin', 'Thyroglobulin', 'Angiotensinogen'], { explanation: 'Introduction, p. 44.' }),
+  mcq('q3-17', 'msh', 'MSH comes from which precursor?', 'Pro-opiomelanocortin (POMC)', ['Proinsulin', 'Thyroglobulin (TG)', 'Angiotensinogen'], { explanation: 'Introduction, p. 44.' }),
   tf({ id: 'q3-18', conceptId: 'msh', statement: 'ACTH has some MSH activity.', answer: true, explanation: 'Introduction, p. 44: MSH corresponds to the first 13 amino acids of ACTH.' }),
 ];
 
@@ -127,7 +127,7 @@ const lesson6: Q[] = [
   multi('q6-11', 'diabetes', 'Which are classic symptoms of diabetes mellitus? Select all that apply.', ['Polyuria', 'Polydipsia', 'Polyphagia', 'Glycosuria'], ['Oliguria'], { explanation: 'Pancreas, p. 15.' }),
   multi('q6-12', 'diabetes', 'Which are ketone bodies? Select all that apply.', ['Acetoacetate', 'Acetone', 'β-hydroxybutyrate'], ['Lactate', 'Pyruvate'], { explanation: 'Pancreas, p. 14.' }),
   mcq('q6-13', 'diabetes', 'Why does glucose appear in the urine in diabetes?', 'Blood glucose exceeds the renal tubular maximum', ['The glomerulus is damaged and leaks glucose', 'Insulin is excreted and carries glucose with it', 'ADH is lacking, so glucose is not reabsorbed'], { explanation: 'Pancreas, p. 15.', skill: 'cause-effect' }),
-  mcq('q6-14', 'diabetes', 'Why do diabetics have lower resistance to infection?', 'Reduced protein synthesis, and sugary blood is a good culture medium', ['Too much insulin suppresses the white cells', 'High blood pressure damages the skin barrier', 'Hypokalaemia weakens the immune cells'], { explanation: 'Pancreas, p. 12.' }),
+  mcq('q6-14', 'diabetes', 'Why do diabetics have lower resistance to infection?', 'Reduced protein synthesis, and sugary blood is a good culture medium', ['Too much insulin suppresses the white cells and the antibody response', 'High blood pressure damages the skin barrier', 'Hypokalaemia weakens the immune cells'], { explanation: 'Pancreas, p. 12.' }),
   multi('q6-15', 'diabetes', 'Which are causes of coma in diabetes? Select all that apply.', ['Acidosis', 'Hyperosmolality', 'Lactic acidosis', 'Cerebral oedema'], ['Hypercalcaemia'], { explanation: 'Pancreas, p. 18.' }),
   multi('q6-16', 'diabetes', 'Which describe type 1 diabetes? Select all that apply.', ['Juvenile onset', 'Lack of insulin', 'Ketosis'], ['Normal insulin levels', 'Usually obese, over 40'], { explanation: 'Pancreas, p. 19.' }),
   mcq('q6-17', 'diabetes', 'In type 2 diabetes, weight loss helps because…', 'It increases insulin receptor sites', ['It raises insulin secretion tenfold', 'It removes ketones', 'It lowers glucagon to zero'], { explanation: 'Pancreas, p. 19.' }),
@@ -156,7 +156,7 @@ const lesson7: Q[] = [
     ['Osteomalacia', 'Loss of mineralisation'],
   ], { explanation: 'Calcium, p. 10.' }),
   mcq('q7-10', 'bone', 'Bone matrix is made of which collagen?', 'Type 1', ['Type 2', 'Type 3', 'Type 4'], { explanation: 'Calcium, p. 7.' }),
-  mcq('q7-11', 'vitamin-d', 'The major source of vitamin D is…', 'Synthesis in the skin under UV light', ['Cow’s milk', 'Fish liver oil', 'Synthesis in the liver'], { explanation: 'Calcium, p. 12.' }),
+  mcq('q7-11', 'vitamin-d', 'The major source of vitamin D is…', 'Synthesis in the skin under UV light', ['Cow’s milk and dairy foods', 'Fish liver oil', 'Synthesis in the liver'], { explanation: 'Calcium, p. 12.' }),
   mcq('q7-12', 'vitamin-d', 'Where is vitamin D 25-hydroxylated?', 'The liver', ['The kidney', 'The skin', 'The gut'], { explanation: 'Calcium, p. 13.' }),
   multi('q7-13', 'vitamin-d', 'What does active vitamin D do? Select all that apply.', ['Increases intestinal absorption of Ca²⁺ and PO₄', 'Increases renal reabsorption of Ca²⁺', 'Mobilises Ca²⁺ and PO₄ from bone'], ['Lowers plasma calcium'], { explanation: 'Calcium, p. 14.' }),
   mcq('q7-14', 'vitamin-d', 'Vitamin D deficiency in children causes…', 'Rickets', ['Osteopetrosis', 'Osteomalacia', 'Gigantism'], { explanation: 'Calcium, p. 18.' }),

@@ -172,7 +172,7 @@ const lesson7: Q[] = [
 
 const lesson8: Q[] = [
   mcq('q8-01', 'small-intestine-motility', 'How does slow-wave frequency change along the small intestine?', 'It falls from duodenum to ileum', ['It rises from duodenum to ileum', 'It is the same everywhere', 'It is highest in the ileum'], { explanation: 'Slide 164.' }),
-  mcq('q8-02', 'small-intestine-motility', 'What suppresses the MMC?', 'A meal, through vagovagal reflexes and hormones', ['Fasting overnight', 'Motilin from the duodenum', 'Sleep, through the vagus'], { explanation: 'Slide 165.' }),
+  mcq('q8-02', 'small-intestine-motility', 'What suppresses the MMC?', 'A meal, through vagovagal reflexes and hormones', ['Fasting overnight', 'Motilin released from the duodenum', 'Sleep, through the vagus'], { explanation: 'Slide 165.' }),
   mcq('q8-03', 'colon', 'The taeniae coli are…', 'Three bands of longitudinal muscle', ['Pouches of the colon wall between folds', 'Fat-filled appendages on the serosa', 'Folds of mucosa across the lumen'], { explanation: 'Slide 166.' }),
   mcq('q8-04', 'colon', 'Why does the colon form haustra?', 'The taeniae coli are shorter than the colon and gather it into pouches', ['Segmentation contractions create them during digestion', 'Gas inflates the colon wall into pouches', 'The mucosa folds inwards between the bands'], { explanation: 'Slide 167.', skill: 'cause-effect' }),
   multi('q8-05', 'colon', 'Which are functions of the large intestine? Select all that apply.', ['Reabsorbing water', 'Absorbing vitamins made by bacteria', 'Storing faeces'], ['Digesting protein with its own enzymes'], { explanation: 'Slides 165–166.' }),
@@ -206,7 +206,7 @@ const lesson9: Q[] = [
   mcq('q9-11', 'bile', 'How does gallbladder bile differ from hepatic bile?', 'It is more concentrated and acidic', ['It is more dilute and alkaline', 'It has different components', 'It has no bile salts left in it'], { explanation: 'Slides 203–204.' }),
   mcq('q9-12', 'bile', 'The main component of pigment gallstones is…', 'Calcium bilirubinate', ['Cholesterol', 'Bile salts', 'Calcium oxalate crystals'], { explanation: 'Slide 204.' }),
   mcq('q9-13', 'bile-secretion', 'What contracts the gallbladder and relaxes the sphincter of Oddi?', 'CCK', ['Secretin', 'Gastrin', 'Sympathetic stimulation'], { explanation: 'Slide 209.' }),
-  mcq('q9-14', 'bile-secretion', 'What is the most important regulator of bile volume?', 'Bile salts returning in the enterohepatic circulation', ['Gastrin from the gastric antrum', 'Sympathetic (splanchnic) nerves', 'Cortisol from the adrenal cortex'], { explanation: 'Slide 209.' }),
+  mcq('q9-14', 'bile-secretion', 'What is the most important regulator of bile volume?', 'Bile salts returning in the enterohepatic circulation', ['Gastrin from the gastric antrum', 'Sympathetic (splanchnic) nerves to the liver', 'Cortisol from the adrenal cortex'], { explanation: 'Slide 209.' }),
   mcq('q9-15', 'bile-secretion', 'Splanchnic (sympathetic) stimulation…', 'Reduces bile by reducing hepatic blood flow', ['Increases bile secretion by the hepatocytes', 'Contracts the gallbladder and empties it', 'Adds HCO₃⁻ to the bile in the ducts'], { explanation: 'Slide 209.' }),
   mcq('q9-16', 'jaundice', 'Jaundice is usually visible above a bilirubin of about…', '2.5–3 mg/dL', ['0.5–1 mg/dL', '10 mg/dL', '1 mg/dL'], { explanation: 'Slide 211.' }),
   match('q9-17', 'jaundice', 'Match each type of jaundice to its cause.', [

@@ -19,7 +19,7 @@ const lesson1: Q[] = [
   mcq('q1-08', 'eye-cavities', 'Lacrimal glands are controlled by…', 'Parasympathetic nerves', ['Sympathetic nerves', 'Circulating hormones', 'The optic nerve'], { explanation: 'Visual System, slide 9.' }),
   mcq('q1-09', 'eye-cavities', 'Tears drain into the nose through the…', 'Nasolacrimal duct', ['Canal of Schlemm', 'Eustachian tube', 'Lacrimal gland duct'], { explanation: 'Visual System, slide 9.' }),
   mcq('q1-10', 'aqueous-humour', 'Aqueous humour is secreted by…', 'The ciliary epithelium', ['The lens epithelium', 'The corneal endothelium', 'The pigmented retina'], { explanation: 'Visual System, slide 11.' }),
-  mcq('q1-11', 'aqueous-humour', 'What determines intraocular pressure?', 'The balance between production and drainage of aqueous humour', ['The size of the pupil in bright light', 'The rate of vitreous humour production', 'Arterial blood pressure alone'], { explanation: 'Visual System, slide 11.' }),
+  mcq('q1-11', 'aqueous-humour', 'What determines intraocular pressure?', 'The balance between production and drainage of aqueous humour', ['The size of the pupil and the curvature of the cornea', 'The rate of vitreous humour production', 'Arterial blood pressure alone'], { explanation: 'Visual System, slide 11.' }),
   tf({ id: 'q1-12', conceptId: 'aqueous-humour', statement: 'Vitreous humour maintains enough pressure to stop the eyeball collapsing.', answer: true, explanation: 'Visual System, slide 14.' }),
 ];
 
@@ -34,7 +34,7 @@ const lesson2: Q[] = [
   mcq('q2-08', 'refractive-errors', 'In myopia, light is focused…', 'In front of the retina', ['Behind the retina', 'On the retina', 'On the surface of the cornea'], { explanation: 'Visual System, slides 23–24.' }),
   mcq('q2-09', 'refractive-errors', 'Hyperopia can be caused by…', 'An eyeball shorter than normal', ['An eyeball longer than normal', 'Too much corneal curvature', 'Clumped crystallins in the lens'], { explanation: 'Visual System, slides 24–25.' }),
   mcq('q2-10', 'refractive-errors', 'Astigmatism results from…', 'Uneven curvature of the cornea or lens', ['An eyeball that is shorter than normal', 'Loss of lens elasticity with age', 'A cloudy lens'], { explanation: 'Visual System, slide 27.' }),
-  mcq('q2-11', 'refractive-errors', 'Cataract is caused by…', 'Clumping of lens proteins (alpha-crystallins)', ['Raised intraocular pressure', 'An eyeball that is too long', 'Loss of rods from the retina'], { explanation: 'Visual System, slide 30.' }),
+  mcq('q2-11', 'refractive-errors', 'Cataract is caused by…', 'Clumping of lens proteins (alpha-crystallins)', ['Raised intraocular pressure (glaucoma)', 'An eyeball that is too long', 'Loss of rods from the retina'], { explanation: 'Visual System, slide 30.' }),
   multi('q2-12', 'refractive-errors', 'Which are causes of cataract? Select all that apply.', ['Ageing', 'Long-term UV exposure', 'Diabetes', 'Smoking'], ['Myopia'], { explanation: 'Visual System, slide 30.' }),
 ];
 
@@ -61,13 +61,13 @@ const lesson3: Q[] = [
 
 const lesson4: Q[] = [
   mcq('q4-01', 'retinal-processing', 'How many cones synapse with a single bipolar cell?', 'One or a few', ['Many hundreds', 'None', 'All cones in the fovea'], { explanation: 'Visual System, slide 63.' }),
-  mcq('q4-02', 'retinal-processing', 'What gives bipolar cells a receptive field of two concentric discs?', 'Lateral connections from horizontal cells', ['Amacrine cells', 'Ganglion cells', 'The pigment epithelium'], { explanation: 'Visual System, slide 63.' }),
+  mcq('q4-02', 'retinal-processing', 'What gives bipolar cells a receptive field of two concentric discs?', 'Lateral connections from horizontal cells', ['Lateral connections between ganglion cells', 'Ganglion cells', 'The pigment epithelium'], { explanation: 'Visual System, slide 63.' }),
   mcq('q4-03', 'retinal-processing', 'In light, on-centre bipolar cells…', 'Depolarise, as inhibition is removed', ['Are inhibited by glutamate', 'Stop releasing transmitter', 'Hyperpolarise strongly'], { explanation: 'Visual System, slide 65.' }),
   mcq('q4-04', 'retinal-processing', 'Where do most ganglion cells get their input?', 'From amacrine cells', ['Directly from rods', 'From horizontal cells', 'From the pigment epithelium'], { explanation: 'Visual System, slide 64.' }),
   order('q4-05', 'retinal-processing', 'Order the rod pathway.', ['Rod', 'Bipolar cell', 'Amacrine cell', 'Ganglion cell'], { explanation: 'Visual System, slide 65.' }),
   mcq('q4-06', 'optic-pathway', 'Light from the temporal visual field falls on the…', 'Nasal hemiretina', ['Temporal hemiretina', 'Fovea only', 'Optic disc'], { explanation: 'Visual System, slide 68.' }),
   mcq('q4-07', 'optic-pathway', 'Which fibres cross at the optic chiasm?', 'Those from the nasal hemiretinas', ['Those from the temporal hemiretinas', 'All fibres', 'None'], { explanation: 'Visual System, slide 68.' }),
-  mcq('q4-08', 'optic-pathway', 'Most optic tract fibres synapse in the…', 'Lateral geniculate nucleus of the thalamus', ['Medial geniculate body', 'Superior colliculus', 'Pretectal nucleus'], { explanation: 'Visual System, slide 69.' }),
+  mcq('q4-08', 'optic-pathway', 'Most optic tract fibres synapse in the…', 'Lateral geniculate nucleus of the thalamus', ['Medial geniculate body of the thalamus', 'Superior colliculus', 'Pretectal nucleus'], { explanation: 'Visual System, slide 69.' }),
   order('q4-09', 'optic-pathway', 'Order the optic pathway.', ['Optic nerve', 'Optic chiasm', 'Optic tract', 'Lateral geniculate nucleus', 'Optic radiations', 'Primary visual cortex'], { explanation: 'Visual System, slides 68–69.' }),
   match('q4-10', 'field-defects', 'Match each lesion to its field defect.', [
     ['Right optic nerve', 'Blind right eye'],
@@ -116,7 +116,7 @@ const lesson6: Q[] = [
 const lesson7: Q[] = [
   mcq('q7-01', 'auditory-transduction', 'What bends the stereocilia?', 'Shearing between the basilar and tectorial membranes', ['Air pressure in the middle ear', 'Perilymph in the scala tympani alone', 'Contraction of the stapedius'], { explanation: 'Auditory, slide 36.' }),
   mcq('q7-02', 'auditory-transduction', 'Which ion entering through MET channels mainly depolarises the hair cell?', 'K⁺', ['Na⁺', 'Cl⁻', 'H⁺'], { explanation: 'Auditory, slide 37: from the endolymph.' }),
-  mcq('q7-03', 'auditory-transduction', 'What triggers transmitter release from the hair cell?', 'Ca²⁺ entering through voltage-gated channels', ['K⁺ leaving the hair cell', 'A rise in cAMP', 'Light'], { explanation: 'Auditory, slides 37–38.' }),
+  mcq('q7-03', 'auditory-transduction', 'What triggers transmitter release from the hair cell?', 'Ca²⁺ entering through voltage-gated channels', ['K⁺ leaving the hair cell through MET channels', 'A rise in cAMP', 'Light'], { explanation: 'Auditory, slides 37–38.' }),
   match('q7-04', 'pitch', 'Match each theory to its idea.', [
     ['Frequency theory', 'Pitch is coded by the firing frequency of the nerve fibre'],
     ['Place theory', 'Different parts of the basilar membrane respond to different frequencies'],
@@ -134,8 +134,8 @@ const lesson7: Q[] = [
 
 const lesson8: Q[] = [
   mcq('q8-01', 'vestibular-overview', 'The utricle and saccule sense…', 'Linear acceleration', ['Angular acceleration', 'Sound', 'Light'], { explanation: 'Auditory, slides 52–53.' }),
-  mcq('q8-02', 'semicircular-canals', 'The semicircular canals are arranged…', 'Roughly at right angles to each other', ['Parallel to one another', 'In a straight line', 'Inside the cochlea'], { explanation: 'Auditory, slide 54.' }),
-  mcq('q8-03', 'semicircular-canals', 'Where is the crista ampullaris?', 'In the ampulla of each semicircular canal', ['In the utricle', 'In the cochlear duct', 'In the middle ear'], { explanation: 'Auditory, slide 55.' }),
+  mcq('q8-02', 'semicircular-canals', 'The semicircular canals are arranged…', 'Roughly at right angles to each other', ['Parallel to one another, in one plane', 'In a straight line', 'Inside the cochlea'], { explanation: 'Auditory, slide 54.' }),
+  mcq('q8-03', 'semicircular-canals', 'Where is the crista ampullaris?', 'In the ampulla of each semicircular canal', ['In the macula of the utricle', 'In the cochlear duct', 'In the middle ear'], { explanation: 'Auditory, slide 55.' }),
   mcq('q8-04', 'semicircular-canals', 'The gelatinous mass in which crista hair cells are embedded is the…', 'Cupula', ['Otolith membrane', 'Tectorial membrane', 'Basilar membrane'], { explanation: 'Auditory, slide 55.' }),
   mcq('q8-05', 'semicircular-canals', 'The tallest cilium of a vestibular hair cell is the…', 'Kinocilium', ['Stereocilium', 'Microvillus', 'Tip link'], { explanation: 'Auditory, slide 55.' }),
   mcq('q8-06', 'semicircular-canals', 'Why does rotation deflect the cupula?', 'The endolymph lags behind because of inertia', ['The perilymph flows out of the canal', 'Otoconia fall onto it', 'Air pressure changes in the canal'], { explanation: 'Auditory, slide 56.', skill: 'cause-effect' }),
@@ -179,7 +179,7 @@ const lesson10: Q[] = [
   mcq('q10-07', 'olfactory-transduction', 'Which ions enter through the cAMP-opened channel?', 'Ca²⁺ and Na⁺', ['K⁺ and Cl⁻ only', 'H⁺', 'Mg²⁺'], { explanation: 'Chemical Senses, slide 30.' }),
   mcq('q10-08', 'olfactory-transduction', 'The firing rate of an olfactory neuron depends on…', 'The concentration of the odorant', ['The time of day', 'The colour of the odorant', 'The breathing rate only'], { explanation: 'Chemical Senses, slides 30–31.' }),
   mcq('q10-09', 'olfactory-pathway', 'Olfactory axons cross which bone?', 'The cribriform plate', ['The sella turcica', 'The petrous temporal bone', 'The nasal septum'], { explanation: 'Chemical Senses, slide 32.' }),
-  mcq('q10-10', 'olfactory-pathway', 'In the olfactory bulb, receptor axons synapse on…', 'Mitral cells, forming glomeruli', ['Ganglion cells', 'Purkinje cells', 'Hair cells'], { explanation: 'Chemical Senses, slide 32.' }),
+  mcq('q10-10', 'olfactory-pathway', 'In the olfactory bulb, receptor axons synapse on…', 'Mitral cells, forming glomeruli', ['Granule cells, forming glomeruli', 'Purkinje cells', 'Hair cells'], { explanation: 'Chemical Senses, slide 32.' }),
   multi('q10-11', 'olfactory-pathway', 'Which limbic structures receive olfactory input? Select all that apply.', ['Hypothalamus', 'Hippocampus', 'Amygdala'], ['Cerebellum'], { explanation: 'Chemical Senses, slide 33.' }),
   tf({ id: 'q10-12', conceptId: 'olfactory-pathway', statement: 'Each olfactory nerve projects to the olfactory bulb on the same side.', answer: true, explanation: 'Chemical Senses, slide 32.' }),
 ];

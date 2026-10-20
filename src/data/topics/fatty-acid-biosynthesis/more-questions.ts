@@ -43,14 +43,14 @@ export const moreQuestions: Q[] = [
     explanation: 'ATP-citrate lyase splits citrate; lyases cleave without hydrolysis or oxidation.',
     difficulty: 'intermediate',
   }),
-  mcq('q1-20', 'enzyme-names-in-topic', 'Malate dehydrogenase and acyl-CoA dehydrogenase share the word “dehydrogenase”. What does a dehydrogenase do?', 'Moves hydrogen (electrons) between a substrate and a carrier such as NAD⁺ or FAD', ['Removes water from its substrate', 'Adds a phosphate group', 'Joins two subunits'], {
+  mcq('q1-20', 'enzyme-names-in-topic', 'Malate dehydrogenase and acyl-CoA dehydrogenase share the word “dehydrogenase”. What does a dehydrogenase do?', 'Moves hydrogen (electrons) between a substrate and a carrier such as NAD⁺ or FAD', ['Removes a molecule of water from its substrate, leaving a carbon–carbon double bond', 'Adds a phosphate group taken from ATP', 'Joins two subunits together with a new bond'], {
     explanation: 'Dehydrogenases transfer hydrogen/electrons between a substrate and a carrier.',
   }),
   fill('q1-21', 'enzyme-names-in-topic', 'An enzyme that moves an acyl group from coenzyme A onto a carrier on the synthase is a ____.', ['transacylase', 'trans-acylase'], {
     explanation: 'Acetyl-CoA:ACP transacylase and malonyl-CoA:ACP transacylase load the synthase.',
     skill: 'terminology',
   }),
-  mcq('q1-22', 'enzyme-names-in-topic', 'From its name alone, what should β-ketoacyl-ACP reductase do?', 'Reduce a β-keto group on an ACP-bound acyl chain', ['Oxidise an alcohol to a ketone', 'Remove water from the chain', 'Join two acyl groups'], {
+  mcq('q1-22', 'enzyme-names-in-topic', 'From its name alone, what should β-ketoacyl-ACP reductase do?', 'Reduce a β-keto group on an ACP-bound acyl chain', ['Oxidise an alcohol on the chain to a ketone', 'Remove water from the chain to make a double bond', 'Join two acyl groups together on the ACP'], {
     explanation: '“β-Ketoacyl-ACP” is the substrate; “reductase” is the job — it reduces the keto group.',
     skill: 'application',
   }),
@@ -61,7 +61,7 @@ export const moreQuestions: Q[] = [
     answer: true,
     explanation: 'Each turn of β-oxidation releases one acetyl-CoA.',
   }),
-  mcq('q1-24', 'beta-oxidation-product', 'Which statement links β-oxidation and fatty acid synthesis correctly?', 'Acetyl-CoA is the product of one and the starting material of the other', ['Malonyl-CoA is the product of β-oxidation', 'Palmitate is the product of β-oxidation', 'Both pathways end with acetyl-CoA'], {
+  mcq('q1-24', 'beta-oxidation-product', 'Which statement links β-oxidation and fatty acid synthesis correctly?', 'Acetyl-CoA is the product of one and the starting material of the other', ['Malonyl-CoA is the product of β-oxidation', 'Palmitate is the product of β-oxidation', 'Both pathways start and end with acetyl-CoA in the mitochondrial matrix'], {
     explanation: 'β-Oxidation produces acetyl-CoA; synthesis starts by activating acetyl-CoA.',
     skill: 'pathway-reasoning',
   }),
@@ -79,7 +79,7 @@ export const moreQuestions: Q[] = [
     explanation: 'It is anabolic: it builds a larger molecule and costs energy and reducing power.',
     skill: 'misconception',
   }),
-  mcq('q2-22', 'citrate-shunt', 'What does the citrate shunt carry out to the cytosol for fatty acid synthesis?', 'Acetyl groups, carried as citrate', ['NADPH, carried directly', 'Malonyl-CoA', 'Palmitate'], {
+  mcq('q2-22', 'citrate-shunt', 'What does the citrate shunt carry out to the cytosol for fatty acid synthesis?', 'Acetyl groups, carried as citrate', ['NADPH, carried directly across the membrane', 'Malonyl-CoA, made in the matrix', 'Palmitate, made in the mitochondria'], {
     explanation: 'Citrate carries acetyl groups out of the mitochondria; Lesson 8 follows the whole cycle.',
     skill: 'pathway-reasoning',
   }),
@@ -90,7 +90,7 @@ export const moreQuestions: Q[] = [
     answer: true,
     explanation: 'Slide 4: as TCA flux increases, excess citrate is removed via the citrate shunt.',
   }),
-  mcq('q2-24', 'not-simple-reversal', 'Which feature does fatty acid synthesis SHARE with β-oxidation?', 'Both change the chain length two carbons at a time', ['Both use FAD as an electron acceptor', 'Both carry intermediates on ACP', 'Both run in the mitochondria'], {
+  mcq('q2-24', 'not-simple-reversal', 'Which feature does fatty acid synthesis SHARE with β-oxidation?', 'Both change the chain length two carbons at a time', ['Both use FAD as an electron acceptor', 'Both carry their intermediates on ACP', 'Both run inside the mitochondria'], {
     explanation: 'Synthesis adds 2 carbons per cycle; β-oxidation removes 2. Carriers, cofactors and location differ.',
     skill: 'comparison',
     difficulty: 'intermediate',
@@ -161,7 +161,7 @@ export const moreQuestions: Q[] = [
     answer: true,
     explanation: 'Slide 10 (FAD, NAD⁺ reduced in β-oxidation) and slides 5/9 (NADPH used in synthesis).',
   }),
-  mcq('q6-25', 'electron-carriers', 'Why does synthesis use NADPH rather than FADH₂ for its reductions?', 'NADPH is a more powerful reducing agent for pushing electrons into the chain', ['FADH₂ cannot cross into the cytosol', 'NADPH is cheaper to make than FADH₂', 'FADH₂ is used up by the thioesterase'], {
+  mcq('q6-25', 'electron-carriers', 'Why does synthesis use NADPH rather than FADH₂ for its reductions?', 'NADPH is a more powerful reducing agent for pushing electrons into the chain', ['FADH₂ cannot cross from the mitochondria into the cytosol', 'NADPH is cheaper for the cell to make than FADH₂', 'FADH₂ is used up by the thioesterase at the end'], {
     explanation: 'Slide 5: NADPH is substituted as a more powerful reducing agent than FADH₂.',
     skill: 'cause-effect',
     difficulty: 'intermediate',
@@ -190,7 +190,7 @@ export const moreQuestions: Q[] = [
     answer: true,
     explanation: 'Slide 13: unsaturated fatty acids of 20, 22 and 24 carbons are made; most longer ones are polyunsaturated.',
   }),
-  mcq('q7-24', 'mitochondrial-elongation', 'Where is the second fatty acid elongation system?', 'In the mitosol (mitochondrial matrix)', ['In the nucleus', 'In the Golgi apparatus', 'In lysosomes'], {
+  mcq('q7-24', 'mitochondrial-elongation', 'Where is the second fatty acid elongation system?', 'In the mitosol (mitochondrial matrix)', ['In the nucleus', 'In the Golgi apparatus (cis face)', 'In the lysosomes'], {
     explanation: 'Slide 14: a second elongation system exists in the mitosol.',
   }),
   match('q7-25', 'er-elongation', 'Match each system to its features.', [

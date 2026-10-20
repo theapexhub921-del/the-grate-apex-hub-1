@@ -60,7 +60,7 @@ const lesson4: Q[] = [
     'The triple helix forms',
     'The N- and C-terminal extensions are cut off',
   ], { explanation: 'Slide 34 figure.' }),
-  mcq('q4-14', 'procollagen-processing', 'What would happen if a procollagen peptidase were missing?', 'Propeptides would be retained and collagen bundles disorganised, as in dermatoparaxis', ['Collagen would lack hydroxyproline, as in scurvy', 'Desmosine would build up in the tissues', 'Glycine would be replaced by cysteine in the chains'], {
+  mcq('q4-14', 'procollagen-processing', 'What would happen if a procollagen peptidase were missing?', 'Propeptides would be retained and collagen bundles disorganised, as in dermatoparaxis', ['Collagen would lack hydroxyproline and melt at body temperature, as in scurvy', 'Desmosine would build up in the tissues', 'Glycine would be replaced by cysteine in the chains'], {
     explanation: 'Slides 54 and 68.',
     skill: 'application',
   }),
@@ -146,7 +146,7 @@ const lesson5: Q[] = [
   mcq('q5-08', 'scurvy', 'Why must humans get ascorbic acid from their diet (slide 43)?', 'Primates cannot synthesise it', ['Humans lack prolyl hydroxylase', 'Humans make no collagen', 'Ascorbate is destroyed in the liver'], {
     explanation: 'Slide 43: primates and guinea pigs cannot synthesise ascorbic acid.',
   }),
-  mcq('q5-09', 'ehlers-danlos', 'What is Ehlers-Danlos syndrome?', 'A group of rare hereditary disorders in which collagen synthesis is impaired', ['A dietary vitamin deficiency that weakens collagen', 'A hereditary disease of cattle (dermatoparaxis)', 'A poisoning caused by eating sweet pea seeds'], {
+  mcq('q5-09', 'ehlers-danlos', 'What is Ehlers-Danlos syndrome?', 'A group of rare hereditary disorders in which collagen synthesis is impaired', ['A dietary deficiency of vitamin C that weakens collagen in skin and joints', 'A hereditary disease of cattle (dermatoparaxis)', 'A poisoning caused by eating sweet pea seeds'], {
     explanation: 'Slide 65.',
   }),
   multi('q5-10', 'ehlers-danlos', 'Which defects can underlie Ehlers-Danlos syndrome? Select all that apply.', ['Defective type III collagen synthesis', 'Deficiency of procollagen peptidases', 'Defective hydroxylation of lysine', 'Deficiency of lysyl oxidase'], ['A glycine-to-cysteine change at residue 988', 'Lack of dietary ascorbate'], {
@@ -190,7 +190,7 @@ const lesson5: Q[] = [
   mcq('q5-21', 'osteogenesis-imperfecta', 'In the lecture’s example of osteogenesis imperfecta, residue 988 changes from glycine to:', 'Cysteine', ['Alanine', 'Proline', 'Serine'], {
     explanation: 'Slide 72.',
   }),
-  mcq('q5-22', 'osteogenesis-imperfecta', 'What does the glycine 988 change do to the collagen?', 'It disrupts the helix near its carboxyl end, so the collagen is over-hydroxylated, over-glycosylated and partly unfolded at body temperature', ['It stops hydroxylation of the chain completely, so the helix never forms at body temperature', 'It adds extra cross-links between neighbouring molecules, making the bone brittle and dense', 'It prevents secretion of procollagen, so collagen builds up inside the osteoblasts'], {
+  mcq('q5-22', 'osteogenesis-imperfecta', 'What does the glycine 988 change do to the collagen?', 'It disrupts the helix near its carboxyl end, so the collagen is over-hydroxylated, over-glycosylated and partly unfolded at body temperature', ['It stops hydroxylation and glycosylation of the chain completely, so the helix never forms and the collagen is degraded inside the cell', 'It adds extra cross-links between neighbouring molecules, making the bone brittle and dense', 'It prevents secretion of procollagen, so collagen builds up inside the osteoblasts'], {
     explanation: 'Slide 72.',
     skill: 'cause-effect',
   }),
@@ -200,7 +200,7 @@ const lesson5: Q[] = [
     answer: true,
     explanation: 'Slide 71.',
   }),
-  mcq('q5-24', 'osteogenesis-imperfecta', 'If the mutant allele had made a completely unusable α1 chain, what would the collagen be like (slide 73)?', 'Normal, but reduced in amount', ['Abnormal and lethal', 'Over-hydroxylated', 'Absent altogether'], {
+  mcq('q5-24', 'osteogenesis-imperfecta', 'If the mutant allele had made a completely unusable α1 chain, what would the collagen be like (slide 73)?', 'Normal, but reduced in amount', ['Abnormal and lethal', 'Over-hydroxylated and fragile', 'Absent altogether'], {
     explanation: 'Slide 73.',
     skill: 'prediction',
   }),

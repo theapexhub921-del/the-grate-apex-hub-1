@@ -79,7 +79,7 @@ export const interactive: Record<string, Steps> = {
     learn('The neurovascular plane', [
       'Vein, artery and nerve run between the internal and innermost intercostals under the lower border of each rib — so a pleural drain goes in just above a rib.',
     ], { sourceRefs: rs([199]) }),
-    ask(mcq('i4-03', 'intercostal-space-joints', 'Why is a pleural drainage needle inserted just above a rib?', 'To avoid the intercostal vessels and nerve running along the lower border of the rib above', ['Because the parietal pleura is thinnest just above each rib', 'To enter the costodiaphragmatic recess at its lowest point', 'Because the rib below protects the lung from the needle tip'], { explanation: 'Slide 199.', skill: 'application' })),
+    ask(mcq('i4-03', 'intercostal-space-joints', 'Why is a pleural drainage needle inserted just above a rib?', 'To avoid the intercostal vessels and nerve running along the lower border of the rib above', ['Because the parietal pleura is thinnest just above each rib, so the needle passes easily into the space', 'To enter the costodiaphragmatic recess at its lowest point', 'Because the rib below protects the lung from the needle tip'], { explanation: 'Slide 199.', skill: 'application' })),
     recall('r4-01', 'thoracic-muscles', 'Compare serratus posterior superior and inferior.', [
       'Superior: from spines C6–T2 to ribs 2–5; elevates the upper ribs (inspiration).',
       'Inferior: from spines T11–L2 to the lowest four ribs; depresses the lower ribs (expiration).',

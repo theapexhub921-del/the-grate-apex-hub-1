@@ -328,7 +328,7 @@ const lesson3: Q[] = [
   mcq('q3-18', 'squalene-to-cholesterol', 'How does slide 12 show the conversion of lanosterol to cholesterol?', 'As a dotted arrow — several steps', ['As a single enzyme step', 'As a reversible equilibrium', 'It is not shown on the slide'], {
     explanation: 'Slide 12: lanosterol ⋯→ cholesterol. Lehninger: about 20 reactions.',
   }),
-  mcq('q3-19', 'pathway-branches', 'Besides squalene, which molecules does slide 12 show branching off from farnesyl pyrophosphate?', 'Heme a, dolichol and ubiquinone (and prenylated proteins)', ['Bile salts and steroid hormones', 'Acetoacetate and acetyl-CoA', 'Glycocholic and taurocholic acid'], {
+  mcq('q3-19', 'pathway-branches', 'Besides squalene, which molecules does slide 12 show branching off from farnesyl pyrophosphate?', 'Heme a, dolichol and ubiquinone (and prenylated proteins)', ['Bile salts, steroid hormones and vitamin D (and lipoproteins)', 'Acetoacetate and acetyl-CoA', 'Glycocholic and taurocholic acid'], {
     explanation: 'Slide 12: farnesyl pyrophosphate → heme a, dolichol, ubiquinone, and prenylated proteins.',
   }),
   mcq('q3-20', 'pathway-branches', 'Prenylated proteins are made from which intermediates (slide 12)?', 'Geranyl and farnesyl pyrophosphate', ['Squalene and lanosterol', 'Mevalonate and HMG-CoA', 'Cholesterol only, after it is made'], {

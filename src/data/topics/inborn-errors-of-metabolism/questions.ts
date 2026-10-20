@@ -215,7 +215,7 @@ const lesson2: Q[] = [
   mcq('q2-23', 'uk-screening', 'Which thyroid condition is on the lecture’s UK screening list?', 'Neonatal hypothyroidism', ['Graves’ disease (hyperthyroidism)', 'Thyroid cancer', 'Hashimoto’s thyroiditis'], {
     explanation: 'Page 10.',
   }),
-  mcq('q2-24', 'uk-screening', 'Which adrenal condition is on the lecture’s UK screening list?', 'Congenital adrenal hyperplasia', ['Addison’s disease', 'Phaeochromocytoma', 'Cushing’s syndrome'], {
+  mcq('q2-24', 'uk-screening', 'Which adrenal condition is on the lecture’s UK screening list?', 'Congenital adrenal hyperplasia', ['Addison’s disease', 'Phaeochromocytoma (adrenal medulla)', 'Cushing’s syndrome'], {
     explanation: 'Page 10.',
   }),
   mcq('q2-25', 'uk-screening', 'Which of these is on the lecture’s UK newborn screening list?', 'Phenylketonuria', ['Alkaptonuria', 'Tay-Sachs disease', 'Haemophilia A'], {
@@ -436,7 +436,7 @@ const lesson4: Q[] = [
     explanation: 'Pages 20–25.',
     skill: 'comparison',
   }),
-  mcq('q4-27', 'scid', 'Which metabolite is toxic to lymphocytes in adenosine deaminase deficiency?', 'dATP (deoxyadenosine triphosphate)', ['Uric acid (urate)', 'Deoxyinosine', 'GM2 ganglioside'], {
+  mcq('q4-27', 'scid', 'Which metabolite is toxic to lymphocytes in adenosine deaminase deficiency?', 'dATP (deoxyadenosine triphosphate)', ['Uric acid (from purine breakdown)', 'Deoxyinosine', 'GM2 ganglioside'], {
     explanation: 'Page 25 figure.',
   }),
   mcq('q4-28', 'scid', 'How is SCID inherited, according to the lecture?', 'Autosomal recessive or X-linked', ['Autosomal dominant only', 'Mitochondrial (maternal)', 'Not inherited at all'], {
@@ -534,7 +534,7 @@ const lesson5: Q[] = [
   mcq('q5-21', 'cystinosis', 'Which gene encodes cystinosin (page 30 figure)?', 'CTNS', ['CFTR', 'ATP7A', 'HEXA'], {
     explanation: 'Page 30 figure.',
   }),
-  mcq('q5-22', 'cystinosis', 'What does cystinosin do (page 30 figure)?', 'It is an H⁺-driven transporter that moves cystine out of the lysosome', ['It exports copper from the cell using ATP', 'It secretes chloride onto the airway surface', 'It digests GM2 ganglioside inside the lysosome'], {
+  mcq('q5-22', 'cystinosis', 'What does cystinosin do (page 30 figure)?', 'It is an H⁺-driven transporter that moves cystine out of the lysosome', ['It exports copper from the cell using ATP, like a P-type pump', 'It secretes chloride onto the airway surface', 'It digests GM2 ganglioside inside the lysosome'], {
     explanation: 'Page 30 figure.',
   }),
   mcq('q5-23', 'menkes', 'Which hair change is typical of Menkes syndrome?', 'Brittle, “kinky” hair', ['Light hair', 'Premature greying', 'Patchy hair loss'], {
@@ -591,7 +591,7 @@ const lesson6: Q[] = [
   mcq('q6-09', 'zellweger', 'Zellweger syndrome results from a defect in a protein needed for:', 'Peroxisome biogenesis', ['Lysosomal digestion of GM2', 'Copper export', 'Chloride secretion'], {
     explanation: 'Page 32.',
   }),
-  mcq('q6-10', 'zellweger', 'What accumulates in Zellweger syndrome?', 'Very-long-chain fatty acids', ['GM2 ganglioside', 'Cystine', 'Copper'], {
+  mcq('q6-10', 'zellweger', 'What accumulates in Zellweger syndrome?', 'Very-long-chain fatty acids', ['GM2 ganglioside in neurons', 'Cystine', 'Copper'], {
     explanation: 'Page 34. GM2 accumulates in Tay-Sachs, cystine in cystinosis.',
     skill: 'comparison',
   }),
