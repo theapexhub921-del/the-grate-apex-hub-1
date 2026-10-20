@@ -15,7 +15,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 1 — Myoglobin: roles, haem iron, structure ─────────────
   'oxygen-carriers-1': [
     ask(
-      mcq('c1-01', 'carrier-roles', 'Before you start: what is myoglobin’s job in red muscle?', 'A reserve supply of oxygen that also helps O₂ move within the muscle', ['Carrying oxygen in the blood', 'Carrying CO₂ to the lungs', 'Making haem for the muscle'], {
+      mcq('c1-01', 'carrier-roles', 'Before you start: what is myoglobin’s job in red muscle?', 'A reserve supply of oxygen that also helps O₂ move within the muscle', ['Carrying oxygen in the blood from the lungs to every tissue', 'Carrying CO₂ from the working muscle to the lungs', 'Making haem for the cytochromes of the muscle'], {
         explanation: 'Slide 2: myoglobin serves as a reserve supply of oxygen and facilitates the movement of oxygen within red muscle.',
         skill: 'prediction',
       }),
@@ -35,7 +35,7 @@ export const interactive: Record<string, Steps> = {
       'Myoglobin is about 75% α-helix, in eight helices labelled A–H. Residues are named by position: A1, A2… The seven non-helical segments between helices are named by both helices (e.g. CD); the ends are NA1–NA2 and HC1–HC5.',
     ], { sourceRefs: ref([7, 8]) }),
     ask(
-      mcq('c1-03', 'myoglobin-shape', 'A non-helical residue lies between helices E and F. How would it be named?', 'EF (e.g. EF1)', ['E8', 'FE1', 'NA1'], {
+      mcq('c1-03', 'myoglobin-shape', 'A non-helical residue lies between helices E and F. How would it be named?', 'EF (e.g. EF1)', ['E8 (the last residue of E)', 'FE1', 'NA1'], {
         explanation: 'Slide 8: non-helical segments between helices are named after both helices — e.g. CD between C and D.',
         skill: 'application',
       })
@@ -98,7 +98,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c2-04', 'co-binding', 'Why does the protein reduce haem’s affinity for CO?', 'The distal histidine prevents CO binding in a straight line, so it binds bent (strained)', ['The proximal histidine blocks the sixth position', 'The iron is oxidised to Fe³⁺', 'CO binds the propionate side chains instead'], {
+      mcq('c2-04', 'co-binding', 'Why does the protein reduce haem’s affinity for CO?', 'The distal histidine prevents CO binding in a straight line, so it binds bent (strained)', ['The proximal histidine blocks the sixth position, so CO cannot reach the iron', 'The iron is oxidised to Fe³⁺ by the protein, which cannot bind CO', 'CO binds the propionate side chains instead of the iron'], {
         explanation: 'Slides 22–23: free haem binds CO linearly; in the proteins the distal histidine forces a bent, strained geometry.',
         skill: 'cause-effect',
       })
@@ -199,12 +199,12 @@ export const interactive: Record<string, Steps> = {
       'One 2,3-BPG binds in the central cavity of deoxyhaemoglobin, held by three positive groups on each β chain. It cross-links the β chains and stabilises the T state — so it lowers O₂ affinity. P50 rises from 1 torr without BPG to 26 torr with it.',
     ], { sourceRefs: ref([47, 51, 52]) }),
     ask(
-      mcq('c4-03', 'bpg-binding', 'Which form of haemoglobin does 2,3-BPG bind?', 'Deoxyhaemoglobin (T state)', ['Oxyhaemoglobin (R state)', 'Both equally', 'Free α chains only'], {
+      mcq('c4-03', 'bpg-binding', 'Which form of haemoglobin does 2,3-BPG bind?', 'Deoxyhaemoglobin (T state)', ['Oxyhaemoglobin (R state)', 'Both forms equally', 'Free α chains only'], {
         explanation: 'Slides 51 and 54: BPG stabilises the deoxy quaternary structure by cross-linking the β chains; it does not bind oxyhaemoglobin.',
       })
     ),
     ask(
-      mcq('c4-04', 'bpg-p50', 'Without 2,3-BPG, what would haemoglobin do in capillaries where pO₂ is about 26 torr?', 'Stay fully saturated and fail to unload O₂', ['Unload all its O₂', 'Unload half its O₂', 'Bind CO instead'], {
+      mcq('c4-04', 'bpg-p50', 'Without 2,3-BPG, what would haemoglobin do in capillaries where pO₂ is about 26 torr?', 'Stay fully saturated and fail to unload O₂', ['Unload all of its O₂ at once', 'Unload exactly half of its O₂', 'Bind CO from the tissues instead of O₂'], {
         explanation: 'Slides 52–54: without BPG, P50 is 1 torr, so at 26 torr SO₂ is about 1.0 — no unloading. With BPG, SO₂ is 0.5.',
         skill: 'cause-effect',
         difficulty: 'advanced',
@@ -214,7 +214,7 @@ export const interactive: Record<string, Steps> = {
       'HbF (α₂γ₂) has serine instead of histidine at H21. With fewer positive charges in the cavity it binds 2,3-BPG less strongly, so its O₂ affinity is higher than HbA’s — oxygen passes from mother to fetus.',
     ], { sourceRefs: ref([56, 57, 58]) }),
     ask(
-      mcq('c4-05', 'fetal-haemoglobin', 'Why does fetal haemoglobin bind oxygen more tightly than adult haemoglobin?', 'It binds 2,3-BPG less strongly (Ser instead of His at H21)', ['It has no haem', 'It binds 2,3-BPG more strongly', 'It is a monomer like myoglobin'], {
+      mcq('c4-05', 'fetal-haemoglobin', 'Why does fetal haemoglobin bind oxygen more tightly than adult haemoglobin?', 'It binds 2,3-BPG less strongly (Ser instead of His at H21)', ['It has no haem, so it binds O₂ through its globin', 'It binds 2,3-BPG more strongly (His instead of Ser at H21)', 'It is a monomer, like myoglobin'], {
         explanation: 'Slide 57.',
         skill: 'cause-effect',
       })

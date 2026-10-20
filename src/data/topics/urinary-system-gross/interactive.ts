@@ -11,7 +11,7 @@ export const interactive: Record<string, Steps> = {
       'Retroperitoneal, T12 to L3, the right about 1–1.5 cm lower than the left because of the liver. Each is about 12 × 6 × 3 cm and 130–150 g.',
     ], { sourceRefs: ur([4]) }),
     ask(order('i1-01', 'kidney-coverings', 'Order the coverings of the kidney from inside out:', ['Fibrous renal capsule', 'Perirenal fat', 'Renal fascia', 'Pararenal fat'], { explanation: 'Slide 7.' })),
-    ask(mcq('i1-02', 'kidney-coverings', 'Why can a perinephric abscess track down into the pelvis?', 'The renal fascia has little or no attachment inferiorly', ['The renal capsule is absent below', 'The pararenal fat is continuous with the bladder', 'The ureter carries pus downward'], { explanation: 'Slides 9–10.', skill: 'cause-effect' })),
+    ask(mcq('i1-02', 'kidney-coverings', 'Why can a perinephric abscess track down into the pelvis?', 'The renal fascia has little or no attachment inferiorly', ['The fibrous renal capsule is absent at the lower pole', 'The pararenal fat is continuous with the bladder wall', 'The ureter carries the pus down inside its lumen'], { explanation: 'Slides 9–10.', skill: 'cause-effect' })),
     learn('In front of each kidney', [
       'Right: suprarenal, liver, 2nd part of duodenum, hepatic flexure, small intestine. Left: suprarenal, stomach, spleen, pancreas, jejunum, descending colon.',
     ], { sourceRefs: ur([13]) }),
@@ -35,7 +35,7 @@ export const interactive: Record<string, Steps> = {
     learn('Two unequal renal veins', [
       'The left renal vein is about three times longer, crosses in front of the aorta and receives the left gonadal and suprarenal veins — so the left kidney is preferred for live donation.',
     ], { sourceRefs: ur([22]) }),
-    ask(mcq('i2-03', 'kidney-vessels', 'Where is the avascular line of Brödel?', 'Along the lateral, slightly posterior border of the kidney', ['At the hilum', 'Across the upper pole', 'Along the medial border'], { explanation: 'Slide 24.' })),
+    ask(mcq('i2-03', 'kidney-vessels', 'Where is the avascular line of Brödel?', 'Along the lateral, slightly posterior border of the kidney', ['At the hilum, between the vessels', 'Across the upper pole, below the adrenal', 'Along the medial border, near the ureter'], { explanation: 'Slide 24.' })),
     learn('Suprarenal blood supply', [
       'Three arteries (from inferior phrenic, aorta and renal artery) but one vein: into the IVC on the right and the left renal vein on the left.',
     ], { sourceRefs: ur([36]) }),
@@ -47,7 +47,7 @@ export const interactive: Record<string, Steps> = {
   ],
 
   [L(3)]: [
-    ask(mcq('i3-01', 'ureter-course', 'At surgery, how is the ureter identified?', 'Whitish, non-pulsatile, and shows peristalsis when pinched', ['Red and pulsatile', 'It has a visible valve', 'It runs in front of the gonadal vessels'], { explanation: 'Slide 38 (Kelly’s sign).' })),
+    ask(mcq('i3-01', 'ureter-course', 'At surgery, how is the ureter identified?', 'Whitish, non-pulsatile, and shows peristalsis when pinched', ['Red, pulsatile and thick-walled like an artery', 'It has a visible valve where it joins the pelvis', 'It runs in front of the gonadal vessels throughout'], { explanation: 'Slide 38 (Kelly’s sign).' })),
     learn('Water under the bridge', [
       'In the female pelvis the uterine artery crosses above the ureter near the lateral vaginal fornix — a classic place to injure it in hysterectomy.',
     ], { sourceRefs: ur([42, 43]) }),
@@ -77,7 +77,7 @@ export const interactive: Record<string, Steps> = {
     learn('Two sphincters', [
       'Internal: smooth muscle, involuntary, sympathetic; also stops retrograde ejaculation. External: skeletal muscle, voluntary, pudendal nerve.',
     ], { sourceRefs: ur([65]) }),
-    ask(mcq('i4-03', 'bladder-interior', 'The uvula vesicae is produced by:', 'The median lobe of the prostate', ['The interureteric ridge', 'The urachus', 'The seminal vesicles'], { explanation: 'Slide 61.' })),
+    ask(mcq('i4-03', 'bladder-interior', 'The uvula vesicae is produced by:', 'The median lobe of the prostate', ['The interureteric ridge', 'The obliterated urachus', 'The seminal vesicles'], { explanation: 'Slide 61.' })),
     recall('r4-01', 'bladder-structure', 'Give the relations of the base (posterior surface) of the bladder in each sex.', [
       'Male: seminal vesicles and ampullae of the vas deferens; rectum behind, separated by the rectovesical (Denonvilliers’) fascia.',
       'Female: cervix and upper vagina, separated by the vesicovaginal septum.',
@@ -93,11 +93,11 @@ export const interactive: Record<string, Steps> = {
     learn('Narrowest and widest', [
       'Prostatic: widest and most dilatable. Membranous: narrowest, least dilatable and most easily injured.',
     ], { sourceRefs: ur([71]) }),
-    ask(mcq('i5-02', 'male-urethra', 'What opens on the seminal colliculus (verumontanum)?', 'The ejaculatory ducts and prostatic utricle', ['The bulbourethral glands', 'The ureters', 'The prostatic ducts only'], { explanation: 'Slide 72.' })),
+    ask(mcq('i5-02', 'male-urethra', 'What opens on the seminal colliculus (verumontanum)?', 'The ejaculatory ducts and prostatic utricle', ['The bulbourethral glands', 'The two ureters', 'The prostatic ducts only'], { explanation: 'Slide 72.' })),
     learn('Why women get more UTIs', [
       'The female urethra is only 3–4 cm and distensible, so bacteria reach the bladder easily — but catheterisation is easier.',
     ], { sourceRefs: ur([70]) }),
-    ask(mcq('i5-03', 'urethra-supply-incontinence', 'Why are infants physiologically incontinent?', 'Their corticospinal tracts to the external sphincter are not yet myelinated', ['Their bladder has no detrusor', 'They lack a trigone', 'Their pudendal nerve is absent'], { explanation: 'Slide 75.', skill: 'cause-effect' })),
+    ask(mcq('i5-03', 'urethra-supply-incontinence', 'Why are infants physiologically incontinent?', 'Their corticospinal tracts to the external sphincter are not yet myelinated', ['Their bladder has no detrusor muscle yet', 'They lack a trigone until about two years', 'Their pudendal nerve is absent at birth'], { explanation: 'Slide 75.', skill: 'cause-effect' })),
     recall('r5-01', 'urethra-supply-incontinence', 'Describe the lymph drainage of the male urethra.', [
       'Prostatic and membranous parts: internal iliac nodes.',
       'Spongy part: inguinal nodes, with some to the external iliac nodes.',

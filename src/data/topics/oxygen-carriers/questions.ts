@@ -30,13 +30,13 @@ const lesson1: Q[] = [
     explanation: 'Slide 2: the effect of these species on the two carriers is not the same (Lesson 3 shows how).',
     skill: 'misconception',
   }),
-  mcq('q1-03', 'carrier-roles', 'Why can myoglobin and haemoglobin bind oxygen?', 'They carry a non-polypeptide haem group', ['Their histidines bind O₂ directly', 'They contain copper', 'Their α-helices trap O₂'], {
+  mcq('q1-03', 'carrier-roles', 'Why can myoglobin and haemoglobin bind oxygen?', 'They carry a non-polypeptide haem group', ['Their histidines bind O₂ directly', 'They contain copper ions', 'Their α-helices trap O₂ inside'], {
     explanation: 'Slide 2: they bind oxygen because of the haem group.',
   }),
   mcq('q1-04', 'carrier-roles', 'In which tissue does myoglobin act as a reserve supply of oxygen?', 'Red muscle', ['Red blood cells', 'Lung', 'Liver'], {
     explanation: 'Slide 2.',
   }),
-  mcq('q1-05', 'haem-iron', 'How many bonds does the haem iron make to the protoporphyrin ring?', 'Four — to the central nitrogens', ['Two', 'Six', 'One'], {
+  mcq('q1-05', 'haem-iron', 'How many bonds does the haem iron make to the protoporphyrin ring?', 'Four — to the central nitrogens', ['Two — to opposite nitrogens', 'Six — to all the ring atoms', 'One — to a single nitrogen'], {
     explanation: 'Slide 4: the iron binds the four nitrogens in the centre of the ring; it can form two more bonds outside the plane.',
   }),
   mcq('q1-06', 'haem-iron', 'Where are the fifth and sixth coordination positions?', 'One on each side of the haem plane', ['Both in the plane of the ring', 'On the propionate side chains', 'Inside the pyrrole rings'], {
@@ -62,7 +62,7 @@ const lesson1: Q[] = [
   mcq('q1-10', 'myoglobin-shape', 'About what fraction of myoglobin’s main chain is α-helical?', 'About 75%', ['About 25%', 'About 50%', 'All of it'], {
     explanation: 'Slide 7.',
   }),
-  mcq('q1-11', 'myoglobin-shape', 'How many major helical segments does myoglobin have?', 'Eight (A–H)', ['Four', 'Six', 'Twelve'], {
+  mcq('q1-11', 'myoglobin-shape', 'How many major helical segments does myoglobin have?', 'Eight (A–H)', ['Four (A–D)', 'Six (A–F)', 'Twelve (A–L)'], {
     explanation: 'Slide 7.',
   }),
   mcq('q1-12', 'myoglobin-shape', 'What are myoglobin’s dimensions (slide 7)?', '45 × 35 × 25 Å', ['A 55 Å sphere', '10 × 10 × 10 Å', '100 × 50 × 25 Å'], {
@@ -90,7 +90,7 @@ const lesson1: Q[] = [
   mcq('q1-17', 'myoglobin-shape', 'Which handedness are myoglobin’s α-helices?', 'Right-handed', ['Left-handed', 'A mixture of both', 'They are not helical'], {
     explanation: 'Slide 7: right-handed α-helical segments.',
   }),
-  mcq('q1-18', 'helix-termination', 'Why does proline terminate an α-helix?', 'Its bulky five-membered ring does not fit inside a helix except at an end', ['It carries a negative charge', 'It forms disulfide bonds', 'It binds the haem'], {
+  mcq('q1-18', 'helix-termination', 'Why does proline terminate an α-helix?', 'Its bulky five-membered ring does not fit inside a helix except at an end', ['It carries a negative charge that repels the helix dipole', 'It forms disulfide bonds that pull the chain out of the helix', 'It binds the haem group and holds the chain away'], {
     explanation: 'Slide 10.',
     skill: 'cause-effect',
   }),
@@ -98,7 +98,7 @@ const lesson1: Q[] = [
     explanation: 'Slide 12.',
     difficulty: 'intermediate',
   }),
-  mcq('q1-20', 'helix-termination', 'Besides proline, what can end an α-helix (slide 12)?', 'The –OH of serine or threonine interacting with a main-chain carbonyl', ['A disulfide bond between cysteines', 'Binding of haem', 'Glycosylation'], {
+  mcq('q1-20', 'helix-termination', 'Besides proline, what can end an α-helix (slide 12)?', 'The –OH of serine or threonine interacting with a main-chain carbonyl', ['A disulfide bond between two cysteines', 'Binding of the haem group', 'Glycosylation of an asparagine'], {
     explanation: 'Slide 12.',
     difficulty: 'intermediate',
   }),
@@ -111,7 +111,7 @@ const lesson1: Q[] = [
   multi('q1-22', 'residue-distribution', 'Which residues are typical of myoglobin’s interior? Select all that apply.', ['Leucine', 'Valine', 'Methionine', 'Phenylalanine'], ['Aspartate', 'Arginine'], {
     explanation: 'Slide 13.',
   }),
-  mcq('q1-23', 'residue-distribution', 'How are threonine, tyrosine and tryptophan positioned in myoglobin?', 'Their nonpolar parts point inward', ['They are entirely buried', 'Their polar parts point inward', 'They are absent from myoglobin'], {
+  mcq('q1-23', 'residue-distribution', 'How are threonine, tyrosine and tryptophan positioned in myoglobin?', 'Their nonpolar parts point inward', ['They are entirely buried in the core', 'Their polar parts point inward', 'They are absent from myoglobin'], {
     explanation: 'Slide 14.',
   }),
   mcq('q1-24', 'residue-distribution', 'What are the only polar residues inside myoglobin?', 'Two histidines', ['Two lysines', 'Four serines', 'Two aspartates'], {
@@ -124,7 +124,7 @@ const lesson1: Q[] = [
     explanation: 'Slide 13: glutamate, aspartate, glutamine, asparagine, lysine and arginine are not found inside.',
     skill: 'misconception',
   }),
-  mcq('q1-26', 'residue-distribution', 'A mutation places a lysine in myoglobin’s interior. Why would that be unusual?', 'Charged side chains like lysine are not found inside myoglobin', ['Lysine is too small to fit', 'Lysine would bind the haem', 'Lysine always ends a helix'], {
+  mcq('q1-26', 'residue-distribution', 'A mutation places a lysine in myoglobin’s interior. Why would that be unusual?', 'Charged side chains like lysine are not found inside myoglobin', ['Lysine is too small to fill the space', 'Lysine would bind to the haem iron', 'Lysine always ends an α-helix'], {
     explanation: 'Slide 13: the interior is nonpolar.',
     skill: 'application',
     difficulty: 'intermediate',
@@ -145,7 +145,7 @@ const lesson2: Q[] = [
   mcq('q2-03', 'proximal-distal-histidine', 'Which coordination position does the proximal histidine occupy?', 'The fifth', ['The sixth', 'The first', 'None'], {
     explanation: 'Slide 17.',
   }),
-  mcq('q2-04', 'proximal-distal-histidine', 'Where does O₂ bind?', 'At the sixth coordination position, on the side opposite F8', ['At the fifth position, next to F8', 'To the distal histidine', 'To a propionate side chain'], {
+  mcq('q2-04', 'proximal-distal-histidine', 'Where does O₂ bind?', 'At the sixth coordination position, on the side opposite F8', ['At the fifth position, next to the proximal histidine F8', 'To the distal histidine E7 directly', 'To one of the propionate side chains'], {
     explanation: 'Slide 17: the oxygen-binding site is on the other side of the haem plane, at the sixth coordination position.',
   }),
   tf({
@@ -155,21 +155,21 @@ const lesson2: Q[] = [
     explanation: 'Slide 17: E7 is nearby but not bonded to the haem; F8 is bonded.',
     skill: 'misconception',
   }),
-  mcq('q2-06', 'proximal-distal-histidine', 'In myoglobin without O₂, where does the iron sit relative to the haem plane (slide 17)?', 'About 0.3 Å out of the plane, on the F8 side', ['Exactly in the plane', 'About 0.3 Å out, on the E7 side', 'Outside the protein'], {
+  mcq('q2-06', 'proximal-distal-histidine', 'In myoglobin without O₂, where does the iron sit relative to the haem plane (slide 17)?', 'About 0.3 Å out of the plane, on the F8 side', ['Exactly in the plane of the ring', 'About 0.3 Å out of the plane, on the E7 side', 'Outside the protein, in the solvent'], {
     explanation: 'Slide 17 (textbook page).',
     difficulty: 'advanced',
   }),
-  mcq('q2-07', 'proximal-distal-histidine', 'Where are the haem’s propionate side chains in myoglobin (slide 17)?', 'On the surface, ionised at physiological pH', ['Buried in the interior', 'Bonded to the iron', 'Bound to the distal histidine'], {
+  mcq('q2-07', 'proximal-distal-histidine', 'Where are the haem’s propionate side chains in myoglobin (slide 17)?', 'On the surface, ionised at physiological pH', ['Buried in the hydrophobic interior', 'Bonded directly to the iron', 'Bound to the distal histidine'], {
     explanation: 'Slide 17 (textbook page).',
     difficulty: 'intermediate',
   }),
-  mcq('q2-08', 'preventing-oxidation', 'What happens to free haem in water when exposed to O₂?', 'It is rapidly oxidised to methaem', ['It binds O₂ reversibly for hours', 'It releases CO', 'It becomes bilirubin'], {
+  mcq('q2-08', 'preventing-oxidation', 'What happens to free haem in water when exposed to O₂?', 'It is rapidly oxidised to methaem', ['It binds O₂ reversibly for hours', 'It releases carbon monoxide', 'It becomes bilirubin'], {
     explanation: 'Slide 18.',
   }),
   mcq('q2-09', 'preventing-oxidation', 'Which complex forms before methaem?', 'Haem–O₂–haem', ['Haem–CO–haem', 'Haem–globin–haem', 'Haem–H₂O'], {
     explanation: 'Slide 18.',
   }),
-  mcq('q2-10', 'preventing-oxidation', 'What blocks the formation of that complex in myoglobin?', 'The distal histidine E7 and residues around the sixth position', ['The proximal histidine F8', 'Proline C2', '2,3-BPG'], {
+  mcq('q2-10', 'preventing-oxidation', 'What blocks the formation of that complex in myoglobin?', 'The distal histidine E7 and residues around the sixth position', ['The proximal histidine F8 on the other face', 'Proline C2 at the end of helix C', '2,3-BPG bound in the central cavity'], {
     explanation: 'Slide 19.',
   }),
   tf({
@@ -178,15 +178,15 @@ const lesson2: Q[] = [
     answer: true,
     explanation: 'Slide 19.',
   }),
-  mcq('q2-12', 'preventing-oxidation', 'What does the polypeptide chain create around the haem?', 'A hindered environment that lets haem bind O₂ reversibly for long periods', ['An open channel for water', 'A positively charged cavity for 2,3-BPG', 'A site for haem oxygenase'], {
+  mcq('q2-12', 'preventing-oxidation', 'What does the polypeptide chain create around the haem?', 'A hindered environment that lets haem bind O₂ reversibly for long periods', ['An open channel that lets water reach the iron', 'A positively charged cavity that binds 2,3-BPG', 'A binding site for haem oxygenase to degrade it'], {
     explanation: 'Slide 20.',
   }),
-  mcq('q2-13', 'preventing-oxidation', 'A mutation removes the distal histidine and its neighbours. What would you predict?', 'Faster oxidation to methaem and loss of O₂ binding', ['Stronger, longer O₂ binding', 'No change at all', 'Myoglobin would start binding 2,3-BPG'], {
+  mcq('q2-13', 'preventing-oxidation', 'A mutation removes the distal histidine and its neighbours. What would you predict?', 'Faster oxidation to methaem and loss of O₂ binding', ['Stronger, longer-lasting O₂ binding', 'No change in O₂ binding at all', 'Myoglobin would start binding 2,3-BPG'], {
     explanation: 'Slides 18–20: without the hindered pocket the haem–O₂–haem sandwich can form and the iron is oxidised.',
     skill: 'prediction',
     difficulty: 'advanced',
   }),
-  mcq('q2-14', 'co-binding', 'How much more strongly does free haem bind CO than O₂?', 'About 25,000 times', ['About 200 times', 'About 2 times', 'Equally'], {
+  mcq('q2-14', 'co-binding', 'How much more strongly does free haem bind CO than O₂?', 'About 25,000 times', ['About 200 times', 'About 2 times', 'Equally strongly'], {
     explanation: 'Slide 21. (Lehninger: “more than 20,000 times”, p. 162.)',
   }),
   mcq('q2-15', 'co-binding', 'In free haem, how are the Fe, C and O atoms of bound CO arranged?', 'In a straight line', ['Bent at an angle', 'In a ring', 'CO does not bind free haem'], {
@@ -202,18 +202,18 @@ const lesson2: Q[] = [
   mcq('q2-17', 'co-binding', 'Which residue forces CO to bind bent in myoglobin?', 'The distal histidine (E7)', ['The proximal histidine (F8)', 'Phenylalanine CD1', 'Glycine B6'], {
     explanation: 'Slides 22–23.',
   }),
-  mcq('q2-18', 'co-binding', 'Which statement about CO and haemoglobin is correct?', 'CO still binds about 200 times more strongly than O₂', ['CO binds more weakly than O₂', 'CO binds exactly as strongly as O₂', 'CO binds 25,000 times more strongly than O₂'], {
+  mcq('q2-18', 'co-binding', 'Which statement about CO and haemoglobin is correct?', 'CO still binds about 200 times more strongly than O₂', ['CO binds more weakly than O₂ to haemoglobin', 'CO binds exactly as strongly as O₂ does', 'CO binds 25,000 times more strongly than O₂'], {
     explanation: 'Slide 21: with the polypeptide chains present, CO affinity is only about 200 times that of O₂ — still far higher.',
     clinical: true,
   }),
   mcq('q2-19', 'conserved-residues', 'How many positions are the same in (nearly) all haemoglobins studied?', 'Nine', ['Twenty', 'Two', 'Forty'], {
     explanation: 'Slide 26.',
   }),
-  mcq('q2-20', 'conserved-residues', 'Why is B6 almost always glycine?', 'There is no room for a larger side chain where helices B and E cross', ['Glycine binds the haem', 'Glycine ends helix B', 'Glycine binds 2,3-BPG'], {
+  mcq('q2-20', 'conserved-residues', 'Why is B6 almost always glycine?', 'There is no room for a larger side chain where helices B and E cross', ['Glycine binds the haem at that point', 'Glycine ends helix B at the corner', 'Glycine binds 2,3-BPG in the cavity'], {
     explanation: 'Slides 28–29.',
     skill: 'cause-effect',
   }),
-  mcq('q2-21', 'conserved-residues', 'What is the role of tyrosine HC2?', 'It cross-links the H and F helices', ['It ends helix C', 'It binds the iron', 'It is a haem contact'], {
+  mcq('q2-21', 'conserved-residues', 'What is the role of tyrosine HC2?', 'It cross-links the H and F helices', ['It ends helix C', 'It binds the haem iron', 'It is a direct haem contact'], {
     explanation: 'Slides 28–29.',
     difficulty: 'intermediate',
   }),
@@ -252,7 +252,7 @@ const lesson3: Q[] = [
   mcq('q3-03', 'haemoglobin-structure', 'How many amino acids are in each β chain?', '146', ['141', '153', '574'], {
     explanation: 'Slide 25.',
   }),
-  mcq('q3-04', 'haemoglobin-structure', 'Where are the haems in haemoglobin?', 'In crevices near the outside, far apart from each other', ['Clustered at the centre', 'Between the α chains only', 'Outside the protein'], {
+  mcq('q3-04', 'haemoglobin-structure', 'Where are the haems in haemoglobin?', 'In crevices near the outside, far apart from each other', ['Clustered together at the centre', 'Between the two α chains only', 'Outside the protein, on its surface'], {
     explanation: 'Slide 24.',
   }),
   tf({
@@ -261,7 +261,7 @@ const lesson3: Q[] = [
     answer: true,
     explanation: 'Slide 24.',
   }),
-  mcq('q3-06', 'allostery', 'What is an allosteric interaction?', 'An interaction between two spatially separate sites on a protein', ['Two ligands competing for the same site', 'Covalent modification of an enzyme', 'A substrate binding at the active site'], {
+  mcq('q3-06', 'allostery', 'What is an allosteric interaction?', 'An interaction between two spatially separate sites on a protein', ['Two ligands competing for the same binding site', 'Covalent modification of an enzyme by a kinase', 'A substrate binding at the active site of an enzyme'], {
     explanation: 'Slide 30.',
     skill: 'terminology',
   }),
@@ -290,7 +290,7 @@ const lesson3: Q[] = [
     explanation: 'Slide 33.',
     difficulty: 'advanced',
   }),
-  mcq('q3-13', 't-r-switch', 'What stabilises the T state of deoxyhaemoglobin (slide 34)?', 'Ion pairs (salt bridges) within and between subunits', ['Disulfide bonds', 'Bound oxygen', 'Covalent links to haem'], {
+  mcq('q3-13', 't-r-switch', 'What stabilises the T state of deoxyhaemoglobin (slide 34)?', 'Ion pairs (salt bridges) within and between subunits', ['Disulfide bonds between chains', 'Oxygen bound to each haem', 'Covalent links to the haems'], {
     explanation: 'Slide 34.',
   }),
   tf({
@@ -299,27 +299,27 @@ const lesson3: Q[] = [
     answer: true,
     explanation: 'Slide 33: intact in the T (deoxy) form, broken in the R (oxy) form.',
   }),
-  mcq('q3-15', 'mb-vs-hb-binding', 'Which protein binds oxygen co-operatively?', 'Haemoglobin', ['Myoglobin', 'Both', 'Neither'], {
+  mcq('q3-15', 'mb-vs-hb-binding', 'Which protein binds oxygen co-operatively?', 'Haemoglobin', ['Myoglobin', 'Both', 'Neither of them'], {
     explanation: 'Slide 35.',
   }),
   multi('q3-16', 'mb-vs-hb-binding', 'Which affect oxygen binding by haemoglobin but NOT by myoglobin? Select all that apply.', ['pH', 'pCO₂', '2,3-DPG'], ['The haem group'], {
     explanation: 'Slide 35. Both proteins need their haem group to bind O₂.',
   }),
-  mcq('q3-17', 'mb-vs-hb-binding', 'What must happen for haemoglobin to bind oxygen co-operatively (slide 35)?', 'Many weak bonds are broken', ['Covalent bonds form to O₂', 'The haems move together', 'The iron is oxidised'], {
+  mcq('q3-17', 'mb-vs-hb-binding', 'What must happen for haemoglobin to bind oxygen co-operatively (slide 35)?', 'Many weak bonds are broken', ['Covalent bonds form to the O₂', 'The four haems move closer together', 'The iron is oxidised to Fe³⁺'], {
     explanation: 'Slide 35.',
     difficulty: 'intermediate',
   }),
   mcq('q3-18', 'dissociation-curve', 'What is plotted on an oxygen dissociation curve?', 'Fractional saturation (Y) against pO₂', ['pO₂ against time', 'Haemoglobin concentration against pH', 'pCO₂ against pO₂'], {
     explanation: 'Slide 36.',
   }),
-  mcq('q3-19', 'dissociation-curve', 'What does P50 mean?', 'The pO₂ at which the protein is half saturated', ['The saturation at a pO₂ of 50 torr', 'The pH at half saturation', 'Half of the maximum velocity'], {
+  mcq('q3-19', 'dissociation-curve', 'What does P50 mean?', 'The pO₂ at which the protein is half saturated', ['The saturation reached at a pO₂ of 50 torr', 'The pH at which the protein is half saturated', 'Half of the maximum velocity of O₂ binding'], {
     explanation: 'Slides 37–38.',
     skill: 'terminology',
   }),
   mcq('q3-20', 'dissociation-curve', 'What is haemoglobin’s P50 under physiological conditions?', '26 torr', ['1 torr', '100 torr', '50 torr'], {
     explanation: 'Slide 38.',
   }),
-  mcq('q3-21', 'dissociation-curve', 'What is myoglobin’s P50?', 'About 1 torr', ['26 torr', '100 torr', '10 torr'], {
+  mcq('q3-21', 'dissociation-curve', 'What is myoglobin’s P50?', 'About 1 torr', ['26 torr', '100 torr', 'About 10 torr'], {
     explanation: 'Slides 38 and 52.',
   }),
   mcq('q3-22', 'dissociation-curve', 'Where does myoglobin’s curve lie compared with haemoglobin’s?', 'To the left', ['To the right', 'On top of it', 'It crosses it twice'], {
@@ -335,7 +335,7 @@ const lesson3: Q[] = [
     answer: true,
     explanation: 'Slide 38.',
   }),
-  mcq('q3-25', 'dissociation-curve', 'Why is a sigmoid curve useful for an oxygen carrier in blood?', 'It loads O₂ almost fully in the lungs yet releases much of it at the lower pO₂ of tissues', ['It keeps haemoglobin saturated in every tissue', 'It prevents CO binding', 'It stores O₂ in muscle'], {
+  mcq('q3-25', 'dissociation-curve', 'Why is a sigmoid curve useful for an oxygen carrier in blood?', 'It loads O₂ almost fully in the lungs yet releases much of it at the lower pO₂ of tissues', ['It keeps haemoglobin fully saturated in every tissue of the body', 'It prevents carbon monoxide from binding to the haem', 'It stores O₂ in the muscle until it is needed'], {
     explanation: 'Slide 38: P50 lies between tissue and alveolar pO₂.',
     skill: 'pathway-reasoning',
     difficulty: 'intermediate',
@@ -347,7 +347,7 @@ const lesson3: Q[] = [
     explanation: 'Slide 37: myoglobin is more saturated at every pO₂ apart from 0.',
     skill: 'misconception',
   }),
-  mcq('q3-27', 'dissociation-curve', 'Which describes myoglobin’s curve?', 'Hyperbolic, non-co-operative', ['Sigmoid, co-operative', 'Linear', 'Sigmoid, non-co-operative'], {
+  mcq('q3-27', 'dissociation-curve', 'Which describes myoglobin’s curve?', 'Hyperbolic, non-co-operative', ['Sigmoid, co-operative', 'Linear, non-co-operative', 'Sigmoid, non-co-operative'], {
     explanation: 'Slides 37–38.',
   }),
 ];
@@ -374,7 +374,7 @@ const lesson4: Q[] = [
     explanation: 'Lehninger (p. 171); the same figure is on slide 46.',
     difficulty: 'intermediate',
   }),
-  mcq('q4-06', 'bohr-effect', 'What is the effect of raising the pCO₂ at constant pH?', 'Haemoglobin’s O₂ affinity falls', ['Its affinity rises', 'No effect', 'Haemoglobin is oxidised'], {
+  mcq('q4-06', 'bohr-effect', 'What is the effect of raising the pCO₂ at constant pH?', 'Haemoglobin’s O₂ affinity falls', ['Its O₂ affinity rises', 'No effect on its affinity', 'Haemoglobin is oxidised'], {
     explanation: 'Slides 39 and 42.',
   }),
   order('q4-07', 'bohr-effect', 'Order the events in an active muscle.', [
@@ -383,7 +383,7 @@ const lesson4: Q[] = [
     'Haemoglobin’s curve shifts right',
     'More O₂ is released to the muscle',
   ], { explanation: 'Slides 40 and 42.' }),
-  mcq('q4-08', 'bohr-mechanism', 'Which residues carry the Bohr effect?', 'Those that bind H⁺ at the tissues and release it in the lungs', ['Those too basic to release H⁺', 'Those too acidic to bind H⁺', 'The haem propionates only'], {
+  mcq('q4-08', 'bohr-mechanism', 'Which residues carry the Bohr effect?', 'Those that bind H⁺ at the tissues and release it in the lungs', ['Those too basic to release H⁺ at any pH', 'Those too acidic to bind H⁺ at any pH', 'The haem propionates only'], {
     explanation: 'Slide 43.',
   }),
   tf({
@@ -411,7 +411,7 @@ const lesson4: Q[] = [
     explanation: 'Slides 47 and 50.',
     difficulty: 'advanced',
   }),
-  mcq('q4-15', 'bpg-binding', 'How does 2,3-BPG lower haemoglobin’s oxygen affinity?', 'It cross-links the β chains, stabilising the deoxy (T) structure', ['It oxidises the haem iron', 'It binds the haem in place of O₂', 'It cross-links the α chains in the R state'], {
+  mcq('q4-15', 'bpg-binding', 'How does 2,3-BPG lower haemoglobin’s oxygen affinity?', 'It cross-links the β chains, stabilising the deoxy (T) structure', ['It oxidises the haem iron to Fe³⁺', 'It binds the haem in place of O₂', 'It cross-links the α chains in the R state'], {
     explanation: 'Slide 51; Lehninger p. 172.',
     skill: 'cause-effect',
   }),
@@ -436,19 +436,19 @@ const lesson4: Q[] = [
     explanation: 'Slide 54: 1.0 without DPG, 0.5 with DPG.',
     difficulty: 'intermediate',
   }),
-  mcq('q4-21', 'bpg-p50', 'What do rising concentrations of 2,3-BPG do to the curve (slide 55)?', 'Shift it further to the right', ['Shift it to the left', 'Make it hyperbolic', 'No effect'], {
+  mcq('q4-21', 'bpg-p50', 'What do rising concentrations of 2,3-BPG do to the curve (slide 55)?', 'Shift it further to the right', ['Shift it to the left', 'Make it hyperbolic', 'Have no effect'], {
     explanation: 'Slide 55: increasing 2,3-DPG shifts the curve right — lower affinity, more O₂ delivered.',
   }),
-  mcq('q4-22', 'bpg-p50', 'Blood stored in acid-citrate-dextrose loses 2,3-BPG. What happens to its P50 (slide 54)?', 'It falls to about 16 torr — higher affinity', ['It rises to about 40 torr', 'It stays at 26 torr', 'It falls to 1 torr at once'], {
+  mcq('q4-22', 'bpg-p50', 'Blood stored in acid-citrate-dextrose loses 2,3-BPG. What happens to its P50 (slide 54)?', 'It falls to about 16 torr — higher affinity', ['It rises to about 40 torr — lower affinity', 'It stays at 26 torr — no change', 'It falls to 1 torr at once, like myoglobin'], {
     explanation: 'Slide 54 (textbook page): stored blood has P50 16 instead of 26 torr as BPG falls.',
     clinical: true,
     difficulty: 'advanced',
   }),
-  mcq('q4-23', 'bpg-p50', 'What happens to red-cell 2,3-BPG within two days of going from sea level to 4500 m (slide 58)?', 'It rises (about 4.5 → 7.0 mM)', ['It falls', 'It disappears', 'It does not change'], {
+  mcq('q4-23', 'bpg-p50', 'What happens to red-cell 2,3-BPG within two days of going from sea level to 4500 m (slide 58)?', 'It rises (about 4.5 → 7.0 mM)', ['It falls (about 7.0 → 4.5 mM)', 'It disappears completely', 'It does not change'], {
     explanation: 'Slide 58 (textbook page): high-altitude adaptation.',
     difficulty: 'intermediate',
   }),
-  mcq('q4-24', 'bpg-p50', 'A patient with severe emphysema has a low arterial pO₂. What compensatory change in 2,3-BPG would you expect?', 'An increase, shifting the curve right', ['A decrease, shifting the curve left', 'No change', 'Complete loss of BPG'], {
+  mcq('q4-24', 'bpg-p50', 'A patient with severe emphysema has a low arterial pO₂. What compensatory change in 2,3-BPG would you expect?', 'An increase, shifting the curve right', ['A decrease, shifting the curve left', 'No change in 2,3-BPG', 'Complete loss of 2,3-BPG'], {
     explanation: 'Slide 54 (textbook page): in hypoxia the curve shifts because DPG rises, so more O₂ is unloaded.',
     skill: 'application',
     clinical: true,
@@ -466,7 +466,7 @@ const lesson4: Q[] = [
     answer: true,
     explanation: 'Slides 56 and 58.',
   }),
-  mcq('q4-28', 'fetal-haemoglobin', 'Why is a higher O₂ affinity useful for the fetus?', 'Oxygen passes from maternal haemoglobin to fetal haemoglobin', ['It stores oxygen in fetal muscle', 'It prevents CO poisoning', 'It removes CO₂ from the fetus'], {
+  mcq('q4-28', 'fetal-haemoglobin', 'Why is a higher O₂ affinity useful for the fetus?', 'Oxygen passes from maternal haemoglobin to fetal haemoglobin', ['It stores oxygen in the fetal muscles', 'It prevents carbon monoxide poisoning', 'It removes CO₂ from the fetal blood'], {
     explanation: 'Slides 56 and 58.',
     skill: 'cause-effect',
   }),
