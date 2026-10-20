@@ -281,6 +281,12 @@ const ICONS = {
       <Path d="M12 11v5M12 8h.01" {...stroke(color, sw)} />
     </>
   ),
+  flag: ({ color, filled, sw }) => (
+    <>
+      <Path d="M6 21V4.5" {...stroke(color, sw)} />
+      <Path d="M6 4.5h10.5l-2.2 4 2.2 4H6" {...stroke(color, sw)} fill={filled ? color : 'none'} />
+    </>
+  ),
   warning: ({ color, sw }) => (
     <>
       <Path d="M10.6 4.8a1.6 1.6 0 0 1 2.8 0l7 12.4a1.6 1.6 0 0 1-1.4 2.4H5a1.6 1.6 0 0 1-1.4-2.4z" {...stroke(color, sw)} />

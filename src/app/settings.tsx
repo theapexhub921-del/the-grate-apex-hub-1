@@ -130,6 +130,7 @@ export default function SettingsScreen() {
 
   // Authentication session.
   const { user } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const [preferenceSyncError, setPreferenceSyncError] = useState(false);
   const [pushNotificationNotice, setPushNotificationNotice] = useState<string | null>(null);
   const [signingOut, setSigningOut] = useState(false);
@@ -498,6 +499,20 @@ export default function SettingsScreen() {
           </View>
           <Icon name="chevronRight" size={18} color={colors.textTertiary} />
         </Interactive>
+        {isAdmin ? (
+          <Interactive
+            onPress={() => router.push('/learn/question-reports' as Href)}
+            accessibilityLabel="Reported questions"
+            style={({ hovered }) => [styles.optionRow, styles.rowDivider, hovered && styles.rowHover]}
+          >
+            <Icon name="flag" size={18} color={colors.primaryText} />
+            <View style={styles.flex}>
+              <Text style={styles.optionLabel}>Reported questions</Text>
+              <Text style={styles.optionDescription}>Admins only: questions learners reported as wrong, unclear or with typos.</Text>
+            </View>
+            <Icon name="chevronRight" size={18} color={colors.textTertiary} />
+          </Interactive>
+        ) : null}
       </SettingsSection>
 
       <SettingsSection title="Offline study">

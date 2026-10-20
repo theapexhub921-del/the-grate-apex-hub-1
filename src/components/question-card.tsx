@@ -12,6 +12,7 @@ import Animated, {
 
 import { AiExplain } from '@/components/learning/ai-explain';
 import { QuestionFigure, QuestionImage } from '@/components/learning/figure-view';
+import { QuestionReportLink, UnderReviewNote } from '@/components/learning/question-report';
 import { Icon } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
@@ -245,6 +246,7 @@ export function QuestionCard({
           style={[styles.feedback, correct ? styles.feedbackCorrect : styles.feedbackIncorrect]}
           accessibilityLiveRegion="polite"
         >
+          <UnderReviewNote questionId={question.id} />
           <View style={styles.feedbackHeader}>
             <Animated.View style={[styles.feedbackMark, correct ? styles.feedbackMarkCorrect : styles.feedbackMarkIncorrect, markStyle]}>
               <Icon name={correct ? 'check' : 'reinforce'} size={15} color={correct ? '#FFFFFF' : colors.warningStrong} strokeWidth={correct ? 3 : 2.2} />
@@ -283,6 +285,7 @@ export function QuestionCard({
           </View>
 
           {!correct ? <AiExplain key={question.id} item={explainItem(question, value)} getLesson={() => aiLessonForQuestion(question)} /> : null}
+          <QuestionReportLink key={`report:${question.id}`} question={question} place={courseNameForQuestion(question) ?? 'Quiz'} />
         </View>
       )}
 

@@ -425,6 +425,58 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // "Report this question" (src/data/question-reports.ts): one private report per learner
+    // per question (id <question key>_<uid>). The learner and admins read it; admins close it.
+    match /questionReports/{id} {
+      allow create: if request.auth != null
+        && id == request.resource.data.qkey + '_' + request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['qid', 'qkey', 'uid', 'reason', 'note', 'text', 'where', 'status', 'createdAt'])
+        && request.resource.data.qid is string && request.resource.data.qid.size() > 0 && request.resource.data.qid.size() <= 300
+        && request.resource.data.qkey is string && request.resource.data.qkey.size() > 0 && request.resource.data.qkey.size() <= 300
+        && request.resource.data.reason in ['wrong-answer', 'typo', 'unclear', 'options', 'other']
+        && request.resource.data.note is string && request.resource.data.note.size() <= 500
+        && request.resource.data.text is string && request.resource.data.text.size() <= 600
+        && request.resource.data.where is string && request.resource.data.where.size() <= 120
+        && request.resource.data.status == 'open'
+        && request.resource.data.createdAt == request.time;
+      allow read: if request.auth != null
+        && (resource.data.uid == request.auth.uid || exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+      allow update: if exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['open', 'fixed', 'dismissed'];
+      allow delete: if false;
+    }
+
+    // How many learners reported each question (public counts, no names), so a question several
+    // learners say has a wrong answer shows "being checked". A learner can only add one, in the
+    // same write as their own new report; admins set `cleared` after checking the question.
+    match /questionFlags/{qkey} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && !exists(/databases/$(database)/documents/questionReports/$(qkey + '_' + request.auth.uid))
+        && existsAfter(/databases/$(database)/documents/questionReports/$(qkey + '_' + request.auth.uid))
+        && request.resource.data.keys().hasOnly(['qid', 'count', 'wrong', 'cleared', 'updatedAt'])
+        && request.resource.data.qid == getAfter(/databases/$(database)/documents/questionReports/$(qkey + '_' + request.auth.uid)).data.qid
+        && request.resource.data.count == 1
+        && request.resource.data.wrong == (getAfter(/databases/$(database)/documents/questionReports/$(qkey + '_' + request.auth.uid)).data.reason == 'wrong-answer' ? 1 : 0)
+        && request.resource.data.cleared == 0
+        && request.resource.data.updatedAt == request.time;
+      allow update: if request.auth != null && (
+        (!exists(/databases/$(database)/documents/questionReports/$(qkey + '_' + request.auth.uid))
+          && existsAfter(/databases/$(database)/documents/questionReports/$(qkey + '_' + request.auth.uid))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['count', 'wrong', 'updatedAt'])
+          && request.resource.data.count == resource.data.count + 1
+          && request.resource.data.wrong == resource.data.wrong + (getAfter(/databases/$(database)/documents/questionReports/$(qkey + '_' + request.auth.uid)).data.reason == 'wrong-answer' ? 1 : 0)
+          && request.resource.data.updatedAt == request.time)
+        || (exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cleared'])
+          && request.resource.data.cleared is int
+          && request.resource.data.cleared >= 0
+          && request.resource.data.cleared <= resource.data.wrong));
+      allow delete: if false;
+    }
+
     // XP battles. Only the server (api/battle.js) writes these; the two players can read their battle live.
     match /battles/{id} {
       allow read: if request.auth != null && request.auth.uid in resource.data.players;
