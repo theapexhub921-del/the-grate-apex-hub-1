@@ -207,6 +207,7 @@ Every lesson has an "Ask AI" tab (questions answered from the lesson's own text)
 
 `/learn/chat` (`src/app/learn/chat.tsx`) is a general AI chat, linked from the Learn home. It calls `/api/chat` (`api/chat.mjs`) through `src/lib/ai-chat-api.ts`, with its own per-learner allowance (120 requests / 10 min) separate from the lesson AI.
 
+* **AI chat history** (owner's request, 2026-10-20): every AI chat is saved to the learner's account in `users/{uid}/tutorChats` (existing rules, nothing to deploy) and listed under **Recent AI chats** on this page, with a filter (Study, Lessons, Explain, Voice). Study chat, Ask AI in a lesson (`AskAiPanel`, which also lists that lesson's recent chats, read by id prefix), "Explain with AI" threads and Voice tutor transcripts (saved when the call ends) all save themselves. Any of them except a voice call can be opened here and continued. The id prefix gives the kind (`tc_`, `la_<lesson>_`, `ex_`, `vt_`) and the first saved turn is a `{ role: 'context' }` note with the lesson / question: `src/data/ai-chat-history.ts` (pure, `tests/ai-chat-history.test.mjs`) and `src/data/tutor-chats.ts`.
 * Providers, tried in order: any OpenAI-compatible service (`CHAT_API_KEY`, optional `CHAT_API_BASE` default Groq, optional `CHAT_MODEL`), then Gemini (`GEMINI_API_KEY`, optional `GEMINI_CHAT_MODEL`). If the first is rate-limited or down, the next answers. Set at least one key in Vercel, then redeploy.
 
 ## Gifts between friends (coins and XP boosts)

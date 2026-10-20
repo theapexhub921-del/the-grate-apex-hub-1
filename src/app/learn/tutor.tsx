@@ -10,6 +10,9 @@ import { PageHeader, Screen, SectionHeader } from '@/components/ui/screen';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { createRealtimeTutorSession } from '@/data/ai-tutor';
+import { newAiChatId } from '@/data/ai-chat-history';
+import { saveTutorChat } from '@/data/tutor-chats';
+import type { ChatTurn } from '@/lib/ai-study-api';
 import { friendlyError } from '@/lib/errors';
 
 type TranscriptLine = { id: string; speaker: 'You' | 'GrAte Apex Hub'; text: string };
@@ -25,12 +28,29 @@ export default function TutorScreen() {
   const streamRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lineCounter = useRef(0);
+  // The whole call's transcript (the screen shows the last 20 lines), saved to the
+  // learner's AI chats when the call ends (Study chat → Recent AI chats).
+  const callLines = useRef<TranscriptLine[]>([]);
+  const callStarted = useRef<string | null>(null);
+  const [savedNote, setSavedNote] = useState('');
 
   const addTranscript = useCallback((speaker: TranscriptLine['speaker'], text: unknown) => {
     if (typeof text !== 'string' || !text.trim()) return;
     lineCounter.current += 1;
     const id = `${Date.now()}-${lineCounter.current}`;
+    callLines.current.push({ id, speaker, text: text.trim() });
     setLines((current) => [...current.slice(-19), { id, speaker, text: text.trim() }]);
+  }, []);
+
+  /** Saves the finished call's transcript once (nothing is saved for a call with no words). */
+  const saveCall = useCallback(() => {
+    const spoken = callLines.current;
+    const started = callStarted.current;
+    callLines.current = [];
+    callStarted.current = null;
+    if (!spoken.length || !started) return Promise.resolve(false);
+    const turns: ChatTurn[] = spoken.map((line) => ({ role: line.speaker === 'You' ? 'user' : 'model', text: line.text }));
+    return saveTutorChat({ id: newAiChatId('voice'), createdAt: started, turns, context: { kind: 'voice' } }).then(() => true, () => false);
   }, []);
 
   const endSession = useCallback(() => {
@@ -48,7 +68,8 @@ export default function TutorScreen() {
     audioRef.current = null;
     setBusy(false);
     setStatus('Call ended');
-  }, []);
+    void saveCall().then((ok) => setSavedNote(ok ? 'This call’s notes were saved to your AI chats (Learn → Study chat → Recent AI chats).' : ''));
+  }, [saveCall]);
 
   useEffect(() => () => {
     const peer = peerRef.current;
@@ -56,7 +77,8 @@ export default function TutorScreen() {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     audioRef.current?.pause();
     audioRef.current?.remove();
-  }, []);
+    void saveCall(); // leaving the page mid-call still keeps its notes
+  }, [saveCall]);
 
   async function startSession() {
     if (Platform.OS !== 'web') {
@@ -66,7 +88,10 @@ export default function TutorScreen() {
 
     setBusy(true);
     setError('');
+    setSavedNote('');
     setLines([]);
+    callLines.current = [];
+    callStarted.current = new Date().toISOString();
     setStatus('Requesting microphone permission…');
     let stream: MediaStream | null = null;
     let peer: RTCPeerConnection | null = null;
@@ -188,7 +213,8 @@ export default function TutorScreen() {
         {Platform.OS !== 'web' ? <Text style={styles.note}>The web voice preview is ready. Native phone audio support will be added with the device call integration.</Text> : null}
       </Card>
 
-      <SectionHeader title="Conversation notes" subtitle="Transcripts appear here while you speak. They stay on this screen and are not saved to your profile." style={styles.section} />
+      <SectionHeader title="Conversation notes" subtitle="Transcripts appear here while you speak. When the call ends they are saved to your AI chats, where only you can see them." style={styles.section} />
+      {savedNote ? <Text style={styles.note}>{savedNote}</Text> : null}
       {lines.length ? (
         <View style={styles.transcriptList}>
           {lines.map((line) => (

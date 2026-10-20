@@ -8,6 +8,8 @@ import { InlineNotice } from '@/components/ui/state-views';
 import { Text, TextInput } from '@/components/ui/text';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import type { AiLessonText } from '@/data/ai-context';
+import { newAiChatId } from '@/data/ai-chat-history';
+import { saveTutorChat } from '@/data/tutor-chats';
 import { AiError, type ChatTurn, type ExplainItem, explainWithAi } from '@/lib/ai-study-api';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -41,6 +43,8 @@ export function AiExplain({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const lesson = useRef<Promise<AiLessonText | null> | null>(null);
+  // Saved to the learner's AI chats (Study chat → Recent AI chats), one thread per opening.
+  const saved = useRef<{ id: string; createdAt: string } | null>(null);
   const busyRef = useRef(false);
   const alive = useRef(true);
   useEffect(() => {
@@ -58,7 +62,15 @@ export function AiExplain({
       if (!lesson.current) lesson.current = getLesson ? getLesson().catch(() => null) : Promise.resolve(null);
       const context = await lesson.current;
       const answer = await explainWithAi(context ? { title: context.title, text: context.text } : null, item, question, history);
-      if (alive.current) setTurns([...history, { role: 'user', text: question }, { role: 'model', text: answer }]);
+      const finished: ChatTurn[] = [...history, { role: 'user', text: question }, { role: 'model', text: answer }];
+      if (alive.current) setTurns(finished);
+      saved.current ??= { id: newAiChatId('explain'), createdAt: new Date().toISOString() };
+      void saveTutorChat({
+        id: saved.current.id,
+        createdAt: saved.current.createdAt,
+        turns: finished,
+        context: { kind: 'explain', item, ...(context ? { lessonId: context.id, lessonTitle: context.title } : {}) },
+      }).catch(() => undefined); // a failed save never interrupts the explanation
     } catch (problem) {
       if (alive.current) {
         setTurns(history);
@@ -129,7 +141,7 @@ export function AiExplain({
           <Button label="Ask" size="sm" onPress={followUp} loading={busy} disabled={busy || !draft.trim()} />
         </View>
       ) : null}
-      <Text style={styles.note}>AI can make mistakes. Check important points against your lecture notes.</Text>
+      <Text style={styles.note}>AI can make mistakes. Check important points against your lecture notes. Saved in Learn → Study chat → Recent AI chats.</Text>
     </Card>
   );
 }

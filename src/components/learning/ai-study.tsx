@@ -15,6 +15,8 @@ import { InlineNotice } from '@/components/ui/state-views';
 import { Text, TextInput } from '@/components/ui/text';
 import { elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
 import { AI_CARDS_KEY, aiCards, mergeCards, parseSavedCards } from '@/data/ai-study';
+import { newAiChatId } from '@/data/ai-chat-history';
+import { getTutorChat, listLessonChats, saveTutorChat, type TutorChatSummary } from '@/data/tutor-chats';
 import type { Flashcard } from '@/data/flashcards';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { AiError, askLessonAi, type ChatTurn, type LessonQuestion, makeLessonCards, makeLessonQuestions } from '@/lib/ai-study-api';
@@ -48,6 +50,10 @@ export function AskAiPanel({ lesson, focus, embedded = false, docked = false }: 
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // This conversation's saved copy (data/tutor-chats.ts), and the lesson's earlier chats.
+  const [chatId, setChatId] = useState<string | null>(null);
+  const [createdAt, setCreatedAt] = useState<string | null>(null);
+  const [recent, setRecent] = useState<TutorChatSummary[]>([]);
   const busyRef = useRef(false);
   const alive = useRef(true);
   useEffect(() => {
@@ -55,18 +61,32 @@ export function AskAiPanel({ lesson, focus, embedded = false, docked = false }: 
     return () => { alive.current = false; };
   }, []);
 
+  const loadRecent = useCallback(() => {
+    listLessonChats(lesson.id, 10).then((list) => { if (alive.current) setRecent(list); }).catch(() => { if (alive.current) setRecent([]); });
+  }, [lesson.id]);
+  useEffect(() => { queueMicrotask(loadRecent); }, [loadRecent]);
+
   async function send(text: string) {
     const question = text.trim();
     if (!question || busyRef.current) return;
     busyRef.current = true;
     const history = turns;
+    const id = chatId ?? newAiChatId('lesson', lesson.id);
+    const started = createdAt ?? new Date().toISOString();
+    setChatId(id);
+    setCreatedAt(started);
     setTurns([...history, { role: 'user', text: question }]);
     setDraft('');
     setError(null);
     setBusy(true);
     try {
       const answer = await askLessonAi(lesson, question, history);
-      if (alive.current) setTurns((current) => [...current, { role: 'model', text: answer }]);
+      const finished: ChatTurn[] = [...history, { role: 'user', text: question }, { role: 'model', text: answer }];
+      if (alive.current) setTurns(finished);
+      // Saved to the learner's AI chats (Study chat → Recent AI chats); a failed save never interrupts.
+      void saveTutorChat({ id, turns: finished, createdAt: started, context: { kind: 'lesson', lessonId: lesson.id, lessonTitle: lesson.title } })
+        .then(loadRecent)
+        .catch(() => undefined);
     } catch (problem) {
       if (alive.current) setError(problemText(problem));
     } finally {
@@ -75,20 +95,61 @@ export function AskAiPanel({ lesson, focus, embedded = false, docked = false }: 
     }
   }
 
+  async function openChat(id: string) {
+    if (busyRef.current) return;
+    setError(null);
+    try {
+      const chat = await getTutorChat(id);
+      if (!alive.current) return;
+      if (!chat) { setError('That chat could not be found. It may have been deleted.'); loadRecent(); return; }
+      setChatId(chat.id);
+      setCreatedAt(chat.createdAt);
+      setTurns(chat.turns);
+    } catch {
+      if (alive.current) setError('That chat could not be opened right now. Please try again.');
+    }
+  }
+
+  function newChat() {
+    setTurns([]);
+    setChatId(null);
+    setCreatedAt(null);
+    setError(null);
+    loadRecent();
+  }
+
   const conversation = (
     <>
       {embedded || docked ? null : <Text style={styles.panelTitle}>Ask AI</Text>}
       <Text style={styles.panelText}>Ask anything about “{lesson.title}”. The answers come from this lesson first. AI can make mistakes, so check important details against your lecture notes.</Text>
 
       {turns.length === 0 ? (
-        <View style={styles.chips}>
-          {(focus ? [`Explain “${focus}” in simple words`, ...SUGGESTIONS] : SUGGESTIONS).map((suggestion) => (
-            <Interactive key={suggestion} onPress={() => void send(suggestion)} disabled={busy} accessibilityRole="button" style={({ hovered }) => [styles.chip, hovered && styles.chipHover]}>
-              <Icon name="sparkle" size={14} color={colors.primaryText} />
-              <Text style={styles.chipText}>{suggestion}</Text>
-            </Interactive>
-          ))}
-        </View>
+        <>
+          <View style={styles.chips}>
+            {(focus ? [`Explain “${focus}” in simple words`, ...SUGGESTIONS] : SUGGESTIONS).map((suggestion) => (
+              <Interactive key={suggestion} onPress={() => void send(suggestion)} disabled={busy} accessibilityRole="button" style={({ hovered }) => [styles.chip, hovered && styles.chipHover]}>
+                <Icon name="sparkle" size={14} color={colors.primaryText} />
+                <Text style={styles.chipText}>{suggestion}</Text>
+              </Interactive>
+            ))}
+          </View>
+          {recent.length ? (
+            <View style={styles.recent}>
+              <Text style={styles.recentTitle}>Your recent chats about this lesson</Text>
+              {recent.slice(0, 5).map((chat) => (
+                <Interactive key={chat.id} onPress={() => void openChat(chat.id)} disabled={busy} accessibilityRole="button" accessibilityLabel={`Open chat: ${chat.title}`} style={({ hovered }) => [styles.recentRow, hovered && styles.chipHover]}>
+                  <Icon name="comment" size={14} color={colors.textSecondary} />
+                  <View style={styles.recentText}>
+                    <Text style={styles.chipText} numberOfLines={1}>{chat.title}</Text>
+                    <Text style={styles.recentMeta}>{chat.updatedAt ? new Date(chat.updatedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : 'Just now'} · {chat.turnCount} messages</Text>
+                  </View>
+                  <Icon name="chevronRight" size={16} color={colors.textTertiary} />
+                </Interactive>
+              ))}
+              <Text style={styles.recentMeta}>All your AI chats: Learn → Study chat → Recent AI chats.</Text>
+            </View>
+          ) : null}
+        </>
       ) : (
         <View style={styles.thread}>
           {turns.map((turn, i) => (
@@ -134,7 +195,7 @@ export function AskAiPanel({ lesson, focus, embedded = false, docked = false }: 
         />
         <Button label="Ask" icon={<Icon name="send" size={16} color={colors.onPrimary} />} onPress={() => void send(draft)} loading={busy} disabled={busy || !draft.trim()} />
       </View>
-      {turns.length > 0 ? <Button label="Clear conversation" variant="ghost" size="sm" onPress={() => { setTurns([]); setError(null); }} disabled={busy} /> : null}
+      {turns.length > 0 ? <Button label="New chat" variant="ghost" size="sm" onPress={newChat} disabled={busy} accessibilityHint="This chat stays saved in your recent chats" /> : null}
     </>
   );
 
@@ -446,6 +507,11 @@ function createStyles(colors: ThemeColors) {
     chip: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 11, paddingHorizontal: 14, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
     chipHover: { borderColor: colors.primaryBorder },
     chipText: { flex: 1, fontSize: 14, fontWeight: '600', color: colors.text },
+    recent: { gap: 8, marginTop: 6 },
+    recentTitle: { ...Type.overline, color: colors.textSecondary },
+    recentRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+    recentText: { flex: 1, minWidth: 0, gap: 2 },
+    recentMeta: { fontSize: 12.5, color: colors.textTertiary },
     thread: { gap: 10 },
     row: { flexDirection: 'row', justifyContent: 'flex-start' },
     rowUser: { justifyContent: 'flex-end' },
