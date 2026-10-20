@@ -1,8 +1,9 @@
 import { findLessonPractice, resumeHref, resumeLabel, useQuizDrafts } from '@/hooks/use-quiz-drafts';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { type ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { type ScrollView, StyleSheet, View } from 'react-native';
 
+import { useLayoutWidth } from '@/components/side-panel-store';
 import { QuizInProgressCard } from '@/components/learning/quiz-in-progress-card';
 import { LegacyBlocks, Rich, TermContext } from '@/components/learning/legacy-blocks';
 import { BackLink } from '@/components/learning/nav-bits';
@@ -49,8 +50,8 @@ export default function LegacyLessonScreen() {
   const colors = useTheme();
   const params = useLocalSearchParams<{ lesson?: string | string[]; section?: string | string[]; tab?: string | string[] }>();
   const lessonId = param(params.lesson);
-  const { width } = useWindowDimensions();
-  const wide = width >= 1000;
+  // The page's own room (less the Ask AI panel when it is open beside the lesson).
+  const wide = useLayoutWidth() >= 1000;
   const progress = useProgress();
   const scroll = useRef<ScrollView>(null);
   const [meta, setMeta] = useState<LegacyLessonMeta | null>(null);

@@ -1,5 +1,7 @@
 import { Children, isValidElement, type ReactNode, useState } from 'react';
-import { StyleSheet, useWindowDimensions, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+
+import { useLayoutWidth } from '@/components/side-panel-store';
 
 const rows = <T,>(items: readonly T[], size: number) => Array.from({ length: Math.ceil(items.length / size) }, (_, i) => items.slice(i * size, i * size + size));
 
@@ -26,7 +28,7 @@ export function CardGrid({
   gap?: number;
   style?: StyleProp<ViewStyle>;
 }) {
-  const { width: windowWidth } = useWindowDimensions();
+  const windowWidth = useLayoutWidth();
   const [measured, setMeasured] = useState(0);
   const width = measured || windowWidth;
   const perRow = Math.max(1, Math.min(maxColumns, Math.floor((width + gap) / (minItemWidth + gap))));

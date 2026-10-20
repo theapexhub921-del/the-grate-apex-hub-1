@@ -147,5 +147,6 @@ const styles = StyleSheet.create({
   content: { flex: 1, zIndex: 1, ...webStyle(cssTransition('padding-left', MOTION.standard)) },
   scene: { backgroundColor: 'transparent' },
   row: { flexDirection: 'row' },
-  tabs: { flex: 1 },
+  // minWidth 0: the page shrinks to make room for a docked side panel (Ask AI) instead of being pushed over.
+  tabs: { flex: 1, minWidth: 0 },
 });

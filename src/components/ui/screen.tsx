@@ -3,12 +3,12 @@ import {
   ScrollView,
   type StyleProp,
   StyleSheet,
-  useWindowDimensions,
   View,
   type ViewStyle,
 } from 'react-native';
 import { Text } from '@/components/ui/text';
 
+import { useLayoutWidth } from '@/components/side-panel-store';
 import { useTabBarScroll } from '@/components/tab-bar-visibility';
 import {
   CONTENT_MAX_WIDTH,
@@ -44,7 +44,8 @@ export const Screen = forwardRef<
   }
 >(function Screen({ children, width = 'content', contentStyle, background }, ref) {
   const styles = useThemedStyles(createStyles);
-  const { width: windowWidth } = useWindowDimensions();
+  // The room the page really has (less the Ask AI panel while it is docked open).
+  const windowWidth = useLayoutWidth();
   const tabBarScroll = useTabBarScroll();
   return (
     <ScrollView
@@ -153,7 +154,7 @@ export function Columns({
   gap?: number;
   sideFirstOnMobile?: boolean;
 }) {
-  const { width } = useWindowDimensions();
+  const width = useLayoutWidth();
   if (!isDesktopWidth(width)) {
     return (
       <View style={{ gap }}>

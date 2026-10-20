@@ -1,6 +1,7 @@
-import { type ReactNode, useEffect, useSyncExternalStore } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 
+import { addSidePanelHost, closeSidePanel, SIDE_PANEL_MIN_WINDOW, sidePanelWidth, useSidePanel } from '@/components/side-panel-store';
 import { IconButton } from '@/components/ui/icon-button';
 import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
@@ -13,60 +14,24 @@ import { useThemedStyles } from '@/hooks/use-theme';
 // Only the web shell (app-tabs.web.tsx) draws <SidePanelHost />. Callers check
 // useSidePanelAvailable() first and use a <Sheet> otherwise (phones, narrow windows).
 
-export const SIDE_PANEL_MIN_WINDOW = 1024;
-
-type Panel = { id: string; title: string; subtitle?: string; content: ReactNode };
-
-let panel: Panel | null = null;
-let hosts = 0;
-const listeners = new Set<() => void>();
-const emit = () => listeners.forEach((listener) => listener());
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => { listeners.delete(listener); };
-};
-
-export function openSidePanel(next: Panel) {
-  panel = next;
-  emit();
-}
-
-// Updates the title or content of the panel that is open, if it is this one.
-export function updateSidePanel(id: string, changes: Partial<Omit<Panel, 'id'>>) {
-  if (panel?.id !== id) return;
-  panel = { ...panel, ...changes };
-  emit();
-}
-
-// Closes the panel; with an id, only if that panel is the one open.
-export function closeSidePanel(id?: string) {
-  if (!panel || (id && panel.id !== id)) return;
-  panel = null;
-  emit();
-}
-
-export function useSidePanel() {
-  return useSyncExternalStore(subscribe, () => panel, () => null);
-}
-
-// True when a docked panel can be shown: the web shell is there and the window is wide enough.
-export function useSidePanelAvailable() {
-  const { width } = useWindowDimensions();
-  const hosted = useSyncExternalStore(subscribe, () => hosts > 0, () => false);
-  return hosted && width >= SIDE_PANEL_MIN_WINDOW;
-}
+export {
+  closeSidePanel,
+  openSidePanel,
+  SIDE_PANEL_MIN_WINDOW,
+  sidePanelWidth,
+  updateSidePanel,
+  useLayoutWidth,
+  useSidePanel,
+  useSidePanelAvailable,
+} from '@/components/side-panel-store';
 
 export function SidePanelHost() {
   const styles = useThemedStyles(createStyles);
   const { width } = useWindowDimensions();
   const current = useSidePanel();
-  useEffect(() => {
-    hosts += 1;
-    emit();
-    return () => { hosts -= 1; emit(); };
-  }, []);
+  useEffect(() => addSidePanelHost(), []);
   if (!current || width < SIDE_PANEL_MIN_WINDOW) return null;
-  const panelWidth = Math.round(Math.min(440, Math.max(360, width * 0.3)));
+  const panelWidth = sidePanelWidth(width);
   return (
     <View style={[styles.panel, { width: panelWidth }]} accessibilityLabel={current.title}>
       <View style={styles.header}>
@@ -84,7 +49,7 @@ export function SidePanelHost() {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-    panel: { height: '100%', borderLeftWidth: 1, borderLeftColor: colors.divider, backgroundColor: colors.surface, zIndex: 2 },
+    panel: { height: '100%', flexShrink: 0, borderLeftWidth: 1, borderLeftColor: colors.divider, backgroundColor: colors.surface, zIndex: 2 },
     header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 18, paddingRight: 10, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.divider },
     headText: { flex: 1, minWidth: 0 },
     title: { ...Type.headline, color: colors.text },
