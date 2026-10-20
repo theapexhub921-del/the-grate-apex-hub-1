@@ -65,7 +65,7 @@ export const interactive: Record<string, Steps> = {
     ask(mcq('c5-01', 'cytokine-basics', 'IL-2, IL-4 and IL-5 all promote B-cell proliferation. This is…', 'Redundancy', ['Pleiotropy', 'Synergy', 'Antagonism'], { explanation: 'CY slide 9.', skill: 'terminology' })),
     ask(order('c5-02', 'cytokine-receptors', 'Order JAK/STAT signalling.', ['Cytokine binds receptor', 'Receptor subunits dimerise', 'JAKs activated', 'STATs phosphorylated and dimerise', 'STATs enter nucleus and switch on genes'], { explanation: 'CY slide 14.' })),
     learn('A shared chain', ['IL-2, 4, 7, 9, 15 and 21 receptors share the common γ-chain. Lose it and T, NK and functional B cells fail — X-linked SCID.'], { sourceRefs: cy([9, 23]) }),
-    ask(mcq('c5-03', 'th-subsets', 'Which master transcription factor defines Th2 cells?', 'GATA-3', ['T-bet', 'RORγt', 'FoxP3'], { explanation: 'CY slide 16.' })),
+    ask(mcq('c5-03', 'th-subsets', 'Which master transcription factor defines Th2 cells?', 'GATA-3', ['T-bet (Th1)', 'RORγt', 'FoxP3'], { explanation: 'CY slide 16.' })),
     recall('r5-01', 'cytokine-disease', 'Explain bacterial septic shock in terms of cytokines.', [
       'LPS (endotoxin) binds TLR4 on dendritic cells and macrophages.',
       'They overproduce IL-1 and TNF-α — a cytokine storm.',
@@ -131,7 +131,7 @@ export const interactive: Record<string, Steps> = {
     ask(mcq('c10-01', 'antiviral-immunity', 'Which defence acts earliest against a virus, before antibody appears?', 'Interferons and NK cells', ['IgG from plasma cells', 'Memory B cells', 'Th2 cells and IgE'], { explanation: 'IF slide 8.' })),
     ask(mcq('c10-02', 'antibacterial-immunity', 'Why does eliminating intracellular bacteria require cell-mediated immunity?', 'They hide inside phagocytes, beyond antibody', ['They lack any antigens that antibody could bind', 'They activate complement, which protects them', 'They are too small for antibodies to reach'], { explanation: 'IF slide 16.', skill: 'cause-effect' })),
     learn('Drift and shift', ['Influenza changes its haemagglutinin slightly (drift) or radically (shift), so antibodies made earlier no longer fit.'], { sourceRefs: inf([11]) }),
-    ask(mcq('c10-03', 'fungi-parasites', 'Which response defends against helminths?', 'Th2 → IgE, eosinophils and mast cells', ['Th1 → IFN-γ and macrophages alone', 'Complement only, without any T cells', 'CD8 cytotoxic T cells alone'], { explanation: 'IF slides 21, 23.' })),
+    ask(mcq('c10-03', 'fungi-parasites', 'Which response defends against helminths?', 'Th2 → IgE, eosinophils and mast cells', ['Th1 → IFN-γ and macrophages alone', 'Complement only, without any T cells', 'CD8 cytotoxic T cells and NK cells alone'], { explanation: 'IF slides 21, 23.' })),
     recall('r10-01', 'antibacterial-immunity', 'Describe the immune response to Mycobacterium tuberculosis and how it evades it.', [
       'Th1 cells recognise mycobacterial peptides and release IFN-γ.',
       'Activated macrophages kill TB mainly with nitric oxide; exhausted macrophages are killed by CTLs and NK cells.',

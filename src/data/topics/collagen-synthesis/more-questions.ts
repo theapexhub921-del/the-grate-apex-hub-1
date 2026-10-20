@@ -146,7 +146,7 @@ const lesson5: Q[] = [
   mcq('q5-08', 'scurvy', 'Why must humans get ascorbic acid from their diet (slide 43)?', 'Primates cannot synthesise it', ['Humans lack prolyl hydroxylase', 'Humans make no collagen', 'Ascorbate is destroyed in the liver'], {
     explanation: 'Slide 43: primates and guinea pigs cannot synthesise ascorbic acid.',
   }),
-  mcq('q5-09', 'ehlers-danlos', 'What is Ehlers-Danlos syndrome?', 'A group of rare hereditary disorders in which collagen synthesis is impaired', ['A dietary deficiency of vitamin C that weakens collagen in skin and joints', 'A hereditary disease of cattle and sheep (dermatoparaxis), not of humans', 'A poisoning caused by eating sweet pea seeds'], {
+  mcq('q5-09', 'ehlers-danlos', 'What is Ehlers-Danlos syndrome?', 'A group of rare hereditary disorders in which collagen synthesis is impaired', ['A dietary deficiency of vitamin C that weakens collagen in skin and joints', 'A hereditary disease of cattle and sheep (dermatoparaxis), not of humans', 'A poisoning caused by eating sweet pea seeds (lathyrism) for months'], {
     explanation: 'Slide 65.',
   }),
   multi('q5-10', 'ehlers-danlos', 'Which defects can underlie Ehlers-Danlos syndrome? Select all that apply.', ['Defective type III collagen synthesis', 'Deficiency of procollagen peptidases', 'Defective hydroxylation of lysine', 'Deficiency of lysyl oxidase'], ['A glycine-to-cysteine change at residue 988', 'Lack of dietary ascorbate'], {

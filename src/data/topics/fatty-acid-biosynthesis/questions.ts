@@ -677,7 +677,7 @@ const lesson5: Q[] = [
   {
     id: 'q5-03', type: 'choice', conceptId: 'keto-reduction', skill: 'recall', label: 'From the diagram',
     prompt: 'Which first-round intermediate carries the hydroxyl group?',
-    options: ['Crotonyl-ACP', 'D-β-Hydroxybutyryl-ACP', 'Butyryl-ACP', 'Acetoacetyl-ACP'],
+    options: ['Crotonyl-ACP', 'D-β-Hydroxybutyryl-ACP', 'Butyryl-ACP (fully reduced)', 'Acetoacetyl-ACP'],
     answer: 1,
     explanation: 'D-β-Hydroxybutyryl-ACP, made by reducing acetoacetyl-ACP.',
   },
@@ -790,7 +790,7 @@ const lesson5: Q[] = [
     prompt: 'What does the ER activity do?',
     options: [
       'Reduces the double bond, giving a fully saturated chain',
-      'Releases the finished chain',
+      'Releases the finished chain from ACP₂ as free palmitate',
       'Adds the next malonyl group to the chain on ACP₂',
       'Reduces the β-keto group, giving a β-hydroxy chain',
     ],
@@ -1178,7 +1178,7 @@ const lesson7: Q[] = [
       'The kink of the cis double bond makes them effectively shorter',
       'They lack a carboxyl group, so the elongase cannot hold them',
       'They are activated by biotin, like acetyl-CoA carboxylase',
-      'They are elongated in the nucleus instead',
+      'They are elongated in the nucleus instead of the ER membrane',
     ],
     answer: 0,
     explanation: 'The cis kink makes them effectively shorter.',

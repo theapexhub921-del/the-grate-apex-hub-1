@@ -129,7 +129,7 @@ const lesson1: Q[] = [
     skill: 'application',
     difficulty: 'intermediate',
   }),
-  mcq('q1-27', 'residue-distribution', 'Why are the two interior histidines important?', 'They have a critical function at the active site', ['They anchor the C-terminus to the haem pocket', 'They bind 2,3-BPG in the central cavity', 'They end helix A'], {
+  mcq('q1-27', 'residue-distribution', 'Why are the two interior histidines important?', 'They have a critical function at the active site', ['They anchor the C-terminus to the haem pocket', 'They bind 2,3-BPG in the central cavity', 'They end helix A and start helix B'], {
     explanation: 'Slide 16.',
   }),
 ];
@@ -163,7 +163,7 @@ const lesson2: Q[] = [
     explanation: 'Slide 17 (textbook page).',
     difficulty: 'intermediate',
   }),
-  mcq('q2-08', 'preventing-oxidation', 'What happens to free haem in water when exposed to O₂?', 'It is rapidly oxidised to methaem', ['It binds O₂ reversibly for hours', 'It releases carbon monoxide gas', 'It becomes bilirubin'], {
+  mcq('q2-08', 'preventing-oxidation', 'What happens to free haem in water when exposed to O₂?', 'It is rapidly oxidised to methaem', ['It binds O₂ reversibly for hours', 'It releases carbon monoxide gas', 'It becomes bilirubin and biliverdin'], {
     explanation: 'Slide 18.',
   }),
   mcq('q2-09', 'preventing-oxidation', 'Which complex forms before methaem?', 'Haem–O₂–haem', ['Haem–CO–haem', 'Haem–globin–haem', 'Haem–H₂O'], {
@@ -178,7 +178,7 @@ const lesson2: Q[] = [
     answer: true,
     explanation: 'Slide 19.',
   }),
-  mcq('q2-12', 'preventing-oxidation', 'What does the polypeptide chain create around the haem?', 'A hindered environment that lets haem bind O₂ reversibly for long periods', ['An open channel that lets water reach the iron and oxidise it quickly', 'A positively charged cavity that binds 2,3-BPG and lowers O₂ affinity', 'A binding site for haem oxygenase to degrade it'], {
+  mcq('q2-12', 'preventing-oxidation', 'What does the polypeptide chain create around the haem?', 'A hindered environment that lets haem bind O₂ reversibly for long periods', ['An open channel that lets water reach the iron and oxidise it quickly', 'A positively charged cavity that binds 2,3-BPG and lowers O₂ affinity', 'A binding site for haem oxygenase to degrade it when the protein is old'], {
     explanation: 'Slide 20.',
   }),
   mcq('q2-13', 'preventing-oxidation', 'A mutation removes the distal histidine and its neighbours. What would you predict?', 'Faster oxidation to methaem and loss of O₂ binding', ['Stronger, longer-lasting O₂ binding', 'No change in O₂ binding at all', 'Myoglobin would start binding 2,3-BPG'], {
@@ -383,7 +383,7 @@ const lesson4: Q[] = [
     'Haemoglobin’s curve shifts right',
     'More O₂ is released to the muscle',
   ], { explanation: 'Slides 40 and 42.' }),
-  mcq('q4-08', 'bohr-mechanism', 'Which residues carry the Bohr effect?', 'Those that bind H⁺ at the tissues and release it in the lungs', ['Those too basic to release H⁺ at any pH found in the body', 'Those too acidic to bind H⁺ at any pH found in the body', 'The haem propionates only'], {
+  mcq('q4-08', 'bohr-mechanism', 'Which residues carry the Bohr effect?', 'Those that bind H⁺ at the tissues and release it in the lungs', ['Those too basic to release H⁺ at any pH found in the body', 'Those too acidic to bind H⁺ at any pH found in the body', 'The haem propionates only, ionised at the surface'], {
     explanation: 'Slide 43.',
   }),
   tf({

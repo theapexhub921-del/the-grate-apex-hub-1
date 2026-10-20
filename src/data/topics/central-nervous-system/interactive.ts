@@ -366,7 +366,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: bg([7]),
     }),
     ask(
-      mcq('c8-03', 'bg-disorders', 'In Parkinson’s disease, which neurons are lost?', 'Dopaminergic neurons of the substantia nigra', ['GABA neurons of the striatum (caudate)', 'Purkinje cells of the cerebellar cortex', 'Neurons of the subthalamic nucleus'], {
+      mcq('c8-03', 'bg-disorders', 'In Parkinson’s disease, which neurons are lost?', 'Dopaminergic neurons of the substantia nigra', ['GABA neurons of the striatum (caudate)', 'Purkinje cells of the cerebellar cortex', 'Glutamate neurons of the subthalamic nucleus'], {
         explanation: 'Basal Ganglia, slide 8: degeneration of the nigrostriatal dopamine system.',
       })
     ),

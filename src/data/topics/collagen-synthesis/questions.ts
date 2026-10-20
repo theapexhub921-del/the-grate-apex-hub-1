@@ -297,7 +297,7 @@ const lesson3: Q[] = [
   mcq('q3-25', 'glycosylation', 'Which sugars form the disaccharide on hydroxylysine?', 'Glucose and galactose', ['Glucose and fructose', 'Mannose and fucose', 'Galactose and sialic acid'], {
     explanation: 'Slide 50.',
   }),
-  mcq('q3-26', 'glycosylation', 'When are the sugars added?', 'To hydroxylysine in nascent collagen, before it becomes helical', ['After the fibres have formed outside the cell', 'After cross-linking by lysyl oxidase, outside the cell', 'Once the collagen is outside the cell, before fibres form'], {
+  mcq('q3-26', 'glycosylation', 'When are the sugars added?', 'To hydroxylysine in nascent collagen, before it becomes helical', ['After the fibres have formed outside the cell, by secreted enzymes', 'After cross-linking by lysyl oxidase, outside the cell', 'Once the collagen is outside the cell, before fibres form'], {
     explanation: 'Slide 50.',
   }),
   mcq('q3-27', 'glycosylation', 'Which collagen has far more carbohydrate units per molecule (slide 51)?', 'Lens capsule (type IV) — about 110', ['Tendon (type I) — about 110', 'They have the same amount — about 6'], {

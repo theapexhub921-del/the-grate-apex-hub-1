@@ -33,7 +33,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c1-04', 'target-specificity', 'Which hormone has receptors on nearly all body cells?', 'Thyroxine', ['ACTH', 'Oxytocin', 'FSH'], {
+      mcq('c1-04', 'target-specificity', 'Which hormone has receptors on nearly all body cells?', 'Thyroxine', ['ACTH', 'Oxytocin only', 'FSH'], {
         explanation: 'Slide 9: thyroxine is the principal hormonal stimulant of cellular metabolism, and nearly all cells have its receptors.',
       })
     ),
@@ -95,7 +95,7 @@ export const interactive: Record<string, Steps> = {
       'A phospholipase splits PIP₂ into DAG and IP₃. DAG activates protein kinases; IP₃ releases Ca²⁺ from the ER; Ca²⁺ (alone or with calmodulin) is the third messenger.',
     ], { sourceRefs: ref([18, 19]) }),
     ask(
-      mcq('c2-04', 'ip3-dag-calcium', 'What does IP₃ do?', 'Releases Ca²⁺ from the endoplasmic reticulum', ['Activates adenylate cyclase in the membrane', 'Binds DNA and switches on transcription', 'Hydrolyses GTP on the G protein'], {
+      mcq('c2-04', 'ip3-dag-calcium', 'What does IP₃ do?', 'Releases Ca²⁺ from the endoplasmic reticulum', ['Activates adenylate cyclase in the plasma membrane', 'Binds DNA and switches on transcription', 'Hydrolyses GTP on the G protein'], {
         explanation: 'Slide 18.',
       })
     ),

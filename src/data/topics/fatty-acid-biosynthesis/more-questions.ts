@@ -190,7 +190,7 @@ export const moreQuestions: Q[] = [
     answer: true,
     explanation: 'Slide 13: unsaturated fatty acids of 20, 22 and 24 carbons are made; most longer ones are polyunsaturated.',
   }),
-  mcq('q7-24', 'mitochondrial-elongation', 'Where is the second fatty acid elongation system?', 'In the mitosol (mitochondrial matrix)', ['In the nucleus', 'In the Golgi apparatus (cis face)', 'In the lysosomes and peroxisomes'], {
+  mcq('q7-24', 'mitochondrial-elongation', 'Where is the second fatty acid elongation system?', 'In the mitosol (mitochondrial matrix)', ['In the nucleus (nuclear envelope)', 'In the Golgi apparatus (cis face)', 'In the lysosomes and peroxisomes'], {
     explanation: 'Slide 14: a second elongation system exists in the mitosol.',
   }),
   match('q7-25', 'er-elongation', 'Match each system to its features.', [

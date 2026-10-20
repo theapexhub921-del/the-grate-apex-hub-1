@@ -280,7 +280,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 5 — Reduce, dehydrate, reduce ──────────────────────────
   'fatty-acid-biosynthesis-5': [
     ask(
-      mcq('c5-01', 'keto-reduction', 'Condensation leaves a keto group (C=O) on the β-carbon. What is the FIRST step that deals with it?', 'Reduction to an alcohol, using NADPH', ['Removal of water', 'Oxidation by FAD to a double bond', 'Hydrolysis by a thioesterase'], {
+      mcq('c5-01', 'keto-reduction', 'Condensation leaves a keto group (C=O) on the β-carbon. What is the FIRST step that deals with it?', 'Reduction to an alcohol, using NADPH', ['Removal of water', 'Oxidation by FAD to a double bond', 'Hydrolysis of the chain by a thioesterase'], {
         explanation: 'Slide 9: the keto group is reduced to an alcohol using NADPH (β-ketoacyl-ACP reductase).',
         skill: 'prediction',
       })

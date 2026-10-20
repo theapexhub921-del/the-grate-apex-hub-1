@@ -27,7 +27,7 @@ const lesson1: Q[] = [
   mcq('q1-04', 'endocrine-glands', 'Which tissue does slide 4 point out as missing from the usual picture of endocrine glands?', 'Adipose tissue', ['Bone marrow', 'Skeletal muscle', 'Skin'], {
     explanation: 'Slide 4: adipose tissue — white and brown adipose tissue have different cellular functions and locations.',
   }),
-  mcq('q1-05', 'endocrine-glands', 'Which two parts of the pituitary does the lecture name?', 'Anterior and posterior', ['Upper and lower', 'Cortex and medulla', 'Left and right'], {
+  mcq('q1-05', 'endocrine-glands', 'Which two parts of the pituitary does the lecture name?', 'Anterior and posterior', ['Upper and lower', 'Cortex and medulla, like the adrenal', 'Left and right'], {
     explanation: 'Slide 5.',
   }),
   mcq('q1-06', 'hormone-definition', 'Which definition of a hormone matches the lecture?', 'An organic substance secreted by a ductless gland into the ECF that regulates metabolic function', ['A protein secreted through a duct onto an epithelial surface to aid digestion', 'A neurotransmitter released at a synapse that acts on the next neuron', 'Any molecule found in the blood, whatever its source or effect'], {
@@ -62,7 +62,7 @@ const lesson1: Q[] = [
   mcq('q1-13', 'target-specificity', 'Where are ACTH receptors normally found (slide 9)?', 'On certain cells of the adrenal cortex', ['On nearly all body cells, like thyroxine receptors', 'On red blood cells', 'In the thyroid gland only'], {
     explanation: 'Slide 9.',
   }),
-  mcq('q1-14', 'target-specificity', 'Why do nearly all cells respond to thyroxine?', 'Nearly all cells have thyroxine receptors', ['Thyroxine needs no receptor to act', 'Thyroxine is made in every cell', 'Thyroxine is itself a second messenger'], {
+  mcq('q1-14', 'target-specificity', 'Why do nearly all cells respond to thyroxine?', 'Nearly all cells have thyroxine receptors', ['Thyroxine needs no receptor to act on its targets', 'Thyroxine is made in every cell', 'Thyroxine is itself a second messenger'], {
     explanation: 'Slide 9: thyroxine is the principal hormonal stimulant of cellular metabolism, and nearly all cells have its receptors.',
   }),
   fill('q1-15', 'target-specificity', 'Hormone–receptor ____ is the crucial first step in hormonal reactions.', ['binding'], {
@@ -88,7 +88,7 @@ const lesson1: Q[] = [
     explanation: 'Slide 9: thyroxine is the principal hormonal stimulant of cellular metabolism.',
     skill: 'application',
   }),
-  mcq('q1-21', 'hormone-functions', 'Which hormone fits “electrolyte balance”, from slide 20?', 'Aldosterone', ['Insulin', 'Prolactin', 'TSH'], {
+  mcq('q1-21', 'hormone-functions', 'Which hormone fits “electrolyte balance”, from slide 20?', 'Aldosterone', ['Insulin', 'Prolactin (PRL)', 'TSH'], {
     explanation: 'Slide 20: mineralocorticoids such as aldosterone regulate Na⁺ and K⁺ in the ECF.',
     skill: 'application',
   }),
@@ -101,7 +101,7 @@ const lesson1: Q[] = [
   mcq('q1-23', 'endocrine-glands', 'Which gland is listed only for females?', 'Ovaries', ['Thymus', 'Pineal', 'Adrenals'], {
     explanation: 'Slide 5: ovaries (females), testes (males).',
   }),
-  mcq('q1-24', 'hormone-definition', 'What kind of drainage does the endocrine system have (slide 8)?', 'A rich vascular and lymphatic drainage', ['Ducts that open onto the skin', 'Drainage into the lumen of the gut', 'None at all'], {
+  mcq('q1-24', 'hormone-definition', 'What kind of drainage does the endocrine system have (slide 8)?', 'A rich vascular and lymphatic drainage', ['Ducts that open onto the skin', 'Drainage into the lumen of the gut through small ducts', 'None at all'], {
     explanation: 'Slide 8.',
   }),
   mcq('q1-25', 'target-specificity', 'A drug lowers a hormone receptor’s affinity for its hormone. What happens to the response?', 'It weakens', ['It strengthens', 'Nothing', 'The hormone becomes a second messenger'], {
@@ -145,7 +145,7 @@ const lesson2: Q[] = [
   multi('q2-10', 'camp-pathway', 'Which three membrane components set the cell’s cAMP level (slide 16)? Select all that apply.', ['The hormone receptor', 'The G protein (signal transducer)', 'Adenylate cyclase (effector enzyme)'], ['Calmodulin', 'Phospholipase C'], {
     explanation: 'Slide 16.',
   }),
-  mcq('q2-11', 'camp-pathway', 'Which enzyme makes cAMP?', 'Adenylate cyclase', ['Protein kinase', 'Phospholipase', 'GTPase'], {
+  mcq('q2-11', 'camp-pathway', 'Which enzyme makes cAMP?', 'Adenylate cyclase', ['Protein kinase', 'Phospholipase C (PLC)', 'GTPase'], {
     explanation: 'Slides 15–17.',
   }),
   mcq('q2-12', 'camp-pathway', 'What is cAMP made from?', 'ATP', ['GTP', 'PIP₂', 'cholesterol'], {
@@ -214,7 +214,7 @@ const lesson3: Q[] = [
   mcq('q3-01', 'steroid-classes', 'Where are sex hormones mainly made?', 'The gonads', ['The adrenal medulla', 'The liver', 'The pituitary'], {
     explanation: 'Slide 20.',
   }),
-  mcq('q3-02', 'steroid-classes', 'Where are corticosteroids mainly made?', 'The adrenal cortex', ['The gonads', 'The thyroid', 'The hypothalamus'], {
+  mcq('q3-02', 'steroid-classes', 'Where are corticosteroids mainly made?', 'The adrenal cortex', ['The gonads (testis, ovary)', 'The thyroid', 'The hypothalamus'], {
     explanation: 'Slide 20.',
   }),
   mcq('q3-03', 'steroid-classes', 'What is the major glucocorticoid in humans?', 'Cortisol', ['Aldosterone', 'Testosterone', 'Corticosterone'], {
@@ -276,11 +276,11 @@ const lesson3: Q[] = [
     '11-Deoxycortisol',
     'Cortisol',
   ], { explanation: 'Slide 22.' }),
-  mcq('q3-18', 'adrenal-synthesis', 'Guyton: in which organelle is cholesterol cleaved to pregnenolone?', 'Mitochondria', ['Nucleus', 'Lysosome', 'Golgi'], {
+  mcq('q3-18', 'adrenal-synthesis', 'Guyton: in which organelle is cholesterol cleaved to pregnenolone?', 'Mitochondria', ['Nucleus (on DNA)', 'Lysosome', 'Golgi'], {
     explanation: 'Guyton (p. 956): cholesterol desmolase in the mitochondria.',
     difficulty: 'intermediate',
   }),
-  mcq('q3-19', 'steroid-mechanism', 'How do steroid hormones cross the cell membrane?', 'By simple diffusion — they are small and hydrophobic', ['Through a specific protein channel in the membrane', 'By binding a G protein on the cell surface', 'By endocytosis only, in coated vesicles'], {
+  mcq('q3-19', 'steroid-mechanism', 'How do steroid hormones cross the cell membrane?', 'By simple diffusion — they are small and hydrophobic', ['Through a specific protein channel in the plasma membrane', 'By binding a G protein on the cell surface', 'By endocytosis only, in coated vesicles'], {
     explanation: 'Slide 23.',
   }),
   order('q3-20', 'steroid-mechanism', 'Order how a steroid hormone changes a cell.', [

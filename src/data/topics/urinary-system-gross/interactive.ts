@@ -97,7 +97,7 @@ export const interactive: Record<string, Steps> = {
     learn('Why women get more UTIs', [
       'The female urethra is only 3–4 cm and distensible, so bacteria reach the bladder easily — but catheterisation is easier.',
     ], { sourceRefs: ur([70]) }),
-    ask(mcq('i5-03', 'urethra-supply-incontinence', 'Why are infants physiologically incontinent?', 'Their corticospinal tracts to the external sphincter are not yet myelinated', ['Their bladder has no detrusor muscle yet, so it cannot contract on demand', 'They lack a trigone until about two years', 'Their pudendal nerve is absent at birth and only grows in later childhood'], { explanation: 'Slide 75.', skill: 'cause-effect' })),
+    ask(mcq('i5-03', 'urethra-supply-incontinence', 'Why are infants physiologically incontinent?', 'Their corticospinal tracts to the external sphincter are not yet myelinated', ['Their bladder has no detrusor muscle yet, so it cannot contract on demand', 'They lack a trigone until about two years, so the ureteric openings cannot close', 'Their pudendal nerve is absent at birth and only grows in later childhood'], { explanation: 'Slide 75.', skill: 'cause-effect' })),
     recall('r5-01', 'urethra-supply-incontinence', 'Describe the lymph drainage of the male urethra.', [
       'Prostatic and membranous parts: internal iliac nodes.',
       'Spongy part: inguinal nodes, with some to the external iliac nodes.',

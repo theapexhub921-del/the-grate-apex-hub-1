@@ -59,9 +59,9 @@ const lesson3: Q[] = [
     ['CpG DNA', 'TLR9'],
     ['Peptidoglycan fragments', 'NOD1/NOD2'],
   ], { explanation: 'IN slide 50; IF0 slide 31.' }),
-  mcq('q3-07', 'pamps-prrs', 'Excessive PRR signalling can cause…', 'Sepsis and cytokine storm', ['Immunodeficiency', 'Tolerance to the microbe', 'Allergy only'], { explanation: 'IN slide 47.', clinical: true }),
+  mcq('q3-07', 'pamps-prrs', 'Excessive PRR signalling can cause…', 'Sepsis and cytokine storm', ['Immunodeficiency and infection', 'Tolerance to the microbe', 'Allergy only'], { explanation: 'IN slide 47.', clinical: true }),
   multi('q3-08', 'pamps-prrs', 'Which are opsonic receptors on macrophages? Select all that apply.', ['IgG Fc receptor', 'Complement receptor CR1'], ['TLR9', 'CD3'], { explanation: 'CE slide 35.' }),
-  mcq('q3-09', 'pamps-prrs', 'Scavenger receptors help remove apoptotic cells by recognising…', 'Phosphatidylserine', ['Mannose residues', 'Flagellin', 'IgG'], { explanation: 'CE slides 30, 33.' }),
+  mcq('q3-09', 'pamps-prrs', 'Scavenger receptors help remove apoptotic cells by recognising…', 'Phosphatidylserine', ['Mannose residues', 'Flagellin of bacteria', 'IgG'], { explanation: 'CE slides 30, 33.' }),
   mcq('q3-10', 'inflammation', 'Swelling in inflammation is due to…', 'Leaky capillaries letting fluid into tissue', ['Increased cell division in the tissue', 'Blood clotting in the small vessels', 'Fever raising the tissue temperature'], { explanation: 'IN slide 51.' }),
   mcq('q3-11', 'inflammation', 'Acute inflammation typically lasts about…', '8–10 days', ['1 hour', '6 months', 'A lifetime'], { explanation: 'IN slide 51.' }),
   multi('q3-12', 'inflammation', 'Which are vascular changes in inflammation? Select all that apply.', ['Arteriolar vasodilation', 'Increased capillary permeability', 'Display of cell adhesion molecules'], ['Vasoconstriction of capillaries'], { explanation: 'IN slide 52.' }),
@@ -102,7 +102,7 @@ const lesson5: Q[] = [
     ['TGF-β receptors', 'SMAD'],
     ['TNF receptors', 'TRAF → NF-κB / caspases'],
   ], { explanation: 'CY slide 13.' }),
-  mcq('q5-07', 'cytokine-receptors', 'Which are the most abundant cytokine receptor families?', 'Class I and class II', ['TNF receptors', 'Chemokine receptors', 'TGF-β receptors'], { explanation: 'CY slide 13.' }),
+  mcq('q5-07', 'cytokine-receptors', 'Which are the most abundant cytokine receptor families?', 'Class I and class II', ['TNF receptors', 'Chemokine receptors (GPCRs)', 'TGF-β receptors'], { explanation: 'CY slide 13.' }),
   mcq('q5-08', 'th-subsets', 'Which cytokines drive Th1 differentiation?', 'IL-12 and IFN-γ', ['IL-4 and IL-2', 'TGF-β and IL-6', 'IL-10 and TGF-β'], { explanation: 'CY slide 16.' }),
   mcq('q5-09', 'th-subsets', 'FoxP3 is the master transcription factor of…', 'Regulatory T cells', ['Th1 cells', 'Th17 (IL-17) cells', 'Tfh cells'], { explanation: 'CY slide 16.' }),
   mcq('q5-10', 'th-subsets', 'Th17 cells mainly…', 'Recruit neutrophils and fight fungi', ['Make IgE against parasites', 'Suppress autoimmunity', 'Help B cells in germinal centres'], { explanation: 'CY slide 16.' }),
@@ -113,14 +113,14 @@ const lesson5: Q[] = [
 ];
 
 const lesson6: Q[] = [
-  mcq('q6-01', 'antigen-terms', 'A substance that induces specific immunological non-responsiveness is a…', 'Tolerogen', ['Allergen', 'Hapten', 'Adjuvant'], { explanation: 'AG slide 6.', skill: 'terminology' }),
+  mcq('q6-01', 'antigen-terms', 'A substance that induces specific immunological non-responsiveness is a…', 'Tolerogen', ['Allergen', 'Hapten', 'Adjuvant (booster)'], { explanation: 'AG slide 6.', skill: 'terminology' }),
   tf({ id: 'q6-02', conceptId: 'antigen-terms', statement: 'All antigens are immunogens.', answer: false, explanation: 'AG slide 5: all immunogens are antigens, but not all antigens are immunogens.', skill: 'misconception' }),
   mcq('q6-03', 'immunogenicity-factors', 'Molecules below about what mass are non-immunogenic?', '1000 Da', ['100,000 Da', '6000 Da', '10 Da'], { explanation: 'AG22 slide 16.' }),
   mcq('q6-04', 'immunogenicity-factors', 'Which route is most immunogenic?', 'Subcutaneous', ['Intravenous', 'Intragastric', 'All are equal'], { explanation: 'AG22 slide 19.' }),
   mcq('q6-05', 'immunogenicity-factors', 'Polymers of D-amino acids are not immunogenic because…', 'APCs cannot degrade and process them', ['They are too small to be seen', 'They are recognised as self', 'They are lipids, not proteins'], { explanation: 'AG22 slide 17.', skill: 'cause-effect' }),
   mcq('q6-06', 'epitopes', 'The part of an antibody that binds an epitope is the…', 'Paratope', ['Hapten', 'Carrier', 'Fc region'], { explanation: 'AG slide 22.', skill: 'terminology' }),
-  mcq('q6-07', 'epitopes', 'Conformational determinants are recognised mainly by…', 'B cells and antibody', ['T cells only', 'NK cells', 'Complement proteins'], { explanation: 'AG slide 24.' }),
-  mcq('q6-08', 'epitopes', 'Which is true of T-cell epitopes?', 'They are linear and need MHC', ['They are conformational', 'They can be polysaccharides', 'They do not need MHC'], { explanation: 'AG22 slide 27.' }),
+  mcq('q6-07', 'epitopes', 'Conformational determinants are recognised mainly by…', 'B cells and antibody', ['T cells only', 'NK cells', 'Complement proteins (C3b)'], { explanation: 'AG slide 24.' }),
+  mcq('q6-08', 'epitopes', 'Which is true of T-cell epitopes?', 'They are linear and need MHC', ['They are conformational', 'They can be polysaccharides or lipids', 'They do not need MHC'], { explanation: 'AG22 slide 27.' }),
   mcq('q6-09', 'antigen-classes', 'ABO blood group antigens are…', 'Alloantigens', ['Xenoantigens', 'Autoantigens', 'Haptens'], { explanation: 'AG slides 33–34.' }),
   mcq('q6-10', 'antigen-classes', 'Streptococcal M protein sharing a determinant with kidney basement membrane is an example of a…', 'Heterophile antigen', ['Tumour-specific antigen', 'Hapten', 'Toxoid'], { explanation: 'AG slide 33.' }),
   mcq('q6-11', 'antigen-classes', 'A toxoid is…', 'An exotoxin that has lost toxicity but kept antigenicity', ['An antibody that neutralises a bacterial toxin', 'An endotoxin from the Gram-negative cell wall', 'An adjuvant that boosts the response to a vaccine'], { explanation: 'AG slide 38.', skill: 'terminology' }),
@@ -152,7 +152,7 @@ const lesson7: Q[] = [
 
 const lesson8: Q[] = [
   mcq('q8-01', 'mab-basics', 'Monoclonal antibodies differ from polyclonal ones in that they…', 'Come from one clone and bind one epitope', ['Bind many different epitopes on one antigen', 'Are made by T cells rather than B cells', 'Are always fully human antibodies'], { explanation: 'AB slide 20.' }),
-  mcq('q8-02', 'mab-basics', 'A hybridoma is a fusion of…', 'A B cell and a myeloma cell', ['A T cell and a B cell', 'Two myeloma cells', 'A macrophage and a B cell'], { explanation: 'AB slide 19.' }),
+  mcq('q8-02', 'mab-basics', 'A hybridoma is a fusion of…', 'A B cell and a myeloma cell', ['A T cell and a B cell', 'Two myeloma cells of the mouse', 'A macrophage and a B cell'], { explanation: 'AB slide 19.' }),
   mcq('q8-03', 'mab-basics', 'The B cells used for hybridomas come from the immunised mouse’s…', 'Spleen', ['Liver', 'Thymus', 'Blood only'], { explanation: 'AB slide 34.' }),
   mcq('q8-04', 'mab-types', 'Chimeric antibodies combine…', 'Mouse variable regions and human constant regions', ['Human variable regions and mouse constant regions', 'Binding sites for two different antigens', 'An antibody joined to a cytotoxic drug'], { explanation: 'AB slide 23.' }),
   mcq('q8-05', 'mab-types', 'In humanised antibodies, which mouse part is kept?', 'The CDRs', ['The Fc region', 'The constant regions', 'Nothing'], { explanation: 'AB slide 24.' }),
@@ -168,7 +168,7 @@ const lesson8: Q[] = [
 
 const lesson9: Q[] = [
   mcq('q9-01', 'complement-intro', 'Who showed that serum’s killing activity has heat-stable and heat-labile parts?', 'Jules Bordet', ['Hans Buchner', 'Paul Ehrlich', 'Elie Metchnikoff'], { explanation: 'CM slide 4.' }),
-  mcq('q9-02', 'complement-intro', 'Complement activity is destroyed by heating serum at…', '56 °C for 30 minutes', ['37 °C for 1 hour', '100 °C for 1 minute', '4 °C overnight'], { explanation: 'CM slide 4.' }),
+  mcq('q9-02', 'complement-intro', 'Complement activity is destroyed by heating serum at…', '56 °C for 30 minutes', ['37 °C for 1 hour or more', '100 °C for 1 minute', '4 °C overnight'], { explanation: 'CM slide 4.' }),
   mcq('q9-03', 'complement-intro', 'Where are most complement proteins made?', 'Liver hepatocytes', ['Bone marrow', 'Kidney', 'Lymph nodes'], { explanation: 'CM slide 3; AB slide 43.' }),
   mcq('q9-04', 'complement-pathways', 'Which component of C1 recognises antibody?', 'C1q', ['C1r', 'C1s', 'C4'], { explanation: 'AB slide 47.' }),
   mcq('q9-05', 'complement-pathways', 'Why do two IgG molecules have to lie close together to activate C1?', 'C1q needs two Fc regions and each IgG has one', ['IgG cannot bind antigen alone, so it needs a partner', 'IgG lacks an Fc region, so a second molecule supplies it', 'C1 binds only IgM, so IgG must mimic a pentamer'], { explanation: 'AB slide 48.', skill: 'cause-effect' }),

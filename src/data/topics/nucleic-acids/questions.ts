@@ -91,7 +91,7 @@ const lesson5: Q[] = [
   mcq('q5-08', 'dna-properties', 'The melting temperature (Tm) is the temperature at which…', 'Half the DNA is single-stranded', ['All of the DNA is single-stranded', 'DNA first starts to absorb UV light', 'DNA precipitates out of solution'], { explanation: 'NA slide 47.', skill: 'terminology' }),
   mcq('q5-09', 'dna-forms-packaging', 'Which DNA form is the default right-handed helix in cells?', 'B-form', ['A-form', 'Z-form', 'Cruciform'], { explanation: 'NA slide 49.' }),
   mcq('q5-10', 'dna-forms-packaging', 'Z-DNA forms in regions rich in…', 'G:C', ['A:T', 'Uracil', 'Methyladenine'], { explanation: 'NA slide 49.' }),
-  mcq('q5-11', 'dna-forms-packaging', 'Prokaryotic DNA is…', 'Naked, circular and supercoiled', ['Linear and bound to histones', 'Single-stranded and circular', 'Always found in plasmids only'], { explanation: 'NA slide 50.' }),
+  mcq('q5-11', 'dna-forms-packaging', 'Prokaryotic DNA is…', 'Naked, circular and supercoiled', ['Linear and bound to histones', 'Single-stranded, circular and relaxed', 'Always found in plasmids only'], { explanation: 'NA slide 50.' }),
   multi('q5-12', 'dna-forms-packaging', 'Which are the major histone proteins? Select all that apply.', ['H1', 'H2A', 'H2B', 'H3', 'H4'], ['Ubiquitin'], { explanation: 'NA slide 53.' }),
   mcq('q5-13', 'dna-forms-packaging', 'Sanger sequencing stops DNA synthesis with…', 'Dideoxynucleotides', ['Chemical cleavage', 'Light signals', 'Restriction enzymes'], { explanation: 'NA slide 55.' }),
 ];
@@ -156,7 +156,7 @@ const lesson8: Q[] = [
 const lesson9: Q[] = [
   mcq('q9-01', 'trna-charging', 'Which enzyme keeps the aminoacylation reaction going by removing PPi?', 'Pyrophosphatase', ['Ligase', 'Peptidyl transferase', 'Kinase'], { explanation: 'NA slide 154.' }),
   mcq('q9-02', 'trna-charging', 'Where are most identity elements recognised by aaRS?', 'Acceptor stem and anticodon loop', ['The 5′ cap and the D-loop', 'The D-loop only', 'The poly(A) tail and T-loop'], { explanation: 'NA slide 153.' }),
-  mcq('q9-03', 'trna-charging', 'Class I and class II synthetases differ in…', 'Which OH of the tRNA (2′ or 3′) they aminoacylate', ['Which amino acids exist in the cell', 'Whether they use ATP to activate the amino acid', 'Whether they need a tRNA at all'], { explanation: 'NA slide 155.' }),
+  mcq('q9-03', 'trna-charging', 'Class I and class II synthetases differ in…', 'Which OH of the tRNA (2′ or 3′) they aminoacylate', ['Which amino acids exist in the cell', 'Whether they use ATP or GTP to activate the amino acid', 'Whether they need a tRNA at all'], { explanation: 'NA slide 155.' }),
   mcq('q9-04', 'translation-steps', 'Which amino acid does the initiator tRNA carry?', 'Methionine', ['Alanine', 'Glycine', 'Tryptophan'], { explanation: 'NA slide 162.' }),
   mcq('q9-05', 'translation-steps', 'In eukaryotes the small subunit binds the mRNA at…', 'The 5′ cap', ['The poly(A) tail', 'The stop codon', 'An intron'], { explanation: 'NA slide 162.' }),
   mcq('q9-06', 'translation-steps', 'In the completed initiation complex the initiator tRNA is in the…', 'P site', ['A site', 'E site', 'Cytoplasm'], { explanation: 'NA slide 162.' }),
@@ -177,7 +177,7 @@ const lesson10: Q[] = [
   mcq('q10-05', 'operon-parts', 'Operators are found in…', 'Prokaryotes only', ['Eukaryotes only', 'Both', 'Viruses and plasmids only'], { explanation: 'GE slide 17.' }),
   mcq('q10-06', 'operon-parts', 'mRNA from a prokaryotic operon is…', 'Polycistronic', ['Monocistronic', 'Spliced', 'Capped'], { explanation: 'GE slide 30.' }),
   mcq('q10-07', 'operon-parts', 'A corepressor…', 'Keeps the repressor on the operator', ['Pulls the repressor off the operator', 'Binds RNA polymerase at the promoter', 'Is a promoter sequence upstream of the operator'], { explanation: 'GE slide 48.' }),
-  mcq('q10-08', 'lac-operon', 'lacZ encodes…', 'β-Galactosidase', ['Permease', 'Transacetylase', 'The repressor'], { explanation: 'GE slide 53.' }),
+  mcq('q10-08', 'lac-operon', 'lacZ encodes…', 'β-Galactosidase', ['Permease (lactose carrier)', 'Transacetylase', 'The repressor'], { explanation: 'GE slide 53.' }),
   mcq('q10-09', 'lac-operon', 'Which gene encodes the Lac repressor?', 'The i gene', ['lacZ (β-galactosidase)', 'lacY', 'lacA'], { explanation: 'GE slide 52.' }),
   mcq('q10-10', 'lac-operon', 'With no lactose, what happens at the lac operon?', 'The repressor binds the operator; no mRNA is made', ['RNA polymerase transcribes the genes freely', 'The repressor is degraded by proteases', 'Lactose is synthesised to switch the operon on'], { explanation: 'GE slide 55.' }),
   mcq('q10-11', 'trp-operon', 'The trp operon is an example of…', 'Repressible negative regulation', ['Inducible positive regulation', 'Constitutive (unregulated) expression', 'Attenuation only, with no repressor'], { explanation: 'GE slide 56.' }),
@@ -197,7 +197,7 @@ const lesson11: Q[] = [
   mcq('q11-09', 'post-transcriptional', 'Stored mRNAs in unfertilised eggs have…', 'Short poly(A) tails', ['No 5′ caps at all', 'Extra introns left in', 'Long poly(A) tails'], { explanation: 'GE slide 70.' }),
   multi('q11-10', 'post-transcriptional', 'Which shorten mRNA half-life? Select all that apply.', ['AU-rich elements', 'Deadenylation', 'Decapping'], ['A long poly(A) tail'], { explanation: 'GE slide 71.' }),
   mcq('q11-11', 'post-transcriptional', 'When iron is low, iron regulatory proteins…', 'Block ferritin translation and stabilise transferrin receptor mRNA', ['Increase ferritin translation and destroy transferrin receptor mRNA', 'Destroy transferrin receptor mRNA but leave ferritin unchanged', 'Do nothing until iron rises again'], { explanation: 'GE slide 78.' }),
-  mcq('q11-12', 'post-transcriptional', 'A protein with N-terminal arginine is likely to have a half-life of…', '3 minutes or less', ['20 hours or more', 'Several days', 'Several years'], { explanation: 'GE slide 72.' }),
+  mcq('q11-12', 'post-transcriptional', 'A protein with N-terminal arginine is likely to have a half-life of…', '3 minutes or less', ['20 hours or more', 'Several days or longer', 'Several years'], { explanation: 'GE slide 72.' }),
   mcq('q11-13', 'expression-measurement', 'Which method is more sensitive and accurate than microarrays for measuring expression?', 'Real-time PCR', ['Southern blotting', 'Restriction mapping', 'Gel electrophoresis alone'], { explanation: 'GE slide 38.' }),
 ];
 
@@ -228,7 +228,7 @@ const lesson13: Q[] = [
   mcq('q13-04', 'rdna-basics', 'Why are vector and gene cut with the same restriction enzyme?', 'So their ends match and can be ligated', ['To destroy the vector after cloning', 'To add antibiotic resistance to the gene', 'To remove the introns from the gene'], { explanation: 'RD slide 7.', skill: 'cause-effect' }),
   multi('q13-05', 'vectors', 'Which are essential elements of a plasmid vector? Select all that apply.', ['Origin of replication', 'Selectable marker', 'Unique restriction sites'], ['Centromere'], { explanation: 'RD slide 8.' }),
   multi('q13-06', 'vectors', 'Which are essential elements of a YAC? Select all that apply.', ['Telomeres', 'Centromere', 'Origin of replication'], ['Ribosome'], { explanation: 'RD slide 9.' }),
-  mcq('q13-07', 'vectors', 'A vector that can replicate in both E. coli and yeast is a…', 'Shuttle vector', ['Cosmid vector', 'Phage', 'Primer'], { explanation: 'RD slide 10.' }),
+  mcq('q13-07', 'vectors', 'A vector that can replicate in both E. coli and yeast is a…', 'Shuttle vector', ['Cosmid vector', 'Phage λ vector', 'Primer'], { explanation: 'RD slide 10.' }),
   mcq('q13-08', 'vectors', 'A 4 kb plasmid with a 2 kb insert is cut at the flanking sites and run on a gel. You see…', 'Two bands: 4 kb and 2 kb', ['One band: 6 kb', 'One band: 4 kb only', 'No bands at all'], { explanation: 'RD slide 14.' }),
   mcq('q13-09', 'rdna-products', 'Human insulin genes for bacteria are obtained by…', 'Making cDNA from insulin mRNA', ['Cutting genomic DNA with introns', 'Synthesising the protein first', 'Using a yeast artificial chromosome'], { explanation: 'RD slide 16.' }),
   mcq('q13-10', 'rdna-products', 'Why are recombinant factors VIII and IX safer than pooled blood products?', 'Pooled blood may carry HIV or hepatitis', ['They are much cheaper to produce', 'They need no injection to be given', 'They cure the gene defect permanently'], { explanation: 'RD slide 20.', clinical: true }),

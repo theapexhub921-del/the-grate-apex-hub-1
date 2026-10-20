@@ -133,7 +133,7 @@ export const interactive: Record<string, Steps> = {
       'Only prolines and lysines already in the chain, before the helix forms, and only on the amino side of a glycine (C-4 of proline, C-5 of lysine). A few prolines are hydroxylated at C-3 by prolyl-3-hydroxylase.',
     ], { sourceRefs: ref([44, 46]) }),
     ask(
-      mcq('c3-04', 'hydroxylation-rules', 'α,α′-Bipyridyl removes iron from prolyl hydroxylase. What happens to the collagen made?', 'It is unhydroxylated and does not form a triple helix at 37 °C', ['It is over-hydroxylated and very stable at body temperature', 'It forms extra cross-links and becomes brittle and insoluble', 'It is secreted faster than normal collagen'], {
+      mcq('c3-04', 'hydroxylation-rules', 'α,α′-Bipyridyl removes iron from prolyl hydroxylase. What happens to the collagen made?', 'It is unhydroxylated and does not form a triple helix at 37 °C', ['It is over-hydroxylated and very stable at body temperature', 'It forms extra cross-links and becomes brittle and insoluble', 'It is secreted faster than normal collagen and assembles early'], {
         explanation: 'Slide 45: it only becomes helical below 24 °C.',
         skill: 'cause-effect',
       })

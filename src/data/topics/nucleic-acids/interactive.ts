@@ -58,7 +58,7 @@ export const interactive: Record<string, Steps> = {
     ], nm([63, 64])),
   ],
   'nucleic-acids-5': [
-    ask(mcq('c5-01', 'dna-double-helix', 'How many hydrogen bonds join G and C?', 'Three', ['Two', 'One', 'Four'], { explanation: 'NA slide 34.' })),
+    ask(mcq('c5-01', 'dna-double-helix', 'How many hydrogen bonds join G and C?', 'Three', ['Two (as in A–T)', 'One', 'Four'], { explanation: 'NA slide 34.' })),
     ask(mcq('c5-02', 'dna-rna-differences', 'Why does DNA use thymine instead of uracil?', 'Uracil arising from deaminated cytosine can then be recognised and repaired', ['Thymine is cheaper for the cell to make than uracil', 'Uracil cannot pair with adenine in a double helix', 'Thymine absorbs less UV, protecting DNA from sunlight'], { explanation: 'NA slide 31.', skill: 'cause-effect' })),
     learn('Melting', ['Heating separates the strands. Stacked bases absorb less UV, so A260 rises as DNA melts. G:C-rich DNA melts at a higher temperature.'], { sourceRefs: na([43, 48]) }),
     ask(mcq('c5-03', 'dna-properties', 'Which DNA has the highest melting temperature?', 'One rich in G:C pairs', ['One rich in A:T pairs', 'Single-stranded DNA', 'RNA'], { explanation: 'NA slide 48.' })),
@@ -70,7 +70,7 @@ export const interactive: Record<string, Steps> = {
     ], na([38])),
   ],
   'nucleic-acids-6': [
-    ask(mcq('c6-01', 'replication-rules', 'Meselson and Stahl showed that replication is…', 'Semiconservative', ['Conservative', 'Dispersive', 'Unidirectional'], { explanation: 'NA slide 60.' })),
+    ask(mcq('c6-01', 'replication-rules', 'Meselson and Stahl showed that replication is…', 'Semiconservative', ['Conservative', 'Dispersive (fragmented)', 'Unidirectional'], { explanation: 'NA slide 60.' })),
     ask(mcq('c6-02', 'replication-rules', 'Why is the lagging strand made in pieces?', 'Polymerase works only 5′→3′, away from the moving fork on that strand', ['That strand has no template to copy from at the fork', 'DNA ligase works too slowly to join a continuous strand', 'Primase cannot bind that strand except at the origin'], { explanation: 'NA slides 72–73.', skill: 'cause-effect' })),
     ask(match('c6-03', 'replication-machinery', 'Match each protein to its job.', [
       ['Helicase', 'Unwinds DNA'],
@@ -109,7 +109,7 @@ export const interactive: Record<string, Steps> = {
       ['RNA polymerase III', 'tRNA'],
     ], { explanation: 'NA slides 115, 149.' })),
     learn('Processing', ['Eukaryotic pre-mRNA gets a 7-methylguanosine cap and a poly(A) tail, and the spliceosome removes introns before export.'], { sourceRefs: ge([6, 7, 75]) }),
-    ask(mcq('c8-03', 'prokaryotic-transcription', 'Rho factor is…', 'An ATP-dependent helicase that releases the RNA', ['A sigma factor that recognises the terminator', 'A ribosomal protein that halts the polymerase', 'An RNA hairpin rich in G and C'], { explanation: 'NA slide 147.' })),
+    ask(mcq('c8-03', 'prokaryotic-transcription', 'Rho factor is…', 'An ATP-dependent helicase that releases the RNA', ['A sigma factor that recognises the terminator', 'A ribosomal protein that halts the polymerase at the stop codon', 'An RNA hairpin rich in G and C'], { explanation: 'NA slide 147.' })),
     recall('r8-01', 'prokaryotic-transcription', 'Describe the stages of transcription in E. coli.', [
       'Initiation: the holoenzyme (core + σ) binds the promoter, opens the DNA and starts RNA; σ leaves after 6–10 nucleotides.',
       'Elongation: the core enzyme adds nucleotides 5′→3′ (20–50 per second).',

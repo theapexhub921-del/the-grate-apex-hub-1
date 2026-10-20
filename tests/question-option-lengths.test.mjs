@@ -44,9 +44,9 @@ describe('answer option lengths', () => {
       }).length;
       all += qs.length;
       longest += n;
-      if (qs.length >= 20) assert.ok(n / qs.length <= 0.5, `${built.topic.id}: the answer is the longest option in ${Math.round((100 * n) / qs.length)}% of questions`);
+      if (qs.length >= 20) assert.ok(n / qs.length <= 0.25, `${built.topic.id}: the answer is the longest option in ${Math.round((100 * n) / qs.length)}% of questions`);
     }
-    assert.ok(longest / all <= 0.35, `overall the answer is the longest option in ${Math.round((100 * longest) / all)}% of questions`);
+    assert.ok(longest / all <= 0.15, `overall the answer is the longest option in ${Math.round((100 * longest) / all)}% of questions`);
   });
 
   it('no question repeats an option', () => {

@@ -13,14 +13,14 @@ type Q = QuestionDraft<ConceptId>;
 
 // ─── Lesson 1 — The cascade ─────────────────────────────────────────
 const lesson1: Q[] = [
-  mcq('q1-01', 'cascade-principles', 'What kind of enzymes are the clotting factors of the cascade?', 'Serine endopeptidases attacking Arg–X bonds', ['Kinases that phosphorylate fibrinogen', 'Lipases that split platelet lipids', 'Oxidoreductases that use vitamin K'], {
+  mcq('q1-01', 'cascade-principles', 'What kind of enzymes are the clotting factors of the cascade?', 'Serine endopeptidases attacking Arg–X bonds', ['Kinases that phosphorylate fibrinogen', 'Lipases that split platelet lipids', 'Oxidoreductases that use vitamin K as a cofactor'], {
     explanation: 'Slide 2.',
   }),
   mcq('q1-02', 'cascade-principles', 'Why are only trace amounts of the first factors needed?', 'Each step amplifies the preceding one', ['The first factors are never used up', 'Fibrinogen activates itself once started', 'The liver adds more as soon as needed'], {
     explanation: 'Slide 2: amplification makes the cascade gather momentum; there are large amounts of the final substrate (fibrinogen).',
     skill: 'cause-effect',
   }),
-  mcq('q1-03', 'cascade-principles', 'What stops the cascade being triggered prematurely?', 'Inhibitors — a stimulus below a threshold does not trigger it', ['Vitamin K, which holds the factors inactive until needed', 'Platelets, which absorb the first active factors', 'Fibrin, which binds the early factors and hides them'], {
+  mcq('q1-03', 'cascade-principles', 'What stops the cascade being triggered prematurely?', 'Inhibitors — a stimulus below a threshold does not trigger it', ['Vitamin K, which holds the factors inactive until needed', 'Platelets, which absorb the first active factors before they can spread', 'Fibrin, which binds the early factors and hides them'], {
     explanation: 'Slide 3.',
   }),
   tf({
@@ -188,7 +188,7 @@ const lesson2: Q[] = [
     explanation: 'Slide 26.',
     difficulty: 'intermediate',
   }),
-  mcq('q2-16', 'fibrinopeptides', 'What is the role of the fibrinopeptides’ negative charges?', 'They repel each other and keep fibrinogen molecules apart', ['They bind calcium needed for the clotting cascade', 'They activate platelets as fibrinogen passes', 'They bind thrombin and hold it near the injury'], {
+  mcq('q2-16', 'fibrinopeptides', 'What is the role of the fibrinopeptides’ negative charges?', 'They repel each other and keep fibrinogen molecules apart', ['They bind calcium needed for the clotting cascade', 'They activate platelets as fibrinogen passes', 'They bind thrombin and hold it near the injury until a clot forms'], {
     explanation: 'Slide 26.',
     skill: 'cause-effect',
   }),
@@ -228,7 +228,7 @@ const lesson2: Q[] = [
   mcq('q2-24', 'fibrin-cross-linking', 'Which side chains are joined in a fibrin cross-link?', 'Glutamine (glutamyl) and lysine', ['Cysteine and cysteine (disulfide)', 'Serine and aspartate (ester)', 'Tyrosine and arginine'], {
     explanation: 'Slides 43–44.',
   }),
-  mcq('q2-25', 'fibrinopeptides', 'Removing the fibrinopeptides allows what?', 'Fibrin monomers to assemble into fibrin', ['Fibrinogen to be secreted by the liver', 'Platelets to divide at the injury', 'Plasmin to form from plasminogen'], {
+  mcq('q2-25', 'fibrinopeptides', 'Removing the fibrinopeptides allows what?', 'Fibrin monomers to assemble into fibrin', ['Fibrinogen to be secreted by the liver', 'Platelets to divide and multiply at the injury', 'Plasmin to form from plasminogen'], {
     explanation: 'Slides 20, 22 and 26.',
     skill: 'cause-effect',
   }),
@@ -240,7 +240,7 @@ const lesson2: Q[] = [
 
 // ─── Lesson 3 — Prothrombin, vitamin K, bleeding disorders ──────────
 const lesson3: Q[] = [
-  mcq('q3-01', 'prothrombin-thrombin', 'What is the mass of thrombin (slide 33)?', '33.7 kDa', ['340 kDa', '72 kDa', '3.4 kDa'], {
+  mcq('q3-01', 'prothrombin-thrombin', 'What is the mass of thrombin (slide 33)?', '33.7 kDa', ['About 340 kDa', '72 kDa', '3.4 kDa'], {
     explanation: 'Slide 33.',
     difficulty: 'intermediate',
   }),
@@ -265,7 +265,7 @@ const lesson3: Q[] = [
   multi('q3-07', 'phospholipid-calcium', 'Which prevent blood from clotting by removing Ca²⁺? Select all that apply.', ['Citrate', 'Oxalate', 'EDTA'], ['Vitamin K', 'Fibrinogen'], {
     explanation: 'Slide 36.',
   }),
-  mcq('q3-08', 'phospholipid-calcium', 'How is prothrombin held on the platelet membrane for activation?', 'Through Ca²⁺ bound to its γ-carboxyglutamates', ['By a disulfide bond to a platelet protein', 'By fibrin strands already on the platelet', 'By von Willebrand factor bound to collagen'], {
+  mcq('q3-08', 'phospholipid-calcium', 'How is prothrombin held on the platelet membrane for activation?', 'Through Ca²⁺ bound to its γ-carboxyglutamates', ['By a disulfide bond to a platelet protein', 'By fibrin strands already attached to the platelet', 'By von Willebrand factor bound to collagen'], {
     explanation: 'Slide 37.',
   }),
   multi('q3-09', 'vitamin-k-gla', 'Which factors make up the “prothrombin complex”? Select all that apply.', ['II', 'VII', 'IX', 'X'], ['VIII', 'XII'], {
@@ -329,7 +329,7 @@ const lesson3: Q[] = [
     explanation: 'Slide 51: it is not an enzyme and has no catalytic activity.',
     skill: 'misconception',
   }),
-  mcq('q3-25', 'vwf-kallikrein', 'What may increased von Willebrand factor levels predict (slide 52)?', 'An increased risk of thrombosis', ['Haemophilia A in later life', 'Vitamin K deficiency', 'A lower blood pressure'], {
+  mcq('q3-25', 'vwf-kallikrein', 'What may increased von Willebrand factor levels predict (slide 52)?', 'An increased risk of thrombosis', ['Haemophilia A in later life', 'Vitamin K deficiency and bleeding', 'A lower blood pressure'], {
     explanation: 'Slide 52.',
   }),
   mcq('q3-26', 'vwf-kallikrein', 'What does plasma kallikrein generate (slide 48)?', 'Bradykinin — a vasodilator that increases vascular permeability', ['Thrombin, which converts fibrinogen to fibrin', 'Fibrin monomers, which polymerise', 'Thromboxane A₂, which aggregates platelets'], {
@@ -369,7 +369,7 @@ const lesson4: Q[] = [
   mcq('q4-08', 'antithrombin-heparin', 'What kind of molecule is heparin?', 'A negatively charged polysaccharide (glycosaminoglycan)', ['A fat-soluble vitamin', 'A serine protease', 'A positively charged peptide (like protamine)'], {
     explanation: 'Slides 61 and 64.',
   }),
-  mcq('q4-09', 'antithrombin-heparin', 'Where is heparin found (slide 61)?', 'In mast cells near blood-vessel walls', ['In the dense granules of platelets', 'In red cells', 'In bile from the liver'], {
+  mcq('q4-09', 'antithrombin-heparin', 'Where is heparin found (slide 61)?', 'In mast cells near blood-vessel walls', ['In the dense granules of the circulating platelets', 'In red cells', 'In bile from the liver'], {
     explanation: 'Slide 61.',
   }),
   mcq('q4-10', 'plasmin-activators', 'What is the inactive precursor of plasmin?', 'Plasminogen', ['Prothrombin', 'Fibrinogen', 'Prekallikrein'], {
@@ -381,7 +381,7 @@ const lesson4: Q[] = [
   multi('q4-12', 'plasmin-activators', 'Which are plasminogen activators (slides 66, 69)? Select all that apply.', ['Tissue plasminogen activator (TPA)', 'Urokinase', 'Streptokinase', 'Factor XIIa + kallikrein'], ['Heparin', 'Warfarin'], {
     explanation: 'Slides 66 and 69.',
   }),
-  mcq('q4-13', 'plasmin-activators', 'Why does urokinase matter in the urinary tract (slide 66)?', 'It prevents clot formation in the ureters and bladder', ['It concentrates the urine in the collecting ducts', 'It activates vitamin K in the kidney', 'It makes fibrinogen for the urinary tract'], {
+  mcq('q4-13', 'plasmin-activators', 'Why does urokinase matter in the urinary tract (slide 66)?', 'It prevents clot formation in the ureters and bladder', ['It concentrates the urine in the collecting ducts', 'It activates vitamin K in the kidney for clotting factor synthesis', 'It makes fibrinogen for the urinary tract'], {
     explanation: 'Slide 66.',
   }),
   mcq('q4-14', 'plasmin-activators', 'Why does TPA act mainly on clots?', 'It and plasminogen both have high affinity for fibrin, so plasmin forms on the fibrin mesh', ['It only exists inside platelets, which gather at the clot', 'It is activated by heparin, which collects in the clot', 'It cannot enter the bloodstream, so it stays on the vessel wall'], {
@@ -410,7 +410,7 @@ const lesson4: Q[] = [
   mcq('q4-20', 'antiplatelet-thrombolytics', 'Which enzyme does aspirin block?', 'Cyclo-oxygenase-1 (COX-1)', ['Thrombin', 'Plasmin', 'Factor Xa (Stuart factor)'], {
     explanation: 'Slide 74.',
   }),
-  mcq('q4-21', 'antiplatelet-thrombolytics', 'What does thromboxane A₂ do?', 'Promotes platelet activation and aggregation', ['Dissolves clots by activating plasminogen', 'Inhibits thrombin at the platelet surface', 'Blocks vitamin K in the liver'], {
+  mcq('q4-21', 'antiplatelet-thrombolytics', 'What does thromboxane A₂ do?', 'Promotes platelet activation and aggregation', ['Dissolves clots by activating plasminogen', 'Inhibits thrombin at the activated platelet surface', 'Blocks vitamin K in the liver'], {
     explanation: 'Slides 74 and 76.',
   }),
   mcq('q4-22', 'antiplatelet-thrombolytics', 'Which residue of COX-1 does low-dose aspirin acetylate?', 'Serine 530', ['Histidine 57', 'Cysteine 25', 'Lysine 82'], {

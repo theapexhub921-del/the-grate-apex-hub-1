@@ -11,7 +11,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 1 — The cascade ────────────────────────────────────────
   'blood-coagulation-and-fibrinolysis-1': [
     ask(
-      mcq('c1-01', 'cascade-principles', 'Before you start: why might the body use a chain of enzymes, each activating the next, to make a clot?', 'Each step amplifies the last, giving a rapid, large response from a tiny trigger', ['It makes clotting slower and safer, so that a clot never forms too quickly', 'Each enzyme can only act once, so many are needed to make enough fibrin', 'It avoids the need for any inhibitors to control the clotting process'], {
+      mcq('c1-01', 'cascade-principles', 'Before you start: why might the body use a chain of enzymes, each activating the next, to make a clot?', 'Each step amplifies the last, giving a rapid, large response from a tiny trigger', ['It makes clotting slower and safer, so that a clot never forms too quickly', 'Each enzyme can only act once, so many different ones are needed to make enough fibrin', 'It avoids the need for any inhibitors to control the clotting process'], {
         explanation: 'Slides 2–3: each step amplifies the preceding one, so trace amounts of initial factors convert large amounts of fibrinogen — and the response is rapid.',
         skill: 'prediction',
       }),
@@ -161,7 +161,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 4 — Control and fibrinolysis ───────────────────────────
   'blood-coagulation-and-fibrinolysis-4': [
     ask(
-      mcq('c4-01', 'clot-limitation', 'As a clot forms, fibrin adsorbs thrombin. What is the effect?', 'It removes the last active factor, helping limit clotting to the injury', ['It activates more thrombin, spreading the clot along the vessel', 'It dissolves the clot by turning plasminogen into plasmin', 'It releases vitamin K so that more clotting factors are made'], {
+      mcq('c4-01', 'clot-limitation', 'As a clot forms, fibrin adsorbs thrombin. What is the effect?', 'It removes the last active factor, helping limit clotting to the injury', ['It activates more thrombin, spreading the clot along the whole length of the vessel', 'It dissolves the clot by turning plasminogen into plasmin', 'It releases vitamin K so that more clotting factors are made'], {
         explanation: 'Slide 59.',
         skill: 'prediction',
       })

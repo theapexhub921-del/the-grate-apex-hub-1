@@ -62,7 +62,7 @@ export const interactive: Record<string, Steps> = {
       ['Sternocostal surface', 'Right ventricle'],
       ['Base (posterior surface)', 'Left atrium'],
     ], { explanation: 'Slides 81–84.' })),
-    ask(mcq('i3-02', 'heart-surface-marking', 'Where is the normal apex beat felt?', 'Left 5th intercostal space, about 8–9 cm from the midline', ['Right 2nd intercostal space at the edge of the sternum', 'Left 2nd costal cartilage, 2 cm from the sternum', 'Left 7th intercostal space in the anterior axillary line'], { explanation: 'Slide 108: the apex lies behind the 5th left intercostal space, 8–9 cm from the mid-sternal line.', skill: 'application' })),
+    ask(mcq('i3-02', 'heart-surface-marking', 'Where is the normal apex beat felt?', 'Left 5th intercostal space, about 8–9 cm from the midline', ['Right 2nd intercostal space at the edge of the sternum', 'Left 2nd costal cartilage, about 2 cm from the edge of the sternum', 'Left 7th intercostal space in the anterior axillary line'], { explanation: 'Slide 108: the apex lies behind the 5th left intercostal space, 8–9 cm from the mid-sternal line.', skill: 'application' })),
     learn('Three layers, four chambers', [
       'Epicardium (visceral pericardium), myocardium (thickest in the left ventricle) and endocardium (continuous with vessel endothelium, forms parts of the valves).',
       'The coronary (AV) sulcus marks atria from ventricles; the anterior and posterior interventricular sulci mark the two ventricles.',
