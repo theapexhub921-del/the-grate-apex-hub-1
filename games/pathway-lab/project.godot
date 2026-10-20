@@ -1,0 +1,44 @@
+; Engine configuration file.
+config_version=5
+
+[application]
+
+config/name="Pathway Lab"
+config/description="Put biochemical, physiological and anatomical pathways back together."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://assets/icon.svg"
+boot_splash/bg_color=Color(0.051, 0.0706, 0.0824, 1)
+boot_splash/show_image=false
+
+[autoload]
+
+PD="*res://scripts/autoload/pathway_data.gd"
+SaveData="*res://scripts/autoload/save_data.gd"
+Style="*res://scripts/autoload/style.gd"
+Audio="*res://scripts/autoload/audio.gd"
+Router="*res://scripts/autoload/router.gd"
+
+[display]
+
+window/size/viewport_width=420
+window/size/viewport_height=780
+window/size/window_width_override=1100
+window/size/window_height_override=780
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=6
+
+[gui]
+
+common/drop_mouse_on_gui_input_disabled=true
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=false
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

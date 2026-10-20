@@ -73,9 +73,9 @@ describe('3D atlas wiring', () => {
   });
 });
 
-const GAME_IDS = ['med-term-scramble', 'golden-hour'];
+const GAME_IDS = ['med-term-scramble', 'golden-hour', 'pathway-lab'];
 
-describe('Study game wiring (Med Term Scramble, Golden Hour)', () => {
+describe('Study game wiring (Med Term Scramble, Golden Hour, Pathway Lab)', () => {
   it('the Vercel build joins the game engine from its parts first', () => {
     assert.match(vercel.buildCommand, /^node scripts\/assemble-games\.mjs && /);
   });

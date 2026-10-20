@@ -41,6 +41,17 @@ export const STUDY_GAMES: readonly StudyGame[] = [
     tags: ['6 shifts', '3D ward', 'Nursing skills', 'Single player'],
     loadingColor: '#1144C3',
   },
+  {
+    id: 'pathway-lab',
+    title: 'Pathway Lab',
+    tagline: 'Put the pathways back together, one enzyme at a time.',
+    description:
+      '70 pathways from biochemistry, physiology, anatomy and immunology. Learn a pathway step by step, then drag the missing enzymes and molecules into place or put the shuffled steps back in order. Combos, stars, a daily pathway and practice on the steps you miss.',
+    href: '/games/pathway-lab',
+    buildPath: '/game-builds/pathway-lab/play.html',
+    tags: ['70 pathways', '634 steps', 'Learn mode', 'Single player'],
+    loadingColor: '#0d1215',
+  },
 ];
 
 /** The live site, used when the native app opens a web game in the browser. */
