@@ -1,3 +1,4 @@
+import { ANDROID_APK_SIZE, ANDROID_APK_URL, inAndroidApp } from '@/lib/android-app';
 import { LIVE_SITE, LIVE_SITE_LABEL } from '@/lib/live-site';
 import { Href, router } from 'expo-router';
 
@@ -142,6 +143,8 @@ export default function SettingsScreen() {
   const [resetProgressError, setResetProgressError] = useState<string | null>(null);
   const [resetProgressDone, setResetProgressDone] = useState(false);
   const [sharingApp, setSharingApp] = useState(false);
+  // Read once: inside the Android app there is nothing to download.
+  const [androidApp] = useState(inAndroidApp);
   const [shareNotice, setShareNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -362,7 +365,7 @@ export default function SettingsScreen() {
         <View style={styles.optionRow}>
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>Sound effects</Text>
-            <Text style={styles.optionDescription}>A soft click when you tap, and a chime or a low note when you answer. Saved on this device.</Text>
+            <Text style={styles.optionDescription}>A short, quiet chime or low note when you check an answer. Taps are silent. Saved on this device.</Text>
           </View>
           <Switch
             value={feedbackPrefs.sound}
@@ -512,9 +515,19 @@ export default function SettingsScreen() {
         <View style={[styles.optionRow, styles.rowDivider]}>
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>Android phones and tablets</Text>
-            <Text style={styles.optionDescription}>Open in Chrome, tap ⋮, then choose Install app or Add to Home screen.</Text>
+            <Text style={styles.optionDescription}>Download the Android app below, or open this site in Chrome, tap ⋮, then choose Install app or Add to Home screen.</Text>
           </View>
         </View>
+        {Platform.OS === 'web' && !androidApp ? (
+          <Interactive onPress={() => void Linking.openURL(ANDROID_APK_URL)} accessibilityRole="link" accessibilityLabel={`Download the Android app, ${ANDROID_APK_SIZE}`} style={styles.optionRow}>
+            <Icon name="download" size={18} color={colors.primaryText} />
+            <View style={styles.flex}>
+              <Text style={styles.optionLabel}>Download the Android app</Text>
+              <Text style={styles.optionDescription}>APK, {ANDROID_APK_SIZE}. Open the file on your phone and allow installing it when Android asks. It updates itself with every new feature.</Text>
+            </View>
+            <Icon name="chevronRight" size={18} color={colors.textTertiary} />
+          </Interactive>
+        ) : null}
         <View style={[styles.optionRow, styles.rowDivider]}>
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>Windows, Mac, Linux and Chromebook</Text>

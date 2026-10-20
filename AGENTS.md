@@ -109,7 +109,7 @@ Each topic with lessons lives in `src/data/topics/<topic>/` (`sources.ts`, `less
 
 `src/data/topics/index.ts` (also set the topic's status to `published` in `src/data/content-catalog.ts`)
 
-Anatomy (HB2) is taught in three sections. Every anatomy topic sets `section` in its `index.ts` to `'Gross Anatomy'`, `'Microanatomy'` or `'Embryology'` (`TopicSection` in `lesson-types.ts`); the app shows it as section headings on the topic path and the HB2 course path, a pill on topic cards, the topic breadcrumb and the lesson subtitle. Gross anatomy topics (in course order): Upper Limb, Cardiovascular System, Respiratory System, Gastrointestinal System, Urinary System, Head and Neck, Neuroanatomy. `tests/hb2-study.test.mjs` fails if an anatomy topic has no section.
+Anatomy (HB2) is taught in three sections. Every anatomy topic sets `section` in its `index.ts` to `'Gross Anatomy'`, `'Microanatomy'` or `'Embryology'` (`TopicSection` in `lesson-types.ts`); the app shows it as section headings on the topic path and the HB2 course path, a pill on topic cards, the topic breadcrumb and the lesson subtitle. Gross anatomy topics (in course order, owner 2026-10-19, following the course outline: cardiovascular system, thoracic cavity, abdomen, pelvis and perineum, upper limbs, lower limbs, head and neck, CNS): Cardiovascular System, Respiratory System, Gastrointestinal System, Urinary System, Upper Limb, Head and Neck, Neuroanatomy (no Lower Limb topic yet). The order is set in `builtTopics` (`src/data/topics/index.ts`), the anatomy entries of `src/data/content-catalog.ts` and `PAST_TOPICS` in `past-question-topics.ts`; keep the three in step. `tests/hb2-study.test.mjs` fails if an anatomy topic has no section.
 
 Subject → course → topic → lesson lookups (the one curriculum model):
 
@@ -342,7 +342,7 @@ The full redesign rationale is in `docs/redesign-notes.md`.
   * `Type.*`, `Radius.*`, `elevation(colors, level)`
 * All durations, springs and curves come from `src/constants/motion.ts`.
 * Respect reduced motion: use `useReducedMotion()`.
-* **Sound and vibration** (owner, 2026-10-19): `src/lib/feedback.ts` — `tapFeedback` on every tap (the `Interactive` primitive and the navigation bars), `correctFeedback` / `wrongFeedback` when an answer is checked (`QuestionCard`; cards that open already answered stay quiet). Sounds are made with Web Audio (no files); vibration uses `navigator.vibrate` (Android; not iPhone) or React Native `Vibration`. Settings → Sounds and vibration switches each off, per device.
+* **Sound and vibration** (owner, 2026-10-19): `src/lib/feedback.ts` — `tapFeedback` on every tap is a tiny buzz only, never a sound (owner: sounds only where necessary); `correctFeedback` / `wrongFeedback` (quiet) when an answer is checked (`QuestionCard`; cards that open already answered stay quiet). Sounds are made with Web Audio (no files); vibration uses `navigator.vibrate` (Android; not iPhone) or React Native `Vibration`. Settings → Sounds and vibration switches each off, per device.
 * Never hard-code new colours in screens.
 
 ### Atmosphere

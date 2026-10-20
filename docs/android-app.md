@@ -11,6 +11,8 @@ APK is only needed to change the app's name, icon, colours or package id.
 
 ## Files
 
+* `public/downloads/grateapex.apk` — the APK learners download from Settings → Install on your devices (`src/lib/android-app.ts`; the link is hidden inside the app itself). Replace this file when a new APK is built. The service worker never saves it.
+
 * `public/.well-known/assetlinks.json` — the site vouches for the app's signing
   key. Without it Android shows a browser address bar at the top of the app.
   `tests/deploy-wiring.test.mjs` checks it.
