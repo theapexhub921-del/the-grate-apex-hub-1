@@ -121,7 +121,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'flow', change: 'up' }],
       },
       {
-        question: mcq('s4-02', 'saliva', 'At that fast flow, what is the saliva like compared with plasma?', 'Still hypotonic', ['Isotonic', 'Hypertonic'], {
+        question: mcq('s4-02', 'saliva', 'At that fast flow, what is the saliva like compared with plasma?', 'Still hypotonic', ['Isotonic with plasma', 'Hypertonic'], {
           ...predict,
           explanation: 'The ducts reabsorb Na⁺ and Cl⁻ but are impermeable to water, so final saliva is always hypotonic — even though, flowing fast, it keeps a little more Na⁺ (slides 61–63).',
         }),
@@ -250,7 +250,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s8-03', 'defecation', 'The pudendal nerve is damaged and the rectum fills. What happens?', 'The external sphincter cannot be held shut: incontinence', ['Nothing — the internal sphincter keeps continence', 'The urge is lost, so the rectum overfills silently'], {
+        question: mcq('s8-03', 'defecation', 'The pudendal nerve is damaged and the rectum fills. What happens?', 'The external sphincter cannot be held shut: incontinence', ['Nothing — the internal sphincter keeps continence', 'The urge is lost, so the rectum overfills silently without leakage'], {
           ...predict,
           explanation: 'The external anal sphincter is skeletal muscle supplied by the pudendal nerve; it is how the person holds on once the reflex relaxes the internal sphincter (slides 174, 182).',
         }),

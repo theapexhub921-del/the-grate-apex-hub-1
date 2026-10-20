@@ -241,7 +241,7 @@ export const simulations: Record<string, Step> = {
     sourceRefs: sc([12, 13]),
     predictions: [
       {
-        question: mcq('s5-01', 'dorsal-horn-laminae', 'Only light touch reaches the dorsal horn. Which cell stays silent?', 'The nociceptive-specific (NS) cell', ['The low-threshold (LT) cell', 'The wide-dynamic-range (WDR) cell'], {
+        question: mcq('s5-01', 'dorsal-horn-laminae', 'Only light touch reaches the dorsal horn. Which cell stays silent?', 'The nociceptive-specific (NS) cell', ['The low-threshold (LT) cell', 'The wide-dynamic-range (WDR) cell of lamina V'], {
           ...predict,
           explanation: 'NS cells respond only to noxious stimuli. LT cells (laminae III–VI) and WDR cells respond to touch (Spinal Cord, slide 13).',
         }),

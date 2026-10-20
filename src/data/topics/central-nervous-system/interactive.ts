@@ -10,7 +10,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 1 — Organisation and sensory receptors ─────────────────
   'central-nervous-system-1': [
     ask(
-      mcq('c1-01', 'cns-organisation', 'A cluster of neuronal cell bodies with a similar function sits just outside the spinal cord, on the dorsal root. What is it called?', 'A ganglion', ['A nucleus', 'A tract', 'A nerve'], {
+      mcq('c1-01', 'cns-organisation', 'A cluster of neuronal cell bodies with a similar function sits just outside the spinal cord, on the dorsal root. What is it called?', 'A ganglion', ['A nucleus (of cell bodies)', 'A tract', 'A nerve'], {
         explanation: 'A ganglion is cell bodies outside the CNS (the dorsal root ganglion holds sensory cell bodies). A nucleus is the same thing inside the CNS (Sensory I, p. 2; Spinal Cord, slide 2).',
         skill: 'terminology',
       })
@@ -68,7 +68,7 @@ export const interactive: Record<string, Steps> = {
       'Ia annulospiral endings wrap bag and chain fibres; II flower-spray endings are on chain fibres only. Motor supply: γ-efferents.',
     ], { sourceRefs: s1([14]) }),
     ask(
-      mcq('c2-02', 'stretch-reflex', 'Why is the knee jerk called monosynaptic?', 'The spindle afferent synapses directly on the α-motor neuron', ['Only one muscle fibre contracts in the quadriceps', 'It uses one interneuron between afferent and motor neuron', 'Only one spinal segment supplies the whole knee'], {
+      mcq('c2-02', 'stretch-reflex', 'Why is the knee jerk called monosynaptic?', 'The spindle afferent synapses directly on the α-motor neuron', ['Only one muscle fibre contracts in the quadriceps', 'It uses one inhibitory interneuron between afferent and motor neuron', 'Only one spinal segment supplies the whole knee'], {
         explanation: 'Sensory I, pp. 12–13: afferent → α-motor neuron, one synapse.',
         skill: 'cause-effect',
       })
@@ -77,7 +77,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: s1([24]),
     }),
     ask(
-      mcq('c2-03', 'gamma-efferents', 'A nervous student’s knee jerks are brisk. What explains it?', 'Descending signals raise γ discharge, making the spindles more sensitive', ['Anxiety damages the Golgi tendon organs, removing their inhibition', 'Anxiety blocks the α-motor neurons until the reflex bursts through', 'The spindles stop adapting because adrenaline acts on them directly'], {
+      mcq('c2-03', 'gamma-efferents', 'A nervous student’s knee jerks are brisk. What explains it?', 'Descending signals raise γ discharge, making the spindles more sensitive', ['Anxiety damages the Golgi tendon organs, removing their inhibition', 'Anxiety blocks the α-motor neurons until the reflex suddenly bursts through', 'The spindles stop adapting because adrenaline acts on them directly'], {
         explanation: 'Sensory I, p. 25: γ-efferents are controlled by descending tracts; hyperactive reflexes can be seen in anxious people. Jendrassik’s manoeuvre works the same way.',
         skill: 'application',
       })
@@ -178,7 +178,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: s2([21]),
     }),
     ask(
-      mcq('c4-03', 'pain-pathways', 'Why does slow pain build up gradually and last long after the injury?', 'Its transmitter, substance P, is slow to build up and slow to be destroyed', ['C fibres are thickly myelinated, so the signal is delayed at each node', 'It travels in the dorsal columns, which relay slowly through the medulla', 'It is relayed through the cerebellum before reaching the cortex'], {
+      mcq('c4-03', 'pain-pathways', 'Why does slow pain build up gradually and last long after the injury?', 'Its transmitter, substance P, is slow to build up and slow to be destroyed', ['C fibres are thickly myelinated, so the signal is delayed at each node', 'It travels in the dorsal columns, which relay slowly through the medulla', 'It is relayed through the cerebellum and red nucleus before reaching the cortex'], {
         explanation: 'Sensory II, p. 21.',
         skill: 'cause-effect',
       })
@@ -223,7 +223,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c5-03', 'cord-tracts', 'A tract is called the “spinocerebellar” tract. What can you tell from its name?', 'It is sensory, running from the spinal cord to the cerebellum', ['It is motor, running from the cerebellum to the spinal cord', 'It is a plexus of spinal nerves near the cerebellum', 'It is a cranial nerve that leaves the brainstem'], {
+      mcq('c5-03', 'cord-tracts', 'A tract is called the “spinocerebellar” tract. What can you tell from its name?', 'It is sensory, running from the spinal cord to the cerebellum', ['It is motor, running from the cerebellum to the spinal cord', 'It is a plexus of spinal nerves that runs up beside the cerebellum', 'It is a cranial nerve that leaves the brainstem'], {
         explanation: 'Spinal Cord, slide 8: spino- first means it starts in the cord and ascends; the ending names its destination.',
         skill: 'application',
       })
@@ -272,7 +272,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c6-03', 'brainstem-motor', 'Which brainstem nucleus inhibits antigravity muscles?', 'The medullary reticular nucleus', ['The pontine reticular nucleus', 'The lateral vestibular nucleus', 'The red nucleus'], {
+      mcq('c6-03', 'brainstem-motor', 'Which brainstem nucleus inhibits antigravity muscles?', 'The medullary reticular nucleus', ['The pontine reticular nucleus (excitatory)', 'The lateral vestibular nucleus', 'The red nucleus'], {
         explanation: 'Motor Activity, slide 16: medullary reticular inhibits; pontine reticular and vestibular nuclei excite.',
       })
     ),
@@ -366,7 +366,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: bg([7]),
     }),
     ask(
-      mcq('c8-03', 'bg-disorders', 'In Parkinson’s disease, which neurons are lost?', 'Dopaminergic neurons of the substantia nigra', ['GABA neurons of the striatum (caudate)', 'Purkinje cells of the cerebellum', 'Neurons of the subthalamic nucleus'], {
+      mcq('c8-03', 'bg-disorders', 'In Parkinson’s disease, which neurons are lost?', 'Dopaminergic neurons of the substantia nigra', ['GABA neurons of the striatum (caudate)', 'Purkinje cells of the cerebellar cortex', 'Neurons of the subthalamic nucleus'], {
         explanation: 'Basal Ganglia, slide 8: degeneration of the nigrostriatal dopamine system.',
       })
     ),
@@ -395,7 +395,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 9 — The brain ──────────────────────────────────────────
   'central-nervous-system-9': [
     ask(
-      mcq('c9-01', 'brain-overview', 'A tumour is described as “infratentorial”. Where is it?', 'In the cerebellum or brainstem', ['In the frontal lobe', 'Anywhere above the tentorium', 'In the cervical spinal cord'], {
+      mcq('c9-01', 'brain-overview', 'A tumour is described as “infratentorial”. Where is it?', 'In the cerebellum or brainstem', ['In the frontal lobe', 'Anywhere above the tentorium', 'In the cervical spinal cord or meninges'], {
         explanation: 'The Brain, slide 15: infratentorial = below the tentorium, in the hindbrain or brainstem.',
         skill: 'terminology',
       })
@@ -404,7 +404,7 @@ export const interactive: Record<string, Steps> = {
       sourceRefs: br([7, 9, 11, 13]),
     }),
     ask(
-      mcq('c9-02', 'brain-lobes', 'A patient speaks fluently but cannot understand what is said to them. Which lobe is damaged?', 'Temporal — Wernicke’s aphasia', ['Frontal — Broca’s aphasia', 'Occipital — visual agnosia', 'Parietal — dyscalculia'], {
+      mcq('c9-02', 'brain-lobes', 'A patient speaks fluently but cannot understand what is said to them. Which lobe is damaged?', 'Temporal — Wernicke’s aphasia', ['Frontal — Broca’s aphasia', 'Occipital — visual agnosia', 'Parietal — dyscalculia and agraphia'], {
         explanation: 'The Brain, slide 10: difficulty understanding spoken words is Wernicke’s aphasia, a temporal lobe sign.',
         skill: 'application',
       })
@@ -424,7 +424,7 @@ export const interactive: Record<string, Steps> = {
       })
     ),
     ask(
-      mcq('c9-05', 'cortex-dominance', 'A right-handed man has a stroke in his left hemisphere. Which problem is most likely?', 'Aphasia with weakness of the right side', ['Loss of spatial perception only', 'Weakness of the left side of the body', 'Loss of smell on both sides only'], {
+      mcq('c9-05', 'cortex-dominance', 'A right-handed man has a stroke in his left hemisphere. Which problem is most likely?', 'Aphasia with weakness of the right side', ['Loss of spatial perception only', 'Weakness of the left side of the body', 'Loss of smell on both sides, with no weakness'], {
         explanation: 'The Brain, slide 23: about 87% are left-hemisphere dominant; a left stroke usually brings aphasia, apraxia and right-sided difficulty.',
         skill: 'application',
         clinical: true,
