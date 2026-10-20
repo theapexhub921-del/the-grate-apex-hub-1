@@ -56,6 +56,8 @@ type QuestionCardProps = {
   reviewNote?: string | null; // e.g. "This concept comes back for review tomorrow."
   compact?: boolean; // Apex: minimal chrome
   showMeta?: boolean; // difficulty / type chips
+  /** Called once the question's picture (diagram or past-paper picture) has loaded. */
+  onPictureReady?: () => void;
 };
 
 function choiceOrder(question: Extract<Question, { type: 'choice' | 'multi' }>, seed: string) {
@@ -125,6 +127,7 @@ export function QuestionCard({
   reviewNote,
   compact = false,
   showMeta = false,
+  onPictureReady,
 }: QuestionCardProps) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
@@ -184,8 +187,8 @@ export function QuestionCard({
         {question.prompt}
       </Text>
 
-      {question.figure ? <QuestionFigure figure={question.figure} revealed={revealed} /> : null}
-      {question.image ? <QuestionImage src={question.image} /> : null}
+      {question.figure ? <QuestionFigure figure={question.figure} revealed={revealed} onReady={onPictureReady} /> : null}
+      {question.image ? <QuestionImage src={question.image} onReady={onPictureReady} /> : null}
 
       {showMeta && !compact ? (
         <View style={styles.meta}>

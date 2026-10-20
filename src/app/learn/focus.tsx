@@ -1,76 +1,52 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
 import { BackLink } from '@/components/learning/nav-bits';
 import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/interactive';
 import { ProgressRing } from '@/components/ui/progress-ring';
 import { PageHeader, Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { clock, FOCUS_PRESETS, type FocusPresetId, MIN_COUNTED_MINUTES, recordFocus, useFocusTotals } from '@/data/focus';
+import { clock, FOCUS_PRESETS, MIN_COUNTED_MINUTES, useFocusTotals } from '@/data/focus';
+import {
+  chooseFocusPreset,
+  focusPhaseMs,
+  focusPresetOf,
+  pauseFocusTimer,
+  remainingOf,
+  startFocusTimer,
+  stopFocusTimer,
+  useFocusTimer,
+} from '@/data/focus-timer';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { correctFeedback } from '@/lib/feedback';
 import { routes } from '@/lib/routes';
 
 // /learn/focus — a focus timer (owner's request, 2026-10-20): 25 minutes of
-// study, then 5 of rest (or 50/10, 15/3). A finished focus block counts its
-// minutes and keeps the learning streak; stopping early still counts once 5
-// minutes were focused (data/focus.ts). The clock runs from an end time, so it
-// stays right in a background tab, and it keeps going if you open another page
-// and come back.
-
-type Phase = 'focus' | 'rest';
-type TimerState = { preset: FocusPresetId; phase: Phase; endsAt: number | null; remainingMs: number };
-
-const presetOf = (id: FocusPresetId) => FOCUS_PRESETS.find((item) => item.id === id) ?? FOCUS_PRESETS[0];
-const phaseMs = (id: FocusPresetId, phase: Phase) => (phase === 'focus' ? presetOf(id).focus : presetOf(id).rest) * 60_000;
-
-// Kept outside the page, so the timer carries on while the learner looks at something else.
-let kept: TimerState = { preset: '25-5', phase: 'focus', endsAt: null, remainingMs: phaseMs('25-5', 'focus') };
-
+// study, then 5 of rest (or 50/10, 15/3). The clock itself lives in
+// data/focus-timer.ts, so it keeps running in the background (another page, a
+// background tab) and rings an alarm when the time is up. A finished focus block
+// counts its minutes and keeps the learning streak; stopping early still counts
+// once 5 minutes were focused (data/focus.ts).
 export default function FocusTimerScreen() {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const totals = useFocusTotals();
-  const [state, setStateRaw] = useState<TimerState>(kept);
+  const state = useFocusTimer();
   const [now, setNow] = useState(() => Date.now());
-  const [note, setNote] = useState<string | null>(null);
-  const handling = useRef(false);
-
-  const setState = (next: TimerState) => {
-    kept = next;
-    setStateRaw(next);
-  };
 
   const running = state.endsAt !== null;
-  const remainingMs = running ? Math.max(0, (state.endsAt ?? 0) - now) : state.remainingMs;
-  const fullMs = phaseMs(state.preset, state.phase);
-  const preset = presetOf(state.preset);
+  const remainingMs = remainingOf(state, now);
+  const fullMs = focusPhaseMs(state.preset, state.phase);
+  const preset = focusPresetOf(state.preset);
 
   useEffect(() => {
     if (!running) return;
     const timer = setInterval(() => setNow(Date.now()), 500);
     return () => clearInterval(timer);
   }, [running]);
-
-  // A phase has ended: count the focus block and start the rest, or get ready for the next block.
-  useEffect(() => {
-    if (!running || remainingMs > 0 || handling.current) return;
-    handling.current = true;
-    correctFeedback();
-    if (state.phase === 'focus') {
-      void recordFocus(preset.focus, true);
-      setNote(`${preset.focus} minutes of focus counted. Take a ${preset.rest}-minute break.`);
-      setState({ ...state, phase: 'rest', endsAt: Date.now() + phaseMs(state.preset, 'rest'), remainingMs: phaseMs(state.preset, 'rest') });
-    } else {
-      setNote('Break over. Ready for the next block?');
-      setState({ ...state, phase: 'focus', endsAt: null, remainingMs: phaseMs(state.preset, 'focus') });
-    }
-    handling.current = false;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [running, remainingMs]);
 
   // The browser tab shows the clock while it runs.
   useEffect(() => {
@@ -82,33 +58,6 @@ export default function FocusTimerScreen() {
     };
   }, [running, remainingMs, state.phase]);
 
-  function start() {
-    setNote(null);
-    setNow(Date.now());
-    setState({ ...state, endsAt: Date.now() + remainingMs });
-  }
-
-  function pause() {
-    setState({ ...state, endsAt: null, remainingMs });
-  }
-
-  // Stop: a focus block stopped after 5+ minutes still counts what was done.
-  function stop() {
-    if (state.phase === 'focus') {
-      const focused = Math.floor((fullMs - remainingMs) / 60_000);
-      if (focused >= MIN_COUNTED_MINUTES) {
-        void recordFocus(focused, false);
-        setNote(`${focused} minutes of focus counted.`);
-      } else setNote(null);
-    } else setNote(null);
-    setState({ ...state, phase: 'focus', endsAt: null, remainingMs: phaseMs(state.preset, 'focus') });
-  }
-
-  function choosePreset(id: FocusPresetId) {
-    setNote(null);
-    setState({ preset: id, phase: 'focus', endsAt: null, remainingMs: phaseMs(id, 'focus') });
-  }
-
   const started = running || remainingMs < fullMs;
   const focusedNow = state.phase === 'focus' ? Math.floor((fullMs - remainingMs) / 60_000) : 0;
 
@@ -118,7 +67,7 @@ export default function FocusTimerScreen() {
       <PageHeader eyebrow="Study" title="Focus timer" subtitle="Study in focused blocks with short breaks. Focused minutes count for your streak and your focus goals." />
       <Card style={styles.card}>
         {!started ? (
-          <SegmentedControl label="Focus and break length" options={FOCUS_PRESETS.map((item) => ({ value: item.id, label: item.label }))} value={state.preset} onChange={choosePreset} />
+          <SegmentedControl label="Focus and break length" options={FOCUS_PRESETS.map((item) => ({ value: item.id, label: item.label }))} value={state.preset} onChange={chooseFocusPreset} />
         ) : null}
         <View style={styles.center}>
           <ProgressRing
@@ -135,18 +84,27 @@ export default function FocusTimerScreen() {
             </View>
           </ProgressRing>
         </View>
-        {note ? <Text style={styles.note}>{note}</Text> : null}
+        {state.note ? <Text style={styles.note}>{state.note}</Text> : null}
         <View style={styles.actions}>
           {running ? (
-            <Button label="Pause" variant="secondary" onPress={pause} />
+            <Button label="Pause" variant="secondary" onPress={pauseFocusTimer} />
           ) : (
-            <Button label={started ? 'Resume' : state.phase === 'rest' ? 'Start break' : 'Start focusing'} onPress={start} size="lg" />
+            <Button label={started ? 'Resume' : state.phase === 'rest' ? 'Start break' : 'Start focusing'} onPress={startFocusTimer} size="lg" />
           )}
           {state.phase === 'rest' ? (
-            <Button label="Skip break" variant="ghost" onPress={stop} />
+            <Button label="Skip break" variant="ghost" onPress={stopFocusTimer} />
           ) : started ? (
-            <Button label={focusedNow >= MIN_COUNTED_MINUTES ? `Stop and count ${focusedNow} min` : 'Stop'} variant="ghost" onPress={stop} />
+            <Button label={focusedNow >= MIN_COUNTED_MINUTES ? `Stop and count ${focusedNow} min` : 'Stop'} variant="ghost" onPress={stopFocusTimer} />
           ) : null}
+        </View>
+        <View style={styles.notice} accessibilityRole="text">
+          <Icon name="bell" size={18} color={colors.accentText} />
+          <View style={styles.flex}>
+            <Text style={styles.noticeTitle}>{running ? 'Running in the background' : 'Runs in the background'}</Text>
+            <Text style={styles.small}>
+              You can leave this page, open your notes or switch tabs: the timer keeps going, and an alarm rings when the time is up. Keep GrAte Apex open (and your volume up) to hear it.
+            </Text>
+          </View>
         </View>
         <Text style={styles.small}>Put your phone face down and study one thing. Stopping early still counts once you have focused for {MIN_COUNTED_MINUTES} minutes.</Text>
       </Card>
@@ -172,6 +130,9 @@ function Stat({ label, value, detail, styles }: { label: string; value: string; 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     card: { gap: 18, maxWidth: 560 },
+    flex: { flex: 1, minWidth: 0 },
+    notice: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceMuted },
+    noticeTitle: { fontSize: 14, fontWeight: '600', color: colors.text },
     center: { alignItems: 'center', paddingVertical: 8 },
     ringInner: { alignItems: 'center', gap: 2 },
     phase: { fontSize: 13, fontWeight: '700', letterSpacing: 0.6, color: colors.textSecondary },

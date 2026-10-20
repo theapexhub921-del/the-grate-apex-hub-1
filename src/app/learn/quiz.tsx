@@ -150,8 +150,8 @@ function buildPlan(input: {
       title: examTitle(exam, subject ? SUBJECT_NAME[subject] : undefined),
       subtitle:
         exam.kind === 'mock'
-          ? `${size} questions from the past papers, ${exam.minutes} minutes for the whole paper. Answers and your score by topic are shown at the end, like the real exam. When the time runs out, your answers are handed in.`
-          : `${size} stations, ${exam.seconds} seconds each. Name what is shown; when a station's time runs out you move on, like the practical exam. Answers at the end.`,
+          ? `${size} questions from the past papers, ${exam.minutes} minutes for the whole paper. Choose to see the answers at the end, like the real exam, or after each question. When the time runs out, your answers are handed in, and you get your score in each topic.`
+          : `${size} stations, ${exam.seconds} seconds each. Name what is shown; when a station's time runs out you move on, like the practical exam. The clock starts once the picture has loaded. See the answers at the end or after each station.`,
       request: { scope: { kind: 'questions', questionIds: pool.map((question) => question.id) }, strategy: 'random', size },
       backHref: back,
       crumbs: [{ label: exam.kind === 'mock' ? 'Mock exam' : 'Spotter', href: back }],
@@ -435,7 +435,7 @@ function QuizScreen({
     );
   }
 
-  // Mock exams and spotters are sat like the real thing: answers at the end, on a clock.
+  // Mock exams and spotters run on a clock (answers at the end unless the learner picks after each).
   const timedExam = exam?.kind === 'mock' || exam?.kind === 'spotter';
   const bankSize = plan.lessonId && plan.kind !== 'practice' ? getLessonQuizBank(plan.lessonId).length : null;
   const lessonDone = plan.lessonId ? progress.completedLessons.includes(plan.lessonId) : true;
@@ -540,7 +540,7 @@ function QuizScreen({
       <QuestionSession
         items={items}
         mode={mode}
-        onModeChange={timedExam ? undefined : setMode}
+        onModeChange={setMode}
         perQuestionSeconds={perQuestionSeconds}
         timeLimitSeconds={exam?.kind === 'mock' ? exam.minutes * 60 : undefined}
         attemptMode={plan.attemptMode}
@@ -605,7 +605,6 @@ function QuizScreen({
         )}
       </View>
 
-      {timedExam ? null : (
       <Card style={styles.modeCard}>
         <Text style={styles.modeTitle}>How do you want feedback?</Text>
         <View style={styles.modeRow} accessibilityRole="radiogroup">
@@ -630,7 +629,6 @@ function QuizScreen({
           ))}
         </View>
       </Card>
-      )}
 
       {saved && !loadingSaved ? (
         <Card style={styles.resumeCard}>

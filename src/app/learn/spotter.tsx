@@ -23,7 +23,7 @@ export default function SpotterBuilderScreen() {
     <ExamBuilder
       eyebrow="Practical practice"
       title="Spotter"
-      subtitle="Timed stations, like a practical exam: look at the picture, name what is marked, and move on when the clock runs out. Answers at the end."
+      subtitle="Timed stations, like a practical exam: look at the picture, name what is marked, and move on when the clock runs out. Each clock starts once its picture has loaded."
       ready={ready}
       choices={[
         { label: 'Subject', value: subject, options: [...EXAM_SUBJECTS.map((item) => ({ value: item, label: SUBJECT_NAME[item] })), { value: 'all', label: 'All' }], onChange: setSubject },

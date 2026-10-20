@@ -4,6 +4,8 @@ import { Text } from '@/components/ui/text';
 
 import { QuestionCard } from '@/components/question-card';
 import { QuestionNote } from '@/components/learning/question-note';
+import { prefetchQuestionPictures, questionPictureUri } from '@/components/learning/figure-view';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 import { toggleStar, useStarredIds } from '@/data/starred-questions';
 import { Button } from '@/components/ui/button';
 import { Card, Interactive } from '@/components/ui/interactive';
@@ -52,6 +54,8 @@ const REASON_LABEL: Partial<Record<SelectionReason, { label: string; tone: 'warn
 // Correct answers move on by themselves after a moment; wrong answers
 // wait, so the explanation can be read.
 const AUTO_ADVANCE_CORRECT_MS = 1300;
+// A picture that never reports it has loaded still lets the clock start after this long.
+const PICTURE_WAIT_MS = 25_000;
 
 export function QuestionSession({
   items,
@@ -119,13 +123,29 @@ export function QuestionSession({
   const currentQuestionId = question?.id;
   const currentQuestionComplete = question ? isAnswerComplete(question, answers[question.id]) : false;
 
+  // A question with a picture (spotter stations, diagrams): its clock starts only
+  // once the picture has loaded, and the next pictures download in the background.
+  const [picturesReady, setPicturesReady] = useState<Set<string>>(() => new Set());
+  const pictureWaiting = Boolean(question && questionPictureUri(question) && !picturesReady.has(question.id));
+  const markPictureReady = (id: string) =>
+    setPicturesReady((previous) => (previous.has(id) ? previous : new Set(previous).add(id)));
+  useEffect(() => {
+    prefetchQuestionPictures(items.slice(index, index + 4).map((item) => item.question));
+  }, [items, index]);
+  // If a picture never reports back, the clock still starts after a while.
+  useEffect(() => {
+    if (!pictureWaiting || !currentQuestionId) return;
+    const timer = setTimeout(() => markPictureReady(currentQuestionId), PICTURE_WAIT_MS);
+    return () => clearTimeout(timer);
+  }, [pictureWaiting, currentQuestionId]);
+
   useEffect(() => {
     const timer = setInterval(() => setElapsed(secondsSince(startedAt)), 1000);
     return () => clearInterval(timer);
   }, [startedAt]);
 
   useEffect(() => {
-    if (!currentQuestionId || !perQuestionSeconds || currentQuestionComplete || timedOut.has(currentQuestionId)) return;
+    if (!currentQuestionId || !perQuestionSeconds || currentQuestionComplete || timedOut.has(currentQuestionId) || pictureWaiting) return;
 
     const remaining = remainingByQuestion.current;
     let seconds = remaining.get(currentQuestionId) ?? perQuestionSeconds;
@@ -150,7 +170,7 @@ export function QuestionSession({
       clearInterval(timer);
       remaining.set(currentQuestionId, seconds);
     };
-  }, [currentQuestionComplete, currentQuestionId, index, mode, perQuestionSeconds, timedOut, total]);
+  }, [currentQuestionComplete, currentQuestionId, index, mode, perQuestionSeconds, timedOut, total, pictureWaiting]);
 
   useEffect(
     () => () => {
@@ -373,14 +393,6 @@ export function QuestionSession({
         {answeredCount}/{total} answered{skipped.size > 0 ? ` · ${skipped.size} skipped` : ''}
       </Text>
       <Text style={styles.navMeta}>{mode === 'instant' ? 'Instant feedback' : 'Feedback when you finish'}</Text>
-      {onModeChange && !anyAnswered ? (
-        <Button
-          label={mode === 'instant' ? 'Switch to submit-at-end' : 'Switch to instant feedback'}
-          size="sm"
-          variant="ghost"
-          onPress={() => onModeChange(mode === 'instant' ? 'submit' : 'instant')}
-        />
-      ) : null}
       {isWeb && desktop ? <Text style={styles.keys}>Keys: 1–4 / A–D choose · Enter check/next · ← → move</Text> : null}
       <Button label={submitLabel} variant="secondary" onPress={requestFinish} disabled={submitting || leaving} loading={submitting} fullWidth />
       {onSaveExit ? <Button label="Save & exit" variant="ghost" onPress={() => void saveAndExit()} disabled={submitting} loading={leaving} fullWidth /> : null}
@@ -405,11 +417,26 @@ export function QuestionSession({
         </View>
       ) : null}
 
+      {onModeChange && !anyAnswered && question ? (
+        <View style={styles.modeSwitch}>
+          <Text style={styles.modeLabel}>When do you want to see the answers?</Text>
+          <SegmentedControl
+            label="When to see the answers"
+            options={[
+              { value: 'instant', label: 'After each question' },
+              { value: 'submit', label: 'At the end' },
+            ]}
+            value={mode}
+            onChange={(value) => onModeChange(value as FeedbackMode)}
+          />
+        </View>
+      ) : null}
+
       {question ? (
         <>
           {perQuestionSeconds ? (
             <Pill
-              label={timedOut.has(question.id) ? 'Time expired' : `Time left: ${timeLeft ?? perQuestionSeconds}s`}
+              label={timedOut.has(question.id) ? 'Time expired' : pictureWaiting ? 'The clock starts when the picture loads' : `Time left: ${timeLeft ?? perQuestionSeconds}s`}
               tone={timedOut.has(question.id) || (timeLeft !== null && timeLeft <= 5) ? 'warning' : 'primary'}
               style={styles.questionTimer}
             />
@@ -431,6 +458,7 @@ export function QuestionSession({
             keyboard={isWeb}
             reviewNote={reviewNote}
             showMeta
+            onPictureReady={() => markPictureReady(question.id)}
           />
           <QuestionNote key={`note:${question.id}`} questionId={question.id} />
           <View style={styles.actions}>
@@ -505,6 +533,8 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     screen: { flex: 1 },
     questionTimer: { marginBottom: 8 },
+    modeSwitch: { gap: 6, marginBottom: 14, maxWidth: 460 },
+    modeLabel: { fontSize: 13, fontWeight: '600', color: colors.textSecondary },
     flex: { flex: 1 },
     kicker: { fontSize: 11, fontWeight: '800', letterSpacing: 1.1, color: colors.textTertiary },
     navCard: { gap: 12 },

@@ -24,7 +24,7 @@ export default function MockExamBuilderScreen() {
     <ExamBuilder
       eyebrow="Exam practice"
       title="Mock exam"
-      subtitle={`A timed paper mixed from the real HB2 past papers. Answers come at the end, with your score in each topic, so you know what to revise first.`}
+      subtitle={`A timed paper mixed from the real HB2 past papers. You can see the answers at the end, like the real exam, or after each question, and you get your score in each topic, so you know what to revise first.`}
       ready={ready}
       choices={[
         { label: 'Course', value: bank, options: EXAM_SUBJECTS.map((subject) => ({ value: pastCourseForSubject(subject), label: SUBJECT_NAME[subject] })), onChange: setBank },

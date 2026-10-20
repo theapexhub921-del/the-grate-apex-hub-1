@@ -37,23 +37,78 @@ const QUESTION_MAX_HEIGHT = 280;
 // The preview card in a lesson.
 const PREVIEW_HEIGHT = 120;
 
+/** The picture a question shows (a lecture diagram or a past paper's picture), or null. */
+export function questionPictureUri(question: { figure?: { id: string }; image?: string }): string | null {
+  if (question.image) return figureUri(question.image);
+  const figure = question.figure ? getFigure(question.figure.id) : undefined;
+  return figure ? figureUri(figure.src) : null;
+}
+
+/** Starts downloading the pictures of the next questions, so they are ready when reached. */
+export function prefetchQuestionPictures(questions: readonly { figure?: { id: string }; image?: string }[]) {
+  const uris = questions.map(questionPictureUri).filter((uri): uri is string => Boolean(uri));
+  if (uris.length) void Image.prefetch(uris).catch(() => undefined);
+}
+
+/**
+ * A picture that says when it is ready: "Loading the picture…" until it has
+ * loaded (timed questions start their clock only then), and "Try again" if it
+ * fails.
+ */
+function Picture({ uri, label, onReady }: { uri: string; label: string; onReady?: () => void }) {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [attempt, setAttempt] = useState(0);
+  return (
+    <>
+      <Image
+        key={attempt}
+        source={{ uri: attempt ? `${uri}${uri.includes('?') ? '&' : '?'}retry=${attempt}` : uri }}
+        style={StyleSheet.absoluteFill}
+        contentFit="contain"
+        accessibilityLabel={label}
+        transition={150}
+        onLoad={() => {
+          setState('ready');
+          onReady?.();
+        }}
+        onError={() => setState('error')}
+      />
+      {state !== 'ready' ? (
+        <View style={styles.pictureState} pointerEvents="box-none">
+          {state === 'loading' ? (
+            <Text style={styles.pictureText}>Loading the picture…</Text>
+          ) : (
+            <>
+              <Icon name="image" size={20} color={colors.textTertiary} />
+              <Text style={styles.pictureText}>The picture did not load.</Text>
+              <Button label="Try again" size="sm" variant="secondary" onPress={() => { setState('loading'); setAttempt((value) => value + 1); }} />
+            </>
+          )}
+        </View>
+      ) : null}
+    </>
+  );
+}
+
 /** A plain picture with a question (a past paper's labelled diagram). */
-export function QuestionImage({ src, label = 'Diagram for this question' }: { src: string; label?: string }) {
+export function QuestionImage({ src, label = 'Diagram for this question', onReady }: { src: string; label?: string; onReady?: () => void }) {
   const styles = useThemedStyles(createStyles);
   return (
     <View style={[styles.canvas, styles.questionImage]}>
-      <Image source={{ uri: figureUri(src) }} style={StyleSheet.absoluteFill} contentFit="contain" accessibilityLabel={label} transition={150} />
+      <Picture uri={figureUri(src)} label={label} onReady={onReady} />
     </View>
   );
 }
 
 /** The picture at its own shape, with covers and pins drawn over it. */
-function Canvas({ figure, children, label, maxHeight = MAX_HEIGHT }: { figure: LessonFigure; children?: ReactNode; label: string; maxHeight?: number }) {
+function Canvas({ figure, children, label, maxHeight = MAX_HEIGHT, onReady }: { figure: LessonFigure; children?: ReactNode; label: string; maxHeight?: number; onReady?: () => void }) {
   const styles = useThemedStyles(createStyles);
   const aspectRatio = figure.width / figure.height;
   return (
     <View style={[styles.canvas, { aspectRatio, maxWidth: Math.min(760, maxHeight * aspectRatio) }]}>
-      <Image source={{ uri: figureUri(figure.src) }} style={StyleSheet.absoluteFill} contentFit="contain" accessibilityLabel={label} transition={150} />
+      <Picture uri={figureUri(figure.src)} label={label} onReady={onReady} />
       {children}
     </View>
   );
@@ -218,14 +273,14 @@ function FigureExplorerBody({ figure }: { figure: LessonFigure }) {
 }
 
 /** The diagram for a quiz question: labels covered, the asked-about part marked. */
-export function QuestionFigure({ figure: ref, revealed }: { figure: { id: string; spot?: string }; revealed: boolean }) {
+export function QuestionFigure({ figure: ref, revealed, onReady }: { figure: { id: string; spot?: string }; revealed: boolean; onReady?: () => void }) {
   const styles = useThemedStyles(createStyles);
   const figure = getFigure(ref.id);
   if (!figure) return null;
   const target = getSpot(figure, ref.spot);
   return (
     <View style={styles.questionFigure}>
-      <Canvas figure={figure} maxHeight={QUESTION_MAX_HEIGHT} label={`${figure.title} — lecture diagram${target ? ', one part marked' : ''}`}>
+      <Canvas figure={figure} maxHeight={QUESTION_MAX_HEIGHT} onReady={onReady} label={`${figure.title} — lecture diagram${target ? ', one part marked' : ''}`}>
         {figure.spots.filter((spot) => !(revealed && spot.id === target?.id)).map((spot) => <Covers key={spot.id} spot={spot} />)}
         {target ? <Pin spot={target} number="?" tone="target" label="The marked part" /> : null}
       </Canvas>
@@ -265,6 +320,8 @@ function createStyles(colors: ThemeColors) {
     caption: { ...Type.caption, color: colors.textTertiary },
     questionFigure: { marginVertical: 4 },
     questionImage: { height: QUESTION_MAX_HEIGHT, marginVertical: 4 },
+    pictureState: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 12 },
+    pictureText: { fontSize: 13, color: colors.textSecondary, textAlign: 'center' },
     previewCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 10, marginVertical: 6, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
     previewHover: { borderColor: colors.primaryBorder },
     previewImage: { height: PREVIEW_HEIGHT, maxWidth: '45%', borderRadius: Radius.sm, overflow: 'hidden', backgroundColor: Paper },

@@ -65,8 +65,8 @@ function context(): AudioContext | null {
   }
 }
 
-function play(tones: readonly Tone[]) {
-  if (!prefs.sound) return;
+function play(tones: readonly Tone[], always = false) {
+  if (!prefs.sound && !always) return;
   const ctx = context();
   if (!ctx) return;
   const now = ctx.currentTime;
@@ -125,4 +125,33 @@ export function correctFeedback() {
 export function wrongFeedback() {
   play([{ from: 260, to: 190, at: 0, length: 0.14, volume: 0.04, wave: 'sine' }]);
   vibrate([20, 40, 20]);
+}
+
+/**
+ * Gets the sound ready while the learner is tapping (browsers only allow sound
+ * that a tap started), so the focus timer's alarm can ring later, even in a
+ * background tab.
+ */
+export function primeAlarm() {
+  context();
+}
+
+/** The focus timer's alarm: three rounds of three clear beeps and a long buzz. It rings even when answer sounds are off. */
+export function alarmFeedback() {
+  const tones: Tone[] = [];
+  for (let round = 0; round < 3; round++) {
+    for (let beep = 0; beep < 3; beep++) {
+      tones.push({ from: 988, at: round * 1.1 + beep * 0.2, length: 0.13, volume: 0.2, wave: 'triangle' });
+    }
+  }
+  play(tones, true);
+  try {
+    if (Platform.OS === 'web') {
+      if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') navigator.vibrate([400, 200, 400, 200, 400]);
+    } else {
+      Vibration.vibrate([0, 400, 200, 400, 200, 400]);
+    }
+  } catch {
+    // vibration is optional
+  }
 }
