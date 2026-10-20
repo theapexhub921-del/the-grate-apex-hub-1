@@ -365,7 +365,7 @@ export default function SettingsScreen() {
         <View style={styles.optionRow}>
           <View style={styles.flex}>
             <Text style={styles.optionLabel}>Sound effects</Text>
-            <Text style={styles.optionDescription}>A soft click when you tap, and a chime or a low note when you answer. Saved on this device.</Text>
+            <Text style={styles.optionDescription}>A short, quiet chime or low note when you check an answer. Taps are silent. Saved on this device.</Text>
           </View>
           <Switch
             value={feedbackPrefs.sound}
