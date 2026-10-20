@@ -11,7 +11,7 @@ export const interactive: Record<string, Steps> = {
       'Retroperitoneal, T12 to L3, the right about 1–1.5 cm lower than the left because of the liver. Each is about 12 × 6 × 3 cm and 130–150 g.',
     ], { sourceRefs: ur([4]) }),
     ask(order('i1-01', 'kidney-coverings', 'Order the coverings of the kidney from inside out:', ['Fibrous renal capsule', 'Perirenal fat', 'Renal fascia', 'Pararenal fat'], { explanation: 'Slide 7.' })),
-    ask(mcq('i1-02', 'kidney-coverings', 'Why can a perinephric abscess track down into the pelvis?', 'The renal fascia has little or no attachment inferiorly', ['The fibrous renal capsule is absent at the lower pole', 'The pararenal fat is continuous with the bladder wall', 'The ureter carries the pus down inside its lumen'], { explanation: 'Slides 9–10.', skill: 'cause-effect' })),
+    ask(mcq('i1-02', 'kidney-coverings', 'Why can a perinephric abscess track down into the pelvis?', 'The renal fascia has little or no attachment inferiorly', ['The fibrous renal capsule is absent at the lower pole', 'The pararenal fat is continuous with the wall of the bladder', 'The ureter carries the pus down inside its lumen'], { explanation: 'Slides 9–10.', skill: 'cause-effect' })),
     learn('In front of each kidney', [
       'Right: suprarenal, liver, 2nd part of duodenum, hepatic flexure, small intestine. Left: suprarenal, stomach, spleen, pancreas, jejunum, descending colon.',
     ], { sourceRefs: ur([13]) }),
@@ -65,7 +65,7 @@ export const interactive: Record<string, Steps> = {
   ],
 
   [L(4)]: [
-    ask(mcq('i4-01', 'bladder-structure', 'What is the normal adult bladder capacity given in the lecture?', '400–600 ml', ['50–100 ml', '1–2 L', '3 L'], { explanation: 'Slide 58.' })),
+    ask(mcq('i4-01', 'bladder-structure', 'What is the normal adult bladder capacity given in the lecture?', '400–600 ml', ['About 50–100 ml', '1–2 L', '3 L'], { explanation: 'Slide 58.' })),
     learn('The trigone', [
       'A smooth triangle between the two ureteric orifices and the internal urethral orifice. It senses stretch and is a common site of infection. The interureteric ridge links the ureteric orifices.',
     ], { sourceRefs: ur([59, 60]) }),
@@ -97,7 +97,7 @@ export const interactive: Record<string, Steps> = {
     learn('Why women get more UTIs', [
       'The female urethra is only 3–4 cm and distensible, so bacteria reach the bladder easily — but catheterisation is easier.',
     ], { sourceRefs: ur([70]) }),
-    ask(mcq('i5-03', 'urethra-supply-incontinence', 'Why are infants physiologically incontinent?', 'Their corticospinal tracts to the external sphincter are not yet myelinated', ['Their bladder has no detrusor muscle yet, so it cannot contract on demand', 'They lack a trigone until about two years', 'Their pudendal nerve is absent at birth'], { explanation: 'Slide 75.', skill: 'cause-effect' })),
+    ask(mcq('i5-03', 'urethra-supply-incontinence', 'Why are infants physiologically incontinent?', 'Their corticospinal tracts to the external sphincter are not yet myelinated', ['Their bladder has no detrusor muscle yet, so it cannot contract on demand', 'They lack a trigone until about two years', 'Their pudendal nerve is absent at birth and only grows in later childhood'], { explanation: 'Slide 75.', skill: 'cause-effect' })),
     recall('r5-01', 'urethra-supply-incontinence', 'Describe the lymph drainage of the male urethra.', [
       'Prostatic and membranous parts: internal iliac nodes.',
       'Spongy part: inguinal nodes, with some to the external iliac nodes.',

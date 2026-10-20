@@ -72,7 +72,7 @@ export const interactive: Record<string, Steps> = {
         'limb-bud-axes',
         'Which signaling centre regulates the anteroposterior axis (thumb to little finger)?',
         'Zone of polarizing activity (ZPA)',
-        ['Apical ectodermal ridge (AER)', 'Progress zone (PZ)', 'Reserve zone of the physis'],
+        ['Apical ectodermal ridge (AER)', 'Progress zone (PZ) of the limb bud mesenchyme', 'Reserve zone of the physis'],
         { explanation: 'Slide 29: The anteroposterior axis is regulated by the zone of polarizing activity (ZPA) located on the posterior margin of the limb bud.', skill: 'terminology' }
       )
     ),
@@ -154,7 +154,7 @@ export const interactive: Record<string, Steps> = {
         'radioulnar-wrist-joints',
         'Which structure attaches to the ulnar fovea and stabilizes the distal radioulnar joint (DRUJ)?',
         'The triangular fibrocartilage complex (TFCC)',
-        ['The interosseous membrane', 'The volar radioulnar ligament alone', 'The pronator quadratus aponeurosis'],
+        ['The interosseous membrane between radius and ulna', 'The volar radioulnar ligament alone', 'The pronator quadratus aponeurosis'],
         { explanation: 'Slides 88 & 89: The TFCC attaches to the fovea at the base of the ulnar styloid and provides the major stability to the DRUJ.', skill: 'recall' }
       )
     ),
