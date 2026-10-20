@@ -1,9 +1,10 @@
 // Sounds and vibration when the learner taps and answers (owner's request,
 // 2026-10-19: tapping felt "a little too boring").
 //
-// - tap: a soft click on every button and card (the Interactive primitive),
-// - correct / wrong: a short bright chime or a low soft "bonk" when an answer is
-//   checked (QuestionCard), so every quiz, lesson checkpoint and review has it.
+// - tap: a tiny buzz on phones for every button and card (no sound: clicking on
+//   every tap was too much, owner 2026-10-19),
+// - correct / wrong: a short, quiet chime or a low soft note when an answer is
+//   checked (QuestionCard) — the only sounds, where they mean something.
 //
 // Sounds are made by the browser (Web Audio), so there are no files to load.
 // Vibration uses the phone's motor where the browser allows it (Android; Apple
@@ -43,7 +44,7 @@ export function setFeedbackPref(name: keyof Prefs, on: boolean) {
   listeners.forEach((listener) => listener());
   void AsyncStorage.setItem(KEY, JSON.stringify(prefs)).catch(() => {});
   // A sample of what was just switched on.
-  if (on && name === 'sound') tapFeedback();
+  if (on && name === 'sound') correctFeedback();
   if (on && name === 'vibration') vibrate([20]);
 }
 
@@ -103,26 +104,25 @@ function vibrate(pattern: number[]) {
 // ── The three feedbacks ──────────────────────────────────────────────────
 let lastTap = 0;
 
-/** A soft click and a tiny buzz for a tap (at most one every 40 ms). */
+/** A tiny buzz for a tap, on phones (at most one every 40 ms). Taps make no sound. */
 export function tapFeedback() {
   const now = Date.now();
   if (now - lastTap < 40) return;
   lastTap = now;
-  play([{ from: 1250, to: 780, at: 0, length: 0.035, volume: 0.035, wave: 'sine' }]);
-  vibrate([10]);
+  vibrate([8]);
 }
 
 /** A right answer: two bright rising notes. */
 export function correctFeedback() {
   play([
-    { from: 660, at: 0, length: 0.11, volume: 0.07, wave: 'triangle' },
-    { from: 990, at: 0.09, length: 0.18, volume: 0.07, wave: 'triangle' },
+    { from: 784, at: 0, length: 0.08, volume: 0.035, wave: 'sine' },
+    { from: 1175, at: 0.07, length: 0.12, volume: 0.035, wave: 'sine' },
   ]);
-  vibrate([18]);
+  vibrate([15]);
 }
 
 /** A wrong answer: a low, soft "bonk" (gentle, not a buzzer). */
 export function wrongFeedback() {
-  play([{ from: 240, to: 150, at: 0, length: 0.2, volume: 0.08, wave: 'triangle' }]);
-  vibrate([25, 50, 25]);
+  play([{ from: 260, to: 190, at: 0, length: 0.14, volume: 0.04, wave: 'sine' }]);
+  vibrate([20, 40, 20]);
 }
