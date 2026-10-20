@@ -20,6 +20,7 @@ import { selectQuestions, type SelectionRequest } from '@/data/learning/selectio
 import { currentMemoryModel } from '@/data/learning/state';
 import { nowMs } from '@/data/learning/time';
 import { XP_RULES } from '@/data/learning/xp-rules';
+import { examBanks, examTitle, type ExamSettings, markWeakestDone, mockPool, parseExam, spotterPool, SUBJECT_NAME, bankSubject } from '@/data/exam-practice';
 import { pastCourseForSubject } from '@/data/past-question-topics';
 import { pastCourseOf, pastQuestionsFor, usePastQuestions } from '@/data/past-questions';
 import { useProgress } from '@/data/progress';
@@ -50,6 +51,9 @@ type QuizPlan = {
 // /learn/quiz?topic=<id>                         cumulative topic quiz
 // /learn/quiz?practice=<id,id,…>                 practise specific questions
 // /learn/quiz?custom=1&lessons=<ids>&past=<topic ids>&size=…   custom quiz (past = topics whose HB2 past questions are included)
+// /learn/quiz?exam=mock&bank=<hb2 course>&size=…&minutes=…        mock exam (timed paper from past papers)
+// /learn/quiz?exam=spotter&subject=<subject|all>&size=…&seconds=…  spotter (timed picture stations)
+// /learn/quiz?exam=weakest&practice=<ids>                          "Your weakest 20"
 // Older links: ?course=<id>&challenge=apex → Apex Challenge;
 //              ?lesson=<id>&practiceWrong=true&wrongQuestions=<ids> → practice
 export default function QuizRoute() {
@@ -72,10 +76,13 @@ export default function QuizRoute() {
       ? { lessonIds: customLessonIds ?? [], pastTopicIds: customPastTopicIds?.length ? customPastTopicIds : undefined, size: customSize ?? 10, feedback, secondsPerQuestion: perQuestionSeconds }
       : undefined;
   const practiceIds = practice ? practice.split(',').filter(Boolean) : undefined;
+  const parsedExam = parseExam((name) => param(params[name]));
+  const exam = parsedExam?.kind === 'weakest' && !practiceIds?.length ? null : parsedExam;
   // Past questions are loaded before the quiz is planned, so they can be found by id.
   const pastCourses = [
     ...(customPastTopicIds ?? []).map((id) => pastCourseForSubject(getTopic(id)!.subject)),
     ...(practiceIds ?? []).map(pastCourseOf).filter((id): id is string => Boolean(id)),
+    ...examBanks(exam),
   ];
   const pastReady = usePastQuestions(pastCourses);
 
@@ -100,7 +107,7 @@ export default function QuizRoute() {
     <QuizScreen
       query={query}
       continueSaved={param(params.continue) === '1'}
-      key={`${lessonId ?? ''}:${topicId ?? ''}:${practice ?? ''}:${masteryCheck}:${custom}:${attemptToken}`}
+      key={`${lessonId ?? ''}:${topicId ?? ''}:${practice ?? ''}:${masteryCheck}:${custom}:${exam?.kind ?? ''}:${attemptToken}`}
       lessonId={lessonId}
       topicId={topicId}
       practiceIds={practiceIds}
@@ -109,8 +116,9 @@ export default function QuizRoute() {
       customPastTopicIds={customPastTopicIds}
       customSize={customSize}
       customSettings={customSettings}
-      initialFeedback={custom ? feedback : undefined}
-      perQuestionSeconds={perQuestionSeconds}
+      initialFeedback={exam && exam.kind !== 'weakest' ? 'submit' : custom ? feedback : undefined}
+      perQuestionSeconds={exam?.kind === 'spotter' ? exam.seconds : perQuestionSeconds}
+      exam={exam ?? undefined}
     />
   );
 }
@@ -125,8 +133,45 @@ function buildPlan(input: {
   customSize?: number;
   customSettings?: CustomQuizSettings;
   completed: string[];
+  exam?: ExamSettings;
 }): QuizPlan | null {
-  const { lessonId, topicId, practiceIds, masteryCheck, customLessonIds, customPastTopicIds, customSize, customSettings, completed } = input;
+  const { lessonId, topicId, practiceIds, masteryCheck, customLessonIds, customPastTopicIds, customSize, customSettings, completed, exam } = input;
+
+  // Exam practice (data/exam-practice.ts): a mock exam, a spotter, or "Your weakest 20".
+  if (exam?.kind === 'mock' || exam?.kind === 'spotter') {
+    const pool = exam.kind === 'mock' ? mockPool(exam.bank) : spotterPool(exam.subject);
+    if (pool.length === 0) return null;
+    const size = Math.min(exam.size, pool.length);
+    const subject = exam.kind === 'mock' ? bankSubject(exam.bank) : undefined;
+    const back = exam.kind === 'mock' ? routes.mockExamBuilder() : routes.spotterBuilder();
+    return {
+      kind: 'practice',
+      attemptMode: 'practice',
+      title: examTitle(exam, subject ? SUBJECT_NAME[subject] : undefined),
+      subtitle:
+        exam.kind === 'mock'
+          ? `${size} questions from the past papers, ${exam.minutes} minutes for the whole paper. Answers and your score by topic are shown at the end, like the real exam. When the time runs out, your answers are handed in.`
+          : `${size} stations, ${exam.seconds} seconds each. Name what is shown; when a station's time runs out you move on, like the practical exam. Answers at the end.`,
+      request: { scope: { kind: 'questions', questionIds: pool.map((question) => question.id) }, strategy: 'random', size },
+      backHref: back,
+      crumbs: [{ label: exam.kind === 'mock' ? 'Mock exam' : 'Spotter', href: back }],
+      customQuiz: { lessonIds: [], size, feedback: 'submit', secondsPerQuestion: exam.kind === 'spotter' ? exam.seconds : undefined, exam },
+    };
+  }
+  if (exam?.kind === 'weakest' && practiceIds?.length) {
+    const questions = getQuestionsByIds(practiceIds);
+    if (questions.length === 0) return null;
+    return {
+      kind: 'practice',
+      attemptMode: 'practice',
+      title: examTitle(exam),
+      subtitle: `The ${questions.length} question${questions.length === 1 ? '' : 's'} you have missed most, worst first. Get them right twice in a row and they leave the list.`,
+      request: { scope: { kind: 'questions', questionIds: questions.map((question) => question.id) }, size: questions.length },
+      backHref: routes.learn(),
+      crumbs: [{ label: 'Your weakest 20' }],
+      customQuiz: { lessonIds: [], size: questions.length, feedback: 'instant', exam },
+    };
+  }
 
   if (customLessonIds?.length || customPastTopicIds?.length) {
     const lessonIds = (customLessonIds ?? []).filter((id) => findLesson(id));
@@ -217,6 +262,10 @@ function buildPlan(input: {
 
 // Which saved quiz this is: its kind and what it covers (the same quiz always gets the same key).
 function draftKey(plan: QuizPlan, practiceIds?: string[]): string {
+  const exam = plan.customQuiz?.exam;
+  if (exam?.kind === 'mock') return `exam:mock:${exam.bank}`;
+  if (exam?.kind === 'spotter') return `exam:spotter:${exam.subject}`;
+  if (exam?.kind === 'weakest') return 'exam:weakest';
   if (plan.kind === 'practice') {
     const ids = plan.customQuiz
       ? [...plan.customQuiz.lessonIds, ...(plan.customQuiz.pastTopicIds ?? []).map((id) => `past:${id}`)]
@@ -241,6 +290,7 @@ function QuizScreen({
   customSettings,
   initialFeedback,
   perQuestionSeconds,
+  exam,
 }: {
   query: string;
   continueSaved: boolean;
@@ -254,11 +304,12 @@ function QuizScreen({
   customSettings?: CustomQuizSettings;
   initialFeedback?: FeedbackMode;
   perQuestionSeconds?: number;
+  exam?: ExamSettings;
 }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const progress = useProgress();
-  const plan = buildPlan({ lessonId, topicId, practiceIds, masteryCheck, customLessonIds, customPastTopicIds, customSize, customSettings, completed: progress.completedLessons });
+  const plan = buildPlan({ lessonId, topicId, practiceIds, masteryCheck, customLessonIds, customPastTopicIds, customSize, customSettings, completed: progress.completedLessons, exam });
   const [mode, setMode] = useState<FeedbackMode>(initialFeedback ?? 'instant');
   const [items, setItems] = useState<SessionItem[] | null>(null);
   const [seed, setSeed] = useState('');
@@ -384,6 +435,8 @@ function QuizScreen({
     );
   }
 
+  // Mock exams and spotters are sat like the real thing: answers at the end, on a clock.
+  const timedExam = exam?.kind === 'mock' || exam?.kind === 'spotter';
   const bankSize = plan.lessonId && plan.kind !== 'practice' ? getLessonQuizBank(plan.lessonId).length : null;
   const lessonDone = plan.lessonId ? progress.completedLessons.includes(plan.lessonId) : true;
 
@@ -462,6 +515,7 @@ function QuizScreen({
       practice: plan.kind === 'practice',
       customQuiz: plan.customQuiz,
     });
+    if (exam?.kind === 'weakest') void markWeakestDone();
     const extra = outcome.milestones.reduce((sum, item) => sum + item.xp, 0);
     if (outcome.xpApplied !== 0 || extra !== 0) {
       setPendingXpReward({
@@ -486,8 +540,9 @@ function QuizScreen({
       <QuestionSession
         items={items}
         mode={mode}
-        onModeChange={setMode}
+        onModeChange={timedExam ? undefined : setMode}
         perQuestionSeconds={perQuestionSeconds}
+        timeLimitSeconds={exam?.kind === 'mock' ? exam.minutes * 60 : undefined}
         attemptMode={plan.attemptMode}
         sessionId={`quiz:${seed}`}
         seed={seed}
@@ -495,7 +550,7 @@ function QuizScreen({
         onProgress={onProgress}
         onSaveExit={saveAndExit}
         onSubmit={submit}
-        submitLabel="Finish quiz"
+        submitLabel={timedExam ? 'Hand in' : 'Finish quiz'}
         reviewNote={plan.kind === 'practice' ? null : 'This concept comes back for review tomorrow.'}
         header={
           <View style={styles.sessionHeader}>
@@ -518,9 +573,13 @@ function QuizScreen({
           ? 'MASTERY CHECK'
           : plan.kind === 'topic'
             ? 'CUMULATIVE TOPIC QUIZ'
-            : plan.kind === 'practice'
-              ? 'PRACTICE'
-              : 'LESSON QUIZ'}
+            : exam?.kind === 'mock'
+              ? 'MOCK EXAM'
+              : exam?.kind === 'spotter'
+                ? 'SPOTTER'
+                : plan.kind === 'practice'
+                  ? 'PRACTICE'
+                  : 'LESSON QUIZ'}
       </Text>
       <Text style={styles.title} accessibilityRole="header">
         {plan.title}
@@ -546,6 +605,7 @@ function QuizScreen({
         )}
       </View>
 
+      {timedExam ? null : (
       <Card style={styles.modeCard}>
         <Text style={styles.modeTitle}>How do you want feedback?</Text>
         <View style={styles.modeRow} accessibilityRole="radiogroup">
@@ -570,6 +630,7 @@ function QuizScreen({
           ))}
         </View>
       </Card>
+      )}
 
       {saved && !loadingSaved ? (
         <Card style={styles.resumeCard}>
@@ -598,7 +659,7 @@ function QuizScreen({
         ) : (
           <>
             <Button label="Back" variant="ghost" onPress={() => router.push(plan.backHref)} />
-            <Button label={saved ? 'Start a fresh quiz' : 'Start quiz'} trailing="→" size="lg" variant={saved ? 'secondary' : 'primary'} onPress={() => void start()} loading={starting} />
+            <Button label={saved ? (timedExam ? 'Start a fresh paper' : 'Start a fresh quiz') : exam?.kind === 'mock' ? 'Start the exam' : exam?.kind === 'spotter' ? 'Start the spotter' : 'Start quiz'} trailing="→" size="lg" variant={saved ? 'secondary' : 'primary'} onPress={() => void start()} loading={starting} />
           </>
         )}
       </View>

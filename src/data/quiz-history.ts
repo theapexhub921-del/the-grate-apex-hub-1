@@ -1,3 +1,4 @@
+import type { ExamSettings } from '@/data/exam-practice-rules';
 import { useSyncExternalStore } from 'react';
 
 import type { Answer } from '@/data/questions';
@@ -25,6 +26,8 @@ export type CustomQuizSettings = {
   size: number;
   feedback: 'instant' | 'submit';
   secondsPerQuestion?: number;
+  /** Set for a mock exam, spotter or "Your weakest 20" (data/exam-practice-rules.ts). */
+  exam?: ExamSettings;
 };
 
 export type QuizAttempt = {

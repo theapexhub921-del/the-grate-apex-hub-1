@@ -33,6 +33,7 @@ import { useLearning } from '@/data/learning/use-learning';
 import { formatXp, XP_RULES } from '@/data/learning/xp-rules';
 import { type Answer, type ChoiceQuestion, correctAnswerText, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
 import { pastCourseOf, usePastQuestions } from '@/data/past-questions';
+import { bankSubject, examTitle, scoreByTopic, SUBJECT_NAME } from '@/data/exam-practice';
 import { canStump } from '@/data/stumps';
 import { type AttemptKind, type QuizAttempt, useQuizHistory } from '@/data/quiz-history';
 import { useRotatingCompliment, useRotatingRemark } from '@/hooks/use-learning-remark';
@@ -148,7 +149,9 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
       : attempt.kind === 'apex'
         ? 'Apex Challenge'
         : attempt.kind === 'practice'
-          ? attempt.customQuiz
+          ? attempt.customQuiz?.exam
+            ? examTitle(attempt.customQuiz.exam, attempt.customQuiz.exam.kind === 'mock' ? SUBJECT_NAME[bankSubject(attempt.customQuiz.exam.bank) ?? 'anatomy'] : undefined)
+            : attempt.customQuiz
             ? 'Custom practice'
             : 'Practice'
           : attempt.kind === 'topic'
@@ -228,8 +231,20 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
             ? 'Getting there. Review the misses below.'
             : 'This needs more practice — the misses below are your plan.';
 
+  // Mock exams and spotters: the score in each topic, weakest first.
+  const exam = attempt.customQuiz?.exam;
+  const topicScores = useMemo(
+    () =>
+      exam && exam.kind !== 'weakest'
+        ? scoreByTopic(rows.map((row) => ({ topic: getTopic(row.question.topicId)?.title ?? row.question.concept, correct: row.correct })))
+        : [],
+    [exam, rows]
+  );
+
   function retake() {
-    if (attempt.customQuiz) {
+    if (exam) {
+      router.replace(exam.kind === 'weakest' ? routes.learn() : routes.exam(exam));
+    } else if (attempt.customQuiz) {
       router.replace(
         routes.customQuiz({
           lessonIds: attempt.customQuiz.lessonIds,
@@ -340,6 +355,26 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
         </Card>
       ) : null}
 
+      {topicScores.length > 0 ? (
+        <Card style={styles.card}>
+          <Text style={styles.kicker}>SCORE BY TOPIC</Text>
+          {topicScores.map((item) => (
+            <View key={item.topic} style={styles.topicRow}>
+              <View style={styles.topicHead}>
+                <Text style={styles.conceptName}>{item.topic}</Text>
+                <Text style={[styles.topicScore, item.percent < XP_RULES.passPercent && styles.topicLow]}>
+                  {item.right}/{item.total} · {item.percent}%
+                </Text>
+              </View>
+              <View style={styles.topicTrack}>
+                <View style={[styles.topicFill, { width: `${item.percent}%` }, item.percent < XP_RULES.passPercent && styles.topicFillLow]} />
+              </View>
+            </View>
+          ))}
+          <Text style={styles.queueNote}>Topics are listed weakest first: start your revision at the top.</Text>
+        </Card>
+      ) : null}
+
       <Card style={styles.card}>
         <Text style={styles.kicker}>NEEDS REVIEW</Text>
         {conceptStatus.weak.length === 0 ? (
@@ -403,7 +438,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
             fullWidth
           />
         ) : null}
-        <Button label={attempt.kind === 'review' ? 'Another review' : 'Retake'} variant="secondary" onPress={retake} fullWidth />
+        <Button label={exam?.kind === 'weakest' ? 'Back to Study' : exam?.kind === 'mock' ? 'Sit another paper' : exam?.kind === 'spotter' ? 'Another spotter' : attempt.kind === 'review' ? 'Another review' : 'Retake'} variant="secondary" onPress={retake} fullWidth />
         {nextLesson && attempt.percentage >= XP_RULES.passPercent ? (
           <Button label={`Next: ${nextLesson.title}`} variant="secondary" onPress={() => router.push(routes.lesson(nextLesson.id))} fullWidth />
         ) : null}
@@ -428,7 +463,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
           ]}
           style={styles.crumbs}
         />
-        <Text style={styles.kindLabel}>{attempt.customQuiz ? 'CUSTOM PRACTICE' : KIND_LABEL[attempt.kind]}</Text>
+        <Text style={styles.kindLabel}>{exam?.kind === 'mock' ? 'MOCK EXAM' : exam?.kind === 'spotter' ? 'SPOTTER' : exam ? 'PRACTICE RESULTS' : attempt.customQuiz ? 'CUSTOM PRACTICE' : KIND_LABEL[attempt.kind]}</Text>
         <Text style={styles.title} accessibilityRole="header">
           {title}
         </Text>
@@ -504,6 +539,13 @@ function createStyles(colors: ThemeColors) {
     xpTotal: { borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: 8, marginTop: 4 },
     xpTotalLabel: { fontSize: 14, fontWeight: '800', color: colors.text },
     xpTotalAmount: { fontSize: 16, fontWeight: '900', color: colors.accentText },
+    topicRow: { gap: 6, paddingVertical: 6 },
+    topicHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+    topicScore: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },
+    topicLow: { color: colors.warningStrong },
+    topicTrack: { height: 6, borderRadius: 3, backgroundColor: colors.surfaceMuted, overflow: 'hidden' },
+    topicFill: { height: 6, borderRadius: 3, backgroundColor: colors.success },
+    topicFillLow: { backgroundColor: colors.warning },
     conceptRow: { gap: 4, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.divider },
     conceptName: { fontSize: 14, fontWeight: '700', color: colors.text },
     conceptState: { gap: 3 },

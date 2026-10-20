@@ -40,6 +40,9 @@ export function loadPastQuestions(courseId: string): Promise<ByTopic> {
   return promise;
 }
 
+/** All of a course's past questions, once it has loaded (empty before). */
+export const allPastQuestions = (courseId: string): Question[] => [...(loaded.get(courseId)?.values() ?? [])].flat();
+
 /** A topic's past questions, once its course has loaded (empty before). */
 export const pastQuestionsFor = (courseId: string, topicId: string): Question[] => loaded.get(courseId)?.get(topicId) ?? [];
 

@@ -29,6 +29,7 @@ import { Columns, PageHeader, Screen, SectionHeader } from '@/components/ui/scre
 import { Type, type ThemeColors } from '@/constants/theme';
 import { CLASS_IDS, classLessonCompletion, firstIncompleteClassBefore, isClassAhead, makeClassSelection, readAcademicTrial, readClassSelection, sameClassSelection, subjectsForClass, type ClassSelection } from '@/data/class-curriculum';
 import { contentTopics } from '@/data/content-catalog';
+import { prepareWeakest, useWeakestDoneToday, weakestCount } from '@/data/exam-practice';
 import { getNextActions } from '@/data/learning/next-action';
 import { curriculumProgress, subjectProgress } from '@/data/learning/progress-model';
 import { useLearning } from '@/data/learning/use-learning';
@@ -58,6 +59,9 @@ export default function LearnScreen() {
   const viewingOwnClass = sameClassSelection(viewing, ownSelection);
   const [browseOpen, setBrowseOpen] = useState(Boolean(querySelection && !viewingOwnClass));
   const { progress, inputs, memory, attempts, now } = useLearning();
+  const weakest = useMemo(() => weakestCount(memory), [memory]);
+  const weakestDone = useWeakestDoneToday();
+  const [openingWeakest, setOpeningWeakest] = useState(false);
   const weekStart = new Date(now);
   weekStart.setHours(0, 0, 0, 0);
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
@@ -283,6 +287,16 @@ export default function LearnScreen() {
   );
 
   // Study, organised in sections (courses, practise and plan, your progress), with uniform tiles.
+  async function openWeakest() {
+    if (openingWeakest) return;
+    setOpeningWeakest(true);
+    try {
+      const ids = await prepareWeakest(memory);
+      if (ids.length > 0) router.push(routes.exam({ kind: 'weakest' }, ids));
+    } finally {
+      setOpeningWeakest(false);
+    }
+  }
   const studyTiles: Tile[] = [
     {
       id: 'review', icon: 'reinforce', title: 'Spaced review',
@@ -295,6 +309,16 @@ export default function LearnScreen() {
     { id: 'starred', icon: 'star', title: 'Starred questions', detail: 'Questions you starred while practising, to go over again.', onPress: () => router.push('/learn/starred' as never) },
     { id: 'past', icon: 'book', title: 'Past question bank', detail: 'Real past papers and predicted papers, sat like the exam.', onPress: () => router.push('/learn/past-questions' as never) },
     { id: 'planner', icon: 'calendar', title: 'Timetable and plans', detail: 'Your weekly calendar, and a lesson path for your goals.', onPress: () => router.push('/learn/planner' as never) },
+    { id: 'mock', icon: 'achievement', title: 'Mock exam', detail: 'A timed paper from the past papers, marked by topic so you know what to revise.', onPress: () => router.push(routes.mockExamBuilder()) },
+    { id: 'spotter', icon: 'image', title: 'Spotter', detail: 'Timed picture stations, like a practical: name what is marked, then move on.', onPress: () => router.push(routes.spotterBuilder()) },
+    {
+      id: 'weakest', icon: 'trend', title: 'Your weakest 20',
+      detail: weakest === 0 ? 'Questions you get wrong will gather here. Get one right twice and it leaves.' : weakestDone ? 'Done today. They come back tomorrow, or go again now.' : 'The questions you miss most, worst first. A few minutes a day.',
+      badge: weakest > 0 && !weakestDone ? `${weakest} today` : undefined,
+      onPress: () => void openWeakest(),
+      disabled: weakest === 0 || openingWeakest,
+    },
+    { id: 'focus', icon: 'timer', title: 'Focus timer', detail: '25 minutes of study, 5 of rest. Focused time counts for your streak.', onPress: () => router.push(routes.focusTimer()) },
     { id: 'chat', icon: 'sparkle', title: 'Study chat', detail: 'Ask the AI anything: concepts, study plans, memory tricks and quizzes.', onPress: () => router.push('/learn/chat' as never) },
   ];
   const reviewCalendar = (

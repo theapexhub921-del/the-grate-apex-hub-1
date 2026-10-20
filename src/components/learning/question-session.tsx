@@ -58,6 +58,7 @@ export function QuestionSession({
   mode,
   onModeChange,
   perQuestionSeconds,
+  timeLimitSeconds,
   attemptMode,
   sessionId,
   seed,
@@ -74,6 +75,8 @@ export function QuestionSession({
   mode: FeedbackMode;
   onModeChange?: (mode: FeedbackMode) => void;
   perQuestionSeconds?: number;
+  /** A time limit for the whole paper (mock exams): when it runs out, the answers are submitted. */
+  timeLimitSeconds?: number;
   attemptMode: AttemptMode;
   sessionId: string;
   seed: string;
@@ -155,6 +158,17 @@ export function QuestionSession({
     },
     []
   );
+
+  // The whole paper's time limit (mock exams): at zero the answers are handed in, like the real exam.
+  const paperLeft = timeLimitSeconds ? Math.max(0, timeLimitSeconds - elapsed) : null;
+  const finishRef = useRef<() => Promise<void>>(async () => undefined);
+  const timeUpRef = useRef(false);
+  useEffect(() => {
+    if (paperLeft === null || paperLeft > 0 || timeUpRef.current) return;
+    timeUpRef.current = true;
+    setConfirming(false);
+    void finishRef.current();
+  }, [paperLeft]);
 
   // Report the state for saving. Not on the first render, so opening a quiz never saves an empty draft.
   const progressRef = useRef(onProgress);
@@ -266,6 +280,8 @@ export function QuestionSession({
     }
   }
 
+  finishRef.current = finish;
+
   async function saveAndExit() {
     if (!onSaveExit || leaving || submitting) return;
     clearTimer();
@@ -318,9 +334,15 @@ export function QuestionSession({
     <Card style={styles.navCard}>
       <View style={styles.navHeader}>
         <Text style={styles.kicker}>QUESTIONS</Text>
-        <Text style={styles.timer} accessibilityLabel={`Time ${formatDuration(elapsed)}`}>
-          ⏱ {formatDuration(elapsed)}
-        </Text>
+        {paperLeft !== null ? (
+          <Text style={[styles.timer, paperLeft <= 300 && styles.timerLow]} accessibilityLabel={`Time left ${formatDuration(paperLeft)}`}>
+            {formatDuration(paperLeft)} left
+          </Text>
+        ) : (
+          <Text style={styles.timer} accessibilityLabel={`Time ${formatDuration(elapsed)}`}>
+            ⏱ {formatDuration(elapsed)}
+          </Text>
+        )}
       </View>
       <View style={styles.navGrid}>
         {items.map((item, i) => {
@@ -378,7 +400,7 @@ export function QuestionSession({
         <View style={styles.mobileProgress}>
           <ProgressBar value={total ? (index + (question ? 0 : 1)) / total : 0} label="Quiz progress" />
           <Text style={styles.mobileMeta}>
-            {question ? `Question ${index + 1} of ${total}` : 'All questions seen'} · {answeredCount} answered · ⏱ {formatDuration(elapsed)}
+            {question ? `Question ${index + 1} of ${total}` : 'All questions seen'} · {answeredCount} answered · {paperLeft !== null ? `${formatDuration(paperLeft)} left` : `⏱ ${formatDuration(elapsed)}`}
           </Text>
         </View>
       ) : null}
@@ -488,6 +510,7 @@ function createStyles(colors: ThemeColors) {
     navCard: { gap: 12 },
     navHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     timer: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },
+    timerLow: { color: colors.warningStrong },
     navGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
     navDot: {
       width: 36,

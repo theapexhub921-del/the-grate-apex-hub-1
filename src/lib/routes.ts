@@ -1,5 +1,6 @@
 import type { Href } from 'expo-router';
 
+import { examQuery, type ExamSettings } from '@/data/exam-practice-rules';
 import type { SubjectId } from '@/data/lesson-types';
 
 // Every learning URL in the app is built here.
@@ -117,6 +118,13 @@ export const routes = {
           attempt: Date.now(),
         })}` as Href)
       : fallback('customQuiz', '/learn/custom-quiz'),
+
+  /** A mock exam, spotter or "Your weakest 20" (data/exam-practice-rules.ts); the weakest 20 also needs its question ids. */
+  exam: (exam: ExamSettings, questionIds: string[] = []) =>
+    `/learn/quiz${query({ ...examQuery(exam), practice: questionIds.join(',') || undefined, attempt: Date.now() })}` as Href,
+  mockExamBuilder: () => '/learn/mock-exam' as Href,
+  spotterBuilder: () => '/learn/spotter' as Href,
+  focusTimer: () => '/learn/focus' as Href,
 
   results: (attemptId: string | null | undefined) =>
     valid(attemptId) ? (`/learn/results${query({ attempt: attemptId })}` as Href) : fallback('results', '/progress'),
