@@ -23,7 +23,7 @@ const lesson1: Q[] = [
   mcq('q1-03', 'protein-functions', 'Actin and myosin are the lecture’s examples of which function?', 'Locomotion', ['Structure', 'Transport (carriers)', 'Catalysis'], {
     explanation: 'Slide 2.',
   }),
-  mcq('q1-04', 'protein-functions', 'Insulin is the lecture’s example of which protein function?', 'Regulation', ['Catalysis', 'Transport', 'Structure'], {
+  mcq('q1-04', 'protein-functions', 'Insulin is the lecture’s example of which protein function?', 'Regulation', ['Catalysis (enzymes)', 'Transport', 'Structure'], {
     explanation: 'Slide 2: protein hormones (e.g. insulin).',
   }),
   tf({
@@ -98,7 +98,7 @@ const lesson1: Q[] = [
   mcq('q1-24', 'wound-healing', 'Which cells arrive early in the inflammatory phase?', 'Neutrophils', ['Fibroblasts', 'Osteocytes', 'Chondrocytes'], {
     explanation: 'Slide 11: early neutrophils, late macrophages.',
   }),
-  mcq('q1-25', 'wound-healing', 'In which phase does the wound gain tensile strength as the scar matures?', 'Remodelling (a week to months)', ['Haemostasis (minutes)', 'Inflammation (first few days)', 'Proliferation (days 3–21)'], {
+  mcq('q1-25', 'wound-healing', 'In which phase does the wound gain tensile strength as the scar matures?', 'Remodelling (a week to months)', ['Haemostasis (minutes)', 'Inflammation (first few days)', 'Proliferation (days 3–21 after injury)'], {
     explanation: 'Slides 10–11.',
   }),
   mcq('q1-26', 'wound-healing', 'In slide 9’s figure, which growth factor released from platelets coordinates the repair cells?', 'TGF-β1', ['Insulin', 'Erythropoietin', 'Thyroxine'], {
@@ -135,7 +135,7 @@ const lesson2: Q[] = [
   mcq('q2-07', 'collagen-types', 'Which collagen type is found in cartilage, intervertebral discs and the vitreous humour?', 'Type II', ['Type I', 'Type III', 'Type IV'], {
     explanation: 'Slide 22.',
   }),
-  mcq('q2-08', 'collagen-types', 'What does type IV collagen polymerise into?', 'A sheetlike network in the basal lamina', ['Thick, banded fibrils in tendon', 'Anchoring fibrils under the epidermis', 'Hemidesmosomes on the basal cells'], {
+  mcq('q2-08', 'collagen-types', 'What does type IV collagen polymerise into?', 'A sheetlike network in the basal lamina', ['Thick, banded fibrils in tendon', 'Anchoring fibrils under the stratified epidermis', 'Hemidesmosomes on the basal cells'], {
     explanation: 'Slide 22.',
   }),
   mcq('q2-09', 'collagen-types', 'Which collagen forms anchoring fibrils beneath stratified squamous epithelia?', 'Type VII', ['Type I', 'Type IV', 'Type XVII'], {
@@ -171,10 +171,10 @@ const lesson2: Q[] = [
   mcq('q2-18', 'tropocollagen', 'What is the diameter of tropocollagen?', '15 Å', ['3000 Å', '150 Å', '1.5 Å'], {
     explanation: 'Slide 25.',
   }),
-  mcq('q2-19', 'tropocollagen', 'What kind of helix is each strand of tropocollagen?', 'A type II trans helix, like synthetic poly-L-proline', ['A right-handed α-helix, like most proteins', 'A β-pleated sheet stabilised by hydrogen bonds', 'A DNA-like double helix with paired strands'], {
+  mcq('q2-19', 'tropocollagen', 'What kind of helix is each strand of tropocollagen?', 'A type II trans helix, like synthetic poly-L-proline', ['A right-handed α-helix, like most proteins', 'A β-pleated sheet stabilised by hydrogen bonds between strands', 'A DNA-like double helix with paired strands'], {
     explanation: 'Slides 25–26.',
   }),
-  mcq('q2-20', 'tropocollagen', 'How many residues per turn does each tropocollagen strand have?', 'Three', ['3.6', 'Ten', 'Two'], {
+  mcq('q2-20', 'tropocollagen', 'How many residues per turn does each tropocollagen strand have?', 'Three', ['3.6', 'Ten (as in DNA)', 'Two'], {
     explanation: 'Slide 25. (3.6 is the α-helix.)',
     skill: 'comparison',
   }),
@@ -224,7 +224,7 @@ const lesson3: Q[] = [
   mcq('q3-04', 'synthesis-overview', 'In slide 34’s figure, what first holds the three procollagen chains together?', 'Disulfide bonds between their C-terminal extensions', ['Aldol cross-links between their lysines', 'Desmosine formed from four lysines', 'Sugars on hydroxylysine joining the chains'], {
     explanation: 'Slide 34 figure.',
   }),
-  mcq('q3-05', 'hydroxylated-residues', 'What is the precursor of hydroxyproline in collagen?', 'Proline residues already in the chain', ['Free hydroxyproline from the diet', 'Lysine residues in the chain', 'Glycine residues in the chain'], {
+  mcq('q3-05', 'hydroxylated-residues', 'What is the precursor of hydroxyproline in collagen?', 'Proline residues already in the chain', ['Free hydroxyproline from the diet, carried by tRNA', 'Lysine residues in the chain', 'Glycine residues in the chain'], {
     explanation: 'Slide 36.',
   }),
   tf({
@@ -237,7 +237,7 @@ const lesson3: Q[] = [
   mcq('q3-07', 'prolyl-hydroxylase', 'What class of enzyme is prolyl hydroxylase?', 'A dioxygenase', ['A kinase', 'A protease (peptidase)', 'A ligase'], {
     explanation: 'Slide 40.',
   }),
-  mcq('q3-08', 'prolyl-hydroxylase', 'Which metal ion is at prolyl hydroxylase’s active site?', 'Ferrous iron (Fe²⁺)', ['Copper (Cu²⁺)', 'Zinc (Zn²⁺)', 'Magnesium (Mg²⁺)'], {
+  mcq('q3-08', 'prolyl-hydroxylase', 'Which metal ion is at prolyl hydroxylase’s active site?', 'Ferrous iron (Fe²⁺)', ['Copper (Cu²⁺), as in lysyl oxidase', 'Zinc (Zn²⁺)', 'Magnesium (Mg²⁺)'], {
     explanation: 'Slide 40.',
   }),
   mcq('q3-09', 'prolyl-hydroxylase', 'What is ascorbate’s role in the prolyl hydroxylase reaction?', 'It keeps the enzyme’s iron reduced in the +2 state', ['It donates the hydroxyl group that is added to proline', 'It is converted to succinate as the proline is oxidised', 'It cuts the procollagen chain at the hydroxylation site'], {
@@ -246,7 +246,7 @@ const lesson3: Q[] = [
   mcq('q3-10', 'prolyl-hydroxylase', 'What is α-ketoglutarate converted to in the reaction?', 'Succinate, with CO₂ released', ['Citrate, with acetyl-CoA', 'Glutamate, by transamination', 'Oxaloacetate, with NADH'], {
     explanation: 'Slide 42 figure.',
   }),
-  mcq('q3-11', 'prolyl-hydroxylase', 'Where does the oxygen atom attached to proline come from?', 'Molecular oxygen (O₂)', ['Water (H₂O)', 'Ascorbate', 'α-Ketoglutarate'], {
+  mcq('q3-11', 'prolyl-hydroxylase', 'Where does the oxygen atom attached to proline come from?', 'Molecular oxygen (O₂)', ['Water (H₂O) in the ER lumen', 'Ascorbate', 'α-Ketoglutarate'], {
     explanation: 'Slide 42.',
   }),
   mcq('q3-12', 'prolyl-hydroxylase', 'Which animals cannot synthesise ascorbic acid (slide 43)?', 'Primates and guinea pigs', ['Rats and mice', 'Cattle and sheep', 'All mammals'], {
@@ -283,7 +283,7 @@ const lesson3: Q[] = [
   mcq('q3-21', 'helix-stability', 'Heating collagen destroys its triple helix, giving:', 'Gelatin, a random coil', ['Elastin, a coiled network', 'Procollagen, with its propeptides', 'Keratin, an α-helical coil'], {
     explanation: 'Slide 48.',
   }),
-  mcq('q3-22', 'helix-stability', 'What is the melting temperature (Tm) of collagen?', 'The temperature at which half of the helical structure is lost', ['The normal body temperature of the animal it came from', 'The temperature at which the collagen was first made', 'The shrinkage temperature of the intact collagen fibres'], {
+  mcq('q3-22', 'helix-stability', 'What is the melting temperature (Tm) of collagen?', 'The temperature at which half of the helical structure is lost', ['The normal body temperature of the animal it came from', 'The temperature at which the collagen was first made in the animal', 'The shrinkage temperature of the intact collagen fibres'], {
     explanation: 'Slide 49.',
     skill: 'terminology',
   }),
@@ -297,7 +297,7 @@ const lesson3: Q[] = [
   mcq('q3-25', 'glycosylation', 'Which sugars form the disaccharide on hydroxylysine?', 'Glucose and galactose', ['Glucose and fructose', 'Mannose and fucose', 'Galactose and sialic acid'], {
     explanation: 'Slide 50.',
   }),
-  mcq('q3-26', 'glycosylation', 'When are the sugars added?', 'To hydroxylysine in nascent collagen, before it becomes helical', ['After the fibres have formed outside the cell', 'After cross-linking by lysyl oxidase', 'Once the collagen is outside the cell, before fibres form'], {
+  mcq('q3-26', 'glycosylation', 'When are the sugars added?', 'To hydroxylysine in nascent collagen, before it becomes helical', ['After the fibres have formed outside the cell', 'After cross-linking by lysyl oxidase, outside the cell', 'Once the collagen is outside the cell, before fibres form'], {
     explanation: 'Slide 50.',
   }),
   mcq('q3-27', 'glycosylation', 'Which collagen has far more carbohydrate units per molecule (slide 51)?', 'Lens capsule (type IV) — about 110', ['Tendon (type I) — about 110', 'They have the same amount — about 6'], {

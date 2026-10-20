@@ -31,7 +31,7 @@ export const interactive: Record<string, Steps> = {
       'Fibronectin helps cells attach to the matrix; its cell-binding domain carries the RGD sequence. Integrins span the membrane and link the matrix outside to actin filaments inside.',
     ], { sourceRefs: ref([7, 8]) }),
     ask(
-      mcq('c1-03', 'matrix-adhesion', 'What do integrins connect?', 'The extracellular matrix to the cell’s cytoskeleton', ['Two neighbouring nuclei through the nuclear pores', 'Collagen fibres to elastin fibres only', 'Ribosomes to the endoplasmic reticulum'], {
+      mcq('c1-03', 'matrix-adhesion', 'What do integrins connect?', 'The extracellular matrix to the cell’s cytoskeleton', ['Two neighbouring nuclei through the nuclear pore complexes', 'Collagen fibres to elastin fibres only', 'Ribosomes to the endoplasmic reticulum'], {
         explanation: 'Slide 8.',
       })
     ),
@@ -133,7 +133,7 @@ export const interactive: Record<string, Steps> = {
       'Only prolines and lysines already in the chain, before the helix forms, and only on the amino side of a glycine (C-4 of proline, C-5 of lysine). A few prolines are hydroxylated at C-3 by prolyl-3-hydroxylase.',
     ], { sourceRefs: ref([44, 46]) }),
     ask(
-      mcq('c3-04', 'hydroxylation-rules', 'α,α′-Bipyridyl removes iron from prolyl hydroxylase. What happens to the collagen made?', 'It is unhydroxylated and does not form a triple helix at 37 °C', ['It is over-hydroxylated and very stable at body temperature', 'It forms extra cross-links and becomes brittle', 'It is secreted faster than normal collagen'], {
+      mcq('c3-04', 'hydroxylation-rules', 'α,α′-Bipyridyl removes iron from prolyl hydroxylase. What happens to the collagen made?', 'It is unhydroxylated and does not form a triple helix at 37 °C', ['It is over-hydroxylated and very stable at body temperature', 'It forms extra cross-links and becomes brittle and insoluble', 'It is secreted faster than normal collagen'], {
         explanation: 'Slide 45: it only becomes helical below 24 °C.',
         skill: 'cause-effect',
       })
@@ -161,7 +161,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 4 — Fibre assembly and cross-links ─────────────────────
   'collagen-synthesis-4': [
     ask(
-      mcq('c4-01', 'procollagen-processing', 'Before you start: collagen fibres form outside the cell. What stops them forming too early inside it?', 'Extension peptides on procollagen, removed only outside the cell', ['The low temperature inside the cell, which stops fibre assembly', 'Cross-links that form inside the cell and hold molecules apart', 'A lack of glycine inside the cell until the chains are secreted'], {
+      mcq('c4-01', 'procollagen-processing', 'Before you start: collagen fibres form outside the cell. What stops them forming too early inside it?', 'Extension peptides on procollagen, removed only outside the cell', ['The low temperature inside the cell, which stops fibre assembly', 'Cross-links that form inside the cell and hold the molecules apart', 'A lack of glycine inside the cell until the chains are secreted'], {
         explanation: 'Slide 54: the extra peptides prevent premature fibre formation; procollagen peptidases cut them off in the extracellular space.',
         skill: 'prediction',
       })
@@ -229,7 +229,7 @@ export const interactive: Record<string, Steps> = {
       'Dermatoparaxis (cattle): no procollagen peptidase; fragile skin; amino-terminal propeptides retained.',
     ], { sourceRefs: ref([65, 66, 68]) }),
     ask(
-      mcq('c5-03', 'dermatoparaxis', 'Which enzyme is missing in dermatoparaxis?', 'A procollagen peptidase', ['Lysyl oxidase', 'Prolyl hydroxylase', 'Glucosyl transferase'], {
+      mcq('c5-03', 'dermatoparaxis', 'Which enzyme is missing in dermatoparaxis?', 'A procollagen peptidase', ['Lysyl oxidase (copper enzyme)', 'Prolyl hydroxylase', 'Glucosyl transferase'], {
         explanation: 'Slide 68.',
       })
     ),
