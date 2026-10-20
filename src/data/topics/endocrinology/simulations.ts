@@ -35,7 +35,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s1-03', 'primary-secondary', 'A pituitary tumour secretes too much ACTH, so cortisol is high. How is this classified?', 'Secondary hypersecretion', ['Primary hypersecretion', 'Secondary hyposecretion'], {
+        question: mcq('s1-03', 'primary-secondary', 'A pituitary tumour secretes too much ACTH, so cortisol is high. How is this classified?', 'Secondary hypersecretion', ['Primary hypersecretion (adrenal)', 'Secondary hyposecretion'], {
           ...predict,
           explanation: 'The adrenal gland is normal but is driven by too much trophic hormone: excess secretion caused by its controller is secondary (Introduction, p. 26).',
         }),
@@ -108,7 +108,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s3-03', 'gh-disorders', 'The same tumour appears in an adult. What happens?', 'The bones widen — hands, feet, jaw — but height does not increase', ['The person grows taller again as the growth plates reopen', 'Nothing, because adults no longer respond to GH at all'], {
+        question: mcq('s3-03', 'gh-disorders', 'The same tumour appears in an adult. What happens?', 'The bones widen — hands, feet, jaw — but height does not increase', ['The person grows taller again as the closed growth plates reopen and lengthen', 'Nothing, because adults no longer respond to GH at all'], {
           ...predict,
           explanation: 'After puberty the epiphyses have fused, so bones cannot lengthen; they widen by subperiosteal growth instead: acromegaly (Introduction, pp. 36–37).',
         }),
@@ -149,7 +149,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s4-03', 'thyroid-control', 'T4 is low because the pituitary has failed. You inject TRH. What do you expect?', 'TSH does not rise', ['TSH rises', 'T4 rises at once'], {
+        question: mcq('s4-03', 'thyroid-control', 'T4 is low because the pituitary has failed. You inject TRH. What do you expect?', 'TSH does not rise', ['TSH rises', 'T4 rises at once to normal'], {
           ...predict,
           explanation: 'A failed pituitary cannot respond to TRH, so TSH stays low. A hypothalamic defect would respond to TRH (Thyroid, p. 13).',
         }),
@@ -214,7 +214,7 @@ export const simulations: Record<string, Step> = {
         ],
       },
       {
-        question: mcq('s6-02', 'diabetes', 'The same drink is given to someone with type 1 diabetes. Compared with a healthy person, what happens?', 'Glucose climbs above the tubular maximum and appears in the urine', ['Glucose rises a little and falls back within two hours', 'Glucose falls, because no insulin is released to stop it'], {
+        question: mcq('s6-02', 'diabetes', 'The same drink is given to someone with type 1 diabetes. Compared with a healthy person, what happens?', 'Glucose climbs above the tubular maximum and appears in the urine', ['Glucose rises a little and falls back to normal within two hours', 'Glucose falls, because no insulin is released to stop it'], {
           ...predict,
           explanation: 'Without insulin, glucose is not taken up and the liver keeps releasing it: blood glucose exceeds the tubular maximum, causing glycosuria and osmotic diuresis (Pancreas, p. 16).',
         }),

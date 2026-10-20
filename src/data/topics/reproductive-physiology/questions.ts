@@ -17,7 +17,7 @@ const lesson1: Q[] = [
   mcq('q1-06', 'testis-structure', 'How many seminiferous tubules does each lobule contain?', '1 to 4', ['10 to 20', 'Exactly one', 'Over 100'], { explanation: 'Male, slide 15.' }),
   mcq('q1-07', 'testis-structure', 'Testicular veins drain into the…', 'Pampiniform plexus', ['Rete testis', 'Tubulus rectus', 'Lumbar lymph nodes'], { explanation: 'Male, slide 15; it forms the bulk of the spermatic cord.' }),
   mcq('q1-08', 'testis-structure', 'Testicular lymph drains to the…', 'Lumbar (aortic) nodes', ['Superficial inguinal nodes', 'Axillary nodes', 'Deep cervical nodes'], { explanation: 'Male, slide 16.' }),
-  mcq('q1-09', 'sertoli-leydig', 'The blood–testis barrier divides the tubule into…', 'Basal and adluminal compartments', ['Cortex and medulla', 'Head, body and tail', 'Separate lobules of the testis'], { explanation: 'Male, slide 19.' }),
+  mcq('q1-09', 'sertoli-leydig', 'The blood–testis barrier divides the tubule into…', 'Basal and adluminal compartments', ['Cortex and medulla', 'Head, body and tail segments', 'Separate lobules of the testis'], { explanation: 'Male, slide 19.' }),
   mcq('q1-10', 'sertoli-leydig', 'Leydig cells produce…', 'Testosterone', ['Inhibin', 'Androgen-binding protein', 'Sperm'], { explanation: 'Male, slide 20.' }),
   tf({ id: 'q1-11', conceptId: 'sertoli-leydig', statement: 'Leydig cells are almost absent before puberty.', answer: true, explanation: 'Male, slide 20.' }),
   mcq('q1-12', 'testis-structure', 'About how long is each seminiferous tubule?', 'About 80 cm', ['About 8 mm', 'About 8 m', 'About 3.8 cm'], { explanation: 'Male, slide 15.' }),
@@ -26,9 +26,9 @@ const lesson1: Q[] = [
 ];
 
 const lesson2: Q[] = [
-  mcq('q2-01', 'spermatogenesis', 'Where does spermatogenesis occur?', 'In the seminiferous tubules', ['In the epididymis', 'In the vas deferens', 'In the prostate gland'], { explanation: 'Male, slide 22.' }),
+  mcq('q2-01', 'spermatogenesis', 'Where does spermatogenesis occur?', 'In the seminiferous tubules', ['In the head of the epididymis', 'In the vas deferens', 'In the prostate gland'], { explanation: 'Male, slide 22.' }),
   mcq('q2-02', 'spermatogenesis', 'Which cells are the stem cells of spermatogenesis?', 'Type A spermatogonia', ['Type B spermatogonia', 'Primary spermatocytes', 'Sertoli cells'], { explanation: 'Male, slides 22–23.' }),
-  mcq('q2-03', 'spermatogenesis', 'Which cell first has a haploid number of chromosomes?', 'Secondary spermatocyte', ['Primary spermatocyte', 'Type B spermatogonium', 'Type A spermatogonium'], { explanation: 'Male, slide 23: after meiosis I.' }),
+  mcq('q2-03', 'spermatogenesis', 'Which cell first has a haploid number of chromosomes?', 'Secondary spermatocyte', ['Primary spermatocyte (in meiosis I)', 'Type B spermatogonium', 'Type A spermatogonium'], { explanation: 'Male, slide 23: after meiosis I.' }),
   mcq('q2-04', 'spermatogenesis', 'What are intercellular bridges thought to do?', 'Allow synchrony of germ cell maturation', ['Form the blood–testis barrier between cells', 'Release mature sperm into the tubule lumen', 'Carry testosterone between germ cells'], { explanation: 'Male, slide 24.' }),
   order('q2-05', 'spermatogenesis', 'Order the stages of spermiogenesis.', ['Golgi phase', 'Cap phase', 'Acrosome phase', 'Maturation phase'], { explanation: 'Male, slides 24–25.' }),
   fill('q2-06', 'spermatogenesis', 'Release of sperm into the lumen of the seminiferous tubule is called ____.', ['spermiation', 'Spermiation'], { explanation: 'Male, slide 25.', skill: 'terminology' }),
@@ -93,13 +93,13 @@ const lesson5: Q[] = [
 
 const lesson6: Q[] = [
   order('q6-01', 'uterine-cycle', 'Order the phases of the uterine cycle.', ['Menstrual', 'Proliferative', 'Secretory', 'Premenstrual'], { explanation: 'Female, slide 22.' }),
-  mcq('q6-02', 'uterine-cycle', 'Which layer of the endometrium is shed at menstruation?', 'Stratum functionale', ['Stratum basale', 'Myometrium', 'Perimetrium'], { explanation: 'Female, slide 23.' }),
-  mcq('q6-03', 'uterine-cycle', 'Why does menstrual blood not clot?', 'Fibrinolysin from the degenerating endometrium', ['It contains heparin from the endometrium', 'It lacks platelets after leaving the uterus', 'Estrogen in the blood prevents clotting'], { explanation: 'Female, slide 24.', skill: 'cause-effect' }),
+  mcq('q6-02', 'uterine-cycle', 'Which layer of the endometrium is shed at menstruation?', 'Stratum functionale', ['Stratum basale (deep layer)', 'Myometrium', 'Perimetrium'], { explanation: 'Female, slide 23.' }),
+  mcq('q6-03', 'uterine-cycle', 'Why does menstrual blood not clot?', 'Fibrinolysin from the degenerating endometrium', ['It contains heparin from the endometrium', 'It lacks platelets after leaving the uterus', 'Estrogen in the blood prevents clotting in the uterus'], { explanation: 'Female, slide 24.', skill: 'cause-effect' }),
   mcq('q6-04', 'uterine-cycle', 'Menstrual blood loss above what volume is abnormal?', '80 mL', ['30 mL', '10 mL', '200 mL'], { explanation: 'Female, slide 24.' }),
   mcq('q6-05', 'uterine-cycle', 'Which hormone drives the proliferative phase?', 'Estrogen', ['Progesterone', 'Prolactin', 'hCG'], { explanation: 'Female, slide 25.' }),
   mcq('q6-06', 'uterine-cycle', 'In the premenstrual phase, what constricts the spiral arteries?', 'Locally produced prostaglandins', ['Estrogen from the dominant follicle', 'Oxytocin from the posterior pituitary', 'Noradrenaline released from the ovary'], { explanation: 'Female, slide 26.' }),
   mcq('q6-07', 'cyclic-changes', 'Under progesterone, the vaginal epithelium…', 'Becomes infiltrated with leucocytes', ['Becomes cornified and thick', 'Is shed completely', 'Secretes clear mucus'], { explanation: 'Female, slide 34.' }),
-  mcq('q6-08', 'cyclic-changes', 'Why does basal body temperature rise after ovulation?', 'Progesterone secretion increases', ['Estrogen secretion falls', 'FSH secretion rises', 'The ruptured follicle bleeds'], { explanation: 'Female, slide 35.', skill: 'cause-effect' }),
+  mcq('q6-08', 'cyclic-changes', 'Why does basal body temperature rise after ovulation?', 'Progesterone secretion increases', ['Estrogen secretion falls', 'FSH secretion rises', 'The ruptured follicle bleeds into the pelvis'], { explanation: 'Female, slide 35.', skill: 'cause-effect' }),
   mcq('q6-09', 'hpo-axis', 'FSH receptors are on…', 'Granulosa cells', ['Theca cells', 'The oocyte', 'The endometrium only'], { explanation: 'Female, slide 37: LH receptors are on theca cells.' }),
   mcq('q6-10', 'hpo-axis', 'The LH surge occurs how long before ovulation?', '34–36 hours', ['14 days', '2–3 hours', 'About 7 days'], { explanation: 'Female, slide 39.' }),
   mcq('q6-11', 'hpo-axis', 'What triggers the LH surge?', 'High estrogen switching to positive feedback', ['Falling estrogen at the end of the follicular phase', 'Rising progesterone from the corpus luteum', 'Inhibin from the dominant follicle'], { explanation: 'Female, slide 38.' }),
@@ -112,7 +112,7 @@ const lesson7: Q[] = [
   mcq('q7-02', 'menstrual-disorders', 'Primary amenorrhoea is…', 'Menarche delayed beyond 15 years', ['No period for 3 months after menarche', 'Painful periods', 'Cycles under 21 days'], { explanation: 'Female, slide 47.', skill: 'terminology' }),
   mcq('q7-03', 'menstrual-disorders', 'The most common cause of secondary amenorrhoea listed is…', 'Pregnancy', ['A uterine abnormality', 'Prolactinoma', 'Menopause'], { explanation: 'Female, slide 48.' }),
   mcq('q7-04', 'menstrual-disorders', 'Oligomenorrhoea means cycles…', 'Longer than 36 days', ['Shorter than 21 days', 'With heavy bleeding', 'With pain'], { explanation: 'Female, slide 49.', skill: 'terminology' }),
-  mcq('q7-05', 'menstrual-disorders', 'Polymenorrhoea implies…', 'Higher estrogen production', ['Lower estrogen production', 'No ovulation in any cycle', 'An early pregnancy'], { explanation: 'Female, slide 50.' }),
+  mcq('q7-05', 'menstrual-disorders', 'Polymenorrhoea implies…', 'Higher estrogen production', ['Lower estrogen production', 'No ovulation in any of the cycles', 'An early pregnancy'], { explanation: 'Female, slide 50.' }),
   mcq('q7-06', 'menstrual-disorders', 'Dysmenorrhoea is mostly due to…', 'Accumulation of prostaglandins', ['Excess estrogen from the ovary', 'Fibrinolysin from the endometrium', 'Low prolactin during menstruation'], { explanation: 'Female, slide 51.' }),
   multi('q7-07', 'menstrual-disorders', 'Which are causes of menorrhagia? Select all that apply.', ['Uterine fibroids', 'Cervical polyps', 'Endometrial polyps'], ['Lactation'], { explanation: 'Female, slides 50–51.' }),
   mcq('q7-08', 'estrogens', 'Which enzyme converts androgens to estrogens?', 'Aromatase', ['5α-reductase', 'Carbonic anhydrase', '17α-hydroxylase'], { explanation: 'Female, slide 52.' }),
@@ -143,13 +143,13 @@ const lesson8: Q[] = [
 
 const lesson9: Q[] = [
   mcq('q9-01', 'fertilisation', 'What proportion of ejaculated sperm reach the ampulla?', 'About 1%', ['About 50%', 'About 99%', 'About 10%'], { explanation: 'Sexual Response, slide 41.' }),
-  mcq('q9-02', 'fertilisation', 'Why do many sperm die in the vagina?', 'Its environment is slightly acidic', ['It is too alkaline for them', 'It is too cold for them', 'Antibodies attack them at once'], { explanation: 'Sexual Response, slides 40–41.' }),
+  mcq('q9-02', 'fertilisation', 'Why do many sperm die in the vagina?', 'Its environment is slightly acidic', ['It is too alkaline for them to survive', 'It is too cold for them', 'Antibodies attack them at once'], { explanation: 'Sexual Response, slides 40–41.' }),
   mcq('q9-03', 'fertilisation', 'Which zona pellucida glycoprotein does the sperm bind?', 'ZP3', ['ZP1', 'hCG', 'Inhibin'], { explanation: 'Sexual Response, slide 42.' }),
   mcq('q9-04', 'fertilisation', 'The earliest event of oocyte activation is…', 'Release of Ca²⁺ from the ER as a wave', ['Completion of the first meiotic division', 'Formation of the blastocyst cavity', 'Secretion of hCG by the trophoblast'], { explanation: 'Sexual Response, slide 43.' }),
   order('q9-05', 'fertilisation', 'Order the events of fertilisation.', ['Sperm crosses the cumulus', 'Binds ZP3 and undergoes the acrosome reaction', 'Fuses with the oolemma', 'Cortical reaction', 'Pronuclei fuse into a zygote'], { explanation: 'Sexual Response, slides 41–44.' }),
   mcq('q9-06', 'implantation', 'When does the morula reach the uterus?', 'In about 4 days', ['Within hours', 'In about 14 days', 'In about a month'], { explanation: 'Sexual Response, slide 49.' }),
   mcq('q9-07', 'implantation', 'Which trophoblast layer invades the decidua and forms chorionic villi?', 'Syncytiotrophoblast', ['Cytotrophoblast', 'Inner cell mass (embryoblast)', 'Decidual cells'], { explanation: 'Sexual Response, slide 53.' }),
-  mcq('q9-08', 'implantation', 'By when is the placenta fully developed?', 'Between the third and fourth months', ['By the end of the first week', 'At term, just before birth', 'By the end of the second month'], { explanation: 'Sexual Response, slide 54.' }),
+  mcq('q9-08', 'implantation', 'By when is the placenta fully developed?', 'Between the third and fourth months', ['By the end of the first week after implantation', 'At term, just before birth', 'By the end of the second month'], { explanation: 'Sexual Response, slide 54.' }),
   multi('q9-09', 'placenta', 'Which hormones does the syncytiotrophoblast secrete? Select all that apply.', ['hCG', 'hCS/hPL', 'Progesterone', 'Relaxin'], ['FSH'], { explanation: 'Sexual Response, slides 58–59.' }),
   multi('q9-10', 'placenta', 'What are the two driving forces for placental transport? Select all that apply.', ['Concentration gradient', 'Electrical gradient'], ['Gravity'], { explanation: 'Sexual Response, slide 60.' }),
   multi('q9-11', 'placenta', 'What are the placenta’s two immunological roles? Select all that apply.', ['Passive immunity to the fetus', 'Suppressing the mother’s immune response to the fetus'], ['Making the fetus’s antibodies'], { explanation: 'Sexual Response, slide 58.' }),
@@ -158,20 +158,20 @@ const lesson9: Q[] = [
 ];
 
 const lesson10: Q[] = [
-  mcq('q10-01', 'parturition-hormones', 'Which hormone decreases uterine motility?', 'Progesterone', ['Estrogen', 'Oxytocin', 'PGF2α'], { explanation: 'Sexual Response, slides 65–66.' }),
+  mcq('q10-01', 'parturition-hormones', 'Which hormone decreases uterine motility?', 'Progesterone', ['Estrogen', 'Oxytocin', 'PGF2α (prostaglandin)'], { explanation: 'Sexual Response, slides 65–66.' }),
   mcq('q10-02', 'parturition-hormones', 'By how much do myometrial oxytocin receptors increase in pregnancy?', 'More than 100-fold', ['About 2-fold', 'About 10% more', 'They decrease in number'], { explanation: 'Sexual Response, slide 67.' }),
   mcq('q10-03', 'parturition-hormones', 'Which prostaglandin may ripen the cervix?', 'PGE2', ['PGF2α', 'PGI2', 'Thromboxane'], { explanation: 'Sexual Response, slide 68.' }),
   mcq('q10-04', 'parturition-hormones', 'What produces markedly more CRH at the end of gestation?', 'The placenta', ['The maternal hypothalamus only', 'The uterus', 'The fetal lungs'], { explanation: 'Sexual Response, slide 68.' }),
   mcq('q10-05', 'parturition-hormones', 'Fetal cortisol is required for…', 'Maturation of the fetal lungs', ['Growth of the fetal bones', 'Production of milk after birth', 'Ripening of the cervix only'], { explanation: 'Sexual Response, slide 70.' }),
-  mcq('q10-06', 'parturition-hormones', 'How may relaxin keep the uterus quiet in pregnancy?', 'By down-regulating oxytocin receptors', ['By raising oxytocin release', 'By raising prostaglandin output', 'By blocking progesterone receptors'], { explanation: 'Sexual Response, slide 71.' }),
+  mcq('q10-06', 'parturition-hormones', 'How may relaxin keep the uterus quiet in pregnancy?', 'By down-regulating oxytocin receptors', ['By raising oxytocin release', 'By raising prostaglandin output', 'By blocking progesterone receptors on the myometrium'], { explanation: 'Sexual Response, slide 71.' }),
   mcq('q10-07', 'parturition-mechanics', 'Why do multiple pregnancies tend to be shorter?', 'The mechanical stretch stimuli come earlier', ['They produce less progesterone than one placenta', 'They have less oxytocin acting on the uterus', 'They have more relaxin, which shortens labour'], { explanation: 'Sexual Response, slide 75.', skill: 'cause-effect' }),
   mcq('q10-08', 'lactation', 'When does copious milk secretion (lactogenesis II) start?', 'About 40 hours after birth', ['During the second trimester', 'Immediately at delivery', 'Two weeks after birth'], { explanation: 'Sexual Response, slide 81.' }),
   multi('q10-09', 'lactation', 'What is needed for lactogenesis II? Select all that apply.', ['A developed mammary epithelium', 'High plasma prolactin', 'A fall in estrogen and progesterone'], ['High progesterone'], { explanation: 'Sexual Response, slide 81.' }),
-  mcq('q10-10', 'lactation', 'The feedback inhibitor of lactation (FIL)…', 'Builds up if milk stays in the breast, slowing production', ['Is released by the anterior pituitary during suckling', 'Ejects milk from the alveoli into the ducts', 'Triggers the return of menstruation after birth'], { explanation: 'Sexual Response, slides 82–83.' }),
+  mcq('q10-10', 'lactation', 'The feedback inhibitor of lactation (FIL)…', 'Builds up if milk stays in the breast, slowing production', ['Is released by the anterior pituitary during suckling to stop milk', 'Ejects milk from the alveoli into the ducts', 'Triggers the return of menstruation after birth'], { explanation: 'Sexual Response, slides 82–83.' }),
   mcq('q10-11', 'lactation', 'Which cells contract to eject milk?', 'Myoepithelial cells around the alveoli', ['Alveolar secretory cells', 'Smooth muscle of the nipple only', 'Epithelium lining the lactiferous ducts'], { explanation: 'Sexual Response, slide 84.' }),
   mcq('q10-12', 'milk-amenorrhoea', 'Compared with mature milk, colostrum has…', 'More protein and IgA', ['More lactose', 'More fat', 'More water-soluble vitamins'], { explanation: 'Sexual Response, slides 86–87.' }),
-  mcq('q10-13', 'milk-amenorrhoea', 'Which hypothalamic substance links suckling to lactational amenorrhoea?', 'β-endorphin', ['Dopamine', 'Oxytocin', 'GnRH'], { explanation: 'Sexual Response, slide 88.' }),
-  mcq('q10-14', 'milk-amenorrhoea', 'The principal mechanism suppressing ovulation in lactational amenorrhoea is…', 'Impaired pulsatile LH secretion', ['Excess FSH secretion', 'Destruction of the follicles', 'A high progesterone level'], { explanation: 'Sexual Response, slide 89.' }),
+  mcq('q10-13', 'milk-amenorrhoea', 'Which hypothalamic substance links suckling to lactational amenorrhoea?', 'β-endorphin', ['Dopamine (PIH)', 'Oxytocin', 'GnRH'], { explanation: 'Sexual Response, slide 88.' }),
+  mcq('q10-14', 'milk-amenorrhoea', 'The principal mechanism suppressing ovulation in lactational amenorrhoea is…', 'Impaired pulsatile LH secretion', ['Excess FSH secretion', 'Destruction of the follicles', 'A high progesterone level from the placenta'], { explanation: 'Sexual Response, slide 89.' }),
   match('q10-15', 'milk-amenorrhoea', 'Match each hormone to its role in lactation.', [
     ['Prolactin', 'Long-term maintenance of milk production'],
     ['Oxytocin', 'Milk ejection'],

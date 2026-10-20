@@ -37,7 +37,7 @@ export const interactive: Record<string, Steps> = {
     ], ma([22, 23, 24, 25])),
   ],
   'reproductive-physiology-3': [
-    ask(mcq('c3-01', 'spermatogenesis-hormones', 'Once spermatogenesis has started, which hormone alone can maintain it?', 'Testosterone', ['FSH', 'Inhibin B', 'Prolactin'], { explanation: 'Male, slide 33: FSH is needed to start it.' })),
+    ask(mcq('c3-01', 'spermatogenesis-hormones', 'Once spermatogenesis has started, which hormone alone can maintain it?', 'Testosterone', ['FSH (with LH)', 'Inhibin B', 'Prolactin'], { explanation: 'Male, slide 33: FSH is needed to start it.' })),
     learn('Sertoli products', ['Under FSH, Sertoli cells make inhibin (feeds back to cut FSH), activin (boosts FSH) and androgen-binding protein, which keeps testosterone 20–50 times higher than in blood.'], { sourceRefs: ma([31, 32]) }),
     ask(mcq('c3-02', 'testis-temperature', 'In a cold room the testes are drawn up towards the body. Which muscle does this?', 'Cremaster', ['Dartos', 'Bulbospongiosus', 'Detrusor'], { explanation: 'Male, slide 38: the cremaster raises the testes to warm them; the dartos changes scrotal surface area.', skill: 'application' })),
     learn('Semen in order', ['Cowper’s glands first (< 5%, mucus), then prostate (~30%: alkaline, zinc, PSA, citric acid), then seminal vesicles (~60%: fructose, prostaglandins). Normal: 1.5–5 mL, pH 7.0–8.3, ≥ 15 million sperm/mL.'], { sourceRefs: ma([47, 48, 49, 50]) }),
@@ -92,7 +92,7 @@ export const interactive: Record<string, Steps> = {
   'reproductive-physiology-7': [
     ask(mcq('c7-01', 'menstrual-disorders', 'A woman has not had a period for 4 months; she is not pregnant or breastfeeding but has lost a lot of weight. What is this?', 'Secondary amenorrhoea', ['Primary amenorrhoea', 'Menorrhagia (heavy periods)', 'Dysmenorrhoea'], { explanation: 'Female, slides 47–48.', skill: 'application', clinical: true })),
     learn('Definitions', ['Oligomenorrhoea: cycles > 36 days. Polymenorrhoea: < 21 days. Menorrhagia: heavy bleeding. Dysmenorrhoea: painful, from prostaglandins.'], { sourceRefs: fe([49, 50, 51]) }),
-    ask(mcq('c7-02', 'estrogens', 'Which is the most abundant and potent natural estrogen?', '17β-estradiol', ['Estrone', 'Estriol', 'Progesterone'], { explanation: 'Female, slide 52.' })),
+    ask(mcq('c7-02', 'estrogens', 'Which is the most abundant and potent natural estrogen?', '17β-estradiol', ['Estrone (E1)', 'Estriol', 'Progesterone'], { explanation: 'Female, slide 52.' })),
     ask(match('c7-03', 'progestins', 'Match each hormone to an effect on the uterus.', [
       ['Estrogen', 'Excites the myometrium'],
       ['Progesterone', 'Decreases myometrial excitability'],
@@ -105,7 +105,7 @@ export const interactive: Record<string, Steps> = {
     ], fe([55, 56, 60, 61])),
   ],
   'reproductive-physiology-8': [
-    ask(mcq('c8-01', 'puberty', 'What is usually the first sign of puberty in girls?', 'Breast development (thelarche)', ['Menstruation (menarche)', 'Pubic hair (pubarche)', 'Acne on the face'], { explanation: 'Sexual Response, slide 4: menarche usually comes last.' })),
+    ask(mcq('c8-01', 'puberty', 'What is usually the first sign of puberty in girls?', 'Breast development (thelarche)', ['The first menstrual period (menarche)', 'Pubic hair (pubarche)', 'Acne on the face'], { explanation: 'Sexual Response, slide 4: menarche usually comes last.' })),
     learn('The trigger', ['Kisspeptin acting on its receptor GPR54 in the hypothalamus changes GnRH release, which drives LH and FSH. Leptin from fat may signal that the body is ready.'], { sourceRefs: sr([1, 2]) }),
     ask(mcq('c8-02', 'climacteric', 'In andropause, why does bioavailable testosterone fall faster than total testosterone?', 'SHBG rises and binds more testosterone', ['The testes stop working abruptly at about 50', 'Testosterone is converted to DHT in the prostate', 'LH secretion stops, so no testosterone is made'], { explanation: 'Sexual Response, slide 11.', skill: 'cause-effect' })),
     ask(order('c8-03', 'sexual-response', 'Order the phases of the human sexual response.', ['Excitement', 'Plateau', 'Orgasm', 'Resolution'], { explanation: 'Sexual Response, slide 23.' })),
@@ -119,14 +119,14 @@ export const interactive: Record<string, Steps> = {
     ], sr([26, 27, 32, 33, 34, 35, 38])),
   ],
   'reproductive-physiology-9': [
-    ask(mcq('c9-01', 'fertilisation', 'Where does fertilisation usually take place?', 'The ampulla of the uterine tube', ['The body of the uterus', 'The surface of the ovary', 'The isthmus of the cervix'], { explanation: 'Sexual Response, slide 40.' })),
+    ask(mcq('c9-01', 'fertilisation', 'Where does fertilisation usually take place?', 'The ampulla of the uterine tube', ['The body of the uterus', 'The surface of the ovary, at ovulation', 'The isthmus of the cervix'], { explanation: 'Sexual Response, slide 40.' })),
     learn('Getting in', ['Hyperactivated motility and hyaluronidases carry the sperm through the cumulus. Binding to ZP3 on the zona triggers the acrosome reaction; the sperm crosses the zona and fuses with the oolemma.'], { sourceRefs: sr([41, 42]) }),
     ask(mcq('c9-02', 'fertilisation', 'How is polyspermy blocked?', 'The cortical reaction hardens the zona and destroys its sperm receptors', ['The acrosome reaction of the first sperm stops all the others', 'The cumulus cells close around the oocyte after one sperm enters', 'hCG released by the oocyte repels the other sperm'], { explanation: 'Sexual Response, slide 43.' })),
     ask(match('c9-03', 'implantation', 'Match each blastocyst part to what it becomes.', [
       ['Inner cell mass', 'The embryo'],
       ['Trophoblast', 'Helps form the placenta'],
     ], { explanation: 'Sexual Response, slide 49.' })),
-    ask(mcq('c9-04', 'implantation', 'What prevents menstruation after implantation?', 'hCG from the chorionic villi maintaining the corpus luteum', ['Oxytocin released from the posterior pituitary', 'FSH from the pituitary keeping the follicle alive', 'Relaxin from the decidua holding the lining in place'], { explanation: 'Sexual Response, slide 54.' })),
+    ask(mcq('c9-04', 'implantation', 'What prevents menstruation after implantation?', 'hCG from the chorionic villi maintaining the corpus luteum', ['Oxytocin released from the posterior pituitary', 'FSH from the pituitary keeping the ruptured follicle alive', 'Relaxin from the decidua holding the lining in place'], { explanation: 'Sexual Response, slide 54.' })),
     recall('r9-01', 'placenta', 'List the functions of the placenta.', [
       'Immunological: passive immunity; suppresses the mother’s immune response to the fetus.',
       'Endocrine: estrogen, progesterone, hCG, hCS/hPL, relaxin and others.',

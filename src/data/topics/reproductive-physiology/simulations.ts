@@ -62,7 +62,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'chromosomes', equals: 23 }],
       },
       {
-        question: mcq('s2-02', 'sperm-maturation', 'Day 80: the sperm has been released from the tubule. Where is it, and what is happening?', 'In the epididymis, maturing and gaining motility', ['In the vas deferens, already able to fertilise', 'Still in the tubule, as an elongating spermatid'], {
+        question: mcq('s2-02', 'sperm-maturation', 'Day 80: the sperm has been released from the tubule. Where is it, and what is happening?', 'In the epididymis, maturing and gaining motility', ['In the vas deferens, already able to fertilise an oocyte', 'Still in the tubule, as an elongating spermatid'], {
           ...predict,
           explanation: 'Sperm pass into the epididymis, where they are stored for up to two weeks, mature and develop motility (slide 41).',
         }),
