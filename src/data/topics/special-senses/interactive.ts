@@ -11,7 +11,7 @@ export const interactive: Record<string, Steps> = {
     ask(mcq('c1-01', 'eye-coats', 'Which coat of the eye contains melanin to stop light reflecting inside the eyeball?', 'The choroid', ['The sclera', 'The retina', 'The cornea'], { explanation: 'Visual System, slide 3.' })),
     learn('Inside the eye', ['The lens divides it into the posterior cavity (vitreous humour) and the anterior cavity (aqueous humour), which has an anterior chamber (cornea–iris) and a posterior chamber (iris–lens).'], { sourceRefs: vs([6, 7]) }),
     ask(order('c1-02', 'aqueous-humour', 'Order the flow of aqueous humour.', ['Ciliary epithelium', 'Posterior chamber', 'Pupil', 'Anterior chamber', 'Trabecular meshwork', 'Canal of Schlemm'], { explanation: 'Visual System, slide 11.' })),
-    ask(mcq('c1-03', 'aqueous-humour', 'The trabecular meshwork becomes blocked. What happens?', 'Intraocular pressure rises — glaucoma', ['The lens becomes cloudy', 'The pupil dilates', 'Tears stop'], { explanation: 'Visual System, slides 11–12.', skill: 'prediction', clinical: true })),
+    ask(mcq('c1-03', 'aqueous-humour', 'The trabecular meshwork becomes blocked. What happens?', 'Intraocular pressure rises — glaucoma', ['The lens becomes cloudy — cataract', 'The pupil dilates and stays fixed', 'Tears stop being produced'], { explanation: 'Visual System, slides 11–12.', skill: 'prediction', clinical: true })),
     recall('r1-01', 'eye-coats', 'Describe the three coats of the eye and the parts of each.', [
       'Sclera: outer, fibrous, white; protects and gives rigidity; its front is the transparent cornea; pierced by the optic nerve.',
       'Choroid: middle, vascular, with melanin; in front forms the iris, ciliary body and zonules.',
@@ -21,7 +21,7 @@ export const interactive: Record<string, Steps> = {
   'special-senses-2': [
     ask(mcq('c2-01', 'refraction', 'Where does most of the eye’s refraction take place?', 'The cornea (about 80%)', ['The lens (about 80%)', 'The vitreous humour', 'The retina'], { explanation: 'Visual System, slides 15–16.' })),
     learn('Near and far', ['Near: ciliary muscle contracts, zonules slacken, the lens rounds up. Far: ciliary muscle relaxes, zonules tighten, the lens thins.'], { sourceRefs: vs([18, 19]) }),
-    ask(mcq('c2-02', 'accommodation', 'You look up from a book at a distant hill. What does the ciliary muscle do?', 'Relaxes, so the zonules tighten and the lens thins', ['Contracts, so the lens rounds up', 'Nothing — the cornea adjusts', 'Contracts, so the zonules tighten'], { explanation: 'Visual System, slide 19.', skill: 'application' })),
+    ask(mcq('c2-02', 'accommodation', 'You look up from a book at a distant hill. What does the ciliary muscle do?', 'Relaxes, so the zonules tighten and the lens thins', ['Contracts, so the zonules slacken and the lens rounds up', 'Nothing — the cornea changes its curve instead', 'Contracts, so the zonules tighten and the lens thins'], { explanation: 'Visual System, slide 19.', skill: 'application' })),
     ask(match('c2-03', 'refractive-errors', 'Match each error to its correcting lens.', [
       ['Myopia', 'Biconcave'],
       ['Hyperopia', 'Convex'],
@@ -37,7 +37,7 @@ export const interactive: Record<string, Steps> = {
     ask(mcq('c3-01', 'rods-cones', 'Which photoreceptors give night (scotopic) vision?', 'Rods', ['Cones', 'Ganglion cells', 'Bipolar cells'], { explanation: 'Visual System, slides 43–44.' })),
     learn('The dark current', ['In the dark cGMP holds CNG channels open; Na⁺ flows in, the cell sits at about −30 mV and releases glutamate.'], { sourceRefs: vs([48, 49]) }),
     ask(order('c3-02', 'phototransduction', 'Order the events after light hits a rod.', ['11-cis retinal becomes all-trans', 'Metarhodopsin II activates transducin', 'Phosphodiesterase hydrolyses cGMP', 'CNG channels close', 'The cell hyperpolarises', 'Glutamate release falls'], { explanation: 'Visual System, slides 51–52.' })),
-    ask(mcq('c3-03', 'phototransduction', 'What does light do to a photoreceptor’s membrane potential?', 'Hyperpolarises it, from about −30 to −90 mV', ['Depolarises it', 'Fires an action potential', 'No change'], { explanation: 'Visual System, slide 52.', skill: 'prediction' })),
+    ask(mcq('c3-03', 'phototransduction', 'What does light do to a photoreceptor’s membrane potential?', 'Hyperpolarises it, from about −30 to −90 mV', ['Depolarises it, from about −90 to −30 mV', 'Fires a burst of action potentials', 'No change in membrane potential'], { explanation: 'Visual System, slide 52.', skill: 'prediction' })),
     recall('r3-01', 'phototransduction', 'Explain phototransduction in a rod, in the dark and in the light.', [
       'Dark: high cGMP keeps CNG channels open; Na⁺ (and Ca²⁺) enter — the dark current; the cell is depolarised and releases glutamate.',
       'Light: 11-cis retinal → all-trans; metarhodopsin II activates transducin, which activates phosphodiesterase.',
@@ -48,7 +48,7 @@ export const interactive: Record<string, Steps> = {
     ask(mcq('c4-01', 'retinal-processing', 'Why is rod vision sensitive but blurry?', 'Many rods converge on one bipolar cell', ['Rods are at the fovea', 'Rods have no pigment', 'Rods connect directly to ganglion cells'], { explanation: 'Visual System, slide 63.', skill: 'cause-effect' })),
     learn('Which fibres cross', ['Nasal hemiretina fibres (seeing the temporal field) cross at the chiasm; temporal fibres stay on their own side. So each optic tract carries the opposite half of the visual field.'], { sourceRefs: vs([68, 69]) }),
     ask(mcq('c4-02', 'field-defects', 'A pituitary tumour presses on the optic chiasm. What visual field defect results?', 'Bitemporal hemianopia', ['Left homonymous hemianopia', 'Blindness in one eye', 'Loss of central vision only'], { explanation: 'Visual System, slide 71: the crossing nasal fibres see the temporal fields.', skill: 'application', clinical: true })),
-    ask(mcq('c4-03', 'field-defects', 'A stroke damages the right optic tract. What is lost?', 'The left half of the visual field in both eyes', ['The right half of the field in both eyes', 'All vision in the right eye', 'Both temporal fields'], { explanation: 'Visual System, slide 72: left homonymous hemianopia.', skill: 'pathway-reasoning' })),
+    ask(mcq('c4-03', 'field-defects', 'A stroke damages the right optic tract. What is lost?', 'The left half of the visual field in both eyes', ['The right half of the visual field in both eyes', 'All vision in the right eye only', 'Both temporal halves of the visual field'], { explanation: 'Visual System, slide 72: left homonymous hemianopia.', skill: 'pathway-reasoning' })),
     recall('r4-01', 'optic-pathway', 'Trace the optic pathway from retina to cortex.', [
       'Ganglion cell axons form the optic nerve.',
       'At the optic chiasm nasal hemiretina fibres cross; temporal fibres do not.',
@@ -74,7 +74,7 @@ export const interactive: Record<string, Steps> = {
     ], vs([87, 88, 89])),
   ],
   'special-senses-6': [
-    ask(mcq('c6-01', 'ear-structure', 'What equalises pressure on both sides of the eardrum?', 'The Eustachian tube', ['The round window', 'The stapedius', 'The cochlear duct'], { explanation: 'Auditory, slide 4.' })),
+    ask(mcq('c6-01', 'ear-structure', 'What equalises pressure on both sides of the eardrum?', 'The Eustachian tube', ['The round window membrane', 'The stapedius', 'The cochlear duct'], { explanation: 'Auditory, slide 4.' })),
     learn('Two fluids', ['Perilymph fills the bony labyrinth (scala vestibuli and tympani); endolymph fills the membranous labyrinth (scala media, canals, utricle, saccule).'], { sourceRefs: av([6, 13]) }),
     ask(mcq('c6-02', 'cochlea', 'Which hair cells amplify basilar membrane vibration?', 'Outer hair cells', ['Inner hair cells', 'Vestibular hair cells', 'Supporting cells'], { explanation: 'Auditory, slide 26: they are electromotile.' })),
     ask(order('c6-03', 'sound-transmission', 'Order the transmission of sound.', ['Eardrum', 'Malleus', 'Incus', 'Stapes', 'Oval window', 'Scala vestibuli perilymph'], { explanation: 'Auditory, slides 32–33.' })),
@@ -85,9 +85,9 @@ export const interactive: Record<string, Steps> = {
     ], av([32, 33])),
   ],
   'special-senses-7': [
-    ask(mcq('c7-01', 'auditory-transduction', 'Bending stereocilia towards the tallest ones…', 'Depolarises the hair cell', ['Hyperpolarises it', 'Has no effect', 'Closes MET channels'], { explanation: 'Auditory, slide 36.' })),
+    ask(mcq('c7-01', 'auditory-transduction', 'Bending stereocilia towards the tallest ones…', 'Depolarises the hair cell', ['Hyperpolarises the hair cell', 'Has no effect on the hair cell', 'Closes the MET channels'], { explanation: 'Auditory, slide 36.' })),
     learn('Which ion?', ['When MET channels open, K⁺ (and Ca²⁺) flows in from the K⁺-rich endolymph, depolarising the cell.'], { sourceRefs: av([37]) }),
-    ask(mcq('c7-02', 'auditory-pathway', 'A lesion in the right lateral lemniscus causes…', 'No one-sided deafness, because the pathway is bilateral', ['Deafness in the right ear', 'Deafness in the left ear', 'Total deafness'], { explanation: 'Auditory, slide 44: only nerve or cochlear nucleus lesions give one-sided deafness.', skill: 'pathway-reasoning' })),
+    ask(mcq('c7-02', 'auditory-pathway', 'A lesion in the right lateral lemniscus causes…', 'No one-sided deafness, because the pathway is bilateral', ['Deafness in the right ear only, from the uncrossed fibres', 'Deafness in the left ear only, from the crossed fibres', 'Total deafness in both ears'], { explanation: 'Auditory, slide 44: only nerve or cochlear nucleus lesions give one-sided deafness.', skill: 'pathway-reasoning' })),
     ask(mcq('c7-03', 'deafness', 'Hearing loss from years of loud music is…', 'Sensorineural', ['Conductive', 'Central', 'Temporary only'], { explanation: 'Auditory, slide 50.', clinical: true })),
     recall('r7-01', 'auditory-pathway', 'Trace the central auditory pathway from the cochlear nerve to the cortex.', [
       'Cochlear nerve (VIII) → cochlear nucleus in the brainstem.',
@@ -98,7 +98,7 @@ export const interactive: Record<string, Steps> = {
   'special-senses-8': [
     ask(mcq('c8-01', 'vestibular-overview', 'Which part of the vestibular system detects angular acceleration (turning the head)?', 'The semicircular canals', ['The utricle', 'The saccule', 'The cochlea'], { explanation: 'Auditory, slide 52.' })),
     learn('Why rotation is sensed', ['When the head turns, the endolymph lags behind because of inertia and pushes the cupula, bending the hair cells.'], { sourceRefs: av([56]) }),
-    ask(mcq('c8-02', 'semicircular-canals', 'A hair cell’s cilia bend away from the kinocilium. What happens to its nerve fibre?', 'Its resting firing rate falls', ['It fires faster', 'It stays silent as before', 'It fires only one spike'], { explanation: 'Auditory, slides 56–57: hair cells release transmitter at rest, so firing can go up or down.', skill: 'prediction' })),
+    ask(mcq('c8-02', 'semicircular-canals', 'A hair cell’s cilia bend away from the kinocilium. What happens to its nerve fibre?', 'Its resting firing rate falls', ['It fires faster than at rest', 'It stays silent, as it was before', 'It fires only a single spike'], { explanation: 'Auditory, slides 56–57: hair cells release transmitter at rest, so firing can go up or down.', skill: 'prediction' })),
     ask(match('c8-03', 'otolith-organs', 'Match each organ to the motion it senses.', [
       ['Utricle', 'Linear motion in the horizontal plane'],
       ['Saccule', 'Linear motion in the vertical plane'],
@@ -126,7 +126,7 @@ export const interactive: Record<string, Steps> = {
   'special-senses-10': [
     ask(mcq('c10-01', 'olfactory-epithelium', 'Which cells regenerate olfactory sensory neurons?', 'Basal cells', ['Supporting cells', 'Mitral cells', 'Olfactory gland cells'], { explanation: 'Chemical Senses, slide 28.' })),
     learn('Second messenger', ['Smell uses cAMP: odorant → G protein → adenylate cyclase → cAMP opens a cation channel; Ca²⁺ then opens Cl⁻ channels for more depolarisation.'], { sourceRefs: cs([29, 30]) }),
-    ask(mcq('c10-02', 'olfactory-transduction', 'In olfactory cilia, what does the influx of Ca²⁺ open?', 'Ca²⁺-gated Cl⁻ channels, letting Cl⁻ out', ['K⁺ channels, letting K⁺ in', 'TRPM5 channels', 'CNG channels closing'], { explanation: 'Chemical Senses, slide 30.' })),
+    ask(mcq('c10-02', 'olfactory-transduction', 'In olfactory cilia, what does the influx of Ca²⁺ open?', 'Ca²⁺-gated Cl⁻ channels, letting Cl⁻ out', ['K⁺ channels, letting K⁺ flow in', 'TRPM5 channels, letting Na⁺ in', 'CNG channels, which then close'], { explanation: 'Chemical Senses, slide 30.' })),
     ask(order('c10-03', 'olfactory-pathway', 'Order the olfactory pathway.', ['Olfactory sensory neurons', 'Olfactory nerve through the cribriform plate', 'Glomeruli with mitral cells in the olfactory bulb', 'Olfactory tract', 'Olfactory cortex and limbic system'], { explanation: 'Chemical Senses, slides 32–33.' })),
     recall('r10-01', 'olfactory-transduction', 'Explain olfactory transduction.', [
       'Odorants dissolve in mucus and bind receptor molecules on the cilia.',

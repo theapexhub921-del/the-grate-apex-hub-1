@@ -28,7 +28,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'iop', change: 'down' }],
       },
       {
-        question: mcq('s1-03', 'aqueous-humour', 'The iris suddenly closes the filtration angle. What happens to the optic nerve?', 'It is put at risk of damage as the pressure climbs', ['Nothing: the vitreous absorbs the extra fluid', 'The pressure falls and the eyeball softens'], {
+        question: mcq('s1-03', 'aqueous-humour', 'The iris suddenly closes the filtration angle. What happens to the optic nerve?', 'It is put at risk of damage as the pressure climbs', ['Nothing: the vitreous absorbs all the extra fluid', 'The pressure falls and the eyeball softens'], {
           ...predict,
           explanation: 'Aqueous can no longer reach the trabecular meshwork and canal of Schlemm; the raised pressure damages the retina and optic nerve — glaucoma (slides 11–12).',
         }),
@@ -61,7 +61,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'focus', equals: 0 }],
       },
       {
-        question: mcq('s2-03', 'accommodation', 'A 60-year-old with otherwise normal eyes tries to read at 30 cm. What happens?', 'The print blurs: light focuses behind the retina', ['It is perfectly sharp', 'Light focuses in front of the retina'], {
+        question: mcq('s2-03', 'accommodation', 'A 60-year-old with otherwise normal eyes tries to read at 30 cm. What happens?', 'The print blurs: light focuses behind the retina', ['It is perfectly sharp at that distance', 'Light focuses in front of the retina'], {
           ...predict,
           explanation: 'With age the lens and ciliary muscle lose elasticity, so accommodation fails — presbyopia, corrected with bifocals (slide 22).',
         }),
@@ -111,7 +111,7 @@ export const simulations: Record<string, Step> = {
     sourceRefs: vs([68, 69, 71, 72]),
     predictions: [
       {
-        question: mcq('s4-01', 'field-defects', 'A pituitary tumour presses on the centre of the optic chiasm. Which fields are lost?', 'Both temporal fields (bitemporal hemianopia)', ['Both nasal fields', 'The left half of each field'], {
+        question: mcq('s4-01', 'field-defects', 'A pituitary tumour presses on the centre of the optic chiasm. Which fields are lost?', 'Both temporal fields (bitemporal hemianopia)', ['Both nasal fields (binasal hemianopia)', 'The left half of each field'], {
           ...predict,
           explanation: 'Only the nasal fibres cross at the chiasm, and they carry the temporal fields (slides 68, 71).',
         }),
@@ -257,7 +257,7 @@ export const simulations: Record<string, Step> = {
         expect: [{ readout: 'right', change: 'same' }],
       },
       {
-        question: mcq('s8-03', 'vestibular-pathway', 'The person stops after spinning right. What do they feel?', 'As if turning left, with dizziness and nystagmus', ['Nothing — they have stopped', 'As if still turning right'], {
+        question: mcq('s8-03', 'vestibular-pathway', 'The person stops after spinning right. What do they feel?', 'As if turning left, with dizziness and nystagmus', ['Nothing — they have stopped turning', 'As if still turning right, with nystagmus'], {
           ...predict,
           explanation: 'The endolymph keeps moving and bends the cupula the other way; the disturbance brings dizziness and nystagmus (slides 56, 72).',
         }),

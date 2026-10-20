@@ -25,7 +25,7 @@ const lesson1: Q[] = [
   mcq('q1-04', 'garrod-hypothesis', 'In Garrod’s figure (A → B → C, with B → C blocked), which compound shows “product deficiency”?', 'C', ['A', 'B', 'D'], {
     explanation: 'Page 3: C is the product the blocked step can no longer make.',
   }),
-  mcq('q1-05', 'garrod-hypothesis', 'In Garrod’s figure, what is D?', 'A toxic metabolite made from B by another route', ['The normal end product', 'The defective enzyme', 'A vitamin cofactor'], {
+  mcq('q1-05', 'garrod-hypothesis', 'In Garrod’s figure, what is D?', 'A toxic metabolite made from B by another route', ['The normal end product of the pathway', 'The defective enzyme that blocks the path', 'A vitamin cofactor needed by the enzyme'], {
     explanation: 'Page 3.',
   }),
   match('q1-06', 'garrod-hypothesis', 'Match each compound in Garrod’s figure to its label.', [
@@ -45,7 +45,7 @@ const lesson1: Q[] = [
   mcq('q1-09', 'age-of-onset', 'Which inborn error does the lecture give as one that may manifest much later in life?', 'Gout', ['Phenylketonuria', 'Glucose-6-phosphate dehydrogenase deficiency'], {
     explanation: 'Page 4.',
   }),
-  mcq('q1-10', 'age-of-onset', 'What does G6PD deficiency illustrate about inborn errors?', 'Their clinical manifestation can depend on external factors', ['They always appear in the newborn period', 'They never cause symptoms', 'They are caused by infection'], {
+  mcq('q1-10', 'age-of-onset', 'What does G6PD deficiency illustrate about inborn errors?', 'Their clinical manifestation can depend on external factors', ['They always appear in the newborn period', 'They never cause any symptoms at all', 'They are caused by infection, not genes'], {
     explanation: 'Page 4.',
   }),
   tf({
@@ -55,7 +55,7 @@ const lesson1: Q[] = [
     explanation: 'Page 4: some appear much later in life (gout), and some only with external factors (G6PD deficiency).',
     skill: 'misconception',
   }),
-  mcq('q1-12', 'age-of-onset', 'Most people with G6PD deficiency have no symptoms. What brings on red-cell breakdown?', 'An environmental trigger, such as fava beans or the drug primaquine', ['Simply growing older', 'A high-carbohydrate diet in infancy', 'Exercise in cold weather'], {
+  mcq('q1-12', 'age-of-onset', 'Most people with G6PD deficiency have no symptoms. What brings on red-cell breakdown?', 'An environmental trigger, such as fava beans or the drug primaquine', ['Simply growing older, as the red cells age', 'A high-carbohydrate diet in early infancy', 'Exercise in cold weather, which cools the blood'], {
     explanation: 'Lehninger p. 551: only G6PD deficiency combined with certain environmental factors produces the clinical picture — the “external factors” of page 4.',
     skill: 'application',
   }),
@@ -102,7 +102,7 @@ const lesson1: Q[] = [
     explanation: 'Page 6: cortisol is reduced — a remote product of the blocked pathway.',
     skill: 'misconception',
   }),
-  mcq('q1-23', 'remote-effects', 'Why is cortisol called a “remote” product in 21-hydroxylase deficiency?', 'It is made further along the pathway than the blocked step, so its formation falls', ['It is made in a different organ from the enzyme', 'It is the substrate of the blocked enzyme', 'It is made by gut bacteria'], {
+  mcq('q1-23', 'remote-effects', 'Why is cortisol called a “remote” product in 21-hydroxylase deficiency?', 'It is made further along the pathway than the blocked step, so its formation falls', ['It is made in a different organ from the one with the defective enzyme', 'It is the substrate of the blocked enzyme, so it builds up', 'It is made by gut bacteria rather than by the body itself'], {
     explanation: 'Page 6: reduced formation of remote products.',
     skill: 'cause-effect',
   }),
@@ -120,7 +120,7 @@ const lesson1: Q[] = [
 
 // ─── Lesson 2 — Detection and newborn screening ─────────────────────
 const lesson2: Q[] = [
-  mcq('q2-01', 'detection-methods', 'Chemical investigations for inborn errors rely extensively on which two techniques?', 'Chromatography and electrophoresis', ['Radiography and ultrasound', 'ECG and EEG', 'Microscopy and culture'], {
+  mcq('q2-01', 'detection-methods', 'Chemical investigations for inborn errors rely extensively on which two techniques?', 'Chromatography and electrophoresis', ['Radiography and ultrasound', 'ECG and EEG recordings', 'Microscopy and culture'], {
     explanation: 'Page 7.',
   }),
   tf({
@@ -173,7 +173,7 @@ const lesson2: Q[] = [
     explanation: 'Page 9: the disease should NOT be clinically apparent at screening.',
     skill: 'misconception',
   }),
-  mcq('q2-14', 'screening-criteria', 'Why must screening results be available quickly?', 'So treatment can start before irreversible damage occurs', ['So the test costs less', 'So the baby can leave hospital sooner', 'Because the samples spoil'], {
+  mcq('q2-14', 'screening-criteria', 'Why must screening results be available quickly?', 'So treatment can start before irreversible damage occurs', ['So that each test costs less to run', 'So the baby can leave hospital sooner', 'Because the blood samples spoil quickly'], {
     explanation: 'Page 9.',
     skill: 'cause-effect',
   }),
@@ -192,11 +192,11 @@ const lesson2: Q[] = [
   mcq('q2-17', 'screening-criteria', 'What should the screening test itself be like?', 'Simple and reliable', ['Invasive and detailed', 'Expensive and specialised', 'Slow but exhaustive'], {
     explanation: 'Page 9.',
   }),
-  mcq('q2-18', 'screening-criteria', 'Disease X cannot be treated, and diagnosing it early does not change its course. By the lecture’s criteria, is it a good candidate for neonatal screening?', 'No — screening needs a treatable disease, or one where early treatment improves outcome', ['Yes, if it is rare', 'Yes — every disease should be screened', 'Only if it is already obvious at birth'], {
+  mcq('q2-18', 'screening-criteria', 'Disease X cannot be treated, and diagnosing it early does not change its course. By the lecture’s criteria, is it a good candidate for neonatal screening?', 'No — screening needs a treatable disease, or one where early treatment improves outcome', ['Yes — rare diseases are always good candidates, whatever the treatment', 'Yes — every disease should be screened for at birth, treatable or not', 'Only if it is already obvious on examination at birth'], {
     explanation: 'Page 9.',
     skill: 'application',
   }),
-  mcq('q2-19', 'screening-criteria', 'Which screening criterion explains why PKU is tested in the first week rather than waiting for symptoms?', 'Results must be available before irreversible damage occurs', ['The disease must be rare', 'The test must be invasive', 'The disease must be clinically apparent'], {
+  mcq('q2-19', 'screening-criteria', 'Which screening criterion explains why PKU is tested in the first week rather than waiting for symptoms?', 'Results must be available before irreversible damage occurs', ['The disease must be rare in the population', 'The test must be invasive to be accurate', 'The disease must already be clinically apparent'], {
     explanation: 'Page 9; Lehninger p. 681: early detection and treatment of PKU prevent much of the damage.',
     skill: 'application',
   }),
@@ -212,7 +212,7 @@ const lesson2: Q[] = [
     answer: true,
     explanation: 'Page 10.',
   }),
-  mcq('q2-23', 'uk-screening', 'Which thyroid condition is on the lecture’s UK screening list?', 'Neonatal hypothyroidism', ['Graves’ disease', 'Thyroid cancer', 'Thyroiditis'], {
+  mcq('q2-23', 'uk-screening', 'Which thyroid condition is on the lecture’s UK screening list?', 'Neonatal hypothyroidism', ['Graves’ disease (hyperthyroidism)', 'Thyroid cancer', 'Hashimoto’s thyroiditis'], {
     explanation: 'Page 10.',
   }),
   mcq('q2-24', 'uk-screening', 'Which adrenal condition is on the lecture’s UK screening list?', 'Congenital adrenal hyperplasia', ['Addison’s disease', 'Phaeochromocytoma', 'Cushing’s syndrome'], {
@@ -256,7 +256,7 @@ const lesson3: Q[] = [
   fill('q3-07', 'suspect-features', 'Persistent ____ (yellowing of the skin) is a suggestive feature.', ['jaundice'], {
     explanation: 'Page 12.',
   }),
-  mcq('q3-08', 'suspect-features', 'What kind of findings should raise the suspicion of an inborn error in an infant?', 'Bizarre and unexplained clinical or laboratory findings', ['Any single fever', 'Only a known family history', 'Only abnormal DNA results'], {
+  mcq('q3-08', 'suspect-features', 'What kind of findings should raise the suspicion of an inborn error in an infant?', 'Bizarre and unexplained clinical or laboratory findings', ['Any single fever in the first year', 'Only a known family history of the disease', 'Only abnormal results on a DNA test'], {
     explanation: 'Page 11.',
   }),
   mcq('q3-09', 'late-findings', 'Which is a LATE clinical finding of inborn errors?', 'Short stature', ['Persistent vomiting', 'Hypoglycaemia', 'Persistent jaundice'], {
@@ -305,11 +305,11 @@ const lesson3: Q[] = [
     answer: true,
     explanation: 'Page 17.',
   }),
-  mcq('q3-22', 'management', 'What does limiting the dietary intake of precursors aim to do?', 'Reduce the substrate reaching the blocked step', ['Increase the activity of the defective enzyme', 'Replace the missing gene', 'Raise the level of the deficient product'], {
+  mcq('q3-22', 'management', 'What does limiting the dietary intake of precursors aim to do?', 'Reduce the substrate reaching the blocked step', ['Increase the activity of the defective enzyme', 'Replace the missing gene in the liver', 'Raise the level of the deficient product'], {
     explanation: 'Page 18, linked to page 5: less precursor means less substrate accumulates.',
     skill: 'cause-effect',
   }),
-  mcq('q3-23', 'management', 'Which example does the lecture give of supplying a deficient product?', 'Cortisol in congenital adrenal hyperplasia', ['Ammonia in a urea cycle defect', 'Phenylalanine in PKU', 'Galactose in galactosaemia'], {
+  mcq('q3-23', 'management', 'Which example does the lecture give of supplying a deficient product?', 'Cortisol in congenital adrenal hyperplasia', ['Ammonia in a urea cycle defect', 'Phenylalanine in phenylketonuria', 'Galactose in galactosaemia'], {
     explanation: 'Page 18.',
   }),
   mcq('q3-24', 'management', 'Which accumulated product does the lecture name as one to remove or reduce?', 'Ammonia', ['Cortisol', 'Tyrosine', 'Glucose'], {
@@ -319,7 +319,7 @@ const lesson3: Q[] = [
     explanation: 'Page 18: cortisol in CAH (CYP21A) — the 21-hydroxylase gene (page 6).',
     skill: 'terminology',
   }),
-  mcq('q3-26', 'management', 'Treating PKU with a diet low in phenylalanine applies which principle?', 'Limiting the dietary intake of precursors', ['Supplying the deficient product', 'Removing the accumulated product', 'Screening the parents'], {
+  mcq('q3-26', 'management', 'Treating PKU with a diet low in phenylalanine applies which principle?', 'Limiting the dietary intake of precursors', ['Supplying the deficient product', 'Removing the accumulated product', 'Screening the parents for carriers'], {
     explanation: 'Page 18; Lehninger p. 680: early rigid dietary control of phenylalanine largely prevents mental retardation.',
     skill: 'application',
   }),
@@ -348,7 +348,7 @@ const lesson4: Q[] = [
   mcq('q4-03', 'enzyme-defects', 'Adenosine deaminase deficiency is a defect of which area of metabolism?', 'Purines', ['Porphyrins', 'Complex lipids', 'Carbohydrate'], {
     explanation: 'Page 19.',
   }),
-  mcq('q4-04', 'enzyme-defects', 'Tay-Sachs disease is a defect in the metabolism of:', 'Complex lipids', ['Organic acids', 'Purines', 'Amino acids'], {
+  mcq('q4-04', 'enzyme-defects', 'Tay-Sachs disease is a defect in the metabolism of:', 'Complex lipids', ['Organic acids', 'Purines and pyrimidines', 'Amino acids'], {
     explanation: 'Page 19.',
   }),
   tf({
@@ -357,10 +357,10 @@ const lesson4: Q[] = [
     answer: true,
     explanation: 'Page 19.',
   }),
-  mcq('q4-06', 'pku', 'Which enzyme is defective in PKU?', 'Phenylalanine hydroxylase', ['Tyrosinase', 'Hexosaminidase A', 'Galactokinase'], {
+  mcq('q4-06', 'pku', 'Which enzyme is defective in PKU?', 'Phenylalanine hydroxylase', ['Tyrosinase (melanin synthesis)', 'Hexosaminidase A', 'Galactokinase'], {
     explanation: 'Pages 19–20.',
   }),
-  mcq('q4-07', 'pku', 'How is PKU inherited?', 'Autosomal recessive', ['Autosomal dominant', 'X-linked recessive', 'Mitochondrial'], {
+  mcq('q4-07', 'pku', 'How is PKU inherited?', 'Autosomal recessive', ['Autosomal dominant', 'X-linked recessive', 'Mitochondrial (maternal)'], {
     explanation: 'Page 20.',
   }),
   mcq('q4-08', 'pku', 'What incidence does the lecture give for PKU?', 'About 1 in 10,000', ['About 1 in 320,000', 'About 1 in 5,000,000', 'About 1 in 100'], {
@@ -376,10 +376,10 @@ const lesson4: Q[] = [
     explanation: 'Page 20 figure: 25% affected, 50% unaffected carriers, 25% unaffected.',
     skill: 'application',
   }),
-  mcq('q4-11', 'pku', 'Why is the disease called phenyl“ketonuria”?', 'Excess phenylalanine is diverted to phenylpyruvate, a phenylketone that appears in the urine', ['Phenylalanine is converted into ketone bodies in the liver', 'The urine contains acetone from fasting', 'Tyrosine is excreted as a ketone'], {
+  mcq('q4-11', 'pku', 'Why is the disease called phenyl“ketonuria”?', 'Excess phenylalanine is diverted to phenylpyruvate, a phenylketone that appears in the urine', ['Phenylalanine is converted into ketone bodies in the liver and excreted', 'The urine contains acetone because the child is fasting', 'Tyrosine builds up and is excreted as a ketone in the urine'], {
     explanation: 'Lehninger pp. 679–680.',
   }),
-  mcq('q4-12', 'galactosaemia', 'Which enzyme is defective in galactosaemia, according to the lecture’s table?', 'Galactose-1-phosphate uridyl transferase', ['Galactokinase', 'Lactase', 'UDP-galactose 4′-epimerase'], {
+  mcq('q4-12', 'galactosaemia', 'Which enzyme is defective in galactosaemia, according to the lecture’s table?', 'Galactose-1-phosphate uridyl transferase', ['Galactokinase', 'Lactase of the brush border', 'UDP-galactose 4′-epimerase'], {
     explanation: 'Page 19; the page 21 figure highlights GALT.',
     skill: 'comparison',
   }),
@@ -406,7 +406,7 @@ const lesson4: Q[] = [
   multi('q4-19', 'methylmalonic-aciduria', 'Which features of methylmalonic aciduria does the lecture list? Select all that apply.', ['Respiratory distress', 'Lethargy', 'Muscle weakness', 'Severe ketoacidosis'], ['Cataract', 'Cherry red spot'], {
     explanation: 'Page 22.',
   }),
-  mcq('q4-20', 'methylmalonic-aciduria', 'When the mutase is blocked, propionyl-CoA backs up. What does it inhibit (page 22 figure)?', 'The urea cycle, the citric acid cycle and other pathways', ['Glycolysis only', 'Haem synthesis only', 'Nothing — it is harmless'], {
+  mcq('q4-20', 'methylmalonic-aciduria', 'When the mutase is blocked, propionyl-CoA backs up. What does it inhibit (page 22 figure)?', 'The urea cycle, the citric acid cycle and other pathways', ['Glycolysis only, in the cytosol', 'Haem synthesis only, in the bone marrow', 'Nothing — it is harmless when it builds up'], {
     explanation: 'Page 22 figure.',
     skill: 'cause-effect',
   }),
@@ -419,7 +419,7 @@ const lesson4: Q[] = [
   mcq('q4-22', 'tay-sachs', 'Which enzyme is missing from Tay-Sachs lysosomes?', 'Hexosaminidase A', ['Adenosine deaminase', 'Galactokinase', 'Methylmalonyl-CoA mutase'], {
     explanation: 'Pages 19 and 23.',
   }),
-  mcq('q4-23', 'tay-sachs', 'What eye sign does the page 24 figure show in Tay-Sachs disease?', 'A cherry red spot in the macula', ['Blue sclerae', 'Cataract', 'Photophobia'], {
+  mcq('q4-23', 'tay-sachs', 'What eye sign does the page 24 figure show in Tay-Sachs disease?', 'A cherry red spot in the macula', ['Blue sclerae', 'Cataracts in both lenses', 'Photophobia'], {
     explanation: 'Page 24 figure. Blue sclerae belong to osteogenesis imperfecta, cataract to galactosaemia, photophobia to cystinosis.',
     skill: 'comparison',
   }),
@@ -436,16 +436,16 @@ const lesson4: Q[] = [
     explanation: 'Pages 20–25.',
     skill: 'comparison',
   }),
-  mcq('q4-27', 'scid', 'Which metabolite is toxic to lymphocytes in adenosine deaminase deficiency?', 'dATP (deoxyadenosine triphosphate)', ['Uric acid', 'Deoxyinosine', 'GM2 ganglioside'], {
+  mcq('q4-27', 'scid', 'Which metabolite is toxic to lymphocytes in adenosine deaminase deficiency?', 'dATP (deoxyadenosine triphosphate)', ['Uric acid (urate)', 'Deoxyinosine', 'GM2 ganglioside'], {
     explanation: 'Page 25 figure.',
   }),
-  mcq('q4-28', 'scid', 'How is SCID inherited, according to the lecture?', 'Autosomal recessive or X-linked', ['Autosomal dominant only', 'Mitochondrial', 'Not inherited'], {
+  mcq('q4-28', 'scid', 'How is SCID inherited, according to the lecture?', 'Autosomal recessive or X-linked', ['Autosomal dominant only', 'Mitochondrial (maternal)', 'Not inherited at all'], {
     explanation: 'Page 25.',
   }),
   multi('q4-29', 'scid', 'Which features of SCID does the lecture list? Select all that apply.', ['Severe yeast and bacterial infections', 'Viral infection from breast milk and vaccinations'], ['Easy bruising', 'Frequent bone fractures'], {
     explanation: 'Page 25.',
   }),
-  mcq('q4-30', 'scid', 'Page 26 shows the “bubble boy” — a child in a protective suit. Which feature of SCID explains this?', 'Severe infections, even from breast milk and vaccinations', ['Easy bruising', 'Photophobia', 'Brittle bones'], {
+  mcq('q4-30', 'scid', 'Page 26 shows the “bubble boy” — a child in a protective suit. Which feature of SCID explains this?', 'Severe infections, even from breast milk and vaccinations', ['Easy bruising and bleeding from minor knocks', 'Photophobia that needs protection from light', 'Brittle bones that fracture with handling'], {
     explanation: 'Pages 25–26.',
     skill: 'cause-effect',
   }),
@@ -471,7 +471,7 @@ const lesson5: Q[] = [
   mcq('q5-04', 'transport-defects', 'Menkes syndrome is a defect in the transport of which metal?', 'Copper', ['Iron', 'Zinc', 'Calcium'], {
     explanation: 'Page 27.',
   }),
-  mcq('q5-05', 'thalassaemia', 'Thalassaemias are caused by deletions and/or mutations of:', 'The α or β subunit of normal adult haemoglobin', ['Myoglobin', 'Spectrin', 'Collagen'], {
+  mcq('q5-05', 'thalassaemia', 'Thalassaemias are caused by deletions and/or mutations of:', 'The α or β subunit of normal adult haemoglobin', ['Myoglobin in muscle', 'Spectrin of the red-cell membrane', 'Type I collagen'], {
     explanation: 'Page 28 figure.',
   }),
   fill('q5-06', 'thalassaemia', 'Normal adult haemoglobin (HbA) has the subunit composition ____.', ['α2β2', 'α₂β₂', 'a2b2', 'alpha2beta2', 'alpha 2 beta 2'], {
@@ -485,7 +485,7 @@ const lesson5: Q[] = [
     explanation: 'Page 28 figure.',
     skill: 'comparison',
   }),
-  mcq('q5-09', 'thalassaemia', 'What results when all four α-globin genes are lost?', 'Hb Barts hydrops fetalis (fatal)', ['A carrier trait', 'Haemoglobin H disease', 'β-thalassaemia major'], {
+  mcq('q5-09', 'thalassaemia', 'What results when all four α-globin genes are lost?', 'Hb Barts hydrops fetalis (fatal)', ['A silent carrier trait', 'Haemoglobin H disease', 'β-thalassaemia major'], {
     explanation: 'Page 28 figure.',
   }),
   mcq('q5-10', 'thalassaemia', 'What results when three α-globin genes are deleted?', 'Haemoglobin H disease', ['Hb Barts hydrops fetalis', 'A silent carrier state', 'Normal haemoglobin'], {
@@ -514,7 +514,7 @@ const lesson5: Q[] = [
     explanation: 'Page 29. The distractors belong to haemophilia A, osteogenesis imperfecta and Menkes syndrome.',
     skill: 'comparison',
   }),
-  mcq('q5-17', 'cystic-fibrosis', 'In CF airways (page 29 figure), why does the mucus become dehydrated?', 'Chloride movement through CFTR fails while sodium absorption continues', ['Too much chloride is secreted', 'Sodium absorption stops completely', 'The mucus glands disappear'], {
+  mcq('q5-17', 'cystic-fibrosis', 'In CF airways (page 29 figure), why does the mucus become dehydrated?', 'Chloride movement through CFTR fails while sodium absorption continues', ['Too much chloride is secreted, drawing water away from the mucus', 'Sodium absorption stops completely, so water stays in the cells', 'The mucus glands disappear, leaving only dry secretions'], {
     explanation: 'Page 29 figure.',
     skill: 'cause-effect',
   }),
@@ -525,7 +525,7 @@ const lesson5: Q[] = [
     explanation: 'Page 29 figure: the defective protein is CFTR; ENaC carries Na⁺.',
     skill: 'misconception',
   }),
-  mcq('q5-19', 'cystinosis', 'Where does cystine accumulate in cystinosis?', 'Inside lysosomes', ['In the plasma', 'In mitochondria', 'In the Golgi'], {
+  mcq('q5-19', 'cystinosis', 'Where does cystine accumulate in cystinosis?', 'Inside lysosomes', ['In the plasma', 'In the mitochondria', 'In the Golgi apparatus'], {
     explanation: 'Pages 27 and 30.',
   }),
   multi('q5-20', 'cystinosis', 'Which features of cystinosis does the lecture list? Select all that apply.', ['Photophobia', 'Fanconi syndrome', 'Failure to thrive'], ['Gallstones', 'Kinky hair'], {
@@ -534,7 +534,7 @@ const lesson5: Q[] = [
   mcq('q5-21', 'cystinosis', 'Which gene encodes cystinosin (page 30 figure)?', 'CTNS', ['CFTR', 'ATP7A', 'HEXA'], {
     explanation: 'Page 30 figure.',
   }),
-  mcq('q5-22', 'cystinosis', 'What does cystinosin do (page 30 figure)?', 'It is an H⁺-driven transporter that moves cystine out of the lysosome', ['It exports copper from the cell', 'It secretes chloride onto the airway surface', 'It digests GM2 ganglioside'], {
+  mcq('q5-22', 'cystinosis', 'What does cystinosin do (page 30 figure)?', 'It is an H⁺-driven transporter that moves cystine out of the lysosome', ['It exports copper from the cell using ATP', 'It secretes chloride onto the airway surface', 'It digests GM2 ganglioside inside the lysosome'], {
     explanation: 'Page 30 figure.',
   }),
   mcq('q5-23', 'menkes', 'Which hair change is typical of Menkes syndrome?', 'Brittle, “kinky” hair', ['Light hair', 'Premature greying', 'Patchy hair loss'], {
@@ -544,7 +544,7 @@ const lesson5: Q[] = [
   multi('q5-24', 'menkes', 'Which features of Menkes syndrome does the lecture list? Select all that apply.', ['Loss of muscle tone', 'Mental retardation', 'Seizures'], ['Salty-tasting skin', 'Cataract'], {
     explanation: 'Page 31.',
   }),
-  mcq('q5-25', 'menkes', 'Which protein in the page 31 figure exports copper from the cell?', 'ATP7A, a copper-transporting ATPase', ['CFTR', 'Cystinosin', 'Spectrin'], {
+  mcq('q5-25', 'menkes', 'Which protein in the page 31 figure exports copper from the cell?', 'ATP7A, a copper-transporting ATPase', ['CFTR, a chloride channel', 'Cystinosin, a lysosomal transporter', 'Spectrin, a cytoskeletal protein'], {
     explanation: 'Page 31 figure.',
   }),
   mcq('q5-26', 'menkes', 'Which transport defect in the lecture is X-linked recessive?', 'Menkes syndrome', ['Cystic fibrosis', 'Cystinosis', 'Thalassaemia'], {
@@ -573,7 +573,7 @@ const lesson6: Q[] = [
   mcq('q6-03', 'structural-defects', 'In the lecture’s table, dystrophin is listed under which site?', 'Cytoskeleton', ['Extracellular', 'Organelle', 'Cell membrane'], {
     explanation: 'Page 32.',
   }),
-  mcq('q6-04', 'structural-defects', 'Osteogenesis imperfecta, hereditary spherocytosis and Zellweger syndrome are grouped as mutations affecting:', 'The structure of cells and organs', ['Transport proteins', 'Extracellular homeostasis', 'Growth control'], {
+  mcq('q6-04', 'structural-defects', 'Osteogenesis imperfecta, hereditary spherocytosis and Zellweger syndrome are grouped as mutations affecting:', 'The structure of cells and organs', ['Transport proteins of membranes', 'Extracellular homeostasis', 'Growth control of cells'], {
     explanation: 'Page 32.',
   }),
   mcq('q6-05', 'osteogenesis-imperfecta', 'Which gene does the lecture name for osteogenesis imperfecta?', 'COL1A1', ['HEXA', 'CTNS', 'ATP7A'], {
@@ -613,7 +613,7 @@ const lesson6: Q[] = [
   mcq('q6-14', 'homeostasis-defects', 'Which protein is defective in haemophilia A?', 'Factor VIII', ['α1-antitrypsin', 'Complement C3', 'Spectrin'], {
     explanation: 'Page 35.',
   }),
-  mcq('q6-15', 'homeostasis-defects', 'What function does α1-antitrypsin serve in the lecture’s table?', 'Protease inhibition', ['Immune protection', 'Haemostasis', 'Oxygen transport'], {
+  mcq('q6-15', 'homeostasis-defects', 'What function does α1-antitrypsin serve in the lecture’s table?', 'Protease inhibition', ['Immune protection', 'Haemostasis (clotting)', 'Oxygen transport'], {
     explanation: 'Page 35.',
   }),
   mcq('q6-16', 'haemophilia-a', 'How is haemophilia A inherited?', 'X-linked', ['Autosomal recessive', 'Autosomal dominant', 'Mitochondrial'], {
@@ -628,23 +628,23 @@ const lesson6: Q[] = [
     'Factor VIII, with other substances, helps form a strong platelet plug',
     'A stable fibrin clot seals the injury and bleeding stops',
   ], { explanation: 'Page 36 figure.' }),
-  mcq('q6-19', 'haemophilia-a', 'What happens when factor VIII is lacking (page 36 figure)?', 'A weak platelet plug forms and the fibrin clot is incomplete or delayed, so bleeding continues', ['The vessel cannot constrict at all', 'Clots form too quickly and block the vessel', 'Platelets are destroyed in the spleen'], {
+  mcq('q6-19', 'haemophilia-a', 'What happens when factor VIII is lacking (page 36 figure)?', 'A weak platelet plug forms and the fibrin clot is incomplete or delayed, so bleeding continues', ['The vessel cannot constrict at all, so blood pours out unchecked', 'Clots form too quickly and block the vessel beyond the injury', 'Platelets are destroyed in the spleen before they reach the wound'], {
     explanation: 'Page 36 figure.',
     skill: 'cause-effect',
   }),
-  mcq('q6-20', 'growth-control-defects', 'Which protein is the tumour suppressor in the lecture’s table?', 'Rb protein', ['bcr-abl', 'Rhodopsin', 'Insulin'], {
+  mcq('q6-20', 'growth-control-defects', 'Which protein is the tumour suppressor in the lecture’s table?', 'Rb protein', ['bcr-abl fusion protein', 'Rhodopsin', 'Insulin'], {
     explanation: 'Page 37.',
   }),
   multi('q6-21', 'growth-control-defects', 'Which cancers does the lecture link to Rb protein mutations? Select all that apply.', ['Retinoblastoma', 'Osteosarcoma'], ['Chronic myelogenous leukaemia', 'Retinitis pigmentosa'], {
     explanation: 'Page 37.',
   }),
-  mcq('q6-22', 'growth-control-defects', 'Which disease does the lecture link to bcr-abl?', 'Chronic myelogenous leukaemia', ['Retinoblastoma', 'Osteosarcoma', 'Dwarfism'], {
+  mcq('q6-22', 'growth-control-defects', 'Which disease does the lecture link to bcr-abl?', 'Chronic myelogenous leukaemia', ['Retinoblastoma', 'Osteosarcoma', 'Dwarfism (achondroplasia)'], {
     explanation: 'Page 37.',
   }),
   mcq('q6-23', 'receptor-hormone-defects', 'Which defect causes familial hypercholesterolaemia?', 'A defective LDL receptor', ['A defective androgen receptor', 'Defective rhodopsin', 'A defective vitamin D receptor'], {
     explanation: 'Page 38.',
   }),
-  mcq('q6-24', 'receptor-hormone-defects', 'Which defect leads to X-linked colour blindness?', 'Defective green and red light opsins', ['Defective rhodopsin', 'A defective vitamin D receptor', 'A defective androgen receptor'], {
+  mcq('q6-24', 'receptor-hormone-defects', 'Which defect leads to X-linked colour blindness?', 'Defective green and red light opsins', ['Defective rhodopsin in the rods', 'A defective vitamin D receptor', 'A defective androgen receptor'], {
     explanation: 'Page 38. Rhodopsin defects cause retinitis pigmentosa.',
     skill: 'comparison',
   }),

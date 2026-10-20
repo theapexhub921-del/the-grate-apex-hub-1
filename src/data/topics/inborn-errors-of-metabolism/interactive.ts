@@ -108,7 +108,7 @@ export const interactive: Record<string, Steps> = {
       'UK newborns are screened between the 5th and 8th day for neonatal hypothyroidism, PKU, sickle cell disease and thalassaemia, galactosaemia and congenital adrenal hyperplasia — and page 10 also lists glucose-6-phosphatase deficiency (check with your lecturer).',
     ], { sourceRefs: ref([10]) }),
     ask(
-      mcq('c2-05', 'uk-screening', 'When are UK newborns screened for these conditions?', 'Between the 5th and 8th day after birth', ['Within the first hour', 'At 6 weeks', 'At 1 year'], {
+      mcq('c2-05', 'uk-screening', 'When are UK newborns screened for these conditions?', 'Between the 5th and 8th day after birth', ['Within the first hour after delivery', 'At the 6-week baby check', 'At 1 year of age'], {
         explanation: 'Page 10.',
       })
     ),
@@ -123,7 +123,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 3 — Suspecting, investigating and managing ─────────────
   'inborn-errors-of-metabolism-3': [
     ask(
-      mcq('c3-01', 'suspect-features', 'Before you start: when should an inborn error come to mind in an infant?', 'When there are bizarre, unexplained clinical or laboratory findings', ['Only when a parent is affected', 'Only after a positive DNA test', 'Only in children over five'], {
+      mcq('c3-01', 'suspect-features', 'Before you start: when should an inborn error come to mind in an infant?', 'When there are bizarre, unexplained clinical or laboratory findings', ['Only when one of the parents is known to be affected', 'Only after a positive DNA test has confirmed it', 'Only in children over five, never in infants'], {
         explanation: 'Page 11.',
         skill: 'prediction',
       })
@@ -203,7 +203,7 @@ export const interactive: Record<string, Steps> = {
       'Methylmalonyl-CoA mutase needs cobalamin (vitamin B12) to make succinyl-CoA. When it fails, methylmalonyl-CoA and propionyl-CoA build up and inhibit the urea cycle and citric acid cycle. Features: respiratory distress, lethargy, muscle weakness and severe ketoacidosis.',
     ], { sourceRefs: ref([22]) }),
     ask(
-      mcq('c4-04', 'methylmalonic-aciduria', 'Which vitamin does methylmalonyl-CoA mutase need (page 22 figure)?', 'Cobalamin (vitamin B12)', ['Thiamine (vitamin B1)', 'Vitamin K', 'Biotin'], {
+      mcq('c4-04', 'methylmalonic-aciduria', 'Which vitamin does methylmalonyl-CoA mutase need (page 22 figure)?', 'Cobalamin (vitamin B12)', ['Thiamine (vitamin B1)', 'Vitamin K (phylloquinone)', 'Biotin (vitamin B7)'], {
         explanation: 'Page 22 figure.',
       })
     ),
@@ -212,7 +212,7 @@ export const interactive: Record<string, Steps> = {
       'SCID: without adenosine deaminase, deoxyadenosine becomes dATP, which is toxic to lymphocytes; severe infections, even from breast milk and vaccinations.',
     ], { sourceRefs: ref([23, 24, 25, 26]) }),
     ask(
-      mcq('c4-05', 'tay-sachs', 'What accumulates in neurons in Tay-Sachs disease?', 'Ganglioside GM2', ['Glycogen', 'Cystine', 'Copper'], {
+      mcq('c4-05', 'tay-sachs', 'What accumulates in neurons in Tay-Sachs disease?', 'Ganglioside GM2', ['Glycogen', 'Cystine crystals', 'Copper'], {
         explanation: 'Pages 23–24 figures.',
       })
     ),
@@ -237,7 +237,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 5 — Transport protein defects ──────────────────────────
   'inborn-errors-of-metabolism-5': [
     ask(
-      mcq('c5-01', 'transport-defects', 'Before you start: haemoglobin carries oxygen between organs. Which disease does the lecture list as its transport defect?', 'Thalassaemia (and haemoglobin variants)', ['Cystinosis', 'Menkes syndrome', 'Cystic fibrosis'], {
+      mcq('c5-01', 'transport-defects', 'Before you start: haemoglobin carries oxygen between organs. Which disease does the lecture list as its transport defect?', 'Thalassaemia (and haemoglobin variants)', ['Cystinosis (lysosomal transport)', 'Menkes syndrome (copper export)', 'Cystic fibrosis (chloride channel)'], {
         explanation: 'Page 27: inter-organ transport — haemoglobin — thalassaemia/haemoglobin variants.',
         skill: 'prediction',
       })
