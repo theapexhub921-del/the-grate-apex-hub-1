@@ -15,7 +15,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 1 — Myoglobin: roles, haem iron, structure ─────────────
   'oxygen-carriers-1': [
     ask(
-      mcq('c1-01', 'carrier-roles', 'Before you start: what is myoglobin’s job in red muscle?', 'A reserve supply of oxygen that also helps O₂ move within the muscle', ['Carrying oxygen in the blood from the lungs to every tissue', 'Carrying CO₂ from the working muscle to the lungs', 'Making haem for the cytochromes of the muscle'], {
+      mcq('c1-01', 'carrier-roles', 'Before you start: what is myoglobin’s job in red muscle?', 'A reserve supply of oxygen that also helps O₂ move within the muscle', ['Carrying oxygen in the blood from the lungs to every tissue', 'Carrying CO₂ from the working muscle to the lungs as carbamino compounds', 'Making haem for the cytochromes of the muscle'], {
         explanation: 'Slide 2: myoglobin serves as a reserve supply of oxygen and facilitates the movement of oxygen within red muscle.',
         skill: 'prediction',
       }),
@@ -199,12 +199,12 @@ export const interactive: Record<string, Steps> = {
       'One 2,3-BPG binds in the central cavity of deoxyhaemoglobin, held by three positive groups on each β chain. It cross-links the β chains and stabilises the T state — so it lowers O₂ affinity. P50 rises from 1 torr without BPG to 26 torr with it.',
     ], { sourceRefs: ref([47, 51, 52]) }),
     ask(
-      mcq('c4-03', 'bpg-binding', 'Which form of haemoglobin does 2,3-BPG bind?', 'Deoxyhaemoglobin (T state)', ['Oxyhaemoglobin (R state)', 'Both forms equally', 'Free α chains only'], {
+      mcq('c4-03', 'bpg-binding', 'Which form of haemoglobin does 2,3-BPG bind?', 'Deoxyhaemoglobin (T state)', ['Oxyhaemoglobin (relaxed R state)', 'Both forms equally', 'Free α chains only'], {
         explanation: 'Slides 51 and 54: BPG stabilises the deoxy quaternary structure by cross-linking the β chains; it does not bind oxyhaemoglobin.',
       })
     ),
     ask(
-      mcq('c4-04', 'bpg-p50', 'Without 2,3-BPG, what would haemoglobin do in capillaries where pO₂ is about 26 torr?', 'Stay fully saturated and fail to unload O₂', ['Unload all of its O₂ at once', 'Unload exactly half of its O₂', 'Bind CO from the tissues instead of O₂'], {
+      mcq('c4-04', 'bpg-p50', 'Without 2,3-BPG, what would haemoglobin do in capillaries where pO₂ is about 26 torr?', 'Stay fully saturated and fail to unload O₂', ['Unload all of its O₂ at once', 'Unload exactly half of its O₂ to the tissues', 'Bind CO from the tissues instead of O₂'], {
         explanation: 'Slides 52–54: without BPG, P50 is 1 torr, so at 26 torr SO₂ is about 1.0 — no unloading. With BPG, SO₂ is 0.5.',
         skill: 'cause-effect',
         difficulty: 'advanced',

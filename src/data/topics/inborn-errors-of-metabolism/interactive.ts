@@ -51,7 +51,7 @@ export const interactive: Record<string, Steps> = {
       'A block can starve a product made several steps later — 21-hydroxylase deficiency in congenital adrenal hyperplasia lowers cortisol. It can also upset feedback control — TSH rises in hypothyroidism.',
     ], { sourceRefs: ref([6]) }),
     ask(
-      mcq('c1-05', 'remote-effects', 'In congenital adrenal hyperplasia, 21-hydroxylase deficiency lowers cortisol. Which feature does this illustrate?', 'Reduced formation of a remote product', ['Interference with feedback control', 'Use of an alternate pathway', 'Accumulation of substrate'], {
+      mcq('c1-05', 'remote-effects', 'In congenital adrenal hyperplasia, 21-hydroxylase deficiency lowers cortisol. Which feature does this illustrate?', 'Reduced formation of a remote product', ['Interference with feedback control of the pathway', 'Use of an alternate pathway', 'Accumulation of substrate'], {
         explanation: 'Page 6: ↓ cortisol due to 21-hydroxylase deficiency is the lecture’s example of a reduced remote product.',
         skill: 'application',
       })
@@ -108,7 +108,7 @@ export const interactive: Record<string, Steps> = {
       'UK newborns are screened between the 5th and 8th day for neonatal hypothyroidism, PKU, sickle cell disease and thalassaemia, galactosaemia and congenital adrenal hyperplasia — and page 10 also lists glucose-6-phosphatase deficiency (check with your lecturer).',
     ], { sourceRefs: ref([10]) }),
     ask(
-      mcq('c2-05', 'uk-screening', 'When are UK newborns screened for these conditions?', 'Between the 5th and 8th day after birth', ['Within the first hour after delivery', 'At the 6-week baby check', 'At 1 year of age'], {
+      mcq('c2-05', 'uk-screening', 'When are UK newborns screened for these conditions?', 'Between the 5th and 8th day after birth', ['Within the first hour after delivery', 'At the 6-week baby check', 'At 1 year of age, before walking starts'], {
         explanation: 'Page 10.',
       })
     ),
@@ -237,7 +237,7 @@ export const interactive: Record<string, Steps> = {
   // ─── Lesson 5 — Transport protein defects ──────────────────────────
   'inborn-errors-of-metabolism-5': [
     ask(
-      mcq('c5-01', 'transport-defects', 'Before you start: haemoglobin carries oxygen between organs. Which disease does the lecture list as its transport defect?', 'Thalassaemia (and haemoglobin variants)', ['Cystinosis (lysosomal transport)', 'Menkes syndrome (copper export)', 'Cystic fibrosis (chloride channel)'], {
+      mcq('c5-01', 'transport-defects', 'Before you start: haemoglobin carries oxygen between organs. Which disease does the lecture list as its transport defect?', 'Thalassaemia (and haemoglobin variants)', ['Cystinosis (lysosomal transport)', 'Menkes syndrome (copper export)', 'Cystic fibrosis (chloride channel of the airways)'], {
         explanation: 'Page 27: inter-organ transport — haemoglobin — thalassaemia/haemoglobin variants.',
         skill: 'prediction',
       })
