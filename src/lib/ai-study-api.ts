@@ -59,3 +59,10 @@ export async function makeLessonQuestions(lesson: { title: string; text: string 
   const data = await call<{ questions: LessonQuestion[] }>({ mode: 'questions', lesson, count, avoid });
   return data.questions;
 }
+
+/** The AI's mark for an answer typed "in your own words", made against the lecture slides first. */
+export type RecallGrade = { verdict: 'yes' | 'partial' | 'no'; feedback: string; missing: string[]; beyond: string };
+
+export async function gradeRecallWithAi(lesson: { title: string; text: string }, item: { prompt: string; model: readonly string[]; answer: string }): Promise<RecallGrade> {
+  return call<RecallGrade>({ mode: 'grade', lesson, item: { prompt: item.prompt, model: [...item.model], answer: item.answer } });
+}

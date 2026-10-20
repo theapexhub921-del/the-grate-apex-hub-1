@@ -202,6 +202,7 @@ Every lesson has an "Ask AI" tab (questions answered from the lesson's own text)
   * Every wrong answer in a quiz, review, HB practice or past paper (`QuestionCard`) has "Explain my mistake with AI"; the results page has "Explain with AI" on every answer. It explains from the lesson's lecture text (`src/data/ai-context.ts` finds it from the question's `lessonId`), with follow-up questions.
   * The Read page of both lesson screens has a floating "Ask AI" button (`AskAiFab` in `ai-study.tsx`) that opens Ask AI without leaving the page: on a computer (window 1024 px or wider) in a panel docked on the right, like Ask Gemini in Chrome (owner, 2026-10-19; `src/components/side-panel.tsx`, drawn by `SidePanelHost` in `app-tabs.web.tsx`; the page moves over and stays scrollable, and the panel closes when the learner leaves the lesson); on phones and narrow windows in a sheet.
   * Flashcards (term cards and AI cards) show "Ask AI about this card" once flipped.
+  * **Recall steps ("in your own words")** in the interactive lesson have a box to type the answer (owner, 2026-10-20). "Check my answer" sends it to `api/ai.mjs` mode `grade`, which marks it against the lecture slides first, then the model answer (`api/_grade.mjs`, `tests/ai-grade.test.mjs`): a verdict, short feedback, the slide points missing, and anything beyond the slides. The learner still picks the rating (the AI's is preselected), so Review works as before. Enter makes a new line in that box.
 
 ## Study chat (general AI chat, outside lessons)
 

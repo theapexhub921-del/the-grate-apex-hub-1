@@ -5,6 +5,10 @@
 //   { mode: 'questions',  lesson: { title, text }, count?, avoid?: [question, ...] }
 //   { mode: 'explain',    lesson?: { title, text }, item: { kind, prompt, options?, correct, picked?, explanation?, course? },
 //                         question?, history?: [{ role, text }] }
+//   { mode: 'grade',      lesson: { title, text }, item: { prompt, model: [point, ...], answer } }
+//     "Check my answer" on a recall step ("in your own words"): the learner's typed
+//     answer is marked against the lecture slides first, then the model answer.
+//     Replies { verdict: 'yes' | 'partial' | 'no', feedback, missing: [...], beyond }.
 //     "Explain with AI" on quiz / practice / review answers and flashcards: why the
 //     right answer is right (and the learner's pick is not), from the lecture text.
 //
@@ -23,6 +27,7 @@
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 import { geminiCall, ModelCallError, openAiCompatibleCall } from './_ai-models.mjs';
+import { GRADE_RULES, gradeBlock, parseGrade } from './_grade.mjs';
 
 const PROJECT = 'grate-apex';
 const KEYS = createRemoteJWKSet(new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'));
@@ -276,6 +281,15 @@ export default async function handler(req, res) {
       const question = text(body?.question, MAX_QUESTION_CHARS) || (body?.item?.kind === 'card' ? 'Explain this flashcard to me.' : body?.item?.picked ? 'Why is my answer wrong, and why is the correct answer right?' : 'Explain why this answer is correct.');
       const answer = await generate({ system: `${EXPLAIN_RULES}\n\n${lessonBlock}\n\n${item}`, turns: chatTurns(question), maxTokens: 2048 });
       return res.status(200).json({ answer });
+    }
+
+    if (mode === 'grade') {
+      const item = gradeBlock(body?.item);
+      if (!item) return res.status(400).json({ error: 'Type your answer first.', code: 'no-answer' });
+      const raw = await generate({ system: `${GRADE_RULES}\n\n${lessonBlock}`, turns: [{ role: 'user', text: `${item}\n\nMark this answer.` }], maxTokens: 1024, json: true });
+      const grade = parseGrade(raw);
+      if (!grade) return res.status(502).json({ error: 'The AI could not mark that right now. Please try again.', code: 'bad-output' });
+      return res.status(200).json(grade);
     }
 
     if (mode === 'flashcards') {

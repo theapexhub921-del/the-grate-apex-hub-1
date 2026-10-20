@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from '@/components/ui/text';
+import { Text, TextInput } from '@/components/ui/text';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
 
 import { SimulationStepView } from '@/components/learning/simulations/simulation-step';
@@ -10,21 +10,25 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Card } from '@/components/ui/interactive';
 import { ProgressBar } from '@/components/ui/progress-bar';
+import { InlineNotice } from '@/components/ui/state-views';
 import { isWeb } from '@/components/ui/web';
 import type { ThemeColors } from '@/constants/theme';
+import { lessonToText } from '@/data/ai-study';
 import type { InteractiveStep, Lesson } from '@/data/lesson-types';
 import { recordAnswer, recordRecall } from '@/data/learning/actions';
 import { type LessonSession, saveLessonSession } from '@/data/learning/lesson-sessions';
 import { type Answer, correctAnswerOf, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { gradeRecallWithAi, type RecallGrade } from '@/lib/ai-study-api';
 
 // Layer 1 of a lesson: learn by thinking and doing.
 //
 // One step at a time. 'learn' cards teach a small piece; 'ask' steps make
 // the learner retrieve / predict / reason BEFORE the explanation is shown;
-// 'recall' steps ask for open recall, then a self-check against the model
-// answer; 'simulate' steps ask for predictions (checkpoints), then let the
+// 'recall' steps ask for open recall: the learner types an answer in their own
+// words, the AI marks it against the lecture slides first (api/ai.mjs mode
+// 'grade'), then the learner compares it with the model answer and rates it; 'simulate' steps ask for predictions (checkpoints), then let the
 // learner explore a model (components/learning/simulations/). A checkpoint missed on the first try comes back once at the end
 // (spaced retrieval inside the lesson), and every answer feeds the memory
 // model, so missed concepts return in Review. Progress is saved after
@@ -51,6 +55,11 @@ export function InteractiveLayer({
   const [answer, setAnswer] = useState<Answer | undefined>(undefined);
   const [revealed, setRevealed] = useState(false);
   const [recallShown, setRecallShown] = useState(false);
+  // A recall step: what the learner typed, and the AI's mark for it.
+  const [typed, setTyped] = useState('');
+  const [grade, setGrade] = useState<RecallGrade | null>(null);
+  const [grading, setGrading] = useState(false);
+  const [gradeError, setGradeError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [simReady, setSimReady] = useState(false);
   // How many steps back the learner is looking (0 = the current step).
@@ -71,6 +80,9 @@ export function InteractiveLayer({
     setAnswer(undefined);
     setRevealed(false);
     setRecallShown(false);
+    setTyped('');
+    setGrade(null);
+    setGradeError(null);
     setSimReady(false);
     saveLessonSession({ ...session, ...patch, position: session.position + 1 });
   }
@@ -110,6 +122,25 @@ export function InteractiveLayer({
     setBusy(false);
   }
 
+  // "Check my answer": the AI marks the typed answer against the slides, then the model answer is shown.
+  async function checkRecall() {
+    if (!step || step.type !== 'recall' || grading || !typed.trim()) return;
+    setGrading(true);
+    setGradeError(null);
+    try {
+      const result = await gradeRecallWithAi(
+        { title: lesson.title, text: lessonToText(lesson) },
+        { prompt: step.recall.prompt, model: step.recall.answer, answer: typed.trim() }
+      );
+      setGrade(result);
+      setRecallShown(true);
+    } catch (error) {
+      setGradeError(error instanceof Error ? error.message : 'The AI could not mark that right now.');
+    } finally {
+      setGrading(false);
+    }
+  }
+
   async function rate(rating: 'yes' | 'partial' | 'no') {
     if (!step || step.type !== 'recall' || busy) return;
     setBusy(true);
@@ -134,12 +165,16 @@ export function InteractiveLayer({
           if (!revealed && canCheck) void check();
           else if (revealed) advance();
         } else if (step.type === 'learn') advance();
-        else if (step.type === 'recall' && !recallShown) setRecallShown(true);
+        else if (step.type === 'recall' && !recallShown) {
+          if (typed.trim()) void checkRecall();
+          else setRecallShown(true);
+        }
         else if (step.type === 'simulate' && simReady) advance();
       },
     },
     !finished,
-    ['Enter']
+    // Enter in a typed checkpoint answer checks it; in a recall answer it starts a new line.
+    step?.type === 'recall' ? [] : ['Enter']
   );
 
   if (finished) {
@@ -282,8 +317,46 @@ export function InteractiveLayer({
             <Text style={styles.kicker}>RECALL · FROM MEMORY</Text>
             <Text style={styles.learnTitle}>{step.recall.prompt}</Text>
             {!recallShown ? (
-              <Text style={styles.body}>Say or write your answer first, then compare.</Text>
+              <>
+                <Text style={styles.body}>Type your answer in your own words. The AI marks it against your lecture slides, then you compare it with the model answer.</Text>
+                <TextInput
+                  value={typed}
+                  onChangeText={setTyped}
+                  placeholder="Type your answer here"
+                  placeholderTextColor={colors.textTertiary}
+                  accessibilityLabel="Your answer, in your own words"
+                  multiline
+                  maxLength={3000}
+                  editable={!grading}
+                  style={styles.recallInput}
+                />
+                {gradeError ? <InlineNotice tone="error" message={`${gradeError} You can still compare with the model answer yourself.`} /> : null}
+              </>
             ) : (
+              <>
+              {typed.trim() ? (
+                <View style={styles.yourAnswer}>
+                  <Text style={styles.modelTitle}>YOUR ANSWER</Text>
+                  <Text style={styles.modelPoint}>{typed.trim()}</Text>
+                </View>
+              ) : null}
+              {grade ? (
+                <View style={[styles.aiMark, grade.verdict === 'yes' ? styles.aiMarkGood : grade.verdict === 'no' ? styles.aiMarkLow : null]}>
+                  <View style={styles.aiMarkHead}>
+                    <Icon name="sparkle" size={15} color={colors.accentText} />
+                    <Text style={styles.modelTitle}>AI MARK · FROM YOUR SLIDES</Text>
+                  </View>
+                  <Text style={styles.aiVerdict}>{VERDICT_LABEL[grade.verdict]}</Text>
+                  <Text style={styles.modelPoint}>{grade.feedback}</Text>
+                  {grade.missing.length ? (
+                    <>
+                      <Text style={styles.aiSub}>From the slides, add:</Text>
+                      {grade.missing.map((point, index) => <Text key={index} style={styles.modelPoint}>• {point}</Text>)}
+                    </>
+                  ) : null}
+                  {grade.beyond ? <Text style={styles.aiSub}>Beyond your slides (check your notes): {grade.beyond}</Text> : null}
+                </View>
+              ) : null}
               <View style={styles.modelAnswer}>
                 <Text style={styles.modelTitle}>MODEL ANSWER</Text>
                 {step.recall.answer.map((point, index) => (
@@ -291,13 +364,20 @@ export function InteractiveLayer({
                     • {point}
                   </Text>
                 ))}
-                <Text style={styles.ratePrompt}>How much of that did you recall?</Text>
+                <Text style={styles.ratePrompt}>{grade ? `How much did you recall? The AI says “${RATE_LABEL[grade.verdict]}” — keep it or choose your own.` : 'How much of that did you recall?'}</Text>
                 <View style={styles.rateRow}>
-                  <Button label="All of it" onPress={() => void rate('yes')} disabled={busy} />
-                  <Button label="Partly" variant="secondary" onPress={() => void rate('partial')} disabled={busy} />
-                  <Button label="Not really" variant="secondary" onPress={() => void rate('no')} disabled={busy} />
+                  {(['yes', 'partial', 'no'] as const).map((rating) => (
+                    <Button
+                      key={rating}
+                      label={RATE_LABEL[rating]}
+                      variant={(grade ? grade.verdict === rating : rating === 'yes') ? 'primary' : 'secondary'}
+                      onPress={() => void rate(rating)}
+                      disabled={busy}
+                    />
+                  ))}
                 </View>
               </View>
+              </>
             )}
           </Card>
         ) : null}
@@ -325,12 +405,22 @@ export function InteractiveLayer({
           />
         ) : null}
         {step?.type === 'recall' && !recallShown ? (
-          <Button label="Show the model answer" onPress={() => setRecallShown(true)} shortcut={isWeb ? 'Enter' : undefined} />
+          typed.trim() ? (
+            <>
+              <Button label="Check my answer" icon={<Icon name="sparkle" size={16} color={colors.onPrimary} />} onPress={() => void checkRecall()} loading={grading} disabled={grading} />
+              <Button label="Show the model answer" variant="secondary" onPress={() => setRecallShown(true)} disabled={grading} />
+            </>
+          ) : (
+            <Button label="Show the model answer" onPress={() => setRecallShown(true)} shortcut={isWeb ? 'Enter' : undefined} />
+          )
         ) : null}
       </View>
     </View>
   );
 }
+
+const RATE_LABEL = { yes: 'All of it', partial: 'Partly', no: 'Not really' } as const;
+const VERDICT_LABEL = { yes: 'Well recalled', partial: 'Partly there', no: 'Not yet' } as const;
 
 /** A teaching card (the current step, or an earlier one when looking back). */
 function LearnCard({ step, styles }: { step: Extract<InteractiveStep, { type: 'learn' }>; styles: ReturnType<typeof createStyles> }) {
@@ -384,6 +474,14 @@ function createStyles(colors: ThemeColors) {
     modelPoint: { fontSize: 15, lineHeight: 22, color: colors.text },
     ratePrompt: { fontSize: 14, fontWeight: '700', color: colors.text, marginTop: 8 },
     rateRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    recallInput: { minHeight: 110, borderWidth: 1, borderColor: colors.borderStrong, borderRadius: 12, backgroundColor: colors.surfaceSunken, padding: 12, color: colors.text, fontSize: 15.5, lineHeight: 22, textAlignVertical: 'top', marginBottom: 8 },
+    yourAnswer: { borderWidth: 1, borderColor: colors.border, borderRadius: 14, padding: 14, gap: 6, marginBottom: 10 },
+    aiMark: { borderWidth: 1, borderColor: colors.primaryBorder, backgroundColor: colors.primarySubtle, borderRadius: 14, padding: 14, gap: 6, marginBottom: 10 },
+    aiMarkGood: { borderColor: colors.successBorder, backgroundColor: colors.successSubtle },
+    aiMarkLow: { borderColor: colors.warningBorder, backgroundColor: colors.warningSubtle },
+    aiMarkHead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    aiVerdict: { fontSize: 16, fontWeight: '700', color: colors.text },
+    aiSub: { fontSize: 13.5, fontWeight: '600', color: colors.textSecondary, marginTop: 4 },
     actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10 },
     summary: { gap: 10 },
     summaryTitle: { fontSize: 21, fontWeight: '800', color: colors.text },
