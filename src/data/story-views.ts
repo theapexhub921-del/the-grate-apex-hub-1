@@ -1,7 +1,10 @@
-// Which stories I have watched (on this device), like Instagram and WhatsApp
-// statuses: a watched person's ring turns grey and moves behind the unwatched.
+// Which stories I have watched, like Instagram and WhatsApp statuses: a watched
+// person's ring turns grey and moves behind the unwatched. Kept on the device and
+// on the account (data/account-sync.ts), so every device knows.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
+
+import { saveSynced, syncedValue, unionIds } from '@/data/account-sync';
 
 const KEY = 'grateapex_seen_stories';
 let seen: ReadonlySet<string> = new Set();
@@ -18,6 +21,15 @@ async function load() {
   } catch {
     // nothing saved yet
   }
+  // Stories watched on my other devices.
+  const remote = await syncedValue<string[]>('seenStories').catch(() => undefined);
+  const merged = unionIds([...seen], remote, 400);
+  if (merged.length !== seen.size) {
+    seen = new Set(merged);
+    listeners.forEach((listener) => listener());
+    void AsyncStorage.setItem(KEY, JSON.stringify(merged)).catch(() => {});
+  }
+  if (merged.length !== (remote?.length ?? 0)) saveSynced('seenStories', merged);
 }
 
 export function markStorySeen(id: string) {
@@ -27,6 +39,7 @@ export function markStorySeen(id: string) {
   seen = new Set(next);
   listeners.forEach((listener) => listener());
   void AsyncStorage.setItem(KEY, JSON.stringify(next)).catch(() => {});
+  saveSynced('seenStories', next);
 }
 
 export function useSeenStories(): ReadonlySet<string> {

@@ -139,6 +139,8 @@ Social (real friends) is in `src/data/social.ts`, backed by Firestore:
 * Until the 2026-10-18 rules are published, answering falls back to the old public way, so nothing breaks.
 * Past-paper questions (`legacy:<course>:<id>`) are only known once their paper is loaded: `useStumpQuestion` / `StumpById` load it first, so friends who never opened that paper can still answer.
 
+**Same on every device** (owner, 2026-10-19): `src/data/account-sync.ts` keeps small per-account records on the private `progress/{uid}` document as `synced.<name>` (read once per sign-in, written a few seconds after a change, each name replaced whole; no rules change): `seenStories`, `viewedPosts`, `seenAlerts` (device alerts already shown), `lessonSessions` (lessons in progress, with clear marks so a finished one does not come back), `flashcards` (per card, the copy with more reviews) and `prePost`. Notification read marks were already synced (`progress/{uid}.notificationsRead`). XP, lessons, answers, quizzes, planner and quiz drafts sync on their own. After a review today, the "reinforcement is ready" reminder is gone for the day (`reviewedToday` in `buildNotifications`); the daily review push already skips anyone who studied that day.
+
 **Groups** (`src/data/group-chat.ts`) hold up to `GROUP_MAX_MEMBERS` = 20 people (owner 2026-10-18; the rules allow 20).
 
 **Push addresses** are private: `pushDevices/{uid}.webPush` (owner-only rule). `api/push.mjs` and `api/reminders.mjs` read them with the service account (`api/_admin.mjs`, Vercel setting `FIREBASE_SERVICE_ACCOUNT`) and merge the older public `users/{uid}.webPush` list (`mergeDevices`). The app removes the public copy only after `GET /api/push` says `privateDevices: true`.

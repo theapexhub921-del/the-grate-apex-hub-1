@@ -6,6 +6,7 @@ import {
   subscribeToLearningAuthChanges,
   writeLearningCache,
 } from '@/data/learning-sync';
+import { saveSynced, syncedValue } from '@/data/account-sync';
 
 // Resume state for lessons in progress, so a learner who leaves halfway
 // never loses their place: which layer they are in, the position in the
@@ -37,6 +38,10 @@ const STORAGE_KEY = 'grateapex_lesson_sessions';
 const EMPTY: Record<string, LessonSession> = {};
 
 let sessions: Record<string, LessonSession> = {};
+// When a lesson's session was cleared (finished or started again), so another
+// device's older copy of it does not come back (data/account-sync.ts).
+let cleared: Record<string, number> = {};
+type Synced = { sessions?: Record<string, LessonSession>; cleared?: Record<string, number> };
 let loadPromise: Promise<void> | null = null;
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 const listeners = new Set<() => void>();
@@ -60,6 +65,26 @@ async function load() {
   } catch (error) {
     console.log('Could not load lesson sessions:', error);
   }
+  // Lessons in progress on my other devices: for each lesson the most recent session,
+  // unless it was cleared later.
+  const remote = await syncedValue<Synced>('lessonSessions').catch(() => undefined);
+  if (!remote) {
+    if (Object.keys(sessions).length) persistSoon();
+    return;
+  }
+  const allCleared = { ...(remote.cleared ?? {}) };
+  for (const [id, at] of Object.entries(cleared)) allCleared[id] = Math.max(allCleared[id] ?? 0, at);
+  const merged: Record<string, LessonSession> = {};
+  for (const id of new Set([...Object.keys(sessions), ...Object.keys(remote.sessions ?? {})])) {
+    const mine = sessions[id];
+    const theirs = remote.sessions?.[id];
+    const latest = !mine ? theirs : !theirs ? mine : (theirs.updatedAt ?? 0) > (mine.updatedAt ?? 0) ? theirs : mine;
+    if (latest && (latest.updatedAt ?? 0) > (allCleared[id] ?? 0)) merged[id] = latest;
+  }
+  sessions = merged;
+  cleared = allCleared;
+  notify();
+  persistSoon();
 }
 
 function persistSoon() {
@@ -69,6 +94,9 @@ function persistSoon() {
     void writeLearningCache(STORAGE_KEY, JSON.stringify(sessions)).catch((error) =>
       console.log('Could not save lesson sessions:', error)
     );
+    // The most recent 200 clear marks are plenty.
+    cleared = Object.fromEntries(Object.entries(cleared).sort((a, b) => a[1] - b[1]).slice(-200));
+    saveSynced('lessonSessions', { sessions, cleared });
   }, 300);
 }
 
@@ -104,6 +132,7 @@ export function clearLessonSession(lessonId: string) {
   const next = { ...sessions };
   delete next[lessonId];
   sessions = next;
+  cleared = { ...cleared, [lessonId]: Date.now() };
   notify();
   persistSoon();
 }
