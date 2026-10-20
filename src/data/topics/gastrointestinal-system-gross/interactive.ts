@@ -10,7 +10,7 @@ export const interactive: Record<string, Steps> = {
     learn('Mapping the abdomen', [
       'Four quadrants come from the median and transumbilical (L3/L4) planes. Nine regions come from the two midclavicular planes and the subcostal (L3) and transtubercular (L5) planes.',
     ], { sourceRefs: aw([4, 5]) }),
-    ask(mcq('i1-01', 'surface-points', 'McBurney’s point lies:', 'One-third of the way from the right ASIS to the umbilicus', ['Below the right costal margin at the midclavicular line', 'At the midpoint of the right inguinal ligament', 'Two-thirds of the way from the umbilicus to the pubis'], { explanation: 'Slide 7: it marks the base of the appendix.' })),
+    ask(mcq('i1-01', 'surface-points', 'McBurney’s point lies:', 'One-third of the way from the right ASIS to the umbilicus', ['Below the right costal margin at the midclavicular line', 'At the midpoint of the right inguinal ligament, over the femoral artery', 'Two-thirds of the way from the umbilicus to the pubis'], { explanation: 'Slide 7: it marks the base of the appendix.' })),
     ask(order('i1-02', 'wall-layers-fascia', 'Order the layers of the anterolateral wall below the umbilicus from outside in:', ['Skin', 'Camper’s fascia', 'Scarpa’s fascia', 'Muscles and aponeuroses', 'Transversalis fascia', 'Extraperitoneal fat', 'Parietal peritoneum'], { explanation: 'Slides 10, 12.' })),
     learn('Where does leaked urine go?', [
       'Scarpa’s fascia is fused to the fascia lata 2.5 cm below the inguinal ligament and continues as Colles’ and dartos fascia, so fluid deep to it spreads into the scrotum, penis and lower wall — not the thigh.',
@@ -115,7 +115,7 @@ export const interactive: Record<string, Steps> = {
   ],
 
   [L(6)]: [
-    ask(mcq('i6-01', 'duodenum', 'The major duodenal papilla is found in which part of the duodenum?', 'Second (descending)', ['First (superior)', 'Third (horizontal)', 'Fourth (ascending)'], { explanation: 'Slide 20.' })),
+    ask(mcq('i6-01', 'duodenum', 'The major duodenal papilla is found in which part of the duodenum?', 'Second (descending)', ['First (superior)', 'Third (horizontal) part', 'Fourth (ascending)'], { explanation: 'Slide 20.' })),
     learn('Ulcers front and back', [
       'Posterior duodenal ulcers erode the gastroduodenal artery (haematemesis, melaena); anterior ones perforate into the peritoneal cavity (peritonitis).',
     ], { sourceRefs: gi([25]) }),
@@ -139,7 +139,7 @@ export const interactive: Record<string, Steps> = {
     learn('Spot the colon', [
       'Teniae coli, haustra and epiploic appendices mark the colon. All three are absent from the rectum.',
     ], { sourceRefs: gi([39, 48]) }),
-    ask(mcq('i7-01', 'colon-features', 'How can the base of the appendix be found at operation?', 'Follow any of the teniae coli on the caecum', ['Follow the ileocaecal valve upward', 'Follow the right colic artery down', 'Feel for the root of the sigmoid mesocolon'], { explanation: 'Slides 39, 41.', skill: 'application' })),
+    ask(mcq('i7-01', 'colon-features', 'How can the base of the appendix be found at operation?', 'Follow any of the teniae coli on the caecum', ['Follow the ileocaecal valve upward', 'Follow the right colic artery down to the caecum', 'Feel for the root of the sigmoid mesocolon'], { explanation: 'Slides 39, 41.', skill: 'application' })),
     ask(match('i7-02', 'colon-features', 'Match each part of the colon to its approximate length:', [
       ['Ascending colon', '15 cm'],
       ['Transverse colon', '45 cm'],

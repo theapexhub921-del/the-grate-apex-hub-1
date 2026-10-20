@@ -106,7 +106,7 @@ export const interactive: Record<string, Steps> = {
     learn('Tooth or sinus?', [
       'Only thin bone separates the maxillary sinus from the roots of the upper teeth, so maxillary sinusitis can feel like toothache and dental infection can spread to the sinus.',
     ], { sourceRefs: hn([235, 236]) }),
-    ask(mcq('i5-03', 'paranasal-sinuses', 'Which gland lies directly above the sphenoidal sinus?', 'Pituitary gland', ['Pineal gland', 'Lacrimal gland', 'Parotid gland'], { explanation: 'Slide 237.' })),
+    ask(mcq('i5-03', 'paranasal-sinuses', 'Which gland lies directly above the sphenoidal sinus?', 'Pituitary gland', ['Pineal gland (epiphysis)', 'Lacrimal gland', 'Parotid gland'], { explanation: 'Slide 237.' })),
     recall('r5-01', 'nasal-walls', 'Name the bones forming the nasal septum.', [
       'Perpendicular plate of the ethmoid.',
       'Vomer.',
@@ -137,7 +137,7 @@ export const interactive: Record<string, Steps> = {
   ],
 
   [L(7)]: [
-    ask(mcq('i7-01', 'tongue', 'Which tongue muscle is NOT supplied by the hypoglossal nerve?', 'Palatoglossus', ['Genioglossus', 'Hyoglossus', 'Styloglossus'], { explanation: 'Slide 370: palatoglossus is supplied by the vagus.' })),
+    ask(mcq('i7-01', 'tongue', 'Which tongue muscle is NOT supplied by the hypoglossal nerve?', 'Palatoglossus', ['Genioglossus', 'Hyoglossus (from the hyoid)', 'Styloglossus'], { explanation: 'Slide 370: palatoglossus is supplied by the vagus.' })),
     learn('Why the submandibular gland gets stones', [
       'Its duct is longer and wider, saliva flows upward against gravity, and the secretion is more mucous and alkaline — so 80% of salivary stones form here.',
     ], { sourceRefs: hn([380, 381]) }),
