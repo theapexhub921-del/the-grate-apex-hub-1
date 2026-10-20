@@ -1,0 +1,4438 @@
+{
+ "pathways": [
+  {
+   "id": "gly1",
+   "name": "Glycolysis: Investment",
+   "subj": "Biochemistry",
+   "blurb": "From glucose to glyceraldehyde-3-phosphate. The cell spends 2 ATP to prime the sugar.",
+   "color": "#ff9a3c",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Glucose",
+     "i": "Six-carbon sugar that enters cells through GLUT transporters. Glycolysis begins by trapping it inside the cell.",
+     "h": "The six-carbon fuel sugar that starts the pathway."
+    },
+    {
+     "t": "e",
+     "n": "Hexokinase",
+     "i": "Transfers a phosphate from ATP to glucose (glucokinase does this in liver and pancreatic beta cells). Inhibited by its own product.",
+     "h": "Uses ATP to phosphorylate glucose. The liver version is called glucokinase."
+    },
+    {
+     "t": "m",
+     "n": "Glucose-6-phosphate",
+     "i": "Phosphorylated glucose that cannot leave the cell. It is also a branch point to glycogen synthesis and the pentose phosphate pathway.",
+     "h": "First phosphorylated intermediate, and the branch point to the pentose phosphate pathway."
+    },
+    {
+     "t": "e",
+     "n": "Phosphoglucose isomerase",
+     "i": "Converts an aldose (glucose-6-phosphate) to a ketose (fructose-6-phosphate) in a freely reversible reaction.",
+     "h": "An isomerase that turns an aldose sugar phosphate into a ketose."
+    },
+    {
+     "t": "m",
+     "n": "Fructose-6-phosphate",
+     "i": "Ketose sugar phosphate that receives a second phosphate in the committed step.",
+     "h": "Ketose sugar phosphate made by isomerisation, about to be phosphorylated again."
+    },
+    {
+     "t": "e",
+     "n": "Phosphofructokinase-1 (PFK-1)",
+     "i": "The rate-limiting, committed step. Activated by AMP and fructose-2,6-bisphosphate; inhibited by ATP and citrate.",
+     "h": "Rate-limiting enzyme. ATP and citrate inhibit it, AMP activates it."
+    },
+    {
+     "t": "m",
+     "n": "Fructose-1,6-bisphosphate",
+     "i": "Six-carbon sugar carrying two phosphates, ready to be split into two three-carbon pieces. It also feeds forward to activate pyruvate kinase.",
+     "h": "Six-carbon sugar carrying two phosphates, about to be cleaved."
+    },
+    {
+     "t": "e",
+     "n": "Aldolase",
+     "i": "Cleaves the six-carbon sugar into DHAP and glyceraldehyde-3-phosphate. Aldolase B in the liver also handles fructose metabolism.",
+     "h": "Cleaves a six-carbon sugar into two trioses."
+    },
+    {
+     "t": "m",
+     "n": "Glyceraldehyde-3-phosphate",
+     "i": "Three-carbon triose that carries on down glycolysis. DHAP is converted into it by triose phosphate isomerase, so each glucose gives two.",
+     "h": "The triose that proceeds onward. DHAP is converted into it by triose phosphate isomerase."
+    }
+   ]
+  },
+  {
+   "id": "gly2",
+   "name": "Glycolysis: Payoff",
+   "subj": "Biochemistry",
+   "blurb": "From glyceraldehyde-3-phosphate to pyruvate. NADH and 4 ATP are made per glucose.",
+   "color": "#f5d547",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Glyceraldehyde-3-phosphate",
+     "i": "Start of the payoff phase. Two molecules arrive per glucose.",
+     "h": "Three-carbon triose. Two of them arrive per glucose."
+    },
+    {
+     "t": "e",
+     "n": "GAPDH",
+     "i": "Glyceraldehyde-3-phosphate dehydrogenase. Oxidises the triose and adds inorganic phosphate, making NADH and a high-energy acyl phosphate.",
+     "h": "Makes the first NADH of glycolysis. It adds inorganic phosphate, not ATP."
+    },
+    {
+     "t": "m",
+     "n": "1,3-Bisphosphoglycerate",
+     "i": "High-energy acyl phosphate that can donate a phosphate straight to ADP.",
+     "h": "High-energy intermediate that hands its phosphate to ADP."
+    },
+    {
+     "t": "e",
+     "n": "Phosphoglycerate kinase",
+     "i": "First substrate-level phosphorylation: makes ATP from ADP. Arsenate poisoning bypasses this step.",
+     "h": "Makes the first ATP of the payoff phase by substrate-level phosphorylation."
+    },
+    {
+     "t": "m",
+     "n": "3-Phosphoglycerate",
+     "i": "Three-carbon acid with the phosphate on carbon 3. Also a precursor for serine synthesis.",
+     "h": "Three-carbon acid with one phosphate on carbon 3. Precursor of serine."
+    },
+    {
+     "t": "e",
+     "n": "Phosphoglycerate mutase",
+     "i": "Shifts the phosphate from carbon 3 to carbon 2.",
+     "h": "Moves a phosphate from carbon 3 to carbon 2."
+    },
+    {
+     "t": "m",
+     "n": "2-Phosphoglycerate",
+     "i": "Phosphate now sits on carbon 2, setting up the loss of water.",
+     "h": "Phosphate sits on carbon 2. It is about to lose water."
+    },
+    {
+     "t": "e",
+     "n": "Enolase",
+     "i": "Removes water to create PEP. Inhibited by fluoride, which is why blood glucose tubes contain sodium fluoride.",
+     "h": "Dehydrates 2-phosphoglycerate. Fluoride inhibits it."
+    },
+    {
+     "t": "m",
+     "n": "Phosphoenolpyruvate (PEP)",
+     "i": "Carries the highest-energy phosphate in glycolysis. Also an intermediate in gluconeogenesis.",
+     "h": "Holds the highest-energy phosphate in glycolysis."
+    },
+    {
+     "t": "e",
+     "n": "Pyruvate kinase",
+     "i": "Second substrate-level phosphorylation and an irreversible step. Activated by fructose-1,6-bisphosphate. Deficiency causes haemolytic anaemia.",
+     "h": "Irreversible last enzyme. Its deficiency causes haemolytic anaemia."
+    },
+    {
+     "t": "m",
+     "n": "Pyruvate",
+     "i": "End product of glycolysis. It becomes lactate (anaerobic), acetyl-CoA (aerobic), oxaloacetate or alanine.",
+     "h": "Three-carbon end product that can become lactate or acetyl-CoA."
+    }
+   ]
+  },
+  {
+   "id": "tca",
+   "name": "Citric Acid Cycle",
+   "subj": "Biochemistry",
+   "blurb": "Eight enzymes oxidise acetyl-CoA in the mitochondrial matrix. Read from oxaloacetate round to malate.",
+   "color": "#2fc7b8",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Oxaloacetate",
+     "i": "Four-carbon acceptor that combines with acetyl-CoA. It is regenerated at the end of every turn.",
+     "h": "Four-carbon acid that picks up acetyl-CoA. Regenerated at the end of the cycle."
+    },
+    {
+     "t": "e",
+     "n": "Citrate synthase",
+     "i": "Condenses acetyl-CoA with oxaloacetate to make citrate. Inhibited by ATP, NADH and succinyl-CoA.",
+     "h": "The condensing enzyme that joins acetyl-CoA to a four-carbon acid."
+    },
+    {
+     "t": "m",
+     "n": "Citrate",
+     "i": "First six-carbon product, and the molecule the cycle is named after. Also exported to the cytosol for fatty acid synthesis.",
+     "h": "First six-carbon product. The cycle is named after it."
+    },
+    {
+     "t": "e",
+     "n": "Aconitase",
+     "i": "Iron-sulfur enzyme that isomerises citrate to isocitrate through cis-aconitate. Blocked by fluorocitrate.",
+     "h": "Iron-sulfur enzyme that isomerises citrate. Fluoroacetate poisoning blocks it."
+    },
+    {
+     "t": "m",
+     "n": "Isocitrate",
+     "i": "Isomer of citrate with the hydroxyl moved into position for oxidation.",
+     "h": "Isomer of the first six-carbon product."
+    },
+    {
+     "t": "e",
+     "n": "Isocitrate dehydrogenase",
+     "i": "Rate-limiting step: releases the first CO2 and makes the first NADH. Activated by ADP and Ca2+, inhibited by ATP and NADH.",
+     "h": "Rate-limiting enzyme. Releases the first CO2 and makes NADH."
+    },
+    {
+     "t": "m",
+     "n": "Alpha-ketoglutarate",
+     "i": "Five-carbon keto acid. Accepts an amino group to become glutamate, linking the cycle to amino acid metabolism.",
+     "h": "Five-carbon keto acid that becomes glutamate when it accepts an amino group."
+    },
+    {
+     "t": "e",
+     "n": "Alpha-KG dehydrogenase",
+     "i": "Multi-enzyme complex that needs the same five cofactors as pyruvate dehydrogenase. Releases the second CO2 and makes NADH.",
+     "h": "A complex using the same five cofactors as pyruvate dehydrogenase. Second CO2 leaves here."
+    },
+    {
+     "t": "m",
+     "n": "Succinyl-CoA",
+     "i": "High-energy thioester. Also the starting material for heme synthesis.",
+     "h": "High-energy thioester that also feeds heme synthesis."
+    },
+    {
+     "t": "e",
+     "n": "Succinyl-CoA synthetase",
+     "i": "The cycle's substrate-level phosphorylation: makes GTP (or ATP) directly.",
+     "h": "Makes GTP by substrate-level phosphorylation."
+    },
+    {
+     "t": "m",
+     "n": "Succinate",
+     "i": "Four-carbon dicarboxylate released after the GTP step.",
+     "h": "Four-carbon acid released after the GTP-forming step."
+    },
+    {
+     "t": "e",
+     "n": "Succinate dehydrogenase",
+     "i": "Also Complex II of the electron transport chain, and the only cycle enzyme embedded in the inner mitochondrial membrane. Makes FADH2.",
+     "h": "Membrane-bound enzyme that doubles as Complex II. Makes FADH2."
+    },
+    {
+     "t": "m",
+     "n": "Fumarate",
+     "i": "Four-carbon acid with a trans double bond. Also released as a by-product of the urea cycle.",
+     "h": "Four-carbon acid with a double bond. Also a by-product of the urea cycle."
+    },
+    {
+     "t": "e",
+     "n": "Fumarase",
+     "i": "Adds water across the double bond of fumarate to give malate.",
+     "h": "Hydrates the double bond."
+    },
+    {
+     "t": "m",
+     "n": "Malate",
+     "i": "Hydroxyl-bearing four-carbon acid. Malate dehydrogenase oxidises it to oxaloacetate, makes the third NADH and closes the cycle.",
+     "h": "The last intermediate. Oxidising it regenerates oxaloacetate."
+    }
+   ]
+  },
+  {
+   "id": "urea",
+   "name": "Urea Cycle",
+   "subj": "Biochemistry",
+   "blurb": "How the liver turns toxic ammonia into urea. Starts in the mitochondria and finishes in the cytosol.",
+   "color": "#a78bfa",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Ammonia + CO2",
+     "i": "Toxic ammonia from amino acid breakdown joins bicarbonate inside liver mitochondria.",
+     "h": "Toxic waste from amino acid breakdown, joined with bicarbonate in liver mitochondria."
+    },
+    {
+     "t": "e",
+     "n": "Carbamoyl phosphate synthetase I",
+     "i": "Mitochondrial rate-limiting enzyme. Uses 2 ATP and needs N-acetylglutamate as an activator.",
+     "h": "Rate-limiting. Activated by N-acetylglutamate."
+    },
+    {
+     "t": "m",
+     "n": "Carbamoyl phosphate",
+     "i": "High-energy molecule that donates its carbamoyl group to ornithine.",
+     "h": "High-energy donor of a carbamoyl group."
+    },
+    {
+     "t": "e",
+     "n": "Ornithine transcarbamylase",
+     "i": "Combines carbamoyl phosphate with ornithine. X-linked deficiency causes hyperammonaemia with raised urinary orotic acid.",
+     "h": "X-linked deficiency raises orotic acid in the urine."
+    },
+    {
+     "t": "m",
+     "n": "Citrulline",
+     "i": "Made inside the mitochondria and then exported to the cytosol.",
+     "h": "Product of the mitochondrial step, exported to the cytosol."
+    },
+    {
+     "t": "e",
+     "n": "Argininosuccinate synthetase",
+     "i": "Cytosolic enzyme that links citrulline to aspartate using ATP. Aspartate provides the second nitrogen of urea.",
+     "h": "Cytosolic. Uses aspartate and ATP to supply the second nitrogen."
+    },
+    {
+     "t": "m",
+     "n": "Argininosuccinate",
+     "i": "Intermediate formed from citrulline and aspartate.",
+     "h": "Intermediate built from citrulline plus aspartate."
+    },
+    {
+     "t": "e",
+     "n": "Argininosuccinate lyase",
+     "i": "Cleaves argininosuccinate and releases fumarate, which links the urea cycle to the citric acid cycle.",
+     "h": "Releases fumarate, linking this cycle to the citric acid cycle."
+    },
+    {
+     "t": "m",
+     "n": "Arginine",
+     "i": "Substrate for the last step. Also the precursor of nitric oxide.",
+     "h": "Substrate for the final step. Also makes nitric oxide."
+    },
+    {
+     "t": "e",
+     "n": "Arginase",
+     "i": "Hydrolyses arginine to urea and ornithine. Ornithine returns to the mitochondria. Found mainly in the liver.",
+     "h": "Splits arginine into urea and ornithine."
+    },
+    {
+     "t": "m",
+     "n": "Urea",
+     "i": "Water-soluble end product that travels in blood to the kidneys and leaves in urine.",
+     "h": "Water-soluble nitrogen waste excreted by the kidneys."
+    }
+   ]
+  },
+  {
+   "id": "bile",
+   "name": "Heme to Bilirubin",
+   "subj": "Biochemistry",
+   "blurb": "What happens to haemoglobin when old red cells die, from heme to the pigment in stool.",
+   "color": "#9acd32",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Heme",
+     "i": "Released from haemoglobin when macrophages in the spleen and liver break down red cells at about 120 days.",
+     "h": "Released from haemoglobin when old red cells are destroyed."
+    },
+    {
+     "t": "e",
+     "n": "Heme oxygenase",
+     "i": "Opens the heme ring using O2 and NADPH, releasing iron and carbon monoxide. The only endogenous source of CO.",
+     "h": "Opens the heme ring and releases iron and carbon monoxide."
+    },
+    {
+     "t": "m",
+     "n": "Biliverdin",
+     "i": "Green pigment. It is the colour you see in a healing bruise.",
+     "h": "Green pigment seen in a healing bruise."
+    },
+    {
+     "t": "e",
+     "n": "Biliverdin reductase",
+     "i": "Uses NADPH to reduce biliverdin to bilirubin.",
+     "h": "Reduces the green pigment to a yellow one using NADPH."
+    },
+    {
+     "t": "m",
+     "n": "Unconjugated bilirubin",
+     "i": "Lipid-soluble and toxic, so it travels bound to albumin. It is not excreted in urine. Also called indirect bilirubin.",
+     "h": "Lipid-soluble form carried on albumin. Not found in urine."
+    },
+    {
+     "t": "e",
+     "n": "UDP-glucuronosyltransferase",
+     "i": "UGT1A1 in the hepatocyte smooth ER adds glucuronic acid. Reduced in Gilbert syndrome, absent in severe Crigler-Najjar.",
+     "h": "Liver enzyme deficient in Gilbert and Crigler-Najjar syndromes."
+    },
+    {
+     "t": "m",
+     "n": "Conjugated bilirubin",
+     "i": "Water-soluble (direct) bilirubin that is secreted into bile. Dubin-Johnson syndrome affects its secretion.",
+     "h": "Water-soluble form that is secreted into bile."
+    },
+    {
+     "t": "e",
+     "n": "Gut bacterial enzymes",
+     "i": "Deconjugate and reduce bilirubin in the terminal ileum and colon.",
+     "h": "Enzymes from intestinal flora that deconjugate and reduce bilirubin."
+    },
+    {
+     "t": "m",
+     "n": "Urobilinogen",
+     "i": "Colourless. Most is lost in faeces, some is reabsorbed into the enterohepatic circulation and a little reaches urine.",
+     "h": "Colourless product. A little is reabsorbed and reaches the urine."
+    },
+    {
+     "t": "m",
+     "n": "Stercobilin",
+     "i": "Brown pigment that colours stool. Stools turn pale when bile flow is obstructed.",
+     "h": "Brown pigment of stool. Absent in obstructive jaundice."
+    }
+   ]
+  },
+  {
+   "id": "coag",
+   "name": "Coagulation Cascade",
+   "subj": "Physiology",
+   "blurb": "Intrinsic pathway into the common pathway, from damaged vessel wall to a stable fibrin clot.",
+   "color": "#ff5d6c",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Exposed collagen",
+     "i": "Vessel injury exposes subendothelial collagen, which activates factor XII and platelets.",
+     "h": "Damage to the vessel wall exposes this structural protein."
+    },
+    {
+     "t": "e",
+     "n": "Factor XIIa",
+     "i": "Activated on negatively charged surfaces. Starts the intrinsic pathway.",
+     "h": "The contact factor that starts the intrinsic pathway."
+    },
+    {
+     "t": "e",
+     "n": "Factor XIa",
+     "i": "Activated by XIIa. Its deficiency (haemophilia C) causes mild bleeding.",
+     "h": "Activated by XIIa and goes on to activate IX."
+    },
+    {
+     "t": "e",
+     "n": "Factor IXa",
+     "i": "Works with factor VIIIa, calcium and phospholipid to activate X. Deficiency causes haemophilia B.",
+     "h": "Deficiency causes haemophilia B (Christmas disease)."
+    },
+    {
+     "t": "e",
+     "n": "Factor Xa",
+     "i": "Start of the common pathway. With factor Va it forms prothrombinase. Blocked directly by rivaroxaban and apixaban.",
+     "h": "Start of the common pathway. Blocked by rivaroxaban and apixaban."
+    },
+    {
+     "t": "m",
+     "n": "Prothrombin",
+     "i": "Vitamin K-dependent precursor made in the liver (factors II, VII, IX and X all need vitamin K).",
+     "h": "Vitamin K-dependent precursor made in the liver."
+    },
+    {
+     "t": "e",
+     "n": "Thrombin",
+     "i": "Master enzyme: cleaves fibrinogen and activates V, VIII, XI, XIII and platelets. Inhibited by antithrombin and dabigatran.",
+     "h": "Cleaves fibrinogen and also activates factors V, VIII, XI and XIII."
+    },
+    {
+     "t": "m",
+     "n": "Fibrinogen",
+     "i": "Soluble plasma protein (factor I) made in the liver.",
+     "h": "Soluble plasma protein made by the liver."
+    },
+    {
+     "t": "m",
+     "n": "Fibrin monomers",
+     "i": "Formed when thrombin removes fibrinopeptides from fibrinogen. They self-assemble into a loose mesh.",
+     "h": "Insoluble units that self-assemble into a loose mesh."
+    },
+    {
+     "t": "e",
+     "n": "Factor XIIIa",
+     "i": "A transglutaminase activated by thrombin. Forms covalent cross-links between fibrin strands.",
+     "h": "Transglutaminase that cross-links fibrin strands."
+    },
+    {
+     "t": "s",
+     "n": "Stable fibrin clot",
+     "i": "Cross-linked mesh that traps platelets and red cells. Later broken down by plasmin, releasing D-dimers.",
+     "h": "Cross-linked mesh later broken down by plasmin."
+    }
+   ]
+  },
+  {
+   "id": "cond",
+   "name": "Cardiac Conduction",
+   "subj": "Physiology",
+   "blurb": "The path of the electrical impulse from the heart's pacemaker to the ventricular muscle.",
+   "color": "#f472b6",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "SA node",
+     "i": "Sinoatrial node in the upper right atrium near the SVC opening. The natural pacemaker, firing at about 60 to 100 bpm.",
+     "h": "The natural pacemaker, in the upper right atrium near the SVC."
+    },
+    {
+     "t": "s",
+     "n": "Atrial myocardium",
+     "i": "Impulse spreads across both atria, causing atrial contraction (P wave).",
+     "h": "Spread of the impulse across both atria produces the P wave."
+    },
+    {
+     "t": "s",
+     "n": "AV node",
+     "i": "Lies in the septum near the coronary sinus. Conducts slowly, which creates the PR interval and lets the ventricles fill.",
+     "h": "Conducts slowly, giving the delay that lets the ventricles fill."
+    },
+    {
+     "t": "s",
+     "n": "Bundle of His",
+     "i": "The only electrical bridge across the fibrous skeleton between atria and ventricles.",
+     "h": "The only electrical bridge between atria and ventricles."
+    },
+    {
+     "t": "s",
+     "n": "Bundle branches",
+     "i": "Right and left branches run down either side of the interventricular septum. The left divides into anterior and posterior fascicles.",
+     "h": "Right and left branches running down the septum."
+    },
+    {
+     "t": "s",
+     "n": "Purkinje fibres",
+     "i": "Large, fast-conducting fibres that spread the impulse through the subendocardium of both ventricles.",
+     "h": "Fast fibres that spread the impulse through the ventricles."
+    },
+    {
+     "t": "s",
+     "n": "Ventricular myocardium",
+     "i": "Depolarises from endocardium to epicardium, producing the QRS complex and the ventricular contraction.",
+     "h": "Its depolarisation produces the QRS complex."
+    }
+   ]
+  },
+  {
+   "id": "raas",
+   "name": "Renin-Angiotensin-Aldosterone",
+   "subj": "Physiology",
+   "blurb": "How the kidney, lungs and adrenal cortex work together to raise a falling blood pressure.",
+   "color": "#60a5fa",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Low renal perfusion",
+     "i": "Low blood pressure, low sodium at the macula densa or sympathetic activity stimulates juxtaglomerular cells.",
+     "h": "Falling pressure in the kidney starts the cascade."
+    },
+    {
+     "t": "m",
+     "n": "Angiotensinogen",
+     "i": "Inactive plasma protein made by the liver. Always available as renin's substrate.",
+     "h": "Inactive plasma protein from the liver."
+    },
+    {
+     "t": "e",
+     "n": "Renin",
+     "i": "Protease released by juxtaglomerular cells. The rate-limiting step. Aliskiren inhibits it.",
+     "h": "Released by juxtaglomerular cells. Rate-limiting step."
+    },
+    {
+     "t": "m",
+     "n": "Angiotensin I",
+     "i": "Inactive decapeptide cleaved from angiotensinogen.",
+     "h": "Inactive ten-amino-acid peptide."
+    },
+    {
+     "t": "e",
+     "n": "ACE",
+     "i": "Angiotensin-converting enzyme, mostly on lung endothelium. Also breaks down bradykinin, which explains the ACE-inhibitor cough.",
+     "h": "Found on lung endothelium. Its inhibitors cause a dry cough."
+    },
+    {
+     "t": "m",
+     "n": "Angiotensin II",
+     "i": "Potent vasoconstrictor (AT1 receptor). Stimulates aldosterone, ADH and thirst, and constricts the efferent arteriole. Blocked by ARBs.",
+     "h": "Vasoconstrictor blocked by ARBs (sartans)."
+    },
+    {
+     "t": "m",
+     "n": "Aldosterone",
+     "i": "Steroid from the zona glomerulosa of the adrenal cortex. Increases Na+ reabsorption and K+ secretion in principal cells.",
+     "h": "Steroid hormone from the zona glomerulosa."
+    },
+    {
+     "t": "s",
+     "n": "Na+ and water retention",
+     "i": "Raises blood volume and pressure, which switches renin release off again by negative feedback.",
+     "h": "Raises blood volume and so switches renin off."
+    }
+   ]
+  },
+  {
+   "id": "flow",
+   "name": "Blood Flow Through the Heart",
+   "subj": "Anatomy",
+   "blurb": "Follow a drop of blood from the body, through the lungs and back out to the aorta.",
+   "color": "#34d3ee",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Vena cavae",
+     "i": "Superior and inferior vena cava return deoxygenated blood from the body.",
+     "h": "Large veins returning deoxygenated blood from the body."
+    },
+    {
+     "t": "s",
+     "n": "Right atrium",
+     "i": "Receives blood from the vena cavae and the coronary sinus. Contains the SA node.",
+     "h": "Contains the SA node."
+    },
+    {
+     "t": "s",
+     "n": "Tricuspid valve",
+     "i": "Three-leaflet valve with chordae tendineae and papillary muscles.",
+     "h": "Three leaflets. Sits between right atrium and right ventricle."
+    },
+    {
+     "t": "s",
+     "n": "Right ventricle",
+     "i": "Thin-walled chamber that pumps against the low-pressure pulmonary circuit.",
+     "h": "Pumps against the low-pressure pulmonary circuit."
+    },
+    {
+     "t": "s",
+     "n": "Pulmonary valve",
+     "i": "Semilunar valve at the right ventricular outflow.",
+     "h": "Semilunar valve leaving the right ventricle."
+    },
+    {
+     "t": "s",
+     "n": "Pulmonary arteries",
+     "i": "The only arteries that carry deoxygenated blood.",
+     "h": "The only arteries carrying deoxygenated blood."
+    },
+    {
+     "t": "s",
+     "n": "Lungs",
+     "i": "Gas exchange at the alveolar capillaries: CO2 out, O2 in.",
+     "h": "Site of gas exchange."
+    },
+    {
+     "t": "s",
+     "n": "Pulmonary veins",
+     "i": "Four veins carrying oxygenated blood. The only veins to do so.",
+     "h": "The only veins carrying oxygenated blood."
+    },
+    {
+     "t": "s",
+     "n": "Left atrium",
+     "i": "Receives the pulmonary veins. Its appendage is a common site for clot formation in atrial fibrillation.",
+     "h": "Receives the pulmonary veins."
+    },
+    {
+     "t": "s",
+     "n": "Mitral valve",
+     "i": "Bicuspid valve between left atrium and left ventricle.",
+     "h": "Two-leaflet valve between left atrium and left ventricle."
+    },
+    {
+     "t": "s",
+     "n": "Left ventricle",
+     "i": "Thick-walled chamber generating systemic pressure. Perfused mainly during diastole.",
+     "h": "Thickest-walled chamber, pumping to the whole body."
+    },
+    {
+     "t": "s",
+     "n": "Aortic valve",
+     "i": "Semilunar valve. The coronary arteries arise just above it.",
+     "h": "Semilunar valve. Coronary arteries arise just above it."
+    },
+    {
+     "t": "s",
+     "n": "Aorta",
+     "i": "Largest artery. Its elastic recoil keeps blood moving during diastole.",
+     "h": "Largest artery. Elastic recoil sustains diastolic pressure."
+    }
+   ]
+  },
+  {
+   "id": "gluco",
+   "name": "Gluconeogenesis",
+   "subj": "Biochemistry",
+   "blurb": "Making glucose from pyruvate in fasting. Four enzymes bypass the irreversible steps of glycolysis.",
+   "color": "#fb923c",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Pyruvate",
+     "i": "Made from lactate or alanine. Gluconeogenesis starts in the mitochondria.",
+     "h": "Three-carbon starting point, made from lactate or alanine."
+    },
+    {
+     "t": "e",
+     "n": "Pyruvate carboxylase",
+     "i": "Mitochondrial. Needs biotin and ATP, and is activated by acetyl-CoA.",
+     "h": "Biotin-dependent mitochondrial enzyme activated by acetyl-CoA."
+    },
+    {
+     "t": "m",
+     "n": "Oxaloacetate",
+     "i": "Cannot cross the inner mitochondrial membrane, so it leaves as malate.",
+     "h": "Four-carbon acid that leaves the mitochondria as malate."
+    },
+    {
+     "t": "e",
+     "n": "PEP carboxykinase",
+     "i": "Cytosolic. Uses GTP to convert oxaloacetate to PEP. Induced by glucagon and cortisol.",
+     "h": "Uses GTP to convert oxaloacetate to PEP."
+    },
+    {
+     "t": "m",
+     "n": "Phosphoenolpyruvate",
+     "i": "From here the pathway runs backwards through the reversible glycolytic steps.",
+     "h": "High-energy phosphate compound. The pathway now runs backwards."
+    },
+    {
+     "t": "e",
+     "n": "Reversible glycolytic enzymes",
+     "i": "Enolase, phosphoglycerate mutase, phosphoglycerate kinase, GAPDH and aldolase all work in reverse.",
+     "h": "A group of glycolytic enzymes that work in both directions."
+    },
+    {
+     "t": "m",
+     "n": "Fructose-1,6-bisphosphate",
+     "i": "Substrate of the second bypass enzyme.",
+     "h": "Six-carbon sugar with two phosphates, about to lose one."
+    },
+    {
+     "t": "e",
+     "n": "Fructose-1,6-bisphosphatase",
+     "i": "Rate-limiting step. Inhibited by AMP and fructose-2,6-bisphosphate, activated by citrate.",
+     "h": "Rate-limiting enzyme, the opposite of PFK-1."
+    },
+    {
+     "t": "m",
+     "n": "Fructose-6-phosphate",
+     "i": "Converted back to glucose-6-phosphate by the same isomerase used in glycolysis.",
+     "h": "Ketose sugar phosphate, one step from glucose-6-phosphate."
+    },
+    {
+     "t": "e",
+     "n": "Phosphoglucose isomerase",
+     "i": "Freely reversible, so it serves both glycolysis and gluconeogenesis.",
+     "h": "Freely reversible isomerase shared with glycolysis."
+    },
+    {
+     "t": "m",
+     "n": "Glucose-6-phosphate",
+     "i": "Trapped inside the cell until it is dephosphorylated.",
+     "h": "Phosphorylated glucose awaiting its final bypass enzyme."
+    },
+    {
+     "t": "e",
+     "n": "Glucose-6-phosphatase",
+     "i": "In the ER of liver, kidney and intestine, and absent from muscle. Deficiency is von Gierke disease.",
+     "h": "Absent in muscle. Deficiency causes von Gierke disease (GSD I)."
+    },
+    {
+     "t": "m",
+     "n": "Glucose",
+     "i": "Released into the blood to maintain fasting glucose.",
+     "h": "The final product, released into the blood."
+    }
+   ]
+  },
+  {
+   "id": "glycogenolysis",
+   "name": "Glycogenolysis",
+   "subj": "Biochemistry",
+   "blurb": "Breaking liver glycogen down to free glucose between meals.",
+   "color": "#4ade80",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Glycogen",
+     "i": "Branched glucose polymer stored in liver and muscle. A debranching enzyme handles the alpha-1,6 branch points.",
+     "h": "Branched glucose polymer stored in liver and muscle."
+    },
+    {
+     "t": "e",
+     "n": "Glycogen phosphorylase",
+     "i": "Rate-limiting. Needs pyridoxal phosphate (vitamin B6). Cleaves alpha-1,4 bonds. Activated by glucagon, adrenaline and Ca2+.",
+     "h": "Rate-limiting and needs vitamin B6. Cleaves alpha-1,4 bonds."
+    },
+    {
+     "t": "m",
+     "n": "Glucose-1-phosphate",
+     "i": "Released by phosphorolysis, so no ATP is spent at this step.",
+     "h": "Released from chain ends without spending ATP."
+    },
+    {
+     "t": "e",
+     "n": "Phosphoglucomutase",
+     "i": "Moves the phosphate from carbon 1 to carbon 6.",
+     "h": "Moves a phosphate from carbon 1 to carbon 6."
+    },
+    {
+     "t": "m",
+     "n": "Glucose-6-phosphate",
+     "i": "Branch point between glycolysis, the pentose phosphate pathway and free glucose.",
+     "h": "Phosphate now sits on carbon 6."
+    },
+    {
+     "t": "e",
+     "n": "Glucose-6-phosphatase",
+     "i": "Liver only, so only liver glycogen can raise blood glucose. Muscle glycogen is used locally.",
+     "h": "Liver enzyme that is missing from muscle."
+    },
+    {
+     "t": "m",
+     "n": "Glucose",
+     "i": "Free glucose released into the blood by the liver.",
+     "h": "Free sugar exported by the liver."
+    }
+   ]
+  },
+  {
+   "id": "glycogenesis",
+   "name": "Glycogenesis",
+   "subj": "Biochemistry",
+   "blurb": "Building glycogen from glucose after a meal, driven by insulin.",
+   "color": "#c084fc",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Glucose-6-phosphate",
+     "i": "Made from glucose by hexokinase or glucokinase.",
+     "h": "Trapped, phosphorylated glucose."
+    },
+    {
+     "t": "e",
+     "n": "Phosphoglucomutase",
+     "i": "Moves the phosphate from carbon 6 to carbon 1.",
+     "h": "Moves a phosphate from carbon 6 to carbon 1."
+    },
+    {
+     "t": "m",
+     "n": "Glucose-1-phosphate",
+     "i": "Ready to be activated with UTP.",
+     "h": "Phosphate sits on carbon 1."
+    },
+    {
+     "t": "e",
+     "n": "UDP-glucose pyrophosphorylase",
+     "i": "Uses UTP to activate glucose-1-phosphate. Pyrophosphate is then hydrolysed, making the step irreversible.",
+     "h": "Uses UTP to activate glucose."
+    },
+    {
+     "t": "m",
+     "n": "UDP-glucose",
+     "i": "The activated glucose donor for glycogen synthase.",
+     "h": "Activated glucose donor."
+    },
+    {
+     "t": "e",
+     "n": "Glycogen synthase",
+     "i": "Rate-limiting. Adds glucose to alpha-1,4 chains on a glycogenin primer. Activated by insulin, inactivated by phosphorylation.",
+     "h": "Rate-limiting enzyme that extends alpha-1,4 chains."
+    },
+    {
+     "t": "m",
+     "n": "Linear glycogen chain",
+     "i": "Long alpha-1,4 chain with no branches yet.",
+     "h": "Unbranched alpha-1,4 chain."
+    },
+    {
+     "t": "e",
+     "n": "Branching enzyme",
+     "i": "Moves a block of about 7 residues to create an alpha-1,6 branch, which makes glycogen soluble and quick to mobilise.",
+     "h": "Creates alpha-1,6 branch points."
+    },
+    {
+     "t": "m",
+     "n": "Branched glycogen",
+     "i": "Many chain ends allow rapid release of glucose.",
+     "h": "Highly branched storage polymer."
+    }
+   ]
+  },
+  {
+   "id": "ppp",
+   "name": "Pentose Phosphate Pathway",
+   "subj": "Biochemistry",
+   "blurb": "The oxidative phase that makes NADPH and ribose-5-phosphate.",
+   "color": "#38bdf8",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Glucose-6-phosphate",
+     "i": "Enters the pentose phosphate pathway in the cytosol.",
+     "h": "Phosphorylated glucose that enters from glycolysis."
+    },
+    {
+     "t": "e",
+     "n": "G6PD",
+     "i": "Glucose-6-phosphate dehydrogenase. Rate-limiting; makes the first NADPH. Deficiency causes haemolysis with fava beans, primaquine or infection.",
+     "h": "Rate-limiting. Deficiency causes haemolysis after fava beans."
+    },
+    {
+     "t": "m",
+     "n": "6-Phosphogluconolactone",
+     "i": "Unstable lactone intermediate.",
+     "h": "Cyclic ester intermediate."
+    },
+    {
+     "t": "e",
+     "n": "Lactonase",
+     "i": "Hydrolyses the lactone ring.",
+     "h": "Opens the lactone ring."
+    },
+    {
+     "t": "m",
+     "n": "6-Phosphogluconate",
+     "i": "Acid substrate for the second oxidation.",
+     "h": "Open-chain sugar acid phosphate."
+    },
+    {
+     "t": "e",
+     "n": "6-Phosphogluconate dehydrogenase",
+     "i": "Makes the second NADPH and releases CO2.",
+     "h": "Makes the second NADPH and releases CO2."
+    },
+    {
+     "t": "m",
+     "n": "Ribulose-5-phosphate",
+     "i": "Branch point: isomerised to ribose-5-phosphate, or converted to xylulose-5-phosphate for the non-oxidative phase.",
+     "h": "Five-carbon ketose at the branch point."
+    },
+    {
+     "t": "e",
+     "n": "Ribose-5-phosphate isomerase",
+     "i": "Converts the ketose to an aldose.",
+     "h": "Interconverts ribulose and ribose phosphates."
+    },
+    {
+     "t": "m",
+     "n": "Ribose-5-phosphate",
+     "i": "Used to build nucleotides and nucleic acids.",
+     "h": "Sugar for nucleotide synthesis."
+    }
+   ]
+  },
+  {
+   "id": "fructose",
+   "name": "Fructose Metabolism",
+   "subj": "Biochemistry",
+   "blurb": "How the liver handles fructose and feeds it into glycolysis, bypassing PFK-1.",
+   "color": "#fbbf24",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Fructose",
+     "i": "From fruit, honey and sucrose.",
+     "h": "Fruit sugar, from sucrose and honey."
+    },
+    {
+     "t": "e",
+     "n": "Fructokinase",
+     "i": "Liver enzyme that traps fructose as fructose-1-phosphate. Deficiency causes benign essential fructosuria.",
+     "h": "Liver kinase. Deficiency is benign (essential fructosuria)."
+    },
+    {
+     "t": "m",
+     "n": "Fructose-1-phosphate",
+     "i": "Bypasses the main regulatory step of glycolysis.",
+     "h": "Phosphorylated at carbon 1."
+    },
+    {
+     "t": "e",
+     "n": "Aldolase B",
+     "i": "Splits fructose-1-phosphate. Deficiency causes hereditary fructose intolerance with hypoglycaemia and liver injury.",
+     "h": "Deficiency causes hereditary fructose intolerance."
+    },
+    {
+     "t": "m",
+     "n": "Glyceraldehyde",
+     "i": "Triose that still needs a phosphate.",
+     "h": "Triose without a phosphate."
+    },
+    {
+     "t": "e",
+     "n": "Triose kinase",
+     "i": "Phosphorylates glyceraldehyde using ATP.",
+     "h": "Phosphorylates the triose."
+    },
+    {
+     "t": "m",
+     "n": "Glyceraldehyde-3-phosphate",
+     "i": "Joins the glycolytic pathway.",
+     "h": "Enters glycolysis here."
+    }
+   ]
+  },
+  {
+   "id": "galactose",
+   "name": "Galactose Metabolism",
+   "subj": "Biochemistry",
+   "blurb": "How milk sugar is converted to glucose derivatives.",
+   "color": "#ff9a3c",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Galactose",
+     "i": "From lactose in milk.",
+     "h": "Half of lactose."
+    },
+    {
+     "t": "e",
+     "n": "Galactokinase",
+     "i": "Phosphorylates galactose. Deficiency causes cataracts because galactitol builds up.",
+     "h": "Deficiency causes cataracts but is otherwise mild."
+    },
+    {
+     "t": "m",
+     "n": "Galactose-1-phosphate",
+     "i": "Toxic if it accumulates.",
+     "h": "Phosphorylated galactose."
+    },
+    {
+     "t": "e",
+     "n": "GALT",
+     "i": "Galactose-1-phosphate uridyltransferase. Deficiency causes classic galactosaemia: jaundice, hepatomegaly, cataracts and E. coli sepsis.",
+     "h": "Deficiency causes classic galactosaemia."
+    },
+    {
+     "t": "m",
+     "n": "UDP-galactose",
+     "i": "Formed by exchanging the UDP carrier from glucose.",
+     "h": "Galactose attached to UDP."
+    },
+    {
+     "t": "e",
+     "n": "UDP-galactose 4-epimerase",
+     "i": "Flips carbon 4 to convert galactose back to glucose form.",
+     "h": "Epimerase acting at carbon 4."
+    },
+    {
+     "t": "m",
+     "n": "UDP-glucose",
+     "i": "Can enter glycogen synthesis or glycolysis.",
+     "h": "The glucose form of the carrier."
+    }
+   ]
+  },
+  {
+   "id": "boxid",
+   "name": "Beta-Oxidation",
+   "subj": "Biochemistry",
+   "blurb": "Fatty acids to acetyl-CoA in the mitochondria, including the carnitine shuttle.",
+   "color": "#2fc7b8",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Long-chain fatty acid",
+     "i": "Mobilised from fat by hormone-sensitive lipase and carried on albumin.",
+     "h": "Released from adipose and carried on albumin."
+    },
+    {
+     "t": "e",
+     "n": "Acyl-CoA synthetase",
+     "i": "On the outer mitochondrial membrane. Uses ATP, costing two high-energy bonds, to activate the fatty acid.",
+     "h": "Activates the fatty acid and costs the equivalent of 2 ATP."
+    },
+    {
+     "t": "m",
+     "n": "Fatty acyl-CoA",
+     "i": "Cannot cross the inner membrane without carnitine.",
+     "h": "Activated fatty acid that needs carnitine."
+    },
+    {
+     "t": "e",
+     "n": "CPT-I",
+     "i": "Carnitine palmitoyltransferase I. Rate-limiting and inhibited by malonyl-CoA.",
+     "h": "Rate-limiting. Inhibited by malonyl-CoA."
+    },
+    {
+     "t": "m",
+     "n": "Acyl-carnitine",
+     "i": "Carried across the inner membrane by a translocase.",
+     "h": "Fatty acid linked to carnitine."
+    },
+    {
+     "t": "e",
+     "n": "CPT-II",
+     "i": "Matrix enzyme that regenerates acyl-CoA from acyl-carnitine.",
+     "h": "Matrix side enzyme that releases carnitine."
+    },
+    {
+     "t": "m",
+     "n": "Acyl-CoA in the matrix",
+     "i": "Ready for the four-step beta-oxidation spiral.",
+     "h": "Now inside the matrix and ready for oxidation."
+    },
+    {
+     "t": "e",
+     "n": "Acyl-CoA dehydrogenase",
+     "i": "First step. Makes FADH2. MCAD deficiency causes hypoketotic hypoglycaemia during fasting in children.",
+     "h": "Makes FADH2. MCAD deficiency causes fasting hypoglycaemia."
+    },
+    {
+     "t": "m",
+     "n": "trans-Enoyl-CoA",
+     "i": "Has a double bond between carbons 2 and 3.",
+     "h": "Unsaturated intermediate."
+    },
+    {
+     "t": "e",
+     "n": "Enoyl-CoA hydratase",
+     "i": "Adds water across the double bond.",
+     "h": "Hydrates the double bond."
+    },
+    {
+     "t": "m",
+     "n": "3-Hydroxyacyl-CoA",
+     "i": "Has a hydroxyl on carbon 3.",
+     "h": "Hydroxylated intermediate."
+    },
+    {
+     "t": "e",
+     "n": "3-Hydroxyacyl-CoA dehydrogenase",
+     "i": "Oxidises the hydroxyl and makes NADH.",
+     "h": "Makes NADH."
+    },
+    {
+     "t": "m",
+     "n": "3-Ketoacyl-CoA",
+     "i": "Ready to be cleaved.",
+     "h": "Keto intermediate."
+    },
+    {
+     "t": "e",
+     "n": "Thiolase",
+     "i": "Cleaves off acetyl-CoA, leaving an acyl-CoA two carbons shorter.",
+     "h": "Cleaves off two carbons as acetyl-CoA."
+    },
+    {
+     "t": "m",
+     "n": "Acetyl-CoA",
+     "i": "Enters the citric acid cycle or, in the liver, ketogenesis.",
+     "h": "Two-carbon product that enters the citric acid cycle."
+    }
+   ]
+  },
+  {
+   "id": "fasyn",
+   "name": "Fatty Acid Synthesis",
+   "subj": "Biochemistry",
+   "blurb": "From mitochondrial acetyl-CoA to palmitate in the cytosol, fed by insulin.",
+   "color": "#a78bfa",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Mitochondrial acetyl-CoA",
+     "i": "Cannot cross the inner mitochondrial membrane.",
+     "h": "Two-carbon unit trapped in the mitochondria."
+    },
+    {
+     "t": "m",
+     "n": "Citrate",
+     "i": "Exported when ATP and citrate are high. Citrate also activates acetyl-CoA carboxylase.",
+     "h": "Six-carbon carrier that exports acetyl units."
+    },
+    {
+     "t": "e",
+     "n": "ATP-citrate lyase",
+     "i": "Regenerates cytosolic acetyl-CoA and oxaloacetate. Activated by insulin.",
+     "h": "Splits citrate in the cytosol."
+    },
+    {
+     "t": "m",
+     "n": "Cytosolic acetyl-CoA",
+     "i": "Substrate for the committed step.",
+     "h": "Acetyl-CoA now in the cytosol."
+    },
+    {
+     "t": "e",
+     "n": "Acetyl-CoA carboxylase",
+     "i": "Rate-limiting. Needs biotin and ATP. Activated by insulin and citrate, inhibited by glucagon, AMPK and palmitoyl-CoA.",
+     "h": "Rate-limiting and biotin-dependent."
+    },
+    {
+     "t": "m",
+     "n": "Malonyl-CoA",
+     "i": "Also inhibits CPT-I, so synthesis and oxidation do not run together.",
+     "h": "Three-carbon donor that blocks CPT-I."
+    },
+    {
+     "t": "e",
+     "n": "Fatty acid synthase",
+     "i": "Multi-enzyme complex that uses NADPH from the pentose phosphate pathway.",
+     "h": "Large complex that uses NADPH."
+    },
+    {
+     "t": "m",
+     "n": "Palmitate",
+     "i": "The 16-carbon product. Elongation and desaturation occur in the ER.",
+     "h": "Sixteen-carbon saturated fatty acid."
+    }
+   ]
+  },
+  {
+   "id": "ketogenesis",
+   "name": "Ketogenesis",
+   "subj": "Biochemistry",
+   "blurb": "How the liver makes ketone bodies during fasting and in diabetic ketoacidosis.",
+   "color": "#ff5d6c",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Acetyl-CoA",
+     "i": "Builds up in the liver in fasting because oxaloacetate is diverted to gluconeogenesis.",
+     "h": "Accumulates in fasting liver."
+    },
+    {
+     "t": "e",
+     "n": "Thiolase",
+     "i": "Joins two acetyl-CoA molecules.",
+     "h": "Joins two acetyl-CoA units."
+    },
+    {
+     "t": "m",
+     "n": "Acetoacetyl-CoA",
+     "i": "Four-carbon thioester.",
+     "h": "Four-carbon thioester."
+    },
+    {
+     "t": "e",
+     "n": "HMG-CoA synthase",
+     "i": "Rate-limiting step of ketogenesis. This is the mitochondrial isoform.",
+     "h": "Rate-limiting mitochondrial enzyme."
+    },
+    {
+     "t": "m",
+     "n": "HMG-CoA",
+     "i": "Also an intermediate in cholesterol synthesis, in the cytosol.",
+     "h": "Six-carbon intermediate shared with cholesterol synthesis."
+    },
+    {
+     "t": "e",
+     "n": "HMG-CoA lyase",
+     "i": "Cleaves HMG-CoA into acetoacetate and acetyl-CoA.",
+     "h": "Cleaves off acetyl-CoA."
+    },
+    {
+     "t": "m",
+     "n": "Acetoacetate",
+     "i": "First ketone body. It spontaneously makes acetone, the fruity breath of ketoacidosis.",
+     "h": "First ketone body; can break down to acetone."
+    },
+    {
+     "t": "e",
+     "n": "3-Hydroxybutyrate dehydrogenase",
+     "i": "Uses NADH to reduce acetoacetate.",
+     "h": "Reduces acetoacetate using NADH."
+    },
+    {
+     "t": "m",
+     "n": "3-Hydroxybutyrate",
+     "i": "The main ketone in blood, and the one missed by nitroprusside urine tests. The liver cannot use ketones.",
+     "h": "Main blood ketone, missed by urine dipsticks."
+    }
+   ]
+  },
+  {
+   "id": "chol",
+   "name": "Cholesterol Synthesis",
+   "subj": "Biochemistry",
+   "blurb": "From acetyl-CoA to cholesterol in the cytosol and ER. The statin target is the rate-limiting step.",
+   "color": "#f472b6",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Acetyl-CoA",
+     "i": "Starting unit for all steroids.",
+     "h": "The two-carbon starting unit."
+    },
+    {
+     "t": "e",
+     "n": "HMG-CoA synthase",
+     "i": "Cytosolic isoform, unlike the mitochondrial one used for ketones.",
+     "h": "Cytosolic isoform."
+    },
+    {
+     "t": "m",
+     "n": "HMG-CoA",
+     "i": "Six-carbon intermediate.",
+     "h": "Six-carbon intermediate."
+    },
+    {
+     "t": "e",
+     "n": "HMG-CoA reductase",
+     "i": "Rate-limiting. Inhibited by statins and by cholesterol, activated by insulin and thyroid hormone.",
+     "h": "Rate-limiting enzyme blocked by statins."
+    },
+    {
+     "t": "m",
+     "n": "Mevalonate",
+     "i": "Six-carbon acid formed using NADPH.",
+     "h": "Product of the statin target."
+    },
+    {
+     "t": "e",
+     "n": "Mevalonate kinase (and later steps)",
+     "i": "Phosphorylations and a decarboxylation, using ATP.",
+     "h": "A series of ATP-using steps."
+    },
+    {
+     "t": "m",
+     "n": "Isopentenyl pyrophosphate",
+     "i": "Five-carbon isoprene building block.",
+     "h": "Five-carbon isoprene unit."
+    },
+    {
+     "t": "e",
+     "n": "Squalene synthase",
+     "i": "Joins farnesyl pyrophosphate units.",
+     "h": "Joins isoprene-derived units into a 30-carbon chain."
+    },
+    {
+     "t": "m",
+     "n": "Squalene",
+     "i": "Thirty-carbon linear hydrocarbon.",
+     "h": "Linear 30-carbon hydrocarbon."
+    },
+    {
+     "t": "e",
+     "n": "Squalene epoxidase and cyclase",
+     "i": "Convert squalene into the four-ring steroid skeleton.",
+     "h": "Close squalene into rings."
+    },
+    {
+     "t": "m",
+     "n": "Lanosterol",
+     "i": "First sterol product.",
+     "h": "First four-ring sterol."
+    },
+    {
+     "t": "e",
+     "n": "Demethylases and reductases",
+     "i": "About 19 steps that remove methyl groups and reduce double bonds.",
+     "h": "Trim methyl groups from the ring system."
+    },
+    {
+     "t": "m",
+     "n": "Cholesterol",
+     "i": "Precursor of bile acids, steroid hormones and vitamin D, and a membrane component.",
+     "h": "Final product and precursor of steroid hormones."
+    }
+   ]
+  },
+  {
+   "id": "purine",
+   "name": "Purine Degradation",
+   "subj": "Biochemistry",
+   "blurb": "From adenosine to uric acid. The enzymes behind SCID and gout.",
+   "color": "#60a5fa",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Adenosine",
+     "i": "Formed from AMP breakdown.",
+     "h": "Nucleoside from AMP."
+    },
+    {
+     "t": "e",
+     "n": "Adenosine deaminase",
+     "i": "Deficiency causes SCID because toxic dATP builds up in lymphocytes.",
+     "h": "Deficiency causes severe combined immunodeficiency."
+    },
+    {
+     "t": "m",
+     "n": "Inosine",
+     "i": "Deaminated adenosine.",
+     "h": "Deaminated adenosine."
+    },
+    {
+     "t": "e",
+     "n": "Purine nucleoside phosphorylase",
+     "i": "Deficiency causes a T-cell immunodeficiency.",
+     "h": "Deficiency causes T-cell immunodeficiency."
+    },
+    {
+     "t": "m",
+     "n": "Hypoxanthine",
+     "i": "Free purine base. HGPRT can salvage it.",
+     "h": "Free purine base."
+    },
+    {
+     "t": "e",
+     "n": "Xanthine oxidase (first oxidation)",
+     "i": "Inhibited by allopurinol and febuxostat.",
+     "h": "Target of allopurinol."
+    },
+    {
+     "t": "m",
+     "n": "Xanthine",
+     "i": "Intermediate purine.",
+     "h": "Intermediate base."
+    },
+    {
+     "t": "e",
+     "n": "Xanthine oxidase (second oxidation)",
+     "i": "Converts xanthine to uric acid.",
+     "h": "The same enzyme acts again."
+    },
+    {
+     "t": "m",
+     "n": "Uric acid",
+     "i": "Poorly soluble end product in humans. Excess causes gout. HGPRT deficiency (Lesch-Nyhan) overproduces it.",
+     "h": "Poorly soluble end product that crystallises in gout."
+    }
+   ]
+  },
+  {
+   "id": "hemesyn",
+   "name": "Heme Synthesis",
+   "subj": "Biochemistry",
+   "blurb": "Mitochondrial and cytosolic steps, and the porphyria linked to each enzyme.",
+   "color": "#34d3ee",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Glycine + succinyl-CoA",
+     "i": "Condense in the mitochondria. Succinyl-CoA comes from the citric acid cycle.",
+     "h": "Two precursors that condense in the mitochondria."
+    },
+    {
+     "t": "e",
+     "n": "ALA synthase",
+     "i": "Rate-limiting and needs vitamin B6. Inhibited by heme. Defective in X-linked sideroblastic anaemia.",
+     "h": "Rate-limiting, needs vitamin B6, repressed by heme."
+    },
+    {
+     "t": "m",
+     "n": "Delta-aminolevulinic acid",
+     "i": "Exported to the cytosol.",
+     "h": "First committed product."
+    },
+    {
+     "t": "e",
+     "n": "ALA dehydratase",
+     "i": "Inhibited by lead.",
+     "h": "Zinc enzyme inhibited by lead."
+    },
+    {
+     "t": "m",
+     "n": "Porphobilinogen",
+     "i": "Pyrrole ring.",
+     "h": "Single pyrrole ring."
+    },
+    {
+     "t": "e",
+     "n": "Porphobilinogen deaminase",
+     "i": "Deficiency causes acute intermittent porphyria: abdominal pain, neuropsychiatric signs, port-wine urine.",
+     "h": "Deficiency causes acute intermittent porphyria."
+    },
+    {
+     "t": "m",
+     "n": "Hydroxymethylbilane",
+     "i": "Linear tetrapyrrole.",
+     "h": "Linear tetrapyrrole."
+    },
+    {
+     "t": "e",
+     "n": "Uroporphyrinogen III synthase",
+     "i": "Closes the ring. Deficiency causes congenital erythropoietic porphyria.",
+     "h": "Closes the ring to form the correct isomer."
+    },
+    {
+     "t": "m",
+     "n": "Uroporphyrinogen III",
+     "i": "Cyclic tetrapyrrole.",
+     "h": "First ring-closed product."
+    },
+    {
+     "t": "e",
+     "n": "Uroporphyrinogen decarboxylase",
+     "i": "Deficiency causes porphyria cutanea tarda, the most common porphyria, with blistering skin.",
+     "h": "Deficiency causes porphyria cutanea tarda."
+    },
+    {
+     "t": "m",
+     "n": "Coproporphyrinogen III",
+     "i": "Returns to the mitochondria.",
+     "h": "Moves back into the mitochondria."
+    },
+    {
+     "t": "e",
+     "n": "Coproporphyrinogen oxidase",
+     "i": "Deficiency causes hereditary coproporphyria.",
+     "h": "Decarboxylates two side chains."
+    },
+    {
+     "t": "m",
+     "n": "Protoporphyrinogen IX",
+     "i": "Substrate for oxidation.",
+     "h": "Reduced porphyrin."
+    },
+    {
+     "t": "e",
+     "n": "Protoporphyrinogen oxidase",
+     "i": "Deficiency causes variegate porphyria.",
+     "h": "Oxidises the ring."
+    },
+    {
+     "t": "m",
+     "n": "Protoporphyrin IX",
+     "i": "Ready for iron insertion.",
+     "h": "Ring waiting for iron."
+    },
+    {
+     "t": "e",
+     "n": "Ferrochelatase",
+     "i": "Inserts Fe2+. Inhibited by lead.",
+     "h": "Inserts iron. Also inhibited by lead."
+    },
+    {
+     "t": "m",
+     "n": "Heme",
+     "i": "Used in haemoglobin, myoglobin and cytochromes.",
+     "h": "Final iron-containing porphyrin."
+    }
+   ]
+  },
+  {
+   "id": "etc",
+   "name": "Electron Transport Chain",
+   "subj": "Biochemistry",
+   "blurb": "Electrons from NADH to oxygen, building the proton gradient that drives ATP synthase.",
+   "color": "#9acd32",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "NADH",
+     "i": "From the citric acid cycle and beta-oxidation. Delivers electrons to Complex I.",
+     "h": "Carries electrons from the cycle."
+    },
+    {
+     "t": "e",
+     "n": "Complex I",
+     "i": "NADH dehydrogenase. Pumps 4 H+. Blocked by rotenone.",
+     "h": "NADH dehydrogenase blocked by rotenone."
+    },
+    {
+     "t": "m",
+     "n": "Coenzyme Q",
+     "i": "Lipid-soluble carrier that also accepts electrons from Complex II.",
+     "h": "Mobile lipid-soluble carrier (ubiquinone)."
+    },
+    {
+     "t": "e",
+     "n": "Complex III",
+     "i": "Cytochrome bc1. Pumps 4 H+. Blocked by antimycin A.",
+     "h": "Cytochrome bc1, blocked by antimycin A."
+    },
+    {
+     "t": "r",
+     "n": "Cytochrome c",
+     "i": "Small mobile protein in the intermembrane space. Its release triggers apoptosis.",
+     "h": "Mobile protein carrier whose release triggers apoptosis."
+    },
+    {
+     "t": "e",
+     "n": "Complex IV",
+     "i": "Cytochrome c oxidase. Pumps 2 H+ and passes electrons to oxygen. Blocked by cyanide, carbon monoxide and azide.",
+     "h": "Cytochrome oxidase blocked by cyanide."
+    },
+    {
+     "t": "m",
+     "n": "Oxygen",
+     "i": "Final electron acceptor, forming water.",
+     "h": "The final electron acceptor."
+    },
+    {
+     "t": "s",
+     "n": "Proton gradient",
+     "i": "Proton-motive force across the inner membrane. Uncouplers such as 2,4-DNP and thermogenin dissipate it as heat.",
+     "h": "Gradient that uncouplers dissipate as heat."
+    },
+    {
+     "t": "e",
+     "n": "ATP synthase",
+     "i": "Complex V. The F0 portion is a proton channel and F1 makes ATP. Blocked by oligomycin.",
+     "h": "Complex V, blocked by oligomycin."
+    },
+    {
+     "t": "m",
+     "n": "ATP",
+     "i": "About 2.5 ATP per NADH and 1.5 per FADH2.",
+     "h": "Final energy currency."
+    }
+   ]
+  },
+  {
+   "id": "catechol",
+   "name": "Catecholamine Synthesis",
+   "subj": "Biochemistry",
+   "blurb": "From phenylalanine to adrenaline, with the enzymes behind PKU and the adrenal medulla.",
+   "color": "#f5d547",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Phenylalanine",
+     "i": "Essential aromatic amino acid.",
+     "h": "Essential aromatic amino acid."
+    },
+    {
+     "t": "e",
+     "n": "Phenylalanine hydroxylase",
+     "i": "Needs tetrahydrobiopterin (BH4). Deficiency causes phenylketonuria: musty odour, intellectual disability, fair skin.",
+     "h": "Needs BH4. Deficiency causes phenylketonuria."
+    },
+    {
+     "t": "m",
+     "n": "Tyrosine",
+     "i": "Becomes non-essential once phenylalanine hydroxylase works.",
+     "h": "Conditionally essential if the previous enzyme fails."
+    },
+    {
+     "t": "e",
+     "n": "Tyrosine hydroxylase",
+     "i": "Rate-limiting. Inhibited by catecholamines and by metyrosine.",
+     "h": "Rate-limiting enzyme."
+    },
+    {
+     "t": "m",
+     "n": "L-DOPA",
+     "i": "Used to treat Parkinson disease.",
+     "h": "Drug used in Parkinson disease."
+    },
+    {
+     "t": "e",
+     "n": "DOPA decarboxylase",
+     "i": "Needs vitamin B6. Inhibited outside the brain by carbidopa.",
+     "h": "Needs vitamin B6. Blocked peripherally by carbidopa."
+    },
+    {
+     "t": "m",
+     "n": "Dopamine",
+     "i": "Neurotransmitter and precursor.",
+     "h": "First catecholamine."
+    },
+    {
+     "t": "e",
+     "n": "Dopamine beta-hydroxylase",
+     "i": "Needs copper and vitamin C, and works inside synaptic vesicles.",
+     "h": "Needs copper and vitamin C."
+    },
+    {
+     "t": "m",
+     "n": "Norepinephrine",
+     "i": "Sympathetic neurotransmitter.",
+     "h": "Main sympathetic neurotransmitter."
+    },
+    {
+     "t": "e",
+     "n": "PNMT",
+     "i": "Phenylethanolamine N-methyltransferase uses SAM and is induced by cortisol. Found in the adrenal medulla.",
+     "h": "Cortisol-induced methyltransferase of the adrenal medulla."
+    },
+    {
+     "t": "m",
+     "n": "Epinephrine",
+     "i": "Main hormone of the adrenal medulla.",
+     "h": "Adrenal medullary hormone."
+    }
+   ]
+  },
+  {
+   "id": "aldo",
+   "name": "Aldosterone Synthesis",
+   "subj": "Biochemistry",
+   "blurb": "Steroid synthesis in the zona glomerulosa, from cholesterol to aldosterone.",
+   "color": "#fb923c",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Cholesterol",
+     "i": "Delivered mainly by LDL and stored as esters.",
+     "h": "Starting material for all steroids."
+    },
+    {
+     "t": "e",
+     "n": "Desmolase",
+     "i": "P450scc (CYP11A1). Rate-limiting step of steroid synthesis, stimulated by ACTH through StAR.",
+     "h": "Rate-limiting enzyme, also called P450scc."
+    },
+    {
+     "t": "m",
+     "n": "Pregnenolone",
+     "i": "First steroid made.",
+     "h": "Parent steroid."
+    },
+    {
+     "t": "e",
+     "n": "3-Beta-hydroxysteroid dehydrogenase",
+     "i": "Converts delta-5 steroids to delta-4 steroids.",
+     "h": "Dehydrogenase needed in every steroid pathway."
+    },
+    {
+     "t": "m",
+     "n": "Progesterone",
+     "i": "Also a sex hormone.",
+     "h": "Hormone of the luteal phase."
+    },
+    {
+     "t": "e",
+     "n": "21-Hydroxylase",
+     "i": "Deficiency is the commonest cause of congenital adrenal hyperplasia: salt wasting and virilisation.",
+     "h": "Deficiency causes the commonest congenital adrenal hyperplasia."
+    },
+    {
+     "t": "m",
+     "n": "11-Deoxycorticosterone",
+     "i": "Weak mineralocorticoid.",
+     "h": "Weak mineralocorticoid."
+    },
+    {
+     "t": "e",
+     "n": "Aldosterone synthase",
+     "i": "CYP11B2. Present only in the zona glomerulosa. Stimulated by angiotensin II and potassium.",
+     "h": "Only in the zona glomerulosa."
+    },
+    {
+     "t": "m",
+     "n": "Aldosterone",
+     "i": "Raises Na+ reabsorption and K+ secretion.",
+     "h": "The final mineralocorticoid."
+    }
+   ]
+  },
+  {
+   "id": "cortisol",
+   "name": "Cortisol Synthesis",
+   "subj": "Biochemistry",
+   "blurb": "Steroid synthesis in the zona fasciculata, and where each CAH enzyme sits.",
+   "color": "#4ade80",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Cholesterol",
+     "i": "Delivered by LDL.",
+     "h": "Starting material."
+    },
+    {
+     "t": "e",
+     "n": "Desmolase",
+     "i": "Rate-limiting step, stimulated by ACTH.",
+     "h": "Rate-limiting enzyme."
+    },
+    {
+     "t": "m",
+     "n": "Pregnenolone",
+     "i": "Common precursor.",
+     "h": "Common precursor."
+    },
+    {
+     "t": "e",
+     "n": "17-Alpha-hydroxylase",
+     "i": "Zona fasciculata. Deficiency causes hypertension with low sex hormones.",
+     "h": "Deficiency gives hypertension and absent puberty."
+    },
+    {
+     "t": "m",
+     "n": "17-Hydroxypregnenolone",
+     "i": "Delta-5 intermediate.",
+     "h": "Hydroxylated precursor."
+    },
+    {
+     "t": "e",
+     "n": "3-Beta-hydroxysteroid dehydrogenase",
+     "i": "Converts delta-5 to delta-4 steroids.",
+     "h": "Dehydrogenase shared with other pathways."
+    },
+    {
+     "t": "m",
+     "n": "17-Hydroxyprogesterone",
+     "i": "Raised in 21-hydroxylase deficiency and used in newborn screening.",
+     "h": "Raised in 21-hydroxylase deficiency."
+    },
+    {
+     "t": "e",
+     "n": "21-Hydroxylase",
+     "i": "Deficiency gives low cortisol, high ACTH, adrenal hyperplasia and virilisation.",
+     "h": "Most commonly deficient enzyme in CAH."
+    },
+    {
+     "t": "m",
+     "n": "11-Deoxycortisol",
+     "i": "Precursor of cortisol.",
+     "h": "Immediate precursor of cortisol."
+    },
+    {
+     "t": "e",
+     "n": "11-Beta-hydroxylase",
+     "i": "Deficiency causes CAH with hypertension and virilisation.",
+     "h": "Deficiency causes hypertensive CAH."
+    },
+    {
+     "t": "m",
+     "n": "Cortisol",
+     "i": "Main glucocorticoid.",
+     "h": "Main glucocorticoid."
+    }
+   ]
+  },
+  {
+   "id": "arachid",
+   "name": "Arachidonic Acid Pathway",
+   "subj": "Biochemistry",
+   "blurb": "Where steroids and NSAIDs act in prostanoid synthesis.",
+   "color": "#c084fc",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Membrane phospholipids",
+     "i": "Store arachidonic acid in their sn-2 position.",
+     "h": "Source of arachidonic acid."
+    },
+    {
+     "t": "e",
+     "n": "Phospholipase A2",
+     "i": "Blocked indirectly by corticosteroids through lipocortin.",
+     "h": "Inhibited indirectly by corticosteroids."
+    },
+    {
+     "t": "m",
+     "n": "Arachidonic acid",
+     "i": "Twenty-carbon polyunsaturated fatty acid.",
+     "h": "Twenty-carbon fatty acid."
+    },
+    {
+     "t": "e",
+     "n": "Cyclooxygenase",
+     "i": "COX-1 and COX-2. Inhibited by NSAIDs; aspirin acetylates it irreversibly.",
+     "h": "Blocked by aspirin and other NSAIDs."
+    },
+    {
+     "t": "m",
+     "n": "Prostaglandin H2",
+     "i": "Common intermediate.",
+     "h": "Unstable common intermediate."
+    },
+    {
+     "t": "e",
+     "n": "Prostanoid synthases",
+     "i": "Thromboxane synthase in platelets and prostacyclin synthase in endothelium.",
+     "h": "Tissue-specific synthases."
+    },
+    {
+     "t": "m",
+     "n": "Prostanoids",
+     "i": "PGE2, PGI2 and TXA2 mediate pain, fever, vasodilation, platelet aggregation and gastric protection.",
+     "h": "End products that mediate pain, fever and platelet aggregation."
+    }
+   ]
+  },
+  {
+   "id": "iron",
+   "name": "Iron Absorption",
+   "subj": "Biochemistry",
+   "blurb": "From dietary iron to the bone marrow, and where hepcidin acts.",
+   "color": "#38bdf8",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Dietary Fe3+",
+     "i": "Ferric iron from food is poorly absorbed.",
+     "h": "Oxidised form from food."
+    },
+    {
+     "t": "e",
+     "n": "Duodenal cytochrome B",
+     "i": "Reduces ferric to ferrous iron on the brush border.",
+     "h": "Brush border reductase."
+    },
+    {
+     "t": "m",
+     "n": "Fe2+",
+     "i": "Ferrous form that can be transported.",
+     "h": "Reduced, transportable form."
+    },
+    {
+     "t": "r",
+     "n": "DMT1",
+     "i": "Divalent metal transporter 1 carries Fe2+ into the enterocyte, along with other metals.",
+     "h": "Transporter on the apical surface."
+    },
+    {
+     "t": "m",
+     "n": "Enterocyte ferritin",
+     "i": "Iron can be stored and lost when the cell is shed.",
+     "h": "Intracellular storage protein."
+    },
+    {
+     "t": "r",
+     "n": "Ferroportin",
+     "i": "Exports iron into blood. Hepcidin from the liver blocks it, which lowers iron in chronic disease.",
+     "h": "Exporter blocked by hepcidin."
+    },
+    {
+     "t": "e",
+     "n": "Hephaestin",
+     "i": "Copper-dependent oxidase that returns iron to the Fe3+ form.",
+     "h": "Copper-containing oxidase."
+    },
+    {
+     "t": "m",
+     "n": "Transferrin",
+     "i": "Plasma carrier that delivers iron to cells.",
+     "h": "Plasma carrier protein."
+    },
+    {
+     "t": "s",
+     "n": "Erythroblasts in marrow",
+     "i": "Take up transferrin through the transferrin receptor for heme synthesis.",
+     "h": "Main consumers of iron."
+    }
+   ]
+  },
+  {
+   "id": "vitd",
+   "name": "Vitamin D Activation",
+   "subj": "Biochemistry",
+   "blurb": "From skin to calcitriol, with the liver and kidney steps.",
+   "color": "#fbbf24",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "7-Dehydrocholesterol",
+     "i": "Cholesterol derivative in the skin.",
+     "h": "Cholesterol precursor in the skin."
+    },
+    {
+     "t": "s",
+     "n": "UVB light",
+     "i": "Opens the ring in the epidermis.",
+     "h": "Sunlight triggers the first reaction."
+    },
+    {
+     "t": "m",
+     "n": "Cholecalciferol",
+     "i": "Vitamin D3, also obtained from diet.",
+     "h": "Vitamin D3."
+    },
+    {
+     "t": "e",
+     "n": "25-Hydroxylase",
+     "i": "In the liver. Makes the main storage form.",
+     "h": "Liver hydroxylase."
+    },
+    {
+     "t": "m",
+     "n": "Calcifediol",
+     "i": "25-hydroxyvitamin D, the form measured in blood.",
+     "h": "The form measured in blood tests."
+    },
+    {
+     "t": "e",
+     "n": "1-Alpha-hydroxylase",
+     "i": "Kidney proximal tubule. Stimulated by PTH and low phosphate. Lost in chronic kidney disease.",
+     "h": "Kidney enzyme stimulated by PTH."
+    },
+    {
+     "t": "m",
+     "n": "Calcitriol",
+     "i": "Active form. Increases intestinal absorption of calcium and phosphate.",
+     "h": "Active hormone form."
+    }
+   ]
+  },
+  {
+   "id": "gs",
+   "name": "GPCR: Gs and cAMP",
+   "subj": "Biochemistry",
+   "blurb": "A hormone to a phosphorylation cascade through adenylyl cyclase.",
+   "color": "#ff9a3c",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Ligand",
+     "i": "Such as adrenaline at beta receptors, glucagon, ACTH or TSH.",
+     "h": "Examples include glucagon and beta agonists."
+    },
+    {
+     "t": "r",
+     "n": "Gs-coupled receptor",
+     "i": "Seven-transmembrane receptor that activates Gs on binding.",
+     "h": "Seven-pass membrane receptor."
+    },
+    {
+     "t": "r",
+     "n": "Gs alpha subunit",
+     "i": "Swaps GDP for GTP. Cholera toxin locks it on.",
+     "h": "Cholera toxin keeps it active."
+    },
+    {
+     "t": "e",
+     "n": "Adenylyl cyclase",
+     "i": "Converts ATP to cAMP.",
+     "h": "Makes the second messenger."
+    },
+    {
+     "t": "m",
+     "n": "cAMP",
+     "i": "Second messenger broken down by phosphodiesterase (blocked by caffeine and theophylline).",
+     "h": "Second messenger."
+    },
+    {
+     "t": "e",
+     "n": "Protein kinase A",
+     "i": "Activated by cAMP and phosphorylates target proteins.",
+     "h": "cAMP-dependent kinase."
+    },
+    {
+     "t": "s",
+     "n": "Target phosphorylation",
+     "i": "For example glycogen phosphorylase kinase and hormone-sensitive lipase.",
+     "h": "Changes enzyme activity."
+    }
+   ]
+  },
+  {
+   "id": "gq",
+   "name": "GPCR: Gq and IP3",
+   "subj": "Biochemistry",
+   "blurb": "Receptors that raise intracellular calcium through phospholipase C.",
+   "color": "#2fc7b8",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Ligand",
+     "i": "Such as angiotensin II (AT1), alpha-1 agonists, histamine (H1) and ACh at M1 and M3.",
+     "h": "Examples include angiotensin II and alpha-1 agonists."
+    },
+    {
+     "t": "r",
+     "n": "Gq-coupled receptor",
+     "i": "Seven-transmembrane receptor linked to Gq.",
+     "h": "Seven-pass receptor coupled to Gq."
+    },
+    {
+     "t": "r",
+     "n": "Gq alpha subunit",
+     "i": "Exchanges GDP for GTP and activates its effector.",
+     "h": "G protein that activates phospholipase C."
+    },
+    {
+     "t": "e",
+     "n": "Phospholipase C",
+     "i": "Cleaves PIP2 in the membrane.",
+     "h": "Cleaves a membrane phospholipid."
+    },
+    {
+     "t": "m",
+     "n": "IP3 and DAG",
+     "i": "Two second messengers made from PIP2.",
+     "h": "Two messengers from PIP2."
+    },
+    {
+     "t": "s",
+     "n": "Calcium release from ER",
+     "i": "IP3 opens ER calcium channels.",
+     "h": "IP3 opens ER channels."
+    },
+    {
+     "t": "e",
+     "n": "Protein kinase C",
+     "i": "Activated by DAG and calcium.",
+     "h": "DAG-activated kinase."
+    }
+   ]
+  },
+  {
+   "id": "cycle",
+   "name": "Cardiac Cycle",
+   "subj": "Physiology",
+   "blurb": "The seven phases of one heartbeat, as read on a Wiggers diagram.",
+   "color": "#a78bfa",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Atrial systole",
+     "i": "Follows the P wave and gives the final 20 to 30% of ventricular filling. Produces the a wave and S4 if the ventricle is stiff.",
+     "h": "Follows the P wave and tops up ventricular filling."
+    },
+    {
+     "t": "s",
+     "n": "Isovolumetric contraction",
+     "i": "All valves are closed and ventricular pressure rises. The mitral valve closing makes S1.",
+     "h": "Pressure rises with every valve closed."
+    },
+    {
+     "t": "s",
+     "n": "Rapid ejection",
+     "i": "The aortic valve opens and most of the stroke volume leaves.",
+     "h": "The semilunar valve is open and most blood leaves."
+    },
+    {
+     "t": "s",
+     "n": "Reduced ejection",
+     "i": "Flow slows as the ventricle repolarises (T wave).",
+     "h": "Ejection slows during the T wave."
+    },
+    {
+     "t": "s",
+     "n": "Isovolumetric relaxation",
+     "i": "All valves closed again. The aortic valve closing makes S2 and the dicrotic notch.",
+     "h": "All valves closed; S2 and the dicrotic notch."
+    },
+    {
+     "t": "s",
+     "n": "Rapid ventricular filling",
+     "i": "The mitral valve opens. S3 here is normal in children but abnormal in older adults with heart failure.",
+     "h": "The AV valve opens and blood rushes in."
+    },
+    {
+     "t": "s",
+     "n": "Diastasis",
+     "i": "Slow filling before the next atrial contraction. Shortens most at high heart rates.",
+     "h": "Slow filling before the next beat."
+    }
+   ]
+  },
+  {
+   "id": "skeletal",
+   "name": "Skeletal Muscle Contraction",
+   "subj": "Physiology",
+   "blurb": "From the motor neuron to cross-bridge cycling and relaxation.",
+   "color": "#ff5d6c",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Motor neuron action potential",
+     "i": "Travels down the axon to the terminal at the neuromuscular junction.",
+     "h": "Impulse arrives at the nerve terminal."
+    },
+    {
+     "t": "r",
+     "n": "Voltage-gated calcium channel",
+     "i": "Opens in the presynaptic terminal.",
+     "h": "Opens in the presynaptic terminal."
+    },
+    {
+     "t": "s",
+     "n": "Acetylcholine release",
+     "i": "Calcium triggers vesicle fusion. Botulinum toxin blocks this step.",
+     "h": "Vesicle fusion blocked by botulinum toxin."
+    },
+    {
+     "t": "r",
+     "n": "Nicotinic receptor",
+     "i": "Ligand-gated Na+ channel on the motor end plate. Blocked in myasthenia gravis.",
+     "h": "Receptor attacked in myasthenia gravis."
+    },
+    {
+     "t": "s",
+     "n": "End-plate potential",
+     "i": "Depolarisation that triggers a muscle action potential.",
+     "h": "Local depolarisation of the muscle membrane."
+    },
+    {
+     "t": "r",
+     "n": "Dihydropyridine receptor",
+     "i": "Voltage sensor in the T-tubule that is mechanically linked to the ryanodine receptor.",
+     "h": "T-tubule voltage sensor."
+    },
+    {
+     "t": "r",
+     "n": "Ryanodine receptor",
+     "i": "Calcium release channel of the sarcoplasmic reticulum. Mutated in malignant hyperthermia.",
+     "h": "SR channel mutated in malignant hyperthermia."
+    },
+    {
+     "t": "s",
+     "n": "Calcium release from the SR",
+     "i": "Calcium floods the cytosol.",
+     "h": "Calcium floods the cytosol."
+    },
+    {
+     "t": "r",
+     "n": "Troponin C",
+     "i": "Binds calcium and moves tropomyosin off the myosin binding sites.",
+     "h": "Calcium-binding regulatory protein."
+    },
+    {
+     "t": "e",
+     "n": "Myosin ATPase",
+     "i": "Cross-bridge cycling: head binds actin, power stroke, ATP detaches it. Rigor mortis occurs when ATP runs out.",
+     "h": "ATP binding releases the head from actin."
+    },
+    {
+     "t": "s",
+     "n": "Contraction",
+     "i": "Sarcomere shortens as thin filaments slide past thick filaments.",
+     "h": "The sarcomere shortens."
+    },
+    {
+     "t": "e",
+     "n": "SERCA pump",
+     "i": "Pumps calcium back into the SR using ATP, which causes relaxation.",
+     "h": "ATP-driven pump that restores relaxation."
+    }
+   ]
+  },
+  {
+   "id": "ap",
+   "name": "Nerve Action Potential",
+   "subj": "Physiology",
+   "blurb": "The sequence of channel events in a neuron.",
+   "color": "#f472b6",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Resting membrane potential",
+     "i": "About -70 mV, set mainly by K+ leak channels and the Na+/K+ ATPase.",
+     "h": "Set mainly by K+ leak channels."
+    },
+    {
+     "t": "s",
+     "n": "Threshold",
+     "i": "About -55 mV. Voltage-gated Na+ channels begin to open.",
+     "h": "The point of no return at -55 mV."
+    },
+    {
+     "t": "r",
+     "n": "Voltage-gated Na+ channels",
+     "i": "Open rapidly, giving positive feedback and fast depolarisation. Blocked by tetrodotoxin and local anaesthetics.",
+     "h": "Blocked by tetrodotoxin and lidocaine."
+    },
+    {
+     "t": "s",
+     "n": "Peak depolarisation",
+     "i": "About +30 mV. Na+ channels inactivate.",
+     "h": "About +30 mV; Na+ channels inactivate."
+    },
+    {
+     "t": "r",
+     "n": "Voltage-gated K+ channels",
+     "i": "Open slowly and let K+ leave, which repolarises the cell.",
+     "h": "Delayed channels that repolarise."
+    },
+    {
+     "t": "s",
+     "n": "Hyperpolarisation",
+     "i": "K+ channels close slowly, causing an undershoot and the relative refractory period.",
+     "h": "Undershoot below resting potential."
+    },
+    {
+     "t": "e",
+     "n": "Na+/K+ ATPase",
+     "i": "Restores gradients by moving 3 Na+ out and 2 K+ in. Inhibited by digoxin.",
+     "h": "Pump blocked by digoxin."
+    }
+   ]
+  },
+  {
+   "id": "synapse",
+   "name": "Chemical Synaptic Transmission",
+   "subj": "Physiology",
+   "blurb": "Steps from presynaptic action potential to postsynaptic response.",
+   "color": "#60a5fa",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Action potential at terminal",
+     "i": "Depolarises the presynaptic bouton.",
+     "h": "Depolarises the nerve terminal."
+    },
+    {
+     "t": "r",
+     "n": "Voltage-gated Ca2+ channels",
+     "i": "Open in response to depolarisation.",
+     "h": "Open on depolarisation."
+    },
+    {
+     "t": "s",
+     "n": "Calcium influx",
+     "i": "The trigger for exocytosis.",
+     "h": "The trigger for release."
+    },
+    {
+     "t": "r",
+     "n": "SNARE complex",
+     "i": "Docks vesicles and mediates fusion. Cleaved by botulinum and tetanus toxins.",
+     "h": "Cleaved by botulinum toxin."
+    },
+    {
+     "t": "s",
+     "n": "Transmitter release",
+     "i": "Neurotransmitter crosses the cleft by diffusion.",
+     "h": "Neurotransmitter enters the cleft."
+    },
+    {
+     "t": "r",
+     "n": "Postsynaptic receptor",
+     "i": "Ionotropic or metabotropic receptor that binds the transmitter.",
+     "h": "Receptor that binds the transmitter."
+    },
+    {
+     "t": "s",
+     "n": "Postsynaptic potential",
+     "i": "Excitatory or inhibitory depending on the ion flux.",
+     "h": "Excitatory or inhibitory."
+    },
+    {
+     "t": "s",
+     "n": "Clearance",
+     "i": "Reuptake, diffusion or enzymatic breakdown ends the signal. SSRIs and cocaine block reuptake.",
+     "h": "Reuptake or breakdown ends the signal."
+    }
+   ]
+  },
+  {
+   "id": "insulinsec",
+   "name": "Insulin Secretion",
+   "subj": "Physiology",
+   "blurb": "How a rise in glucose triggers insulin release from the pancreatic beta cell.",
+   "color": "#34d3ee",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Glucose",
+     "i": "Rise in blood glucose after a meal.",
+     "h": "Rise in blood sugar."
+    },
+    {
+     "t": "r",
+     "n": "GLUT2",
+     "i": "Insulin-independent transporter on the beta cell.",
+     "h": "Insulin-independent transporter."
+    },
+    {
+     "t": "e",
+     "n": "Glucokinase",
+     "i": "Beta-cell glucose sensor with a high Km.",
+     "h": "Glucose sensor with a high Km."
+    },
+    {
+     "t": "s",
+     "n": "Rise in ATP/ADP ratio",
+     "i": "Produced by glycolysis and oxidative phosphorylation.",
+     "h": "Metabolism raises the ATP/ADP ratio."
+    },
+    {
+     "t": "r",
+     "n": "K-ATP channel",
+     "i": "Closes when ATP rises. Sulfonylureas close it directly.",
+     "h": "Blocked by sulfonylureas."
+    },
+    {
+     "t": "s",
+     "n": "Membrane depolarisation",
+     "i": "K+ efflux stops and the cell depolarises.",
+     "h": "The cell depolarises."
+    },
+    {
+     "t": "r",
+     "n": "Voltage-gated Ca2+ channel",
+     "i": "Opens in response to depolarisation.",
+     "h": "Opens on depolarisation."
+    },
+    {
+     "t": "s",
+     "n": "Calcium influx",
+     "i": "Triggers fusion of insulin granules.",
+     "h": "The trigger for granule fusion."
+    },
+    {
+     "t": "s",
+     "n": "Insulin exocytosis",
+     "i": "Insulin and C-peptide are released together.",
+     "h": "Insulin and C-peptide are released together."
+    }
+   ]
+  },
+  {
+   "id": "insulinsig",
+   "name": "Insulin Signalling",
+   "subj": "Physiology",
+   "blurb": "From the insulin receptor to GLUT4 translocation in muscle and fat.",
+   "color": "#9acd32",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Insulin",
+     "i": "Binds the extracellular alpha subunits.",
+     "h": "Binds the alpha subunits."
+    },
+    {
+     "t": "r",
+     "n": "Insulin receptor",
+     "i": "Receptor tyrosine kinase that autophosphorylates.",
+     "h": "Receptor tyrosine kinase."
+    },
+    {
+     "t": "r",
+     "n": "IRS-1",
+     "i": "Docking protein that is phosphorylated by the receptor.",
+     "h": "Substrate that docks signalling proteins."
+    },
+    {
+     "t": "e",
+     "n": "PI3 kinase",
+     "i": "Makes PIP3 in the membrane.",
+     "h": "Makes PIP3."
+    },
+    {
+     "t": "e",
+     "n": "Akt",
+     "i": "Protein kinase B. Drives the metabolic effects of insulin.",
+     "h": "Also called protein kinase B."
+    },
+    {
+     "t": "r",
+     "n": "GLUT4 vesicles",
+     "i": "Move to the membrane in muscle and fat cells.",
+     "h": "Insulin-dependent glucose transporter."
+    },
+    {
+     "t": "s",
+     "n": "Glucose uptake",
+     "i": "Blood glucose falls.",
+     "h": "Blood glucose falls."
+    }
+   ]
+  },
+  {
+   "id": "thyroid",
+   "name": "Thyroid Hormone Synthesis",
+   "subj": "Physiology",
+   "blurb": "From iodide trapping to T3, with each drug target.",
+   "color": "#f5d547",
+   "nodes": [
+    {
+     "t": "r",
+     "n": "Sodium-iodide symporter",
+     "i": "Takes up iodide on the basolateral membrane. Blocked by perchlorate.",
+     "h": "Blocked by perchlorate."
+    },
+    {
+     "t": "m",
+     "n": "Iodide",
+     "i": "Concentrated in the follicular cell.",
+     "h": "Trapped from blood."
+    },
+    {
+     "t": "e",
+     "n": "Thyroid peroxidase",
+     "i": "Oxidises iodide, iodinates tyrosines and couples them. Blocked by propylthiouracil and methimazole.",
+     "h": "Target of thionamide drugs."
+    },
+    {
+     "t": "m",
+     "n": "Iodinated thyroglobulin",
+     "i": "Contains MIT and DIT on the colloid.",
+     "h": "Colloid protein carrying MIT and DIT."
+    },
+    {
+     "t": "s",
+     "n": "Coupling",
+     "i": "MIT and DIT combine to form T3 and T4 while still on thyroglobulin.",
+     "h": "Residues join to form T3 and T4."
+    },
+    {
+     "t": "e",
+     "n": "Lysosomal proteases",
+     "i": "Cleave thyroglobulin after endocytosis and release T3 and T4.",
+     "h": "Release hormone from thyroglobulin."
+    },
+    {
+     "t": "m",
+     "n": "T4",
+     "i": "The main secreted hormone, with a longer half-life.",
+     "h": "Main secreted form."
+    },
+    {
+     "t": "e",
+     "n": "Deiodinase",
+     "i": "Converts T4 to the active T3 in peripheral tissues. Blocked by propylthiouracil.",
+     "h": "Converts T4 to T3."
+    },
+    {
+     "t": "m",
+     "n": "T3",
+     "i": "The more active hormone at the nuclear receptor.",
+     "h": "The active form."
+    }
+   ]
+  },
+  {
+   "id": "hpa",
+   "name": "HPA Axis",
+   "subj": "Physiology",
+   "blurb": "The stress axis and its feedback control.",
+   "color": "#fb923c",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Stress or low cortisol",
+     "i": "Triggers the paraventricular nucleus.",
+     "h": "Starts the cascade."
+    },
+    {
+     "t": "m",
+     "n": "CRH",
+     "i": "Corticotropin-releasing hormone from the hypothalamus.",
+     "h": "Hypothalamic releasing hormone."
+    },
+    {
+     "t": "m",
+     "n": "ACTH",
+     "i": "Released by anterior pituitary corticotrophs from POMC.",
+     "h": "Pituitary hormone made from POMC."
+    },
+    {
+     "t": "s",
+     "n": "Zona fasciculata",
+     "i": "ACTH drives cortisol synthesis here.",
+     "h": "The adrenal layer that makes cortisol."
+    },
+    {
+     "t": "m",
+     "n": "Cortisol",
+     "i": "Raises blood glucose and suppresses inflammation.",
+     "h": "Main stress glucocorticoid."
+    },
+    {
+     "t": "s",
+     "n": "Negative feedback",
+     "i": "Cortisol suppresses CRH and ACTH. Long courses of steroids suppress the axis and cause adrenal atrophy.",
+     "h": "Cortisol shuts the axis off."
+    }
+   ]
+  },
+  {
+   "id": "menstrual",
+   "name": "Menstrual Cycle Hormones",
+   "subj": "Physiology",
+   "blurb": "The hormonal sequence from GnRH to menstruation.",
+   "color": "#4ade80",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "GnRH pulses",
+     "i": "From the hypothalamus. Pulsatile release is needed.",
+     "h": "Released in pulses from the hypothalamus."
+    },
+    {
+     "t": "m",
+     "n": "FSH",
+     "i": "Anterior pituitary hormone that recruits follicles.",
+     "h": "Recruits ovarian follicles."
+    },
+    {
+     "t": "s",
+     "n": "Follicular growth",
+     "i": "Granulosa cells make estradiol using androgens from theca cells.",
+     "h": "Follicles grow under FSH."
+    },
+    {
+     "t": "m",
+     "n": "Estradiol",
+     "i": "Sustained high levels switch feedback to positive.",
+     "h": "Rising levels trigger positive feedback."
+    },
+    {
+     "t": "m",
+     "n": "LH surge",
+     "i": "Triggers ovulation about 36 hours later.",
+     "h": "Surge triggers ovulation."
+    },
+    {
+     "t": "s",
+     "n": "Ovulation",
+     "i": "Release of the oocyte from the dominant follicle.",
+     "h": "Release of the oocyte."
+    },
+    {
+     "t": "s",
+     "n": "Corpus luteum",
+     "i": "Forms from the empty follicle under LH.",
+     "h": "Forms from the ruptured follicle."
+    },
+    {
+     "t": "m",
+     "n": "Progesterone",
+     "i": "Maintains the secretory endometrium.",
+     "h": "Dominant luteal hormone."
+    },
+    {
+     "t": "s",
+     "n": "Luteolysis and menstruation",
+     "i": "Without hCG the corpus luteum regresses, hormones fall and the endometrium sheds.",
+     "h": "Hormone withdrawal causes bleeding."
+    }
+   ]
+  },
+  {
+   "id": "photo",
+   "name": "Phototransduction",
+   "subj": "Physiology",
+   "blurb": "How a photon hyperpolarises a rod cell.",
+   "color": "#c084fc",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Photon absorbed",
+     "i": "Light strikes rhodopsin in the disc membrane.",
+     "h": "Light strikes the visual pigment."
+    },
+    {
+     "t": "r",
+     "n": "Rhodopsin",
+     "i": "11-cis-retinal changes to all-trans-retinal. Vitamin A deficiency causes night blindness.",
+     "h": "Needs vitamin A."
+    },
+    {
+     "t": "r",
+     "n": "Transducin",
+     "i": "G protein activated by rhodopsin.",
+     "h": "G protein of the photoreceptor."
+    },
+    {
+     "t": "e",
+     "n": "Phosphodiesterase 6",
+     "i": "Activated by transducin and breaks down cGMP.",
+     "h": "Breaks down cGMP."
+    },
+    {
+     "t": "m",
+     "n": "Falling cGMP",
+     "i": "Cyclic GMP levels fall in the light.",
+     "h": "Second messenger falls."
+    },
+    {
+     "t": "r",
+     "n": "CNG channels close",
+     "i": "Cyclic nucleotide-gated Na+ channels close.",
+     "h": "Na+ channels close."
+    },
+    {
+     "t": "s",
+     "n": "Hyperpolarisation",
+     "i": "The cell is depolarised in the dark and hyperpolarises in light.",
+     "h": "The cell becomes more negative."
+    },
+    {
+     "t": "s",
+     "n": "Less glutamate released",
+     "i": "Reduced release is the signal that light has arrived.",
+     "h": "Neurotransmitter release falls."
+    }
+   ]
+  },
+  {
+   "id": "baro",
+   "name": "Baroreceptor Reflex",
+   "subj": "Physiology",
+   "blurb": "Short-term control of a rise in blood pressure.",
+   "color": "#38bdf8",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Rise in arterial pressure",
+     "i": "Stretches the vessel walls.",
+     "h": "Pressure rises."
+    },
+    {
+     "t": "r",
+     "n": "Baroreceptors",
+     "i": "Carotid sinus and aortic arch stretch receptors.",
+     "h": "Stretch sensors in the carotid sinus and aortic arch."
+    },
+    {
+     "t": "s",
+     "n": "Afferents in CN IX and CN X",
+     "i": "Glossopharyngeal from the carotid sinus, vagus from the arch.",
+     "h": "Glossopharyngeal and vagus nerves."
+    },
+    {
+     "t": "s",
+     "n": "Nucleus tractus solitarius",
+     "i": "Medullary relay for visceral afferents.",
+     "h": "Medullary integration centre."
+    },
+    {
+     "t": "s",
+     "n": "Vagal tone up, sympathetic down",
+     "i": "Output of the vasomotor centre changes.",
+     "h": "Autonomic balance shifts."
+    },
+    {
+     "t": "s",
+     "n": "Lower heart rate and vasodilation",
+     "i": "Cardiac output and resistance fall.",
+     "h": "Cardiac output and resistance fall."
+    },
+    {
+     "t": "s",
+     "n": "Pressure returns toward normal",
+     "i": "Negative feedback restores the set point.",
+     "h": "Negative feedback closes the loop."
+    }
+   ]
+  },
+  {
+   "id": "co2",
+   "name": "Carbon Dioxide Transport",
+   "subj": "Physiology",
+   "blurb": "How tissue CO2 reaches the lungs, mostly as bicarbonate.",
+   "color": "#fbbf24",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "CO2 from tissues",
+     "i": "Diffuses into red blood cells.",
+     "h": "Waste gas entering red cells."
+    },
+    {
+     "t": "e",
+     "n": "Carbonic anhydrase",
+     "i": "Inside red cells. Inhibited by acetazolamide.",
+     "h": "Blocked by acetazolamide."
+    },
+    {
+     "t": "m",
+     "n": "Carbonic acid",
+     "i": "Unstable and dissociates quickly.",
+     "h": "Unstable intermediate."
+    },
+    {
+     "t": "m",
+     "n": "Bicarbonate and H+",
+     "i": "H+ is buffered by haemoglobin, and the Haldane effect favours this in deoxygenated blood.",
+     "h": "Products buffered by haemoglobin."
+    },
+    {
+     "t": "r",
+     "n": "Band 3 exchanger",
+     "i": "Chloride-bicarbonate exchanger (chloride shift).",
+     "h": "Exchanges chloride for bicarbonate."
+    },
+    {
+     "t": "m",
+     "n": "Plasma bicarbonate",
+     "i": "The main form of CO2 transport, about 70%.",
+     "h": "The main transport form."
+    }
+   ]
+  },
+  {
+   "id": "gastric",
+   "name": "Gastric Acid Secretion",
+   "subj": "Physiology",
+   "blurb": "How a parietal cell makes HCl, and where drugs act.",
+   "color": "#ff9a3c",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Stimuli",
+     "i": "Histamine (H2), acetylcholine (M3) and gastrin (CCK-B). H2 blockers and PPIs reduce secretion.",
+     "h": "Three stimuli: histamine, ACh and gastrin."
+    },
+    {
+     "t": "e",
+     "n": "Carbonic anhydrase",
+     "i": "Makes H+ and bicarbonate from CO2 and water.",
+     "h": "Makes H+ and bicarbonate inside the cell."
+    },
+    {
+     "t": "m",
+     "n": "Intracellular H+",
+     "i": "Pumped out across the apical membrane.",
+     "h": "Hydrogen ions ready to be pumped."
+    },
+    {
+     "t": "e",
+     "n": "H+/K+ ATPase",
+     "i": "The proton pump. Blocked irreversibly by omeprazole.",
+     "h": "Target of proton pump inhibitors."
+    },
+    {
+     "t": "s",
+     "n": "HCl in the lumen",
+     "i": "Chloride follows H+ through apical channels.",
+     "h": "Acid enters the stomach."
+    },
+    {
+     "t": "s",
+     "n": "Alkaline tide",
+     "i": "Bicarbonate leaves the basolateral side in exchange for chloride, raising venous pH after meals.",
+     "h": "Bicarbonate enters blood after a meal."
+    }
+   ]
+  },
+  {
+   "id": "fatabs",
+   "name": "Fat Digestion and Absorption",
+   "subj": "Physiology",
+   "blurb": "From dietary triglyceride to chylomicrons in the lymph.",
+   "color": "#2fc7b8",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Dietary triglyceride",
+     "i": "Too large to absorb.",
+     "h": "Dietary fat."
+    },
+    {
+     "t": "m",
+     "n": "Bile salts",
+     "i": "Emulsify fat into small droplets.",
+     "h": "Detergents from bile."
+    },
+    {
+     "t": "e",
+     "n": "Pancreatic lipase and colipase",
+     "i": "Digest triglycerides in the duodenum. Blocked by orlistat.",
+     "h": "Blocked by orlistat."
+    },
+    {
+     "t": "m",
+     "n": "Fatty acids and monoglycerides",
+     "i": "Products of lipase.",
+     "h": "Digestion products."
+    },
+    {
+     "t": "s",
+     "n": "Micelles",
+     "i": "Carry products to the brush border. Absorption is in the jejunum.",
+     "h": "Carry fat products to the enterocyte."
+    },
+    {
+     "t": "s",
+     "n": "Re-esterification",
+     "i": "Triglycerides are rebuilt inside the enterocyte.",
+     "h": "Triglycerides rebuilt inside the cell."
+    },
+    {
+     "t": "m",
+     "n": "Chylomicron",
+     "i": "Packaged with ApoB-48. Abetalipoproteinaemia blocks this step.",
+     "h": "Contains ApoB-48."
+    },
+    {
+     "t": "s",
+     "n": "Lacteal",
+     "i": "Chylomicrons enter lymph, not blood.",
+     "h": "Lymphatic vessel in the villus."
+    },
+    {
+     "t": "s",
+     "n": "Thoracic duct",
+     "i": "Drains into the left venous angle.",
+     "h": "Main lymphatic channel."
+    },
+    {
+     "t": "s",
+     "n": "Systemic circulation",
+     "i": "Lipoprotein lipase then releases fatty acids to tissues.",
+     "h": "Fat reaches the blood after bypassing the liver."
+    }
+   ]
+  },
+  {
+   "id": "zymogen",
+   "name": "Pancreatic Zymogen Activation",
+   "subj": "Physiology",
+   "blurb": "How trypsin is switched on in the duodenum, and why premature activation causes pancreatitis.",
+   "color": "#a78bfa",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "Trypsinogen",
+     "i": "Inactive precursor secreted by the pancreas.",
+     "h": "Inactive precursor."
+    },
+    {
+     "t": "e",
+     "n": "Enteropeptidase",
+     "i": "Brush border enzyme of the duodenum.",
+     "h": "Duodenal brush border enzyme."
+    },
+    {
+     "t": "e",
+     "n": "Trypsin",
+     "i": "Activates itself and other zymogens. Premature activation in the pancreas causes pancreatitis.",
+     "h": "The master activator."
+    },
+    {
+     "t": "m",
+     "n": "Other zymogens",
+     "i": "Chymotrypsinogen, proelastase and procarboxypeptidase.",
+     "h": "Several other inactive precursors."
+    },
+    {
+     "t": "e",
+     "n": "Active proteases",
+     "i": "Chymotrypsin, elastase and carboxypeptidases.",
+     "h": "Active digestive enzymes."
+    },
+    {
+     "t": "s",
+     "n": "Peptides and amino acids",
+     "i": "Final digestion is by brush border peptidases.",
+     "h": "Small products ready for absorption."
+    }
+   ]
+  },
+  {
+   "id": "epo",
+   "name": "Erythropoiesis",
+   "subj": "Physiology",
+   "blurb": "From stem cell to red cell, and where erythropoietin acts.",
+   "color": "#ff5d6c",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Haematopoietic stem cell",
+     "i": "Pluripotent bone marrow cell.",
+     "h": "Pluripotent marrow cell."
+    },
+    {
+     "t": "s",
+     "n": "CFU-GEMM",
+     "i": "Common myeloid progenitor.",
+     "h": "Common myeloid progenitor."
+    },
+    {
+     "t": "s",
+     "n": "BFU-E",
+     "i": "Burst-forming unit, responds to stem cell factor.",
+     "h": "Early erythroid progenitor."
+    },
+    {
+     "t": "s",
+     "n": "CFU-E",
+     "i": "Responds to erythropoietin from the kidney.",
+     "h": "Erythropoietin-sensitive progenitor."
+    },
+    {
+     "t": "s",
+     "n": "Proerythroblast",
+     "i": "First recognisable red cell precursor.",
+     "h": "First recognisable precursor."
+    },
+    {
+     "t": "s",
+     "n": "Basophilic erythroblast",
+     "i": "Basophilic cytoplasm from abundant ribosomes.",
+     "h": "Blue cytoplasm from ribosomes."
+    },
+    {
+     "t": "s",
+     "n": "Polychromatic erythroblast",
+     "i": "Haemoglobin starts to accumulate.",
+     "h": "Haemoglobin accumulates."
+    },
+    {
+     "t": "s",
+     "n": "Orthochromatic erythroblast",
+     "i": "Nucleus is extruded.",
+     "h": "Extrudes its nucleus."
+    },
+    {
+     "t": "s",
+     "n": "Reticulocyte",
+     "i": "Contains residual RNA and enters the blood.",
+     "h": "Young red cell with residual RNA."
+    },
+    {
+     "t": "s",
+     "n": "Erythrocyte",
+     "i": "Mature biconcave cell with a lifespan of about 120 days.",
+     "h": "Mature red cell."
+    }
+   ]
+  },
+  {
+   "id": "calcium",
+   "name": "Calcium Homeostasis",
+   "subj": "Physiology",
+   "blurb": "How low calcium triggers PTH and corrects itself.",
+   "color": "#f472b6",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Low serum calcium",
+     "i": "Detected by the parathyroid chief cells.",
+     "h": "The trigger."
+    },
+    {
+     "t": "r",
+     "n": "Calcium-sensing receptor",
+     "i": "On chief cells. Low calcium reduces its activity.",
+     "h": "Sensor on the parathyroid."
+    },
+    {
+     "t": "m",
+     "n": "PTH",
+     "i": "Parathyroid hormone is released.",
+     "h": "Released by the parathyroid glands."
+    },
+    {
+     "t": "s",
+     "n": "Osteoclast activation",
+     "i": "Via RANKL on osteoblasts, releasing calcium and phosphate.",
+     "h": "Bone resorption through RANKL."
+    },
+    {
+     "t": "e",
+     "n": "Renal 1-alpha-hydroxylase",
+     "i": "PTH stimulates it and phosphate excretion rises.",
+     "h": "Kidney enzyme stimulated by PTH."
+    },
+    {
+     "t": "m",
+     "n": "Calcitriol",
+     "i": "Active vitamin D.",
+     "h": "Active vitamin D."
+    },
+    {
+     "t": "s",
+     "n": "Intestinal calcium absorption",
+     "i": "Increased by calcitriol.",
+     "h": "Increased absorption in the gut."
+    },
+    {
+     "t": "s",
+     "n": "Calcium restored",
+     "i": "Negative feedback switches PTH off.",
+     "h": "Negative feedback."
+    }
+   ]
+  },
+  {
+   "id": "adh",
+   "name": "ADH Action",
+   "subj": "Physiology",
+   "blurb": "How a rise in osmolality leads to concentrated urine.",
+   "color": "#60a5fa",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Rise in plasma osmolality",
+     "i": "Detected by hypothalamic osmoreceptors.",
+     "h": "The trigger."
+    },
+    {
+     "t": "s",
+     "n": "Hypothalamic osmoreceptors",
+     "i": "Supraoptic and paraventricular nuclei.",
+     "h": "Sensors in the hypothalamus."
+    },
+    {
+     "t": "m",
+     "n": "ADH",
+     "i": "Vasopressin is released from the posterior pituitary.",
+     "h": "Released from the posterior pituitary."
+    },
+    {
+     "t": "r",
+     "n": "V2 receptor",
+     "i": "Gs-coupled receptor on collecting duct principal cells. Deficient signalling causes nephrogenic diabetes insipidus.",
+     "h": "Receptor on collecting duct cells."
+    },
+    {
+     "t": "e",
+     "n": "Adenylyl cyclase",
+     "i": "Increases cAMP.",
+     "h": "Makes cAMP."
+    },
+    {
+     "t": "r",
+     "n": "Aquaporin-2",
+     "i": "Inserted into the apical membrane.",
+     "h": "Water channel inserted into the membrane."
+    },
+    {
+     "t": "s",
+     "n": "Water reabsorption",
+     "i": "Urine becomes concentrated and plasma osmolality falls.",
+     "h": "Urine is concentrated."
+    }
+   ]
+  },
+  {
+   "id": "no",
+   "name": "Nitric Oxide Signalling",
+   "subj": "Physiology",
+   "blurb": "From arginine to smooth muscle relaxation, and the target of nitrates and sildenafil.",
+   "color": "#34d3ee",
+   "nodes": [
+    {
+     "t": "m",
+     "n": "L-Arginine",
+     "i": "Substrate for NO synthase.",
+     "h": "Amino acid substrate."
+    },
+    {
+     "t": "e",
+     "n": "Nitric oxide synthase",
+     "i": "eNOS in endothelium, activated by calcium-calmodulin.",
+     "h": "Endothelial enzyme."
+    },
+    {
+     "t": "m",
+     "n": "Nitric oxide",
+     "i": "Diffuses to adjacent smooth muscle. Nitrates release it directly.",
+     "h": "Gas that diffuses to smooth muscle."
+    },
+    {
+     "t": "e",
+     "n": "Soluble guanylyl cyclase",
+     "i": "Activated by NO.",
+     "h": "Cytosolic enzyme activated by NO."
+    },
+    {
+     "t": "m",
+     "n": "cGMP",
+     "i": "Broken down by phosphodiesterase 5, which sildenafil blocks.",
+     "h": "Second messenger broken down by PDE5."
+    },
+    {
+     "t": "e",
+     "n": "Protein kinase G",
+     "i": "Lowers intracellular calcium.",
+     "h": "cGMP-dependent kinase."
+    },
+    {
+     "t": "s",
+     "n": "Smooth muscle relaxation",
+     "i": "Vasodilation and erection.",
+     "h": "Vasodilation."
+    }
+   ]
+  },
+  {
+   "id": "extrinsic",
+   "name": "Extrinsic Pathway and Fibrinolysis",
+   "subj": "Physiology",
+   "blurb": "Tissue factor to a clot, and plasmin to dissolve it.",
+   "color": "#9acd32",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Tissue injury",
+     "i": "Exposes tissue factor outside the vessel.",
+     "h": "Vessel damage exposes tissue factor."
+    },
+    {
+     "t": "r",
+     "n": "Tissue factor",
+     "i": "Factor III. Binds factor VII.",
+     "h": "Cofactor outside the vessel."
+    },
+    {
+     "t": "e",
+     "n": "Factor VIIa",
+     "i": "Prolongs PT when deficient. Monitored by INR.",
+     "h": "Measured by PT and INR."
+    },
+    {
+     "t": "e",
+     "n": "Factor Xa",
+     "i": "Common pathway enzyme.",
+     "h": "Common pathway protease."
+    },
+    {
+     "t": "e",
+     "n": "Thrombin",
+     "i": "Converts fibrinogen to fibrin.",
+     "h": "Generates fibrin."
+    },
+    {
+     "t": "s",
+     "n": "Fibrin clot",
+     "i": "Stabilised by factor XIIIa.",
+     "h": "Stable mesh."
+    },
+    {
+     "t": "e",
+     "n": "tPA",
+     "i": "Tissue plasminogen activator, used therapeutically in stroke and MI.",
+     "h": "Clot-busting drug target."
+    },
+    {
+     "t": "e",
+     "n": "Plasmin",
+     "i": "Digests fibrin.",
+     "h": "Digests fibrin."
+    },
+    {
+     "t": "m",
+     "n": "D-dimer",
+     "i": "Fibrin degradation product used to screen for thrombosis.",
+     "h": "Raised in thrombosis."
+    }
+   ]
+  },
+  {
+   "id": "nephron",
+   "name": "Nephron Filtrate Pathway",
+   "subj": "Physiology",
+   "blurb": "The path of filtrate through each nephron segment.",
+   "color": "#f5d547",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Glomerulus",
+     "i": "Filters plasma by size and charge.",
+     "h": "Site of filtration."
+    },
+    {
+     "t": "s",
+     "n": "Bowman capsule",
+     "i": "Collects the filtrate.",
+     "h": "Collects filtrate."
+    },
+    {
+     "t": "s",
+     "n": "Proximal convoluted tubule",
+     "i": "Reabsorbs most glucose, amino acids and about 65% of Na+ and water.",
+     "h": "Reabsorbs all glucose."
+    },
+    {
+     "t": "s",
+     "n": "Descending limb",
+     "i": "Permeable to water and not to solute.",
+     "h": "Water leaves."
+    },
+    {
+     "t": "s",
+     "n": "Thin ascending limb",
+     "i": "Passively reabsorbs Na+.",
+     "h": "Impermeable to water."
+    },
+    {
+     "t": "s",
+     "n": "Thick ascending limb",
+     "i": "NKCC2 pump, blocked by loop diuretics. Impermeable to water.",
+     "h": "Target of furosemide."
+    },
+    {
+     "t": "s",
+     "n": "Distal convoluted tubule",
+     "i": "NCC channel, blocked by thiazides. Calcium reabsorption is regulated by PTH here.",
+     "h": "Target of thiazides."
+    },
+    {
+     "t": "s",
+     "n": "Collecting duct",
+     "i": "Aldosterone and ADH act here.",
+     "h": "Target of aldosterone and ADH."
+    }
+   ]
+  },
+  {
+   "id": "airway",
+   "name": "Path of Air",
+   "subj": "Anatomy",
+   "blurb": "From the nose to the alveoli, through the conducting and respiratory zones.",
+   "color": "#fb923c",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Nasal cavity",
+     "i": "Warms, humidifies and filters air.",
+     "h": "Warms and filters air."
+    },
+    {
+     "t": "s",
+     "n": "Pharynx",
+     "i": "Shared airway and food passage.",
+     "h": "Shared passage."
+    },
+    {
+     "t": "s",
+     "n": "Larynx",
+     "i": "Contains the vocal cords. The cricoid cartilage is the only complete ring.",
+     "h": "Contains the vocal cords."
+    },
+    {
+     "t": "s",
+     "n": "Trachea",
+     "i": "C-shaped cartilage rings, ending at the carina near T4-T5.",
+     "h": "C-shaped cartilage rings."
+    },
+    {
+     "t": "s",
+     "n": "Carina",
+     "i": "Cough reflex is strongest here.",
+     "h": "The tracheal bifurcation."
+    },
+    {
+     "t": "s",
+     "n": "Main bronchi",
+     "i": "The right is wider, shorter and more vertical, so aspirated objects usually lodge on the right.",
+     "h": "The right is wider and more vertical."
+    },
+    {
+     "t": "s",
+     "n": "Lobar bronchi",
+     "i": "Three on the right and two on the left.",
+     "h": "Three on the right, two on the left."
+    },
+    {
+     "t": "s",
+     "n": "Segmental bronchi",
+     "i": "Supply the bronchopulmonary segments.",
+     "h": "Supply bronchopulmonary segments."
+    },
+    {
+     "t": "s",
+     "n": "Bronchioles",
+     "i": "No cartilage, lined with smooth muscle. Constrict in asthma.",
+     "h": "No cartilage."
+    },
+    {
+     "t": "s",
+     "n": "Terminal bronchioles",
+     "i": "End of the conducting zone.",
+     "h": "End of the conducting zone."
+    },
+    {
+     "t": "s",
+     "n": "Respiratory bronchioles",
+     "i": "Start of gas exchange.",
+     "h": "Start of gas exchange."
+    },
+    {
+     "t": "s",
+     "n": "Alveolar ducts",
+     "i": "Lead into alveolar sacs.",
+     "h": "Lead into alveolar sacs."
+    },
+    {
+     "t": "s",
+     "n": "Alveoli",
+     "i": "Type I cells for gas exchange and type II cells for surfactant.",
+     "h": "Site of gas exchange."
+    }
+   ]
+  },
+  {
+   "id": "gitract",
+   "name": "Path of Food Through the GI Tract",
+   "subj": "Anatomy",
+   "blurb": "Mouth to anus.",
+   "color": "#4ade80",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Mouth",
+     "i": "Mechanical digestion and salivary amylase.",
+     "h": "Starts digestion."
+    },
+    {
+     "t": "s",
+     "n": "Pharynx",
+     "i": "Swallowing reflex.",
+     "h": "Swallowing begins here."
+    },
+    {
+     "t": "s",
+     "n": "Oesophagus",
+     "i": "Peristalsis. Upper third skeletal muscle, lower third smooth.",
+     "h": "Peristalsis."
+    },
+    {
+     "t": "s",
+     "n": "Stomach",
+     "i": "Acid and pepsin.",
+     "h": "Acid and pepsin."
+    },
+    {
+     "t": "s",
+     "n": "Duodenum",
+     "i": "Receives bile and pancreatic juice. Most iron is absorbed here.",
+     "h": "Site of iron absorption."
+    },
+    {
+     "t": "s",
+     "n": "Jejunum",
+     "i": "Most absorption of nutrients.",
+     "h": "Main absorptive site."
+    },
+    {
+     "t": "s",
+     "n": "Ileum",
+     "i": "Absorbs vitamin B12 and bile salts.",
+     "h": "Absorbs B12 and bile salts."
+    },
+    {
+     "t": "s",
+     "n": "Ileocaecal valve",
+     "i": "Controls flow into the large bowel.",
+     "h": "Valve into the large bowel."
+    },
+    {
+     "t": "s",
+     "n": "Caecum",
+     "i": "Appendix attached here.",
+     "h": "Appendix attaches here."
+    },
+    {
+     "t": "s",
+     "n": "Ascending colon",
+     "i": "Retroperitoneal.",
+     "h": "Retroperitoneal."
+    },
+    {
+     "t": "s",
+     "n": "Transverse colon",
+     "i": "Intraperitoneal on a mesocolon.",
+     "h": "Mobile on a mesentery."
+    },
+    {
+     "t": "s",
+     "n": "Descending colon",
+     "i": "Retroperitoneal.",
+     "h": "Retroperitoneal."
+    },
+    {
+     "t": "s",
+     "n": "Sigmoid colon",
+     "i": "Common site for diverticula and volvulus.",
+     "h": "Common site for volvulus."
+    },
+    {
+     "t": "s",
+     "n": "Rectum",
+     "i": "Stores stool.",
+     "h": "Stores stool."
+    },
+    {
+     "t": "s",
+     "n": "Anal canal",
+     "i": "Internal sphincter involuntary, external voluntary.",
+     "h": "Ends at the anal verge."
+    }
+   ]
+  },
+  {
+   "id": "bileflow",
+   "name": "Path of Bile",
+   "subj": "Anatomy",
+   "blurb": "From the hepatocyte to the duodenum.",
+   "color": "#c084fc",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Bile canaliculi",
+     "i": "Formed between hepatocytes.",
+     "h": "Between adjacent hepatocytes."
+    },
+    {
+     "t": "s",
+     "n": "Canals of Hering",
+     "i": "Link canaliculi to bile ducts.",
+     "h": "Link canaliculi to ducts."
+    },
+    {
+     "t": "s",
+     "n": "Interlobular bile ducts",
+     "i": "In the portal triad.",
+     "h": "Portal triad structure."
+    },
+    {
+     "t": "s",
+     "n": "Right and left hepatic ducts",
+     "i": "Drain each lobe.",
+     "h": "Drain each lobe."
+    },
+    {
+     "t": "s",
+     "n": "Common hepatic duct",
+     "i": "Joins the cystic duct.",
+     "h": "Formed by the hepatic ducts."
+    },
+    {
+     "t": "s",
+     "n": "Cystic duct",
+     "i": "Leads to the gallbladder. Contains the spiral valve.",
+     "h": "Leads to the gallbladder."
+    },
+    {
+     "t": "s",
+     "n": "Gallbladder",
+     "i": "Stores and concentrates bile.",
+     "h": "Stores bile."
+    },
+    {
+     "t": "s",
+     "n": "Common bile duct",
+     "i": "Passes behind the duodenum.",
+     "h": "Joins the pancreatic duct."
+    },
+    {
+     "t": "s",
+     "n": "Ampulla of Vater",
+     "i": "Controlled by the sphincter of Oddi.",
+     "h": "Shared opening with the pancreatic duct."
+    },
+    {
+     "t": "s",
+     "n": "Duodenum",
+     "i": "Bile enters the second part.",
+     "h": "Bile enters here."
+    }
+   ]
+  },
+  {
+   "id": "urinary",
+   "name": "Path of Urine",
+   "subj": "Anatomy",
+   "blurb": "From the collecting duct to the urethral meatus.",
+   "color": "#38bdf8",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Collecting duct",
+     "i": "Empties at the renal papilla.",
+     "h": "Final concentration step."
+    },
+    {
+     "t": "s",
+     "n": "Renal papilla",
+     "i": "Apex of the medullary pyramid.",
+     "h": "Apex of the pyramid."
+    },
+    {
+     "t": "s",
+     "n": "Minor calyx",
+     "i": "Cups the papilla.",
+     "h": "Cups the papilla."
+    },
+    {
+     "t": "s",
+     "n": "Major calyx",
+     "i": "Formed from several minor calyces.",
+     "h": "Formed by minor calyces."
+    },
+    {
+     "t": "s",
+     "n": "Renal pelvis",
+     "i": "Funnel shape that narrows into the ureter.",
+     "h": "Funnel-shaped."
+    },
+    {
+     "t": "s",
+     "n": "Ureter",
+     "i": "Three constrictions: pelviureteric junction, pelvic brim and vesicoureteric junction.",
+     "h": "Three narrow points."
+    },
+    {
+     "t": "s",
+     "n": "Urinary bladder",
+     "i": "Detrusor muscle stores urine.",
+     "h": "Detrusor muscle."
+    },
+    {
+     "t": "s",
+     "n": "Urethra",
+     "i": "Longer in men than women.",
+     "h": "Opens at the external meatus."
+    }
+   ]
+  },
+  {
+   "id": "sperm",
+   "name": "Path of Sperm",
+   "subj": "Anatomy",
+   "blurb": "From the testis to the urethral meatus.",
+   "color": "#fbbf24",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Seminiferous tubules",
+     "i": "Sperm production in the testis.",
+     "h": "Site of sperm production."
+    },
+    {
+     "t": "s",
+     "n": "Rete testis",
+     "i": "Collecting network inside the testis.",
+     "h": "Network in the mediastinum testis."
+    },
+    {
+     "t": "s",
+     "n": "Efferent ductules",
+     "i": "Carry sperm to the epididymis.",
+     "h": "Carry sperm out of the testis."
+    },
+    {
+     "t": "s",
+     "n": "Epididymis",
+     "i": "Sperm mature and are stored.",
+     "h": "Maturation and storage."
+    },
+    {
+     "t": "s",
+     "n": "Vas deferens",
+     "i": "Passes through the inguinal canal.",
+     "h": "Cut in vasectomy."
+    },
+    {
+     "t": "s",
+     "n": "Ejaculatory duct",
+     "i": "Formed by the vas and seminal vesicle duct.",
+     "h": "Joined by the seminal vesicle."
+    },
+    {
+     "t": "s",
+     "n": "Prostatic urethra",
+     "i": "Receives prostatic secretions.",
+     "h": "Surrounded by the prostate."
+    },
+    {
+     "t": "s",
+     "n": "Membranous urethra",
+     "i": "Passes through the urogenital diaphragm.",
+     "h": "Shortest and narrowest part."
+    },
+    {
+     "t": "s",
+     "n": "Spongy urethra",
+     "i": "Runs through the penis.",
+     "h": "Runs through the corpus spongiosum."
+    }
+   ]
+  },
+  {
+   "id": "visual",
+   "name": "Visual Pathway",
+   "subj": "Anatomy",
+   "blurb": "From the retina to the primary visual cortex. Classic lesion localisation.",
+   "color": "#ff9a3c",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Retina",
+     "i": "Photoreceptors, bipolar cells and ganglion cells.",
+     "h": "Contains photoreceptors."
+    },
+    {
+     "t": "s",
+     "n": "Optic nerve",
+     "i": "A lesion causes ipsilateral blindness.",
+     "h": "A lesion blinds one eye."
+    },
+    {
+     "t": "s",
+     "n": "Optic chiasm",
+     "i": "Nasal fibres cross. Pituitary tumours cause bitemporal hemianopia.",
+     "h": "Compression gives bitemporal hemianopia."
+    },
+    {
+     "t": "s",
+     "n": "Optic tract",
+     "i": "A lesion causes contralateral homonymous hemianopia.",
+     "h": "Lesion gives homonymous hemianopia."
+    },
+    {
+     "t": "s",
+     "n": "Lateral geniculate nucleus",
+     "i": "Thalamic relay for vision.",
+     "h": "Thalamic relay."
+    },
+    {
+     "t": "s",
+     "n": "Optic radiations",
+     "i": "Meyer loop (temporal) carries the upper visual field; the parietal pathway carries the lower.",
+     "h": "Temporal loop carries the upper field."
+    },
+    {
+     "t": "s",
+     "n": "Primary visual cortex",
+     "i": "Calcarine sulcus of the occipital lobe.",
+     "h": "Occipital lobe."
+    }
+   ]
+  },
+  {
+   "id": "auditory",
+   "name": "Auditory Pathway",
+   "subj": "Anatomy",
+   "blurb": "From sound waves to the auditory cortex.",
+   "color": "#2fc7b8",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Pinna",
+     "i": "Collects sound.",
+     "h": "Collects sound."
+    },
+    {
+     "t": "s",
+     "n": "External auditory canal",
+     "i": "Ends at the tympanic membrane.",
+     "h": "Leads to the eardrum."
+    },
+    {
+     "t": "s",
+     "n": "Tympanic membrane",
+     "i": "Vibrates with sound.",
+     "h": "The eardrum."
+    },
+    {
+     "t": "s",
+     "n": "Malleus",
+     "i": "First ossicle.",
+     "h": "First ossicle."
+    },
+    {
+     "t": "s",
+     "n": "Incus",
+     "i": "Middle ossicle.",
+     "h": "Middle ossicle."
+    },
+    {
+     "t": "s",
+     "n": "Stapes",
+     "i": "Smallest bone. Footplate sits in the oval window.",
+     "h": "Smallest bone in the body."
+    },
+    {
+     "t": "s",
+     "n": "Oval window",
+     "i": "Transmits vibration into the cochlea.",
+     "h": "Entry to the cochlea."
+    },
+    {
+     "t": "s",
+     "n": "Basilar membrane",
+     "i": "Tonotopic: high frequency at the base, low at the apex.",
+     "h": "Frequency map."
+    },
+    {
+     "t": "s",
+     "n": "Organ of Corti",
+     "i": "Hair cells convert vibration to a signal.",
+     "h": "Contains the hair cells."
+    },
+    {
+     "t": "s",
+     "n": "Cochlear nerve",
+     "i": "Part of CN VIII.",
+     "h": "Part of CN VIII."
+    },
+    {
+     "t": "s",
+     "n": "Cochlear nuclei",
+     "i": "First relay in the medulla.",
+     "h": "First relay."
+    },
+    {
+     "t": "s",
+     "n": "Superior olivary complex",
+     "i": "Bilateral input for sound localisation.",
+     "h": "Sound localisation."
+    },
+    {
+     "t": "s",
+     "n": "Inferior colliculus",
+     "i": "Midbrain relay.",
+     "h": "Midbrain relay."
+    },
+    {
+     "t": "s",
+     "n": "Medial geniculate nucleus",
+     "i": "Thalamic relay.",
+     "h": "Thalamic relay."
+    },
+    {
+     "t": "s",
+     "n": "Primary auditory cortex",
+     "i": "Superior temporal gyrus.",
+     "h": "Temporal lobe."
+    }
+   ]
+  },
+  {
+   "id": "corticospinal",
+   "name": "Corticospinal Tract",
+   "subj": "Anatomy",
+   "blurb": "Voluntary motor pathway from the cortex to a skeletal muscle.",
+   "color": "#a78bfa",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Precentral gyrus",
+     "i": "Primary motor cortex with a somatotopic map.",
+     "h": "Primary motor cortex."
+    },
+    {
+     "t": "s",
+     "n": "Corona radiata",
+     "i": "White matter fan beneath the cortex.",
+     "h": "Fan of white matter."
+    },
+    {
+     "t": "s",
+     "n": "Posterior limb of internal capsule",
+     "i": "Common site for lacunar infarcts.",
+     "h": "Common site for lacunar stroke."
+    },
+    {
+     "t": "s",
+     "n": "Cerebral peduncle",
+     "i": "Midbrain.",
+     "h": "Midbrain."
+    },
+    {
+     "t": "s",
+     "n": "Basilar pons",
+     "i": "Fibres split into bundles.",
+     "h": "Pontine level."
+    },
+    {
+     "t": "s",
+     "n": "Medullary pyramid",
+     "i": "Gives the tract its name.",
+     "h": "Gives the tract its other name."
+    },
+    {
+     "t": "s",
+     "n": "Pyramidal decussation",
+     "i": "About 90% of fibres cross here.",
+     "h": "Fibres cross the midline."
+    },
+    {
+     "t": "s",
+     "n": "Lateral corticospinal tract",
+     "i": "Descends in the lateral funiculus.",
+     "h": "Descends in the cord."
+    },
+    {
+     "t": "s",
+     "n": "Anterior horn motor neuron",
+     "i": "The lower motor neuron.",
+     "h": "Lower motor neuron."
+    },
+    {
+     "t": "s",
+     "n": "Ventral root",
+     "i": "Motor fibres leave the cord.",
+     "h": "Motor fibres leave the cord."
+    },
+    {
+     "t": "s",
+     "n": "Neuromuscular junction",
+     "i": "Acetylcholine acts on the muscle.",
+     "h": "Synapse with muscle."
+    }
+   ]
+  },
+  {
+   "id": "dcml",
+   "name": "Dorsal Column-Medial Lemniscus",
+   "subj": "Anatomy",
+   "blurb": "Fine touch, vibration and proprioception.",
+   "color": "#ff5d6c",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Peripheral receptor",
+     "i": "Meissner, Pacinian and muscle spindle endings.",
+     "h": "Receptors in skin and muscle."
+    },
+    {
+     "t": "s",
+     "n": "Dorsal root ganglion",
+     "i": "Cell body of the first-order neuron.",
+     "h": "First-order neuron cell body."
+    },
+    {
+     "t": "s",
+     "n": "Dorsal columns",
+     "i": "Gracile (legs) and cuneate (arms) fasciculi, ipsilateral.",
+     "h": "Gracile and cuneate."
+    },
+    {
+     "t": "s",
+     "n": "Nucleus gracilis and cuneatus",
+     "i": "Second-order neurons in the medulla.",
+     "h": "Medullary nuclei."
+    },
+    {
+     "t": "s",
+     "n": "Internal arcuate fibres",
+     "i": "Decussate in the medulla.",
+     "h": "Cross the midline."
+    },
+    {
+     "t": "s",
+     "n": "Medial lemniscus",
+     "i": "Carries fibres to the thalamus.",
+     "h": "Ascends to the thalamus."
+    },
+    {
+     "t": "s",
+     "n": "VPL nucleus of thalamus",
+     "i": "Third-order neurons.",
+     "h": "Thalamic relay."
+    },
+    {
+     "t": "s",
+     "n": "Primary somatosensory cortex",
+     "i": "Postcentral gyrus.",
+     "h": "Postcentral gyrus."
+    }
+   ]
+  },
+  {
+   "id": "spinothal",
+   "name": "Spinothalamic Tract",
+   "subj": "Anatomy",
+   "blurb": "Pain and temperature.",
+   "color": "#f472b6",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Nociceptor",
+     "i": "Free nerve endings (A-delta and C fibres).",
+     "h": "Free nerve endings."
+    },
+    {
+     "t": "s",
+     "n": "Dorsal root ganglion",
+     "i": "First-order neuron.",
+     "h": "First-order neuron."
+    },
+    {
+     "t": "s",
+     "n": "Dorsal horn synapse",
+     "i": "Fibres ascend one or two levels in Lissauer tract.",
+     "h": "Synapse in the dorsal horn."
+    },
+    {
+     "t": "s",
+     "n": "Anterior white commissure",
+     "i": "Decussation within the cord, so lesions cause contralateral loss.",
+     "h": "Crosses within the cord."
+    },
+    {
+     "t": "s",
+     "n": "Spinothalamic tract",
+     "i": "Ascends in the anterolateral cord.",
+     "h": "Ascends in the anterolateral system."
+    },
+    {
+     "t": "s",
+     "n": "VPL nucleus of thalamus",
+     "i": "Third-order relay.",
+     "h": "Thalamic relay."
+    },
+    {
+     "t": "s",
+     "n": "Postcentral gyrus",
+     "i": "Primary somatosensory cortex.",
+     "h": "Sensory cortex."
+    }
+   ]
+  },
+  {
+   "id": "csf",
+   "name": "CSF Circulation",
+   "subj": "Anatomy",
+   "blurb": "From production in the ventricles to absorption in the venous sinuses.",
+   "color": "#60a5fa",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Choroid plexus",
+     "i": "Produces most CSF, mainly in the lateral ventricles.",
+     "h": "Produces CSF."
+    },
+    {
+     "t": "s",
+     "n": "Lateral ventricles",
+     "i": "C-shaped cavities in each hemisphere.",
+     "h": "Largest ventricles."
+    },
+    {
+     "t": "s",
+     "n": "Interventricular foramen",
+     "i": "Foramen of Monro.",
+     "h": "Foramen of Monro."
+    },
+    {
+     "t": "s",
+     "n": "Third ventricle",
+     "i": "Between the thalami.",
+     "h": "Between the thalami."
+    },
+    {
+     "t": "s",
+     "n": "Cerebral aqueduct",
+     "i": "Narrow midbrain channel. Common site of obstructive hydrocephalus.",
+     "h": "Narrow channel in the midbrain."
+    },
+    {
+     "t": "s",
+     "n": "Fourth ventricle",
+     "i": "Between the pons and cerebellum.",
+     "h": "Between pons and cerebellum."
+    },
+    {
+     "t": "s",
+     "n": "Foramina of Luschka and Magendie",
+     "i": "Open into the subarachnoid space.",
+     "h": "Exit foramina."
+    },
+    {
+     "t": "s",
+     "n": "Subarachnoid space",
+     "i": "Surrounds the brain and cord.",
+     "h": "Surrounds the brain."
+    },
+    {
+     "t": "s",
+     "n": "Arachnoid granulations",
+     "i": "One-way valves into the venous sinus.",
+     "h": "Absorb CSF."
+    },
+    {
+     "t": "s",
+     "n": "Superior sagittal sinus",
+     "i": "CSF enters venous blood here.",
+     "h": "Final destination."
+    }
+   ]
+  },
+  {
+   "id": "embryo",
+   "name": "Fertilisation to Gastrulation",
+   "subj": "Anatomy",
+   "blurb": "The first three weeks of development.",
+   "color": "#34d3ee",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Ovulation",
+     "i": "Oocyte is released and picked up by the fimbriae.",
+     "h": "Oocyte released."
+    },
+    {
+     "t": "s",
+     "n": "Fertilisation",
+     "i": "Occurs in the ampulla of the uterine tube.",
+     "h": "Occurs in the ampulla."
+    },
+    {
+     "t": "s",
+     "n": "Zygote",
+     "i": "Diploid cell with 46 chromosomes.",
+     "h": "Single diploid cell."
+    },
+    {
+     "t": "s",
+     "n": "Cleavage",
+     "i": "Rapid divisions without growth.",
+     "h": "Divisions without growth."
+    },
+    {
+     "t": "s",
+     "n": "Morula",
+     "i": "Solid ball of 16 or more cells.",
+     "h": "Solid ball of cells."
+    },
+    {
+     "t": "s",
+     "n": "Blastocyst",
+     "i": "Inner cell mass and trophoblast.",
+     "h": "Fluid-filled cavity appears."
+    },
+    {
+     "t": "s",
+     "n": "Hatching",
+     "i": "Loses the zona pellucida.",
+     "h": "Loses the zona pellucida."
+    },
+    {
+     "t": "s",
+     "n": "Implantation",
+     "i": "About day 6 to 10. Ectopic pregnancy usually occurs in the ampulla.",
+     "h": "Begins about day 6."
+    },
+    {
+     "t": "s",
+     "n": "Bilaminar disc",
+     "i": "Epiblast and hypoblast, week 2.",
+     "h": "Two layers, week 2."
+    },
+    {
+     "t": "s",
+     "n": "Gastrulation",
+     "i": "Forms the trilaminar disc in week 3.",
+     "h": "Forms three germ layers."
+    }
+   ]
+  },
+  {
+   "id": "fetal1",
+   "name": "Fetal Circulation: Oxygenated Route",
+   "subj": "Anatomy",
+   "blurb": "Oxygenated blood from the placenta to the head and upper limbs.",
+   "color": "#9acd32",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Placenta",
+     "i": "Site of gas exchange for the fetus.",
+     "h": "Site of exchange."
+    },
+    {
+     "t": "s",
+     "n": "Umbilical vein",
+     "i": "Carries oxygenated blood to the fetus.",
+     "h": "One vessel carries oxygenated blood."
+    },
+    {
+     "t": "s",
+     "n": "Ductus venosus",
+     "i": "Bypasses the liver.",
+     "h": "Bypasses the liver."
+    },
+    {
+     "t": "s",
+     "n": "Inferior vena cava",
+     "i": "Mixes with deoxygenated blood from the legs.",
+     "h": "Receives the ductus venosus."
+    },
+    {
+     "t": "s",
+     "n": "Right atrium",
+     "i": "Streams most blood across the septum.",
+     "h": "Preferential streaming."
+    },
+    {
+     "t": "s",
+     "n": "Foramen ovale",
+     "i": "Right-to-left shunt. Closes after birth when left atrial pressure rises.",
+     "h": "Interatrial shunt."
+    },
+    {
+     "t": "s",
+     "n": "Left atrium",
+     "i": "Receives the shunted blood.",
+     "h": "Receives the shunted blood."
+    },
+    {
+     "t": "s",
+     "n": "Left ventricle",
+     "i": "Pumps to the aorta.",
+     "h": "Pumps to the body."
+    },
+    {
+     "t": "s",
+     "n": "Ascending aorta",
+     "i": "Supplies the coronary arteries, brain and upper limbs.",
+     "h": "Supplies brain and heart."
+    }
+   ]
+  },
+  {
+   "id": "fetal2",
+   "name": "Fetal Circulation: Ductus Arteriosus Route",
+   "subj": "Anatomy",
+   "blurb": "How deoxygenated blood bypasses the lungs and returns to the placenta.",
+   "color": "#f5d547",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Superior vena cava",
+     "i": "Returns deoxygenated blood from the head.",
+     "h": "Returns blood from the head."
+    },
+    {
+     "t": "s",
+     "n": "Right atrium",
+     "i": "Receives blood from both venae cavae.",
+     "h": "Receives venous blood."
+    },
+    {
+     "t": "s",
+     "n": "Right ventricle",
+     "i": "Pumps against high pulmonary resistance.",
+     "h": "Pumps blood into the pulmonary trunk."
+    },
+    {
+     "t": "s",
+     "n": "Pulmonary trunk",
+     "i": "Most blood bypasses the lungs.",
+     "h": "Gives off pulmonary arteries."
+    },
+    {
+     "t": "s",
+     "n": "Ductus arteriosus",
+     "i": "Kept open by prostaglandins. Closed with indomethacin, kept open with alprostadil.",
+     "h": "Kept open by prostaglandin E2."
+    },
+    {
+     "t": "s",
+     "n": "Descending aorta",
+     "i": "Receives mixed blood.",
+     "h": "Receives blood from the duct."
+    },
+    {
+     "t": "s",
+     "n": "Umbilical arteries",
+     "i": "Two vessels carry deoxygenated blood to the placenta.",
+     "h": "Carry deoxygenated blood away."
+    },
+    {
+     "t": "s",
+     "n": "Placenta",
+     "i": "Exchange with maternal blood.",
+     "h": "Site of exchange."
+    }
+   ]
+  },
+  {
+   "id": "brachial",
+   "name": "Brachial Plexus",
+   "subj": "Anatomy",
+   "blurb": "Roots, trunks, divisions, cords, branches.",
+   "color": "#fb923c",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Roots",
+     "i": "Ventral rami of C5 to T1. Dorsal scapular nerve and long thoracic nerve arise here.",
+     "h": "C5 to T1."
+    },
+    {
+     "t": "s",
+     "n": "Trunks",
+     "i": "Upper, middle and lower. Upper trunk injury causes Erb palsy.",
+     "h": "Three trunks."
+    },
+    {
+     "t": "s",
+     "n": "Divisions",
+     "i": "Anterior and posterior divisions.",
+     "h": "Each trunk splits in two."
+    },
+    {
+     "t": "s",
+     "n": "Cords",
+     "i": "Lateral, posterior and medial, named for their relation to the axillary artery.",
+     "h": "Named from the axillary artery."
+    },
+    {
+     "t": "s",
+     "n": "Terminal branches",
+     "i": "Musculocutaneous, axillary, radial, median and ulnar nerves.",
+     "h": "Five major nerves."
+    }
+   ]
+  },
+  {
+   "id": "portal",
+   "name": "Hepatic Portal Circulation",
+   "subj": "Anatomy",
+   "blurb": "From the gut to the liver and back to the heart.",
+   "color": "#4ade80",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Intestinal capillaries",
+     "i": "Absorb nutrients from the gut.",
+     "h": "Absorb nutrients."
+    },
+    {
+     "t": "s",
+     "n": "Superior mesenteric and splenic veins",
+     "i": "Join behind the neck of the pancreas.",
+     "h": "Two veins join."
+    },
+    {
+     "t": "s",
+     "n": "Hepatic portal vein",
+     "i": "Carries nutrient-rich blood to the liver.",
+     "h": "Carries nutrient-rich blood."
+    },
+    {
+     "t": "s",
+     "n": "Liver sinusoids",
+     "i": "Blood mixes with hepatic artery blood and flows past hepatocytes.",
+     "h": "Fenestrated capillaries."
+    },
+    {
+     "t": "s",
+     "n": "Central vein",
+     "i": "Drains each lobule.",
+     "h": "Drains each lobule."
+    },
+    {
+     "t": "s",
+     "n": "Hepatic veins",
+     "i": "Three veins leave the liver.",
+     "h": "Leave the liver."
+    },
+    {
+     "t": "s",
+     "n": "Inferior vena cava",
+     "i": "Returns blood to the right atrium.",
+     "h": "Returns blood to the heart."
+    }
+   ]
+  },
+  {
+   "id": "complement",
+   "name": "Complement Cascade",
+   "subj": "Immunology",
+   "blurb": "Classical pathway from antibody binding to the membrane attack complex.",
+   "color": "#c084fc",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Antigen-antibody complex",
+     "i": "IgM and IgG bind and expose the C1q site.",
+     "h": "IgM or IgG on the surface."
+    },
+    {
+     "t": "e",
+     "n": "C1",
+     "i": "The C1q/C1r/C1s complex. C1s cleaves C4 and C2.",
+     "h": "Starts the classical pathway."
+    },
+    {
+     "t": "e",
+     "n": "C3 convertase",
+     "i": "C4b2a. Cleaves C3.",
+     "h": "Made from C4b and C2a."
+    },
+    {
+     "t": "m",
+     "n": "C3b",
+     "i": "Opsonin that tags microbes for phagocytosis. Deficiency causes recurrent bacterial infections.",
+     "h": "Opsonin that coats pathogens."
+    },
+    {
+     "t": "e",
+     "n": "C5 convertase",
+     "i": "Cleaves C5 to C5a and C5b.",
+     "h": "Cleaves C5."
+    },
+    {
+     "t": "m",
+     "n": "C5b",
+     "i": "Starts assembly of the membrane attack complex.",
+     "h": "Starts the MAC."
+    },
+    {
+     "t": "m",
+     "n": "C6 to C9",
+     "i": "Added in order to C5b.",
+     "h": "Final components."
+    },
+    {
+     "t": "s",
+     "n": "Membrane attack complex",
+     "i": "Forms a pore. Deficiency of terminal components causes Neisseria infections.",
+     "h": "Pore in the membrane."
+    }
+   ]
+  },
+  {
+   "id": "extrav",
+   "name": "Leukocyte Extravasation",
+   "subj": "Immunology",
+   "blurb": "How a neutrophil leaves the blood to enter tissue.",
+   "color": "#38bdf8",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Margination and rolling",
+     "i": "Selectins on endothelium bind sialyl-Lewis X on leukocytes. Absent in LAD type 2.",
+     "h": "Selectin-mediated."
+    },
+    {
+     "t": "m",
+     "n": "Chemokine activation",
+     "i": "IL-8 activates integrins on the leukocyte.",
+     "h": "IL-8 signals."
+    },
+    {
+     "t": "s",
+     "n": "Firm adhesion",
+     "i": "LFA-1 and Mac-1 bind ICAM-1. Absent in LAD type 1.",
+     "h": "Integrin binding."
+    },
+    {
+     "t": "s",
+     "n": "Diapedesis",
+     "i": "Leukocyte squeezes between endothelial cells using PECAM-1.",
+     "h": "Squeezes through the wall."
+    },
+    {
+     "t": "s",
+     "n": "Chemotaxis",
+     "i": "Follows a gradient of C5a, IL-8 and LTB4 to the site.",
+     "h": "Follows a chemical gradient."
+    }
+   ]
+  },
+  {
+   "id": "tcell",
+   "name": "T-Cell Activation",
+   "subj": "Immunology",
+   "blurb": "From antigen uptake to clonal expansion of a CD4 cell.",
+   "color": "#fbbf24",
+   "nodes": [
+    {
+     "t": "s",
+     "n": "Antigen uptake",
+     "i": "Dendritic cell phagocytoses a microbe.",
+     "h": "Dendritic cell engulfs the antigen."
+    },
+    {
+     "t": "r",
+     "n": "MHC II presentation",
+     "i": "Peptide is displayed to CD4 cells.",
+     "h": "Displays peptide to CD4 cells."
+    },
+    {
+     "t": "r",
+     "n": "T-cell receptor",
+     "i": "Recognises peptide-MHC. Signal 1.",
+     "h": "Signal 1."
+    },
+    {
+     "t": "r",
+     "n": "CD28-B7 costimulation",
+     "i": "Signal 2. Without it the cell becomes anergic.",
+     "h": "Signal 2."
+    },
+    {
+     "t": "m",
+     "n": "IL-2",
+     "i": "Autocrine growth factor for T cells.",
+     "h": "T-cell growth factor."
+    },
+    {
+     "t": "s",
+     "n": "Clonal expansion",
+     "i": "Rapid proliferation of antigen-specific cells.",
+     "h": "Rapid proliferation."
+    },
+    {
+     "t": "s",
+     "n": "Differentiation",
+     "i": "Th1, Th2, Th17 or Treg depending on cytokines.",
+     "h": "Subset choice."
+    }
+   ]
+  }
+ ]
+}
