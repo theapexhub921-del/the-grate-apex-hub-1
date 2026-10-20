@@ -83,6 +83,7 @@ export default function AppTabs() {
           <Tabs.Screen name="learn/hb-lesson" options={{ href: null }} />
           <Tabs.Screen name="learn/hb-practice" options={{ href: null }} />
         <Tabs.Screen name="explore/discovery" options={{ href: null }} />
+        <Tabs.Screen name="games/index" options={{ href: null }} />
         <Tabs.Screen name="games/med-term-scramble" options={{ href: null }} />
         <Tabs.Screen name="games/golden-hour" options={{ href: null }} />
         <Tabs.Screen name="games/pathway-lab" options={{ href: null }} />

@@ -1,5 +1,6 @@
 // Study games built outside the app (Godot) and published as web builds in
-// public/game-builds/<id>/. Add a game here and it appears in Explore → Games.
+// public/game-builds/<id>/. Add a game here and it appears on the Games page
+// (/games, opened from the Games button in Explore and Connect).
 
 export type StudyGame = {
   id: string;
@@ -15,6 +16,14 @@ export type StudyGame = {
   loadingColor: string;
   /** Short line for the Connect page; only games you can play with classmates are listed there. */
   connectText?: string;
+  /** Games page: the kind of game, shown on its cover (e.g. "Word game"). */
+  genre: string;
+  /** Games page: the cover's highlight colour (readable on loadingColor). */
+  accent: string;
+  /** Games page: "Play this when…", for the quick guide under the games. */
+  bestFor: string;
+  /** Games page: three short "how it works" steps. */
+  steps: readonly [string, string, string];
 };
 
 export const STUDY_GAMES: readonly StudyGame[] = [
@@ -29,6 +38,10 @@ export const STUDY_GAMES: readonly StudyGame[] = [
     tags: ['112 terms', '14 subjects', 'Single player', 'Multiplayer'],
     loadingColor: '#14101e',
     connectText: 'Race your classmates to unscramble medical terms in a live room, or play solo.',
+    genre: 'Word game',
+    accent: '#FDC00A',
+    bestFor: 'You want to drill medical terminology, alone or against classmates.',
+    steps: ['Read the clinical clue', 'Unscramble the term before time runs out', 'Keep your streak going or race friends live'],
   },
   {
     id: 'golden-hour',
@@ -40,6 +53,10 @@ export const STUDY_GAMES: readonly StudyGame[] = [
     buildPath: '/game-builds/golden-hour/play.html',
     tags: ['6 shifts', '3D ward', 'Nursing skills', 'Single player'],
     loadingColor: '#1144C3',
+    genre: 'Ward simulation',
+    accent: '#FFD95C',
+    bestFor: 'You want to practise bedside clinical and nursing skills in order.',
+    steps: ['Learn the skill', 'Drill it against the clock', 'Prove it at the bedside on a night shift'],
   },
   {
     id: 'pathway-lab',
@@ -51,6 +68,10 @@ export const STUDY_GAMES: readonly StudyGame[] = [
     buildPath: '/game-builds/pathway-lab/play.html',
     tags: ['70 pathways', '634 steps', 'Learn mode', 'Single player'],
     loadingColor: '#0d1215',
+    genre: 'Puzzle',
+    accent: '#5FCB7E',
+    bestFor: 'You are learning a pathway and want to know every enzyme and step.',
+    steps: ['Learn a pathway step by step', 'Drag the missing enzymes and molecules into place', 'Earn stars and replay the steps you miss'],
   },
 ];
 

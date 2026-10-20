@@ -8,7 +8,7 @@ import { CardGrid } from '@/components/ui/card-grid';
 import { Icon } from '@/components/ui/icon';
 import { ExploreFeatureGroups } from '@/components/explore/feature-groups';
 import { FeatureGuideSimulator } from '@/components/explore/feature-guide-simulator';
-import { GamesSection } from '@/components/explore/games-section';
+import { GamesEntry } from '@/components/explore/games-section';
 import { OrganisationSimulator } from '@/components/explore/organisation-simulator';
 import { PwaInstallCard } from '@/components/pwa-install-card';
 import { Card, Interactive } from '@/components/ui/interactive';
@@ -141,8 +141,8 @@ export default function ExploreScreen() {
       {/* Discovery first (owner request): concepts, connections and research; the
           welcome and the simulations follow. */}
 
-      {/* Study games (src/data/games.ts). */}
-      <GamesSection style={styles.firstSection} />
+      {/* Study games: one Games button opens the Games page (/games) with every game. */}
+      <GamesEntry style={styles.firstSection} />
 
       {weeklySession ? <SectionHeader title={`${upcoming ? 'Next week' : 'This week'} · ${weeklySession.title}`} subtitle={`${weeklySession.summary} Begins ${weekLabel}.`} style={styles.section} /> : null}
 

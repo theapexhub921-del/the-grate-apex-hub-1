@@ -32,6 +32,7 @@ const SECTION_LABELS: [string, string][] = [
   ['/learn', 'Study'],
   ['/explore/discovery', 'Discovery'],
   ['/explore', 'Explore'],
+  ['/games', 'Games'],
   ['/social/friends', 'Friends'],
   ['/social', 'Connect'],
   ['/progress', 'Progress'],

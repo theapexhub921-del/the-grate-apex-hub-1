@@ -9,6 +9,7 @@
 import { getLessonQuizBank, getSubjectTopics } from '@/data/curriculum';
 import type { Lesson, LessonChunk, LessonChunkKind, SubjectId, Topic } from '@/data/lesson-types';
 import type { Question } from '@/data/questions';
+import { trueFalseStatement } from '@/data/true-false';
 
 /** The same shape as an original course (data/legacy-study.ts), marked with its subject. */
 export type LocalCourse = { id: string; name: string; icon: string; desc: string; classId: 'HB2'; semester: 1; gradient: readonly [string, string]; subject: SubjectId };
@@ -187,8 +188,13 @@ export function buildLocalPractice(source: readonly Question[], count: number, s
         const showCorrect = random() < 0.5;
         const wrong = question.options.filter((_, index) => index !== question.answer);
         const shown = showCorrect ? answer : wrong[Math.floor(random() * wrong.length)];
-        out.push({ ...question, id: `${question.id}:tf`, type: 'choice', prompt: `True or false? For “${question.prompt}”, the answer is “${shown}”.`, options: ['True', 'False'], answer: showCorrect ? 0 : 1, fixedOrder: true, label: 'True or false', reviewEligible: false } as Question);
-        continue;
+        // Asked as one plain statement ("Hydrolase is the enzyme type that…"); a question
+        // that does not read well as a statement stays as written.
+        const statement = trueFalseStatement(question.prompt, shown);
+        if (statement) {
+          out.push({ ...question, id: `${question.id}:tf`, type: 'choice', prompt: statement, options: ['True', 'False'], answer: showCorrect ? 0 : 1, fixedOrder: true, label: 'True or false', reviewEligible: false } as Question);
+          continue;
+        }
       }
       if (roll < 0.42 && short(answer) && question.prompt.length <= 140) {
         matchable.push(question);

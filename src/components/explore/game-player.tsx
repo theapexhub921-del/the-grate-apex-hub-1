@@ -15,7 +15,7 @@ import { useDisplayName } from '@/data/user';
 import { useResolvedColorScheme, useThemedStyles } from '@/hooks/use-theme';
 import { isLocalPreview } from '@/lib/local-preview';
 
-const EXPLORE_HREF = '/explore' as Href;
+const GAMES_HREF = '/games' as string as Href;
 
 // Plays a study game (a Godot web build in public/game-builds/, listed in src/data/games.ts).
 // The learner's name and light/dark choice are passed to the game in the URL.
@@ -53,7 +53,7 @@ export function GamePlayer({ game }: { game: StudyGame }) {
     return (
       <View style={styles.page}>
         <View style={styles.bar}>
-          <BackLink fallback={EXPLORE_HREF} label="Explore" />
+          <BackLink fallback={GAMES_HREF} label="Games" />
           <Text style={styles.barTitle} numberOfLines={1}>{game.title}</Text>
         </View>
         {open ? createElement('iframe', {
@@ -69,7 +69,7 @@ export function GamePlayer({ game }: { game: StudyGame }) {
   // Phones: the game runs in the browser.
   return (
     <Screen width="prose">
-      <BackLink fallback={EXPLORE_HREF} label="Explore" />
+      <BackLink fallback={GAMES_HREF} label="Games" />
       <PageHeader eyebrow="Games" title={game.title} subtitle={game.description} />
       <Button label="Play in your browser" trailing="→" onPress={() => void WebBrowser.openBrowserAsync(`${LIVE_SITE}${src}`)} />
     </Screen>

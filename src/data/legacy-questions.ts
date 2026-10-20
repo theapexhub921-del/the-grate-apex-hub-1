@@ -1,6 +1,7 @@
 // Pure helpers for the original app's lessons and questions (no React Native,
 // no Firebase), so the tests can check them. Used by data/legacy-study.ts.
 import type { Question } from '@/data/questions';
+import { trueFalseStatement } from '@/data/true-false';
 
 export type BankQuestion = { id: string; q: string; o: string[]; a: number; e: string; t: string; p?: string[]; kind?: 'input'; ans?: string; img?: string; tp?: string };
 
@@ -102,8 +103,13 @@ export function buildPractice(source: readonly (BankQuestion & { setName?: strin
         const showCorrect = random() < 0.5;
         const wrong = q.o.map(plainText).filter((_, index) => index !== q.a);
         const shown = showCorrect ? answer : wrong[Math.floor(random() * wrong.length)];
-        out.push({ ...original, id: `${original.id}:tf`, type: 'choice', prompt: `True or false? For “${plainText(q.q)}”, the answer is “${shown}”.`, options: ['True', 'False'], answer: showCorrect ? 0 : 1, fixedOrder: true, label: 'True or false' } as Question);
-        continue;
+        // Asked as one plain statement ("Hydrolase is the enzyme type that…"); a question
+        // that does not read well as a statement stays as written.
+        const statement = trueFalseStatement(plainText(q.q), shown);
+        if (statement) {
+          out.push({ ...original, id: `${original.id}:tf`, type: 'choice', prompt: statement, options: ['True', 'False'], answer: showCorrect ? 0 : 1, fixedOrder: true, label: 'True or false' } as Question);
+          continue;
+        }
       }
       if (roll < 0.42 && short(answer) && plainText(q.q).length <= 140) {
         matchable.push(q);
