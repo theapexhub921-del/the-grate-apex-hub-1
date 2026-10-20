@@ -33,7 +33,7 @@ const lesson1: Q[] = [
   mcq('q1-03', 'haem-proteins', 'Where is myoglobin found (slide 2)?', 'Red muscle', ['Red blood cells', 'Liver', 'Bone'], {
     explanation: 'Slide 2: myoglobin in red muscle; haemoglobin in red blood cells.',
   }),
-  mcq('q1-04', 'haem-proteins', 'Chemically, what is the haem of myoglobin (slide 3)?', 'Ferroprotoporphyrin IX', ['Ferriprotoporphyrin I', 'Uroporphyrin III', 'Coproporphyrin III'], {
+  mcq('q1-04', 'haem-proteins', 'Chemically, what is the haem of myoglobin (slide 3)?', 'Ferroprotoporphyrin IX', ['Ferriprotoporphyrin I', 'Uroporphyrin III (ferrous)', 'Coproporphyrin III'], {
     explanation: 'Slide 3: haem (ferroprotoporphyrin IX).',
     skill: 'terminology',
   }),
@@ -56,7 +56,7 @@ const lesson1: Q[] = [
   mcq('q1-09', 'porphin-structure', 'How many pyrrole rings make up porphin?', 'Four', ['Two', 'Three', 'Six'], {
     explanation: 'Slide 4.',
   }),
-  mcq('q1-10', 'porphin-structure', 'What is the molecular formula of porphin (slide 5)?', 'C₂₀H₁₄N₄', ['C₂₇H₄₆O', 'C₅H₅N', 'C₆H₁₂O₆'], {
+  mcq('q1-10', 'porphin-structure', 'What is the molecular formula of porphin (slide 5)?', 'C₂₀H₁₄N₄', ['C₂₇H₄₆O', 'C₂₀H₁₆N₄O₂', 'C₆H₁₂O₆'], {
     explanation: 'Slide 5: porphin (porphine) C₂₀H₁₄N₄.',
     difficulty: 'intermediate',
   }),
@@ -78,7 +78,7 @@ const lesson1: Q[] = [
     'Coproporphyrin',
     'Protoporphyrin',
   ], { explanation: 'Slide 9: uro → copro → proto.' }),
-  mcq('q1-15', 'porphyrin-series', 'Which side chains does uroporphyrin carry?', 'Acetate and propionate', ['Methyl and propionate', 'Methyl and vinyl', 'Vinyl and acetate'], {
+  mcq('q1-15', 'porphyrin-series', 'Which side chains does uroporphyrin carry?', 'Acetate and propionate', ['Methyl and propionate', 'Methyl, vinyl and propionate', 'Vinyl and acetate'], {
     explanation: 'Slides 9–10: each pyrrole of uroporphyrin carries an acetate (A) and a propionate (P).',
   }),
   mcq('q1-16', 'porphyrin-series', 'How does coproporphyrin differ from uroporphyrin?', 'Its acetate side chains have become methyl groups', ['Its propionate side chains have become vinyl groups', 'It has lost one of its four pyrrole rings', 'It contains iron in the centre of the ring'], {
@@ -92,7 +92,7 @@ const lesson1: Q[] = [
     skill: 'pathway-reasoning',
     difficulty: 'advanced',
   }),
-  mcq('q1-19', 'porphyrin-series', 'How many isomeric protoporphyrins are possible?', 'Fifteen', ['Four', 'Nine', 'Two'], {
+  mcq('q1-19', 'porphyrin-series', 'How many isomeric protoporphyrins are possible?', 'Fifteen', ['Four', 'Nine (three per ring)', 'Two'], {
     explanation: 'Slide 11: fifteen isomeric forms; the ninth, protoporphyrin IX, is in haem proteins.',
   }),
   tf({
@@ -210,7 +210,7 @@ const lesson2: Q[] = [
     explanation: 'Slide 18: PBG units are added until a linear hexapyrrole has been formed; hydrolysis then releases the tetrapyrrole.',
     difficulty: 'advanced',
   }),
-  mcq('q2-20', 'pbg-deaminase', 'What is released for each methylene bridge formed as porphobilinogens join (slide 15)?', 'An ammonium ion (NH₄⁺)', ['A molecule of CO₂', 'A molecule of water', 'A pyrophosphate (PPᵢ)'], {
+  mcq('q2-20', 'pbg-deaminase', 'What is released for each methylene bridge formed as porphobilinogens join (slide 15)?', 'An ammonium ion (NH₄⁺)', ['A molecule of CO₂', 'A molecule of water (H₂O)', 'A pyrophosphate (PPᵢ)'], {
     explanation: 'Slide 15 (textbook page): an ammonium ion is released for each methylene bridge formed.',
     difficulty: 'intermediate',
   }),
@@ -249,7 +249,7 @@ const lesson2: Q[] = [
 
 // ─── Lesson 3 — Synthesis II ────────────────────────────────────────
 const lesson3: Q[] = [
-  mcq('q3-01', 'urogen-decarboxylase', 'What does uroporphyrinogen decarboxylase produce?', 'Coproporphyrinogen III', ['Protoporphyrinogen IX', 'Protoporphyrin IX', 'Hydroxymethylbilane'], {
+  mcq('q3-01', 'urogen-decarboxylase', 'What does uroporphyrinogen decarboxylase produce?', 'Coproporphyrinogen III', ['Protoporphyrinogen IX', 'Protoporphyrin IX (with iron)', 'Hydroxymethylbilane'], {
     explanation: 'Slides 24–25.',
   }),
   mcq('q3-02', 'urogen-decarboxylase', 'How many CO₂ does uroporphyrinogen decarboxylase remove from one uroporphyrinogen III?', 'Four — one from each acetate', ['Two — one from each propionate', 'One — from a single acetate', 'Eight — from every side chain'], {
@@ -353,12 +353,12 @@ const lesson3: Q[] = [
     explanation: 'It is mitochondrial (slide 24).',
     skill: 'misconception',
   }),
-  mcq('q3-25', 'coprogen-oxidase', 'In which order are the side chains changed on the way to protoporphyrin IX?', 'First acetates → methyls, then two propionates → vinyls', ['First propionates → vinyls, then acetates → methyls', 'Methyls → acetates first, then vinyls → propionates', 'All at once, by ferrochelatase as it inserts iron'], {
+  mcq('q3-25', 'coprogen-oxidase', 'In which order are the side chains changed on the way to protoporphyrin IX?', 'First acetates → methyls, then two propionates → vinyls', ['First propionates → vinyls, then acetates → methyls', 'Methyls → acetates first, then vinyls → propionates', 'All at once, by ferrochelatase as it inserts iron into the ring'], {
     explanation: 'Uroporphyrinogen decarboxylase acts first (acetates), then coproporphyrinogen oxidase (propionates at 2 and 4) (slides 24–25).',
     skill: 'sequence',
     difficulty: 'intermediate',
   }),
-  mcq('q3-26', 'compartments', 'Which intermediate is the first to leave the mitochondrion?', 'δ-Aminolevulinic acid (ALA)', ['Porphobilinogen (PBG)', 'Succinyl-CoA', 'Coproporphyrinogen III'], {
+  mcq('q3-26', 'compartments', 'Which intermediate is the first to leave the mitochondrion?', 'δ-Aminolevulinic acid (ALA)', ['Porphobilinogen (PBG)', 'Succinyl-CoA', 'Coproporphyrinogen III (to the cytosol)'], {
     explanation: 'ALA is made in the mitochondria and converted to porphobilinogen in the cytosol (slide 24).',
     skill: 'pathway-reasoning',
     difficulty: 'intermediate',
@@ -370,7 +370,7 @@ const lesson4: Q[] = [
   mcq('q4-01', 'alas-regulation', 'Which enzyme is usually rate-limiting for the whole haem pathway?', 'ALA synthase', ['Ferrochelatase', 'PBG deaminase', 'Uroporphyrinogen decarboxylase'], {
     explanation: 'Slide 26: ALA synthase is the committed step and usually rate-limiting.',
   }),
-  mcq('q4-02', 'alas-regulation', 'In most cells, how does haem mainly regulate ALA synthase (slide 26)?', 'By repressing transcription of its gene', ['By phosphorylating the enzyme', 'By degrading the enzyme in lysosomes', 'By activating it allosterically'], {
+  mcq('q4-02', 'alas-regulation', 'In most cells, how does haem mainly regulate ALA synthase (slide 26)?', 'By repressing transcription of its gene', ['By phosphorylating the enzyme', 'By degrading the enzyme in lysosomes within minutes', 'By activating it allosterically'], {
     explanation: 'Slide 26: regulation occurs through control of gene transcription; haem represses transcription of the ALA synthase gene.',
   }),
   tf({
@@ -383,7 +383,7 @@ const lesson4: Q[] = [
   fill('q4-04', 'alas-regulation', 'The red-cell variant of ALA synthase is regulated by the availability of ____.', ['iron', 'Fe', 'iron-sulphur clusters', 'iron-sulfur clusters'], {
     explanation: 'Slide 26: in the form of iron–sulphur clusters.',
   }),
-  mcq('q4-05', 'alas-regulation', 'Haem levels in a liver cell fall. What happens to transcription of the ALA synthase gene?', 'It increases (de-repression)', ['It decreases (repression)', 'It stops completely', 'It is unaffected by haem'], {
+  mcq('q4-05', 'alas-regulation', 'Haem levels in a liver cell fall. What happens to transcription of the ALA synthase gene?', 'It increases (de-repression)', ['It decreases (repression)', 'It stops completely until haem rises', 'It is unaffected by haem'], {
     explanation: 'Haem represses the gene (slide 26), so less haem relieves the repression.',
     skill: 'prediction',
     difficulty: 'intermediate',
@@ -449,7 +449,7 @@ const lesson4: Q[] = [
   mcq('q4-20', 'hemin-drug', 'For which porphyria is hemin used in particular?', 'Acute intermittent porphyria', ['Porphyria cutanea tarda', 'Congenital erythropoietic porphyria', 'Gilbert’s syndrome'], {
     explanation: 'Slide 32: used in the management of porphyria attacks, particularly in acute intermittent porphyria.',
   }),
-  mcq('q4-21', 'hemin-drug', 'How does hematin differ from hemin?', 'It has a hydroxide in place of the chloride', ['It contains zinc in place of the iron', 'It has no propionate side chains at all', 'It is a linear tetrapyrrole, not a ring'], {
+  mcq('q4-21', 'hemin-drug', 'How does hematin differ from hemin?', 'It has a hydroxide in place of the chloride', ['It contains zinc in place of the iron at the centre', 'It has no propionate side chains at all', 'It is a linear tetrapyrrole, not a ring'], {
     explanation: 'Slide 32.',
     difficulty: 'intermediate',
   }),
@@ -527,7 +527,7 @@ const lesson5: Q[] = [
     explanation: 'Slide 40.',
     difficulty: 'intermediate',
   }),
-  mcq('q5-12', 'porphyria-map', 'Congenital erythropoietic porphyria results from a deficiency of which enzyme?', 'Uroporphyrinogen III cosynthase', ['Uroporphyrinogen decarboxylase', 'Ferrochelatase (haem synthase)', 'ALA synthase (erythroid form)'], {
+  mcq('q5-12', 'porphyria-map', 'Congenital erythropoietic porphyria results from a deficiency of which enzyme?', 'Uroporphyrinogen III cosynthase', ['Uroporphyrinogen decarboxylase (hepatic)', 'Ferrochelatase (haem synthase)', 'ALA synthase (erythroid form)'], {
     explanation: 'Slide 40.',
     difficulty: 'intermediate',
   }),
@@ -593,7 +593,7 @@ const lesson5: Q[] = [
     explanation: 'Slide 37.',
     difficulty: 'intermediate',
   }),
-  mcq('q5-27', 'lead-poisoning', 'In lead poisoning, in what form does the excess protoporphyrin exist?', 'As a zinc chelate (zinc protoporphyrin)', ['As haem, with iron inserted normally', 'As bilirubin, after breakdown', 'As an iron–sulphur cluster'], {
+  mcq('q5-27', 'lead-poisoning', 'In lead poisoning, in what form does the excess protoporphyrin exist?', 'As a zinc chelate (zinc protoporphyrin)', ['As haem, with iron inserted normally', 'As bilirubin, after breakdown', 'As an iron–sulphur cluster in the mitochondria'], {
     explanation: 'Slide 36 (textbook page).',
     difficulty: 'advanced',
   }),
@@ -601,7 +601,7 @@ const lesson5: Q[] = [
     ['Decreased erythrocyte ALA dehydratase activity', 'Acute exposure to lead'],
     ['Increased erythrocyte protoporphyrin', 'Chronic exposure to lead'],
   ], { explanation: 'Slide 36 (textbook page).', difficulty: 'advanced' }),
-  mcq('q5-29', 'lead-poisoning', 'Besides the direct enzyme block, why does blood ALA rise in lead poisoning (slide 37)?', 'Impaired haem synthesis de-represses the ALA synthase gene', ['ALA is released from the red cells that lead has damaged', 'The kidneys stop excreting ALA in the urine', 'Lead converts porphobilinogen back into ALA'], {
+  mcq('q5-29', 'lead-poisoning', 'Besides the direct enzyme block, why does blood ALA rise in lead poisoning (slide 37)?', 'Impaired haem synthesis de-represses the ALA synthase gene', ['ALA is released from the red cells that lead has damaged', 'The kidneys stop excreting ALA in the urine, so it is retained', 'Lead converts porphobilinogen back into ALA'], {
     explanation: 'Slide 37: impaired haem synthesis leads to de-repression of transcription of the ALA synthase gene.',
     skill: 'cause-effect',
     difficulty: 'advanced',
@@ -663,7 +663,7 @@ const lesson6: Q[] = [
   mcq('q6-15', 'biliverdin-to-bilirubin', 'What colour is bilirubin?', 'Orange-yellow', ['Green', 'Blue', 'Colourless (white)'], {
     explanation: 'Slide 4 (textbook page): bilirubin IXα, the orange-yellow bile pigment.',
   }),
-  mcq('q6-16', 'biliverdin-to-bilirubin', 'Which coenzyme does biliverdin reductase use?', 'NADPH', ['NADH', 'FAD', 'ATP'], {
+  mcq('q6-16', 'biliverdin-to-bilirubin', 'Which coenzyme does biliverdin reductase use?', 'NADPH', ['NADH (from the TCA)', 'FAD', 'ATP'], {
     explanation: 'Slides 4 and 20.',
   }),
   tf({
@@ -694,7 +694,7 @@ const lesson6: Q[] = [
     explanation: 'Slide 12: released to transferrin with the aid of ceruloplasmin.',
     difficulty: 'intermediate',
   }),
-  mcq('q6-24', 'macrophage-handling', 'In what form does bilirubin leave the macrophage?', 'Unconjugated bilirubin, bound to albumin', ['Bilirubin diglucuronide, free in plasma', 'Urobilinogen, bound to albumin', 'Free biliverdin, bound to ligandin'], {
+  mcq('q6-24', 'macrophage-handling', 'In what form does bilirubin leave the macrophage?', 'Unconjugated bilirubin, bound to albumin', ['Bilirubin diglucuronide, free in plasma', 'Urobilinogen, bound to albumin in the plasma', 'Free biliverdin, bound to ligandin'], {
     explanation: 'Slides 12 and 19.',
   }),
   tf({
@@ -762,10 +762,10 @@ const lesson7: Q[] = [
   mcq('q7-12', 'intestinal-fate', 'According to slide 11, what removes the glucuronide residues in the gut?', 'Bacterial hydrolases', ['Pancreatic lipase', 'UDP-glucuronyl transferase', 'Stomach acid'], {
     explanation: 'Slide 11 (the pasted textbook page also names bacterial β-glucuronidase).',
   }),
-  mcq('q7-13', 'intestinal-fate', 'What are urobilinogens?', 'Colourless linear tetrapyrroles made by reducing bilirubin', ['Coloured cyclic porphyrins made by oxidising bilirubin', 'Conjugated bilirubins excreted in the urine', 'Iron-containing pigments of the stool'], {
+  mcq('q7-13', 'intestinal-fate', 'What are urobilinogens?', 'Colourless linear tetrapyrroles made by reducing bilirubin', ['Coloured cyclic porphyrins made by oxidising bilirubin', 'Conjugated bilirubins excreted in the urine', 'Iron-containing pigments of the stool made from haem'], {
     explanation: 'Slide 11.',
   }),
-  mcq('q7-14', 'intestinal-fate', 'Urobilinogens are oxidised to what?', 'Coloured urobilins (stercobilins)', ['Colourless bilirubin', 'Green biliverdin (in the colon)', 'Haem (in the gut)'], {
+  mcq('q7-14', 'intestinal-fate', 'Urobilinogens are oxidised to what?', 'Coloured urobilins (stercobilins)', ['Colourless bilirubin glucuronides', 'Green biliverdin (in the colon)', 'Haem (in the gut)'], {
     explanation: 'Slide 11.',
   }),
   fill('q7-15', 'intestinal-fate', 'Reabsorption of urobilinogen and its return to the liver is called ____ recirculation.', ['enterohepatic', 'entero-hepatic'], {

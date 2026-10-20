@@ -204,7 +204,7 @@ export const interactive: Record<string, Steps> = {
       'Developing red cells use a variant of ALA synthase regulated instead by iron (iron–sulphur clusters).',
     ], { sourceRefs: syn([24, 26, 40]) }),
     ask(
-      mcq('c4-02', 'alas-regulation', 'The red-cell variant of ALA synthase is regulated mainly by what?', 'Iron availability (iron–sulphur clusters)', ['Haem repression of its gene', 'Insulin acting on the erythroblast', 'Bilirubin feedback from the macrophage'], {
+      mcq('c4-02', 'alas-regulation', 'The red-cell variant of ALA synthase is regulated mainly by what?', 'Iron availability (iron–sulphur clusters)', ['Haem repression of its gene', 'Insulin acting on the erythroblast membrane', 'Bilirubin feedback from the macrophage'], {
         explanation: 'Slide 26: the variant expressed only in developing erythrocytes is regulated by iron, in the form of iron–sulphur clusters.',
       })
     ),
@@ -220,14 +220,14 @@ export const interactive: Record<string, Steps> = {
       'Excess free haem is oxidised to hemin. Hemin represses ALA synthase and inhibits the kinase that would inactivate eIF2 — so globin synthesis continues and combines with the extra haem.',
     ], { sourceRefs: syn([29]) }),
     ask(
-      mcq('c4-04', 'hemin-globin-balance', 'Hemin inhibits the kinase that phosphorylates eIF2. What is the effect?', 'eIF2 stays active, so globin synthesis continues', ['eIF2 is inactivated, so globin synthesis stops', 'ALA synthase is activated, so more haem is made', 'Haem is exported from the cell into the plasma'], {
+      mcq('c4-04', 'hemin-globin-balance', 'Hemin inhibits the kinase that phosphorylates eIF2. What is the effect?', 'eIF2 stays active, so globin synthesis continues', ['eIF2 is inactivated, so globin synthesis stops', 'ALA synthase is activated, so more haem is made', 'Haem is exported from the cell into the plasma for the liver'], {
         explanation: 'Slide 29: phosphorylation inactivates eIF2; by inhibiting the kinase, hemin lets globin be made to combine with the excess haem.',
         skill: 'cause-effect',
         difficulty: 'advanced',
       })
     ),
     ask(
-      mcq('c4-05', 'hemin-drug', 'Why does intravenous hemin help in an attack of acute intermittent porphyria?', 'It gives negative feedback to the haem pathway, so precursors stop accumulating', ['It replaces the missing PBG deaminase, so the pathway runs to completion again', 'It binds and removes lead that is blocking the pathway', 'It speeds up bilirubin conjugation so that the precursors are excreted'], {
+      mcq('c4-05', 'hemin-drug', 'Why does intravenous hemin help in an attack of acute intermittent porphyria?', 'It gives negative feedback to the haem pathway, so precursors stop accumulating', ['It replaces the missing PBG deaminase, so the pathway runs to completion again', 'It binds and removes lead that is blocking the pathway', 'It speeds up bilirubin conjugation in the liver so that the precursors are excreted'], {
         explanation: 'Slides 31–32 and 39: hemin is used in porphyria attacks; it provides negative feedback on the pathway, preventing precursor accumulation.',
         skill: 'application',
       })
