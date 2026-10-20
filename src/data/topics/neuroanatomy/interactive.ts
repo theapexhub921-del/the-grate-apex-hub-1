@@ -36,7 +36,7 @@ export const interactive: Record<string, Steps> = {
     learn('Speech areas', [
       'Broca’s area (inferior frontal gyrus) forms words; Wernicke’s area (temporal lobe) understands language. Lesions cause expressive and receptive aphasia respectively.',
     ], { sourceRefs: cns([22, 25, 27]) }),
-    ask(mcq('i2-02', 'cortical-lesions', 'A lesion of the left frontal eye field makes both eyes deviate:', 'To the left (toward the lesion)', ['To the right', 'Upward', 'They do not move'], { explanation: 'Slide 27.', skill: 'application' })),
+    ask(mcq('i2-02', 'cortical-lesions', 'A lesion of the left frontal eye field makes both eyes deviate:', 'To the left (toward the lesion)', ['To the right (away from the lesion)', 'Upward, towards the forehead', 'They do not move at all'], { explanation: 'Slide 27.', skill: 'application' })),
     learn('Three kinds of white matter fibres', [
       'Commissural (between hemispheres — corpus callosum), association (within one hemisphere) and projection (cortex to lower centres — internal capsule).',
     ], { sourceRefs: cns([30]) }),
@@ -62,7 +62,7 @@ export const interactive: Record<string, Steps> = {
     learn('Geniculate bodies', [
       'Medial geniculate relays hearing to the auditory cortex; lateral geniculate relays vision to the striate cortex.',
     ], { sourceRefs: cns([73]) }),
-    ask(mcq('i3-03', 'thalamic-lesions', 'Damage to the VPL and VPM nuclei causes:', 'Loss of all forms of sensation on the opposite side', ['Paralysis on the same side', 'Loss of hearing', 'Obesity'], { explanation: 'Slide 48.' })),
+    ask(mcq('i3-03', 'thalamic-lesions', 'Damage to the VPL and VPM nuclei causes:', 'Loss of all forms of sensation on the opposite side', ['Paralysis of the limbs on the same side', 'Loss of hearing in both ears', 'Obesity from overeating'], { explanation: 'Slide 48.' })),
     recall('r3-01', 'thalamic-lesions', 'Describe the thalamic hand.', [
       'Forearm pronated, wrist flexed.',
       'Metacarpophalangeal joints flexed, interphalangeal joints extended.',
@@ -93,7 +93,7 @@ export const interactive: Record<string, Steps> = {
   ],
 
   [L(5)]: [
-    ask(mcq('i5-01', 'basal-nuclei', 'The lentiform nucleus consists of the:', 'Putamen and globus pallidus', ['Caudate and putamen', 'Amygdala and claustrum', 'Thalamus and hypothalamus'], { explanation: 'Slide 75.' })),
+    ask(mcq('i5-01', 'basal-nuclei', 'The lentiform nucleus consists of the:', 'Putamen and globus pallidus', ['Caudate nucleus and putamen', 'Amygdala and claustrum', 'Thalamus and hypothalamus'], { explanation: 'Slide 75.' })),
     ask(match('i5-02', 'basal-nuclei', 'Match each nucleus to its role in movement (lecture summary):', [
       ['Caudate', 'Plan'],
       ['Putamen', 'Perform'],
@@ -168,7 +168,7 @@ export const interactive: Record<string, Steps> = {
       ['Subdural space', 'Bridging veins'],
       ['Subarachnoid space', 'Cerebrospinal fluid'],
     ], { explanation: 'Slides 56–57.' })),
-    ask(mcq('i8-02', 'meningeal-spaces-cisterns', 'Which cistern can be tapped for CSF by suboccipital puncture?', 'Cerebellomedullary cistern (cisterna magna)', ['Pontine cistern', 'Interpeduncular cistern', 'Ambient cistern'], { explanation: 'Slide 62.' })),
+    ask(mcq('i8-02', 'meningeal-spaces-cisterns', 'Which cistern can be tapped for CSF by suboccipital puncture?', 'Cerebellomedullary cistern (cisterna magna)', ['Pontine (prepontine) cistern', 'Interpeduncular cistern', 'Ambient (superior) cistern'], { explanation: 'Slide 62.' })),
     learn('Arterial vs venous bleeds', [
       'Epidural haematoma: torn meningeal artery after a skull fracture. Subdural haematoma: torn bridging veins after severe head trauma.',
     ], { sourceRefs: men([67, 70]) }),

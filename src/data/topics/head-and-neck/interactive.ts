@@ -33,7 +33,7 @@ export const interactive: Record<string, Steps> = {
     learn('The dangerous layer', [
       'Loose areolar tissue lets the outer three layers slide. Its valveless emissary veins link the scalp veins to the dural venous sinuses, so infection can spread inward.',
     ], { sourceRefs: hn([61, 62]) }),
-    ask(mcq('i2-02', 'scalp-layers', 'Why do scalp lacerations bleed so much?', 'The connective tissue layer holds the vessel walls open so they cannot retract', ['The scalp has no veins', 'The pericranium is very vascular', 'Scalp arteries lack muscle'], { explanation: 'Slide 57.', skill: 'cause-effect' })),
+    ask(mcq('i2-02', 'scalp-layers', 'Why do scalp lacerations bleed so much?', 'The connective tissue layer holds the vessel walls open so they cannot retract', ['The scalp has no veins, so all bleeding is arterial and fast', 'The pericranium is very vascular and bleeds into the wound', 'Scalp arteries lack muscle in their walls, so they cannot constrict'], { explanation: 'Slide 57.', skill: 'cause-effect' })),
     learn('Facial muscles', [
       'All muscles of facial expression develop from the 2nd pharyngeal arch and are supplied by the facial nerve. They are grouped around the eyes, nose and mouth.',
     ], { sourceRefs: hn([72, 74]) }),
@@ -61,7 +61,7 @@ export const interactive: Record<string, Steps> = {
     learn('Following a tear', [
       'Lacrimal gland → superior fornix → lacrimal lake → puncta → canaliculi → lacrimal sac → nasolacrimal duct → inferior meatus.',
     ], { sourceRefs: hn([135]) }),
-    ask(mcq('i3-03', 'lacrimal-apparatus-eye', 'Crocodile tears follow a facial nerve lesion because:', 'Regenerating salivary parasympathetic fibres grow to the lacrimal gland', ['The lacrimal duct is blocked', 'The trigeminal nerve is damaged', 'The eyelid cannot close'], { explanation: 'Slide 137.', skill: 'cause-effect' })),
+    ask(mcq('i3-03', 'lacrimal-apparatus-eye', 'Crocodile tears follow a facial nerve lesion because:', 'Regenerating salivary parasympathetic fibres grow to the lacrimal gland', ['The lacrimal duct is blocked, so tears overflow at meals', 'The trigeminal nerve is damaged and irritates the gland', 'The eyelid cannot close, so the eye waters constantly'], { explanation: 'Slide 137.', skill: 'cause-effect' })),
     recall('r3-01', 'extraocular-muscles', 'Which structures pass through the superior orbital fissure outside the common tendinous ring?', [
       'Trochlear nerve.',
       'Frontal and lacrimal nerves.',
@@ -79,7 +79,7 @@ export const interactive: Record<string, Steps> = {
       ['Pterygomaxillary fissure', 'Infratemporal fossa'],
       ['Greater palatine canal', 'Palate'],
     ], { explanation: 'Slides 148–157.' })),
-    ask(mcq('i4-02', 'ppf-contents', 'Preganglionic parasympathetic fibres reach the pterygopalatine ganglion through the:', 'Greater petrosal nerve and nerve of the pterygoid canal', ['Lesser petrosal nerve', 'Chorda tympani', 'Deep petrosal nerve alone'], { explanation: 'Slide 164.' })),
+    ask(mcq('i4-02', 'ppf-contents', 'Preganglionic parasympathetic fibres reach the pterygopalatine ganglion through the:', 'Greater petrosal nerve and nerve of the pterygoid canal', ['Lesser petrosal nerve and otic ganglion', 'Chorda tympani and lingual nerve', 'Deep petrosal nerve alone'], { explanation: 'Slide 164.' })),
     learn('Why surgeons go here', [
       'Maxillary artery ligation for severe epistaxis, and Vidian neurectomy for vasomotor rhinorrhoea and crocodile tears.',
     ], { sourceRefs: hn([178]) }),
@@ -162,7 +162,7 @@ export const interactive: Record<string, Steps> = {
     learn('Special components', [
       'Branchiomotor fibres (V, VII, IX, X, XI) supply pharyngeal arch muscles; taste travels in VII, IX and X; hearing and balance in VIII.',
     ], { sourceRefs: hn([394, 395]) }),
-    ask(mcq('i8-01', 'olfactory-optic', 'At the optic chiasma, which fibres cross?', 'Fibres from the nasal halves of each retina', ['Fibres from the temporal halves', 'All fibres', 'No fibres'], { explanation: 'Slide 399.' })),
+    ask(mcq('i8-01', 'olfactory-optic', 'At the optic chiasma, which fibres cross?', 'Fibres from the nasal halves of each retina', ['Fibres from the temporal halves of each retina', 'All fibres from both retinae', 'No fibres at all'], { explanation: 'Slide 399.' })),
     ask(mcq('i8-02', 'eye-movement-nerves', 'Which cranial nerve emerges from the dorsal surface of the brainstem?', 'Trochlear (IV)', ['Oculomotor (III)', 'Abducent (VI)', 'Trigeminal (V)'], { explanation: 'Slide 404.' })),
     learn('Three divisions, three exits', [
       'V1 through the superior orbital fissure, V2 through the foramen rotundum, V3 through the foramen ovale. Only V3 carries motor fibres.',
@@ -180,7 +180,7 @@ export const interactive: Record<string, Steps> = {
   ],
 
   [L(9)]: [
-    ask(mcq('i9-01', 'facial-nerve', 'Through which foramen does the facial nerve leave the skull?', 'Stylomastoid foramen', ['Jugular foramen', 'Foramen ovale', 'Foramen rotundum'], { explanation: 'Slide 413.' })),
+    ask(mcq('i9-01', 'facial-nerve', 'Through which foramen does the facial nerve leave the skull?', 'Stylomastoid foramen', ['Jugular foramen', 'Foramen ovale', 'Foramen rotundum (sphenoid)'], { explanation: 'Slide 413.' })),
     learn('Bell’s palsy signs', [
       'Cannot close the eye, whistle, wrinkle the forehead or show the teeth; reduced tears and saliva; loss of taste on the anterior tongue; hyperacusis.',
     ], { sourceRefs: hn([415]) }),
@@ -208,7 +208,7 @@ export const interactive: Record<string, Steps> = {
     learn('Folds and spaces', [
       'Vestibular (false) folds above, vocal (true) folds below; between them the ventricle. The rima glottidis between the vocal folds is the narrowest part.',
     ], { sourceRefs: hn([454, 455, 456]) }),
-    ask(mcq('i10-02', 'larynx-ligaments-cavity', 'Where is an emergency airway (cricothyrotomy) made?', 'Through the cricothyroid membrane', ['Through the thyrohyoid membrane', 'Through the first tracheal ring', 'Through the epiglottis'], { explanation: 'Slide 445.', skill: 'application' })),
+    ask(mcq('i10-02', 'larynx-ligaments-cavity', 'Where is an emergency airway (cricothyrotomy) made?', 'Through the cricothyroid membrane', ['Through the thyrohyoid membrane', 'Through the first tracheal ring', 'Through the base of the epiglottis'], { explanation: 'Slide 445.', skill: 'application' })),
     learn('Sensory watershed', [
       'Above the vocal folds: internal laryngeal nerve. Below: recurrent laryngeal nerve.',
     ], { sourceRefs: hn([470, 471]) }),
