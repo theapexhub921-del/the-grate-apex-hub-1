@@ -40,7 +40,13 @@ import { friendlyError } from '@/lib/errors';
 // type-the-answer, true/false and matching. Apex Challenge: 10 seconds a
 // question, as in this app's Apex Challenge.
 export default function LegacyPracticeScreen() {
+  const params = useLocalSearchParams<Record<string, string | string[]>>();
+  return <LegacyPracticeAttempt key={param(params.attempt) ?? 'first'} />;
+}
+
+function LegacyPracticeAttempt() {
   const styles = useThemedStyles(createStyles);
+
   const params = useLocalSearchParams<Record<string, string | string[]>>();
   const course = legacyCourse(param(params.course));
   const paramKey = JSON.stringify(params);
