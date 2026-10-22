@@ -180,6 +180,12 @@ export default function TabLayout() {
     if (Platform.OS === 'web') applyWebFontScale(fontSize);
   }, [fontSize]);
 
+  useEffect(() => {
+    if (!isClient) return;
+    const timer = setTimeout(() => setAppShellReady(true), 0);
+    return () => clearTimeout(timer);
+  }, [isClient]);
+
   // Light / Dark from Settings ("System" follows the device).
   const scheme = useResolvedColorScheme();
   const colors = useTheme();

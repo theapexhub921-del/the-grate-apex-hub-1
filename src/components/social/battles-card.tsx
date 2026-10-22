@@ -1,5 +1,5 @@
-import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { router } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/avatar';
@@ -10,7 +10,7 @@ import { Pill } from '@/components/ui/pill';
 import { Sheet } from '@/components/ui/sheet';
 import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { type Battle, type BattleCourse, battleRecord, battleStatus, createBattle, declineBattle, listBattles } from '@/data/battles';
+import { type Battle, type BattleCourse, battleRecord, battleStatus, createBattle, declineBattle, watchBattles } from '@/data/battles';
 import { announceBattle, announceBattleResult } from '@/lib/web-push';
 import { readClassSelection } from '@/data/class-curriculum';
 import { publishedTopics } from '@/data/curriculum';
@@ -40,15 +40,16 @@ export function BattlesCard() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
-    try {
-      setBattles(await listBattles());
-      setError(null);
-    } catch (problem) {
-      setError(friendlyError(problem, 'Battles could not be loaded.'));
+  useEffect(() => {
+    if (!uid) {
+      setBattles([]);
+      return;
     }
-  }, []);
-  useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
+    return watchBattles(uid, (next) => {
+      setBattles(next);
+      setError(null);
+    }, (problem) => setError(friendlyError(problem, 'Battles could not be loaded.')));
+  }, [uid]);
 
   // Courses to battle on: the learner's class courses (HB1), else this app's topics.
   const courses = useMemo<BattleCourse[]>(() => {
@@ -80,7 +81,7 @@ export function BattlesCard() {
 
   return (
     <>
-      <PressableCard onPress={() => { setOpen(true); void refresh(); }} accessibilityLabel="Battles" style={styles.entry}>
+      <PressableCard onPress={() => setOpen(true)} accessibilityLabel="Battles" style={styles.entry}>
         <View style={styles.entryIcon}>{originals ? <Text style={styles.emoji}>⚔️</Text> : <Icon name="challenge" size={22} color={colors.accentText} />}</View>
         <View style={styles.flex}>
           <Text style={styles.entryTitle}>Battles</Text>
@@ -157,7 +158,7 @@ export function BattlesCard() {
                 {status === 'waiting-for-you' ? (
                   <View style={styles.row}>
                     <Button label="Play" size="sm" onPress={() => { setOpen(false); router.push({ pathname: '/social/battle', params: { id: battle.id } } as never); }} />
-                    {incoming ? <Button label="Decline" size="sm" variant="ghost" onPress={() => void declineBattle(battle).then(() => { void announceBattleResult(battle.id, battle.challengerId); return refresh(); })} /> : null}
+                    {incoming ? <Button label="Decline" size="sm" variant="ghost" onPress={() => void declineBattle(battle).then(() => { void announceBattleResult(battle.id, battle.challengerId); })} /> : null}
                   </View>
                 ) : (
                   <Pill

@@ -14,7 +14,7 @@ import { ErrorScreen, LoadingState } from '@/components/ui/state-views';
 import { Text } from '@/components/ui/text';
 import { setPendingXpReward } from '@/components/xp-toast';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { type Battle, BATTLE_SECONDS, BATTLE_WIN_XP, battleStatus, getBattle, submitBattleResult } from '@/data/battles';
+import { type Battle, BATTLE_SECONDS, BATTLE_WIN_XP, battleStatus, getBattle, submitBattleResult, watchBattles } from '@/data/battles';
 import { announceBattleResult } from '@/lib/web-push';
 import { getTopicQuestions } from '@/data/curriculum';
 import { bankQuestions, buildPractice, loadLegacyBank } from '@/data/legacy-study';
@@ -79,7 +79,7 @@ export default function BattleScreen() {
   }, [phase, count]);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || !uid) return;
     let live = true;
     getBattle(id)
       .then(async (found) => {
@@ -89,8 +89,25 @@ export default function BattleScreen() {
         setQuestions(await battleQuestions(found));
       })
       .catch((problem) => { if (live) setError(friendlyError(problem, 'The battle could not be loaded.')); });
+    const stop = watchBattles(uid, (battles) => {
+      const found = battles.find((battle) => battle.id === id);
+      if (found && live) setBattle(found);
+    }, (problem) => { if (live) setError(friendlyError(problem, 'The battle could not be loaded.')); });
+    return () => { live = false; stop(); };
+  }, [id, uid]);
+
+  useEffect(() => {
+    if (!battle || !uid || battleStatus(battle, uid) !== 'won') return;
+    let live = true;
+    void awardXp({ sourceType: 'quiz', sourceId: `battle:${battle.id}`, amount: BATTLE_WIN_XP, label: `Battle won · ${battle.course.name}` })
+      .then((xp) => {
+        if (!live || xp <= 0) return;
+        setPendingXpReward({ amount: xp, message: `Battle won · ${battle.course.name}` });
+        setReward(xp);
+      })
+      .catch(() => undefined);
     return () => { live = false; };
-  }, [id]);
+  }, [battle, uid]);
 
   const items = useMemo(() => (questions ?? []).map((question) => ({ question })), [questions]);
 
@@ -109,14 +126,7 @@ export default function BattleScreen() {
     await submitBattleResult(battle!, side);
     void announceBattleResult(battle!.id, battle!.challengerId === uid ? battle!.opponentId : battle!.challengerId); // tell the other player (best effort)
     const updated = await getBattle(battle!.id);
-    if (updated) {
-      setBattle(updated);
-      if (battleStatus(updated, uid) === 'won') {
-        const xp = await awardXp({ sourceType: 'quiz', sourceId: `battle:${updated.id}`, amount: BATTLE_WIN_XP, label: `Battle won · ${updated.course.name}` });
-        if (xp > 0) setPendingXpReward({ amount: xp, message: `Battle won · ${updated.course.name}` });
-        setReward(xp);
-      }
-    }
+    if (updated) setBattle(updated);
     setDone(true);
   }
 

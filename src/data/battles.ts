@@ -10,7 +10,7 @@
 //   opponent   → battleResults.<id> = { score, total, seconds } | { declined: true }
 // Scores are written by each player's own app, so — like XP in both apps —
 // they are not tamper-proof; a server referee would be needed for that.
-import { arrayUnion, collection, doc, getDoc, getDocs, limit, query, setDoc, where } from 'firebase/firestore';
+import { arrayUnion, collection, doc, getDoc, getDocs, limit, onSnapshot, query, setDoc, where, type Unsubscribe } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
@@ -100,6 +100,20 @@ function fromOut(id: string, challengerId: string, challengerName: string | null
   };
 }
 
+type BattleDocument = { id: string; data: Record<string, unknown> };
+
+function battlesFromDocuments(uid: string, mine: Record<string, unknown>, incoming: readonly BattleDocument[], opponents: ReadonlyMap<string, Record<string, unknown>>): Battle[] {
+  const out: Battle[] = [];
+  const sent = Object.entries((mine.battlesOut ?? {}) as Record<string, Record<string, unknown>>);
+  for (const [id, value] of sent) out.push(fromOut(id, uid, mine.username as string ?? null, value, opponents.get(String(value.opponent))?.battleResults as Record<string, unknown> | undefined));
+  for (const item of incoming) {
+    for (const [id, value] of Object.entries((item.data.battlesOut ?? {}) as Record<string, Record<string, unknown>>)) {
+      if (String(value.opponent) === uid) out.push(fromOut(id, item.id, item.data.username as string ?? null, value, mine.battleResults as Record<string, unknown> | undefined));
+    }
+  }
+  return out.sort((a, b) => b.createdAt - a.createdAt);
+}
+
 /** My battles: the ones I sent, and the ones sent to me. Newest first. */
 export async function listBattles(): Promise<Battle[]> {
   const uid = await me();
@@ -119,6 +133,49 @@ export async function listBattles(): Promise<Battle[]> {
     }
   }
   return out.sort((a, b) => b.createdAt - a.createdAt);
+}
+
+/** Keeps both sides of my battles current without polling Firestore. */
+export function watchBattles(uid: string, onList: (battles: Battle[]) => void, onError: (error: unknown) => void): Unsubscribe {
+  let mine: Record<string, unknown> = {};
+  let incoming: BattleDocument[] = [];
+  const opponents = new Map<string, Record<string, unknown>>();
+  const opponentStops = new Map<string, Unsubscribe>();
+
+  const emit = () => onList(battlesFromDocuments(uid, mine, incoming, opponents));
+  const syncOpponents = () => {
+    const ids = new Set(Object.values((mine.battlesOut ?? {}) as Record<string, Record<string, unknown>>).map((battle) => String(battle.opponent)));
+    for (const [id, stop] of opponentStops) {
+      if (!ids.has(id)) {
+        stop();
+        opponentStops.delete(id);
+        opponents.delete(id);
+      }
+    }
+    for (const id of ids) {
+      if (opponentStops.has(id)) continue;
+      opponentStops.set(id, onSnapshot(doc(db, 'users', id), (snap) => {
+        opponents.set(id, (snap.data() ?? {}) as Record<string, unknown>);
+        emit();
+      }, onError));
+    }
+  };
+
+  const stopMine = onSnapshot(doc(db, 'users', uid), (snap) => {
+    mine = (snap.data() ?? {}) as Record<string, unknown>;
+    syncOpponents();
+    emit();
+  }, onError);
+  const stopIncoming = onSnapshot(query(collection(db, 'users'), where('battleTo', 'array-contains', uid), limit(40)), (snap) => {
+    incoming = snap.docs.map((item) => ({ id: item.id, data: item.data() as Record<string, unknown> }));
+    emit();
+  }, onError);
+
+  return () => {
+    stopMine();
+    stopIncoming();
+    opponentStops.forEach((stop) => stop());
+  };
 }
 
 /** Sends a challenge: same course, same questions for both. */
