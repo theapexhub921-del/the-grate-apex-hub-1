@@ -10,8 +10,11 @@ export function applyWebFontScale(size: string) {
     const style = node.getAttribute('style') ?? '';
     const font = style.match(/(?:^|;)\s*font-size\s*:\s*([\d.]+px)/i)?.[1];
     const line = style.match(/(?:^|;)\s*line-height\s*:\s*([\d.]+px)/i)?.[1];
-    if (font && node.style.getPropertyValue('--grateapex-font-base') !== font) node.style.setProperty('--grateapex-font-base', font);
-    if (line && node.style.getPropertyValue('--grateapex-line-base') !== line) node.style.setProperty('--grateapex-line-base', line);
+    // React Native Web may set already-scaled inline sizes. Keep the original
+    // value captured before the first scaling pass; updating it here causes
+    // each preference change to compound (e.g. 1.3x then 1.3x again).
+    if (font && !node.style.getPropertyValue('--grateapex-font-base')) node.style.setProperty('--grateapex-font-base', font);
+    if (line && !node.style.getPropertyValue('--grateapex-line-base')) node.style.setProperty('--grateapex-line-base', line);
     if ((font || line) && !node.hasAttribute('data-grateapex-scaled')) node.setAttribute('data-grateapex-scaled', '');
   };
   root.querySelectorAll('[style]').forEach(mark);

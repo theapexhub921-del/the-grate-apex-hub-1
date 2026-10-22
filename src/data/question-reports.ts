@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { questionKey, questionUnderReview, type QuestionFlag, type ReportReason } from '@/data/question-report-rules';
 import { auth, db } from '@/lib/firebase';
+import { API_BASE } from '@/lib/live-site';
 
 // "Report this question" (owner's request, 2026-10-20). A learner reports a
 // problem with a question once; the report is private (the learner and the
@@ -89,6 +90,20 @@ export async function reportQuestion(question: { id: string; prompt: string }, r
     throw new Error('The report could not be sent. Check your connection and try again.');
   }
   await remember(question.id);
+  // Email is sent through the server so no mail credentials are shipped in the app.
+  // Firestore remains the source of truth if the notification service is unavailable.
+  const currentUser = auth.currentUser;
+  if (!currentUser) throw new Error('Sign in again to email this report.');
+  const token = await currentUser.getIdToken();
+  const mailResponse = await fetch(`${API_BASE}/api/question-report`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+    body: JSON.stringify({ questionId: question.id, prompt: question.prompt, reason, note: note.trim(), place }),
+  }).catch(() => null);
+  if (!mailResponse?.ok) {
+    const message = await mailResponse?.json().then((body) => body?.error).catch(() => null);
+    throw new Error(typeof message === 'string' ? message : 'The report was saved, but its email could not be sent. Please try again later.');
+  }
 }
 
 async function remember(questionId: string) {

@@ -83,7 +83,7 @@ export function QuestionReportLink({ question, place }: { question: { id: string
         visible={open}
         onClose={close}
         title="Report this question"
-        subtitle="What is wrong with it? Reports are private and go to the team."
+        subtitle="What is wrong with it? Your report is saved privately and emailed to the content team."
         footer={
           <View style={styles.actions}>
             <Button label="Cancel" variant="ghost" onPress={close} disabled={busy} />
