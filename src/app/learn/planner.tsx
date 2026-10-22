@@ -50,8 +50,9 @@ export default function PlannerScreen() {
       setEditingId(entry.id); setTitle(entry.title ?? ''); setSubject(entry.subject ?? ''); setDay(DAYS[entry.weekday]); setStart(entry.start_time.slice(0, 5)); setEnd(entry.end_time.slice(0, 5));
     } else {
       const startAt = defaults?.start ?? '09:00';
-      const endHour = Math.min(23, Number(startAt.slice(0, 2)) + 1);
-      setEditingId(null); setTitle(''); setSubject(''); setDay(DAYS[defaults?.weekday ?? 0]); setStart(startAt); setEnd(`${String(endHour).padStart(2, '0')}:${startAt.slice(3, 5)}`);
+      const endHour = Number(startAt.slice(0, 2)) + 1;
+      const endAt = endHour === 24 ? '24:00' : `${String(endHour).padStart(2, '0')}:${startAt.slice(3, 5)}`;
+      setEditingId(null); setTitle(''); setSubject(''); setDay(DAYS[defaults?.weekday ?? 0]); setStart(startAt); setEnd(endAt);
     }
     setSheetOpen(true);
   }
@@ -106,7 +107,7 @@ export default function PlannerScreen() {
 
   async function addTimetableEntry() {
     if (savingEntry) return;
-    if (!title.trim() || !validTime(start) || !validTime(end) || end <= start) { setError('Add a title and a valid time range.'); return; }
+    if (!title.trim() || !validTime(start) || !validTime(end, true) || !validTimeRange(start, end)) { setError('Add a title and a valid time range. The end time can be on the next day, including 24:00.'); return; }
     setSavingEntry(true);
     try {
       setError('');
@@ -210,7 +211,14 @@ export default function PlannerScreen() {
   );
 }
 
-function validTime(value: string) { return /^([01]\d|2[0-3]):[0-5]\d$/.test(value); }
+function validTime(value: string, allowMidnightEnd = false) { return (allowMidnightEnd && value === '24:00') || /^([01]\d|2[0-3]):[0-5]\d$/.test(value); }
+function validTimeRange(start: string, end: string) {
+  const toMinutes = (time: string) => time === '24:00' ? 1440 : Number(time.slice(0, 2)) * 60 + Number(time.slice(3));
+  const startMinutes = toMinutes(start);
+  const endMinutes = toMinutes(end);
+  const duration = endMinutes <= startMinutes ? endMinutes + 1440 - startMinutes : endMinutes - startMinutes;
+  return duration > 0 && duration <= 1440;
+}
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({

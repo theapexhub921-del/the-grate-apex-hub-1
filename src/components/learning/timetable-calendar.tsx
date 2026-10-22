@@ -22,8 +22,15 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const HOUR = 58;
 
 const minutesOf = (time: string) => {
+  if (time.slice(0, 5) === '24:00') return 1440;
   const [h, m] = time.slice(0, 5).split(':').map(Number);
   return (h || 0) * 60 + (m || 0);
+};
+const durationOf = (entry: TimetableBlock) => {
+  const start = minutesOf(entry.start_time);
+  let end = minutesOf(entry.end_time);
+  if (end <= start) end += 1440;
+  return end - start;
 };
 const hourLabel = (hour: number) => `${String(hour).padStart(2, '0')}:00`;
 const dayStart = (date: Date) => { const d = new Date(date); d.setHours(0, 0, 0, 0); return d; };
@@ -36,9 +43,24 @@ const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
 /** The blocks on a date: weekly ones on that weekday, and one-off ones dated that day. */
 export function blocksOn(entries: readonly TimetableBlock[], date: Date) {
   const iso = isoDay(date);
+  const previousIso = isoDay(addDays(date, -1));
+  const day = weekdayOf(date);
+  const previousDay = (day + 6) % 7;
   return entries
-    .filter((entry) => (entry.event_date ? entry.event_date === iso : entry.weekday === weekdayOf(date)))
+    .filter((entry) => {
+      const startsToday = entry.event_date ? entry.event_date === iso : entry.weekday === day;
+      const startedYesterday = entry.event_date ? entry.event_date === previousIso : entry.weekday === previousDay;
+      return startsToday || (startedYesterday && durationOf(entry) > 1440 - minutesOf(entry.start_time));
+    })
     .sort((a, b) => a.start_time.localeCompare(b.start_time));
+}
+
+/** The part of a block that falls on the selected date, in minutes from midnight. */
+function segmentOn(entry: TimetableBlock, date: Date): [number, number] {
+  const startsToday = entry.event_date ? entry.event_date === isoDay(date) : entry.weekday === weekdayOf(date);
+  const start = startsToday ? minutesOf(entry.start_time) : 0;
+  const end = startsToday ? Math.min(1440, start + durationOf(entry)) : Math.min(1440, durationOf(entry) - minutesOf(entry.start_time));
+  return [start, Math.max(start + 15, end)];
 }
 
 export function TimetableCalendar({ entries, name, onAdd, onSelect }: {
@@ -90,8 +112,9 @@ export function TimetableCalendar({ entries, name, onAdd, onSelect }: {
 
   // Hours shown: the blocks' span, at least 07:00–19:00.
   const [first, last] = useMemo(() => {
-    let start = 7 * 60;
-    let end = 19 * 60;
+    const hasLongBlock = entries.some((entry) => durationOf(entry) >= 1440 || durationOf(entry) > 1440 - minutesOf(entry.start_time));
+    let start = hasLongBlock ? 0 : 7 * 60;
+    let end = hasLongBlock ? 24 * 60 : 19 * 60;
     for (const entry of entries) {
       start = Math.min(start, minutesOf(entry.start_time));
       end = Math.max(end, minutesOf(entry.end_time));
@@ -108,7 +131,9 @@ export function TimetableCalendar({ entries, name, onAdd, onSelect }: {
     for (let i = 0; i < 7; i++) {
       for (const entry of blocksOn(entries, addDays(mondayOf(now), i))) {
         const key = entry.subject?.trim() || entry.title;
-        totals.set(key, (totals.get(key) ?? 0) + Math.max(0, minutesOf(entry.end_time) - minutesOf(entry.start_time)) / 60);
+        // Count recurring blocks on their start day only; overnight portions are
+        // visible the next day but belong to the same planned session.
+        if (entry.event_date || entry.weekday === i) totals.set(key, (totals.get(key) ?? 0) + durationOf(entry) / 60);
       }
     }
     return [...totals.entries()].sort((a, b) => b[1] - a[1]);
@@ -168,8 +193,7 @@ export function TimetableCalendar({ entries, name, onAdd, onSelect }: {
                   <Interactive key={hour} onPress={() => onAdd({ weekday: weekdayOf(date), start: hourLabel(hour) })} accessibilityRole="button" accessibilityLabel={`Add a block on ${DAYS[weekdayOf(date)]} at ${hourLabel(hour)}`} style={[styles.slot, { top: (hour - first) * HOUR, height: HOUR }]}><View /></Interactive>
                 ))}
                 {blocksOn(entries, date).map((entry) => {
-                  const start = minutesOf(entry.start_time);
-                  const end = Math.max(start + 15, minutesOf(entry.end_time));
+                  const [start, end] = segmentOn(entry, date);
                   const tint = tintOf(entry);
                   const tall = end - start >= 60;
                   return (
