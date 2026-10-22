@@ -11,6 +11,7 @@ import type { AiLessonText } from '@/data/ai-context';
 import { newAiChatId } from '@/data/ai-chat-history';
 import { saveTutorChat } from '@/data/tutor-chats';
 import { AiError, type ChatTurn, type ExplainItem, explainWithAi } from '@/lib/ai-study-api';
+import { MarkdownMessage } from '@/components/chat/markdown-message';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 // "Explain with AI" — a small button under a quiz answer, a reviewed answer or a
@@ -120,7 +121,7 @@ export function AiExplain({
       {shown.map((turn, i) => (
         <View key={i} style={turn.role === 'user' ? styles.userTurn : styles.modelTurn}>
           {turn.role === 'user' ? <Text style={styles.who}>You asked</Text> : null}
-          <Text selectable style={turn.role === 'user' ? styles.userText : styles.message}>{turn.text}</Text>
+          {turn.role === 'user' ? <Text selectable style={styles.userText}>{turn.text}</Text> : <MarkdownMessage text={turn.text} />}
         </View>
       ))}
       {busy ? <Text style={styles.thinking}>Thinking…</Text> : null}

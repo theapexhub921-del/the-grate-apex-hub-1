@@ -13,6 +13,7 @@ import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Sheet } from '@/components/ui/sheet';
 import { InlineNotice } from '@/components/ui/state-views';
 import { Text, TextInput } from '@/components/ui/text';
+import { MarkdownMessage } from '@/components/chat/markdown-message';
 import { elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
 import { AI_CARDS_KEY, aiCards, mergeCards, parseSavedCards } from '@/data/ai-study';
 import { newAiChatId } from '@/data/ai-chat-history';

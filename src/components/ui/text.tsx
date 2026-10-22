@@ -12,6 +12,7 @@ import { experienceFont } from '@/data/experience-style';
 import { isLabelStyle, originateFamily, originateWeight, sentenceCaseLabel } from '@/data/originate-type';
 import { useExperience } from '@/hooks/use-experience';
 import { loadLegacyWebFonts } from '@/lib/web-fonts';
+import { useFontSizePreference } from '@/data/settings';
 
 // Text and TextInput for every screen. In Originate they apply the design
 // system's type rules (data/originate-type.ts, docs/design-system.md): IBM Plex
@@ -62,21 +63,24 @@ function useExperienceFont(style: TextProps['style'], input: boolean) {
 
 export const Text = forwardRef<RNText, TextProps>(function Text({ style, children, ...rest }, ref) {
   const originate = useExperience() === 'originate';
+  const fontSizePreference = useFontSizePreference();
   const parentFamily = useContext(ParentFamily);
   const font = useExperienceFont(style, false);
+  const fontScale = fontSizePreference === 'small' ? 0.9 : fontSizePreference === 'large' ? 1.15 : fontSizePreference === 'extra_large' ? 1.3 : 1;
+  const scaledStyle = fontScale === 1 ? style : [style, { fontSize: ((StyleSheet.flatten(style) ?? {}) as Flat).fontSize ? (((StyleSheet.flatten(style) ?? {}) as Flat).fontSize! * fontScale) : undefined }];
   if (originate) {
     const flat = (StyleSheet.flatten(style) ?? {}) as Flat;
     const label = isLabelStyle(flat);
     const own = originateStyle(flat, parentFamily);
     return (
       <ParentFamily.Provider value={own.fontFamily ?? parentFamily}>
-        <RNText ref={ref} {...rest} style={[style, own]}>
+        <RNText ref={ref} {...rest} style={[scaledStyle, own, { fontSize: (StyleSheet.flatten(own)?.fontSize ?? (StyleSheet.flatten(style) as Flat | undefined)?.fontSize ?? 14) * fontScale }]}>
           {label ? sentenceCaseChildren(children) : children}
         </RNText>
       </ParentFamily.Provider>
     );
   }
-  return <RNText ref={ref} {...rest} style={font ? [style, font] : style}>{children}</RNText>;
+  return <RNText ref={ref} {...rest} style={font ? [scaledStyle, font] : scaledStyle}>{children}</RNText>;
 });
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- the type of a Text ref, as with React Native's own
 export type Text = RNText;
