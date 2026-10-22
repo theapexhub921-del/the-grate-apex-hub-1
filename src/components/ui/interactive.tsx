@@ -196,6 +196,7 @@ function experienceCard(styles: CardStyles, experience: ExperienceId, tone: Card
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     card: {
+      minWidth: 0,
       backgroundColor: colors.surface,
       borderRadius: Radius.lg,
       padding: 18,

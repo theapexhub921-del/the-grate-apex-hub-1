@@ -179,6 +179,7 @@ function createStyles(colors: ThemeColors) {
     bottomSpace: { height: 120 },
     pageHeader: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       alignItems: 'flex-end',
       justifyContent: 'space-between',
       gap: 16,
@@ -186,7 +187,7 @@ function createStyles(colors: ThemeColors) {
     },
     pageTitle: { ...Type.title1, color: colors.text },
     pageSubtitle: { ...Type.body, color: colors.textSecondary, marginTop: 4 },
-    pageRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    pageRight: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1, maxWidth: '100%' },
     sectionHeader: {
       flexDirection: 'row',
       alignItems: 'flex-end',
