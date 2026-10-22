@@ -102,6 +102,8 @@ export type CommunityPost = {
   stump?: StumpRef | null; // a "Stump a friend" question (data/stumps.ts)
   /** Learners who have seen the post (once each); null until the first view is counted. */
   views?: number | null;
+  /** Who can see this post: 'everyone' (default) or 'friends' (mutual follows). */
+  visibility?: 'everyone' | 'friends';
 };
 
 /** The quiz question a "Stump a friend" post shares, and the sharer's note. */
@@ -319,6 +321,7 @@ async function postsFrom(rows: readonly { id: string; data: () => DocumentData }
       my_reaction: liked[index] ? 'like' : null,
       stump: readStump(d),
       views: readViews(d),
+      visibility: (d.visibility === 'friends' ? 'friends' : 'everyone') as 'everyone' | 'friends',
     };
   });
 }
@@ -383,7 +386,13 @@ export async function listPostsBy(uid: string, limitCount = 30): Promise<Communi
   return postsFrom(newest);
 }
 
-export async function createCommunityPost(body: string, media?: CommunityMedia | readonly CommunityMedia[], resharedPostId?: string | null, stump?: StumpRef): Promise<CommunityPost> {
+export async function createCommunityPost(
+  body: string,
+  media?: CommunityMedia | readonly CommunityMedia[],
+  resharedPostId?: string | null,
+  stump?: StumpRef,
+  visibility: 'everyone' | 'friends' = 'everyone'
+): Promise<CommunityPost> {
   const files = (Array.isArray(media) ? media : media ? [media as CommunityMedia] : []).slice(0, 3);
   let text = body.trim() || (resharedPostId ? REPOST_TEXT : '');
   // A photo or video can go up with no words (or just one or two letters).
@@ -409,6 +418,7 @@ export async function createCommunityPost(body: string, media?: CommunityMedia |
     likeCount: 0,
     createdAt: serverTimestamp(),
     lastActivityAt: serverTimestamp(),
+    visibility: visibility === 'friends' ? 'friends' : 'everyone',
     ...(resharedPostId ? { resharedPostId } : {}),
     ...(uploaded.length ? { media: uploaded } : {}),
     ...(stump ? { stump: { qid: stump.qid, note: stump.note.slice(0, 200) } } : {}),
@@ -418,11 +428,16 @@ export async function createCommunityPost(body: string, media?: CommunityMedia |
     media_type: uploaded[0]?.t ?? null, media_url: uploaded[0]?.url ?? null, media_list: mediaList(uploaded),
     reshared_post_id: resharedPostId ?? null, created_at: new Date().toISOString(), reactions: 0, comments: 0, reshares: 0, my_reaction: null,
     stump: stump ?? null,
+    visibility: visibility === 'friends' ? 'friends' : 'everyone',
   };
 }
 
 /** A post whose only content is a voice note (up to two minutes). */
-export async function createVoicePost(body: string, clip: { blob: Blob; seconds: number }): Promise<CommunityPost> {
+export async function createVoicePost(
+  body: string,
+  clip: { blob: Blob; seconds: number },
+  visibility: 'everyone' | 'friends' = 'everyone'
+): Promise<CommunityPost> {
   const text = body.trim() || VOICE_POST_TEXT;
   if (text.length < 3) throw new Error('Posts need at least 3 characters.');
   if (text.length > 2000) throw new Error('Posts can be up to 2,000 characters.');
@@ -442,6 +457,7 @@ export async function createVoicePost(body: string, clip: { blob: Blob; seconds:
     likeCount: 0,
     createdAt: serverTimestamp(),
     lastActivityAt: serverTimestamp(),
+    visibility: visibility === 'friends' ? 'friends' : 'everyone',
     media,
   });
   return {
@@ -449,6 +465,7 @@ export async function createVoicePost(body: string, clip: { blob: Blob; seconds:
     media_type: null, media_url: null, media_list: mediaList(media),
     reshared_post_id: null, created_at: new Date().toISOString(), reactions: 0, comments: 0, reshares: 0, my_reaction: null,
     stump: null,
+    visibility: visibility === 'friends' ? 'friends' : 'everyone',
   };
 }
 

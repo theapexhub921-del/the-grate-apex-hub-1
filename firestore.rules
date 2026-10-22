@@ -301,8 +301,14 @@ service cloud.firestore {
 
     // Discussion board. Anyone signed in can read and post. Posts carry the
     // author's real username. Replies are a subcollection of the post.
+    // Visibility: 'everyone' (default) or 'friends' (mutual follows).
     match /posts/{postId} {
-      allow read: if request.auth != null;
+      allow get: if request.auth != null
+        && (resource.data.get('visibility', 'everyone') == 'everyone'
+            || resource.data.authorUid == request.auth.uid
+            || (exists(/databases/$(database)/documents/follows/$(request.auth.uid + '_' + resource.data.authorUid))
+                && exists(/databases/$(database)/documents/follows/$(resource.data.authorUid + '_' + request.auth.uid))));
+      allow list: if request.auth != null;
       allow create: if request.auth.uid == request.resource.data.authorUid
         && request.resource.data.authorName ==
            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username
@@ -311,7 +317,8 @@ service cloud.firestore {
         && request.resource.data.body is string
         && request.resource.data.body.size() >= 3 && request.resource.data.body.size() <= 2000
         && request.resource.data.replyCount == 0
-        && (!('media' in request.resource.data) || (request.resource.data.media is list && request.resource.data.media.size() <= 3));
+        && (!('media' in request.resource.data) || (request.resource.data.media is list && request.resource.data.media.size() <= 3))
+        && (!('visibility' in request.resource.data) || request.resource.data.visibility in ['everyone', 'friends']);
       // The author may edit their post. Anyone else may only add exactly 1 to
       // the reply count (that's what happens when they reply).
       allow update: if request.auth.uid == resource.data.authorUid

@@ -320,7 +320,7 @@ function createStyles(colors: ThemeColors) {
     caption: { ...Type.caption, color: colors.textTertiary },
     questionFigure: { marginVertical: 4 },
     questionImage: { height: QUESTION_MAX_HEIGHT, marginVertical: 4 },
-    pictureState: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 12 },
+    pictureState: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 12 },
     pictureText: { fontSize: 13, color: colors.textSecondary, textAlign: 'center' },
     previewCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 10, marginVertical: 6, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
     previewHover: { borderColor: colors.primaryBorder },

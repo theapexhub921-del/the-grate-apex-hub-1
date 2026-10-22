@@ -200,10 +200,11 @@ export default function PlannerScreen() {
             {DAYS.map((value) => <Button key={value} label={value} size="sm" variant={day === value ? 'primary' : 'secondary'} onPress={() => setDay(value)} />)}
           </View>
           <Text style={styles.label}>Time</Text>
+          <Text style={styles.muted}>Use 24-hour time. An end time earlier than the start continues into the next day. Matching times means a full 24 hours; 24:00 means midnight at the end of this day.</Text>
           <View style={styles.inputPair}>
-            <TextInput value={start} onChangeText={setStart} placeholder="09:00" accessibilityLabel="Start time" style={[styles.input, styles.timeInput]} />
+            <TextInput value={start} onChangeText={setStart} placeholder="09:00" keyboardType="numbers-and-punctuation" accessibilityLabel="Start time, 24-hour format" style={[styles.input, styles.timeInput]} />
             <Text style={styles.body}>to</Text>
-            <TextInput value={end} onChangeText={setEnd} placeholder="10:00" accessibilityLabel="End time" style={[styles.input, styles.timeInput]} />
+            <TextInput value={end} onChangeText={setEnd} placeholder="10:00" keyboardType="numbers-and-punctuation" accessibilityLabel="End time, 24-hour format; can be next day" style={[styles.input, styles.timeInput]} />
           </View>
         </View>
       </Sheet>

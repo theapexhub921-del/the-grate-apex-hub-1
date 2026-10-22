@@ -49,6 +49,7 @@ export function CommunityPostsFeed({ authorId, showComposer = true }: { authorId
   const [draft, setDraft] = useState('');
   const [media, setMedia] = useState<CommunityMedia[]>([]);
   const [busy, setBusy] = useState(false);
+  const [visibility, setVisibility] = useState<'everyone' | 'friends'>('everyone');
   const [selectedPost, setSelectedPost] = useState<CommunityPost | null>(null);
   const [comments, setComments] = useState<PostComment[]>([]);
   const [commentDraft, setCommentDraft] = useState('');
@@ -107,18 +108,29 @@ export function CommunityPostsFeed({ authorId, showComposer = true }: { authorId
     setError(null);
   }
 
+  const isPostVisible = useCallback(
+    (post: CommunityPost) => {
+      if (post.visibility !== 'friends') return true;
+      const myId = user?.id ?? social.userId;
+      if (post.author_id && myId && post.author_id === myId) return true;
+      return social.people.some((person) => person.userId === post.author_id && person.relationship === 'friends');
+    },
+    [user?.id, social.userId, social.people]
+  );
+
   async function publish(resharedPostId?: string) {
     if ((!draft.trim() && !media.length && !voice && !resharedPostId) || busy) return;
     setBusy(true);
     setError(null);
     try {
-      if (voice) await createVoicePost(draft, voice);
-      else await createCommunityPost(draft, resharedPostId ? undefined : media, resharedPostId);
+      if (voice) await createVoicePost(draft, voice, visibility);
+      else await createCommunityPost(draft, resharedPostId ? undefined : media, resharedPostId, undefined, visibility);
       if (voice) { discardVoiceClip(voice); setVoice(null); }
       setDraft('');
       setMedia([]);
+      setVisibility('everyone');
       setComposeOpen(false);
-      setNotice(resharedPostId ? 'Reposted to your feed.' : 'Your post is live for your friends.');
+      setNotice(resharedPostId ? 'Reposted to your feed.' : visibility === 'friends' ? 'Your post is live for your friends.' : 'Your post is live for everyone.');
       await refresh();
     } catch (caught) { setError(getErrorMessage(caught, 'Could not publish this post.')); }
     finally { setBusy(false); }
@@ -182,6 +194,7 @@ export function CommunityPostsFeed({ authorId, showComposer = true }: { authorId
   }
 
   async function openPost(post: CommunityPost) {
+    if (!isPostVisible(post)) return;
     markSeen(post);
     setSelectedPost(post);
     setComments([]);
@@ -274,13 +287,43 @@ export function CommunityPostsFeed({ authorId, showComposer = true }: { authorId
       {error ? <Card style={styles.errorCard}><Text style={styles.errorTitle}>Community feed issue</Text><Text style={styles.muted}>{error}</Text><Button label="Try again" size="sm" variant="secondary" onPress={() => void refresh()} /></Card> : null}
       {loading ? <Text style={styles.muted}>Loading posts…</Text> : null}
       {!loading && !posts.length && !error ? <Card style={styles.empty}><Icon name="social" size={22} color={colors.primaryText} /><Text style={styles.emptyTitle}>Your feed is ready for your circle</Text><Text style={styles.muted}>Posts from people across GrAte Apex Hub will appear here.</Text></Card> : null}
-      {posts.filter((post) => !hiddenIds.includes(post.id)).map((post) => (
+      {posts.filter((post) => !hiddenIds.includes(post.id) && isPostVisible(post)).map((post) => (
         <PostCard key={post.id} post={post} socialPeople={social.people} ownId={user?.id ?? social.userId} ownName={displayName || 'You'} onOpen={() => void openPost(post)} onLike={() => void like(post)} onComment={() => void openPost(post)} onReshare={() => void repost(post)} onShare={() => void sharePost(post)} onReport={() => report('post', post.id, `post by ${post.author_name ? `@${post.author_name}` : 'a learner'}`)} onDelete={() => confirmDeletePost(post)} onSeen={() => markSeen(post)} />
       ))}
       <ReportSheet target={reportTarget} reporter={displayName || 'a learner'} onClose={() => setReportTarget(null)} onHide={hidePost} onDone={(message) => { setReportTarget(null); setNotice(message); }} />
-      <Sheet visible={composeOpen} onClose={() => setComposeOpen(false)} title="Create a post" subtitle="Share something with the GrAte Apex Hub community.">
+      <Sheet visible={composeOpen} onClose={() => { setComposeOpen(false); setVisibility('everyone'); }} title="Create a post" subtitle="Share something with the GrAte Apex Hub community.">
         <View style={styles.composeSheet}>
         <Text style={styles.muted}>Share how you’re feeling, what’s happening in your life, or anything you’d like your friends to know.</Text>
+        <View style={styles.audienceSelector}>
+          <Text style={styles.audienceLabel}>Who can see this?</Text>
+          <View style={styles.audiencePills}>
+            <Interactive
+              onPress={() => setVisibility('everyone')}
+              style={[styles.audiencePill, visibility === 'everyone' && styles.audiencePillActive]}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: visibility === 'everyone' }}
+              accessibilityLabel="Share with everyone"
+            >
+              <Icon name="sparkle" size={14} color={visibility === 'everyone' ? colors.primaryText : colors.textTertiary} />
+              <Text style={[styles.audiencePillText, visibility === 'everyone' && styles.audiencePillTextActive]}>Everyone</Text>
+            </Interactive>
+            <Interactive
+              onPress={() => setVisibility('friends')}
+              style={[styles.audiencePill, visibility === 'friends' && styles.audiencePillActive]}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: visibility === 'friends' }}
+              accessibilityLabel="Share with friends only"
+            >
+              <Icon name="profile" size={14} color={visibility === 'friends' ? colors.primaryText : colors.textTertiary} />
+              <Text style={[styles.audiencePillText, visibility === 'friends' && styles.audiencePillTextActive]}>Friends only</Text>
+            </Interactive>
+          </View>
+          <Text style={styles.audienceHelper}>
+            {visibility === 'everyone'
+              ? 'Everyone with access to the app can see this post.'
+              : 'Only your friends (learners you follow who follow you back) can see this post.'}
+          </Text>
+        </View>
         <MentionInput people={social.people} value={draft} onChangeText={setDraft} multiline maxLength={5000} placeholder="What’s on your mind today?" placeholderTextColor={colors.textTertiary} accessibilityLabel="Write a post" style={styles.postInput} />
           {media.length ? null : <VoiceClipRecorder clip={voice} onClip={setVoice} />}
           {media.map((item, at) => <View key={`${item.uri}-${at}`} style={styles.mediaSelected}><Icon name={item.type === 'video' ? 'play' : 'image'} size={16} color={colors.primaryText} /><Text style={[styles.muted, styles.flex]} numberOfLines={1}>{item.filename}</Text><Button label="Remove" size="sm" variant="ghost" onPress={() => setMedia((list) => list.filter((_, index) => index !== at))} /></View>)}
@@ -376,7 +419,7 @@ function PostCard({ post, socialPeople, ownId, ownName, onOpen, onLike, onCommen
     <Card style={[styles.postCard, verticalActions && styles.postDetailCard]}>
       <View style={verticalActions ? styles.postDetailLayout : undefined}>
       <View style={verticalActions ? styles.postDetailContent : styles.postContent}>
-      <View style={styles.postHead}><View style={styles.postAuthor}><PersonAvatar uid={post.author_id} uri={friend?.avatarUrl ?? null} name={name} size={42} ring="subtle" /><Interactive onPress={() => router.push(post.author_id && post.author_id !== ownId ? routes.profile(post.author_id) : ('/profile' as never))} accessibilityRole="link" accessibilityLabel={`View ${name}'s profile`} style={styles.flex}><View style={styles.nameRow}><Text style={styles.author}>{name}</Text><VerifiedBadge username={post.author_name} uid={post.author_id} /></View><Text style={styles.muted}>{new Date(post.created_at).toLocaleString()}</Text></Interactive></View>{post.reshared_post_id ? <Pill label="Reposted" /> : null}{post.author_id === ownId ? <Button label="Delete" size="sm" variant="ghost" icon={<Icon name="trash" size={16} color={colors.error} />} onPress={onDelete} accessibilityLabel="Delete post" /> : null}</View>
+      <View style={styles.postHead}><View style={styles.postAuthor}><PersonAvatar uid={post.author_id} uri={friend?.avatarUrl ?? null} name={name} size={42} ring="subtle" /><Interactive onPress={() => router.push(post.author_id && post.author_id !== ownId ? routes.profile(post.author_id) : ('/profile' as never))} accessibilityRole="link" accessibilityLabel={`View ${name}'s profile`} style={styles.flex}><View style={styles.nameRow}><Text style={styles.author}>{name}</Text><VerifiedBadge username={post.author_name} uid={post.author_id} /></View><Text style={styles.muted}>{new Date(post.created_at).toLocaleString()}</Text></Interactive></View>{post.visibility === 'friends' ? <Pill label="Friends only" /> : null}{post.reshared_post_id ? <Pill label="Reposted" /> : null}{post.author_id === ownId ? <Button label="Delete" size="sm" variant="ghost" icon={<Icon name="trash" size={16} color={colors.error} />} onPress={onDelete} accessibilityLabel="Delete post" /> : null}</View>
       {post.stump && stumped ? <StumpCard postId={post.id} question={stumped} stump={post.stump} authorId={post.author_id} authorName={name} ownId={ownId} people={socialPeople} /> : displayBody(post) ? <Interactive onPress={onOpen} accessibilityRole="button" accessibilityLabel="Open post" style={styles.postBodyOpen}><Text style={styles.body}>{displayBody(post)}</Text></Interactive> : null}
       {post.reshared_post_id ? (
         <View style={styles.reshareBox}>
@@ -443,6 +486,27 @@ function createStyles(colors: ThemeColors) {
     railAction: { minWidth: 48, minHeight: 44, alignItems: 'center', justifyContent: 'center', paddingVertical: 3 },
     action: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', minHeight: 42, paddingVertical: 8 },
     composeSheet: { gap: 12 },
+    audienceSelector: { gap: 6, paddingVertical: 2 },
+    audienceLabel: { ...Type.caption, color: colors.textSecondary, fontWeight: '600' },
+    audiencePills: { flexDirection: 'row', gap: 8 },
+    audiencePill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderRadius: Radius.pill,
+      backgroundColor: colors.surfaceSunken,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    audiencePillActive: {
+      backgroundColor: colors.accentSubtle,
+      borderColor: colors.accent,
+    },
+    audiencePillText: { ...Type.caption, color: colors.textSecondary, fontWeight: '500' },
+    audiencePillTextActive: { color: colors.primaryText, fontWeight: '700' },
+    audienceHelper: { ...Type.caption, color: colors.textTertiary, fontSize: 12 },
     postInput: { minHeight: 140, textAlignVertical: 'top', padding: 13, borderWidth: 1, borderColor: colors.borderStrong, borderRadius: 14, backgroundColor: colors.surfaceSunken, color: colors.text, fontSize: 15 },
     mediaSelected: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     input: { minHeight: 42, borderWidth: 1, borderColor: colors.borderStrong, borderRadius: Radius.md, backgroundColor: colors.surfaceSunken, paddingHorizontal: 12, color: colors.text, fontSize: 14 },

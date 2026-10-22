@@ -14,6 +14,7 @@ import { StumpCard, useStumpQuestion } from '@/components/social/stump-card';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
 import { Sheet } from '@/components/ui/sheet';
+import { Pill } from '@/components/ui/pill';
 import { Text } from '@/components/ui/text';
 import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { webStyle } from '@/components/ui/web';
@@ -111,6 +112,7 @@ export function PostDetail({
         <PersonAvatar uid={post.author_id} uri={friend?.avatarUrl ?? null} name={name} size={34} ring="subtle" />
         <Text style={styles.headName} numberOfLines={1}>{handle}</Text>
         <VerifiedBadge username={post.author_name} uid={post.author_id} size={14} />
+        {post.visibility === 'friends' ? <Pill label="Friends only" /> : null}
       </Interactive>
       {post.author_id === ownId ? (
         <Interactive onPress={onDelete} accessibilityRole="button" accessibilityLabel="Delete post" style={styles.iconButton}><Icon name="trash" size={19} color={colors.error} /></Interactive>

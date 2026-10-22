@@ -133,7 +133,10 @@ export function TimetableCalendar({ entries, name, onAdd, onSelect }: {
         const key = entry.subject?.trim() || entry.title;
         // Count recurring blocks on their start day only; overnight portions are
         // visible the next day but belong to the same planned session.
-        if (entry.event_date || entry.weekday === i) totals.set(key, (totals.get(key) ?? 0) + durationOf(entry) / 60);
+        const startsOnThisDay = entry.event_date
+          ? entry.event_date === isoDay(addDays(mondayOf(now), i))
+          : entry.weekday === i;
+        if (startsOnThisDay) totals.set(key, (totals.get(key) ?? 0) + durationOf(entry) / 60);
       }
     }
     return [...totals.entries()].sort((a, b) => b[1] - a[1]);
