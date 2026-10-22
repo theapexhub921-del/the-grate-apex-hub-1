@@ -10,7 +10,7 @@
 //   opponent   → battleResults.<id> = { score, total, seconds } | { declined: true }
 // Scores are written by each player's own app, so — like XP in both apps —
 // they are not tamper-proof; a server referee would be needed for that.
-import { arrayUnion, collection, doc, getDoc, getDocs, limit, onSnapshot, query, setDoc, where, type Unsubscribe } from 'firebase/firestore';
+import { arrayUnion, collection, doc, getDoc, getDocs, limit, onSnapshot, query, serverTimestamp, setDoc, where, writeBatch, type Unsubscribe } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
@@ -125,8 +125,11 @@ export async function listBattles(): Promise<Battle[]> {
   const opponentDocs = new Map(await Promise.all(opponents.map(async (id) => [id, (await getDoc(doc(db, 'users', id)).catch(() => null))?.data() ?? {}] as const)));
   for (const [id, value] of sent) out.push(fromOut(id, uid, mine.username ?? null, value, opponentDocs.get(String(value.opponent))?.battleResults));
   // Sent to me: on the challengers' documents.
-  const incoming = await getDocs(query(collection(db, 'users'), where('battleTo', 'array-contains', uid), limit(40))).catch(() => null);
-  for (const item of incoming?.docs ?? []) {
+  // Don't turn permission/index/network errors into an empty battle list. That
+  // made an invite on another learner's profile look like it simply did not
+  // exist when Firestore rejected the incoming-challenge query.
+  const incoming = await getDocs(query(collection(db, 'users'), where('battleTo', 'array-contains', uid), limit(40)));
+  for (const item of incoming.docs) {
     const data = item.data();
     for (const [id, value] of Object.entries((data.battlesOut ?? {}) as Record<string, Record<string, unknown>>)) {
       if (String(value.opponent) === uid) out.push(fromOut(id, item.id, data.username ?? null, value, mine.battleResults));
@@ -190,7 +193,20 @@ export async function createBattle(opponent: { userId: string; username: string 
   const kept = Object.entries((data.battlesOut ?? {}) as Record<string, { createdAt?: number }>)
     .sort((a, b) => (b[1].createdAt ?? 0) - (a[1].createdAt ?? 0))
     .slice(0, KEEP - 1);
-  await setDoc(ref, { battlesOut: { ...Object.fromEntries(kept), [id]: entry }, battleTo: arrayUnion(opponent.userId) }, { merge: true });
+  const batch = writeBatch(db);
+  batch.set(ref, { battlesOut: { ...Object.fromEntries(kept), [id]: entry }, battleTo: arrayUnion(opponent.userId) }, { merge: true });
+  // The account bell listens to this collection across devices. Push alerts are
+  // sent separately and may be unavailable when notifications are disabled.
+  batch.set(doc(collection(db, 'users', opponent.userId, 'notifications')), {
+    type: 'battle',
+    from: uid,
+    fromName: data.username ?? '',
+    battleId: id,
+    text: `challenged you to a ${course.name} battle`,
+    read: false,
+    createdAt: serverTimestamp(),
+  });
+  await batch.commit();
   track('battle_start', { course: course.id });
   return fromOut(id, uid, data.username ?? null, entry, undefined);
 }

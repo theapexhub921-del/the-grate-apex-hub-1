@@ -104,14 +104,19 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
         allow create: if request.auth.uid == request.resource.data.from
           && request.auth.uid != uid
-          && request.resource.data.type in ['like', 'comment', 'reshare', 'follow', 'reply', 'support', 'message']
+          && request.resource.data.type in ['like', 'comment', 'reshare', 'follow', 'reply', 'support', 'message', 'battle']
           && (request.resource.data.fromName ==
               get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username
               || (request.resource.data.type == 'support'
                   && exists(/databases/$(database)/documents/admins/$(request.auth.uid))))
           && request.resource.data.read == false
-          && request.resource.data.keys().hasOnly(['type', 'from', 'fromName', 'text', 'read', 'createdAt'])
-          && (!('text' in request.resource.data) || request.resource.data.text.size() <= 100);
+          && request.resource.data.keys().hasOnly(['type', 'from', 'fromName', 'text', 'read', 'createdAt', 'battleId'])
+          && (!('text' in request.resource.data) || (request.resource.data.text is string && request.resource.data.text.size() <= 100))
+          && (request.resource.data.type != 'battle'
+              || (request.resource.data.battleId is string
+                  && request.resource.data.battleId.matches('^b[a-z0-9]+$')
+                  && request.resource.data.text is string
+                  && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.battlesOut[request.resource.data.battleId].opponent == uid));
       }
 
       // Incoming-call invites: a friend rings me by writing one; I (or the caller, to cancel) delete it.

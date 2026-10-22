@@ -39,7 +39,7 @@ export function BattleIntro({ course, me, opponent, questions, seconds, winXp, o
 
   return (
     <Arena>
-      <Text style={styles.kicker}>XP BATTLE · {course.toUpperCase()}</Text>
+      <Text style={styles.kicker}>CHALLENGE ACCEPTED · {course.toUpperCase()}</Text>
       <View style={styles.versus}>
         <Animated.View style={[styles.side, leftStyle]}>
           <PersonAvatar uid={me.uid} name={me.name} size={84} ring="gold" />
@@ -51,7 +51,8 @@ export function BattleIntro({ course, me, opponent, questions, seconds, winXp, o
           <Text style={[styles.name, { color: colors.apexText }]} numberOfLines={1}>@{opponent.name}</Text>
         </Animated.View>
       </View>
-      <Text style={[styles.lead, { color: colors.apexText }]}>Same questions. Same clock. Highest score wins.</Text>
+      <Text style={[styles.lead, { color: colors.apexText }]}>Your battle is ready. Tap “Start the battle” to begin.</Text>
+      <Text style={[styles.summary, { color: colors.apexText }]}>Same questions. Same clock. Highest score wins.</Text>
       <View style={styles.rules}>
         <Rule text={`${questions} questions from ${course}, the same for both of you`} />
         <Rule text={`${seconds} seconds per question — time out and it counts as missed`} />
@@ -73,6 +74,7 @@ const styles = StyleSheet.create({
   name: { fontSize: 15, fontWeight: '800', textAlign: 'center' },
   vs: { ...Type.numeral, fontSize: 54, lineHeight: 62, color: '#FDC00A', textShadowColor: 'rgba(253,192,10,0.55)', textShadowRadius: 18 },
   lead: { fontSize: 18, fontWeight: '700', textAlign: 'center', lineHeight: 26 },
+  summary: { fontSize: 14, fontWeight: '600', textAlign: 'center', lineHeight: 21, opacity: 0.86 },
   rules: { gap: 10, padding: 18, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(253,192,10,0.18)' },
   actions: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10, marginTop: 8 },
 });

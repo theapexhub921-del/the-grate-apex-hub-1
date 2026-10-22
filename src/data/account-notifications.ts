@@ -23,6 +23,7 @@ const TITLES: Record<string, (name: string) => string> = {
   reply: (name) => `${name} replied to you`,
   reshare: (name) => `${name} reposted your post`,
   message: (name) => `New message from ${name}`,
+  battle: (name) => `${name} challenged you to a battle`,
   support: () => 'Reply from GrAte Apex Hub support',
 };
 
@@ -44,9 +45,15 @@ function apply(docs: readonly QueryDocumentSnapshot[]) {
       title: (TITLES[kind] ?? (() => `${name} sent you a notification`))(name),
       body: kind === 'follow' ? 'Follow back to become friends — then you can message and battle.' : String(d.text ?? ''),
       at: millis(d.createdAt),
-      href: (kind === 'message' ? '/social/messages' : kind === 'follow' ? `/social/person?user=${encodeURIComponent(String(d.from ?? ''))}` : '/') as Href,
-      icon: kind === 'follow' ? 'profile' : kind === 'like' ? 'heart' : kind === 'reshare' ? 'repost' : kind === 'message' ? 'comment' : 'comment',
-      tone: kind === 'follow' ? 'gold' : 'primary',
+      href: (kind === 'battle' && typeof d.battleId === 'string'
+        ? `/social/battle?id=${encodeURIComponent(d.battleId)}`
+        : kind === 'message'
+          ? '/social/messages'
+          : kind === 'follow'
+            ? `/social/person?user=${encodeURIComponent(String(d.from ?? ''))}`
+            : '/') as Href,
+      icon: kind === 'battle' ? 'challenge' : kind === 'follow' ? 'profile' : kind === 'like' ? 'heart' : kind === 'reshare' ? 'repost' : kind === 'message' ? 'comment' : 'comment',
+      tone: kind === 'battle' ? 'gold' : kind === 'follow' ? 'gold' : 'primary',
     };
   });
   if (JSON.stringify(next.map((n) => [n.id, n.read])) !== JSON.stringify(items.map((n) => [n.id, n.read]))) {
