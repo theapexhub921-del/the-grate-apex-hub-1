@@ -49,9 +49,12 @@ function seededShuffle<T>(items: readonly T[], seed: string) {
 async function battleQuestions(battle: Battle): Promise<Question[]> {
   if (battle.course.kind === 'hb') {
     const bank = await loadLegacyBank(battle.course.id);
-    return buildPractice(bankQuestions(bank), { course: battle.course.id }, battle.count, battle.seed);
+    const selected = new Set(battle.course.topicIds ?? []);
+    const source = bankQuestions(bank).filter((question) => !selected.size || selected.has(question.tp?.trim() || question.t?.trim() || 'general'));
+    return buildPractice(source, { course: battle.course.id }, battle.count, battle.seed);
   }
-  const pool = getTopicQuestions(battle.course.id).filter((question) => question.usage !== 'learn');
+  const selected = new Set(battle.course.topicIds ?? []);
+  const pool = getTopicQuestions(battle.course.id).filter((question) => question.usage !== 'learn' && (!selected.size || selected.has(question.lessonId ?? '')));
   return seededShuffle(pool, battle.seed).slice(0, battle.count);
 }
 
@@ -156,6 +159,7 @@ export default function BattleScreen() {
     return (
       <BattleIntro
         course={battle.course.name}
+        topics={battle.course.topicNames}
         me={{ uid, name: user?.profile?.username ?? 'You' }}
         opponent={{ uid: battle.challengerId === uid ? battle.opponentId : battle.challengerId, name: otherName ?? 'opponent' }}
         questions={questions.length}

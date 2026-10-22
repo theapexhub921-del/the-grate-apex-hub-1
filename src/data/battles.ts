@@ -15,7 +15,7 @@ import { arrayUnion, collection, doc, getDoc, getDocs, limit, onSnapshot, query,
 import { auth, db } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
 
-export type BattleCourse = { kind: 'hb' | 'topic'; id: string; name: string };
+export type BattleCourse = { kind: 'hb' | 'topic'; id: string; name: string; topicIds?: string[]; topicNames?: string[] };
 export type BattleSide = { score: number; total: number; seconds: number };
 
 export type Battle = {

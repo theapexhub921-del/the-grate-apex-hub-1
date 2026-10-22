@@ -13,8 +13,9 @@ import { useTheme } from '@/hooks/use-theme';
 
 // The battle intro: two learners face each other in the arena, a pulsing VS,
 // the rules, then "Start the battle" (3 · 2 · 1 follows on the battle screen).
-export function BattleIntro({ course, me, opponent, questions, seconds, winXp, onStart }: {
+export function BattleIntro({ course, topics, me, opponent, questions, seconds, winXp, onStart }: {
   course: string;
+  topics?: readonly string[];
   me: { uid: string; name: string };
   opponent: { uid: string; name: string };
   questions: number;
@@ -55,6 +56,7 @@ export function BattleIntro({ course, me, opponent, questions, seconds, winXp, o
       <Text style={[styles.summary, { color: colors.apexText }]}>Same questions. Same clock. Highest score wins.</Text>
       <View style={styles.rules}>
         <Rule text={`${questions} questions from ${course}, the same for both of you`} />
+        {topics?.length ? <Rule text={`Topics: ${topics.join(', ')}`} /> : null}
         <Rule text={`${seconds} seconds per question — time out and it counts as missed`} />
         <Rule text={`The winner earns ${winXp} XP; nothing is taken from the other player`} />
         <Rule text="A tie on score goes to the faster player" />
