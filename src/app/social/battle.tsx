@@ -14,7 +14,7 @@ import { ErrorScreen, LoadingState } from '@/components/ui/state-views';
 import { Text } from '@/components/ui/text';
 import { setPendingXpReward } from '@/components/xp-toast';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { type Battle, BATTLE_SECONDS, BATTLE_WIN_XP, battleStatus, getBattle, submitBattleResult, watchBattles } from '@/data/battles';
+import { acceptBattle, type Battle, BATTLE_SECONDS, BATTLE_WIN_XP, battleStatus, declineBattle, getBattle, submitBattleResult, watchBattles } from '@/data/battles';
 import { announceBattleResult } from '@/lib/web-push';
 import { getTopicQuestions } from '@/data/curriculum';
 import { bankQuestions, buildPractice, loadLegacyBank } from '@/data/legacy-study';
@@ -123,6 +123,26 @@ export default function BattleScreen() {
   const theirs = battle.challengerId === uid ? battle.opponent : battle.challenger;
   const otherName = battle.challengerId === uid ? battle.opponentName : battle.challengerName;
 
+  async function acceptAndJoin() {
+    try {
+      await acceptBattle(battle!);
+      const updated = await getBattle(battle!.id);
+      if (updated) setBattle(updated);
+    } catch (problem) {
+      setError(friendlyError(problem, 'The battle could not be joined.'));
+    }
+  }
+
+  async function rejectChallenge() {
+    try {
+      await declineBattle(battle!);
+      void announceBattleResult(battle!.id, battle!.challengerId);
+      router.replace('/social');
+    } catch (problem) {
+      setError(friendlyError(problem, 'The challenge could not be declined.'));
+    }
+  }
+
   async function submit(result: SessionResult) {
     const correct = questions!.filter((question) => isAnswerCorrect(question, result.answers[question.id])).length;
     const side = { score: correct, total: questions!.length, seconds: Math.round(result.timeSeconds) };
@@ -149,6 +169,34 @@ export default function BattleScreen() {
             tone={status === 'won' ? 'success' : status === 'lost' ? 'error' : status === 'draw' ? 'gold' : 'neutral'}
           />
           {reward > 0 ? <Text style={styles.reward}>+{reward} XP</Text> : null}
+          <Button label="Back to Connect" variant="secondary" onPress={() => router.replace('/social')} />
+        </Card>
+      </Screen>
+    );
+  }
+
+  if (status === 'incoming-challenge') {
+    return (
+      <Screen width="learning">
+        <BackLink fallback={'/social' as never} />
+        <Card style={styles.lobby}>
+          <Text style={styles.resultTitle}>Battle invitation</Text>
+          <Text style={styles.muted}>@{otherName ?? 'your friend'} challenged you to {battle.course.name}{battle.course.topicNames?.length ? ` · ${battle.course.topicNames.join(', ')}` : ''}.</Text>
+          <Text style={styles.muted}>Accept to join the shared room. You will both answer the same {questions.length} questions, wherever you are.</Text>
+          <Button label="Accept & join room" variant="apex" onPress={() => { void acceptAndJoin(); }} />
+          <Button label="Decline challenge" variant="secondary" onPress={() => { void rejectChallenge(); }} />
+        </Card>
+      </Screen>
+    );
+  }
+
+  if (status === 'waiting-for-response') {
+    return (
+      <Screen width="learning">
+        <BackLink fallback={'/social' as never} />
+        <Card style={styles.lobby}>
+          <Text style={styles.resultTitle}>Your battle room is ready</Text>
+          <Text style={styles.muted}>Waiting for @{otherName ?? 'your friend'} to accept or decline {battle.course.name}. We’ll update this screen when they respond.</Text>
           <Button label="Back to Connect" variant="secondary" onPress={() => router.replace('/social')} />
         </Card>
       </Screen>
@@ -207,6 +255,7 @@ function createStyles(colors: ThemeColors) {
     title: { ...Type.title2, color: colors.text },
     muted: { fontSize: 12.5, color: colors.textTertiary },
     result: { alignItems: 'center', gap: 14, padding: 26, marginTop: 10 },
+    lobby: { alignItems: 'center', gap: 14, padding: 26, marginTop: 10 },
     resultTitle: { ...Type.title3, color: colors.text },
     scores: { flexDirection: 'row', alignItems: 'center', gap: 22 },
     scoreBox: { alignItems: 'center', gap: 2, minWidth: 110 },

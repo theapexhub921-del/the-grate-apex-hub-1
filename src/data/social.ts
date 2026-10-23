@@ -19,6 +19,7 @@ import {
 
 import { subscribeToLearningAuthChanges } from '@/data/learning-sync';
 import { rankSuggestions, relationshipOf } from '@/data/friend-suggestions';
+import { rankAndFilterCandidates, tokenizeWords } from '@/data/social-search';
 import type { AppNotification } from '@/data/notifications';
 import { chooseUsername } from '@/lib/accounts';
 import { auth, db } from '@/lib/firebase';
@@ -386,51 +387,99 @@ function learnerDirectory() {
 }
 
 /**
- * Learners by username or name: usernames and names that start with the typed
- * text (as in the original app), plus those that contain it anywhere. People
- * who turned off "Let students find me" are left out (unless you know them).
+ * Synchronous predictive search across known contacts or a supplied list.
+ * Returns results ranked with Instagram-style predictive scoring in 0ms.
+ */
+export function predictLearners(searchQuery: string, candidates?: SocialPerson[]): SocialPerson[] {
+  const list = candidates ?? state.people;
+  return rankAndFilterCandidates(list, searchQuery, 20);
+}
+
+/**
+ * Learners by username or name: smart predictive search (like Instagram profile search).
+ * Predicts both name and username with word-boundary, initials, prefix and substring matching.
+ * Prioritizes mutual friends and following, followed by classmates and other learners.
+ * People who turned off "Let students find me" are left out (unless you know them).
  */
 export async function searchLearners(searchQuery: string): Promise<SocialPerson[]> {
-  const typed = searchQuery.trim().replace(/^@/, '');
-  if (typed.length < 2) return [];
+  const typed = searchQuery.trim().replace(/^@+/, '');
+  if (typed.length < 1) return [];
   await auth.authStateReady();
   const me = auth.currentUser?.uid ?? null;
   if (!me) throw new Error('Sign in to search for learners.');
+
   const term = typed.toLowerCase();
-  const prefixQueries = searchSpellings(typed).flatMap((spelling) =>
+  const queryTokens = tokenizeWords(typed);
+  const known = new Map(state.people.map((person) => [person.userId, person]));
+
+  // Spellings to query in Firestore (prefix queries)
+  const spellingsToQuery = [...new Set([
+    ...searchSpellings(typed),
+    ...queryTokens.flatMap((t) => searchSpellings(t)),
+  ])].slice(0, 6);
+
+  const prefixQueries = spellingsToQuery.flatMap((spelling) =>
     ['username', 'displayName'].map((field) =>
-      getDocs(query(collection(db, 'users'), where(field, '>=', spelling), where(field, '<=', `${spelling}`), limit(10)))
+      getDocs(query(collection(db, 'users'), where(field, '>=', spelling), where(field, '<=', `${spelling}`), limit(15)))
         .then((snap) => snap.docs.map((item) => ({ id: item.id, data: item.data() as Record<string, unknown> })))
         .catch(() => [])
     )
   );
+
   // Older accounts may only have their username on the leaderboard (scores).
-  const scoreQuery = getDocs(query(collection(db, 'scores'), where('username', '>=', term), where('username', '<=', term + ''), limit(10)))
+  const scoreQuery = getDocs(query(collection(db, 'scores'), where('username', '>=', term), where('username', '<=', term + ''), limit(15)))
     .then((snap) => snap.docs.map((item) => ({ id: item.id, data: item.data() as Record<string, unknown> })))
     .catch(() => []);
+
   const [everyone, ...prefixed] = await Promise.all([learnerDirectory(), scoreQuery, ...prefixQueries]);
   const found = new Map<string, Record<string, unknown>>();
-  for (const item of prefixed.flat()) found.set(item.id, { ...item.data, ...(found.get(item.id) ?? {}) });
+
+  // Include in-memory known contacts first so friends/follows are always searchable
+  for (const person of state.people) {
+    if (person.userId !== me) {
+      found.set(person.userId, {
+        username: person.username,
+        displayName: person.displayName,
+        avatar_url: person.avatarUrl,
+        isOnline: person.isOnline,
+        totalXp: person.totalXp,
+      });
+    }
+  }
+
+  for (const item of prefixed.flat()) {
+    found.set(item.id, { ...item.data, ...(found.get(item.id) ?? {}) });
+  }
+
   for (const item of everyone) {
     const username = String(item.data.username ?? '').toLowerCase();
     const name = String(item.data.displayName ?? '').toLowerCase();
-    if (username.includes(term) || name.includes(term)) found.set(item.id, item.data);
+    if (
+      username.includes(term) ||
+      name.includes(term) ||
+      queryTokens.some((t) => username.includes(t) || name.includes(t))
+    ) {
+      found.set(item.id, { ...item.data, ...(found.get(item.id) ?? {}) });
+    }
   }
+
   const hidden = (data: Record<string, unknown>) => {
     const privacy = (data.preferences as { privacy_preferences?: { discoverable?: boolean } } | undefined)?.privacy_preferences;
     return data.discoverable === false || privacy?.discoverable === false;
   };
-  const rank = (data: Record<string, unknown>) => {
-    const username = String(data.username ?? '').toLowerCase();
-    const name = String(data.displayName ?? '').toLowerCase();
-    return username === term ? 0 : username.startsWith(term) ? 1 : name.startsWith(term) ? 2 : 3;
-  };
-  const known = new Map(state.people.map((person) => [person.userId, person]));
-  return [...found.entries()]
-    .filter(([uid, data]) => uid !== me && (known.has(uid) || !hidden(data)) && (data.username || data.displayName))
-    .sort((a, b) => rank(a[1]) - rank(b[1]) || String(a[1].username ?? '').localeCompare(String(b[1].username ?? '')))
-    .slice(0, 20)
-    .map(([uid, data]) => known.get(uid) ?? toPerson(uid, 'none', null, null, null, { profile: data, score: {} }));
+
+  const candidates: SocialPerson[] = [];
+  for (const [uid, data] of found.entries()) {
+    if (uid === me) continue;
+    const isKnown = known.has(uid);
+    if (!isKnown && hidden(data)) continue;
+    const person = known.get(uid) ?? toPerson(uid, 'none', null, null, null, { profile: data, score: {} });
+    if (person.username || person.displayName) {
+      candidates.push(person);
+    }
+  }
+
+  return rankAndFilterCandidates(candidates, typed, 20);
 }
 
 /**

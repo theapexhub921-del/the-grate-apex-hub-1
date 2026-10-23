@@ -189,6 +189,11 @@ export async function announceBattleResult(battleId: string, to: string) {
   await announce({ kind: 'battle-result', battle: battleId, to });
 }
 
+/** A challenged learner accepted and joined the shared battle room. */
+export async function announceBattleAccepted(battleId: string, to: string) {
+  await announce({ kind: 'battle-accepted', battle: battleId, to });
+}
+
 /** I just gifted Apex Coins or an XP boost to `to` (their phone is alerted). */
 export async function announceGift(type: 'coins' | 'boost', giftId: string, to: string) {
   await announce({ kind: 'gift', type, gift: giftId, to });

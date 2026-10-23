@@ -10,14 +10,15 @@ import { Pill } from '@/components/ui/pill';
 import { Sheet } from '@/components/ui/sheet';
 import { Text, TextInput } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { type Battle, type BattleCourse, battleRecord, battleStatus, createBattle, declineBattle, watchBattles } from '@/data/battles';
+import { acceptBattle, type Battle, type BattleCourse, battleRecord, battleStatus, createBattle, declineBattle, watchBattles } from '@/data/battles';
 import { announceBattle, announceBattleResult } from '@/lib/web-push';
 import { readClassSelection } from '@/data/class-curriculum';
 import { getTopic, publishedTopics } from '@/data/curriculum';
 import { bankQuestions, legacyCoursesForClass, loadLegacyBank } from '@/data/legacy-study';
 import { OTHER_PAST_TOPIC, PAST_TOPICS } from '@/data/past-question-topics';
 import { useProgress } from '@/data/progress';
-import { personName, useSocial } from '@/data/social';
+import { personName, predictLearners, searchLearners, useSocial, type SocialPerson } from '@/data/social';
+import { rankAndFilterCandidates } from '@/data/social-search';
 import { useAuth } from '@/hooks/use-auth';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -37,8 +38,11 @@ export function BattlesCard() {
   const [picking, setPicking] = useState(false);
   const [battles, setBattles] = useState<Battle[]>([]);
   const [opponentId, setOpponentId] = useState<string | null>(null);
+  const [selectedOpponent, setSelectedOpponent] = useState<SocialPerson | null>(null);
   const [friendSearchOpen, setFriendSearchOpen] = useState(false);
   const [friendSearch, setFriendSearch] = useState('');
+  const [remoteResults, setRemoteResults] = useState<SocialPerson[]>([]);
+  const [searchingRemote, setSearchingRemote] = useState(false);
   const [courseKey, setCourseKey] = useState<string | null>(null);
   const [topicOptions, setTopicOptions] = useState<{ id: string; name: string }[]>([]);
   const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
@@ -58,13 +62,51 @@ export function BattlesCard() {
     }, (problem) => setError(friendlyError(problem, 'Battles could not be loaded.')));
   }, [uid]);
 
+  // Debounced search for learners across the app when searching for battle opponents
+  useEffect(() => {
+    const trimmed = friendSearch.trim().replace(/^@+/, '');
+    if (!trimmed) {
+      setRemoteResults([]);
+      setSearchingRemote(false);
+      return;
+    }
+    let cancelled = false;
+    setSearchingRemote(true);
+    const timer = setTimeout(() => {
+      searchLearners(trimmed)
+        .then((found) => {
+          if (!cancelled) {
+            setRemoteResults(found);
+            setSearchingRemote(false);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) setSearchingRemote(false);
+        });
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [friendSearch]);
+
   // Courses to battle on: the learner's class courses (HB1), else this app's topics.
   const courses = useMemo<BattleCourse[]>(() => {
     const hb = legacyCoursesForClass(readClassSelection(user?.user_metadata)).map((course) => ({ kind: 'hb' as const, id: course.id, name: course.name }));
     return hb.length ? hb : publishedTopics.slice(0, 10).map((topic) => ({ kind: 'topic' as const, id: topic.id, name: topic.title }));
   }, [user?.user_metadata]);
-  const people = social.people.filter((person) => person.relationship === 'friends');
-  const visiblePeople = people.filter((person) => `${personName(person)} ${person.username ?? ''}`.toLowerCase().includes(friendSearch.trim().replace(/^@/, '').toLowerCase()));
+
+  const defaultPeople = useMemo(() => {
+    const friends = social.people.filter((person) => person.relationship === 'friends');
+    return friends.length ? friends : social.people;
+  }, [social.people]);
+
+  const visiblePeople = useMemo(() => {
+    const trimmed = friendSearch.trim().replace(/^@+/, '');
+    if (!trimmed) return defaultPeople;
+    const local = predictLearners(trimmed, social.people);
+    return rankAndFilterCandidates([...local, ...remoteResults], trimmed, 20);
+  }, [friendSearch, defaultPeople, social.people, remoteResults]);
   const selectedCourse = courses.find((item) => `${item.kind}:${item.id}` === courseKey) ?? null;
   const record = battleRecord(battles, uid);
   const yourTurn = battles.filter((battle) => battleStatus(battle, uid) === 'waiting-for-you').length;
@@ -105,7 +147,12 @@ export function BattlesCard() {
   }, [courseKey, courses]);
 
   async function send() {
-    const person = people.find((item) => item.userId === opponentId);
+    const person =
+      (selectedOpponent && selectedOpponent.userId === opponentId)
+        ? selectedOpponent
+        : visiblePeople.find((item) => item.userId === opponentId) ??
+          social.people.find((item) => item.userId === opponentId) ??
+          remoteResults.find((item) => item.userId === opponentId);
     const course = selectedCourse;
     if (!person || !course || busy) return;
     setBusy(true);
@@ -157,19 +204,51 @@ export function BattlesCard() {
               <Text style={styles.pickLabel}>Who?</Text>
               <Button label={friendSearchOpen ? 'Close search' : 'Search friends'} variant="ghost" size="sm" icon={<Icon name="search" size={14} color={colors.textSecondary} />} onPress={() => { setFriendSearchOpen((open) => !open); setFriendSearch(''); }} />
             </View>
-            {friendSearchOpen ? <TextInput value={friendSearch} onChangeText={setFriendSearch} placeholder="Search friends by name or username" placeholderTextColor={colors.textTertiary} autoCapitalize="none" style={styles.searchInput} accessibilityLabel="Search friends for a battle" /> : null}
-            {people.length ? (
+            {friendSearchOpen ? (
+              <TextInput
+                value={friendSearch}
+                onChangeText={setFriendSearch}
+                placeholder="Search friends or classmates by name or username"
+                placeholderTextColor={colors.textTertiary}
+                autoCapitalize="none"
+                autoCorrect={false}
+                style={styles.searchInput}
+                accessibilityLabel="Search friends or classmates for a battle"
+              />
+            ) : null}
+            {visiblePeople.length ? (
               <View style={styles.chips}>
-                {visiblePeople.map((person) => (
-                  <Interactive key={person.userId} onPress={() => setOpponentId(person.userId)} accessibilityRole="radio" accessibilityState={{ checked: opponentId === person.userId }} style={[styles.chip, opponentId === person.userId && styles.chipOn]}>
-                    <Avatar uri={person.avatarUrl} name={personName(person)} size={22} />
-                    <Text style={styles.chipText}>{personName(person)}</Text>
-                  </Interactive>
-                ))}
-                {!visiblePeople.length ? <Text style={styles.muted}>No friends match that search.</Text> : null}
+                {visiblePeople.map((person) => {
+                  const isSelected = opponentId === person.userId;
+                  const isFriend = person.relationship === 'friends';
+                  return (
+                    <Interactive
+                      key={person.userId}
+                      onPress={() => {
+                        setOpponentId(person.userId);
+                        setSelectedOpponent(person);
+                      }}
+                      accessibilityRole="radio"
+                      accessibilityState={{ checked: isSelected }}
+                      style={[styles.chip, isSelected && styles.chipOn]}
+                    >
+                      <Avatar uri={person.avatarUrl} name={personName(person)} size={22} />
+                      <Text style={styles.chipText}>{personName(person)}</Text>
+                      {isFriend ? (
+                        <Text style={styles.chipTag}>Friend</Text>
+                      ) : person.username ? (
+                        <Text style={styles.chipTag}>@{person.username}</Text>
+                      ) : null}
+                    </Interactive>
+                  );
+                })}
               </View>
+            ) : searchingRemote ? (
+              <Text style={styles.muted}>Searching for “{friendSearch.trim()}”…</Text>
+            ) : friendSearch.trim() ? (
+              <Text style={styles.muted}>No learners match “{friendSearch.trim()}”.</Text>
             ) : (
-              <Text style={styles.muted}>Add classmates and follow each other to make friends you can challenge.</Text>
+              <Text style={styles.muted}>Search for any classmate or friend by name or username to challenge them.</Text>
             )}
             <Text style={styles.pickLabel}>On what?</Text>
             <View style={styles.chips}>
@@ -242,14 +321,18 @@ export function BattlesCard() {
                     {mine && theirs ? ` · ${mine.score}–${theirs.score}` : mine ? ` · you ${mine.score}/${mine.total}` : ''}
                   </Text>
                 </View>
-                {status === 'waiting-for-you' ? (
+                {status === 'incoming-challenge' ? (
                   <View style={styles.row}>
-                    <Button label="Play" size="sm" onPress={() => { setOpen(false); router.push({ pathname: '/social/battle', params: { id: battle.id } } as never); }} />
-                    {incoming ? <Button label="Decline" size="sm" variant="ghost" onPress={() => void declineBattle(battle).then(() => { void announceBattleResult(battle.id, battle.challengerId); })} /> : null}
+                    <Button label="Accept & join" size="sm" onPress={() => { void acceptBattle(battle).then(() => { setOpen(false); router.push({ pathname: '/social/battle', params: { id: battle.id } } as never); }).catch((problem) => setError(friendlyError(problem, 'The battle could not be joined.'))); }} />
+                    <Button label="Decline" size="sm" variant="ghost" onPress={() => { void declineBattle(battle).then(() => announceBattleResult(battle.id, battle.challengerId)).catch((problem) => setError(friendlyError(problem, 'The challenge could not be declined.'))); }} />
+                  </View>
+                ) : status === 'waiting-for-you' ? (
+                  <View style={styles.row}>
+                    <Button label="Join room" size="sm" onPress={() => { setOpen(false); router.push({ pathname: '/social/battle', params: { id: battle.id } } as never); }} />
                   </View>
                 ) : (
                   <Pill
-                    label={status === 'won' ? 'Won' : status === 'lost' ? 'Lost' : status === 'draw' ? 'Draw' : status === 'declined' ? 'Declined' : 'Waiting'}
+                    label={status === 'won' ? 'Won' : status === 'lost' ? 'Lost' : status === 'draw' ? 'Draw' : status === 'declined' ? 'Declined' : status === 'waiting-for-response' ? 'Waiting for response' : 'In room · waiting'}
                     tone={status === 'won' ? 'success' : status === 'lost' ? 'error' : status === 'draw' ? 'gold' : 'neutral'}
                   />
                 )}
@@ -284,6 +367,7 @@ function createStyles(colors: ThemeColors) {
     chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
     chipOn: { borderColor: colors.primary, backgroundColor: colors.primarySubtle },
     chipText: { fontSize: 13, fontWeight: '700', color: colors.text },
+    chipTag: { fontSize: 11, color: colors.textTertiary, fontWeight: '500' },
     row: { flexDirection: 'row', gap: 8, justifyContent: 'flex-end' },
     error: { fontSize: 13, color: colors.error, marginTop: 8 },
     muted: { fontSize: 12.5, color: colors.textTertiary, marginTop: 8 },

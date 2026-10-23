@@ -7,6 +7,7 @@
 //   { kind: 'battle', battle, to }           "challenged you to a battle"
 //   { kind: 'test' }                         a test push to the caller's own devices (returns each device's status)
 //   { kind: 'battle-result', battle, to }    the other player played / declined / finished a battle
+//   { kind: 'battle-accepted', battle, to }  the challenged player joined the room
 //   { kind: 'gift', type: 'coins'|'boost', gift, to }  "sent you Apex Coins / an XP boost"
 //
 // Sends a push to the recipient's phones and computers, so it
@@ -173,12 +174,12 @@ export default async function handler(req, res) {
     return res.status(200).json({ sent: counts.reduce((total, count) => total + count, 0) });
   }
 
-  if (kind === 'battle' || kind === 'battle-result') {
+  if (kind === 'battle' || kind === 'battle-result' || kind === 'battle-accepted') {
     const battleId = String(body.battle ?? '');
     const to = String(body.to ?? '');
     if (!BATTLE_ID.test(battleId) || !USER_ID.test(to) || to === sender) return res.status(400).json({ error: 'Bad request.' });
     // A challenge is sent once; a result is announced once per player.
-    if (tooSoon(`${sender}:${kind}:${battleId}`, kind === 'battle' ? 30_000 : 10 * 60_000)) return res.status(429).json({ error: 'Slow down.' });
+    if (tooSoon(`${sender}:${kind}:${battleId}`, kind === 'battle' || kind === 'battle-accepted' ? 30_000 : 10 * 60_000)) return res.status(429).json({ error: 'Slow down.' });
     // Both learners' documents are readable by any signed-in learner (the same reads the app does).
     const [mine, other] = await Promise.all([read(`users/${sender}`, token), person(to)]);
     const username = typeof mine?.username === 'string' ? mine.username : null;
@@ -191,6 +192,20 @@ export default async function handler(req, res) {
       const sent = await deliver(other, 'battles', {
         title: username ? `@${username} challenged you to a battle` : 'You have been challenged to a battle',
         body: `${course} · ${Number(entry.count) || 10} questions, same for both of you. Tap to play.`,
+        tag: `battle:${battleId}`,
+        href,
+      });
+      return res.status(200).json({ sent });
+    }
+
+    if (kind === 'battle-accepted') {
+      const entry = other?.battlesOut?.[battleId];
+      if (!entry || entry.opponent !== sender || mine?.battleResults?.[battleId]?.accepted !== true) {
+        return res.status(403).json({ error: 'This challenge has not been accepted by its invited player.' });
+      }
+      const sent = await deliver(other, 'battles', {
+        title: username ? `@${username} joined your battle room` : 'Your opponent joined the battle room',
+        body: `${String(entry.course?.name ?? 'Your battle').slice(0, 40)} is ready. Tap to join.`,
         tag: `battle:${battleId}`,
         href,
       });

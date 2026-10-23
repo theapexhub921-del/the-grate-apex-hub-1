@@ -10,10 +10,11 @@
 //   opponent   → battleResults.<id> = { score, total, seconds } | { declined: true }
 // Scores are written by each player's own app, so — like XP in both apps —
 // they are not tamper-proof; a server referee would be needed for that.
-import { arrayUnion, collection, doc, getDoc, getDocs, limit, onSnapshot, query, serverTimestamp, setDoc, where, writeBatch, type Unsubscribe } from 'firebase/firestore';
+import { arrayUnion, collection, doc, getDoc, getDocs, limit, onSnapshot, query, runTransaction, serverTimestamp, setDoc, where, writeBatch, type Unsubscribe } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
+import { announceBattleAccepted } from '@/lib/web-push';
 
 export type BattleCourse = { kind: 'hb' | 'topic'; id: string; name: string; topicIds?: string[]; topicNames?: string[] };
 export type BattleSide = { score: number; total: number; seconds: number };
@@ -30,10 +31,11 @@ export type Battle = {
   createdAt: number;
   challenger: BattleSide | null;
   opponent: BattleSide | null;
+  accepted: boolean;
   declined: boolean;
 };
 
-export type BattleStatus = 'waiting-for-you' | 'waiting-for-them' | 'declined' | 'won' | 'lost' | 'draw';
+export type BattleStatus = 'incoming-challenge' | 'waiting-for-response' | 'waiting-for-you' | 'waiting-for-them' | 'declined' | 'won' | 'lost' | 'draw';
 
 export const BATTLE_QUESTIONS = 10;
 export const BATTLE_SECONDS = 15;
@@ -62,6 +64,7 @@ export function battleStatus(battle: Battle, uid: string): BattleStatus {
   if (battle.declined) return 'declined';
   const winner = battleWinner(battle);
   if (winner) return winner === 'draw' ? 'draw' : winner === mine ? 'won' : 'lost';
+  if (!battle.accepted) return mine === 'challenger' ? 'waiting-for-response' : 'incoming-challenge';
   return (mine === 'challenger' ? battle.challenger : battle.opponent) ? 'waiting-for-them' : 'waiting-for-you';
 }
 
@@ -96,6 +99,8 @@ function fromOut(id: string, challengerId: string, challengerName: string | null
     createdAt: Number(out.createdAt) || 0,
     challenger: side(out.result),
     opponent: reply && !reply.declined ? side(reply) : null,
+    // Results from battles created before the accept step count as accepted.
+    accepted: reply?.accepted === true || Boolean(out.result) || Boolean(reply && (reply.declined || side(reply))),
     declined: Boolean(reply?.declined),
   };
 }
@@ -214,6 +219,7 @@ export async function createBattle(opponent: { userId: string; username: string 
 /** Saves my result for a battle (challenger or opponent), once. */
 export async function submitBattleResult(battle: Battle, result: BattleSide) {
   const uid = await me();
+  if (!battle.accepted) throw new Error('Wait until the other player joins the room.');
   const ref = doc(db, 'users', uid);
   if (battle.challengerId === uid) {
     const data = (await getDoc(ref)).data() ?? {};
@@ -228,7 +234,30 @@ export async function submitBattleResult(battle: Battle, result: BattleSide) {
 
 export async function declineBattle(battle: Battle) {
   const uid = await me();
-  await setDoc(doc(db, 'users', uid), { battleResults: { [battle.id]: { declined: true } } }, { merge: true });
+  if (uid !== battle.opponentId || battle.accepted) throw new Error('This challenge can no longer be declined.');
+  await answerInvite(battle, uid, { declined: true });
+}
+
+/** Accepts the incoming challenge and joins its shared battle room. */
+export async function acceptBattle(battle: Battle) {
+  const uid = await me();
+  if (uid !== battle.opponentId || battle.accepted || battle.declined) throw new Error('This challenge is no longer waiting for you.');
+  await answerInvite(battle, uid, { accepted: true, acceptedAt: Date.now() });
+  void announceBattleAccepted(battle.id, battle.challengerId);
+}
+
+async function answerInvite(battle: Battle, uid: string, response: { accepted?: boolean; acceptedAt?: number; declined?: boolean }) {
+  const mineRef = doc(db, 'users', uid);
+  const challengerRef = doc(db, 'users', battle.challengerId);
+  await runTransaction(db, async (transaction) => {
+    const [mineSnap, challengerSnap] = await Promise.all([transaction.get(mineRef), transaction.get(challengerRef)]);
+    const entry = (challengerSnap.data()?.battlesOut ?? {})[battle.id] as Record<string, unknown> | undefined;
+    const existing = (mineSnap.data()?.battleResults ?? {})[battle.id] as Record<string, unknown> | undefined;
+    if (!entry || entry.opponent !== uid || existing?.accepted === true || existing?.declined === true || side(existing)) {
+      throw new Error('This challenge is no longer waiting for a response.');
+    }
+    transaction.set(mineRef, { battleResults: { [battle.id]: response } }, { merge: true });
+  });
 }
 
 export async function getBattle(id: string): Promise<Battle | null> {

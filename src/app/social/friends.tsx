@@ -1,5 +1,5 @@
 import type { Href } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '@/components/ui/text';
 
@@ -13,6 +13,7 @@ import { EmptyState, InlineNotice, LoadingState } from '@/components/ui/state-vi
 import { elevation, Radius, Type, type ThemeColors } from '@/constants/theme';
 import {
   personName,
+  predictLearners,
   removeFriendship,
   respondToFriendRequest,
   searchLearners,
@@ -22,6 +23,7 @@ import {
   type SocialPerson,
   useSocial,
 } from '@/data/social';
+import { rankAndFilterCandidates } from '@/data/social-search';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { blockCommunityUser, reportCommunityContent } from '@/data/community';
 import { nextUsernameChange, USERNAME_CHANGE_DAYS } from '@/lib/accounts';
@@ -202,34 +204,56 @@ function SearchCard() {
   const colors = useTheme();
   const social = useSocial();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SocialPerson[] | null>(null);
+  const [remoteResults, setRemoteResults] = useState<SocialPerson[] | null>(null);
+  const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const relationshipKey = social.people.map((person) => `${person.userId}:${person.relationship}`).sort().join('|');
 
+  const trimmed = query.trim().replace(/^@+/, '');
+
+  // Instant 0ms predictive results from in-memory contacts
+  const localPredictions = useMemo(() => {
+    if (!trimmed) return [];
+    return predictLearners(trimmed, social.people);
+  }, [trimmed, social.people]);
+
   useEffect(() => {
-    const trimmed = query.trim();
-    if (trimmed.length < 2) return;
+    if (!trimmed) {
+      setRemoteResults(null);
+      setSearching(false);
+      return;
+    }
     let cancelled = false;
+    setSearching(true);
     const timer = setTimeout(() => {
       searchLearners(trimmed)
         .then((found) => {
           if (!cancelled) {
-            setResults(found);
+            setRemoteResults(found);
+            setSearching(false);
             setError(null);
           }
         })
         .catch((caught) => {
-          if (!cancelled) setError(friendlyError(caught, 'Search failed.'));
+          if (!cancelled) {
+            setSearching(false);
+            setError(friendlyError(caught, 'Search failed.'));
+          }
         });
-    }, 300);
+    }, 250);
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
     // Re-run when friendships change so result buttons stay accurate.
-  }, [query, relationshipKey]);
+  }, [trimmed, relationshipKey]);
 
-  const showResults = query.trim().length >= 2 && results;
+  const displayResults = useMemo(() => {
+    if (!trimmed) return null;
+    return rankAndFilterCandidates([...localPredictions, ...(remoteResults ?? [])], trimmed, 20);
+  }, [trimmed, localPredictions, remoteResults]);
+
+  const showResults = Boolean(trimmed && displayResults);
 
   return (
     <View style={styles.card}>
@@ -238,7 +262,7 @@ function SearchCard() {
         value={query}
         onChangeText={(text) => {
           setQuery(text);
-          setResults(null);
+          setError(null);
         }}
         placeholder="Search by username or name"
         placeholderTextColor={colors.textTertiary}
@@ -248,17 +272,17 @@ function SearchCard() {
         style={styles.input}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      {showResults ? (
-        results.length > 0 ? (
-          <View style={styles.results}>
-            {results.map((person, index) => (
-              <PersonRow key={person.userId} person={person} first={index === 0} compact />
-            ))}
-          </View>
-        ) : (
-          <Text style={styles.rowDetail}>No learners match “{query.trim()}”.</Text>
-        )
-      ) : query.trim().length >= 2 && !error ? <Text style={styles.rowDetail}>Searching…</Text> : null}
+      {showResults && displayResults && displayResults.length > 0 ? (
+        <View style={styles.results}>
+          {displayResults.map((person, index) => (
+            <PersonRow key={person.userId} person={person} first={index === 0} compact />
+          ))}
+        </View>
+      ) : searching ? (
+        <Text style={styles.rowDetail}>Searching…</Text>
+      ) : showResults ? (
+        <Text style={styles.rowDetail}>No learners match “{trimmed}”.</Text>
+      ) : null}
     </View>
   );
 }
