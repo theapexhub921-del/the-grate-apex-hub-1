@@ -24,6 +24,7 @@ import { setDisplayName } from '@/data/user';
 import { useTheme } from '@/hooks/use-theme';
 import { friendlyGoogleError, signInWithGoogle, takeOAuthPending } from '@/lib/google-auth';
 import {
+  getRedirectResult,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   updatePassword as fbUpdatePassword,
@@ -117,6 +118,15 @@ export default function LoginScreen() {
     // Back from Google: a successful return carries the session in the
     // address (the auth library picks it up by itself); an error is already shown.
     if (oauthReturn) {
+      void getRedirectResult(auth)
+        .then((result) => {
+          if (!active || !result) return;
+          track('login', { method: 'google' });
+          return saveHeldSignUpConsent();
+        })
+        .catch((redirectError: any) => {
+          if (active) setError(friendlyGoogleError(redirectError?.message));
+        });
       if (oauthReturn.error) {
         // Google errors arrive as query parameters, which the router keeps
         // in its own state (and writes back to the address bar as it
@@ -131,7 +141,6 @@ export default function LoginScreen() {
           active = false;
         };
       }
-      void saveHeldSignUpConsent();
       return () => {
         active = false;
       };
