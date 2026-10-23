@@ -291,7 +291,9 @@ export default function LoginScreen() {
       return;
     }
     if (mode === 'signUp') {
-      await holdSignUpConsent();
+      // Persist consent without consuming the user gesture; popup blockers
+      // require Google to open directly from the button press.
+      void holdSignUpConsent();
     }
     setGoogleLoading(true);
     setError(null);

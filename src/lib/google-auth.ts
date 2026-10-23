@@ -1,5 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup, signInWithRedirect } from 'firebase/auth';
-import { Platform } from 'react-native';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 import { auth } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
@@ -47,13 +46,8 @@ export async function signInWithGoogle(): Promise<GoogleResult> {
     // No profile is created here: a first Google sign-in has no username yet,
     // so the route guard sends the learner to /choose-username, which reserves
     // one and creates the profile (lib/accounts.ts).
-    // Installed web apps (including Windows Store/PWA shells) can block or
-    // lose popup windows. A top-level redirect works in those environments.
-    if (Platform.OS === 'web') {
-      markOAuthPending();
-      await signInWithRedirect(auth, provider);
-      return { status: 'redirecting' };
-    }
+    // Use a popup on the web: redirect sign-in depends on cross-site auth
+    // storage that Chrome and embedded app browsers may block.
     await signInWithPopup(auth, provider);
     track('login', { method: 'google' });
 
