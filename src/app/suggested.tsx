@@ -1,7 +1,7 @@
 import { BackLink } from '@/components/learning/nav-bits';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 
 import { openProfileCard, PersonAvatar } from '@/components/social/profile-card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,12 @@ import { refreshSocial, sendFriendRequest, useSocial } from '@/data/social';
 import { loadGoldAccounts, type SuggestedAccount } from '@/data/verified';
 import { useThemedStyles } from '@/hooks/use-theme';
 import { friendlyError } from '@/lib/errors';
+
+const COMMUNITY_SOCIALS = [
+  { name: 'Instagram', url: 'https://www.instagram.com/grateapexhub?cplk=MWQxbHhva3xzNm1sbQ%3D%3D&utm_source=qr' },
+  { name: 'X', url: 'https://x.com/grateapexhub' },
+  { name: 'TikTok', url: 'https://www.tiktok.com/@grateapexhub?_r=1&_t=ZS-9AmIjv59dHo' },
+];
 
 // Shown once, right after the introduction: the gold-tick accounts to follow.
 export default function SuggestedScreen() {
@@ -80,6 +86,27 @@ export default function SuggestedScreen() {
         })}
         {accounts && !accounts.length ? <Text style={styles.bio}>No suggestions right now. You can find classmates any time in Connect.</Text> : null}
       </View>
+      <Card style={styles.communityCard}>
+        <Text style={styles.communityTitle}>Follow the GrAte Apex Community on Social Media.</Text>
+        <View style={styles.socialLinks}>
+          {COMMUNITY_SOCIALS.map((item) => (
+            <Interactive
+              key={item.name}
+              onPress={() => void Linking.openURL(item.url).catch(() => {})}
+              accessibilityRole="link"
+              accessibilityLabel={`Follow GrAte Apex Hub on ${item.name}`}
+              style={styles.socialLink}
+            >
+              <Text style={styles.socialLinkText}>{item.name}</Text>
+              <Text style={styles.socialArrow}>↗</Text>
+            </Interactive>
+          ))}
+        </View>
+        <View style={styles.tagline}>
+          <Text style={styles.taglineText}>Beginning of Something New.</Text>
+          <Text style={styles.taglineMark}>GAPX</Text>
+        </View>
+      </Card>
       <Button label="Continue to GrAte Apex" trailing="→" onPress={() => router.replace('/')} />
     </Screen>
   );
@@ -96,5 +123,14 @@ function createStyles(colors: ThemeColors) {
     handle: { fontSize: 13, color: colors.textSecondary },
     bio: { fontSize: 13, lineHeight: 18, color: colors.textSecondary },
     error: { fontSize: 13, color: colors.error },
+    communityCard: { gap: 14, marginTop: 8, padding: 18 },
+    communityTitle: { ...Type.title3, color: colors.text },
+    socialLinks: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    socialLink: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 999, backgroundColor: colors.primarySubtle, borderWidth: 1, borderColor: colors.primaryBorder },
+    socialLinkText: { ...Type.callout, color: colors.primaryText, fontWeight: '700' },
+    socialArrow: { fontSize: 14, color: colors.primaryText },
+    tagline: { alignItems: 'center', gap: 2, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.divider },
+    taglineText: { ...Type.headline, color: colors.text },
+    taglineMark: { ...Type.overline, color: colors.accentText, letterSpacing: 3 },
   });
 }
