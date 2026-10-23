@@ -38,7 +38,7 @@ function alert(title: string, body: string) {
   if (Platform.OS !== 'web' || typeof window === 'undefined' || !('Notification' in window)) return;
   if (Notification.permission !== 'granted') return;
   if (typeof document !== 'undefined' && document.visibilityState === 'visible') return;
-  const options = { body, tag: 'grateapex-focus', icon: '/icons/grateapex-192.png', badge: '/icons/grateapex-192.png' };
+  const options = { body, tag: 'grateapex-focus', icon: '/icons/grateapex-192-v2.png', badge: '/icons/grateapex-192-v2.png' };
   navigator.serviceWorker?.ready
     .then((registration) => registration.showNotification(title, options))
     .catch(() => {

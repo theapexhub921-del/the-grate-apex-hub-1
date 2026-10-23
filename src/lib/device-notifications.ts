@@ -73,8 +73,8 @@ export async function showDeviceNotification(item: Pick<AppNotification, 'id' | 
 
   const options: NotificationOptions = {
     body: item.body,
-    icon: '/icons/grateapex-192.png',
-    badge: '/icons/grateapex-192.png',
+    icon: '/icons/grateapex-192-v2.png',
+    badge: '/icons/grateapex-192-v2.png',
     tag: item.id,
     data: { href: item.href ?? '/' },
   };

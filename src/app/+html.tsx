@@ -39,7 +39,8 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta name="twitter:title" content="GrAte Apex Hub" />
 
         <link rel="manifest" href="/manifest.webmanifest" />
-        <link rel="apple-touch-icon" href="/icons/grateapex-192.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/grateapex-192-v2.png" />
+        <link rel="apple-touch-icon" href="/icons/grateapex-192-v2.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="GrAte Apex Hub" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />

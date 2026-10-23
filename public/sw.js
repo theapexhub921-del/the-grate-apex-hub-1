@@ -1,10 +1,10 @@
-const CACHE_NAME = 'grateapex-pwa-v10';
+const CACHE_NAME = 'grateapex-pwa-v11';
 // Study material kept for offline revision (question banks, lecture diagrams, and what
 // Settings → Offline study saves: src/lib/offline-study.ts). A different prefix from
 // CACHE_PREFIX on purpose: an app update must never delete what a learner saved.
 const OFFLINE_CACHE = 'grateapex-offline-v1';
 const CACHE_PREFIX = 'grateapex-pwa-';
-const APP_SHELL = ['/', '/manifest.webmanifest', '/icons/grateapex-192.png', '/icons/grateapex-512.png'];
+const APP_SHELL = ['/', '/manifest.webmanifest', '/icons/grateapex-192-v2.png', '/icons/grateapex-512-v2.png'];
 const CACHEABLE_DESTINATIONS = new Set(['font', 'image', 'script', 'style']);
 
 self.addEventListener('install', (event) => {
@@ -173,8 +173,8 @@ self.addEventListener('push', (event) => {
     if (!apple && windows.some((client) => client.visibilityState === 'visible' && client.focused)) return;
     await self.registration.showNotification(data.title || 'GrAte Apex Hub', {
       body: data.body || '',
-      icon: '/icons/grateapex-192.png',
-      badge: '/icons/grateapex-192.png',
+      icon: '/icons/grateapex-192-v2.png',
+      badge: '/icons/grateapex-192-v2.png',
       tag: data.tag || undefined,
       renotify: Boolean(data.tag),
       data: { href: data.href || '/' },
