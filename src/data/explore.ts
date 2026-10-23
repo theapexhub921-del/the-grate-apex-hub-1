@@ -351,7 +351,7 @@ export const EXPLORE_GUIDE: readonly ExploreGuideEntry[] = [
   { title: 'Notifications', detail: 'Turn on alerts on your phone or computer for new messages, league promotions, streak reminders and more. New messages also pop up inside the app, and a promotion brings a congratulations card. Choose which alerts you get in Settings.', status: 'available' },
   { title: 'Posts, reactions, comments and reshares', detail: 'Share what is on your mind with a photo or video, mention friends by @username, like, comment, reshare, and report content to the team.', status: 'available' },
   { title: 'Apex Challenge', detail: 'Take a timed challenge across a course and compare it with your own best score.', status: 'available' },
-  { title: 'Past Question Bank', detail: 'A home for verified past-question material. No question content is published yet.', status: 'coming-soon' },
+  { title: 'Apex High Yield', detail: 'Sit real past papers and predicted papers from your courses, with answers at the end.', status: 'available' },
   { title: 'Widgets and personalization', detail: 'Responsive in-app cards and profile/theme choices are available; native home-screen widgets are not.', status: 'limited' },
 ];
 

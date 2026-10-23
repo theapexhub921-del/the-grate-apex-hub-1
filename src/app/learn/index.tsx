@@ -120,11 +120,11 @@ export default function LearnScreen() {
 
       <Card style={styles.tutorCard} tone="outline">
         <View style={styles.tutorCopy}>
-          <Text style={styles.tutorEyebrow}>PAST QUESTION BANK</Text>
-          <Text style={styles.tutorTitle}>Verified past questions</Text>
-          <Text style={styles.subjectTagline}>Coming Soon. We’ll open the bank when verified question material is ready.</Text>
+          <Text style={styles.tutorEyebrow}>APEX HIGH YIELD</Text>
+          <Text style={styles.tutorTitle}>Past papers and predicted papers</Text>
+          <Text style={styles.subjectTagline}>Choose a course and sit a paper with answers at the end, like the real exam.</Text>
         </View>
-        <Pill label="Coming Soon" />
+        <Button label="Open Apex High Yield" variant="secondary" trailing="chevronRight" onPress={() => router.push('/learn/past-questions' as never)} />
       </Card>
 
       <SectionHeader title="Subjects" subtitle="Subject → course → topic → lessons." style={styles.section} />
@@ -247,11 +247,10 @@ export default function LearnScreen() {
             <View style={styles.reviewIcon}>
               <Icon name="book" size={18} color={colors.primaryText} />
             </View>
-            <Text style={styles.kicker}>QUESTION BANK</Text>
-            <Pill label="Coming soon" />
+            <Text style={styles.kicker}>APEX HIGH YIELD</Text>
           </View>
-          <Text style={styles.reviewTitle}>Past questions</Text>
-          <Text style={styles.reviewText}>A past-question bank is planned for Study. Materials will be added when they are ready to share.</Text>
+          <Text style={styles.reviewTitle}>Past papers and predicted papers</Text>
+          <Text style={styles.reviewText}>Review questions from your courses, sat like the exam with answers shown at the end.</Text>
         </Card>
         {actions.length > 1 ? (
           <>
@@ -307,7 +306,7 @@ export default function LearnScreen() {
     },
     { id: 'custom', icon: 'edit', title: 'Custom quiz', detail: 'Choose the lessons, how many questions, a timer and when you see the answers.', onPress: () => router.push(routes.customQuizBuilder()) },
     { id: 'starred', icon: 'star', title: 'Starred questions', detail: 'Questions you starred while practising, to go over again.', onPress: () => router.push('/learn/starred' as never) },
-    { id: 'past', icon: 'book', title: 'Past question bank', detail: 'Real past papers and predicted papers, sat like the exam.', onPress: () => router.push('/learn/past-questions' as never) },
+    { id: 'past', icon: 'book', title: 'Apex High Yield', detail: 'Real past papers and predicted papers, sat like the exam.', onPress: () => router.push('/learn/past-questions' as never) },
     { id: 'planner', icon: 'calendar', title: 'Timetable and plans', detail: 'Your weekly calendar, and a lesson path for your goals.', onPress: () => router.push('/learn/planner' as never) },
     { id: 'mock', icon: 'achievement', title: 'Mock exam', detail: 'A timed paper from the past papers, marked by topic so you know what to revise.', onPress: () => router.push(routes.mockExamBuilder()) },
     { id: 'spotter', icon: 'image', title: 'Spotter', detail: 'Timed picture stations, like a practical: name what is marked, then move on.', onPress: () => router.push(routes.spotterBuilder()) },

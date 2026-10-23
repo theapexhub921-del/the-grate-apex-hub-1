@@ -111,7 +111,7 @@ export default function PastQuestionsScreen() {
   return (
     <Screen width="content">
       <BackLink fallback={routes.learn()} />
-      <PageHeader eyebrow="Study" title="Past question bank" subtitle="Real past papers and predicted papers from your courses. Sit one as an exam: the answers are shown at the end, like the real paper." />
+      <PageHeader eyebrow="Study" title="Apex High Yield" subtitle="Real past papers and predicted papers from your courses. Sit one as an exam: the answers are shown at the end, like the real paper." />
       <View style={styles.switch}>
         <SegmentedControl label="Class and semester" options={tabOptions} value={tab} onChange={(value) => setTab(value as Tab)} />
       </View>
