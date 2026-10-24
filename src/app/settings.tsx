@@ -412,7 +412,11 @@ export default function SettingsScreen() {
           return (
             <Interactive
               key={option.value}
-              onPress={() => (experience === 'originals' ? void updateCurrentProfile({ autoHideNav: option.value === 'autoHide' }) : setTabBarMode(option.value))}
+              onPress={() => {
+                if (experience === 'originals') void updateCurrentProfile({ autoHideNav: option.value === 'autoHide' });
+                // Also this device's own mode (tablets follow it, and other looks use it).
+                void setTabBarMode(option.value);
+              }}
               accessibilityRole="radio"
               accessibilityState={{ checked: selected }}
               accessibilityLabel={`${option.label}. ${option.description}`}

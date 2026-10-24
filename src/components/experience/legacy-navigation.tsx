@@ -1,4 +1,5 @@
 import { usePathname } from 'expo-router';
+import { isTabletDevice, useTabBarMode } from '@/data/navigation-settings';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -39,6 +40,9 @@ const SLIM_WIDTH = 76;
  */
 export function useOriginalAutoHide() {
   const { user } = useAuth();
+  const deviceMode = useTabBarMode();
+  // Tablets and iPads: this device's mode (always visible unless chosen otherwise here).
+  if (isTabletDevice()) return deviceMode === 'autoHide';
   return user?.profile?.autoHideNav === true;
 }
 
