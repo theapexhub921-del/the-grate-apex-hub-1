@@ -803,7 +803,11 @@ const lesson10: Draft = {
   ],
 };
 
-export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7, lesson8, lesson9, lesson10].map((lesson) => ({
+// In the order of the numbered lectures (owner, 2026-10-24): 01 introduction (1-3),
+// 02-03 cytokines and receptors (5), 04 cells (4), 05 antibodies and monoclonals (7-8),
+// 06 antigens (6), then complement (9, an unnumbered deck) and 07 immunity to infection
+// (10). Lesson ids keep their numbers, so learners' progress is unchanged.
+export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson5, lesson4, lesson7, lesson8, lesson6, lesson9, lesson10].map((lesson) => ({
   ...lesson,
   ...readingExtras[lesson.id],
   interactive: interactive[lesson.id],

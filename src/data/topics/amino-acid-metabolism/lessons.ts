@@ -636,7 +636,10 @@ const lesson9: Draft = {
   ],
 };
 
-export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, lesson7, lesson8, lesson9].map((lesson) => ({
+// In the order of the lectures (owner, 2026-10-24): AA1 amino acids (1-3), AA2 fate of
+// the carbon skeleton (6-7), AA3 transport of ammonia (4-5), AA4 sulfur amino acids
+// (8-9). Lesson ids keep their numbers, so learners' progress is unchanged.
+export const lessons: Draft[] = [lesson1, lesson2, lesson3, lesson6, lesson7, lesson4, lesson5, lesson8, lesson9].map((lesson) => ({
   ...lesson,
   ...readingExtras[lesson.id],
   interactive: interactive[lesson.id],
