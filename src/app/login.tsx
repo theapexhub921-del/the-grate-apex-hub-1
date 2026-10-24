@@ -113,12 +113,12 @@ export default function LoginScreen() {
   const signedInWaiting = Boolean(session) && mode !== 'newPassword';
   const [slowAccount, setSlowAccount] = useState(false);
   useEffect(() => {
-    if (!signedInWaiting) {
-      setSlowAccount(false);
-      return;
-    }
+    if (!signedInWaiting) return;
     const timer = setTimeout(() => setSlowAccount(true), 12_000);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      setSlowAccount(false);
+    };
   }, [signedInWaiting]);
 
   // "Set New Password" form.
