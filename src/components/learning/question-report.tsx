@@ -23,6 +23,8 @@ export function QuestionReportLink({ question, place }: { question: { id: string
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Sent in this visit (a clear confirmation), rather than reported on an earlier one.
+  const [justSent, setJustSent] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -48,6 +50,7 @@ export function QuestionReportLink({ question, place }: { question: { id: string
     setError(null);
     try {
       await reportQuestion(question, reason, note, place);
+      setJustSent(true);
       setDone(true);
       setOpen(false);
       setReason(null);
@@ -65,7 +68,12 @@ export function QuestionReportLink({ question, place }: { question: { id: string
   }
 
   if (done) {
-    return (
+    return justSent ? (
+      <View style={styles.sentRow} accessibilityRole="alert">
+        <Icon name="check" size={15} color={colors.successText} strokeWidth={2.6} />
+        <Text style={styles.sentText}>Report sent. Thank you, the content team will check this question.</Text>
+      </View>
+    ) : (
       <View style={styles.linkRow}>
         <Icon name="flag" size={14} color={colors.textTertiary} filled />
         <Text style={styles.linkTextMuted}>Reported. Thank you, it will be checked.</Text>
@@ -85,9 +93,17 @@ export function QuestionReportLink({ question, place }: { question: { id: string
         title="Report this question"
         subtitle="What is wrong with it? Your report is saved privately and emailed to the content team."
         footer={
-          <View style={styles.actions}>
-            <Button label="Cancel" variant="ghost" onPress={close} disabled={busy} />
-            <Button label="Send report" onPress={() => void send()} loading={busy} disabled={!reason} />
+          <View>
+            {error ? (
+              <View style={styles.errorRow} accessibilityRole="alert">
+                <Icon name="warning" size={14} color={colors.error} />
+                <Text style={styles.error}>{error}</Text>
+              </View>
+            ) : null}
+            <View style={styles.actions}>
+              <Button label="Cancel" variant="ghost" onPress={close} disabled={busy} />
+              <Button label={busy ? 'Sending…' : 'Send report'} onPress={() => void send()} loading={busy} disabled={!reason} />
+            </View>
           </View>
         }
       >
@@ -112,12 +128,6 @@ export function QuestionReportLink({ question, place }: { question: { id: string
               {reason === 'other' ? 'What is the problem?' : reason === 'wrong-answer' ? 'What should the answer be, and where is it in your notes? (optional)' : 'Anything else? (optional)'}
             </Text>
             <TextInput value={note} onChangeText={setNote} placeholder="Write it in your own words." placeholderTextColor={colors.textTertiary} multiline maxLength={500} style={styles.input} accessibilityLabel="Details of the problem" />
-          </View>
-        ) : null}
-        {error ? (
-          <View style={styles.errorRow}>
-            <Icon name="warning" size={14} color={colors.error} />
-            <Text style={styles.error}>{error}</Text>
           </View>
         ) : null}
       </Sheet>
@@ -156,8 +166,10 @@ function createStyles(colors: ThemeColors) {
     writeWrap: { gap: 6, marginTop: 12 },
     writeLabel: { fontSize: 13, fontWeight: '700', color: colors.text },
     input: { minHeight: 80, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, color: colors.text, padding: 12, fontSize: 15, textAlignVertical: 'top' },
-    errorRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 },
-    error: { fontSize: 13, color: colors.error },
+    errorRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
+    error: { flex: 1, fontSize: 13, color: colors.error },
+    sentRow: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'stretch', marginTop: 6, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10, backgroundColor: colors.successSubtle },
+    sentText: { flex: 1, fontSize: 13, fontWeight: '600', color: colors.successText },
     actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10 },
     review: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, padding: 10, borderRadius: 12, borderWidth: 1, borderColor: colors.warningBorder, backgroundColor: colors.warningSubtle, marginBottom: 8 },
     reviewText: { flex: 1, fontSize: 13.5, lineHeight: 19, color: colors.text },

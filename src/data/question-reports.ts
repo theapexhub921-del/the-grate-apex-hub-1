@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { collection, doc, getDoc, getDocs, limit, query, runTransaction, serverTimestamp, updateDoc, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, limit, query, runTransaction, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
 import { questionKey, questionUnderReview, type QuestionFlag, type ReportReason } from '@/data/question-report-rules';
@@ -58,21 +58,24 @@ export async function reportQuestion(question: { id: string; prompt: string }, r
   const reportRef = doc(db, 'questionReports', `${qkey}_${uid}`);
   const flagRef = doc(db, 'questionFlags', qkey);
   const wrong = reason === 'wrong-answer' ? 1 : 0;
+  const report = {
+    qid: question.id.slice(0, 300),
+    qkey,
+    uid,
+    reason,
+    note: note.trim().slice(0, 500),
+    text: question.prompt.slice(0, 600),
+    where: place.slice(0, 120),
+    status: 'open',
+    createdAt: serverTimestamp(),
+  };
   try {
+    // Only the public counter is read: the learner's own report can't be read before it
+    // exists (the rules check its owner, and a missing report has none, so every first
+    // report used to be refused). Creating it twice is refused by the rules instead.
     await runTransaction(db, async (tx) => {
-      const [mine, flag] = await Promise.all([tx.get(reportRef), tx.get(flagRef)]);
-      if (mine.exists()) throw new AlreadyReported('You have already reported this question. Thank you.');
-      tx.set(reportRef, {
-        qid: question.id.slice(0, 300),
-        qkey,
-        uid,
-        reason,
-        note: note.trim().slice(0, 500),
-        text: question.prompt.slice(0, 600),
-        where: place.slice(0, 120),
-        status: 'open',
-        createdAt: serverTimestamp(),
-      });
+      const flag = await tx.get(flagRef);
+      tx.set(reportRef, report);
       if (flag.exists()) {
         const data = flag.data() as { count?: number; wrong?: number };
         tx.update(flagRef, { count: (data.count ?? 0) + 1, wrong: (data.wrong ?? 0) + wrong, updatedAt: serverTimestamp() });
@@ -81,15 +84,41 @@ export async function reportQuestion(question: { id: string; prompt: string }, r
       }
     });
   } catch (error) {
-    if (error instanceof AlreadyReported) {
-      await remember(question.id);
-      throw error;
-    }
     const code = (error as { code?: string })?.code;
-    if (code === 'permission-denied') throw new Error('Reports are not switched on yet. Please try again later.');
-    throw new Error('The report could not be sent. Check your connection and try again.');
+    if (!RETRY_ALONE.has(code ?? '')) throw new Error(friendlyReportError(code));
+    // Refused, or the database is busy / out of its free daily reads (2026-10-24; writes
+    // have their own allowance): save the report on its own, with no reads. Only the
+    // public "being checked" count is skipped.
+    try {
+      await setDoc(reportRef, report);
+    } catch (fallback) {
+      const again = (fallback as { code?: string })?.code;
+      if (again !== 'permission-denied') throw new Error(friendlyReportError(again));
+      // Refused again: either this learner reported it before (a report can't be rewritten),
+      // or reports are not switched on in the database rules.
+      const before = await getDoc(reportRef).then((snap) => snap.exists()).catch(() => false);
+      if (before) {
+        await remember(question.id);
+        throw new AlreadyReported('You have already reported this question. Thank you.');
+      }
+      throw new Error('Reports are not switched on yet. Please try again later.');
+    }
   }
   await remember(question.id);
+  // The email goes in the background: the report is saved, so the learner is told at once.
+  void emailReport(question, reason, note, place);
+}
+
+// Errors after which the report alone is saved without the counter.
+const RETRY_ALONE = new Set(['permission-denied', 'resource-exhausted', 'unavailable', 'deadline-exceeded', 'aborted']);
+
+function friendlyReportError(code: string | undefined) {
+  if (code === 'resource-exhausted') return 'The app is very busy right now, so the report could not be saved. Please try again in a few hours.';
+  if (code === 'unavailable' || code === 'deadline-exceeded') return 'The report could not reach the server. Check your connection and try again.';
+  return `The report could not be sent${code ? ` (${code})` : ''}. Please try again.`;
+}
+
+async function emailReport(question: { id: string; prompt: string }, reason: ReportReason, note: string, place: string) {
   // The team is emailed through the server (api/question-report.mjs: Resend, then
   // Formspree), so no mail credentials ship in the app. The report is already saved and
   // admins see it in Settings → Help → Reported questions, so a failed email never shows

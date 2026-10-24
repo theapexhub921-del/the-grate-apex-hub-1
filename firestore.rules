@@ -451,8 +451,10 @@ service cloud.firestore {
         && request.resource.data.where is string && request.resource.data.where.size() <= 120
         && request.resource.data.status == 'open'
         && request.resource.data.createdAt == request.time;
+      // resource == null: asking for a report that doesn't exist yet (has this learner reported
+      // it?) returns nothing; before 2026-10-24 that was refused, which failed every first report.
       allow read: if request.auth != null
-        && (resource.data.uid == request.auth.uid || exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+        && (resource == null || resource.data.uid == request.auth.uid || exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
       allow update: if exists(/databases/$(database)/documents/admins/$(request.auth.uid))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status in ['open', 'fixed', 'dismissed'];
