@@ -4,6 +4,16 @@
   "buildCommand": "node scripts/assemble-games.mjs && npx expo export --platform web && cp dist/+not-found.html dist/404.html && rm -f dist/game-builds/*/*.part*",
   "outputDirectory": "dist",
   "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/__/auth/:path*",
+      "destination": "https://grate-apex.firebaseapp.com/__/auth/:path*"
+    },
+    {
+      "source": "/__/firebase/init.json",
+      "destination": "https://grate-apex.firebaseapp.com/__/firebase/init.json"
+    }
+  ],
   "crons": [
     {
       "path": "/api/reminders",

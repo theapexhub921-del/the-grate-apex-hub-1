@@ -24,7 +24,10 @@ import { setDisplayName } from '@/data/user';
 import { useTheme } from '@/hooks/use-theme';
 import { friendlyGoogleError, signInWithGoogle, takeOAuthPending } from '@/lib/google-auth';
 import {
+  GoogleAuthProvider,
   getRedirectResult,
+  signInWithCredential,
+  signOut,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   updatePassword as fbUpdatePassword,
@@ -51,10 +54,11 @@ const linkParams = readLinkParams();
 // problem — not as an expired email link.
 const oauthReturn = readOAuthReturn();
 
-function readOAuthReturn(): { error: string | null } | null {
-  if (!takeOAuthPending()) return null;
+function readOAuthReturn(): { flow: 'installed-pwa' | 'legacy'; error: string | null } | null {
+  const flow = takeOAuthPending();
+  if (!flow) return null;
   const failure = linkParams.get('error_description') ?? linkParams.get('error');
-  return { error: failure ? friendlyGoogleError(failure) : null };
+  return { flow, error: failure ? friendlyGoogleError(failure) : null };
 }
 
 type Mode = 'signIn' | 'signUp' | 'checkEmail' | 'reset' | 'newPassword';
@@ -115,18 +119,35 @@ export default function LoginScreen() {
 
     // (No auth listener here: the router handles password recovery links.)
 
-    // Back from Google: a successful return carries the session in the
-    // address (the auth library picks it up by itself); an error is already shown.
+    // Complete Google redirects when the installed PWA returns. The PWA's
+    // Firebase helper lives on our own domain; transfer its Google credential
+    // into the app's normal Auth instance so the rest of the app stays shared.
     if (oauthReturn) {
-      void getRedirectResult(auth)
-        .then((result) => {
-          if (!active || !result) return;
+      void (async () => {
+        try {
+          const redirectAuth = oauthReturn.flow === 'installed-pwa'
+            ? (await import('@/lib/firebase-pwa-auth')).getPwaOAuthAuth()
+            : auth;
+          const result = await getRedirectResult(redirectAuth);
+          if (!active) return;
+          if (!result) {
+            if (!oauthReturn.error) setError('Google sign-in did not return to the app. Please try again.');
+            return;
+          }
+
+          if (oauthReturn.flow === 'installed-pwa') {
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            if (!credential) throw new Error('Google did not return a sign-in credential.');
+            await signOut(redirectAuth).catch(() => undefined);
+            await signInWithCredential(auth, credential);
+          }
+
           track('login', { method: 'google' });
-          return saveHeldSignUpConsent();
-        })
-        .catch((redirectError: any) => {
+          await saveHeldSignUpConsent();
+        } catch (redirectError: any) {
           if (active) setError(friendlyGoogleError(redirectError?.message));
-        });
+        }
+      })();
       if (oauthReturn.error) {
         // Google errors arrive as query parameters, which the router keeps
         // in its own state (and writes back to the address bar as it

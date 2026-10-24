@@ -330,7 +330,7 @@ service cloud.firestore {
                  && !exists(/databases/$(database)/documents/posts/$(postId)/likes/$(request.auth.uid)))
               || (request.resource.data.likeCount == resource.data.get('likeCount', 0) - 1
                  && !existsAfter(/databases/$(database)/documents/posts/$(postId)/likes/$(request.auth.uid))
-                 && exists(/databases/$(database)/documents/posts/$(postId)/likes/$(request.auth.uid))))));
+                 && exists(/databases/$(database)/documents/posts/$(postId)/likes/$(request.auth.uid)))))));
       allow delete: if request.auth.uid == resource.data.authorUid;
 
       match /likes/{liker} {
