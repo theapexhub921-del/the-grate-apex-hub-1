@@ -16,9 +16,8 @@ import { Radius, type ThemeColors, Type } from '@/constants/theme';
 import { type AchievementGroup, type AchievementState } from '@/data/achievements';
 import { useAchievements } from '@/data/achievements-store';
 import { describeGiftBoost } from '@/data/boost-gifts';
-import { activatePowerup, boostRemainingMs, describeBoost, usePowerups, useActiveBoost } from '@/data/learning/powerups';
+import { boostRemainingMs, describeBoost, usePowerups, useActiveBoost } from '@/data/learning/powerups';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
-import { friendlyError } from '@/lib/errors';
 
 // /achievements — hidden; reached from You (profile) and the level-complete
 // notice. Every original-app milestone plus this app's own, five levels each.
@@ -93,7 +92,6 @@ function BoostPanel() {
   const inventory = usePowerups();
   const active = useActiveBoost();
   const [now, setNow] = useState(() => Date.now());
-  const [error, setError] = useState<string | null>(null);
   const [gift, setGift] = useState<{ id: string | null } | null>(null);
   const remaining = boostRemainingMs(active, now);
   const timed = inventory.filter((item) => item.kind === 'timed');
@@ -110,20 +108,11 @@ function BoostPanel() {
     };
   }, [active]);
 
-  async function activate(id: string) {
-    setError(null);
-    try {
-      await activatePowerup(id);
-    } catch (problem) {
-      setError(friendlyError(problem, 'That boost could not be started.'));
-    }
-  }
-
   const minutes = Math.floor(remaining / 60000);
   const seconds = Math.floor((remaining % 60000) / 1000);
   return (
     <Card style={styles.boostCard}>
-      <SectionHeader title="Boosts" subtitle="Each one multiplies the XP from lessons and lesson or topic quizzes for up to an hour, from when you activate it." />
+      <SectionHeader title="Boosts" subtitle="A boost starts working as soon as you get it: it multiplies the XP from lessons and lesson or topic quizzes for up to an hour. One runs at a time; the next starts by itself when it ends." />
       {remaining > 0 && active ? (
         <View style={styles.activeRow} accessibilityLiveRegion="polite">
           <Pill label={`×${active.multiplier} XP active`} tone="gold" />
@@ -134,20 +123,19 @@ function BoostPanel() {
       {timed.map((item) => (
         <View key={item.id} style={styles.boostRow}>
           <Text style={styles.boostText}>{describeBoost(item)}{item.source === 'gift' ? ' · gift' : ''}</Text>
+          <Pill label="Up next" tone="neutral" />
           <Button label="Gift" size="sm" variant="ghost" onPress={() => setGift({ id: item.id })} accessibilityLabel={`Gift ${describeBoost(item)} to a friend`} />
-          <Button label="Activate" size="sm" disabled={remaining > 0} onPress={() => void activate(item.id)} accessibilityLabel={`Activate ${describeBoost(item)}`} />
         </View>
       ))}
       {single.map((item) => (
         <View key={item.id} style={styles.boostRow}>
-          <Text style={styles.boostText}>{describeGiftBoost(item)}{item.source === 'gift' ? ' · gift' : ''}</Text>
+          <Text style={styles.boostText}>{describeGiftBoost(item)}{item.source === 'gift' ? ' · gift' : ''} · applies to your next lesson or quiz</Text>
           <Button label="Gift" size="sm" variant="ghost" onPress={() => setGift({ id: item.id })} accessibilityLabel={`Gift ${describeGiftBoost(item)} to a friend`} />
         </View>
       ))}
       {inventory.length > 0 ? <Button label="Gift a boost to a friend" variant="secondary" size="sm" icon={<Icon name="sparkle" size={15} color={colors.text} />} onPress={() => setGift({ id: null })} style={styles.giftButton} /> : null}
       <GiftBoostSheet visible={gift !== null} boostId={gift?.id ?? null} onClose={() => setGift(null)} />
-      {remaining > 0 && timed.length > 0 ? <Text style={styles.muted}>One boost at a time: the others wait here until this one ends.</Text> : null}
-      {error ? <Text style={styles.error} accessibilityRole="alert">{error}</Text> : null}
+      {remaining > 0 && timed.length > 0 ? <Text style={styles.muted}>One boost at a time: {timed.length === 1 ? 'the next one starts' : 'the next ones start'} by itself when this one ends.</Text> : null}
     </Card>
   );
 }
@@ -178,7 +166,6 @@ function createStyles(colors: ThemeColors) {
     boostRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 10 },
     boostText: { flex: 1, minWidth: 140, fontSize: 14, color: colors.text },
     muted: { fontSize: 13, lineHeight: 18, color: colors.textSecondary },
-    error: { fontSize: 13, color: colors.error },
     giftButton: { alignSelf: 'flex-start' },
   });
 }

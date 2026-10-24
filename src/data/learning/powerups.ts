@@ -16,8 +16,9 @@ export type Powerup = {
   sourceId: string;
   multiplier: Exclude<PowerupMultiplier, 1>;
   earnedAt: number;
-  /** 'single' (default): multiplies the next lesson or quiz. 'timed': once
-   *  activated, multiplies every lesson and quiz until it expires. */
+  /** 'single' (default): multiplies the next lesson or quiz. 'timed': starts as soon
+   *  as it is received (or when the running one ends) and multiplies every lesson
+   *  and quiz until it expires. */
   kind?: 'single' | 'timed';
   /** Timed boosts only; never more than MAX_POWERUP_SECONDS. */
   durationSeconds?: number;
@@ -36,6 +37,39 @@ const listeners = new Set<() => void>();
 
 function notify() {
   listeners.forEach((listener) => listener());
+}
+
+/**
+ * Starts the next timed boost if none is running (owner, 2026-10-24: a boost should
+ * work as soon as you get it, not wait to be activated). One at a time, so an effect
+ * is never extended or stacked; the next one starts when the running one ends.
+ * Returns true when one was started (the caller saves).
+ */
+function startNextTimed(now: number): boolean {
+  if (boostRemainingMs(active, now) > 0) return false;
+  const next = inventory.find((item) => item.kind === 'timed');
+  if (!next) {
+    if (active) active = null;
+    return false;
+  }
+  active = { id: next.id, multiplier: next.multiplier, activatedAt: now, durationSeconds: clampSeconds(next.durationSeconds), seenAt: now };
+  inventory = inventory.filter((item) => item.id !== next.id);
+  return true;
+}
+
+// While the app is open, the next boost starts the moment the running one ends.
+let endTimer: ReturnType<typeof setTimeout> | null = null;
+function scheduleNextStart() {
+  if (endTimer) clearTimeout(endTimer);
+  endTimer = null;
+  const left = boostRemainingMs(active, Date.now());
+  if (left <= 0) return;
+  endTimer = setTimeout(() => {
+    endTimer = null;
+    if (startNextTimed(Date.now())) void save();
+    notify();
+    scheduleNextStart();
+  }, left + 250);
 }
 
 function ordered(items: Powerup[]) {
@@ -75,6 +109,9 @@ async function load() {
     active = savedActive && typeof savedActive === 'object' && boostRemainingMs(savedActive, Date.now()) > 0
       ? { ...savedActive, durationSeconds: clampSeconds(savedActive.durationSeconds) }
       : null;
+    // Boosts that were waiting to be activated (before 2026-10-24) start now, one at a time.
+    if (startNextTimed(Date.now())) await save();
+    scheduleNextStart();
     notify();
   } catch (error) {
     console.warn('Could not load power-ups:', error);
@@ -125,6 +162,7 @@ export async function grantPowerup(
     ? { id: key, source, sourceId, multiplier, earnedAt: Date.now(), kind: 'timed', durationSeconds: clampSeconds(durationSeconds) }
     : { id: key, source, sourceId, multiplier, earnedAt: Date.now() };
   inventory = ordered([...inventory, item]);
+  if (item.kind === 'timed' && startNextTimed(Date.now())) scheduleNextStart();
   await save();
   notify();
   return true;
@@ -153,6 +191,7 @@ export async function activatePowerup(id: string): Promise<ActiveBoost> {
   if (!item) throw new Error('That boost is not in your inventory.');
   active = { id: item.id, multiplier: item.multiplier, activatedAt: now, durationSeconds: clampSeconds(item.durationSeconds), seenAt: now };
   inventory = inventory.filter((candidate) => candidate.id !== id);
+  scheduleNextStart();
   await save();
   notify();
   return active;
@@ -204,7 +243,14 @@ export async function consumePowerup(): Promise<Powerup | null> {
     await save();
     notify();
   }
-  // Otherwise the strongest single-use power-up. Timed boosts wait for activation.
+  // The next timed boost starts straight away and applies to this one.
+  if (startNextTimed(now)) {
+    scheduleNextStart();
+    await save();
+    notify();
+    return { id: `${active!.id}:active`, source: 'achievement', sourceId: active!.id, multiplier: active!.multiplier, earnedAt: active!.activatedAt, kind: 'timed' };
+  }
+  // Otherwise the strongest single-use power-up.
   const powerup = inventory.find((item) => item.kind !== 'timed');
   if (!powerup) return null;
   inventory = inventory.filter((item) => item.id !== powerup.id);
@@ -223,6 +269,8 @@ export async function returnPowerup(powerup: Powerup) {
 }
 
 subscribeToLearningAuthChanges(() => {
+  if (endTimer) clearTimeout(endTimer);
+  endTimer = null;
   inventory = [];
   earnedKeys = new Set();
   active = null;
