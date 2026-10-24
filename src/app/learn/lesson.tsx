@@ -293,6 +293,7 @@ function LessonPlayer({
 
       {view === 'learn' && hasInteractive && session && session.phase !== 'complete' ? (
         <InteractiveLayer
+          aiLesson={aiLesson}
           lesson={lesson}
           session={session}
           onFinished={() => {

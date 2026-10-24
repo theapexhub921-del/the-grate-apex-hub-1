@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '@/components/ui/text';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
 
+import { type AiLesson, ExplainSimplyButton } from '@/components/learning/ai-study';
 import { SimulationStepView } from '@/components/learning/simulations/simulation-step';
 import { PathwaySteps } from '@/components/pathway-steps';
 import { QuestionCard } from '@/components/question-card';
@@ -14,7 +15,7 @@ import { InlineNotice } from '@/components/ui/state-views';
 import { isWeb } from '@/components/ui/web';
 import type { ThemeColors } from '@/constants/theme';
 import { lessonToText } from '@/data/ai-study';
-import type { InteractiveStep, Lesson } from '@/data/lesson-types';
+import type { InteractiveStep, Lesson, LessonTerm } from '@/data/lesson-types';
 import { recordAnswer, recordRecall } from '@/data/learning/actions';
 import { type LessonSession, saveLessonSession } from '@/data/learning/lesson-sessions';
 import { type Answer, correctAnswerOf, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
@@ -43,10 +44,13 @@ export function InteractiveLayer({
   lesson,
   session,
   onFinished,
+  aiLesson,
 }: {
   lesson: Lesson;
   session: LessonSession;
   onFinished: () => void;
+  /** The lesson as text for the AI: adds "Explain it more simply" to the learn steps. */
+  aiLesson?: AiLesson;
 }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
@@ -274,8 +278,15 @@ export function InteractiveLayer({
         <Text style={styles.progressText}>{stepLabel}</Text>
       </View>
 
+      {position === 0 ? <StartSimple lesson={lesson} styles={styles} /> : null}
+
       <Animated.View key={`${position}`} entering={reduceMotion ? undefined : FadeInDown.duration(220)}>
         {step?.type === 'learn' ? <LearnCard step={step} styles={styles} /> : null}
+        {step?.type === 'learn' && aiLesson ? (
+          <View style={styles.simpler}>
+            <ExplainSimplyButton lesson={aiLesson} focus={step.title} />
+          </View>
+        ) : null}
 
         {step?.type === 'ask' ? (
           <>
@@ -299,6 +310,11 @@ export function InteractiveLayer({
                   </Text>
                 ))}
               </Card>
+            ) : null}
+            {revealed && aiLesson ? (
+              <View style={styles.simpler}>
+                <ExplainSimplyButton lesson={aiLesson} focus={step.question.concept} />
+              </View>
             ) : null}
           </>
         ) : null}
@@ -423,6 +439,61 @@ const RATE_LABEL = { yes: 'All of it', partial: 'Partly', no: 'Not really' } as 
 const VERDICT_LABEL = { yes: 'Well recalled', partial: 'Partly there', no: 'Not yet' } as const;
 
 /** A teaching card (the current step, or an earlier one when looking back). */
+/**
+ * Before the first step: the lesson from zero (owner, 2026-10-24: "as though the
+ * learner knew nothing, then move on to the complex stuff"). Built only from the
+ * lesson's own lecture material: its big idea, the words it uses with their plain
+ * meanings, and what the learner will be able to do. Shown above step 1 rather than
+ * as a step, so lessons already in progress keep their place.
+ */
+function StartSimple({ lesson, styles }: { lesson: Lesson; styles: ReturnType<typeof createStyles> }) {
+  const words = starterTerms(lesson);
+  return (
+    <Card tone="insight" style={styles.learnCard}>
+      <Text style={styles.kicker}>START SIMPLE · NO BACKGROUND NEEDED</Text>
+      <Text style={styles.learnTitle}>The big idea</Text>
+      <Text style={styles.body}>{lesson.description}</Text>
+      {words.length ? (
+        <>
+          <Text style={styles.simpleHeading}>Words you will meet</Text>
+          <View style={styles.terms}>
+            {words.map((term) => (
+              <View key={term.term} style={styles.term}>
+                <Text style={styles.termName}>{term.term}</Text>
+                <Text style={styles.termMeaning}>{term.meaning}</Text>
+              </View>
+            ))}
+          </View>
+        </>
+      ) : null}
+      {lesson.objectives?.length ? (
+        <>
+          <Text style={styles.simpleHeading}>By the end you will be able to</Text>
+          {lesson.objectives.map((objective) => <Text key={objective} style={styles.body}>• {objective}</Text>)}
+        </>
+      ) : null}
+      <Text style={styles.body}>We start with the basics and build up one small step at a time. When a question comes before the explanation, just give it your best guess: being wrong is part of learning, and nothing is lost.</Text>
+    </Card>
+  );
+}
+
+/** The lesson's key words with their plain meanings, in the order they come up (at most six). */
+function starterTerms(lesson: Lesson): LessonTerm[] {
+  const seen = new Set<string>();
+  const out: LessonTerm[] = [];
+  const add = (terms: readonly LessonTerm[] | undefined) => {
+    for (const term of terms ?? []) {
+      const key = term.term.trim().toLowerCase();
+      if (!key || seen.has(key) || out.length >= 6) continue;
+      seen.add(key);
+      out.push(term);
+    }
+  };
+  for (const step of lesson.interactive ?? []) if (step.type === 'learn') add(step.terms);
+  for (const chunk of lesson.chunks) add(chunk.terms);
+  return out;
+}
+
 function LearnCard({ step, styles }: { step: Extract<InteractiveStep, { type: 'learn' }>; styles: ReturnType<typeof createStyles> }) {
   return (
     <Card style={styles.learnCard}>
@@ -460,6 +531,8 @@ function createStyles(colors: ThemeColors) {
     progressText: { fontSize: 12, fontWeight: '700', color: colors.textTertiary },
     kicker: { fontSize: 11, fontWeight: '800', letterSpacing: 1.1, color: colors.textTertiary, marginBottom: 8 },
     learnCard: { marginBottom: 16, gap: 4 },
+    simpler: { alignItems: 'flex-start', marginTop: -8, marginBottom: 12 },
+    simpleHeading: { fontSize: 15, fontWeight: '800', color: colors.text, marginTop: 8, marginBottom: 6 },
     learnTitle: { fontSize: 21, fontWeight: '800', lineHeight: 28, color: colors.text, marginBottom: 8 },
     body: { fontSize: 16, lineHeight: 25, color: colors.textSecondary, marginBottom: 10 },
     terms: { gap: 8, marginTop: 4 },

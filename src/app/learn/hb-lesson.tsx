@@ -215,12 +215,14 @@ export default function LegacyLessonScreen() {
         {done ? <Pill label="Completed" tone="success" /> : <Pill label={`${Math.min(readCount, total)}/${total} sections`} tone="primary" />}
       </View>
       {meta.subject && !finished ? (
-        // HB2 lessons also have an interactive version (this app's lesson page): offer it clearly.
-        <PressableCard onPress={() => router.push(routes.lesson(meta.id, { layer: 'learn' }))} accessibilityLabel="Learn by answering: the interactive version of this lesson" style={styles.modeCard}>
+        // Studying is not just reading (owner, 2026-10-24): the step-by-step version, which
+        // starts from the basics and builds up with short questions, is where to begin; the
+        // reading below is the full notes to revise from. Same lesson, same progress.
+        <PressableCard onPress={() => router.push(routes.lesson(meta.id, { layer: 'learn' }))} accessibilityLabel="Start here: learn this lesson step by step, from the basics" style={styles.modeCard}>
           <View style={styles.modeIcon}><Icon name="challenge" size={20} color={colors.onPrimary} /></View>
           <View style={styles.flex}>
-            <Text style={styles.modeTitle}>Learn by answering</Text>
-            <Text style={styles.modeText}>Prefer learning by doing? Study this lesson step by step, answering short questions as you go.</Text>
+            <Text style={styles.modeTitle}>{done ? 'Learn it again step by step' : 'New to this? Start here'}</Text>
+            <Text style={styles.modeText}>Learn this lesson step by step: it starts from the basics, explains the key words in plain language and builds up to the lecture, with short questions as you go. Then read the full notes below to revise.</Text>
           </View>
           <View style={styles.modeGo}>
             <Text style={styles.modeGoText}>Start</Text>

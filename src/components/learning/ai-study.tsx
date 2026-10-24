@@ -38,9 +38,10 @@ const problemText = (problem: unknown) => (problem instanceof AiError ? problem.
 
 // ── Ask AI ──────────────────────────────────────────────────────────
 
-export function AskAiPanel({ lesson, focus, embedded = false, docked = false }: {
+export function AskAiPanel({ lesson, focus, autoAsk, embedded = false, docked = false }: {
   lesson: AiLesson;
   /** The section being read, offered as a first question. */ focus?: string;
+  /** Asked as soon as the panel opens ("Explain it more simply"). */ autoAsk?: string;
   /** Inside the "Ask AI" sheet: the sheet shows the title. */ embedded?: boolean;
   /** In the right-hand side panel: the conversation scrolls and the question box stays at the bottom. */ docked?: boolean;
 }) {
@@ -95,6 +96,15 @@ export function AskAiPanel({ lesson, focus, embedded = false, docked = false }: 
       if (alive.current) setBusy(false);
     }
   }
+
+  // "Explain it more simply": ask straight away, once.
+  const asked = useRef(false);
+  useEffect(() => {
+    if (!autoAsk || asked.current) return;
+    asked.current = true;
+    void send(autoAsk);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the panel opens
+  }, [autoAsk]);
 
   async function openChat(id: string) {
     if (busyRef.current) return;
@@ -263,6 +273,44 @@ export function AskAiFab({ lesson, focus }: { lesson: AiLesson | null; focus?: s
       </Interactive>
       <Sheet visible={open && !docked} onClose={() => setOpen(false)} title="Ask AI" subtitle={subtitle} width={640}>
         <AskAiPanel lesson={lesson} focus={focus} embedded />
+      </Sheet>
+    </>
+  );
+}
+
+/** The question behind "Explain it more simply": from zero, then up to the lecture. */
+export const explainSimplyQuestion = (focus: string) =>
+  `Explain “${focus}” from the very basics, as if I know nothing about it yet: start with a simple everyday picture, explain every technical word in plain language, then build up step by step to what the lecture says.`;
+
+/**
+ * "Explain it more simply" under a lesson step: opens Ask AI (docked on the right on a
+ * computer, a sheet on a phone) and asks for a from-zero explanation of that step.
+ */
+export function ExplainSimplyButton({ lesson, focus }: { lesson: AiLesson; focus: string }) {
+  const colors = useTheme();
+  const [open, setOpen] = useState(false);
+  const docked = useSidePanelAvailable();
+  const panelId = `explain-simply:${lesson.id}`;
+  useFocusEffect(useCallback(() => () => closeSidePanel(panelId), [panelId]));
+  useEffect(() => () => closeSidePanel(panelId), [panelId]);
+  const question = explainSimplyQuestion(focus);
+  const press = () => {
+    if (!docked) { setOpen(true); return; }
+    // A new panel for each step (the key makes it ask again for the new step).
+    openSidePanel({ id: panelId, title: 'Explain it more simply', subtitle: focus, content: <AskAiPanel key={focus} lesson={lesson} focus={focus} autoAsk={question} docked /> });
+  };
+  return (
+    <>
+      <Button
+        label="Explain it more simply"
+        variant="ghost"
+        size="sm"
+        icon={<Icon name="sparkle" size={14} color={colors.primaryText} />}
+        onPress={press}
+        accessibilityHint="Ask AI explains this step from the basics, using this lesson"
+      />
+      <Sheet visible={open && !docked} onClose={() => setOpen(false)} title="Explain it more simply" subtitle={focus} width={640}>
+        {open ? <AskAiPanel lesson={lesson} focus={focus} autoAsk={question} embedded /> : null}
       </Sheet>
     </>
   );
