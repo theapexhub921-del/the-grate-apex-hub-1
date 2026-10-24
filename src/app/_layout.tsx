@@ -30,6 +30,7 @@ import { useResolvedColorScheme, useTheme } from '@/hooks/use-theme';
 import { loadWebFonts } from '@/lib/web-fonts';
 import { routes } from '@/lib/routes';
 import { initAnalytics } from '@/lib/analytics';
+import { installWebScrolling } from '@/lib/web-scrolling';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -168,6 +169,7 @@ export default function TabLayout() {
   useEffect(() => {
     loadWebFonts();
     initAnalytics();
+    installWebScrolling();
   }, []);
 
   useEffect(() => {

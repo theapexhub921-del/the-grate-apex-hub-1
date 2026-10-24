@@ -58,7 +58,8 @@ export const Screen = forwardRef<
         isDesktopWidth(windowWidth) && styles.containerDesktop,
         contentStyle,
       ]}
-      showsVerticalScrollIndicator={false}
+      // A (thin) scrollbar on wide windows, so a laptop has something to grab (lib/web-scrolling.ts).
+      showsVerticalScrollIndicator={isDesktopWidth(windowWidth)}
       keyboardShouldPersistTaps="handled"
     >
       {children}
