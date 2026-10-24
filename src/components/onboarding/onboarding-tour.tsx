@@ -36,6 +36,8 @@ import { getNextActions } from '@/data/learning/next-action';
 import { useLearning } from '@/data/learning/use-learning';
 import { acceptCurrentLegalVersions, completeOnboarding, needsLegalAcceptance } from '@/data/onboarding';
 import { useDisplayName } from '@/data/user';
+import { snoozeNotificationPrompt } from '@/components/notification-prompt';
+import { needsUsername } from '@/lib/login-identifier';
 import { useAuth } from '@/hooks/use-auth';
 import { useGreeting } from '@/hooks/use-greeting';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
@@ -80,7 +82,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
   const [legalError, setLegalError] = useState<string | null>(null);
   const showLegalGate = !legalSaved && needsLegalAcceptance(user);
 
-  const chapters: Chapter[] = [
+  const allChapters: Chapter[] = [
     {
       id: 'welcome',
       icon: 'sparkle',
@@ -214,28 +216,6 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       demo: (props) => <SocialDemo {...props} />,
     },
     {
-      id: 'team',
-      icon: 'profile',
-      kicker: 'MEET THE TEAM',
-      title: 'The people behind GrAte Apex Hub',
-      body: 'The people building and supporting GrAte Apex Hub.',
-      demo: () => (
-        <SimFrame>
-          <View style={styles.aboutTeam}>
-            {EXPLORE_TEAM.map((member) => (
-              <View key={member.name} style={styles.aboutTeamRow}>
-                <View style={styles.aboutTeamIcon}><Icon name={member.icon} size={16} color={colors.accentText} /></View>
-                <View style={styles.teamMemberCopy}>
-                  <Text style={styles.aboutTeamName}>{member.name}</Text>
-                  <Text style={styles.aboutTeamRole}>{member.role}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        </SimFrame>
-      ),
-    },
-    {
       id: 'personalise',
       icon: 'profile',
       kicker: 'PROFILE & SETTINGS',
@@ -290,6 +270,9 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       ),
     },
   ];
+  // Every learner chooses a username before the tour (the sign-up form or
+  // /choose-username), so its step only shows for one who somehow has none.
+  const chapters = allChapters.filter((item) => item.id !== 'username' || needsUsername(user?.profile?.username));
 
   const last = chapters.length - 1;
   const chapter = chapters[index];
@@ -299,6 +282,8 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
     if (leaving) return;
     setLeaving(true);
     if (user) await completeOnboarding(user.id, how);
+    // The tour has its own notifications step: don't ask again straight after it.
+    if (!replay) await snoozeNotificationPrompt();
     // First time through: suggest the gold-tick accounts to follow.
     if (!replay) { router.replace('/suggested' as never); return; }
     router.replace('/');

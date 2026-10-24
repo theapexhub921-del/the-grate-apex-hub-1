@@ -22,6 +22,11 @@ const ASK_AGAIN_MS = 7 * 86_400_000;
 // Never over the first-run steps (the introduction already asks, and the card covered "Confirm my class").
 const HIDDEN_ON = /^\/(login|onboarding|choose-experience|choose-username|suggested|class-selection|learn\/(quiz|lesson|hb-lesson|hb-practice|review|apex)|social\/battle)/;
 
+/** Counts as a "Not now": used when the introduction has just asked. */
+export async function snoozeNotificationPrompt() {
+  await AsyncStorage.setItem(KEY, String(Date.now())).catch(() => {});
+}
+
 const permission = () => (Platform.OS === 'web' && typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : null);
 
 export function NotificationPrompt() {
