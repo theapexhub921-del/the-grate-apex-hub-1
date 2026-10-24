@@ -557,7 +557,8 @@ function MatchInput({
       </Text>
 
       <View style={[styles.matchColumns, stacked && styles.matchColumnsStacked]}>
-        <View style={styles.matchColumn}>
+        <View style={[styles.matchColumn, stacked && styles.matchColumnStacked]}>
+          {stacked ? <Text style={styles.matchColumnLabel}>1. Tap one of these</Text> : null}
           {question.pairs.map((pair, leftIndex) => {
             const rightIndex = value[leftIndex];
             const matched = rightIndex >= 0;
@@ -589,7 +590,8 @@ function MatchInput({
           })}
         </View>
 
-        <View style={styles.matchColumn}>
+        <View style={[styles.matchColumn, stacked && styles.matchColumnStacked]}>
+          {stacked ? <Text style={styles.matchColumnLabel}>2. Then tap its match</Text> : null}
           {rightOrder.map((rightIndex) => {
             const leftIndex = value.findIndex((match) => match === rightIndex);
             const matched = leftIndex >= 0;
@@ -719,7 +721,11 @@ function createStyles(colors: ThemeColors) {
 
     matchColumns: { flexDirection: 'row', alignItems: 'stretch', gap: 10 },
     matchColumn: { flex: 1, minWidth: 0, gap: 8 },
-    matchColumnsStacked: { flexDirection: 'column' },
+    matchColumnsStacked: { flexDirection: 'column', gap: 16 },
+    // Stacked (phones): each list keeps its own height. With flex: 1 in a column, both
+    // lists started from zero height inside the scrolling page and their cards overlapped.
+    matchColumnStacked: { flexGrow: 0, flexShrink: 0, flexBasis: 'auto', width: '100%' },
+    matchColumnLabel: { fontSize: 12, fontWeight: '700', color: colors.textSecondary, marginBottom: 2 },
     matchPartnerText: { fontSize: 11, lineHeight: 15, color: colors.textTertiary, textAlign: 'center', marginTop: 3 },
     matchOption: {
       minHeight: 48,

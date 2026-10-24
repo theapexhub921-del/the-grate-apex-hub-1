@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Text, TextInput } from '@/components/ui/text';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
 
@@ -55,6 +55,8 @@ export function InteractiveLayer({
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
   const reduceMotion = useReducedMotion();
+  // Phones: the step's buttons stack full width (a row ran off the screen, hiding some).
+  const narrow = useWindowDimensions().width < 520;
   const steps = lesson.interactive ?? [];
   const [answer, setAnswer] = useState<Answer | undefined>(undefined);
   const [revealed, setRevealed] = useState(false);
@@ -263,7 +265,7 @@ export function InteractiveLayer({
             </Card>
           ) : null}
         </Animated.View>
-        <View style={styles.actions}>
+        <View style={[styles.actions, narrow && styles.actionsNarrow]}>
           {previousButton}
           <Button label={back === 1 ? 'Back to where I was' : 'Next'} trailing="→" onPress={next} shortcut={isWeb ? 'Enter' : undefined} />
         </View>
@@ -399,7 +401,7 @@ export function InteractiveLayer({
         ) : null}
       </Animated.View>
 
-      <View style={styles.actions}>
+      <View style={[styles.actions, narrow && styles.actionsNarrow]}>
         {previousButton}
         {step?.type === 'learn' ? (
           <Button label="Continue" trailing="→" onPress={() => advance()} shortcut={isWeb ? 'Enter' : undefined} />
@@ -423,8 +425,8 @@ export function InteractiveLayer({
         {step?.type === 'recall' && !recallShown ? (
           typed.trim() ? (
             <>
-              <Button label="Check my answer" icon={<Icon name="sparkle" size={16} color={colors.onPrimary} />} onPress={() => void checkRecall()} loading={grading} disabled={grading} />
               <Button label="Show the model answer" variant="secondary" onPress={() => setRecallShown(true)} disabled={grading} />
+              <Button label="Check my answer" icon={<Icon name="sparkle" size={16} color={colors.onPrimary} />} onPress={() => void checkRecall()} loading={grading} disabled={grading} />
             </>
           ) : (
             <Button label="Show the model answer" onPress={() => setRecallShown(true)} shortcut={isWeb ? 'Enter' : undefined} />
@@ -555,7 +557,9 @@ function createStyles(colors: ThemeColors) {
     aiMarkHead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     aiVerdict: { fontSize: 16, fontWeight: '700', color: colors.text },
     aiSub: { fontSize: 13.5, fontWeight: '600', color: colors.textSecondary, marginTop: 4 },
-    actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10 },
+    actions: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 10 },
+    // Stacked, main action on top (it is the last button in the row).
+    actionsNarrow: { flexDirection: 'column-reverse', alignItems: 'stretch' },
     summary: { gap: 10 },
     summaryTitle: { fontSize: 21, fontWeight: '800', color: colors.text },
     revisit: { backgroundColor: colors.primarySubtle, borderRadius: 14, padding: 14 },

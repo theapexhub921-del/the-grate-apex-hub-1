@@ -28,7 +28,7 @@ export function WeeklyChallengeCard() {
   return (
     <Card style={styles.card}>
       <View style={styles.headingRow}>
-        <SectionHeader title="Weekly challenge" subtitle={`Complete ${FREEZE_LESSONS} lessons this week (Monday to Sunday) to earn a streak freeze.`} style={styles.noMargin} />
+        <SectionHeader title="Weekly challenge" subtitle={`Complete ${FREEZE_LESSONS} lessons this week (Monday to Sunday) to earn a streak freeze.`} style={[styles.noMargin, styles.headingText]} />
         <Pill label={`${done}/${FREEZE_LESSONS}`} tone={complete ? 'success' : 'neutral'} />
       </View>
       <View style={styles.track}><View style={[styles.trackFill, { width: `${Math.round((done / FREEZE_LESSONS) * 100)}%` }]} /></View>
@@ -63,7 +63,7 @@ export function WeeklyLeagueCard() {
   return (
     <Card style={styles.card}>
       <View style={styles.headingRow}>
-        <SectionHeader title="League" subtitle={me ? `${me.rank_name} · total XP` : 'Learners of your rank · total XP'} style={styles.noMargin} />
+        <SectionHeader title="League" subtitle={me ? `${me.rank_name} · total XP` : 'Learners of your rank · total XP'} style={[styles.noMargin, styles.headingText]} />
         {me ? <Pill label={`#${me.league_position} of ${me.league_size}`} tone="gold" /> : null}
       </View>
       {loading ? <Text style={styles.muted}>Loading the standings…</Text> : null}
@@ -139,7 +139,7 @@ export function FriendBattlesCard({ friends }: { friends: readonly SocialPerson[
   const currentUserId = social.userId;
   return (
     <Card style={styles.card}>
-      <View style={styles.headingRow}><SectionHeader title="Friend battles" subtitle="Earn the most verified learning XP in a seven-day round." style={styles.noMargin} /><Button label="Refresh" variant="ghost" size="sm" onPress={() => void refresh()} /></View>
+      <View style={styles.headingRow}><SectionHeader title="Friend battles" subtitle="Earn the most verified learning XP in a seven-day round." style={[styles.noMargin, styles.headingText]} /><Button label="Refresh" variant="ghost" size="sm" onPress={() => void refresh()} /></View>
       {friends.length ? <>
         <Text style={styles.fieldLabel}>Challenge a friend</Text>
         <View style={styles.chips}>
@@ -183,6 +183,8 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     card: { gap: 12 }, noMargin: { marginTop: 0 },
     headingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+    // The title takes the room left beside the pill, so long text wraps inside the card.
+    headingText: { flex: 1, minWidth: 0 },
     muted: { ...Type.caption, color: colors.textTertiary }, success: { ...Type.caption, fontWeight: '800', color: colors.successText }, error: { ...Type.caption, color: colors.warningText },
     fieldLabel: { ...Type.caption, color: colors.textSecondary, fontWeight: '800' },
     track: { height: 8, overflow: 'hidden', borderRadius: 8, backgroundColor: colors.track },
