@@ -19,11 +19,22 @@ import { getFeaturedItem } from '@/data/explore';
 import { APEX } from '@/data/learning/apex';
 import { XP_RULES } from '@/data/learning/xp-rules';
 import type { Answer } from '@/data/questions';
-import { APPEARANCE_OPTIONS, setAppearancePreference, setPushNotificationsPreference, useAppearancePreference } from '@/data/settings';
+import {
+  type AppearancePreference,
+  chooseLegacyTheme,
+  chooseNewerTheme,
+  setPushNotificationsPreference,
+  useAppearancePreference,
+  useLegacyThemePreference,
+} from '@/data/settings';
+import { THEME_CATALOG } from '@/data/theme-catalog';
 import { setUsername, useSocial } from '@/data/social';
 import { subjects } from '@/data/subjects';
 import { setDisplayName, useDisplayName } from '@/data/user';
-import { useTheme, useThemedStyles } from '@/hooks/use-theme';
+import { useTheme, useThemedStyles, useThemeFamily } from '@/hooks/use-theme';
+
+// The free themes a new learner can pick in the tour (the rest unlock with XP).
+const STARTER_THEMES = THEME_CATALOG.filter((theme) => theme.level <= 1 && !theme.ach && !theme.adminOnly);
 import { enableDeviceNotifications } from '@/lib/device-notifications';
 import { friendlyError } from '@/lib/errors';
 
@@ -587,6 +598,8 @@ export function PersonaliseDemo({ onDone }: DemoProps) {
   const styles = useThemedStyles(createStyles);
   const savedName = useDisplayName();
   const appearance = useAppearancePreference();
+  const legacyTheme = useLegacyThemePreference();
+  const family = useThemeFamily();
   const [name, setName] = useState(savedName ?? '');
   const [saved, setSaved] = useState(false);
 
@@ -621,21 +634,25 @@ export function PersonaliseDemo({ onDone }: DemoProps) {
 
       <Text style={[styles.levelLabel, styles.spaced]}>THEME</Text>
       <View style={styles.themeRow}>
-        {APPEARANCE_OPTIONS.map((theme) => (
-          <Interactive
-            key={theme.value}
-            onPress={() => {
-              setAppearancePreference(theme.value);
-              onDone();
-            }}
-            accessibilityRole="radio"
-            accessibilityState={{ checked: appearance === theme.value }}
-            accessibilityLabel={`${theme.label} theme`}
-            style={[styles.themeChip, appearance === theme.value && styles.themeChipSelected]}
-          >
-            <Text style={[styles.themeText, appearance === theme.value && styles.themeTextSelected]}>{theme.label}</Text>
-          </Interactive>
-        ))}
+        {STARTER_THEMES.map((theme) => {
+          const selected = theme.family === family && theme.id === (family === 'legacy' ? legacyTheme : appearance);
+          return (
+            <Interactive
+              key={theme.key}
+              onPress={() => {
+                // Picks the theme's family too, so the choice is what's drawn.
+                void (theme.family === 'legacy' ? chooseLegacyTheme(theme.id) : chooseNewerTheme(theme.id as AppearancePreference));
+                onDone();
+              }}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: selected }}
+              accessibilityLabel={`${theme.name} theme`}
+              style={[styles.themeChip, selected && styles.themeChipSelected]}
+            >
+              <Text style={[styles.themeText, selected && styles.themeTextSelected]}>{theme.name}</Text>
+            </Interactive>
+          );
+        })}
       </View>
       <Text style={styles.muted}>Change any of these later in You and Settings. You can also upload your own photo there.</Text>
     </SimFrame>

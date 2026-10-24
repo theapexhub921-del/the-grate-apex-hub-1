@@ -197,9 +197,11 @@ async function loadSettings() {
       streakReminderHour: Number.isInteger(data?.streakReminderHour) && data.streakReminderHour >= 0 && data.streakReminderHour <= 23 ? data.streakReminderHour : null,
       legacyTheme: isLegacyThemeId(data?.legacyTheme) ? data.legacyTheme : defaultSettings.legacyTheme,
       // (Before 2026-10-10 only Hybrid had a family: 'originals' meant legacy.)
-      // A brand-new install starts on Apex Legacy, one of the four free themes;
-      // an existing device keeps the theme it already uses.
-      themeFamily: isThemeFamily(data?.themeFamily) ? data.themeFamily : data?.hybridThemeFamily === 'originals' ? 'legacy' : saved ? null : 'legacy',
+      // A brand-new install follows the device (System, owner 2026-10-24: new
+      // learners shouldn't start on the blue theme); an existing device keeps the
+      // theme it already uses, and a signed-in learner's own choice arrives from
+      // their account (applyAccountLook).
+      themeFamily: isThemeFamily(data?.themeFamily) ? data.themeFamily : data?.hybridThemeFamily === 'originals' ? 'legacy' : saved ? null : 'newer',
     };
 
     notify();
