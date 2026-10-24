@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Image, StyleSheet, type StyleProp, type TextStyle, View, type ViewStyle } from 'react-native';
 import { Text, TextInput } from '@/components/ui/text';
 
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Interactive } from '@/components/ui/interactive';
 import { Sheet } from '@/components/ui/sheet';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { claimIncomingCoins, readApexCoinBalance, sendApexCoins } from '@/data/apex-coins';
+import { claimIncomingCoins, coinsOf, sendApexCoins } from '@/data/apex-coins';
 import { personName, type SocialPerson, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -27,7 +27,8 @@ export function ApexCoinWalletCard({
   const colors = useTheme();
   const { user } = useAuth();
   const social = useSocial();
-  const [balance, setBalance] = useState<number | null>(null);
+  // Live from the account (hooks/use-auth): no reads, and a gift or reward shows at once.
+  const balance = user?.profileLoaded ? coinsOf(user.profile) : null;
   const [open, setOpen] = useState(false);
   const [boostOpen, setBoostOpen] = useState(false);
   const [recipient, setRecipient] = useState<SocialPerson | null>(null);
@@ -35,20 +36,17 @@ export function ApexCoinWalletCard({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
-    if (!user) { setBalance(null); return; }
-    try {
-      const received = await claimIncomingCoins();
-      if (received > 0) setMessage(`You received ${received.toLocaleString()} Apex Coins from friends.`);
-      setBalance(await readApexCoinBalance());
-    } catch { /* Keep the last known balance while offline. */ }
-  }, [user]);
-
+  // Gifts waiting for this learner are collected when the card opens (and app-wide
+  // by CoinGiftSync); the balance then updates by itself.
+  const uid = user?.uid ?? null;
   useEffect(() => {
-    queueMicrotask(() => { void refresh(); });
-    const timer = setInterval(() => void refresh(), 60_000);
-    return () => clearInterval(timer);
-  }, [refresh]);
+    if (!uid) return;
+    let live = true;
+    void claimIncomingCoins().then((received) => {
+      if (live && received > 0) setMessage(`You received ${received.toLocaleString()} Apex Coins from friends.`);
+    });
+    return () => { live = false; };
+  }, [uid]);
 
   async function gift() {
     if (!recipient) { setMessage('Choose a friend to receive your coins.'); return; }
@@ -57,7 +55,7 @@ export function ApexCoinWalletCard({
     setBusy(true);
     setMessage(null);
     try {
-      setBalance(await sendApexCoins(recipient.userId, value));
+      await sendApexCoins(recipient.userId, value);
       setMessage(`${value} Apex Coins sent to ${personName(recipient)}.`);
       setRecipient(null);
       setAmount('');

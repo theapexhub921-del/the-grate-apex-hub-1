@@ -125,8 +125,60 @@ async function tierRows(week: string, tier: number, me: string, finished = false
 
 export type LeagueView = { week: string; tier: number; endsAt: number; rows: LeagueRow[]; prev: LeagueEntry['prev'] | null };
 
-/** This week's league for the signed-in learner (joins Bronze, or settles last week first). */
-export async function loadLeague(): Promise<LeagueView> {
+// A league load reads everyone in the tier (and their XP), hundreds of reads on
+// Firebase's free plan: one result is shared by every screen for a while.
+const LEAGUE_REUSE_MS = 10 * 60_000;
+let lastLeague: { uid: string; week: string; at: number; view: Promise<LeagueView> } | null = null;
+
+/**
+ * This week's league for the signed-in learner (joins Bronze, or settles last week
+ * first). A result from the last few minutes is reused unless `fresh` is asked for.
+ */
+export async function loadLeague(options: { fresh?: boolean } = {}): Promise<LeagueView> {
+  await auth.authStateReady();
+  const uid = auth.currentUser?.uid ?? '';
+  const week = weekKey();
+  if (!options.fresh && lastLeague && lastLeague.uid === uid && lastLeague.week === week && Date.now() - lastLeague.at < LEAGUE_REUSE_MS) {
+    return lastLeague.view;
+  }
+  const view = readLeague();
+  lastLeague = { uid, week, at: Date.now(), view };
+  view.catch(() => { if (lastLeague?.view === view) lastLeague = null; });
+  return view;
+}
+
+/**
+ * The league as saved on the learner's own document (already watched live, so free
+ * to read): `settled` when this week has been joined and last week settled; only
+ * then can its promotion be shown without a league load.
+ */
+export function savedLeague(value: unknown, week = weekKey()): { settled: boolean; tier: number; prev: LeagueEntry['prev'] | null } {
+  const entry = value && typeof value === 'object' ? (value as LeagueEntry) : null;
+  if (!entry || entry.week !== week || typeof entry.tier !== 'number') return { settled: false, tier: 0, prev: null };
+  const recheck = Boolean(entry.prev && !entry.prev.rechecked && entry.prev.outcome !== 'promoted');
+  return { settled: !recheck, tier: entry.tier, prev: entry.prev && entry.prev.week !== week ? entry.prev : null };
+}
+
+/**
+ * Keeps this week's XP on the learner's own league entry up to date (others'
+ * league tables read it), with no reads: the entry comes from the live account
+ * and the XP from this device's XP history. Same figures as readLeague writes.
+ */
+export async function saveWeeklyLeagueXp(value: unknown) {
+  const uid = auth.currentUser?.uid;
+  const saved = savedLeague(value);
+  if (!uid || !saved.settled) return;
+  await waitForProgressSync().catch(() => {});
+  const progress = getProgressSnapshot();
+  const monday = new Date(); monday.setHours(0, 0, 0, 0); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  const weeklyXp = progress.xpLedger.filter((item) => item.at >= monday.getTime()).reduce((sum, item) => sum + Math.max(0, item.amount), 0);
+  const startXp = Math.max(0, progress.xp - weeklyXp);
+  const entry = value as LeagueEntry;
+  if (progress.xp <= 0 || (entry.weeklyXp === weeklyXp && entry.startXp === startXp)) return;
+  await setDoc(doc(db, 'users', uid), { league: { ...entry, startXp, weeklyXp } }, { merge: true }).catch(() => {});
+}
+
+async function readLeague(): Promise<LeagueView> {
   await auth.authStateReady();
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error('Sign in to see your league.');

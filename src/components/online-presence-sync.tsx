@@ -5,6 +5,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { usePrivacyPreferences } from '@/data/settings';
 import { useAuth } from '@/hooks/use-auth';
 import { db } from '@/lib/firebase';
+import { PRESENCE_EVERY_MS } from '@/lib/presence';
 
 /**
  * Keeps presence fresh while the app is open, and clears it when it backgrounds:
@@ -34,7 +35,10 @@ export function OnlinePresenceSync() {
       } catch {}
     };
     void update();
-    const timer = setInterval(() => { if (foreground) void update(); }, 45_000);
+    // Every 3 minutes (was 45 s): each write is also a read for everyone watching this
+    // profile (own app, open chats, battles), and Firebase's free plan has 50,000 a day.
+    // Opening or leaving the app still writes at once.
+    const timer = setInterval(() => { if (foreground) void update(); }, PRESENCE_EVERY_MS);
     const appState = AppState.addEventListener('change', (state) => {
       foreground = state === 'active';
       void update();

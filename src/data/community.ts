@@ -24,6 +24,7 @@ import {
 
 import { auth, db } from '@/lib/firebase';
 import { cleanMedia, optimized, safeUrl, uploadMedia, uploadVoiceNote } from '@/lib/media';
+import { ONLINE_WITHIN_MS } from '@/lib/presence';
 import { announceInteraction } from '@/lib/web-push';
 
 export type CommunityMedia = {
@@ -1065,7 +1066,7 @@ function conversationMetaOf(otherId: string | null, chat: DocumentData, other: D
     otherSeenAt: mine.readReceipts && theirReceipts && otherId ? millisOf((chat.seen ?? {})[otherId]) : null,
     otherActiveAt: typeof other.appActiveAt === 'number' ? other.appActiveAt : null,
     // Online and last seen are shown only to learners who share their own.
-    otherOnline: mine.shareOnlineStatus && other.isOnline === true && lastSeen !== null && Date.now() - lastSeen < 2 * 60_000,
+    otherOnline: mine.shareOnlineStatus && other.isOnline === true && lastSeen !== null && Date.now() - lastSeen < ONLINE_WITHIN_MS,
     otherLastSeen: mine.shareOnlineStatus ? lastSeen : null,
     otherTyping: otherId ? millisOf((chat.typing ?? {})[otherId]) : null,
   };

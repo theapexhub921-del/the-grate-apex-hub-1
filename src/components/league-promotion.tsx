@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet } from '@/components/ui/sheet';
 import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { LEAGUE_TIERS, loadLeague, type LeagueView } from '@/data/leagues';
+import { LEAGUE_TIERS, loadLeague, type LeagueView, savedLeague, saveWeeklyLeagueXp, weekKey } from '@/data/leagues';
 import { markNotificationsRead, type AppNotification } from '@/data/notifications';
 import { useAuth } from '@/hooks/use-auth';
 import { useThemedStyles } from '@/hooks/use-theme';
@@ -20,7 +20,7 @@ import { useThemedStyles } from '@/hooks/use-theme';
 //    already came in by tapping that notification.
 
 const KEY = 'grateapex_league_congrats'; // the last promotion week congratulated
-const CHECK_EVERY_MS = 30 * 60_000;
+const WEEK_CHECK_MS = 30 * 60_000; // notices a new week while the app stays open (no reads)
 
 let items: AppNotification[] = [];
 const listeners = new Set<() => void>();
@@ -32,7 +32,7 @@ export function usePromotionNotifications() {
 
 type Promotion = { week: string; id: string; tier: number; prevTier: number; position: number; size: number; weeklyXp: number };
 
-function promotionOf(view: LeagueView): Promotion | null {
+function promotionOf(view: Pick<LeagueView, 'tier' | 'prev'>): Promotion | null {
   if (!view.prev || view.prev.outcome !== 'promoted') return null;
   return { week: view.prev.week, id: `league:${view.prev.week}`, tier: view.tier, prevTier: view.prev.tier, position: view.prev.position, size: view.prev.size, weeklyXp: view.prev.weeklyXp };
 }
@@ -46,16 +46,33 @@ export function LeaguePromotionWatcher() {
   const { user } = useAuth();
   const [card, setCard] = useState<Promotion | null>(null);
 
+  // The league entry on the learner's own document is watched live (hooks/use-auth),
+  // so a promotion already settled costs no reads. Only joining the week or settling
+  // the one that ended needs the league itself (loadLeague: the whole tier, hundreds
+  // of reads), about once a week. Before, that ran on every app open and every
+  // return to the app, which used up Firebase's free daily reads.
+  const uid = user?.uid ?? null;
+  const profileLoaded = user?.profileLoaded ?? false;
+  const league = user?.profile?.league;
+  const leagueKey = JSON.stringify(league ?? null);
+  const [week, setWeek] = useState(weekKey);
   useEffect(() => {
-    if (!user) {
+    const timer = setInterval(() => setWeek(weekKey()), WEEK_CHECK_MS);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!uid) {
       setItems([]);
       return;
     }
+    if (!profileLoaded) return;
     let live = true;
     const check = async () => {
-      if (typeof document !== 'undefined' && document.visibilityState !== 'visible' && items.length) return;
       try {
-        const promotion = promotionOf(await loadLeague());
+        const saved = savedLeague(league, week);
+        const promotion = promotionOf(saved.settled ? saved : await loadLeague());
+        if (saved.settled) void saveWeeklyLeagueXp(league);
         if (!live || !promotion) return;
         const tier = LEAGUE_TIERS[promotion.tier];
         setItems([{
@@ -81,16 +98,12 @@ export function LeaguePromotionWatcher() {
       }
     };
     const first = setTimeout(() => void check(), 4000);
-    const timer = setInterval(() => void check(), CHECK_EVERY_MS);
-    const onVisible = () => { if (document.visibilityState === 'visible') void check(); };
-    if (typeof document !== 'undefined') document.addEventListener('visibilitychange', onVisible);
     return () => {
       live = false;
       clearTimeout(first);
-      clearInterval(timer);
-      if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', onVisible);
     };
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `league` is followed through leagueKey
+  }, [uid, profileLoaded, leagueKey, week]);
 
   function close(go?: boolean) {
     if (!card) return;

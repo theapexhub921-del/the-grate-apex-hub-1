@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (!snap.metadata.fromCache && !snap.metadata.hasPendingWrites) fromServer = true;
           const profile = snap.data() || {};
           attempt = 0;
-          // Presence alone changed (written every 45 s while the app is open):
+          // Presence alone changed (written every few minutes while the app is open):
           // keep the same learner, so the whole app doesn't redraw and reload.
           // (Never skip the copy that first makes the profile count as loaded.)
           if (lastProfile && lastLoaded === fromServer && samePresenceAside(lastProfile, profile)) return;

@@ -37,6 +37,37 @@ test('the bell and the chats list are live, not polled from Firebase', () => {
   assert.match(read('src/data/community.ts'), /function myChatDocs[\s\S]*?onSnapshot\(/);
 });
 
+// 2026-10-24: the free daily reads ran out by mid-afternoon. The league load (the
+// whole tier and everyone's XP) ran on every app open and every return to the app.
+test('the league is loaded rarely: promotions come from the live account', () => {
+  const watcher = read('src/components/league-promotion.tsx');
+  assert.match(watcher, /savedLeague\(/);
+  assert.doesNotMatch(watcher, /visibilitychange/, 'returning to the app must not load the league');
+  assert.match(read('src/data/leagues.ts'), /LEAGUE_REUSE_MS/);
+});
+
+test('presence is written every few minutes, not every 45 seconds', () => {
+  const presence = read('src/lib/presence.ts');
+  const every = Number(/PRESENCE_EVERY_MS = (\d+) \* 60_000/.exec(presence)?.[1]);
+  const online = Number(/ONLINE_WITHIN_MS = (\d+) \* 60_000/.exec(presence)?.[1]);
+  assert.ok(every >= 3, 'presence at most every 3 minutes');
+  assert.ok(online > every, 'someone still counts as online between two writes');
+  assert.match(read('src/components/online-presence-sync.tsx'), /PRESENCE_EVERY_MS/);
+});
+
+test('the coin balance and read marks are not re-read on a timer', () => {
+  for (const file of ['src/components/apex-coin-button.tsx', 'src/components/apex-coin-wallet-card.tsx']) {
+    assert.doesNotMatch(read(file), /setInterval\(/, `${file} must not poll`);
+    assert.doesNotMatch(read(file), /readApexCoinBalance\(/, `${file} reads the live account`);
+  }
+  assert.doesNotMatch(read('src/data/notifications.ts'), /setInterval\(\(\) => void refresh\(\), REMOTE_EVERY_MS\)/);
+});
+
+test('battles follow opponents only while they are on screen', () => {
+  assert.match(read('src/components/social/battles-card.tsx'), /useFocusEffect\(useCallback\(\(\) => \{[\s\S]*?watchBattles\(/);
+  assert.match(read('src/app/social/battle.tsx'), /useFocusEffect\(useCallback\(\(\) => \{[\s\S]*?watchBattles\(/);
+});
+
 test('a presence-only change keeps the same account', () => {
   const before = { username: 'ama', xp: 10, isOnline: true, lastSeen: 1, appActiveAt: 1 };
   assert.equal(samePresenceAside(before, { ...before, lastSeen: 2, appActiveAt: 2, isOnline: false }), true);

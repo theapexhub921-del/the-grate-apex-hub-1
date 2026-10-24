@@ -1,5 +1,5 @@
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { BackLink } from '@/components/learning/nav-bits';
@@ -92,12 +92,19 @@ export default function BattleScreen() {
         setQuestions(await battleQuestions(found));
       })
       .catch((problem) => { if (live) setError(friendlyError(problem, 'The battle could not be loaded.')); });
+    return () => { live = false; };
+  }, [id, uid]);
+
+  // Follows the opponent live only while this page is on screen (it stays open in the background once visited).
+  useFocusEffect(useCallback(() => {
+    if (!id || !uid) return;
+    let live = true;
     const stop = watchBattles(uid, (battles) => {
       const found = battles.find((battle) => battle.id === id);
       if (found && live) setBattle(found);
     }, (problem) => { if (live) setError(friendlyError(problem, 'The battle could not be loaded.')); });
     return () => { live = false; stop(); };
-  }, [id, uid]);
+  }, [id, uid]));
 
   useEffect(() => {
     if (!battle || !uid || battleStatus(battle, uid) !== 'won') return;

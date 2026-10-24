@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/avatar';
@@ -51,7 +51,9 @@ export function BattlesCard() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  // Live only while Connect is on screen: the listeners follow every opponent's
+  // profile, and Connect stays open in the background once visited.
+  useFocusEffect(useCallback(() => {
     if (!uid) {
       setBattles([]);
       return;
@@ -60,7 +62,7 @@ export function BattlesCard() {
       setBattles(next);
       setError(null);
     }, (problem) => setError(friendlyError(problem, 'Battles could not be loaded.')));
-  }, [uid]);
+  }, [uid]));
 
   // Debounced search for learners across the app when searching for battle opponents
   useEffect(() => {

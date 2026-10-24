@@ -233,11 +233,11 @@ export function useReadNotifications(): ReadonlySet<string> {
     (listener) => {
       listeners.add(listener);
       void refresh();
-      const timer = setInterval(() => void refresh(), REMOTE_EVERY_MS);
+      // No timer (it read the account every 2 minutes per open screen): marks from other
+      // devices arrive at sign-in and whenever the app comes back to the front (above).
       const unsubscribe = auth.onAuthStateChanged(() => void refresh());
       return () => {
         listeners.delete(listener);
-        clearInterval(timer);
         unsubscribe();
       };
     },

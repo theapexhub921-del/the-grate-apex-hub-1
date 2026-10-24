@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 import { Interactive } from '@/components/ui/interactive';
 import { Sheet } from '@/components/ui/sheet';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { readApexCoinBalance } from '@/data/apex-coins';
+import { coinsOf } from '@/data/apex-coins';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -15,23 +15,14 @@ export function ApexCoinButton() {
   const colors = useTheme();
   const { user } = useAuth();
   const [visible, setVisible] = useState(false);
-  const [balance, setBalance] = useState<number | null>(null);
-
-  const refresh = useCallback(async () => {
-    if (!user) { setBalance(null); return; }
-    try { setBalance(await readApexCoinBalance()); } catch { setBalance(null); }
-  }, [user]);
-
-  useEffect(() => {
-    queueMicrotask(() => { void refresh(); });
-    const timer = setInterval(() => void refresh(), 60_000);
-    return () => clearInterval(timer);
-  }, [refresh]);
+  // The account is watched live (hooks/use-auth), so the balance is always current
+  // and costs no reads (it was re-read every minute).
+  const balance = user?.profileLoaded ? coinsOf(user.profile) : null;
 
   if (!user) return null;
   return (
     <>
-      <Interactive onPress={() => { void refresh(); setVisible(true); }} accessibilityLabel="Apex Coins" accessibilityHint="Shows your coin balance and how to earn coins" style={styles.button}>
+      <Interactive onPress={() => setVisible(true)} accessibilityLabel="Apex Coins" accessibilityHint="Shows your coin balance and how to earn coins" style={styles.button}>
         <View style={styles.coin}>
           <Image source={require('@/assets/images/grateapex-mark-letters.png')} style={styles.logoLayer} tintColor="#0A1F5C" resizeMode="contain" />
           <Image source={require('@/assets/images/grateapex-mark-gold.png')} style={styles.logoLayer} resizeMode="contain" />

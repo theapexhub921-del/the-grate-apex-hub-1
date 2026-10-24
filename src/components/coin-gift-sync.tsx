@@ -16,7 +16,9 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 // Collects gifts from friends — Apex Coins (data/apex-coins.ts) and XP boosts
 // (data/boost-gifts.ts) — on sign-in and then every few minutes, and says
 // what arrived and from whom.
-const EVERY_MS = 3 * 60_000;
+// Every 15 minutes, and whenever the app comes back to the front (each check is two
+// queries, so it is kept rare on Firebase's free plan; gifts are not urgent).
+const EVERY_MS = 15 * 60_000;
 
 type Arrival = { key: string; from: string; what: string; kind: 'coins' | 'boost' };
 
@@ -46,9 +48,17 @@ export function CoinGiftSync() {
     }
     void collect();
     const timer = setInterval(() => void collect(), EVERY_MS);
+    let lastAt = Date.now();
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible' || Date.now() - lastAt < 2 * 60_000) return;
+      lastAt = Date.now();
+      void collect();
+    };
+    if (typeof document !== 'undefined') document.addEventListener('visibilitychange', onVisible);
     return () => {
       live = false;
       clearInterval(timer);
+      if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', onVisible);
     };
   }, [uid]);
 
