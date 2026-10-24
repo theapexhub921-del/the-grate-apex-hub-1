@@ -132,6 +132,8 @@ Social (real friends) is in `src/data/social.ts`, backed by Firestore:
 
 **Firebase reads (free plan, owner 2026-10-18):** the project is on Firebase's free Spark plan (50,000 document reads a day for everyone). Never poll Firestore with `getDocs` on a timer: use `onSnapshot` listeners, which are charged only for changed documents. Open chats (`watchConversationMessages`, `watchConversationMeta`, `watchGroupMessages`, `watchGroup`), the chats list (`myChatDocs` in `community.ts`, shared by the chats list, the bell and the recent-messages card), the groups list (`listMyGroups`) and the bell's account notifications are all live. The friend streak reads only messages newer than the last load. `tests/firebase-reads.test.mjs` checks this, and that every collection the app uses has a rule.
 
+**Quota ran out on 2026-10-24** ("429 Quota exceeded" by mid-afternoon). Fixed by: the league promotion watcher reads `league` from the live account and only calls `loadLeague` to join or settle a week (`savedLeague`, `saveWeeklyLeagueXp`); a loaded league is reused for 10 minutes; presence is written every 3 minutes (`PRESENCE_EVERY_MS`, online for `ONLINE_WITHIN_MS` = 5 minutes, `src/lib/presence.ts`); battles are watched only while on screen (`useFocusEffect`); the coin balance comes from the live account (`coinsOf`), not a timer. Keep these; `tests/firebase-reads.test.mjs` checks them.
+
 "Stamp a friend" (renamed from "Stump a friend" on screen, owner 2026-10-20; the code, files and database names keep "stump" so existing posts and answers keep working — only text learners see says "Stamp") (`src/data/stumps.ts`, `src/components/social/stump-card.tsx`): a multiple-choice question sent from quiz results or from the stump button in any chat (`pickStumpQuestion` picks only questions the learner has answered, owner 2026-10-18). The composer sends it to any mix of the feed, friends (each in the private chat) and groups (`sendStump`). Answers are saved to question history as practice, no XP. Only the sender sees who got it right or wrong; others see only their own result, and the database enforces it (owner: answers must be private).
 
 * **Feed:** a post with `stump: { qid, note }`; answers are private documents `posts/{id}/stumpAnswers/{uid}` (readable by the answerer and the post's author). Older answers were public `replies` with `stump: { pick, ok }` and are still read.
@@ -199,6 +201,17 @@ The interactive layer has a fourth step type, `simulate` (`SimulationStep` in `s
 * **Simulations tab** (owner's request, 2026-10-18): Physiology has its own Simulations tab, like Anatomy's Atlas — on the HB2 Physiology course page (`hb-course.tsx`, `&tab=simulations`) and the Physiology subject page (`SubjectScreen` prop `simulations`). It lists every lesson simulation by topic (`src/components/learning/simulation-library.tsx`, `src/data/simulation-library.ts`); each opens on its own page, `/learn/simulation?lesson=<lesson id>` (`routes.simulation`), as practice (predictions there are not recorded).
 * **Checks**: `tests/simulations.test.mjs` — every prediction's marked answer must match what the model shows, every scenario stays in range, and every challenge is unsolved at its start and solvable with its unlocked controls.
 * Adding a simulation: write the model, its drawing, register both, then add a `simulate()` step with predictions to the topic. Bump the topic's `contentVersion` when steps are added, so half-finished lesson sessions restart cleanly.
+
+## Study from the basics up (owner, 2026-10-24)
+
+* Every step-by-step lesson opens with **Start simple** (`StartSimple` in `interactive-layer.tsx`): the big idea (`description`), the lesson's own key words (`terms`, at most six) and `objectives`. It is a card above step 1, not a step, so sessions in progress keep their place. `tests/start-simple.test.mjs`.
+* **Explain it more simply** (`ExplainSimplyButton` in `ai-study.tsx`) under every learn step and every answered checkpoint: Ask AI with `autoAsk` asks for a from-zero explanation.
+* HB2 lesson pages recommend the step-by-step version first ("New to this? Start here"); the reading is the notes to revise from.
+* **Lesson order follows the lecture decks** (`tests/lesson-order.test.mjs` for numbered decks). Reorder by changing the `lessons` array only; lesson ids never change, so progress is kept.
+
+## Laptop scrolling (2026-10-24)
+
+`src/lib/web-scrolling.ts` (web only, started in `_layout.tsx`): page content ignores the mouse while scrolling (hover redraws caused 200–790 ms freezes), keyboard keys scroll the page without clicking first, and wide windows show a thin scrollbar (`Screen` passes `showsVerticalScrollIndicator` on desktop).
 
 ## Ask AI and AI Flashcards (every lesson)
 
