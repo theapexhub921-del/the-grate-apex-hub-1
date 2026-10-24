@@ -37,6 +37,23 @@ export const MOBILE_NAV_ITEMS: readonly NavItem[] = [
   NAV_ITEMS[4], // You
 ];
 
+// A new learner's first-run steps (interface, username, suggested accounts,
+// class): no navigation around them, so it can't cover their buttons or lead
+// away half-way through.
+const SETUP_ROUTES = ['choose-experience', 'choose-username', 'suggested', 'class-selection'];
+// Answer-heavy sessions on phones: the bar would sit over the options. Each has
+// its own Back / "Save & exit".
+const SESSION_ROUTES = ['learn/quiz', 'learn/review', 'learn/apex', 'learn/hb-practice'];
+
+export function isSetupRoute(segments: readonly string[]): boolean {
+  return SETUP_ROUTES.includes(segments[0] as string);
+}
+
+/** True where the phone / narrow-window bottom bar is left out. */
+export function hidesBottomBar(segments: readonly string[]): boolean {
+  return isSetupRoute(segments) || SESSION_ROUTES.includes(segments.join('/'));
+}
+
 // Which destination owns a path: '/learn/lesson' belongs to Study,
 // '/social/friends' to Connect. Settings and Progress belong to none.
 export function activeNavPath(pathname: string): string | null {

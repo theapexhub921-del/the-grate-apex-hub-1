@@ -9,7 +9,7 @@ import { useAtmosphereMood } from '@/components/atmosphere/config';
 import { LegacyBackground } from '@/components/experience/legacy-background';
 import { LegacyFloatingBar } from '@/components/experience/legacy-navigation';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
-import { NAV_ITEMS } from '@/components/nav-items';
+import { hidesBottomBar, NAV_ITEMS } from '@/components/nav-items';
 import { MOTION } from '@/constants/motion';
 import { useExperience } from '@/hooks/use-experience';
 
@@ -34,6 +34,7 @@ export default function AppTabs() {
   // signed-out users on /login; this simply hides the shell around it.
   const isAuthRoute = ['login', 'onboarding', 'privacy', 'terms'].includes(segments[0] as string);
   const isWidgetRoute = segments[0] === 'widget';
+  const noBottomBar = hidesBottomBar(segments);
 
   return (
     <View style={styles.shell}>
@@ -43,7 +44,7 @@ export default function AppTabs() {
         // Back (incl. Android back button) returns to the page you came from.
         backBehavior="history"
         tabBar={({ navigation }) =>
-          isAuthRoute || isWidgetRoute ? null : experience === 'originals' ? (
+          isAuthRoute || isWidgetRoute || noBottomBar ? null : experience === 'originals' ? (
             <LegacyFloatingBar onNavigate={(route) => navigation.navigate(route as never)} />
           ) : (
             <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />

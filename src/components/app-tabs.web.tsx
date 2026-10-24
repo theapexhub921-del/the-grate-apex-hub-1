@@ -10,7 +10,7 @@ import { COLLAPSED_WIDTH, DesktopSidebar } from '@/components/desktop-sidebar';
 import { LegacyBackground } from '@/components/experience/legacy-background';
 import { LEGACY_DESKTOP_MIN, LegacyFloatingBar, LegacySidebar, useOriginalAutoHide } from '@/components/experience/legacy-navigation';
 import { FloatingTabBar } from '@/components/floating-tab-bar';
-import { NAV_ITEMS } from '@/components/nav-items';
+import { hidesBottomBar, isSetupRoute, NAV_ITEMS } from '@/components/nav-items';
 import { PageTitle } from '@/components/page-title';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
@@ -52,7 +52,10 @@ export default function AppTabs() {
   const isWidgetRoute = segments[0] === 'widget';
   // The Originals keeps the original app's desktop width for its sidebar.
   const isDesktop = width >= (originals ? LEGACY_DESKTOP_MIN : DESKTOP_BREAKPOINT);
-  const useRail = !isAuthRoute && !isWidgetRoute && isDesktop;
+  // First-run setup pages show no navigation at all; quizzes keep the desktop rail
+  // (it sits beside the page) but drop the bottom bar that would cover the answers.
+  const useRail = !isAuthRoute && !isWidgetRoute && !isSetupRoute(segments) && isDesktop;
+  const noBottomBar = hidesBottomBar(segments);
   const docked = useRail && mode === 'alwaysVisible' && !originals;
 
   return (
@@ -75,7 +78,7 @@ export default function AppTabs() {
         <Tabs
           backBehavior="history"
           tabBar={({ navigation }) =>
-            useRail || isAuthRoute || isWidgetRoute || inChat || barLocked ? null : originals ? (
+            useRail || isAuthRoute || isWidgetRoute || inChat || barLocked || noBottomBar ? null : originals ? (
               <LegacyFloatingBar onNavigate={(route) => navigation.navigate(route as never)} />
             ) : (
               <FloatingTabBar onNavigate={(route) => navigation.navigate(route as never)} />

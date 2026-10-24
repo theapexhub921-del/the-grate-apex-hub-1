@@ -19,7 +19,8 @@ import { enableDeviceNotifications } from '@/lib/device-notifications';
 
 const KEY = 'grateapex_notification_prompt'; // when "Not now" was last tapped
 const ASK_AGAIN_MS = 7 * 86_400_000;
-const HIDDEN_ON = /^\/(login|onboarding|learn\/(quiz|lesson|hb-lesson|hb-practice|review|apex)|social\/battle)/;
+// Never over the first-run steps (the introduction already asks, and the card covered "Confirm my class").
+const HIDDEN_ON = /^\/(login|onboarding|choose-experience|choose-username|suggested|class-selection|learn\/(quiz|lesson|hb-lesson|hb-practice|review|apex)|social\/battle)/;
 
 const permission = () => (Platform.OS === 'web' && typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : null);
 
