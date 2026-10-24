@@ -56,7 +56,10 @@ export default function AppTabs() {
   // (it sits beside the page) but drop the bottom bar that would cover the answers.
   const useRail = !isAuthRoute && !isWidgetRoute && !isSetupRoute(segments) && isDesktop;
   const noBottomBar = hidesBottomBar(segments);
-  const docked = useRail && mode === 'alwaysVisible' && !originals;
+  // A game fills the page with its own frame, so the pointer never reaches the page's left
+  // edge and an auto-hiding sidebar could never come back: while a game is open it stays docked.
+  const onGame = segments[0] === 'games' && Boolean(segments[1]); // a game, not the Games list
+  const docked = useRail && (mode === 'alwaysVisible' || onGame) && !originals;
 
   return (
     <View style={styles.shell}>

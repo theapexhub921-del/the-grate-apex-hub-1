@@ -53,7 +53,7 @@ export function GamePlayer({ game }: { game: StudyGame }) {
     return (
       <View style={styles.page}>
         <View style={styles.bar}>
-          <BackLink fallback={GAMES_HREF} label="Games" />
+          <BackLink fallback={GAMES_HREF} label="Back to Games" />
           <Text style={styles.barTitle} numberOfLines={1}>{game.title}</Text>
         </View>
         {open ? createElement('iframe', {
@@ -69,7 +69,7 @@ export function GamePlayer({ game }: { game: StudyGame }) {
   // Phones: the game runs in the browser.
   return (
     <Screen width="prose">
-      <BackLink fallback={GAMES_HREF} label="Games" />
+      <BackLink fallback={GAMES_HREF} label="Back to Games" />
       <PageHeader eyebrow="Games" title={game.title} subtitle={game.description} />
       <Button label="Play in your browser" trailing="→" onPress={() => void WebBrowser.openBrowserAsync(`${LIVE_SITE}${src}`)} />
     </Screen>
