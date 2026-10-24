@@ -10,7 +10,7 @@ import { Text } from '@/components/ui/text';
 import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { listMyConversations, type ConversationSummary } from '@/data/community';
-import { personName, useSocial } from '@/data/social';
+import { personName, refreshFriendPresence, useSocial } from '@/data/social';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
 const openChat = (friendId: string, name: string) =>
@@ -38,6 +38,7 @@ export function RecentMessagesCard() {
   useFocusEffect(
     useCallback(() => {
       let live = true;
+      void refreshFriendPresence(); // friends' online dots (at most every 10 minutes)
       const load = () => listMyConversations(6).then((list) => { if (live) setChats(list); }).catch(() => { if (live) setChats([]); });
       void load();
       const timer = setInterval(() => void load(), 20_000);

@@ -14,7 +14,7 @@ import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { listMyConversations, type ConversationSummary } from '@/data/community';
 import { loadFriendStreak } from '@/data/friend-streak-store';
-import { personName, useSocial } from '@/data/social';
+import { personName, refreshFriendPresence, useSocial } from '@/data/social';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -49,6 +49,7 @@ export function ChatList({ activeId, onOpen, onOpenGroup }: { activeId?: string 
 
   useFocusEffect(useCallback(() => {
     let live = true;
+    void refreshFriendPresence(); // friends' online dots (at most every 10 minutes)
     const load = async () => {
       const [list, mine] = await Promise.all([listMyConversations(40).catch(() => [] as ConversationSummary[]), listMyGroups().catch(() => [] as GroupSummary[])]);
       if (!live) return;

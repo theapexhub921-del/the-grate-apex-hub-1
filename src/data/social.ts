@@ -23,6 +23,7 @@ import { rankAndFilterCandidates, tokenizeWords } from '@/data/social-search';
 import type { AppNotification } from '@/data/notifications';
 import { chooseUsername } from '@/lib/accounts';
 import { auth, db } from '@/lib/firebase';
+import { ONLINE_WITHIN_MS } from '@/lib/presence';
 import { announceFollow } from '@/lib/web-push';
 
 export type Relationship = 'none' | 'friends' | 'outgoing' | 'incoming';
@@ -167,6 +168,11 @@ async function readPeople(uids: string[]): Promise<Map<string, PersonData>> {
   return people;
 }
 
+/** Online now: their app said so within the last few minutes (an app closed without saying goodbye drops off). */
+function onlineNow(profile: Record<string, any>): boolean {
+  return profile.isOnline === true && typeof profile.lastSeen === 'number' && Date.now() - profile.lastSeen < ONLINE_WITHIN_MS;
+}
+
 /** A friend's learning streak as it stands today: 0 once they have missed a day no freeze covers. */
 function friendStudyStreak(score: Record<string, any>): number | null {
   if (typeof score.streak !== 'number') return null;
@@ -189,7 +195,7 @@ function toPerson(uid: string, relationship: Relationship, friendshipId: string 
     weeklyXp: null, // not stored by either app
     streak: friendStudyStreak(score),
     since,
-    isOnline: profile.isOnline === true,
+    isOnline: onlineNow(profile),
   };
 }
 
@@ -221,6 +227,7 @@ async function loadSocial(userId: string, attempt = 0): Promise<void> {
       return [toPerson(uid, relationship, friendshipId, since, mine?.username ?? theirs?.username ?? null, details.get(uid))];
     });
 
+    presenceReadAt = Date.now();
     setState({
       status: 'ready',
       error: null,
@@ -249,7 +256,23 @@ export async function refreshSocial() {
   await loadSocial(state.userId);
 }
 
-export async function refreshFriendPresence() {}
+// Friends' online dots: read with the friends list, then again when Connect or the chats
+// open, at most every 10 minutes and for at most 30 friends (free plan: every read counts).
+const PRESENCE_REFRESH_MS = 10 * 60_000;
+let presenceReadAt = 0;
+
+export async function refreshFriendPresence() {
+  const uid = state.userId;
+  if (!uid || state.status !== 'ready' || Date.now() - presenceReadAt < PRESENCE_REFRESH_MS) return;
+  presenceReadAt = Date.now();
+  const friends = state.people.filter((person) => person.relationship === 'friends').slice(0, 30);
+  if (!friends.length) return;
+  const snaps = await Promise.all(friends.map((person) => getDoc(doc(db, 'users', person.userId)).catch(() => null)));
+  if (state.userId !== uid) return;
+  const online = new Map(friends.flatMap((person, i) => (snaps[i]?.exists() ? [[person.userId, onlineNow(snaps[i]!.data())] as const] : [])));
+  if (!online.size) return;
+  setState({ people: state.people.map((person) => (online.has(person.userId) ? { ...person, isOnline: online.get(person.userId)! } : person)) });
+}
 
 function startFor(userId: string | null) {
   if (userId === state.userId) return;

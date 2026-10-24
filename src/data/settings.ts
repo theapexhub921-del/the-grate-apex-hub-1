@@ -62,6 +62,12 @@ type SettingsData = {
   friendRequestPermission: MessagingPermission;
   discoverable: boolean;
   shareOnlineStatus: boolean;
+  /**
+   * Always true from 2026-10-24: marks shareOnlineStatus as chosen under the current rule
+   * (online is shown unless the learner turns it off, as before 2026-10-12). Settings saved
+   * without it were saved when "off" was only the default, so they read as on.
+   */
+  onlineStatusV2: true;
   /** Show and send read receipts (blue ticks) in messages. */
   readReceipts: boolean;
   answerBounceEnabled: boolean;
@@ -95,7 +101,8 @@ const defaultSettings: SettingsData = {
   messagingPermission: 'friends',
   friendRequestPermission: 'everyone',
   discoverable: true,
-  shareOnlineStatus: false,
+  shareOnlineStatus: true, // "who is online" is back (owner, 2026-10-24); Settings → Privacy turns it off
+  onlineStatusV2: true,
   readReceipts: true,
   answerBounceEnabled: true,
   streakReminderHour: null,
@@ -191,7 +198,8 @@ async function loadSettings() {
       messagingPermission: data?.messagingPermission === 'everyone' ? 'everyone' : 'friends',
       friendRequestPermission: data?.friendRequestPermission === 'friends' ? 'friends' : 'everyone',
       discoverable: data?.discoverable !== false,
-      shareOnlineStatus: data?.shareOnlineStatus === true,
+      shareOnlineStatus: data?.onlineStatusV2 === true ? data.shareOnlineStatus !== false : true,
+      onlineStatusV2: true,
       readReceipts: data?.readReceipts !== false,
       answerBounceEnabled: data?.answerBounceEnabled !== false,
       streakReminderHour: Number.isInteger(data?.streakReminderHour) && data.streakReminderHour >= 0 && data.streakReminderHour <= 23 ? data.streakReminderHour : null,
@@ -249,6 +257,7 @@ async function saveSettings() {
               friendRequestPermission: settings.friendRequestPermission,
               discoverable: settings.discoverable,
               shareOnlineStatus: settings.shareOnlineStatus,
+              onlineStatusV2: true,
               readReceipts: settings.readReceipts,
             },
           },
@@ -359,7 +368,7 @@ export async function syncSettingsFromAccount(userId: string) {
             ? 'everyone'
             : settings.friendRequestPermission,
       discoverable: typeof privacy?.discoverable === 'boolean' ? privacy.discoverable : settings.discoverable,
-      shareOnlineStatus: privacy?.shareOnlineStatus === true,
+      shareOnlineStatus: privacy?.onlineStatusV2 === true ? privacy.shareOnlineStatus !== false : true,
       readReceipts: privacy?.readReceipts !== false,
       answerBounceEnabled:
         typeof notifications?.answerBounceEnabled === 'boolean'
