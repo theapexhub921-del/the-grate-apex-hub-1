@@ -23,6 +23,7 @@ import {
   findLesson,
   getCourseTopics,
   getLessonQuestions,
+  getQuestion,
   getQuestionsByIds,
   getSubjectTopics,
   getTopic,
@@ -54,7 +55,26 @@ export type SelectionFilters = {
   usage?: ('quiz' | 'learn')[];
   apexEligible?: boolean;
   learnedOnly?: boolean; // only concepts the learner has met
+  /** Only questions from these lessons (Review: the lessons the learner has studied, studiedLessonIds). */
+  studiedLessons?: ReadonlySet<string>;
 };
+
+/**
+ * The lessons a learner has really studied (owner, 2026-10-24: "review should give
+ * questions on what the person has actually learnt, not new stuff"): every completed
+ * lesson, and every lesson worked through step by step (its checkpoints answered).
+ * A concept met only in an Apex Challenge, the Question of the Day or a quiz taken
+ * without the lesson is not "learned" for Review.
+ */
+export function studiedLessonIds(completedLessons: readonly string[], memory: MemoryModel): Set<string> {
+  const studied = new Set(completedLessons);
+  for (const [questionId, record] of memory.questions) {
+    if (!record.seenIn.some((mode) => mode === 'interactive' || mode === 'interactive-retry')) continue;
+    const lessonId = getQuestion(questionId)?.lessonId;
+    if (lessonId) studied.add(lessonId);
+  }
+  return studied;
+}
 
 export type SelectionStrategy = 'random' | 'weighted' | 'targeted';
 
@@ -189,6 +209,7 @@ function passesFilters(
   if (filters.conceptKeys && (!conceptKey || !filters.conceptKeys.includes(conceptKey))) return false;
   if (filters.apexEligible && !isApexEligible(question)) return false;
   if (filters.learnedOnly && !concept) return false;
+  if (filters.studiedLessons && !filters.studiedLessons.has(question.lessonId ?? '')) return false;
   if (filters.due && !concept?.due) return false;
   if (filters.weak && !(concept && (concept.state === 'struggling' || concept.lastResult === 'incorrect'))) return false;
   if (filters.missed && !(qm && !qm.lastCorrect)) return false;

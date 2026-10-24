@@ -114,6 +114,16 @@ export function buildMemoryModel(input: {
     })),
   ].sort((a, b) => a.at - b.at || (a.kind === 'learned' ? -1 : 1));
 
+  // Lessons the learner has really studied: completed, or worked through step by step.
+  // Only their concepts fall due for Review (owner, 2026-10-24: review what was learned,
+  // not new material met in an Apex Challenge or the Question of the Day).
+  const studied = new Set(input.completions.map((completion) => completion.lessonId));
+  for (const attempt of input.attempts) {
+    if (attempt.mode !== 'interactive' && attempt.mode !== 'interactive-retry') continue;
+    const lessonId = attempt.lessonId ?? getQuestion(attempt.questionId)?.lessonId;
+    if (lessonId) studied.add(lessonId);
+  }
+
   const recordFor = (key: string) => {
     let record = records.get(key);
     if (!record) {
@@ -181,6 +191,7 @@ export function buildMemoryModel(input: {
     if (!key || records.has(key)) continue;
     const entry = getConceptEntry(key);
     if (!entry || !isTrackableConcept(entry.concept)) continue;
+    studied.add(entry.lesson.id); // scheduled by the original app after a lesson there
     const stage = Math.max(0, Math.min(LEGACY_INTERVALS.length - 1, item.stage));
     const base = emptyMemory(entry.concept.difficulty ?? 'introductory');
     records.set(key, {
@@ -210,7 +221,7 @@ export function buildMemoryModel(input: {
       conceptId: entry.concept.id,
       name: entry.concept.name,
       state: classify(record),
-      due: isDue(record, now),
+      due: studied.has(entry.lesson.id) && isDue(record, now),
       mastery: masteryEstimate(record, now),
       priority: reviewPriority(record, now),
     });

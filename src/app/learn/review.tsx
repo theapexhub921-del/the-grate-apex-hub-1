@@ -15,7 +15,8 @@ import type { ThemeColors } from '@/constants/theme';
 import { conceptKey, findLesson, getCourseInfo, getTopic, isTrackableConcept } from '@/data/curriculum';
 import { logSessionStart, submitQuiz } from '@/data/learning/actions';
 import { type ConceptMemory, countStates } from '@/data/learning/memory';
-import { selectQuestions, type SelectionFilters, type SelectionStrategy } from '@/data/learning/selection';
+import { selectQuestions, type SelectionFilters, type SelectionStrategy, studiedLessonIds } from '@/data/learning/selection';
+import { useProgress } from '@/data/progress';
 import { currentMemoryModel } from '@/data/learning/state';
 import { describeAgo, describeDue, nowMs } from '@/data/learning/time';
 import { useLearning } from '@/data/learning/use-learning';
@@ -69,6 +70,9 @@ function ReviewScreen({
 }) {
   const styles = useThemedStyles(createStyles);
   const { memory, now } = useLearning();
+  // Review asks only about lessons the learner has studied (completed, or worked through).
+  const { completedLessons } = useProgress();
+  const studied = useMemo(() => studiedLessonIds(completedLessons, memory), [completedLessons, memory]);
   const [focus, setFocus] = useState<Focus>(initialFocus);
   const [size, setSize] = useState<number>(initialSize);
   const [mode, setMode] = useState<FeedbackMode>('instant');
@@ -98,12 +102,13 @@ function ReviewScreen({
   const concepts: ConceptMemory[] = useMemo(
     () =>
       Array.from(memory.concepts.values()).filter((concept) => {
+        if (!studied.has(concept.lessonId)) return false;
         if (lessonKeys) return lessonKeys.includes(concept.key);
         if (topic) return concept.topicId === topic.id;
         if (course) return getTopic(concept.topicId)?.courseId === course.id;
         return true;
       }),
-    [memory, lessonKeys, topic, course]
+    [memory, studied, lessonKeys, topic, course]
   );
   const counts = countStates(concepts);
   const weak = concepts.filter((concept) => concept.state === 'struggling' || concept.lastResult === 'incorrect');
@@ -123,7 +128,7 @@ function ReviewScreen({
       await ensureQuestionHistoryLoaded();
       const time = nowMs();
       const nextSeed = `review:${topic?.id ?? course?.id ?? 'all'}:${focus}:${time}`;
-      const filters: SelectionFilters = { learnedOnly: true, ...(lessonKeys ? { conceptKeys: lessonKeys } : {}) };
+      const filters: SelectionFilters = { learnedOnly: true, studiedLessons: studied, ...(lessonKeys ? { conceptKeys: lessonKeys } : {}) };
       if (focus === 'due') filters.due = true;
       if (focus === 'weak') filters.weak = true;
       const strategy: SelectionStrategy = focus === 'mixed' ? 'weighted' : 'targeted';
@@ -144,7 +149,7 @@ function ReviewScreen({
             ? 'Nothing is due in this scope right now. Try a mixed session instead.'
             : focus === 'weak'
               ? 'No weak concepts in this scope right now — nice. Try a mixed session.'
-              : 'There is nothing to review here yet. Complete a lesson first.'
+              : 'Review only asks about lessons you have studied. Complete a lesson (or work through its steps) first.'
         );
         setStarting(false);
         return;
