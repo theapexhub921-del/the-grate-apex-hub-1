@@ -13,7 +13,7 @@ import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firesto
 import { auth, db } from '@/lib/firebase';
 
 export const VERIFIED_USERNAMES: readonly string[] = ['prince', 'theapexhub', 'originate', 'robotnik', 'stbretro', 'grate_apex', 'myuncletouchesme', 'grate_apex02', 'stickyfingers', 'retro', 'retr0', 'patricia_a', 'atu', 'grateapex_official', 'nate', 'echocircuitnkn07', 'ev', 'drev'];
-export const BLUE_VERIFIED_USERNAMES: readonly string[] = ['bevelyn', 'amtul', 'akua'];
+export const BLUE_VERIFIED_USERNAMES: readonly string[] = ['bevelyn', 'amtul', 'akua', 'cupid'];
 
 export type VerifiedTier = 'gold' | 'blue';
 
