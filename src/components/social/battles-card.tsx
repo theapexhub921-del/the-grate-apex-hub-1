@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Interactive, PressableCard } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Sheet } from '@/components/ui/sheet';
 import { Text, TextInput } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { acceptBattle, type Battle, type BattleCourse, battleRecord, battleStatus, createBattle, declineBattle, watchBattles } from '@/data/battles';
+import { acceptBattle, type Battle, type BattleCourse, battleRecord, battleStatus, type BattleStatus, createBattle, declineBattle, watchBattles } from '@/data/battles';
 import { announceBattle, announceBattleResult } from '@/lib/web-push';
 import { readClassSelection } from '@/data/class-curriculum';
 import { getTopic, publishedTopics } from '@/data/curriculum';
@@ -112,6 +113,13 @@ export function BattlesCard() {
   const selectedCourse = courses.find((item) => `${item.kind}:${item.id}` === courseKey) ?? null;
   const record = battleRecord(battles, uid);
   const yourTurn = battles.filter((battle) => battleStatus(battle, uid) === 'waiting-for-you').length;
+  // Open battles first; the history of requests received and sent is one switch away
+  // (owner, 2026-10-24: not everything at once).
+  const [view, setView] = useState<BattleView>('open');
+  const openBattles = battles.filter((battle) => OPEN.has(battleStatus(battle, uid)));
+  const received = battles.filter((battle) => battle.opponentId === uid);
+  const sent = battles.filter((battle) => battle.challengerId === uid);
+  const shown = view === 'open' ? openBattles : view === 'received' ? received : sent;
 
   useEffect(() => {
     setSelectedTopicIds([]);
@@ -305,9 +313,28 @@ export function BattlesCard() {
         )}
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
+        {battles.length > 0 ? (
+          <View style={styles.viewSwitch}>
+            <SegmentedControl
+              label="Show"
+              value={view}
+              onChange={setView}
+              options={[
+                { value: 'open', label: 'Open', count: openBattles.length },
+                { value: 'received', label: 'Received', count: received.length },
+                { value: 'sent', label: 'Sent', count: sent.length },
+              ]}
+            />
+          </View>
+        ) : null}
         {battles.length === 0 && !picking ? <Text style={styles.muted}>No battles yet. Challenge a friend to get started.</Text> : null}
+        {battles.length > 0 && shown.length === 0 ? (
+          <Text style={styles.muted}>
+            {view === 'open' ? 'Nothing waiting for you. See Received and Sent for your past battles.' : view === 'received' ? 'No challenges received yet.' : 'You have not sent a challenge yet.'}
+          </Text>
+        ) : null}
         <View style={styles.list}>
-          {battles.slice(0, 12).map((battle) => {
+          {shown.map((battle) => {
             const status = battleStatus(battle, uid);
             const incoming = battle.opponentId === uid;
             const other = incoming ? battle.challengerName : battle.opponentName;
@@ -347,6 +374,10 @@ export function BattlesCard() {
   );
 }
 
+type BattleView = 'open' | 'received' | 'sent';
+// Still needs someone: a challenge to accept or decline, a turn to play, or a reply to come.
+const OPEN = new Set<BattleStatus>(['incoming-challenge', 'waiting-for-you', 'waiting-for-response', 'waiting-for-them']);
+
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     flex: { flex: 1, minWidth: 0 },
@@ -374,6 +405,7 @@ function createStyles(colors: ThemeColors) {
     error: { fontSize: 13, color: colors.error, marginTop: 8 },
     muted: { fontSize: 12.5, color: colors.textTertiary, marginTop: 8 },
     list: { gap: 8, marginTop: 12 },
+    viewSwitch: { marginTop: 14 },
     item: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 14, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
     itemTitle: { fontSize: 14, fontWeight: '800', color: colors.text },
   });
