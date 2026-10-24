@@ -83,9 +83,9 @@ const isLegacyThemeId = (value: unknown): value is string => typeof value === 's
 
 const STORAGE_KEY = 'grateapex_settings';
 
-// Apex (light-blue GRATEAPEX theme) is the default for now.
+// Follow the device appearance until the learner chooses a theme.
 const defaultSettings: SettingsData = {
-  appearance: 'apex',
+  appearance: 'system',
   pushNotificationsEnabled: false,
   pageZoom: 100,
   notifications: { ...defaultNotificationPreferences },
