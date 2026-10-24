@@ -260,6 +260,45 @@ async function saveSettings() {
   }
 }
 
+// The look last read from the account (per learner), so only a CHANGE there is applied.
+let lastAccountLook: string | null = null;
+
+/**
+ * Applies the look saved on the account (users/{uid}.preferences: theme, font size,
+ * zoom) to this device as soon as it arrives or changes — e.g. chosen on another
+ * phone or laptop — instead of only when Settings is opened. Called with every
+ * live copy of the account. Only a change on the account is applied, so a choice
+ * just made here (still being saved) is never put back.
+ */
+export async function applyAccountLook(userId: string, preferences: unknown) {
+  if (!preferences || typeof preferences !== 'object') return;
+  const data = preferences as Record<string, unknown>;
+  const key = JSON.stringify([userId, data.appearance, data.legacy_theme, data.theme_family, data.font_size, data.zoom]);
+  if (key === lastAccountLook) return;
+  lastAccountLook = key;
+  await ensureSettingsLoaded();
+  const next: Pick<SettingsData, 'appearance' | 'legacyTheme' | 'themeFamily' | 'fontSize' | 'pageZoom'> = {
+    appearance: isAppearance(data.appearance) ? data.appearance : settings.appearance,
+    legacyTheme: isLegacyThemeId(data.legacy_theme) ? data.legacy_theme : settings.legacyTheme,
+    // Same reading as syncSettingsFromAccount below.
+    themeFamily: isThemeFamily(data.theme_family)
+      ? data.theme_family
+      : data.hybrid_theme_family === 'originals'
+        ? 'legacy'
+        : typeof data.appearance === 'string'
+          ? null
+          : settings.themeFamily,
+    fontSize: ['small', 'default', 'large', 'extra_large'].includes(String(data.font_size))
+      ? (data.font_size as FontSizePreference)
+      : settings.fontSize,
+    pageZoom: isPageZoom(data.zoom) ? data.zoom : settings.pageZoom,
+  };
+  if ((Object.keys(next) as (keyof typeof next)[]).every((name) => settings[name] === next[name])) return;
+  settings = { ...settings, ...next };
+  notify();
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(settings)).catch(() => undefined);
+}
+
 /** Load account preferences onto this device after sign-in, seeding the account on first use. */
 export async function syncSettingsFromAccount(userId: string) {
   await ensureSettingsLoaded();

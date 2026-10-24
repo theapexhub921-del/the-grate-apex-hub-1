@@ -7,7 +7,7 @@ import { specialThemeStart } from '@/data/holidays';
 import { useLearning } from '@/data/learning/use-learning';
 import { DEFAULT_LEGACY_THEME, legacyThemeById } from '@/data/legacy-theme-colors';
 import { useProgress, waitForProgressSync } from '@/data/progress';
-import { chooseLegacyTheme, setLegacyThemePreference, useAppearancePreference, useLegacyThemePreference } from '@/data/settings';
+import { applyAccountLook, chooseLegacyTheme, setLegacyThemePreference, useAppearancePreference, useLegacyThemePreference } from '@/data/settings';
 import { THEME_CATALOG, themeLock, type ThemeEntry, type ThemeLock } from '@/data/theme-catalog';
 import { useAuth } from '@/hooks/use-auth';
 import { setActiveExperience } from '@/hooks/use-experience';
@@ -54,6 +54,14 @@ export function ExperienceSync() {
     if (!user) setActiveExperience(null); // signed out: the shared sign-in look
     else if (profileLoaded) setActiveExperience(saved);
   }, [loading, user, profileLoaded, saved]);
+
+  // The theme, font size and zoom chosen on another device show here straight
+  // away (the account is already watched live), not only after opening Settings.
+  const accountId = user?.uid ?? null;
+  const preferences = user?.profile?.preferences;
+  useEffect(() => {
+    if (accountId && profileLoaded) void applyAccountLook(accountId, preferences);
+  }, [accountId, profileLoaded, preferences]);
 
   // As in the original app: an admin-only theme is reset to Dark for anyone who isn't an admin.
   useEffect(() => {
