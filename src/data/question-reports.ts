@@ -90,11 +90,14 @@ export async function reportQuestion(question: { id: string; prompt: string }, r
     throw new Error('The report could not be sent. Check your connection and try again.');
   }
   await remember(question.id);
-  // Email is sent through the server so no mail credentials are shipped in the app.
-  // Firestore remains the source of truth if the notification service is unavailable.
+  // The team is emailed through the server (api/question-report.mjs: Resend, then
+  // Formspree), so no mail credentials ship in the app. The report is already saved and
+  // admins see it in Settings → Help → Reported questions, so a failed email never shows
+  // the learner an error (they could not send the report again anyway).
   const currentUser = auth.currentUser;
-  if (!currentUser) throw new Error('Sign in again to email this report.');
-  const token = await currentUser.getIdToken();
+  if (!currentUser) return;
+  const token = await currentUser.getIdToken().catch(() => null);
+  if (!token) return;
   const mailResponse = await fetch(`${API_BASE}/api/question-report`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
@@ -102,7 +105,7 @@ export async function reportQuestion(question: { id: string; prompt: string }, r
   }).catch(() => null);
   if (!mailResponse?.ok) {
     const message = await mailResponse?.json().then((body) => body?.error).catch(() => null);
-    throw new Error(typeof message === 'string' ? message : 'The report was saved, but its email could not be sent. Please try again later.');
+    console.warn('The question report was saved, but its email was not sent:', message ?? mailResponse?.status ?? 'no connection');
   }
 }
 
