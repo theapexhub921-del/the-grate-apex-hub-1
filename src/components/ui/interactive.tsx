@@ -30,6 +30,8 @@ export type InteractiveState = { hovered: boolean; pressed: boolean; focused: bo
 type InteractiveProps = {
   onPress?: () => void;
   onLongPress?: () => void;
+  /** Web: a right-click (instead of the browser's own menu), e.g. the same menu as a long press. */
+  onContextMenu?: () => void;
   disabled?: boolean;
   accessibilityLabel?: string;
   accessibilityRole?: AccessibilityRole;
@@ -46,6 +48,7 @@ type InteractiveProps = {
 export function Interactive({
   onPress,
   onLongPress,
+  onContextMenu,
   disabled,
   accessibilityLabel,
   accessibilityRole = 'button',
@@ -67,6 +70,10 @@ export function Interactive({
       // Every tap clicks and buzzes softly (Settings → Sounds and vibration).
       onPress={disabled || !onPress ? undefined : () => { tapFeedback(); onPress(); }}
       onLongPress={disabled ? undefined : onLongPress}
+      // react-native-web passes onContextMenu through to the page (not in React Native's types).
+      {...(onContextMenu && !disabled
+        ? { onContextMenu: (event: { preventDefault?: () => void }) => { event.preventDefault?.(); onContextMenu(); } }
+        : {})}
       disabled={disabled}
       onHoverIn={() => setHovered(true)}
       onHoverOut={() => setHovered(false)}

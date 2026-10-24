@@ -19,8 +19,9 @@ import { enableDeviceNotifications } from '@/lib/device-notifications';
 
 const KEY = 'grateapex_notification_prompt'; // when "Not now" was last tapped
 const ASK_AGAIN_MS = 7 * 86_400_000;
-// Never over the first-run steps (the introduction already asks, and the card covered "Confirm my class").
-const HIDDEN_ON = /^\/(login|onboarding|choose-experience|choose-username|suggested|class-selection|learn\/(quiz|lesson|hb-lesson|hb-practice|review|apex)|social\/battle)/;
+// Never over the first-run steps (the introduction already asks, and the card covered "Confirm my class"),
+// nor over an open chat (on a computer it covered the newest messages and the message box).
+const HIDDEN_ON = /^\/(login|onboarding|choose-experience|choose-username|suggested|class-selection|learn\/(quiz|lesson|hb-lesson|hb-practice|review|apex)|social\/(battle|message))/;
 
 /** Counts as a "Not now": used when the introduction has just asked. */
 export async function snoozeNotificationPrompt() {

@@ -40,6 +40,8 @@ import { friendlyError } from '@/lib/errors';
 const EMOJI = ['😀', '😂', '🥹', '😍', '😎', '🤔', '😴', '😭', '🔥', '❤️', '👍', '🙏', '🎉', '📚', '🧠', '💯', '✅', '🩺'];
 const STATUS_LABEL: Record<MessageStatus, string> = { sent: 'Sent', delivered: 'Delivered', read: 'Seen' };
 const isWeb = Platform.OS === 'web';
+// A mouse or trackpad (laptops, also touch-screen ones): hover buttons and right-click.
+const canHover = isWeb && typeof window !== 'undefined' && window.matchMedia?.('(hover: hover) and (pointer: fine)').matches === true;
 const now = () => Date.now();
 
 function ago(at: number) {
@@ -392,6 +394,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
                     ) : (
                     <Interactive
                       onLongPress={() => setMenu(message)}
+                      onContextMenu={() => setMenu(message)}
                       onPress={canSwipe ? () => setMenu(message) : undefined}
                       accessibilityLabel={`${mine ? 'You' : title}: ${previewOf(message)}. Actions`}
                       style={({ hovered }) => [styles.bubbleWrap, hovered && styles.hovered]}
@@ -430,8 +433,10 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
                               {mine && meta && !isGroup ? <Ticks status={messageStatus(message, meta)} color={colors.onPrimaryMuted} read={readBlue} /> : null}
                             </View>
                           </View>
-                          {isWeb && hovered ? (
-                            <View style={[styles.quick, mine && styles.quickMine]}>
+                          {canHover ? (
+                            // Always in place (only faded out), so the message never shifts when the
+                            // pointer arrives, and it stays for a moment after it leaves: easy to reach.
+                            <View style={[styles.quick, mine && styles.quickMine, hovered ? styles.quickShown : styles.quickHidden]}>
                               <QuickButton icon="heart" label="React" onPress={() => setMenu(message)} />
                               <QuickButton icon="reply" label="Reply" onPress={() => startReply(message)} />
                               <QuickButton icon="more" label="More" onPress={() => setMenu(message)} />
@@ -709,7 +714,9 @@ function createStyles(colors: ThemeColors) {
     mineSoft: { color: colors.onPrimaryMuted },
     meta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 5 },
     time: { fontSize: 10.5, color: colors.textTertiary },
-    quick: { flexDirection: 'row', gap: 2 },
+    quick: { flexDirection: 'row', gap: 2, ...webStyle({ transitionProperty: 'opacity', transitionDuration: '120ms' }) },
+    quickShown: { opacity: 1, ...webStyle({ transitionDelay: '0ms' }) },
+    quickHidden: { opacity: 0, ...webStyle({ transitionDelay: '600ms' }) },
     quickMine: { flexDirection: 'row-reverse' },
     quickButton: { padding: 6, borderRadius: 999, backgroundColor: colors.surfaceMuted },
     reactions: { flexDirection: 'row', gap: 4, marginTop: -6, marginHorizontal: 8, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 999, backgroundColor: colors.surfaceElevated, borderWidth: 1, borderColor: colors.border },

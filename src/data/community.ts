@@ -6,6 +6,7 @@ import {
   deleteField,
   doc,
   getDoc,
+  getDocFromServer,
   getDocs,
   increment,
   limit,
@@ -227,9 +228,14 @@ async function signedInUserId(): Promise<string> {
 
 const BLOCKED_KEY = 'grateapex_blocked_learners';
 
+const validUsername = (value: unknown): value is string => typeof value === 'string' && /^[a-z0-9_]{3,20}$/.test(value);
+
 export async function myUsername(): Promise<{ uid: string; username: string }> {
   const uid = await signedInUserId();
-  const username = (await getDoc(doc(db, 'users', uid))).data()?.username;
+  let username = (await getDoc(doc(db, 'users', uid))).data()?.username;
+  // Right after signing in on a new device the first read can be a local copy holding only
+  // what the app has just written (online status): ask the server once before giving up.
+  if (!validUsername(username)) username = (await getDocFromServer(doc(db, 'users', uid)).catch(() => null))?.data()?.username;
   if (typeof username !== 'string' || !/^[a-z0-9_]{3,20}$/.test(username)) throw new Error('Choose a username first — posts show your username.');
   return { uid, username };
 }
