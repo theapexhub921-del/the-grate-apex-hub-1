@@ -22,7 +22,8 @@ import { elevation, Radius, ThemeColors, Type } from '@/constants/theme';
 import { acceptCurrentLegalVersions, holdSignUpConsent, needsOnboarding, saveHeldSignUpConsent, useOnboardingState } from '@/data/onboarding';
 import { setDisplayName } from '@/data/user';
 import { useTheme } from '@/hooks/use-theme';
-import { friendlyGoogleError, signInWithGoogle, takeOAuthPending } from '@/lib/google-auth';
+import { clearOAuthPending, friendlyGoogleError, isInstalledPwa, peekOAuthPending, signInWithGoogle } from '@/lib/google-auth';
+import { useAuth } from '@/hooks/use-auth';
 import {
   GoogleAuthProvider,
   getRedirectResult,
@@ -54,11 +55,14 @@ const linkParams = readLinkParams();
 // problem — not as an expired email link.
 const oauthReturn = readOAuthReturn();
 
-function readOAuthReturn(): { flow: 'installed-pwa' | 'legacy'; error: string | null } | null {
-  const flow = takeOAuthPending();
+// `expected`: this device noted it left for Google. The installed app also checks
+// when no note survived (a fresh browsing context after Google), quietly.
+function readOAuthReturn(): { flow: 'installed-pwa' | 'legacy'; error: string | null; expected: boolean } | null {
+  const pending = peekOAuthPending();
+  const flow = pending ?? (isInstalledPwa() ? 'installed-pwa' : null);
   if (!flow) return null;
   const failure = linkParams.get('error_description') ?? linkParams.get('error');
-  return { flow, error: failure ? friendlyGoogleError(failure) : null };
+  return { flow, error: failure ? friendlyGoogleError(failure) : null, expected: pending !== null };
 }
 
 type Mode = 'signIn' | 'signUp' | 'checkEmail' | 'reset' | 'newPassword';
@@ -99,7 +103,23 @@ export default function LoginScreen() {
   const [maybeExisting, setMaybeExisting] = useState(false);
   const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [googleLoading, setGoogleLoading] = useState(false);
+  // Back from Google: finishing the sign-in (only when this device was expecting it).
+  const [finishingGoogle, setFinishingGoogle] = useState(Boolean(oauthReturn?.expected && !oauthReturn.error));
   const onboarding = useOnboardingState();
+  // Signed in, but the account itself is still loading (slow connection, or the
+  // server is busy): the route guard moves on once it arrives. Say so, instead of
+  // showing the sign-in form again as if nothing had happened.
+  const { session } = useAuth();
+  const signedInWaiting = Boolean(session) && mode !== 'newPassword';
+  const [slowAccount, setSlowAccount] = useState(false);
+  useEffect(() => {
+    if (!signedInWaiting) {
+      setSlowAccount(false);
+      return;
+    }
+    const timer = setTimeout(() => setSlowAccount(true), 12_000);
+    return () => clearTimeout(timer);
+  }, [signedInWaiting]);
 
   // "Set New Password" form.
   const [newPassword, setNewPassword] = useState('');
@@ -129,9 +149,10 @@ export default function LoginScreen() {
             ? (await import('@/lib/firebase-pwa-auth')).getPwaOAuthAuth()
             : auth;
           const result = await getRedirectResult(redirectAuth);
+          clearOAuthPending();
           if (!active) return;
           if (!result) {
-            if (!oauthReturn.error) setError('Google sign-in did not return to the app. Please try again.');
+            if (!oauthReturn.error && oauthReturn.expected && !auth.currentUser) setError('Google sign-in did not return to the app. Please try again.');
             return;
           }
 
@@ -145,7 +166,10 @@ export default function LoginScreen() {
           track('login', { method: 'google' });
           await saveHeldSignUpConsent();
         } catch (redirectError: any) {
+          clearOAuthPending();
           if (active) setError(friendlyGoogleError(redirectError?.message));
+        } finally {
+          if (active) setFinishingGoogle(false);
         }
       })();
       if (oauthReturn.error) {
@@ -394,7 +418,20 @@ export default function LoginScreen() {
               </Text>
               <Text style={styles.subtitle}>{subtitle}</Text>
 
-              {mode === 'newPassword' ? (
+              {signedInWaiting || finishingGoogle ? (
+                <View style={styles.waiting} accessibilityRole="progressbar" accessibilityLabel="Signing you in">
+                  <ActivityIndicator color={colors.primary} />
+                  <Text style={styles.waitingTitle}>{signedInWaiting ? 'Signing you in…' : 'Finishing Google sign-in…'}</Text>
+                  {slowAccount ? (
+                    <>
+                      <Text style={styles.waitingText}>
+                        You are signed in, but your account is taking longer than usual to load. The connection may be slow, or our server is busy right now. It keeps trying on its own.
+                      </Text>
+                      <Button label="Sign out" variant="ghost" onPress={() => void signOut(auth)} style={styles.secondaryAction} />
+                    </>
+                  ) : null}
+                </View>
+              ) : mode === 'newPassword' ? (
                 passwordUpdated ? (
                   <>
                     <View style={styles.success}>
@@ -1032,6 +1069,9 @@ function createStyles(colors: ThemeColors) {
     linkText: { fontSize: 13.5, fontWeight: '700', color: colors.primaryText },
     submit: { marginTop: 8 },
     secondaryAction: { marginTop: 8, alignSelf: 'center' },
+    waiting: { alignItems: 'center', gap: 10, paddingVertical: 18 },
+    waitingTitle: { ...Type.headline, color: colors.text, textAlign: 'center' },
+    waitingText: { ...Type.callout, color: colors.textSecondary, textAlign: 'center' },
     error: {
       flexDirection: 'row',
       gap: 10,

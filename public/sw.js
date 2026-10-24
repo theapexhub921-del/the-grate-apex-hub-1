@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grateapex-pwa-v11';
+const CACHE_NAME = 'grateapex-pwa-v12';
 // Study material kept for offline revision (question banks, lecture diagrams, and what
 // Settings → Offline study saves: src/lib/offline-study.ts). A different prefix from
 // CACHE_PREFIX on purpose: an app update must never delete what a learner saved.
@@ -38,6 +38,10 @@ self.addEventListener('fetch', (event) => {
   // the connection was slow) left phones stuck on an old, broken version. The browser's normal checks keep it fresh:
   // the page is revalidated on every open (vercel.json) and its address carries a fresh ?v= stamp (src/lib/atlas-theme.ts).
   if (new URL(request.url).pathname.startsWith('/atlas/')) return;
+  // Firebase's sign-in helper (/__/auth/..., proxied to Firebase by vercel.json for the installed
+  // app's Google sign-in) always goes straight to the network and is never saved: a saved or
+  // re-fetched copy loses the one-time sign-in result and leaves the learner on the login page.
+  if (new URL(request.url).pathname.startsWith('/__/')) return;
   // Vercel Web Analytics (/_vercel/insights/...) always goes straight to the network.
   if (new URL(request.url).pathname.startsWith('/_vercel/')) return;
   // The 3D organs shown with the lesson simulations (/sim3d/...) use the atlas models: same rule.

@@ -24,11 +24,15 @@ export function markOAuthPending(flow: OAuthFlow = 'legacy') {
   } catch {}
 }
 
-export function takeOAuthPending(): OAuthFlow | null {
+/**
+ * The Google sign-in this device left for, if any. Only read here: the note is
+ * cleared (clearOAuthPending) once the result has been handled, so a reload
+ * while the app is finishing (an update, a slow start) doesn't lose it.
+ */
+export function peekOAuthPending(): OAuthFlow | null {
   try {
     if (typeof window === 'undefined') return null;
     const value = window.localStorage.getItem(PENDING_KEY);
-    window.localStorage.removeItem(PENDING_KEY);
     if (value) {
       try {
         const pending = JSON.parse(value) as { at?: number; flow?: OAuthFlow };
@@ -39,14 +43,21 @@ export function takeOAuthPending(): OAuthFlow | null {
     }
 
     const oldValue = window.sessionStorage.getItem(PENDING_KEY);
-    window.sessionStorage.removeItem(PENDING_KEY);
     return Boolean(oldValue) && Date.now() - Number(oldValue) < 30 * 60 * 1000 ? 'legacy' : null;
   } catch {
     return null;
   }
 }
 
-function isInstalledPwa() {
+export function clearOAuthPending() {
+  try {
+    if (typeof window === 'undefined') return;
+    window.localStorage.removeItem(PENDING_KEY);
+    window.sessionStorage.removeItem(PENDING_KEY);
+  } catch {}
+}
+
+export function isInstalledPwa() {
   if (Platform.OS !== 'web' || typeof window === 'undefined') return false;
   return window.matchMedia?.('(display-mode: standalone)').matches === true
     || (navigator as Navigator & { standalone?: boolean }).standalone === true;
