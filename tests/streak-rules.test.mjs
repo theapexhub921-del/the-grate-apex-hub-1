@@ -6,6 +6,7 @@ import {
   canRestore,
   currentStreak,
   freezeEarned,
+  lapseDay,
   restoredState,
   streakStatus,
   weekKeyOf,
@@ -50,6 +51,17 @@ test('a lost streak can be restored for a few days, keeping today’s study', ()
   assert.deepEqual(restoredState(state(0, '2026-10-13'), lost, '2026-10-16'), state(9, '2026-10-15'));
   // Already studied today (a new streak of 1): 9 + today.
   assert.equal(restoredState(state(1, '2026-10-16'), lost, '2026-10-16').streak, 10);
+});
+
+test('a streak lost during a long break is dated the day it ended, so it can’t be bought back weeks later', () => {
+  // Last studied on the 1st, back on the 20th: it ended at midnight after the 2nd.
+  const late = applyActivity(state(12, '2026-10-01'), '2026-10-20');
+  assert.deepEqual(late.lost, { streak: 12, on: '2026-10-03' });
+  assert.equal(canRestore(late.lost, '2026-10-20'), false);
+  // Freezes push the end back one day each.
+  assert.equal(lapseDay('2026-10-01', 2, '2026-10-20'), '2026-10-05');
+  // Never later than today.
+  assert.equal(lapseDay('2026-10-14', 0, '2026-10-15'), '2026-10-15');
 });
 
 test('five lessons in one week earn one freeze, once, up to the cap', () => {

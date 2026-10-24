@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, limit, query, runTransaction, serverTimestamp, updateDoc, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, limit, query, runTransaction, serverTimestamp, where } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
 import { canRestore, RESTORE_COST } from '@/data/learning/streak-rules';
@@ -8,12 +8,21 @@ import { announceGift } from '@/lib/web-push';
 
 export type ApexCoinReward = 'apex_challenge' | 'topic_completion';
 
+/**
+ * The balance on a users document. Early accounts kept it as `apexCoins`; every
+ * write now goes to `coins`, so the balance shown is always the one that can be spent.
+ */
+export function coinsOf(data: Record<string, unknown> | undefined): number {
+  const value = Number(data?.coins ?? data?.apexCoins ?? 0);
+  return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+}
+
 export async function readApexCoinBalance(): Promise<number> {
   const user = auth.currentUser;
   if (!user) return 0;
   try {
     const snap = await getDoc(doc(db, 'users', user.uid));
-    return Number(snap.data()?.coins ?? snap.data()?.apexCoins ?? 0);
+    return coinsOf(snap.data());
   } catch {
     return 0;
   }
@@ -41,7 +50,7 @@ export async function sendApexCoins(recipientId: string, amount: number): Promis
   try {
     const balance = await runTransaction(db, async (tx) => {
       const snap = await tx.get(userRef);
-      const current = Number(snap.data()?.coins ?? 0);
+      const current = coinsOf(snap.data());
       if (current < amount) throw new Error('Insufficient coins.');
       tx.update(userRef, { coins: current - amount });
       tx.set(giftRef, { from: user.uid, to: recipientId, amount, status: 'pending', createdAt: serverTimestamp() });
@@ -76,7 +85,7 @@ export async function claimIncomingCoins(onGift?: (gift: { from: string; amount:
         const data = giftSnap.data();
         if (!data || data.status !== 'pending' || data.to !== user.uid) return 0;
         const value = Number(data.amount);
-        tx.update(userRef, { coins: Number(userSnap.data()?.coins ?? 0) + value });
+        tx.update(userRef, { coins: coinsOf(userSnap.data()) + value });
         tx.update(gift.ref, { status: 'claimed', claimedAt: serverTimestamp() });
         return value;
       });
@@ -93,11 +102,14 @@ export async function awardApexCoins(reward: ApexCoinReward, sourceId: string): 
   const user = auth.currentUser;
   if (!user) return 0;
   const userRef = doc(db, 'users', user.uid);
-  const snap = await getDoc(userRef);
-  const current = Number(snap.data()?.coins ?? 0);
   const added = reward === 'apex_challenge' ? 10 : 5;
-  await updateDoc(userRef, { coins: current + added });
-  return current + added;
+  // One transaction, so a gift claimed at the same moment is never overwritten.
+  return runTransaction(db, async (tx) => {
+    const snap = await tx.get(userRef);
+    const balance = coinsOf(snap.data()) + added;
+    tx.update(userRef, { coins: balance });
+    return balance;
+  });
 }
 
 /** Takes `amount` coins in one transaction; refuses (nothing taken) when the balance is too low. Returns the new balance. */
@@ -107,7 +119,7 @@ export async function spendApexCoins(amount: number): Promise<number> {
   const userRef = doc(db, 'users', user.uid);
   return runTransaction(db, async (tx) => {
     const snap = await tx.get(userRef);
-    const current = Number(snap.data()?.coins ?? 0);
+    const current = coinsOf(snap.data());
     if (current < amount) throw new Error(`You need ${amount} Apex Coins for this. You have ${current}.`);
     tx.update(userRef, { coins: current - amount });
     return current - amount;
@@ -121,7 +133,7 @@ export async function refundApexCoins(amount: number) {
   const userRef = doc(db, 'users', user.uid);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(userRef);
-    tx.update(userRef, { coins: Number(snap.data()?.coins ?? 0) + amount });
+    tx.update(userRef, { coins: coinsOf(snap.data()) + amount });
   }).catch(() => undefined);
 }
 

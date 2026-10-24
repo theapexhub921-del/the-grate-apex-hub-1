@@ -29,6 +29,7 @@ import {
   canRestore,
   currentStreak,
   freezeEarned,
+  lapseDay,
   type LostStreak,
   MAX_FREEZES,
   missedDays,
@@ -252,7 +253,7 @@ function noteLapse(now = Date.now()) {
   if (progress.streak <= 0 || !progress.lastActivityDate) return false;
   if (missedDays(progress.lastActivityDate, dayKey(now)) <= progress.streakFreezes) return false;
   if (!progress.lostStreak || progress.lostStreak.streak < progress.streak || progress.lostStreak.on < progress.lastActivityDate) {
-    progress.lostStreak = { streak: progress.streak, on: dayKey(now) };
+    progress.lostStreak = { streak: progress.streak, on: lapseDay(progress.lastActivityDate, progress.streakFreezes, dayKey(now)) };
   }
   progress.streak = 0;
   return true;
@@ -304,7 +305,11 @@ async function syncProgressWithCloud(hasLocalProgress: boolean) {
   progress.streak = streak;
   progress.lastActivityDate = activityDate;
   if (remote.streak) {
+    // Freezes are only used when the last study day moves on, so on the same day the
+    // larger count is the true one (a freeze earned on the other device is kept: its
+    // week is already marked as rewarded below, so it could never be earned again).
     if (useRemoteActivity) progress.streakFreezes = clampFreezes(remote.streak.freezes);
+    else if (remoteDate === localDate) progress.streakFreezes = Math.max(progress.streakFreezes, clampFreezes(remote.streak.freezes));
     progress.freezeWeeks = [...new Set([...progress.freezeWeeks, ...remote.streak.freezeWeeks])].sort().slice(-30);
     const remoteLost = parseLost(remote.streak.lost);
     if (remoteLost && (!progress.lostStreak || remoteLost.on > progress.lostStreak.on)) progress.lostStreak = remoteLost;

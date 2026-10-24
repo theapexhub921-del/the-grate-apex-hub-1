@@ -57,6 +57,16 @@ export type StreakState = {
 
 export type LostStreak = { streak: number; on: string }; // `on`: the day it was found lost
 
+/**
+ * The day a streak was really lost: the midnight after the first missed day that no
+ * freeze covers. Recorded instead of the day the app noticed, so a learner who comes
+ * back after a long break can't restore a streak that ended weeks ago.
+ */
+export function lapseDay(lastActivityDate: string, freezes: number, today: string) {
+  const day = addDays(lastActivityDate, Math.max(0, Math.floor(freezes)) + 2);
+  return day < today ? day : today;
+}
+
 /** Days missed since the last activity, before `today` (0 when it was today or yesterday). */
 export function missedDays(lastActivityDate: string | null, today: string) {
   if (!lastActivityDate) return 0;
@@ -93,7 +103,7 @@ export function applyActivity(state: StreakState, today: string): { state: Strea
   const missed = missedDays(state.lastActivityDate, today);
   if (missed === 0) return { state: { streak: state.streak + 1, lastActivityDate: today, freezes }, freezesUsed: 0, lost: null };
   if (missed <= freezes) return { state: { streak: state.streak + 1, lastActivityDate: today, freezes: freezes - missed }, freezesUsed: missed, lost: null };
-  return { state: { streak: 1, lastActivityDate: today, freezes }, freezesUsed: 0, lost: { streak: state.streak, on: today } };
+  return { state: { streak: 1, lastActivityDate: today, freezes }, freezesUsed: 0, lost: { streak: state.streak, on: lapseDay(state.lastActivityDate, freezes, today) } };
 }
 
 /** A lost streak can be restored for a few days after it was lost. */
