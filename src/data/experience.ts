@@ -18,7 +18,7 @@ export const EXPERIENCE_INFO: Record<ExperienceId, { name: string; summary: stri
     name: 'Legacy',
     summary: 'The original GrAte Apex Hub, as it was: its colours, emoji, fonts, glass panels, gradient background and navigation — with every new feature inside it.',
   },
-  originate: { name: 'Originate', summary: 'The new GrAte Apex Hub design: its themes, layouts, icons and sidebar, in a clean, simple style.' },
+  originate: { name: 'OrigiNate', summary: 'The new GrAte Apex Hub design: its themes, layouts, icons and sidebar, in a clean, simple style.' },
 };
 
 /** The default experience: shown until a learner chooses, and preselected in the chooser. */
