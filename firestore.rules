@@ -4,6 +4,7 @@
 // file and deployed only with the owner's approval (the owner pastes the whole
 // file into Firebase console → Firestore Database → Rules → Publish).
 // 2026-10-18: added pushDevices, posts/*/stumpAnswers and groups/*/stumpAnswers.
+// 2026-10-25: Apex Coins can only go up through users/{uid}/coinLog (see "Apex Coins" below).
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -15,7 +16,10 @@ service cloud.firestore {
       allow create: if request.auth.uid == uid
         && request.resource.data.username is string
         && request.resource.data.username.size() >= 3
-        && request.resource.data.username.size() <= 20;
+        && request.resource.data.username.size() <= 20
+        // A new account starts with no coins.
+        && request.resource.data.get('coins', 0) == 0
+        && !('apexCoins' in request.resource.data);
       allow update: if request.auth.uid == uid
         // The username can change at most once every 30 days, and only to a name that this user has
         // just claimed in the usernames registry (written in the same batch).
@@ -41,7 +45,11 @@ service cloud.firestore {
                 && request.resource.data.get('classLocked', false) == true))
         && (request.resource.data.get('classLocked', false) != true
             || (request.resource.data.get('hall', '') in ['HB1', 'HB2', 'HB3', 'MB1', 'MB2', 'MB3']
-                && request.resource.data.get('semester', 0) in [1, 2]));
+                && request.resource.data.get('semester', 0) in [1, 2]))
+        // Apex Coins: the balance stays, goes down (spending, gifts), or goes up by exactly one new
+        // coinLog entry written in the same step. The old apexCoins field can't be changed.
+        && request.resource.data.get('apexCoins', 0) == resource.data.get('apexCoins', 0)
+        && coinsChangeOk(uid);
       allow delete: if false;
 
       // AI-made flashcard sets (private to the owner).
@@ -166,6 +174,63 @@ service cloud.firestore {
           allow update, delete: if false;
         }
       }
+    }
+
+    // ─── Apex Coins (2026-10-25) ───────────────────────────────────────────────
+    // Coins come in only with an entry in users/{uid}/coinLog/{kind}_{ref}, created once, for
+    // something the rules can check (src/data/apex-coins.ts):
+    //   lesson_<lessonId>  +10  the lesson's completion record exists
+    //   apex_<attemptId>   +10  an Apex Challenge attempt of this learner exists
+    //   topic_<topicId>    +5   the topic's first lesson was completed
+    //   gift_<transferId>  the gift's amount: a pending gift to this learner, claimed in the same step
+    //   refund_<ref>       the amount of this learner's earlier payment spend_<ref>
+    //   spend_<ref>        written with a payment: the balance goes down by exactly that amount
+    function coinsOf(data) {
+      return data.get('coins', data.get('apexCoins', 0));
+    }
+    function coinLogPath(uid, entry) {
+      return /databases/$(database)/documents/users/$(uid)/coinLog/$(entry);
+    }
+    function coinsChangeOk(uid) {
+      let before = coinsOf(resource.data);
+      let after = request.resource.data.get('coins', before);
+      let entry = request.resource.data.get('coinEntry', '');
+      return after == before
+        || (after is int && after >= 0 && after < before)
+        || (after is int && entry is string && entry.size() > 0
+            && !exists(coinLogPath(uid, entry)) && existsAfter(coinLogPath(uid, entry))
+            && after == before + getAfter(coinLogPath(uid, entry)).data.amount);
+    }
+    function coinEntryOk(uid, e) {
+      return (e.kind == 'lesson' && e.amount == 10
+          && existsAfter(/databases/$(database)/documents/progress/$(uid)/completions/$(e.ref)))
+        || (e.kind == 'apex' && e.amount == 10
+          && existsAfter(/databases/$(database)/documents/progress/$(uid)/attempts/$(e.ref))
+          && getAfter(/databases/$(database)/documents/progress/$(uid)/attempts/$(e.ref)).data.attemptType == 'apex_challenge')
+        || (e.kind == 'topic' && e.amount == 5
+          && existsAfter(/databases/$(database)/documents/progress/$(uid)/completions/$(e.ref + '-1')))
+        || (e.kind == 'gift'
+          && get(/databases/$(database)/documents/coinTransfers/$(e.ref)).data.to == uid
+          && get(/databases/$(database)/documents/coinTransfers/$(e.ref)).data.status == 'pending'
+          && getAfter(/databases/$(database)/documents/coinTransfers/$(e.ref)).data.status == 'claimed'
+          && get(/databases/$(database)/documents/coinTransfers/$(e.ref)).data.amount == e.amount)
+        || (e.kind == 'refund'
+          && exists(coinLogPath(uid, 'spend_' + e.ref))
+          && get(coinLogPath(uid, 'spend_' + e.ref)).data.amount == e.amount)
+        || (e.kind == 'spend'
+          && coinsOf(getAfter(/databases/$(database)/documents/users/$(uid)).data)
+             == coinsOf(get(/databases/$(database)/documents/users/$(uid)).data) - e.amount);
+    }
+    match /users/{uid}/coinLog/{entryId} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['kind', 'amount', 'ref', 'at'])
+        && request.resource.data.at == request.time
+        && request.resource.data.amount is int && request.resource.data.amount > 0
+        && request.resource.data.ref is string && request.resource.data.ref.size() > 0 && request.resource.data.ref.size() <= 120
+        && entryId == request.resource.data.kind + '_' + request.resource.data.ref
+        && coinEntryOk(uid, request.resource.data);
+      allow update, delete: if false;
     }
 
     // Push addresses of a learner's phones and computers (added 2026-10-18, src/lib/web-push.ts).

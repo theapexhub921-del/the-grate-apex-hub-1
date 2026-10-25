@@ -1,4 +1,5 @@
 import { findLessonPractice, resumeHref, resumeLabel, useQuizDrafts } from '@/hooks/use-quiz-drafts';
+import { LESSON_COINS } from '@/data/apex-coins';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { type ScrollView, StyleSheet, View } from 'react-native';
@@ -155,7 +156,7 @@ export default function LegacyLessonScreen() {
     <Card style={styles.finished}>
       <Text style={styles.finishedEmoji}>🎉</Text>
       <Text style={styles.finishedTitle}>Lesson completed</Text>
-      <Text style={styles.finishedText}>{finished.xp > 0 ? `+${finished.xp} XP · ${meta.title}` : `${meta.title} — already completed earlier.`}</Text>
+      <Text style={styles.finishedText}>{finished.xp > 0 ? `+${finished.xp} XP · +${LESSON_COINS} Apex Coins · ${meta.title}` : `${meta.title} — already completed earlier.`}</Text>
       <View style={styles.finishedActions}>
         {questions > 0 && course ? <Button label={savedPractice ? `Resume practice · ${resumeLabel(savedPractice)}` : `Practice · ${questions} questions`} onPress={() => router.push(savedPractice ? resumeHref(savedPractice) : routes.legacyPractice({ course: course.id, lesson: meta.id }))} /> : null}
         {meta.subject ? <Button label="Learn by answering" variant="secondary" onPress={() => router.push(routes.lesson(meta.id, { layer: 'learn' }))} /> : null}

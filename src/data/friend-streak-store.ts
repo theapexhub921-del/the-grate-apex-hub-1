@@ -93,13 +93,12 @@ export async function protectFriendStreak(friendId: string, method: 'freeze' | '
   if (method === 'freeze') {
     // Check first, save the covered days, then spend: a failed save costs nothing.
     if (streakProtection().freezes < days.length) throw new Error(`You need ${days.length} streak freeze${days.length === 1 ? '' : 's'} for this. You have ${streakProtection().freezes}.`);
-  } else {
-    await spendApexCoins(RESTORE_COST);
   }
+  const payment = method === 'coins' ? await spendApexCoins(RESTORE_COST) : null;
   try {
     await setDoc(doc(db, 'friendStreaks', chatId), { covered: arrayUnion(...days), updatedAt: serverTimestamp() }, { merge: true });
   } catch (error) {
-    if (method === 'coins') await refundApexCoins(RESTORE_COST);
+    if (payment) await refundApexCoins(payment, RESTORE_COST);
     if ((error as { code?: string })?.code === 'permission-denied') throw new Error('Friend streak restores are not switched on yet. Nothing was spent.');
     throw error;
   }

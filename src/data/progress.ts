@@ -630,6 +630,9 @@ export async function completeLesson(lessonId: string, _subject: Subject, xp: nu
   await saveProgress();
   notify();
   void saveCloudProgress(cloudLessonRows(), cloudStats());
+  // +10 Apex Coins for a first completion (data/apex-coins.ts; loaded here on demand because
+  // apex-coins imports this module). Best effort: a failed reward never fails the lesson.
+  void import('@/data/apex-coins').then((coins) => coins.awardLessonCoins(lessonId, xp, at)).catch((error) => console.warn('Could not add lesson coins:', error));
   track('lesson_complete', { lesson_id: lessonId });
   if (progress.lessonsCompleted === 1) track('first_lesson_complete', { lesson_id: lessonId });
   return true;

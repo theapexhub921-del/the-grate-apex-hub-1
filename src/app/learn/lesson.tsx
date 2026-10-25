@@ -5,6 +5,7 @@ import { Text } from '@/components/ui/text';
 
 import { AiFlashcardsPanel, AiQuestionsPanel, AskAiFab, AskAiPanel } from '@/components/learning/ai-study';
 import { InteractiveLayer } from '@/components/learning/interactive-layer';
+import { LESSON_COINS } from '@/data/apex-coins';
 import { ClassAccessCard } from '@/components/learning/class-access-card';
 import { QuizInProgressCard } from '@/components/learning/quiz-in-progress-card';
 import { MemoryStateBadge } from '@/components/learning/memory-ui';
@@ -266,7 +267,7 @@ function LessonPlayer({
         <Card style={styles.doneCard}>
           <Text style={styles.doneTitle}>✓ Lesson completed</Text>
           <Text style={styles.doneText}>
-            {finish?.awarded ? `+${finish.xp} XP. ` : ''}
+            {finish?.awarded ? `+${finish.xp} XP · +${LESSON_COINS} Apex Coins. ` : ''}
             {concepts.length} concept{concepts.length === 1 ? '' : 's'} scheduled for their first review tomorrow — retrieval then is what makes it stick.
           </Text>
           {finish?.milestones.map((item) => (
