@@ -18,9 +18,10 @@ import { LogoMark } from '@/components/logo-mark';
 import { Button } from '@/components/ui/button';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Interactive } from '@/components/ui/interactive';
-import { elevation, Radius, ThemeColors, Type } from '@/constants/theme';
+import { ThemeColors, Type } from '@/constants/theme';
 import { acceptCurrentLegalVersions, holdSignUpConsent, needsOnboarding, saveHeldSignUpConsent, useOnboardingState } from '@/data/onboarding';
 import { setDisplayName } from '@/data/user';
+import { ExperiencePreview } from '@/hooks/use-experience';
 import { useTheme } from '@/hooks/use-theme';
 import { clearOAuthPending, friendlyGoogleError, isInstalledPwa, peekOAuthPending, signInWithGoogle } from '@/lib/google-auth';
 import { useAuth } from '@/hooks/use-auth';
@@ -79,7 +80,17 @@ const ONBOARDING_HREF = '/onboarding' as Href;
 //   checkEmail  — sign-up sent a confirmation link
 //   reset       — "Forgot password?": email a reset link
 //   newPassword — opened from the reset link: choose a new password
-export default function LoginScreen() {
+// The sign-in page is always drawn in Originate (owner, 2026-10-25), whichever
+// interface the learner chose: plain page, IBM Plex, flat cards, no shadows.
+export default function LoginRoute() {
+  return (
+    <ExperiencePreview experience="originate">
+      <LoginScreen />
+    </ExperiencePreview>
+  );
+}
+
+function LoginScreen() {
   const colors = useTheme();
   const styles = createStyles(colors);
   const { width } = useWindowDimensions();
@@ -361,14 +372,14 @@ export default function LoginScreen() {
 
   const title =
     mode === 'newPassword'
-      ? 'Set New Password'
+      ? 'Set a new password'
       : mode === 'reset'
-        ? 'Reset Password'
+        ? 'Reset your password'
         : mode === 'signUp'
           ? 'Create your account'
           : mode === 'checkEmail'
             ? 'Check your email'
-            : 'Sign In';
+            : 'Sign in';
   const subtitle =
     mode === 'newPassword'
       ? passwordUpdated
@@ -401,17 +412,17 @@ export default function LoginScreen() {
           )}
 
           <View style={[styles.formPanel, isWide && styles.formPanelWide]}>
-            <View style={[styles.card, elevation(colors, 3)]}>
+            <View style={styles.card}>
               <Text style={styles.eyebrow}>
                 {mode === 'signIn'
-                  ? 'WELCOME BACK'
+                  ? 'Welcome back'
                   : mode === 'signUp'
-                    ? 'NEW TO GrAte Apex Hub'
+                    ? 'New to GrAte Apex Hub'
                     : mode === 'checkEmail'
-                      ? 'ALMOST THERE'
+                      ? 'Almost there'
                       : mode === 'reset'
-                        ? 'ACCOUNT RECOVERY'
-                        : 'NEW PASSWORD'}
+                        ? 'Account recovery'
+                        : 'New password'}
               </Text>
               <Text style={styles.title} accessibilityRole="header">
                 {title}
@@ -771,7 +782,7 @@ function isWrongUsernameOrPassword(code?: string | null) {
 
 type LoginStyles = ReturnType<typeof createStyles>;
 
-// Desktop: the brand side of the split screen, on the shared atmosphere.
+// Desktop: the brand side of the split screen.
 function BrandPanel({ styles, colors }: { styles: LoginStyles; colors: ThemeColors }) {
   const points: { icon: IconName; title: string; text: string }[] = [
     { icon: 'learn', title: 'Every course in your class', text: 'Lessons section by section, practice in four question types and spaced review that brings concepts back before you forget.' },
@@ -785,15 +796,14 @@ function BrandPanel({ styles, colors }: { styles: LoginStyles; colors: ThemeColo
         <Text style={styles.brandName}>GrAte Apex Hub</Text>
       </View>
       <View style={styles.brandStatement}>
-        <View style={styles.brandAccent} />
         <Text style={styles.brandMotto}>Learn together. You’ve got this.</Text>
-        <Text style={styles.brandSubjects}>LEARN · CONNECT · RISE TOGETHER</Text>
+        <Text style={styles.brandSubjects}>Learn · connect · rise together</Text>
       </View>
       <View style={styles.points}>
         {points.map((point) => (
           <View key={point.title} style={styles.point}>
             <View style={styles.pointIcon}>
-              <Icon name={point.icon} size={18} color={colors.accentText} />
+              <Icon name={point.icon} size={18} color={colors.primaryText} />
             </View>
             <View style={styles.pointText}>
               <Text style={styles.pointTitle}>{point.title}</Text>
@@ -998,71 +1008,55 @@ function friendlyError(message?: string | null, code?: string | null) {
 
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
-    // Transparent: the shell's atmosphere (auth mood) is the background.
-    screen: { flex: 1, backgroundColor: 'transparent' },
+    // Its own plain page colour, so a Legacy learner's gradient does not show behind it.
+    screen: { flex: 1, backgroundColor: colors.background },
     scrollView: { flex: 1 },
     container: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, paddingTop: 40, paddingBottom: 60 },
     containerWide: { paddingHorizontal: 48, paddingVertical: 48 },
     layout: { width: '100%', maxWidth: 440, alignSelf: 'center', gap: 22 },
-    layoutWide: { maxWidth: 1240, flexDirection: 'row', alignItems: 'center', gap: 64 },
+    layoutWide: { maxWidth: 1120, flexDirection: 'row', alignItems: 'center', gap: 64 },
 
     // Brand (desktop)
-    brandPanel: { flex: 1.1, minWidth: 0, gap: 36, justifyContent: 'center' },
-    brandHeader: { flexDirection: 'row', alignItems: 'center', gap: 18, alignSelf: 'flex-start' },
-    brandName: { fontSize: 26, fontWeight: '800', letterSpacing: 1.4, color: colors.logoLetters },
-    brandStatement: { gap: 12 },
-    brandAccent: { width: 44, height: 4, borderRadius: 2, backgroundColor: colors.accent },
-    brandMotto: { ...Type.display, fontSize: 46, lineHeight: 52, color: colors.text, maxWidth: 520 },
-    brandSubjects: { ...Type.overline, letterSpacing: 2.2, color: colors.textTertiary },
-    points: { gap: 18, maxWidth: 460 },
-    point: { flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
-    pointIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: 13,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.accentSubtle,
-      borderWidth: 1,
-      borderColor: colors.accent + '44',
-    },
+    brandPanel: { flex: 1.1, minWidth: 0, gap: 32, justifyContent: 'center' },
+    brandHeader: { flexDirection: 'row', alignItems: 'center', gap: 16, alignSelf: 'flex-start' },
+    brandName: { fontSize: 24, fontWeight: '600', color: colors.logoLetters },
+    brandStatement: { gap: 8 },
+    brandMotto: { ...Type.display, fontSize: 40, lineHeight: 48, color: colors.text, maxWidth: 520 },
+    brandSubjects: { ...Type.callout, color: colors.textSecondary },
+    points: { maxWidth: 460, borderTopWidth: 1, borderTopColor: colors.border },
+    point: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: colors.border },
+    pointIcon: { width: 36, height: 36, borderRadius: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySubtle },
     pointText: { flex: 1, minWidth: 0 },
     pointTitle: { ...Type.headline, color: colors.text },
-    pointBody: { fontSize: 13.5, lineHeight: 20, color: colors.textSecondary, marginTop: 2 },
+    pointBody: { ...Type.callout, color: colors.textSecondary, marginTop: 2 },
 
     // Brand (phones)
     mobileBrand: { alignItems: 'flex-start', gap: 10, marginBottom: 4, paddingLeft: 8 },
-    mobileMotto: { ...Type.overline, letterSpacing: 1.6, color: colors.textTertiary, textAlign: 'center', marginTop: 18 },
+    mobileMotto: { ...Type.callout, color: colors.textSecondary, textAlign: 'center', marginTop: 16 },
 
     // Form
     formPanel: { width: '100%' },
     formPanelWide: { width: 440, flexShrink: 0 },
-    card: {
-      backgroundColor: colors.surfaceElevated,
-      borderRadius: Radius.xl,
-      padding: 28,
-      borderWidth: 1,
-      borderColor: colors.hairline,
-    },
-    eyebrow: { ...Type.overline, color: colors.accentText, marginBottom: 8 },
+    card: { backgroundColor: colors.surface, borderRadius: 12, padding: 24, borderWidth: 1, borderColor: colors.border },
+    eyebrow: { ...Type.caption, fontWeight: '600', color: colors.primaryText, marginBottom: 4 },
     title: { ...Type.title1, color: colors.text },
-    subtitle: { ...Type.callout, color: colors.textSecondary, marginTop: 4, marginBottom: 22 },
+    subtitle: { ...Type.callout, color: colors.textSecondary, marginTop: 4, marginBottom: 24 },
     field: { marginBottom: 14 },
-    label: { fontSize: 13, fontWeight: '700', color: colors.textSecondary, marginBottom: 6 },
+    label: { fontSize: 13, fontWeight: '600', color: colors.text, marginBottom: 6 },
     inputShell: {
       flexDirection: 'row',
       alignItems: 'center',
-      minHeight: 50,
-      borderRadius: 14,
+      minHeight: 48,
+      borderRadius: 8,
       borderWidth: 1,
       borderColor: colors.border,
-      backgroundColor: colors.surfaceSunken,
+      backgroundColor: colors.surface,
       paddingHorizontal: 12,
       gap: 8,
     },
     inputIcon: { marginRight: 2 },
     input: { flex: 1, minWidth: 0, fontSize: 15, color: colors.text, paddingVertical: 12 },
-    reveal: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 10 },
+    reveal: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8 },
     revealHover: { backgroundColor: colors.surfaceMuted },
     revealText: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },
     forgot: { alignSelf: 'flex-end', paddingVertical: 4, paddingHorizontal: 2, marginTop: -4, marginBottom: 8, borderRadius: 6 },
@@ -1076,7 +1070,7 @@ function createStyles(colors: ThemeColors) {
       flexDirection: 'row',
       gap: 10,
       padding: 12,
-      borderRadius: 12,
+      borderRadius: 8,
       backgroundColor: colors.errorSubtle,
       borderWidth: 1,
       borderColor: colors.errorBorder,
@@ -1087,7 +1081,7 @@ function createStyles(colors: ThemeColors) {
       flexDirection: 'row',
       gap: 10,
       padding: 12,
-      borderRadius: 12,
+      borderRadius: 8,
       backgroundColor: colors.successSubtle,
       borderWidth: 1,
       borderColor: colors.successBorder,
@@ -1097,28 +1091,28 @@ function createStyles(colors: ThemeColors) {
     strong: { fontWeight: '800' },
     hintText: { fontSize: 12.5, lineHeight: 18, color: colors.textSecondary, marginTop: -4, marginBottom: 10 },
     consentRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 6, marginTop: 2 },
-    consentBox: { width: 20, height: 20, borderRadius: 6, borderWidth: 1.5, borderColor: colors.borderStrong, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
+    consentBox: { width: 20, height: 20, borderRadius: 4, borderWidth: 1.5, borderColor: colors.borderStrong, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
     consentBoxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
     consentCopy: { flex: 1, fontSize: 12.5, lineHeight: 19, color: colors.textSecondary },
     consentLink: { color: colors.primaryText, fontWeight: '700', textDecorationLine: 'underline' },
     or: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 16 },
     orLine: { flex: 1, height: 1, backgroundColor: colors.divider },
-    orText: { fontSize: 12, fontWeight: '700', color: colors.textTertiary, textTransform: 'uppercase', letterSpacing: 1 },
+    orText: { fontSize: 13, color: colors.textTertiary },
     google: {
-      minHeight: 50,
+      minHeight: 48,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 10,
-      borderRadius: 14,
+      borderRadius: 8,
       backgroundColor: '#FFFFFF',
       borderWidth: 1,
       borderColor: '#DADCE0',
       paddingHorizontal: 16,
     },
     googleHover: { backgroundColor: '#F7F8FA' },
-    googlePressed: { transform: [{ scale: 0.98 }] },
-    googleText: { fontSize: 15, fontWeight: '700', color: '#1F1F1F' },
+    googlePressed: { backgroundColor: '#EEF0F3' },
+    googleText: { fontSize: 15, fontWeight: '600', color: '#1F1F1F' },
     switchRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 18 },
     switchText: { fontSize: 13.5, color: colors.textSecondary },
     legalRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 14 },

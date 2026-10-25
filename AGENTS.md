@@ -389,6 +389,7 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * Learners see experiences as **interfaces** (Settings → Interface, "Choose your interface") and The Originals as **Legacy** (owner's requests, 2026-10-17); code, routes and the saved id (`originals`) keep the old words, so nobody's choice resets. Originate is shown to learners as **OrigiNate** (owner, 2026-10-24); its id and code names stay `originate`.
 * The Originals (Legacy) is the default experience; the chooser and Settings never call one experience "recommended" (owner's choice, 2026-10-16).
 * Originate's desktop sidebar (`src/components/desktop-sidebar.tsx`) is the owner's favourite: do not restyle it.
+* Both interfaces stay (owner, 2026-10-25): do not remove Legacy or Originate. The sign-in page (`src/app/login.tsx`) is always drawn in Originate, whatever the learner chose (`ExperiencePreview` around the page, with its own plain page colour).
 * Originate's Study page keeps every section The Originals has (course pictures, question of the day, practise-and-plan tiles, your progress, your week), drawn in Originate's style.
 
 ### Themes
