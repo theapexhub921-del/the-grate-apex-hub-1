@@ -1,0 +1,26 @@
+# Runs on every push to master and every pull request: the TypeScript check and all
+# tests (npm test: the learning engine, every published topic's content, the rules
+# for Firebase reads, deploy wiring...). A red ✗ next to a commit on GitHub means
+# something broke; the details are in the Actions tab. Vercel still deploys on its own.
+name: Checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Tests
+        run: npm test
