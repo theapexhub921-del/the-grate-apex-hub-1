@@ -1,5 +1,5 @@
 // POST /api/question-report — email a saved question report to the content team.
-// Email goes through Resend (RESEND_API_KEY in Vercel; 3,000 a month free). If Resend
+// Email goes through Resend (RESEND_API_KEY, or RESEND_KEY, in Vercel; 3,000 a month free). If Resend
 // is not set up or fails, Formspree is the backup (FORMSPREE_FORM_ID in Vercel, the
 // id from formspree.io/f/<id>; 50 a month free), so a report is emailed once, never
 // twice. The Firestore report is saved first either way, and admins also see it in
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
   if (req.headers['content-length'] && Number(req.headers['content-length']) > 16_384) {
     return res.status(413).json({ error: 'Report is too large.' });
   }
-  if (!process.env.RESEND_API_KEY && !process.env.FORMSPREE_FORM_ID) return res.status(503).json({ error: 'Email notifications are not configured.' });
+  if (!process.env.RESEND_API_KEY && !process.env.RESEND_KEY && !process.env.FORMSPREE_FORM_ID) return res.status(503).json({ error: 'Email notifications are not configured.' });
   const body = typeof req.body === 'string' ? safeJson(req.body) : req.body;
   if (!body || typeof body !== 'object' || Array.isArray(body)) return res.status(400).json({ error: 'Invalid report.' });
   const questionId = clean(body?.questionId, 300);
@@ -95,11 +95,12 @@ export default async function handler(req, res) {
 }
 
 async function sendWithResend(subject, details) {
-  if (!process.env.RESEND_API_KEY) return false;
+  const key = process.env.RESEND_API_KEY || process.env.RESEND_KEY;
+  if (!key) return false;
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+      headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
       body: JSON.stringify({
         // Resend's test sender only delivers to the email the Resend account was made
         // with; for any other address, verify a domain and set QUESTION_REPORT_FROM.

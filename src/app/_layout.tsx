@@ -31,6 +31,7 @@ import { loadWebFonts } from '@/lib/web-fonts';
 import { routes } from '@/lib/routes';
 import { initAnalytics } from '@/lib/analytics';
 import { installWebScrolling } from '@/lib/web-scrolling';
+import { installCrashReporting } from '@/lib/crash-report';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -170,6 +171,7 @@ export default function TabLayout() {
     loadWebFonts();
     initAnalytics();
     installWebScrolling();
+    installCrashReporting();
   }, []);
 
   useEffect(() => {

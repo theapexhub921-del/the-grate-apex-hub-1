@@ -426,6 +426,11 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * **Google Analytics for Firebase** (web, so the Android app too): `src/lib/analytics.ts` (`initAnalytics` in `_layout.tsx`, `track`, `setAnalyticsUser` in `use-auth.tsx`). Page views are automatic; events: `sign_up`, `login`, `lesson_complete`, `first_lesson_complete`, `quiz_complete`, `apex_challenge_complete`, `battle_start`, `battle_finish`, `stamp_sent`. Never send names, emails or answers. Every call is fire-and-forget and does nothing on native or with the emulators.
 * **Vercel Web Analytics**: the script tag in `src/app/+html.tsx` (served by Vercel, no package); `public/sw.js` lets `/_vercel/` go straight to the network. Switched on in Vercel → Analytics.
 
+### Crash reports (2026-10-25)
+
+* Every page is wrapped in `CrashBoundary` (`src/components/crash-boundary.tsx`, through the tabs' `screenLayout` in both `app-tabs` files): a crash shows "Something went wrong" with Reload / Go to Study, the navigation stays, and a new page clears it.
+* `src/lib/crash-report.ts` sends the error (and, on the web, uncaught script errors) to `api/crash-report.mjs` (at most 5 per visit, each error once). The function logs every report (Vercel → Logs, search "CRASH") and emails theapexhub921@gmail.com through Resend (`RESEND_API_KEY` or `RESEND_KEY`), at most once an hour per error.
+
 ### Help and contact
 
 * Explore → Contact us shows the team email and the two WhatsApp help groups (`WHATSAPP_HELP_GROUPS` in `src/lib/contact.ts`).

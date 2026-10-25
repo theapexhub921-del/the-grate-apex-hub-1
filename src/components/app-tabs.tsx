@@ -1,4 +1,5 @@
 import Tabs from 'expo-router/js-tabs';
+import { CrashBoundary } from '@/components/crash-boundary';
 import { useSegments } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
@@ -43,6 +44,8 @@ export default function AppTabs() {
       <Tabs
         // Back (incl. Android back button) returns to the page you came from.
         backBehavior="history"
+          // Each page has its own crash screen (components/crash-boundary.tsx); the navigation stays.
+          screenLayout={({ children }) => <CrashBoundary>{children}</CrashBoundary>}
         tabBar={({ navigation }) =>
           isAuthRoute || isWidgetRoute || noBottomBar ? null : experience === 'originals' ? (
             <LegacyFloatingBar onNavigate={(route) => navigation.navigate(route as never)} />
