@@ -32,6 +32,7 @@ import { routes } from '@/lib/routes';
 import { initAnalytics } from '@/lib/analytics';
 import { installWebScrolling } from '@/lib/web-scrolling';
 import { installCrashReporting } from '@/lib/crash-report';
+import { useHomeUnderneath } from '@/lib/home-underneath';
 import { FirstTimeTips } from '@/components/first-time-tips';
 
 SplashScreen.preventAutoHideAsync();
@@ -165,6 +166,7 @@ export default function TabLayout() {
   const isClient = useIsClient();
   const pageZoom = usePageZoomPreference();
   const fontSize = useFontSizePreference();
+  useHomeUnderneath();
 
   // Web: fetch the display font once the app is running (never blocks paint),
   // and start usage analytics (lib/analytics.ts).
