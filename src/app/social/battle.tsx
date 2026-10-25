@@ -1,11 +1,11 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { BackLink } from '@/components/learning/nav-bits';
 import { Arena, Countdown } from '@/components/learning/apex-arena';
 import { BattleIntro } from '@/components/social/battle-intro';
-import { QuestionSession, type SessionResult } from '@/components/learning/question-session';
+import { QuestionSession, type SessionProgress, type SessionResult } from '@/components/learning/question-session';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/interactive';
 import { Pill } from '@/components/ui/pill';
@@ -14,7 +14,7 @@ import { ErrorScreen, LoadingState } from '@/components/ui/state-views';
 import { Text } from '@/components/ui/text';
 import { setPendingXpReward } from '@/components/xp-toast';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { acceptBattle, type Battle, BATTLE_SECONDS, BATTLE_WIN_XP, battleStatus, declineBattle, getBattle, submitBattleResult, watchBattles } from '@/data/battles';
+import { acceptBattle, type Battle, type BattleLive, type BattleSide, BATTLE_SECONDS, BATTLE_WIN_XP, battleStatus, declineBattle, getBattle, reportBattleProgress, submitBattleResult, watchBattles } from '@/data/battles';
 import { announceBattleResult } from '@/lib/web-push';
 import { getTopicQuestions } from '@/data/curriculum';
 import { bankQuestions, buildPractice, loadLegacyBank } from '@/data/legacy-study';
@@ -29,6 +29,14 @@ import { friendlyError } from '@/lib/errors';
 // opponent (same course and seed), 15 seconds each. Then the result, once
 // both have played. The winner earns XP from the app; nothing is taken from
 // the other player.
+
+/** The other player, live: finished, part-way through, or not started. */
+function opponentLine(name: string | null, done: BattleSide | null, progress: BattleLive | null, total: number) {
+  const who = `@${name ?? 'opponent'}`;
+  if (done) return `${who} finished: ${done.score}/${done.total}`;
+  if (progress && progress.answered > 0) return `${who} is playing: ${progress.answered}/${total} answered · ${progress.correct} correct`;
+  return `${who} hasn't started yet`;
+}
 
 function seededShuffle<T>(items: readonly T[], seed: string) {
   let h = 2166136261;
@@ -121,6 +129,17 @@ export default function BattleScreen() {
 
   const items = useMemo(() => (questions ?? []).map((question) => ({ question })), [questions]);
 
+  // My progress goes to my own document as I answer, so the other player sees it live.
+  const sentAnswered = useRef(-1);
+  const progressed = useCallback((progress: SessionProgress) => {
+    if (!battle || !questions) return;
+    const answered = new Set([...progress.checked, ...progress.timedOut]).size;
+    if (answered === sentAnswered.current) return;
+    sentAnswered.current = answered;
+    const correct = questions.filter((question) => progress.checked.includes(question.id) && isAnswerCorrect(question, progress.answers[question.id])).length;
+    void reportBattleProgress(battle, { answered, correct }).catch(() => undefined);
+  }, [battle, questions]);
+
   if (!id) return <ErrorScreen title="No battle chosen" message="Open a battle from Connect." primary={{ label: 'Back to Connect', onPress: () => router.replace('/social') }} />;
   if (error) return <ErrorScreen title="Battle unavailable" message={error} primary={{ label: 'Back to Connect', onPress: () => router.replace('/social') }} />;
   if (!battle || !questions) return <LoadingState label="Setting up the battle…" />;
@@ -129,6 +148,8 @@ export default function BattleScreen() {
   const mine = battle.challengerId === uid ? battle.challenger : battle.opponent;
   const theirs = battle.challengerId === uid ? battle.opponent : battle.challenger;
   const otherName = battle.challengerId === uid ? battle.opponentName : battle.challengerName;
+  const theirLive = battle.challengerId === uid ? battle.opponentLive : battle.challengerLive;
+  const liveLine = opponentLine(otherName, theirs, theirLive, questions.length);
 
   async function acceptAndJoin() {
     try {
@@ -169,7 +190,7 @@ export default function BattleScreen() {
           <View style={styles.scores}>
             <View style={styles.scoreBox}><Text style={styles.scoreLabel}>YOU</Text><Text style={styles.score}>{mine ? `${mine.score}/${mine.total}` : '—'}</Text><Text style={styles.muted}>{mine ? `${mine.seconds}s` : ''}</Text></View>
             <Text style={styles.vs}>vs</Text>
-            <View style={styles.scoreBox}><Text style={styles.scoreLabel}>@{otherName ?? 'opponent'}</Text><Text style={styles.score}>{theirs ? `${theirs.score}/${theirs.total}` : '…'}</Text><Text style={styles.muted}>{theirs ? `${theirs.seconds}s` : 'not played yet'}</Text></View>
+            <View style={styles.scoreBox}><Text style={styles.scoreLabel}>@{otherName ?? 'opponent'}</Text><Text style={styles.score}>{theirs ? `${theirs.score}/${theirs.total}` : theirLive?.answered ? `${theirLive.correct}/${theirLive.answered}` : '…'}</Text><Text style={styles.muted}>{theirs ? `${theirs.seconds}s` : theirLive?.answered ? `playing · ${theirLive.answered}/${questions.length}` : 'not played yet'}</Text></View>
           </View>
           <Pill
             label={status === 'won' ? 'You won' : status === 'lost' ? 'You lost' : status === 'draw' ? 'Draw' : status === 'declined' ? 'Declined' : 'Waiting for your opponent'}
@@ -241,6 +262,7 @@ export default function BattleScreen() {
         attemptMode="practice"
         sessionId={`battle:${battle.id}:${uid}`}
         seed={battle.seed}
+        onProgress={progressed}
         onSubmit={submit}
         submitLabel="Finish the battle"
         reviewNote={null}
@@ -249,6 +271,10 @@ export default function BattleScreen() {
             <BackLink fallback={'/social' as never} />
             <Text style={styles.title}>Battle · {battle.course.name}</Text>
             <Text style={styles.muted}>Against @{otherName ?? 'opponent'} · {questions.length} questions · {BATTLE_SECONDS} seconds each</Text>
+            <View style={styles.liveRow} accessibilityLiveRegion="polite">
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>{liveLine}</Text>
+            </View>
           </View>
         }
       />
@@ -259,6 +285,9 @@ export default function BattleScreen() {
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     header: { gap: 4, marginBottom: 10 },
+    liveRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6, alignSelf: 'flex-start', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 999, backgroundColor: colors.primarySubtle },
+    liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.success },
+    liveText: { fontSize: 13, fontWeight: '700', color: colors.primaryText },
     title: { ...Type.title2, color: colors.text },
     muted: { fontSize: 12.5, color: colors.textTertiary },
     result: { alignItems: 'center', gap: 14, padding: 26, marginTop: 10 },

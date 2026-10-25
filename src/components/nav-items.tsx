@@ -43,7 +43,7 @@ export const MOBILE_NAV_ITEMS: readonly NavItem[] = [
 const SETUP_ROUTES = ['choose-experience', 'choose-username', 'suggested', 'class-selection'];
 // Answer-heavy sessions on phones: the bar would sit over the options. Each has
 // its own Back / "Save & exit".
-const SESSION_ROUTES = ['learn/quiz', 'learn/review', 'learn/apex', 'learn/hb-practice'];
+const SESSION_ROUTES = ['learn/quiz', 'learn/review', 'learn/apex', 'learn/hb-practice', 'social/battle'];
 
 export function isSetupRoute(segments: readonly string[]): boolean {
   return SETUP_ROUTES.includes(segments[0] as string);

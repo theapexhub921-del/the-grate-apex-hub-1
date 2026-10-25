@@ -380,7 +380,10 @@ export function Icon({
   label?: string;
   style?: StyleProp<ViewStyle>;
 }) {
-  const draw: Draw = ICONS[name];
+  const draw: Draw | undefined = ICONS[name];
+  // An unknown name draws nothing. (A battle's "Start" button once asked for "⚔", and the
+  // crash blanked the whole battle screen for both players: "nothing happens".)
+  if (!draw) return null;
   return (
     <Svg
       width={size}

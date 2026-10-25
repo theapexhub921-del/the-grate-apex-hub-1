@@ -31,7 +31,7 @@ type ButtonProps = {
   shortcut?: string; // keyboard hint shown on web, e.g. "Enter"
 };
 
-const TRAILING_ICONS: Record<string, IconName> = { '→': 'arrowRight', '⚡': 'challenge', '›': 'chevronRight' };
+const TRAILING_ICONS: Record<string, IconName> = { '→': 'arrowRight', '⚡': 'challenge', '⚔': 'challenge', '›': 'chevronRight' };
 
 // Tactile buttons: a soft top sheen and inner highlight on filled
 // variants, a small lift on hover, and a press that settles in.

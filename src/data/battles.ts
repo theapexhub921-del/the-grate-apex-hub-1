@@ -10,7 +10,7 @@
 //   opponent   → battleResults.<id> = { score, total, seconds } | { declined: true }
 // Scores are written by each player's own app, so — like XP in both apps —
 // they are not tamper-proof; a server referee would be needed for that.
-import { arrayUnion, collection, doc, getDoc, getDocs, limit, onSnapshot, query, runTransaction, serverTimestamp, setDoc, where, writeBatch, type Unsubscribe } from 'firebase/firestore';
+import { arrayUnion, collection, doc, getDoc, getDocFromServer, getDocs, limit, onSnapshot, query, runTransaction, serverTimestamp, setDoc, where, writeBatch, type Unsubscribe } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
@@ -18,6 +18,8 @@ import { announceBattleAccepted } from '@/lib/web-push';
 
 export type BattleCourse = { kind: 'hb' | 'topic'; id: string; name: string; topicIds?: string[]; topicNames?: string[] };
 export type BattleSide = { score: number; total: number; seconds: number };
+/** A player's progress while the battle is being played, seen live by the other player. */
+export type BattleLive = { answered: number; correct: number; at: number };
 
 export type Battle = {
   id: string;
@@ -33,6 +35,8 @@ export type Battle = {
   opponent: BattleSide | null;
   accepted: boolean;
   declined: boolean;
+  challengerLive: BattleLive | null;
+  opponentLive: BattleLive | null;
 };
 
 export type BattleStatus = 'incoming-challenge' | 'waiting-for-response' | 'waiting-for-you' | 'waiting-for-them' | 'declined' | 'won' | 'lost' | 'draw';
@@ -84,6 +88,11 @@ const side = (value: unknown): BattleSide | null => {
   return v && typeof v.score === 'number' && typeof v.total === 'number' ? { score: v.score, total: v.total, seconds: Number(v.seconds) || 0 } : null;
 };
 
+const live = (value: unknown): BattleLive | null => {
+  const v = value as Partial<BattleLive> | null | undefined;
+  return v && typeof v.answered === 'number' && typeof v.correct === 'number' ? { answered: v.answered, correct: v.correct, at: Number(v.at) || 0 } : null;
+};
+
 function fromOut(id: string, challengerId: string, challengerName: string | null, out: Record<string, unknown>, results: Record<string, unknown> | undefined): Battle {
   const course = out.course as BattleCourse;
   const reply = (results?.[id] ?? null) as Record<string, unknown> | null;
@@ -102,6 +111,8 @@ function fromOut(id: string, challengerId: string, challengerName: string | null
     // Results from battles created before the accept step count as accepted.
     accepted: reply?.accepted === true || Boolean(out.result) || Boolean(reply && (reply.declined || side(reply))),
     declined: Boolean(reply?.declined),
+    challengerLive: live(out.live),
+    opponentLive: reply ? live(reply.live) : null,
   };
 }
 
@@ -122,7 +133,10 @@ function battlesFromDocuments(uid: string, mine: Record<string, unknown>, incomi
 /** My battles: the ones I sent, and the ones sent to me. Newest first. */
 export async function listBattles(): Promise<Battle[]> {
   const uid = await me();
-  const mine = (await getDoc(doc(db, 'users', uid))).data() ?? {};
+  // From the server: right after signing in, a plain read can return a local copy that holds
+  // only what the app just wrote (online status), and the battle looked "not found".
+  const mineRef = doc(db, 'users', uid);
+  const mine = (await getDocFromServer(mineRef).catch(() => getDoc(mineRef))).data() ?? {};
   const out: Battle[] = [];
   // Sent by me: their replies are on the opponent's document.
   const sent = Object.entries((mine.battlesOut ?? {}) as Record<string, Record<string, unknown>>);
@@ -230,6 +244,19 @@ export async function submitBattleResult(battle: Battle, result: BattleSide) {
     await setDoc(ref, { battleResults: { [battle.id]: result } }, { merge: true });
   }
   track('battle_finish', { score: result.score, total: result.total });
+}
+
+/**
+ * My progress while playing (answered, correct), on my own document, so the other player
+ * sees it live (owner, 2026-10-24: battles should feel like a live 1 v 1). The battle page
+ * calls it only when the number answered changes: about ten small writes a battle.
+ */
+export async function reportBattleProgress(battle: Battle, progress: { answered: number; correct: number }) {
+  const uid = await me();
+  const value = { answered: progress.answered, correct: progress.correct, at: Date.now() };
+  const ref = doc(db, 'users', uid);
+  if (battle.challengerId === uid) await setDoc(ref, { battlesOut: { [battle.id]: { live: value } } }, { merge: true });
+  else if (battle.opponentId === uid) await setDoc(ref, { battleResults: { [battle.id]: { live: value } } }, { merge: true });
 }
 
 export async function declineBattle(battle: Battle) {
