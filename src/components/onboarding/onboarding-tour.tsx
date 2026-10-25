@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { type ReactNode, useMemo, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,21 +7,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LogoMark } from '@/components/logo-mark';
 import { AnimatedContent } from '@/components/motion';
 import {
-  ApexDemo,
-  ExploreDemo,
-  HomeDemo,
-  InstallGuideDemo,
   LearnDemo,
   NotificationsDemo,
   PersonaliseDemo,
-  PlanningDemo,
   ProgressDemo,
-  QuizDemo,
-  ReadDemo,
   RecallDemo,
-  ReviewDemo,
-  SimFrame,
-  SocialDemo,
   UsernameDemo,
   WelcomeDemo,
 } from '@/components/onboarding/tour-demos';
@@ -30,16 +20,12 @@ import { Icon, type IconName } from '@/components/ui/icon';
 import { webStyle } from '@/components/ui/web';
 import { cssTransition, MOTION } from '@/constants/motion';
 import { elevation, isDesktopWidth, Radius, Type, type ThemeColors } from '@/constants/theme';
-import { ABOUT_US } from '@/data/about';
-import { EXPLORE_TEAM } from '@/data/explore';
-import { getNextActions } from '@/data/learning/next-action';
-import { useLearning } from '@/data/learning/use-learning';
 import { acceptCurrentLegalVersions, completeOnboarding, needsLegalAcceptance } from '@/data/onboarding';
 import { useDisplayName } from '@/data/user';
 import { snoozeNotificationPrompt } from '@/components/notification-prompt';
 import { needsUsername } from '@/lib/login-identifier';
+import { enableFirstTimeTips } from '@/data/first-time-tips';
 import { useAuth } from '@/hooks/use-auth';
-import { useGreeting } from '@/hooks/use-greeting';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { InlineNotice } from '@/components/ui/state-views';
@@ -66,10 +52,7 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
   const { width } = useWindowDimensions();
   const desktop = isDesktopWidth(width);
   const { user } = useAuth();
-  const { inputs } = useLearning();
-  const { greeting } = useGreeting();
   const displayName = useDisplayName();
-  const nextAction = useMemo(() => getNextActions(inputs)[0], [inputs]);
   const name = displayName?.trim() ? `Doc. ${displayName.trim()}` : 'Doc.';
 
   const [index, setIndex] = useState(0);
@@ -88,42 +71,8 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       icon: 'sparkle',
       kicker: 'WELCOME',
       title: `Welcome to GrAte Apex Hub, ${name}`,
-      body: 'A quick tour of the main features. Try each sample as you go — practice actions do not change your learning progress.',
+      body: 'Six short steps to get you started. Try each sample as you go — practice actions do not change your learning progress. Tips for the other features appear the first time you open them.',
       demo: () => <WelcomeDemo />,
-    },
-    {
-      id: 'about-us',
-      icon: 'profile',
-      kicker: 'ABOUT US',
-      title: 'A learning companion for medical students',
-      body: ABOUT_US,
-      demo: () => (
-        <SimFrame>
-          <View style={styles.aboutTeam}>
-            <Text style={styles.finishKicker}>MEET THE TEAM</Text>
-            {EXPLORE_TEAM.map((member) => (
-              <View key={member.name} style={styles.aboutTeamRow}>
-                <View style={styles.aboutTeamIcon}>
-                  <Icon name={member.icon} size={16} color={colors.primaryText} />
-                </View>
-                <View style={styles.teamMemberCopy}>
-                  <Text style={styles.aboutTeamName}>{member.name}</Text>
-                  <Text style={styles.aboutTeamRole}>{member.role}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        </SimFrame>
-      ),
-    },
-    {
-      id: 'home',
-      icon: 'home',
-      kicker: 'HOME',
-      title: 'Your study circle, all in one place',
-      body: 'Feed is your social space. Watch and share Stories, post photos, videos and study moments, then like, comment on, reply to and reshare posts from friends.',
-      tryIt: 'See how Stories and the community feed work.',
-      demo: (props) => <HomeDemo {...props} nextTitle={nextAction?.title ?? 'Your next lesson is waiting in Study'} greeting={`${greeting}, ${name}`} />,
     },
     {
       id: 'learn',
@@ -144,33 +93,6 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       demo: (props) => <RecallDemo {...props} />,
     },
     {
-      id: 'read',
-      icon: 'book',
-      kicker: 'READ & REVISE',
-      title: 'The reference layer',
-      body: 'Every lesson also has a reading version: the full explanation, the slide sources, high-yield points and common confusions.',
-      tryIt: 'Show the key points.',
-      demo: (props) => <ReadDemo {...props} />,
-    },
-    {
-      id: 'quiz',
-      icon: 'lesson',
-      kicker: 'LESSON QUIZZES',
-      title: 'Check your understanding',
-      body: 'After a lesson, take its quiz with instant feedback or as an exam. Results show your strengths, what to revise, and let you practise the misses.',
-      tryIt: 'Switch the feedback mode.',
-      demo: (props) => <QuizDemo {...props} />,
-    },
-    {
-      id: 'review',
-      icon: 'reinforce',
-      kicker: 'REVIEW',
-      title: 'Spaced repetition, built in',
-      body: 'Each concept is scheduled to come back just before you would forget it. Your review calendar in Study shows what’s due and when.',
-      tryIt: 'Tap a day with dots.',
-      demo: (props) => <ReviewDemo {...props} />,
-    },
-    {
       id: 'progress',
       icon: 'rank',
       kicker: 'XP, LEAGUES & STREAKS',
@@ -178,42 +100,6 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       body: 'Learning earns XP and advances your rank. Each week you compete in a league on that week’s XP. Weekly challenges can earn streak freezes, and Apex Coins can restore a lost streak.',
       tryIt: 'Finish an example lesson.',
       demo: (props) => <ProgressDemo {...props} />,
-    },
-    {
-      id: 'planning',
-      icon: 'calendar',
-      kicker: 'PLAN YOUR WEEK',
-      title: 'Turn your goals into a study routine',
-      body: 'Build your timetable in Study and set lesson, XP or streak goals in Your progress. Your next learning step is always waiting in Study.',
-      tryIt: 'Choose days for a sample study timetable.',
-      demo: (props) => <PlanningDemo {...props} />,
-    },
-    {
-      id: 'apex',
-      icon: 'challenge',
-      kicker: 'APEX CHALLENGE & BATTLES',
-      title: 'The mastery test',
-      body: 'A timed run across a whole course. Fast, serious and separate from lesson quizzes — your best score is your benchmark. In Connect you can also battle a friend on the same questions.',
-      tryIt: 'Start the clock.',
-      demo: (props) => <ApexDemo {...props} />,
-    },
-    {
-      id: 'explore',
-      icon: 'explore',
-      kicker: 'EXPLORE',
-      title: 'Explore every feature',
-      body: 'Explore explains how each part of GrAte Apex Hub works, shares announcements, and shows what is coming next. There is more to discover in Explore.',
-      tryIt: 'See the feature guide and updates.',
-      demo: (props) => <ExploreDemo {...props} />,
-    },
-    {
-      id: 'social',
-      icon: 'social',
-      kicker: 'CONNECT',
-      title: 'Study with your classmates',
-      body: 'Follow classmates and message friends or groups with photos, documents and voice notes — swipe a message to reply. Keep friend streaks going, and join study groups and Table Conferences. Voice and video calls are coming later.',
-      tryIt: 'Explore a sample group or study session.',
-      demo: (props) => <SocialDemo {...props} />,
     },
     {
       id: 'personalise',
@@ -242,33 +128,6 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
       tryIt: 'Allow notifications to receive a test alert.',
       demo: (props) => <NotificationsDemo {...props} />,
     },
-    {
-      id: 'install',
-      icon: 'share',
-      kicker: 'INSTALL ON YOUR DEVICES',
-      title: 'Keep GrAte Apex Hub close at hand',
-      body: 'Add the app to your home screen or desktop for quick access. No app-store download is needed.',
-      demo: () => <InstallGuideDemo />,
-    },
-    {
-      id: 'finish',
-      icon: 'achievement',
-      kicker: 'YOU’RE READY',
-      title: `You’re all set, ${name}`,
-      body: 'Open Study for lessons, practice and your plan, Feed for Stories and posts, Connect for messages and classmates, and Explore for the feature guide and updates. Replay this introduction anytime from Settings.',
-      demo: () => (
-        <SimFrame kind="real">
-          <View style={styles.finish}>
-            <View style={styles.finishIcon}>
-              <Icon name="play" size={22} color="#0A1F5C" filled />
-            </View>
-            <Text style={styles.finishKicker}>READY TO BEGIN?</Text>
-            <Text style={styles.finishTitle}>Start where you need most</Text>
-            <Text style={styles.finishText}>Lessons and plans in Study · classmates in Connect · discoveries and updates in Explore</Text>
-          </View>
-        </SimFrame>
-      ),
-    },
   ];
   // Every learner chooses a username before the tour (the sign-up form or
   // /choose-username), so its step only shows for one who somehow has none.
@@ -284,6 +143,8 @@ export function OnboardingTour({ replay = false }: { replay?: boolean }) {
     if (user) await completeOnboarding(user.id, how);
     // The tour has its own notifications step: don't ask again straight after it.
     if (!replay) await snoozeNotificationPrompt();
+    // The other features explain themselves the first time they are opened.
+    if (!replay) await enableFirstTimeTips();
     // First time through: suggest the gold-tick accounts to follow.
     if (!replay) { router.replace('/suggested' as never); return; }
     router.replace('/');

@@ -32,6 +32,7 @@ import { routes } from '@/lib/routes';
 import { initAnalytics } from '@/lib/analytics';
 import { installWebScrolling } from '@/lib/web-scrolling';
 import { installCrashReporting } from '@/lib/crash-report';
+import { FirstTimeTips } from '@/components/first-time-tips';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -226,6 +227,7 @@ export default function TabLayout() {
               <ProfileCardHost />
               <LeaguePromotionWatcher />
               <NotificationPrompt />
+              <FirstTimeTips />
               <AchievementWatcher />
               <DeviceNotificationBridge />
               <StreakCelebrationWatcher />
