@@ -432,6 +432,12 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 * Every page is wrapped in `CrashBoundary` (`src/components/crash-boundary.tsx`, through the tabs' `screenLayout` in both `app-tabs` files): a crash shows "Something went wrong" with Reload / Go to Study, the navigation stays, and a new page clears it.
 * `src/lib/crash-report.ts` sends the error (and, on the web, uncaught script errors) to `api/crash-report.mjs` (at most 5 per visit, each error once). The function logs every report (Vercel → Logs, search "CRASH") and emails theapexhub921@gmail.com through Resend (`RESEND_API_KEY` or `RESEND_KEY`), at most once an hour per error.
 
+### Deleting an account (2026-10-25)
+
+* Settings → Account → Delete account calls `api/delete-account.mjs` (firebase-admin with `FIREBASE_SERVICE_ACCOUNT`), which runs `server/account-deletion.mjs`: profile, username, leaderboard entry, progress, push addresses, posts, likes and replies, group and chat messages, follows, then the login. If there is no server (local preview, or the key is missing: 503) the app deletes the login and private progress itself (`src/lib/account.ts`).
+* Firebase needs a recent sign-in: a password field for email accounts, a Google pop-up for Google accounts in a browser. The installed app cannot open pop-ups, so there (and when a pop-up fails) the learner is asked to sign out, sign in again and delete straight away.
+* Likes and replies on other people's posts need two collection-group indexes (likes.username, replies.authorUid); until they exist those two steps are skipped and the Vercel log has the link to create them.
+
 ### Help and contact
 
 * Explore → Contact us shows the team email and the two WhatsApp help groups (`WHATSAPP_HELP_GROUPS` in `src/lib/contact.ts`).

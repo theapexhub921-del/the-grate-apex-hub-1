@@ -654,7 +654,9 @@ export default function SettingsScreen() {
           />
         ) : deleteConfirmation === 'google' ? (
           <Text style={styles.optionDescription}>To confirm it is you, a Google window opens when you press delete.</Text>
-        ) : null}
+        ) : (
+          <Text style={styles.optionDescription}>To confirm it is you: if you signed in more than a few minutes ago, sign out, sign in again, and then delete your account straight away.</Text>
+        )}
         {deleteError ? <Text style={styles.signOutText}>{deleteError}</Text> : null}
       </Sheet>
 

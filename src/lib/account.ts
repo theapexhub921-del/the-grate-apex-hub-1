@@ -5,6 +5,8 @@ import { deleteDoc, doc } from 'firebase/firestore';
 
 import { friendlyError } from '@/lib/errors';
 import { auth, db } from '@/lib/firebase';
+import { isInstalledPwa } from '@/lib/google-auth';
+import { API_BASE } from '@/lib/live-site';
 
 // Firebase only deletes an account that signed in within the last 5 minutes
 // (otherwise "auth/requires-recent-login"). Check this BEFORE deleting any
@@ -12,13 +14,13 @@ import { auth, db } from '@/lib/firebase';
 const RECENT_SIGN_IN_MS = 4 * 60 * 1000;
 
 /**
- * Full deletion (profile, username, leaderboard entry, everything shared) needs a
- * trusted server with the admin key: server/account-deletion.mjs. It is used
- * only when its address is configured; until then the app deletes what the
- * rules allow (the login and private progress) and says so.
+ * Full deletion (profile, username, leaderboard entry, everything shared) runs on
+ * the server with the admin key: api/delete-account.mjs. Where there is no such
+ * server (a local preview, or the key is missing: 503) the app deletes what the
+ * rules allow instead (the login and private progress).
  */
-export const ACCOUNT_DELETION_URL = process.env.EXPO_PUBLIC_ACCOUNT_DELETION_URL || '';
-export const FULL_ACCOUNT_DELETION = Boolean(ACCOUNT_DELETION_URL);
+export const ACCOUNT_DELETION_URL = process.env.EXPO_PUBLIC_ACCOUNT_DELETION_URL || `${API_BASE}/api/delete-account`;
+export const FULL_ACCOUNT_DELETION = true;
 
 const SIGN_IN_AGAIN =
   'For your security, please sign out, sign in again, and then delete your account within a few minutes.';
@@ -36,7 +38,8 @@ export type DeleteConfirmation = 'password' | 'google' | 'sign-in-again';
 export function deleteConfirmationFor(user: User | null = auth.currentUser): DeleteConfirmation {
   const providers = (user?.providerData ?? []).map((info) => info.providerId);
   if (providers.includes('password')) return 'password';
-  if (providers.includes('google.com') && Platform.OS === 'web') return 'google';
+  // The installed app (Android, installed web app) cannot open Google's pop-up.
+  if (providers.includes('google.com') && Platform.OS === 'web' && !isInstalledPwa()) return 'google';
   return 'sign-in-again';
 }
 
@@ -61,6 +64,8 @@ async function confirmIdentity(user: User, password: string | undefined): Promis
     if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return 'Google confirmation was cancelled, so nothing was deleted.';
     if (code === 'auth/user-mismatch') return 'Please confirm with the same Google account you are signed in with.';
     if (code === 'auth/network-request-failed') return 'No connection. Please check your internet and try again.';
+    // Google's pop-up could not open (blocked, or not allowed here): signing in again works everywhere.
+    if (way === 'google') return SIGN_IN_AGAIN;
     return 'We could not confirm it is you. Please try again.';
   }
 }
@@ -88,15 +93,19 @@ export async function deleteMyAccount(options: { password?: string } = {}): Prom
     }
     const { token } = await user.getIdTokenResult(true);
 
-    if (FULL_ACCOUNT_DELETION) {
-      // Everything, on the trusted server (server/account-deletion.mjs).
-      const response = await fetch(ACCOUNT_DELETION_URL, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-      const body = (await response.json().catch(() => ({}))) as { deleted?: boolean; error?: string };
-      if (!response.ok || !body.deleted) return { error: body.error || 'Your account could not be deleted. Please try again.' };
+    // Everything, on the trusted server (api/delete-account.mjs).
+    const response = await fetch(ACCOUNT_DELETION_URL, { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(() => null);
+    const body = response ? ((await response.json().catch(() => null)) as { deleted?: boolean; error?: string } | null) : null;
+    if (response?.ok && body?.deleted) {
       await clearLocalCache(userId);
       await signOut(auth).catch(() => undefined);
       return { error: null };
     }
+    // The server answered but refused (sign in again) or failed part-way (safe to retry).
+    if (response && body && response.status !== 503) return { error: body.error || 'Your account could not be deleted. Please try again.' };
+    if (!response && typeof navigator !== 'undefined' && navigator.onLine === false) return { error: 'No connection. Please check your internet and try again.' };
+
+    // No deletion server here (a local preview, or not set up yet): what the rules allow.
 
     // Private progress (the rules allow the owner to delete it). The
     // deployed rules refuse deletes of users/{uid}, scores/{uid} and

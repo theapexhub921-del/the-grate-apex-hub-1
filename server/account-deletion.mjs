@@ -1,10 +1,11 @@
 // Full account deletion — runs on a TRUSTED SERVER with the Firebase admin key
 // (the deployed Firestore rules don't let the app delete users/{uid},
-// scores/{uid} or usernames/{name}). NOT deployed: see "Enabling" below.
+// scores/{uid} or usernames/{name}). Live as api/delete-account.mjs (owner,
+// 2026-10-25), with the service account in Vercel's FIREBASE_SERVICE_ACCOUNT.
 //
 // What it removes for the requesting learner (and nothing of anyone else's):
 //   users/{uid} with every subcollection · usernames/* owned by them ·
-//   scores/{uid} · progress/{uid} with attempts and completions · their follows
+//   scores/{uid} · progress/{uid} with attempts and completions · pushDevices/{uid} · their follows
 //   (both directions) · their posts (with likes/replies) · their likes and
 //   replies on other posts (counters kept right) · their group memberships
 //   (groups they own are deleted) · messages they sent in groups and chats ·
@@ -15,25 +16,11 @@
 // Cloudinary admin API would need its API secret) and the anonymous Question
 // of the Day tallies.
 //
-// Enabling (owner's approval needed — it is a server-side function):
-//   1. A service-account key for grate-apex, set as a server-only secret
-//      (e.g. Vercel env FIREBASE_SERVICE_ACCOUNT, never EXPO_PUBLIC_*).
-//   2. A tiny route, e.g. api/delete-account.mjs:
-//        import { cert, getApps, initializeApp } from 'firebase-admin/app';
-//        import { getAuth } from 'firebase-admin/auth';
-//        import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-//        import { handleAccountDeletion } from '../server/account-deletion.mjs';
-//        const app = getApps()[0] ?? initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) });
-//        export default async function handler(req, res) {
-//          if (req.method !== 'POST') return res.status(405).end();
-//          const { status, body } = await handleAccountDeletion(req.headers.authorization, { auth: getAuth(app), db: getFirestore(app), FieldValue });
-//          res.status(status).json(body);
-//        }
-//   3. Firestore collection-group indexes (single field, ascending) for
-//      likes.username and replies.authorUid — Firestore asks for them with a
-//      link the first time; the emulator doesn't need them.
-//   4. EXPO_PUBLIC_ACCOUNT_DELETION_URL=https://<site>/api/delete-account in the
-//      app's build settings — the app then uses it (src/lib/account.ts).
+// Likes and replies on other people's posts are found with collection-group
+// queries, which need two single-field indexes (likes.username and
+// replies.authorUid, collection group scope). Until they exist those two steps
+// are skipped (the Vercel log has Firestore's link to create each one) and the
+// rest of the account is still deleted.
 
 const RECENT_SIGN_IN_SECONDS = 5 * 60;
 
@@ -70,7 +57,13 @@ export async function deleteAccount({ auth, db, FieldValue }, uid) {
   const username = typeof profile.username === 'string' ? profile.username : null;
 
   // Others' posts: my likes and replies, with their counters kept right.
-  if (username) {
+  const needsIndex = (step) => (error) => {
+    if (error?.code !== 9 && !/FAILED_PRECONDITION|index/i.test(String(error?.message))) throw error;
+    console.warn(`Account deletion: skipped ${step} until its index exists:`, String(error?.message ?? error));
+  };
+  if (username) await removeLikes().catch(needsIndex('likes on other posts'));
+  await removeReplies().catch(needsIndex('replies on other posts'));
+  async function removeLikes() {
     for (const like of (await db.collectionGroup('likes').where('username', '==', username).get()).docs) {
       if (like.id !== uid) continue;
       const parent = like.ref.parent.parent;
@@ -79,11 +72,13 @@ export async function deleteAccount({ auth, db, FieldValue }, uid) {
       if (parent?.parent?.id === 'posts') await parent.update({ likeCount: FieldValue.increment(-1) }).catch(() => undefined);
     }
   }
-  for (const reply of (await db.collectionGroup('replies').where('authorUid', '==', uid).get()).docs) {
-    const post = reply.ref.parent.parent;
-    await reply.ref.delete();
-    removed.documents += 1;
-    if (post) await post.update({ replyCount: FieldValue.increment(-1) }).catch(() => undefined);
+  async function removeReplies() {
+    for (const reply of (await db.collectionGroup('replies').where('authorUid', '==', uid).get()).docs) {
+      const post = reply.ref.parent.parent;
+      await reply.ref.delete();
+      removed.documents += 1;
+      if (post) await post.update({ replyCount: FieldValue.increment(-1) }).catch(() => undefined);
+    }
   }
 
   // My posts (with their likes and replies).
@@ -124,7 +119,7 @@ export async function deleteAccount({ auth, db, FieldValue }, uid) {
   }
 
   // My own documents (with every subcollection), then the login.
-  for (const path of [`scores/${uid}`, `progress/${uid}`, `users/${uid}`]) await del(db.doc(path));
+  for (const path of [`scores/${uid}`, `progress/${uid}`, `pushDevices/${uid}`, `users/${uid}`]) await del(db.doc(path));
   await auth.deleteUser(uid).catch((error) => {
     if (error?.code !== 'auth/user-not-found') throw error; // already gone on a retry
   });

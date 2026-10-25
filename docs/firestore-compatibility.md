@@ -28,7 +28,7 @@ On the merger branch every row is fixed, except where noted:
 | stories, qotd | users/{uid}/stories (24 h) and users/{uid}/qotd + this app's tally |
 | Planner | users/{uid}/planner/{kind} (**new rule**), device copy as fallback |
 | Reports | supportTickets (admins read them) |
-| Account deletion | Full deletion needs server/account-deletion.mjs (not deployed); until then the app deletes the login and progress and says so |
+| Account deletion | Full deletion runs on the server: api/delete-account.mjs with server/account-deletion.mjs and FIREBASE_SERVICE_ACCOUNT (2026-10-25). Without the server the app deletes the login and progress |
 | **Still refused / not built** | Table Conferences (`calls` belongs to the original app's voice calls), friend battles (`battles` is server-only), weekly freeze reward, explore_weekly_sessions — shown as "coming soon" |
 | **Trust gaps (no rule change made)** | users/{uid}.coins and progress/{uid}.xp are client-writable, as in the original app — server-side XP/coins would be needed to make them tamper-proof |
 

@@ -23,6 +23,9 @@
   "functions": {
     "api/reminders.mjs": {
       "maxDuration": 60
+    },
+    "api/delete-account.mjs": {
+      "maxDuration": 60
     }
   },
   "headers": [
