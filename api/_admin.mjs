@@ -19,14 +19,16 @@ export function serviceAccount() {
   }
 }
 
-let cached = null;
+const cache = new Map(); // scope -> { email, token, until }
+export const DATASTORE_SCOPE = 'https://www.googleapis.com/auth/datastore';
 
-/** A short-lived Google access token for Firestore (kept for 50 minutes per server instance). */
-export async function adminToken(account = serviceAccount()) {
+/** A short-lived Google access token (Firestore by default; kept for 50 minutes per server instance). */
+export async function adminToken(account = serviceAccount(), scope = DATASTORE_SCOPE) {
   if (!account) throw new Error('No service account.');
+  const cached = cache.get(scope);
   if (cached && cached.email === account.client_email && cached.until > Date.now()) return cached.token;
   const key = await importPKCS8(account.private_key, 'RS256');
-  const assertion = await new SignJWT({ scope: 'https://www.googleapis.com/auth/datastore' })
+  const assertion = await new SignJWT({ scope })
     .setProtectedHeader({ alg: 'RS256', typ: 'JWT' })
     .setIssuer(account.client_email)
     .setSubject(account.client_email)
@@ -41,7 +43,7 @@ export async function adminToken(account = serviceAccount()) {
   });
   if (!response.ok) throw new Error(`Google refused the service account (${response.status}).`);
   const token = (await response.json()).access_token;
-  cached = { email: account.client_email, token, until: Date.now() + 50 * 60_000 };
+  cache.set(scope, { email: account.client_email, token, until: Date.now() + 50 * 60_000 });
   return token;
 }
 

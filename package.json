@@ -21,7 +21,6 @@
     "expo-system-ui": "~57.0.4",
     "expo-web-browser": "~57.0.3",
     "firebase": "^13.0.0",
-    "firebase-admin": "^14.5.0",
     "jose": "^5.9.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",

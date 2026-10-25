@@ -434,7 +434,7 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 
 ### Deleting an account (2026-10-25)
 
-* Settings → Account → Delete account calls `api/delete-account.mjs` (firebase-admin with `FIREBASE_SERVICE_ACCOUNT`), which runs `server/account-deletion.mjs`: profile, username, leaderboard entry, progress, push addresses, posts, likes and replies, group and chat messages, follows, then the login. If there is no server (local preview, or the key is missing: 503) the app deletes the login and private progress itself (`src/lib/account.ts`).
+* Settings → Account → Delete account calls `api/delete-account.mjs` (the service account in `FIREBASE_SERVICE_ACCOUNT`, through plain web requests in `api/_admin-rest.mjs`: firebase-admin does not load on Vercel), which runs `server/account-deletion.mjs`: profile, username, leaderboard entry, progress, push addresses, posts, likes and replies, group and chat messages, follows, then the login. If there is no server (local preview, or the key is missing: 503) the app deletes the login and private progress itself (`src/lib/account.ts`).
 * Firebase needs a recent sign-in: a password field for email accounts, a Google pop-up for Google accounts in a browser. The installed app cannot open pop-ups, so there (and when a pop-up fails) the learner is asked to sign out, sign in again and delete straight away.
 * Likes and replies on other people's posts need two collection-group indexes (likes.username, replies.authorUid); until they exist those two steps are skipped and the Vercel log has the link to create them.
 
