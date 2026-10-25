@@ -186,6 +186,24 @@ export function leagueOutcome(position, size, weeklyXp = 1) {
   return 'stays';
 }
 
+/** The tier after a finished week: one up when promoted, one down when relegated (Bronze to Diamond). */
+export function nextLeagueTier(tier, outcome) {
+  const next = Math.round(Number(tier) || 0) + (outcome === 'promoted' ? 1 : outcome === 'relegated' ? -1 : 0);
+  return Math.max(0, Math.min(LEAGUE_NAMES.length - 1, next));
+}
+
+/**
+ * Final places in one tier for a finished week (api/leagues.mjs, at midnight when
+ * the week ends), the same way the app settles it (src/data/leagues.ts):
+ * most weekly XP first, ties in the order given. `rows`: [{ uid, weeklyXp }].
+ * Returns Map uid → { position, size, weeklyXp, outcome }.
+ */
+export function leagueFinalPlaces(rows) {
+  const ordered = [...rows].sort((a, b) => b.weeklyXp - a.weeklyXp);
+  const size = ordered.length;
+  return new Map(ordered.map((row, index) => [row.uid, { position: index + 1, size, weeklyXp: row.weeklyXp, outcome: leagueOutcome(index + 1, size, row.weeklyXp) }]));
+}
+
 /**
  * The end-of-week league push for one learner, or null.
  * `rows` is everyone in the learner's tier: [{ uid, weeklyXp }].

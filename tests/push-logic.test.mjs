@@ -211,3 +211,24 @@ test('the weekly summary says only what is known, and nothing for an empty week'
   assert.equal(weeklySummary({ xp: 0, questions: 0, streak: 0 }), null);
   assert.equal(weeklySummary({ xp: null, questions: null, streak: 0 }), null);
 });
+
+test('a finished league week: final places and the next tier, as the app settles it', async () => {
+  const { leagueFinalPlaces, nextLeagueTier } = await import('../api/_push-logic.mjs');
+  const rows = [{ uid: 'a', weeklyXp: 50 }, { uid: 'b', weeklyXp: 300 }, { uid: 'c', weeklyXp: 0 }, { uid: 'd', weeklyXp: 120 }, { uid: 'e', weeklyXp: 120 }, { uid: 'f', weeklyXp: 10 }, { uid: 'g', weeklyXp: 5 }, { uid: 'h', weeklyXp: 80 }, { uid: 'i', weeklyXp: 60 }, { uid: 'j', weeklyXp: 1 }];
+  const places = leagueFinalPlaces(rows);
+  assert.equal(places.get('b').position, 1);
+  assert.equal(places.get('d').position, 2); // a tie keeps the order given
+  assert.equal(places.get('e').position, 3);
+  assert.deepEqual([...places.values()].filter((p) => p.outcome === 'promoted').length, 2); // 20% of 10
+  assert.equal(places.get('b').outcome, 'promoted');
+  assert.equal(places.get('d').outcome, 'promoted');
+  assert.equal(places.get('c').outcome, 'relegated');
+  assert.equal(places.get('j').outcome, 'relegated');
+  for (const place of places.values()) assert.equal(place.outcome, getLeagueOutcome(place.position, place.size) === 'promoted' && place.weeklyXp <= 0 ? 'stays' : getLeagueOutcome(place.position, place.size));
+  // No XP that week: never promoted, even at the top
+  assert.equal(leagueFinalPlaces([{ uid: 'x', weeklyXp: 0 }, { uid: 'y', weeklyXp: 0 }]).get('x').outcome, 'stays');
+  assert.equal(nextLeagueTier(0, 'promoted'), 1);
+  assert.equal(nextLeagueTier(0, 'relegated'), 0);
+  assert.equal(nextLeagueTier(9, 'promoted'), 9);
+  assert.equal(nextLeagueTier(4, 'stays'), 4);
+});

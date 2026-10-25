@@ -448,7 +448,8 @@ The full redesign rationale is in `docs/redesign-notes.md`.
 
 * `src/data/notifications.ts` derives notifications from real learning state. Only read marks are stored, on the device.
 * The bell and centre UI are in `src/components/notifications.tsx`.
-* Phone and computer alerts that arrive when the app is closed (messages, follows, likes, comments, **battle challenges and results**) go through `api/push.mjs`; **streak-at-risk, review-due, weekly league and Sunday weekly-summary pushes** are sent on a daily schedule by `api/reminders.mjs` (needs `FIREBASE_SERVICE_ACCOUNT` and `CRON_SECRET` in Vercel). Shared rules are in `api/_push-logic.mjs`, checked by `tests/push-logic.test.mjs`. Setup, switches and a safe dry run: `docs/push-notifications.md`.
+* Phone and computer alerts that arrive when the app is closed (messages, follows, likes, comments, **battle challenges and results**) go through `api/push.mjs`; **streak-at-risk, review-due, weekly league and Sunday weekly-summary pushes** are sent on a daily schedule by `api/reminders.mjs` (needs `FIREBASE_SERVICE_ACCOUNT` and `CRON_SECRET` in Vercel). Shared rules are in `api/_push-logic.mjs`, checked by `tests/push-logic.test.mjs`.
+* **Weekly leagues end at midnight** (owner, 2026-10-25): `api/leagues.mjs` (Vercel Cron, Mondays 00:00 UTC) settles the week that ended for everyone, as the app does (`leagueFinalPlaces`, `nextLeagueTier` in `_push-logic.mjs`): top 20% up (with XP that week), bottom 20% down. Learners already moved by their own app count but are not changed, and an entry changed after it was read is skipped (Firestore precondition). The app still settles anyone the job missed. `?dry=1` shows what would change. Setup, switches and a safe dry run: `docs/push-notifications.md`.
 
 ### Android app (2026-10-19)
 
