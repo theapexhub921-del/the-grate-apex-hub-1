@@ -17,7 +17,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no, interactive-widget=resizes-content"
         />
-
+        <meta name="google-site-verification" content="YHt2O8ioXYB-QlB7eNscJYZUh50rlZy0x3iPxYkN6r8" />
         {/* No static <title> here on purpose: Expo Router's static export
             emits its own empty <title> first, and browsers use the FIRST one
             they find, which is what caused the tab to show "localhost:8081".
