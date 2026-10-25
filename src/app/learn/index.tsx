@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/text';
 
 import { SubjectGlyph } from '@/components/learning/glyphs';
 import { ClassAccessCard } from '@/components/learning/class-access-card';
+import { ExamCountdownCard } from '@/components/learning/exam-countdown-card';
 import { LegacyCourseList } from '@/components/learning/legacy-course-list';
 import { legacyCoursesForClass } from '@/data/legacy-study';
 import { LearningWelcomeAtmosphere } from '@/components/learning/learning-welcome-atmosphere';
@@ -27,7 +28,7 @@ import { Pill } from '@/components/ui/pill';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { Columns, PageHeader, Screen, SectionHeader } from '@/components/ui/screen';
 import { Type, type ThemeColors } from '@/constants/theme';
-import { CLASS_IDS, classLessonCompletion, firstIncompleteClassBefore, isClassAhead, makeClassSelection, readAcademicTrial, readClassSelection, sameClassSelection, subjectsForClass, type ClassSelection } from '@/data/class-curriculum';
+import { CLASS_IDS, classLessonCompletion, classLessonIds, firstIncompleteClassBefore, isClassAhead, makeClassSelection, readAcademicTrial, readClassSelection, sameClassSelection, subjectsForClass, type ClassSelection } from '@/data/class-curriculum';
 import { contentTopics } from '@/data/content-catalog';
 import { prepareWeakest, useWeakestDoneToday, weakestCount } from '@/data/exam-practice';
 import { getNextActions } from '@/data/learning/next-action';
@@ -75,6 +76,10 @@ export default function LearnScreen() {
     .slice(0, 3);
   const trial = readAcademicTrial(user?.user_metadata);
   const currentCompletion = ownSelection ? classLessonCompletion(ownSelection, inputs.completedAt) : { completed: 0, total: 0, complete: false };
+  // Exam countdown: lessons of the learner's class finished since midnight.
+  const todayStart = new Date(now).setHours(0, 0, 0, 0);
+  const lessonsDoneToday = ownSelection ? classLessonIds(ownSelection).filter((id) => (inputs.completedAt[id] ?? 0) >= todayStart).length : 0;
+  const lessonAction = actions.find((action) => action.kind === 'resume-lesson' || action.kind === 'start-lesson' || action.kind === 'next-topic') ?? actions[0];
   const restrictedViewing = Boolean(viewing && ownSelection && isClassAhead(viewing, ownSelection) && !trial.active && firstIncompleteClassBefore(viewing, ownSelection, inputs.completedAt));
   const [requestedFuture, setRequestedFuture] = useState<ClassSelection | null>(null);
   const blockedSelection = requestedFuture ?? (restrictedViewing ? viewing : null);
@@ -337,6 +342,16 @@ export default function LearnScreen() {
         side={<QuestionOfTheDay />}
         sideWidth={440}
       />
+      {ownSelection && viewingOwnClass ? (
+        <ExamCountdownCard
+          lessonsLeft={currentCompletion.total - currentCompletion.completed}
+          lessonsDoneToday={lessonsDoneToday}
+          reviewsDue={overall.due}
+          now={now}
+          onContinue={() => router.push(lessonAction ? lessonAction.href : routes.learn())}
+          onWeakest={weakest > 0 ? () => void openWeakest() : undefined}
+        />
+      ) : null}
       <SectionHeader title="Practise and plan" subtitle="Ways to practise beyond the lessons, and your week." style={styles.hubSection} />
       <TileGrid columns={4} tiles={studyTiles} />
       <SectionHeader title="Your progress" subtitle="Your rank, this week and your goals." style={styles.hubSection} />

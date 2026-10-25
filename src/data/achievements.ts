@@ -105,7 +105,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
   { id: 'fc50', name: 'Card shark', group: 'Lessons', metric: 'flashcards', levels: [10, 20, 30, 40, 50], goal: (n) => `Review ${plural(n, 'flashcard')}`, pending: 'This app does not record flashcard reviews yet; only the original app’s count.' },
   { id: 'fc200', name: 'Flashcard fiend', group: 'Lessons', metric: 'flashcards', levels: [80, 110, 140, 170, 200], goal: (n) => `Review ${plural(n, 'flashcard')}`, pending: 'This app does not record flashcard reviews yet; only the original app’s count.' },
   { id: 'fc500', name: 'Memory palace', group: 'Lessons', metric: 'flashcards', levels: [260, 320, 380, 440, 500], goal: (n) => `Review ${plural(n, 'flashcard')}`, pending: 'This app does not record flashcard reviews yet; only the original app’s count.' },
-  { id: 'exam', name: 'Planner', group: 'Lessons', metric: 'examDates', levels: [1, 2, 3, 4, 5], goal: (n) => (n === 1 ? 'Set your exam date' : `Set ${n} exam dates`), pending: 'Exam dates are not in this app yet; the original app keeps one.' },
+  { id: 'exam', name: 'Planner', group: 'Lessons', metric: 'examDates', levels: [1, 2, 3, 4, 5], goal: (n) => (n === 1 ? 'Set your exam date' : `Set ${n} exam dates`) },
 
   // ── Mistakes ─────────────────────────────────────────────────────────────
   { id: 'fix10', name: 'Mistake fixer', group: 'Mistakes', metric: 'fixed', levels: [2, 4, 6, 8, 10], goal: (n) => `Master ${plural(n, 'question')} you got wrong` },

@@ -8,10 +8,11 @@
 // seconds after they happen, each name replaced whole. Every module merges the
 // account's copy with its device copy when it loads, so nothing is lost when
 // the same account is used on two devices.
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { deleteField, doc, getDoc, setDoc } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
 
+// The whole progress document as read at sign-in; synced records are under `synced`.
 let cache: { uid: string; data: Promise<Record<string, unknown>> } | null = null;
 
 async function currentUid() {
@@ -19,20 +20,38 @@ async function currentUid() {
   return auth.currentUser?.uid ?? null;
 }
 
-/** The account's copy of one synced record (undefined when signed out, offline or never saved). */
-export async function syncedValue<T>(name: string): Promise<T | undefined> {
+async function progressDocument(): Promise<Record<string, unknown> | null> {
   const uid = await currentUid();
-  if (!uid) return undefined;
+  if (!uid) return null;
   if (cache?.uid !== uid) {
     cache = {
       uid,
       data: getDoc(doc(db, 'progress', uid))
-        .then((snap) => (snap.data()?.synced ?? {}) as Record<string, unknown>)
-        .catch(() => ({})),
+        .then((snap) => ({ ...(snap.data() ?? {}), synced: { ...((snap.data()?.synced ?? {}) as Record<string, unknown>) } }))
+        .catch(() => ({ synced: {} })),
     };
   }
-  const data = await cache.data;
-  return data[name] as T | undefined;
+  return cache.data;
+}
+
+/** The account's copy of one synced record (undefined when signed out, offline or never saved). */
+export async function syncedValue<T>(name: string): Promise<T | undefined> {
+  const data = await progressDocument();
+  return (data?.synced as Record<string, unknown> | undefined)?.[name] as T | undefined;
+}
+
+/** A top-level field of progress/{uid} from the same sign-in read (e.g. the original app's examDate). */
+export async function progressField<T>(name: string): Promise<T | undefined> {
+  const data = await progressDocument();
+  return data?.[name] as T | undefined;
+}
+
+/** Saves a top-level field of progress/{uid} now (null removes it). */
+export async function saveProgressField(name: string, value: unknown) {
+  const uid = await currentUid();
+  if (!uid) return;
+  void cache?.data.then((data) => { if (value === null) delete data[name]; else data[name] = value; });
+  await setDoc(doc(db, 'progress', uid), { [name]: value === null ? deleteField() : value }, { merge: true });
 }
 
 const pending = new Map<string, unknown>();
@@ -42,7 +61,7 @@ let timer: ReturnType<typeof setTimeout> | null = null;
 export function saveSynced(name: string, value: unknown) {
   pending.set(name, value);
   // The copy read at sign-in follows what this device saves.
-  void cache?.data.then((data) => { data[name] = value; });
+  void cache?.data.then((data) => { (data.synced as Record<string, unknown>)[name] = value; });
   if (timer) clearTimeout(timer);
   timer = setTimeout(() => void flush(), 3000);
 }
