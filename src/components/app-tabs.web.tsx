@@ -59,7 +59,7 @@ export default function AppTabs() {
   const noBottomBar = hidesBottomBar(segments);
   // A game fills the page with its own frame, so the pointer never reaches the page's left
   // edge and an auto-hiding sidebar could never come back: while a game is open it stays docked.
-  const onGame = segments[0] === 'games' && Boolean(segments[1]); // a game, not the Games list
+  const onGame = segments[0] === 'games' && Boolean((segments as string[])[1]); // a game, not the Games list
   const docked = useRail && (mode === 'alwaysVisible' || onGame) && !originals;
 
   return (

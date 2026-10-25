@@ -20,6 +20,10 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --no-audit --no-fund
+      # expo-env.d.ts is made by `expo start` and is not in git; it gives TypeScript the
+      # types for .css imports.
+      - name: Expo types
+        run: echo '/// <reference types="expo/types" />' > expo-env.d.ts
       - name: TypeScript
         run: npm run typecheck
       - name: Tests
