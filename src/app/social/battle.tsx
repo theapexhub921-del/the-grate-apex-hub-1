@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { BackLink } from '@/components/learning/nav-bits';
 import { Arena, Countdown } from '@/components/learning/apex-arena';
 import { BattleIntro } from '@/components/social/battle-intro';
+import { BattleRoomScreen } from '@/components/social/battle-room';
 import { QuestionSession, type SessionProgress, type SessionResult } from '@/components/learning/question-session';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/interactive';
@@ -66,7 +67,16 @@ async function battleQuestions(battle: Battle): Promise<Question[]> {
   return seededShuffle(pool, battle.seed).slice(0, battle.count);
 }
 
+// ?room=… is an XP battle room (live, refereed by the server: components/social/battle-room.tsx);
+// ?id=… is a battle from before 2026-10-26, played each in your own time (below).
 export default function BattleScreen() {
+  const params = useLocalSearchParams<{ id?: string | string[]; room?: string | string[] }>();
+  const room = param(params.room);
+  if (room) return <BattleRoomScreen key={room} roomId={room} />;
+  return <OlderBattleScreen />;
+}
+
+function OlderBattleScreen() {
   const styles = useThemedStyles(createStyles);
   const params = useLocalSearchParams<{ id?: string | string[] }>();
   const id = param(params.id);
