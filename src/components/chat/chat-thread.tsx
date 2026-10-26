@@ -6,6 +6,7 @@ import Svg, { Path } from 'react-native-svg';
 
 import { ReportSheet, type ReportTarget } from '@/components/social/report-sheet';
 import { openProfileCard, PersonAvatar } from '@/components/social/profile-card';
+import { ChatText } from '@/components/chat/chat-text';
 import { GroupInfoSheet } from '@/components/chat/group-info';
 import { canSwipe, SwipeToReply } from '@/components/chat/swipe-to-reply';
 import { Avatar } from '@/components/ui/avatar';
@@ -426,7 +427,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
                               </Interactive>
                             ) : null}
                             {message.audio ? <VoiceNotePlayer url={message.audio.url} seconds={message.audio.seconds} color={mine ? colors.onPrimary : colors.primaryText} trackColor={mine ? colors.onPrimaryMuted : colors.track} /> : null}
-                            {message.body ? <Text style={[styles.text, mine && styles.mineText]} selectable>{message.body}</Text> : null}
+                            {message.body ? <ChatText text={message.body} style={[styles.text, mine && styles.mineText]} codeBackground={mine ? 'rgba(255,255,255,0.18)' : colors.surface} /> : null}
                             <View style={styles.meta}>
                               {chatId && isStarred(prefs, chatId, message.id) ? <Icon name="star" size={11} color={mine ? colors.onPrimaryMuted : colors.accentText} filled /> : null}
                               <Text style={[styles.time, mine && styles.mineSoft]}>{new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</Text>
@@ -471,6 +472,7 @@ export function ChatThread({ friendId = '', groupId, name, onBack }: { friendId?
       {emojiOpen ? (
         <View style={styles.emojiPanel}>
           {EMOJI.map((emoji) => <Interactive key={emoji} onPress={() => setDraft((text) => `${text}${emoji}`)} accessibilityLabel={`Insert ${emoji}`} style={styles.emojiKey}><Text style={styles.emojiText}>{emoji}</Text></Interactive>)}
+          <Text style={styles.formatHint}>Formatting: *bold*  _italic_  ~strike~  `code`</Text>
         </View>
       ) : null}
       {voice.recording ? (
@@ -731,6 +733,7 @@ function createStyles(colors: ThemeColors) {
     emojiPanel: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginHorizontal: 16, padding: 8, borderRadius: 16, backgroundColor: colors.surfaceMuted },
     emojiKey: { padding: 6, borderRadius: 10 },
     emojiText: { fontSize: 22 },
+    formatHint: { width: '100%', fontSize: 12, color: colors.textTertiary, paddingHorizontal: 6, paddingTop: 4 },
     composer: { flexDirection: 'row', alignItems: 'center', gap: 6, margin: 12, marginTop: 8, paddingHorizontal: 8, paddingVertical: 6, borderRadius: 999, borderWidth: 1.5, borderColor: colors.borderStrong, backgroundColor: colors.surface },
     tool: { padding: 8, borderRadius: 999 },
     emojiButton: { fontSize: 21 },

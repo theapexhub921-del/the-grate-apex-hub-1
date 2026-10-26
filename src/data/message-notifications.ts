@@ -6,6 +6,7 @@
 import type { Href } from 'expo-router';
 import { useSyncExternalStore } from 'react';
 
+import { chatListPrefs, isChatMuted, onChatListPrefsChanged } from '@/data/chat-list-prefs';
 import { listMyConversations, onMyChatsChanged } from '@/data/community';
 import type { AppNotification } from '@/data/notifications';
 import { auth } from '@/lib/firebase';
@@ -21,9 +22,9 @@ export async function refreshMessageNotifications() {
     return;
   }
   try {
-    const chats = await listMyConversations(20);
+    const [chats, prefs] = await Promise.all([listMyConversations(20), chatListPrefs()]);
     const next: AppNotification[] = chats
-      .filter((chat) => chat.unread)
+      .filter((chat) => chat.unread && !isChatMuted(prefs, chat.id)) // muted chats: no bell, alert or toast
       .map((chat) => ({
         id: `msg:${chat.id}:${chat.lastAt}`,
         group: 'updates',
@@ -54,6 +55,7 @@ function start() {
   // The chats list is live (community.ts), so a new message shows at once; the
   // timer only re-reads that live list, which costs no Firebase reads.
   onMyChatsChanged(() => void refreshMessageNotifications());
+  onChatListPrefsChanged(() => void refreshMessageNotifications());
   timer = setInterval(() => void refreshMessageNotifications(), 30_000);
   if (typeof document !== 'undefined') document.addEventListener('visibilitychange', onVisible);
 }

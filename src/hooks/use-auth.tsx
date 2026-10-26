@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 
@@ -33,6 +34,60 @@ export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
   loading: boolean;
+}
+
+// A copy of the learner's profile on this device (owner, 2026-10-26): when the database can't be
+// read — no connection, or the free plan's daily reads used up — the app carries on with the
+// last profile it saw instead of an empty one (an empty one has no class, so Study showed
+// "Coming soon" and other features hid). Only plain values are kept (no database timestamps).
+const PROFILE_KEY = 'grateapex_profile:';
+
+function plainCopy(value: unknown): unknown {
+  if (value === null || ['string', 'number', 'boolean'].includes(typeof value)) return value;
+  if (Array.isArray(value)) return value.map(plainCopy).filter((item) => item !== undefined);
+  if (value && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype) {
+    const out: Record<string, unknown> = {};
+    for (const [key, item] of Object.entries(value)) {
+      const copy = plainCopy(item);
+      if (copy !== undefined) out[key] = copy;
+    }
+    return out;
+  }
+  return undefined; // timestamps and other special values
+}
+
+function saveProfileCopy(uid: string, profile: Record<string, any>) {
+  try {
+    void AsyncStorage.setItem(PROFILE_KEY + uid, JSON.stringify(plainCopy(profile))).catch(() => {});
+  } catch {
+    // too large or not storable: skip
+  }
+}
+
+async function readProfileCopy(uid: string): Promise<Record<string, any> | null> {
+  try {
+    const saved = JSON.parse((await AsyncStorage.getItem(PROFILE_KEY + uid)) ?? 'null');
+    return saved && typeof saved === 'object' ? (saved as Record<string, any>) : null;
+  } catch {
+    return null;
+  }
+}
+
+function authUserOf(firebaseUser: FirebaseUser, profile: Record<string, any>, profileLoaded: boolean): AuthUser {
+  return {
+    id: firebaseUser.uid,
+    uid: firebaseUser.uid,
+    email: firebaseUser.email,
+    displayName: profile.displayName || profile.username || firebaseUser.displayName || null,
+    created_at: firebaseUser.metadata.creationTime,
+    user_metadata: {
+      ...profile,
+      onboarding_completed: profile.onboardingDone === true,
+      full_name: profile.displayName || profile.username || firebaseUser.displayName || '',
+    },
+    profile,
+    profileLoaded,
+  };
 }
 
 const AuthContext = createContext<AuthState>({
@@ -72,11 +127,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // the route guard would think the learner has no interface, username or class
       // yet and send them to set it up again.
       let fromServer = false;
+      // Until the real profile arrives, what the database gives (often only those start-up
+      // fields) is filled in from the device's copy — when the database can't be reached
+      // (no connection, or the daily free reads used up) that copy is all there is.
+      let copy: Record<string, any> | null = null;
+      void readProfileCopy(firebaseUser.uid).then((saved) => {
+        copy = saved;
+        if (!saved || fromServer || auth.currentUser?.uid !== firebaseUser.uid) return;
+        const profile = { ...saved, ...(lastProfile ?? {}) };
+        lastProfile = profile;
+        setSession({ user: authUserOf(firebaseUser, profile, false) });
+        setLoading(false);
+      });
       unsubSnapshot = onSnapshot(
         userRef,
         (snap) => {
           if (!snap.metadata.fromCache && !snap.metadata.hasPendingWrites) fromServer = true;
-          const profile = snap.data() || {};
+          const profile = fromServer ? snap.data() || {} : { ...(copy ?? {}), ...(snap.data() || {}) };
           attempt = 0;
           // Presence alone changed (written every few minutes while the app is open):
           // keep the same learner, so the whole app doesn't redraw and reload.
@@ -84,21 +151,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (lastProfile && lastLoaded === fromServer && samePresenceAside(lastProfile, profile)) return;
           lastProfile = profile;
           lastLoaded = fromServer;
-          const authUser: AuthUser = {
-            id: firebaseUser.uid,
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: profile.displayName || profile.username || firebaseUser.displayName || null,
-            created_at: firebaseUser.metadata.creationTime,
-            user_metadata: {
-              ...profile,
-              onboarding_completed: profile.onboardingDone === true,
-              full_name: profile.displayName || profile.username || firebaseUser.displayName || '',
-            },
-            profile,
-            profileLoaded: fromServer,
-          };
-          setSession({ user: authUser });
+          if (fromServer && snap.exists()) saveProfileCopy(firebaseUser.uid, profile);
+          setSession({ user: authUserOf(firebaseUser, profile, fromServer) });
           setLoading(false);
         },
         () => {
@@ -107,18 +161,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // either way, listen again shortly (a failed listener never recovers).
           unsubSnapshot = null;
           if (!lastProfile) {
-            const authUser: AuthUser = {
-              id: firebaseUser.uid,
-              uid: firebaseUser.uid,
-              email: firebaseUser.email,
-              displayName: firebaseUser.displayName,
-              created_at: firebaseUser.metadata.creationTime,
-              user_metadata: {},
-              profile: {},
-              profileLoaded: false,
-            };
-            setSession({ user: authUser });
-            setLoading(false);
+            // The device's copy of the profile, if there is one (still "not loaded", so nothing is
+            // set up again from it); otherwise the basic sign-in.
+            void readProfileCopy(firebaseUser.uid).then((saved) => {
+              if (lastProfile || auth.currentUser?.uid !== firebaseUser.uid) return;
+              setSession({ user: authUserOf(firebaseUser, saved ?? {}, false) });
+              setLoading(false);
+            });
           }
           const wait = Math.min(60_000, 2_000 * 2 ** attempt);
           retry = setTimeout(() => {

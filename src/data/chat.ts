@@ -12,6 +12,7 @@ import { Platform } from 'react-native';
 import { useSyncExternalStore } from 'react';
 
 import type { MessageShare } from '@/data/community';
+import { plainChatText } from '@/lib/chat-format';
 import { auth, db } from '@/lib/firebase';
 import { CLOUDINARY, safeUrl, type Media } from '@/lib/media';
 
@@ -40,7 +41,7 @@ const me = () => {
 export function previewOf(message: { body: string; media?: Media[] | null; doc?: ChatDoc | null; audio?: unknown; share?: MessageShare | null }) {
   if (message.share?.kind === 'stump') return 'Stamp a friend question';
   if (message.share?.kind === 'stumpAnswer') return 'Answered a Stamp a friend question';
-  if (message.body.trim()) return message.body.trim().slice(0, 120);
+  if (message.body.trim()) return plainChatText(message.body.trim()).slice(0, 120);
   if (message.media?.length) return message.media.length > 1 ? `${message.media.length} photos` : message.media[0].t === 'video' ? 'Video' : 'Photo';
   if (message.doc) return `Document: ${message.doc.name}`.slice(0, 120);
   if (message.audio) return 'Voice note';

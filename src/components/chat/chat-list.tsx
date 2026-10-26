@@ -12,6 +12,7 @@ import { Sheet } from '@/components/ui/sheet';
 import { Text, TextInput } from '@/components/ui/text';
 import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { Type, type ThemeColors } from '@/constants/theme';
+import { isChatMuted, MUTE_ALWAYS, MUTE_CHOICES, muteChat, PIN_LIMIT, toggleArchivedChat, togglePinnedChat, useChatListPrefs } from '@/data/chat-list-prefs';
 import { listMyConversations, type ConversationSummary } from '@/data/community';
 import { loadFriendStreak } from '@/data/friend-streak-store';
 import { personName, refreshFriendPresence, useSocial } from '@/data/social';
@@ -31,7 +32,8 @@ function when(at: number) {
 
 // The chats list (like Instagram / WhatsApp): you, a new-message button,
 // search, friends to start a chat with, then every chat with its last message,
-// time, unread dot and friend streak.
+// time, unread dot and friend streak. Chats can be pinned (top), archived (under
+// "Archived") and muted, from a long-press or right-click (data/chat-list-prefs.ts).
 export function ChatList({ activeId, onOpen, onOpenGroup }: { activeId?: string | null; onOpen: (friendId: string, name: string) => void; onOpenGroup: (groupId: string, name: string) => void }) {
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
@@ -43,6 +45,10 @@ export function ChatList({ activeId, onOpen, onOpenGroup }: { activeId?: string 
   const [newGroup, setNewGroup] = useState(false);
   const [groups, setGroups] = useState<GroupSummary[]>([]);
   const [, setTick] = useState(0);
+  const prefs = useChatListPrefs();
+  const [showArchived, setShowArchived] = useState(false);
+  const [actions, setActions] = useState<{ id: string; label: string } | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const friends = social.people.filter((person) => person.relationship === 'friends');
   const requests = social.people.filter((person) => person.relationship === 'incoming').length;
   const known = new Map(social.people.map((person) => [person.userId, person]));
@@ -76,8 +82,21 @@ export function ChatList({ activeId, onOpen, onOpenGroup }: { activeId?: string 
   };
   const shown = (chats ?? []).filter((chat) => !q || nameOf(chat.otherId, chat.otherName).toLowerCase().includes(q) || chat.lastText.toLowerCase().includes(q));
   const shownGroups = groups.filter((group) => !q || group.name.toLowerCase().includes(q));
-  // Chats and groups together, newest first (like WhatsApp).
-  const rows = [...shown.map((chat) => ({ kind: 'chat' as const, at: chat.lastAt, chat })), ...shownGroups.map((group) => ({ kind: 'group' as const, at: group.lastAt, group }))].sort((a, b) => b.at - a.at);
+  // Chats and groups together: pinned first, then newest first (like WhatsApp). Archived chats
+  // have their own list; a search looks through all of them.
+  const all = [...shown.map((chat) => ({ kind: 'chat' as const, id: chat.id, at: chat.lastAt, chat })), ...shownGroups.map((group) => ({ kind: 'group' as const, id: group.id, at: group.lastAt, group }))];
+  const archivedCount = all.filter((entry) => prefs.archived.includes(entry.id)).length;
+  const pinRank = (id: string) => { const index = prefs.pinned.indexOf(id); return index < 0 ? Infinity : index; };
+  const rows = all
+    .filter((entry) => q || (showArchived ? prefs.archived.includes(entry.id) : !prefs.archived.includes(entry.id)))
+    .sort((a, b) => (showArchived || q ? 0 : pinRank(a.id) - pinRank(b.id) || 0) || b.at - a.at);
+  const flags = (id: string) => (
+    <>
+      {isChatMuted(prefs, id) ? <Icon name="bellOff" size={13} color={colors.textTertiary} /> : null}
+      {!showArchived && prefs.pinned.includes(id) ? <Icon name="pin" size={13} color={colors.textTertiary} /> : null}
+    </>
+  );
+  const openActions = (id: string, label: string) => { setNotice(null); setActions({ id, label }); };
   const chatting = new Set((chats ?? []).map((chat) => chat.otherId));
   const starters = friends.filter((friend) => !q || personName(friend).toLowerCase().includes(q)).sort((a, b) => Number(b.isOnline) - Number(a.isOnline));
 
@@ -109,15 +128,25 @@ export function ChatList({ activeId, onOpen, onOpenGroup }: { activeId?: string 
       </View>
       <ScrollView style={styles.rows}>
         {chats === null ? <Text style={styles.muted}>Loading your chats…</Text> : null}
+        {!q && (showArchived || archivedCount) ? (
+          <Interactive onPress={() => setShowArchived((value) => !value)} accessibilityRole="button" accessibilityLabel={showArchived ? 'Back to chats' : `Archived chats, ${archivedCount}`} style={({ hovered }) => [styles.row, hovered && styles.rowActive]}>
+            <View style={styles.archiveIcon}><Icon name={showArchived ? 'chevronLeft' : 'archive'} size={20} color={colors.textSecondary} /></View>
+            <Text style={[styles.name, styles.rowText]}>{showArchived ? 'Back to chats' : 'Archived'}</Text>
+            {!showArchived ? <Text style={styles.preview}>{archivedCount}</Text> : null}
+          </Interactive>
+        ) : null}
         {rows.map((entry) => {
           if (entry.kind === 'group') {
             const group = entry.group;
             const active = group.id === activeId;
             return (
-              <Interactive key={group.id} onPress={() => onOpenGroup(group.id, group.name)} accessibilityRole="link" accessibilityLabel={`Group ${group.name}`} style={({ hovered }) => [styles.row, (active || hovered) && styles.rowActive]}>
+              <Interactive key={group.id} onPress={() => onOpenGroup(group.id, group.name)} onLongPress={() => openActions(group.id, group.name)} onContextMenu={() => openActions(group.id, group.name)} accessibilityRole="link" accessibilityLabel={`Group ${group.name}`} accessibilityHint="Long-press for pin, archive and mute" style={({ hovered }) => [styles.row, (active || hovered) && styles.rowActive]}>
                 <Avatar name={group.name} size={52} ring="gold" />
                 <View style={styles.rowText}>
-                  <Text style={styles.name} numberOfLines={1}>{group.name}</Text>
+                  <View style={styles.nameRow}>
+                    <Text style={styles.name} numberOfLines={1}>{group.name}</Text>
+                    {flags(group.id)}
+                  </View>
                   <Text style={styles.preview} numberOfLines={1}>{group.lastFrom === user?.id ? 'You: ' : group.lastName ? `${group.lastName}: ` : ''}{group.lastText} · {when(group.lastAt)}</Text>
                 </View>
               </Interactive>
@@ -129,12 +158,13 @@ export function ChatList({ activeId, onOpen, onOpenGroup }: { activeId?: string 
           const streak = streaks.get(chat.id)?.value ?? 0;
           const active = chat.otherId === activeId;
           return (
-            <Interactive key={chat.id} onPress={() => onOpen(chat.otherId, label)} accessibilityRole="link" accessibilityLabel={`Chat with ${label}${chat.unread ? ', unread' : ''}`} style={({ hovered }) => [styles.row, (active || hovered) && styles.rowActive]}>
+            <Interactive key={chat.id} onPress={() => onOpen(chat.otherId, label)} onLongPress={() => openActions(chat.id, label)} onContextMenu={() => openActions(chat.id, label)} accessibilityHint="Long-press for pin, archive and mute" accessibilityRole="link" accessibilityLabel={`Chat with ${label}${chat.unread ? ', unread' : ''}`} style={({ hovered }) => [styles.row, (active || hovered) && styles.rowActive]}>
               <PersonAvatar uid={chat.otherId} uri={person?.avatarUrl ?? null} name={label} size={52} status={person?.isOnline ? 'online' : null} />
               <View style={styles.rowText}>
                 <View style={styles.nameRow}>
                   <Text style={[styles.name, chat.unread && styles.bold]} numberOfLines={1}>{label}</Text>
                   <VerifiedBadge username={person?.username ?? chat.otherName} uid={chat.otherId} size={13} />
+                  {flags(chat.id)}
                   {streak > 0 ? (
                     <View style={styles.streakBadge} accessibilityLabel={`${streak}-day friend streak`}>
                       <Icon name="streak" size={12} color={colors.accentText} filled />
@@ -148,7 +178,7 @@ export function ChatList({ activeId, onOpen, onOpenGroup }: { activeId?: string 
             </Interactive>
           );
         })}
-        {chats && !rows.length ? <Text style={styles.muted}>{q ? 'No chats match.' : friends.length ? 'No chats yet — tap a friend above to say hello.' : 'Follow classmates; when they follow you back you can message each other.'}</Text> : null}
+        {chats && !rows.length && !showArchived ? <Text style={styles.muted}>{q ? 'No chats match.' : friends.length ? 'No chats yet — tap a friend above to say hello.' : 'Follow classmates; when they follow you back you can message each other.'}</Text> : null}
       </ScrollView>
 
       <Sheet visible={compose} onClose={() => setCompose(false)} title="New message" width={420}>
@@ -168,7 +198,43 @@ export function ChatList({ activeId, onOpen, onOpenGroup }: { activeId?: string 
         {!friends.length ? <Text style={styles.muted}>You can message friends who follow you back.</Text> : null}
       </Sheet>
       <NewGroupSheet visible={newGroup} onClose={() => setNewGroup(false)} />
+      <Sheet visible={actions !== null} onClose={() => setActions(null)} title={actions?.label ?? 'Chat'} width={380}>
+        {actions ? (
+          <View>
+            <ChatAction
+              icon="pin"
+              label={prefs.pinned.includes(actions.id) ? 'Unpin chat' : 'Pin chat'}
+              onPress={() => {
+                if (togglePinnedChat(actions.id)) setActions(null);
+                else setNotice(`You can pin up to ${PIN_LIMIT} chats. Unpin one first.`);
+              }}
+            />
+            <ChatAction icon="archive" label={prefs.archived.includes(actions.id) ? 'Unarchive chat' : 'Archive chat'} onPress={() => { toggleArchivedChat(actions.id); setActions(null); }} />
+            {isChatMuted(prefs, actions.id) ? (
+              <ChatAction
+                icon="bell"
+                label={prefs.muted[actions.id] >= MUTE_ALWAYS ? 'Unmute (muted always)' : `Unmute (muted until ${new Date(prefs.muted[actions.id]).toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' })})`}
+                onPress={() => { muteChat(actions.id, null); setActions(null); }}
+              />
+            ) : (
+              MUTE_CHOICES.map((choice) => <ChatAction key={choice.label} icon="bellOff" label={choice.ms === Infinity ? 'Mute always' : `Mute for ${choice.label}`} onPress={() => { muteChat(actions.id, choice.ms); setActions(null); }} />)
+            )}
+            {notice ? <Text style={styles.muted}>{notice}</Text> : null}
+          </View>
+        ) : null}
+      </Sheet>
     </View>
+  );
+}
+
+function ChatAction({ icon, label, onPress }: { icon: 'pin' | 'archive' | 'bell' | 'bellOff'; label: string; onPress: () => void }) {
+  const styles = useThemedStyles(createStyles);
+  const colors = useTheme();
+  return (
+    <Interactive onPress={onPress} accessibilityRole="button" style={({ hovered }) => [styles.actionRow, hovered && styles.rowActive]}>
+      <Icon name={icon} size={18} color={colors.text} />
+      <Text style={styles.name}>{label}</Text>
+    </Interactive>
   );
 }
 
@@ -202,6 +268,8 @@ function createStyles(colors: ThemeColors) {
     dot: { width: 9, height: 9, borderRadius: 5, backgroundColor: colors.primary },
     muted: { fontSize: 13, color: colors.textTertiary, padding: 16, textAlign: 'center' },
     groupIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary },
+    archiveIcon: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceMuted },
+    actionRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 12, paddingHorizontal: 8, borderRadius: 10 },
     composeRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
   });
 }

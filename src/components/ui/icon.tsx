@@ -350,6 +350,18 @@ const ICONS = {
   ),
   star: ({ color, filled, sw }) => <Path d="m12 3.8 2.5 5.1 5.6.8-4 3.9 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4-3.9 5.6-.8z" {...stroke(color, sw)} fill={filled ? color : 'none'} />,
   pin: ({ color, filled, sw }) => <Path d="M9 4.5h6l-1 5 3 3v1.5H7V12.5l3-3zM12 14v6" {...stroke(color, sw)} fill={filled ? color : 'none'} />,
+  bellOff: ({ color, sw }) => (
+    <>
+      <Path d="M8.2 6.6A5.8 5.8 0 0 1 17.8 11v4M6.2 11v5.4l-1.6 1.6H16" {...stroke(color, sw)} />
+      <Path d="M10 20.4a2.1 2.1 0 0 0 4 0M4 4l16 16" {...stroke(color, sw)} />
+    </>
+  ),
+  archive: ({ color, sw }) => (
+    <>
+      <Path d="M4 5h16v4H4zM5.5 9v9.5h13V9" {...stroke(color, sw)} />
+      <Path d="M10 13h4" {...stroke(color, sw)} />
+    </>
+  ),
   attach: ({ color, sw }) => <Path d="m19.5 11.5-7.4 7.4a4.6 4.6 0 0 1-6.5-6.5l7.8-7.8a3 3 0 0 1 4.3 4.3l-7.6 7.6a1.5 1.5 0 0 1-2.1-2.1l7-7" {...stroke(color, sw)} />,
   more: ({ color }) => (
     <>
