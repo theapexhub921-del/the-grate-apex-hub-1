@@ -289,10 +289,25 @@ export async function listCommunityFeed(limitCount = 50): Promise<CommunityPost[
   return postsFrom(snap.docs.filter((item) => !blocked.has(String(item.data().authorUid))));
 }
 
+// Whether I liked each post, remembered for the session: checking costs one read per post,
+// and the feed is shown again and again (2026-10-26, the free plan's daily reads). Liking
+// or unliking here updates it; a like given on another device shows after a reload.
+let likedPosts: { uid: string; known: Map<string, boolean> } = { uid: '', known: new Map() };
+function likedPostsOf(uid: string) {
+  if (likedPosts.uid !== uid) likedPosts = { uid, known: new Map() };
+  return likedPosts.known;
+}
+
 /** Post documents as shown: with my like, and the original of a reshare. */
 async function postsFrom(rows: readonly { id: string; data: () => DocumentData }[]): Promise<CommunityPost[]> {
   const userId = auth.currentUser?.uid ?? null;
-  const liked = await Promise.all(rows.map((item) => (userId ? getDoc(doc(db, 'posts', item.id, 'likes', userId)).then((like) => like.exists()).catch(() => false) : Promise.resolve(false))));
+  const known = userId ? likedPostsOf(userId) : new Map<string, boolean>();
+  const liked = await Promise.all(rows.map((item) => {
+    if (!userId) return Promise.resolve(false);
+    const have = known.get(item.id);
+    if (have !== undefined) return Promise.resolve(have);
+    return getDoc(doc(db, 'posts', item.id, 'likes', userId)).then((like) => { known.set(item.id, like.exists()); return like.exists(); }).catch(() => false);
+  }));
   const originals = new Map<string, Record<string, any>>();
   await Promise.all(
     [...new Set(rows.map((item) => item.data().resharedPostId).filter((id): id is string => typeof id === 'string'))].map(async (id) => {
@@ -503,6 +518,7 @@ export async function togglePostLike(postId: string): Promise<boolean> {
   else batch.set(likeRef, { username: me.username, createdAt: serverTimestamp() });
   batch.update(doc(db, 'posts', postId), { likeCount: increment(liked ? -1 : 1) });
   await batch.commit();
+  likedPostsOf(me.uid).set(postId, !liked);
   if (!liked) {
     void getDoc(doc(db, 'posts', postId)).then((post) => {
       const d = post.data();
@@ -659,9 +675,23 @@ function toStory(uid: string, id: string, d: Record<string, any>): CommunityStor
 }
 
 /** Live stories from me and the people I follow, oldest first per person. */
+// The stories strip costs one query per person followed: kept a few minutes, so moving
+// around the app doesn't read them all again (2026-10-26, the free plan's daily reads).
+// Posting or deleting my own story clears it.
+const STORIES_KEEP_MS = 3 * 60_000;
+let storiesCache: { uid: string; at: number; list: Promise<CommunityStory[]> } | null = null;
+
 export async function listLiveStories(): Promise<CommunityStory[]> {
   await auth.authStateReady();
   const me = await signedInUserId();
+  if (storiesCache && storiesCache.uid === me && Date.now() - storiesCache.at < STORIES_KEEP_MS) return storiesCache.list;
+  const entry = { uid: me, at: Date.now(), list: readLiveStories(me) };
+  storiesCache = entry;
+  entry.list.catch(() => { if (storiesCache === entry) storiesCache = null; });
+  return entry.list;
+}
+
+async function readLiveStories(me: string): Promise<CommunityStory[]> {
   const [following, blocked] = await Promise.all([
     getDocs(query(collection(db, 'follows'), where('follower', '==', me), limit(50))).then((snap) => snap.docs.map((item) => String(item.data().followee))),
     blockedLearners(),
@@ -692,6 +722,7 @@ export async function createCommunityStory(body: string, media?: CommunityMedia,
   const uploaded = media ? cleanMedia([await uploadMedia(media)])[0] : null;
   if (media && !uploaded) throw new Error('Upload failed.');
   const ref = doc(collection(db, 'users', me.uid, 'stories'));
+  storiesCache = null;
   // Only a text-only story has a coloured background (the rules allow a `bg` field).
   const background = !uploaded && isStoryBg(bg) ? bg : undefined;
   await setDoc(ref, {
@@ -726,6 +757,7 @@ export async function deleteCommunityStory(storyId: string, mediaPath: string | 
   void mediaPath;
   const me = await signedInUserId();
   await deleteDoc(doc(db, 'users', me, 'stories', storyId));
+  storiesCache = null;
 }
 
 export async function listOpenStudyGroups(): Promise<StudyGroup[]> {
