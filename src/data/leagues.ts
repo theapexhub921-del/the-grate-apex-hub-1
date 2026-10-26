@@ -105,7 +105,10 @@ async function tierRows(week: string, tier: number, me: string, finished = false
     getDocs(query(collection(db, 'users'), where('league.prev.week', '==', week), where('league.prev.tier', '==', tier), limit(200))).catch(() => null),
   ]);
   const live = current?.docs ?? [];
-  const xp = await lifetimeXp(live.map((item) => item.id));
+  // A finished week uses the weekly figure each learner's app saved, so only those without one need their
+  // leaderboard XP (free plan: every scores read counts, and everyone settles at the same moment).
+  const needXp = live.filter((item) => !(finished && typeof (item.data().league as LeagueEntry | undefined)?.weeklyXp === 'number'));
+  const xp = await lifetimeXp(needXp.map((item) => item.id));
   const rows = new Map<string, LeagueRow>();
   for (const item of live) {
     const entry = item.data().league as LeagueEntry;
@@ -128,6 +131,17 @@ export type LeagueView = { week: string; tier: number; endsAt: number; rows: Lea
 // A league load reads everyone in the tier (and their XP), hundreds of reads on
 // Firebase's free plan: one result is shared by every screen for a while.
 const LEAGUE_REUSE_MS = 10 * 60_000;
+// When Firebase's daily free reads run out it keeps retrying instead of failing, which left the
+// league on "Loading…" (2026-10-26): give up after a while with a message instead.
+const LEAGUE_TIMEOUT_MS = 25_000;
+const LEAGUE_BUSY = 'The league can’t be loaded right now (the app has reached today’s database limit). It will be back within a few hours, and your place is kept.';
+
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), ms);
+    promise.then((value) => { clearTimeout(timer); resolve(value); }, (error) => { clearTimeout(timer); reject(error); });
+  });
+}
 let lastLeague: { uid: string; week: string; at: number; view: Promise<LeagueView> } | null = null;
 
 /**
@@ -141,7 +155,7 @@ export async function loadLeague(options: { fresh?: boolean } = {}): Promise<Lea
   if (!options.fresh && lastLeague && lastLeague.uid === uid && lastLeague.week === week && Date.now() - lastLeague.at < LEAGUE_REUSE_MS) {
     return lastLeague.view;
   }
-  const view = readLeague();
+  const view = withTimeout(readLeague(), LEAGUE_TIMEOUT_MS, LEAGUE_BUSY);
   lastLeague = { uid, week, at: Date.now(), view };
   view.catch(() => { if (lastLeague?.view === view) lastLeague = null; });
   return view;
