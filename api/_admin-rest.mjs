@@ -29,6 +29,7 @@ export const FieldValue = {
 function encode(value) {
   if (value === null || value === undefined) return { nullValue: null };
   if (typeof value === 'string') return { stringValue: value };
+  if (value instanceof Date) return { timestampValue: value.toISOString() };
   if (typeof value === 'boolean') return { booleanValue: value };
   if (typeof value === 'number') return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
   if (Array.isArray(value)) return { arrayValue: { values: value.map(encode) } };
@@ -74,7 +75,7 @@ export function restAdmin() {
     const data = text ? JSON.parse(text) : {};
     if (!response.ok) {
       const error = new Error(data?.error?.message || `${method} ${url} failed (${response.status})`);
-      error.code = data?.error?.status === 'FAILED_PRECONDITION' ? 9 : data?.error?.status;
+      error.code = data?.error?.status === 'FAILED_PRECONDITION' || data?.error?.status === 'ALREADY_EXISTS' || data?.error?.status === 'ABORTED' ? 9 : data?.error?.status;
       throw error;
     }
     return data;
@@ -93,7 +94,20 @@ export function restAdmin() {
       collection: (id) => collectionRef(`${path}/${id}`),
       async get() {
         const data = await call(docUrl(path), { allow404: true });
-        return { exists: Boolean(data), id: parts[parts.length - 1], ref: docRef(path), data: () => (data ? decode({ mapValue: { fields: data.fields ?? {} } }) : undefined) };
+        return { exists: Boolean(data), id: parts[parts.length - 1], ref: docRef(path), updateTime: data?.updateTime ?? null, data: () => (data ? decode({ mapValue: { fields: data.fields ?? {} } }) : undefined) };
+      },
+      /**
+       * Writes the whole document. `precondition` makes it safe when two requests race:
+       * { exists: false } only creates, { updateTime } only replaces the version that was
+       * read. A lost race throws an error with code 9 (FAILED_PRECONDITION), so the caller
+       * can read again and retry. (Used by api/battle.mjs.)
+       */
+      async set(data, precondition) {
+        const fields = encode(data).mapValue.fields;
+        const write = { update: { name: `${root}/${path}`, fields } };
+        if (precondition?.updateTime) write.currentDocument = { updateTime: precondition.updateTime };
+        else if (precondition && 'exists' in precondition) write.currentDocument = { exists: Boolean(precondition.exists) };
+        await call(`${firestoreBase}/${root}:commit`, { method: 'POST', body: { writes: [write] } });
       },
       async delete() {
         await call(docUrl(path), { method: 'DELETE' });

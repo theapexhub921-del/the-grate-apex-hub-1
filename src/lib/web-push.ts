@@ -194,6 +194,11 @@ export async function announceBattleAccepted(battleId: string, to: string) {
   await announce({ kind: 'battle-accepted', battle: battleId, to });
 }
 
+/** XP battle rooms: a challenge sent, a challenge accepted, or a battle just over (the server checks the room). */
+export async function announceRace(kind: 'race' | 'race-accepted' | 'race-result', roomId: string, to: string) {
+  await announce({ kind, room: roomId, to });
+}
+
 /** I just gifted Apex Coins or an XP boost to `to` (their phone is alerted). */
 export async function announceGift(type: 'coins' | 'boost', giftId: string, to: string) {
   await announce({ kind: 'gift', type, gift: giftId, to });

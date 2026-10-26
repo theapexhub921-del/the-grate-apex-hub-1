@@ -8,6 +8,7 @@
 //   { kind: 'test' }                         a test push to the caller's own devices (returns each device's status)
 //   { kind: 'battle-result', battle, to }    the other player played / declined / finished a battle
 //   { kind: 'battle-accepted', battle, to }  the challenged player joined the room
+//   { kind: 'race' | 'race-accepted' | 'race-result', room, to }  XP battle rooms (api/battle.mjs)
 //   { kind: 'gift', type: 'coins'|'boost', gift, to }  "sent you Apex Coins / an XP boost"
 //
 // Sends a push to the recipient's phones and computers, so it
@@ -235,6 +236,37 @@ export default async function handler(req, res) {
     const message = battleResultMessage({ recipientIsChallenger: !senderIsChallenger, senderName: username, course: entry.course?.name, challenger, opponent, declined });
     if (!message) return res.status(200).json({ sent: 0 });
     const sent = await deliver(other, 'battles', { ...message, tag: `battle:${battleId}`, href });
+    return res.status(200).json({ sent });
+  }
+
+  if (kind === 'race' || kind === 'race-accepted' || kind === 'race-result') {
+    // XP battle rooms (api/battle.mjs writes them; nothing here comes from the caller but who they are).
+    const roomId = String(body.room ?? '');
+    const to = String(body.to ?? '');
+    if (!/^r[a-z0-9]{8,24}$/.test(roomId) || !USER_ID.test(to) || to === sender) return res.status(400).json({ error: 'Bad request.' });
+    if (tooSoon(`${sender}:${kind}:${roomId}`, kind === 'race-result' ? 10 * 60_000 : 30_000)) return res.status(429).json({ error: 'Slow down.' });
+    // The room is readable by its two players; until those rules are published, read it with the service account.
+    const room = (await read(`battleRooms/${roomId}`, token)) ?? (admin ? await read(`battleRooms/${roomId}`, admin) : null);
+    const players = Array.isArray(room?.players) ? room.players.map(String) : [];
+    if (!room || !players.includes(sender) || !players.includes(to)) return res.status(403).json({ error: 'Not your battle.' });
+    const other = await person(to);
+    const senderName = room.challenger?.uid === sender ? room.challenger?.name : room.opponent?.name;
+    const who = typeof senderName === 'string' && senderName ? `@${senderName}` : 'Your friend';
+    const course = String(room.course?.name ?? 'a course').slice(0, 40);
+    const href = `/social/battle?room=${encodeURIComponent(roomId)}`;
+    let payload = null;
+    if (kind === 'race' && room.status === 'invited' && room.challenger?.uid === sender && Date.now() - Number(room.createdAt) < FRESH) {
+      payload = { title: `${who} challenged you to an XP battle`, body: `${course} · ${Number(room.count) || 10} questions. Accept within 5 minutes.` };
+    } else if (kind === 'race-accepted' && room.opponent?.uid === sender && (room.status === 'lobby' || room.status === 'live')) {
+      payload = { title: `${who} joined your battle room`, body: `${course} is ready. Tap to join and press Ready.` };
+    } else if (kind === 'race-result' && room.status === 'done') {
+      const mine = Number(room.sides?.[to]?.score) || 0;
+      const theirs = Number(room.sides?.[sender]?.score) || 0;
+      const outcome = room.winner === 'draw' ? 'It was a draw' : room.winner === to ? 'You won' : 'You lost';
+      payload = { title: `${outcome} against ${who}`, body: `${course} · ${mine} – ${theirs} XP. Tap for the result.` };
+    }
+    if (!payload) return res.status(409).json({ error: 'Nothing to announce.' });
+    const sent = await deliver(other, 'battles', { ...payload, tag: `race:${roomId}`, href });
     return res.status(200).json({ sent });
   }
 

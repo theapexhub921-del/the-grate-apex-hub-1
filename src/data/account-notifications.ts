@@ -45,7 +45,9 @@ function apply(docs: readonly QueryDocumentSnapshot[]) {
       title: (TITLES[kind] ?? (() => `${name} sent you a notification`))(name),
       body: kind === 'follow' ? 'Follow back to become friends — then you can message and battle.' : String(d.text ?? ''),
       at: millis(d.createdAt),
-      href: (kind === 'battle' && typeof d.battleId === 'string'
+      href: (kind === 'battle' && typeof d.roomId === 'string'
+        ? `/social/battle?room=${encodeURIComponent(d.roomId)}`
+        : kind === 'battle' && typeof d.battleId === 'string'
         ? `/social/battle?id=${encodeURIComponent(d.battleId)}`
         : kind === 'message'
           ? '/social/messages'

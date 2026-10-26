@@ -66,6 +66,14 @@ test('the coin balance and read marks are not re-read on a timer', () => {
 test('battles follow opponents only while they are on screen', () => {
   assert.match(read('src/components/social/battles-card.tsx'), /useFocusEffect\(useCallback\(\(\) => \{[\s\S]*?watchBattles\(/);
   assert.match(read('src/app/social/battle.tsx'), /useFocusEffect\(useCallback\(\(\) => \{[\s\S]*?watchBattles\(/);
+  // XP battle rooms (2026-10-26): one listener on the room while its page is open, the open
+  // rooms and the record while Connect is open; the server is asked on a timer only when
+  // the rules refuse the listener, and only while a battle page is open.
+  assert.match(read('src/components/social/battle-room.tsx'), /useFocusEffect\(useCallback\(\(\) => \{[\s\S]*?watchRace\(/);
+  assert.match(read('src/components/social/battles-card.tsx'), /useFocusEffect\(useCallback\(\(\) => \{[\s\S]*?watchMyRaces\(/);
+  const rooms = read('src/data/battle-rooms.ts');
+  assert.match(rooms, /onSnapshot\(doc\(db, 'battleRooms', id\)/);
+  assert.match(rooms, /if \(!denied\(error\)\) return onError\(error\);[\s\S]*?setInterval\(/, 'the room is only polled when the listener is refused');
 });
 
 test('a presence-only change keeps the same account', () => {
