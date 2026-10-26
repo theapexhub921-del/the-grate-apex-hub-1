@@ -17,6 +17,7 @@ import type { ThemeColors } from '@/constants/theme';
 import { lessonToText } from '@/data/ai-study';
 import type { InteractiveStep, Lesson, LessonTerm } from '@/data/lesson-types';
 import { recordAnswer, recordRecall } from '@/data/learning/actions';
+import { keyWordsFor } from '@/data/key-words';
 import { type LessonSession, saveLessonSession } from '@/data/learning/lesson-sessions';
 import { type Answer, correctAnswerOf, isAnswerComplete, isAnswerCorrect, type Question } from '@/data/questions';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
@@ -493,6 +494,7 @@ function starterTerms(lesson: Lesson): LessonTerm[] {
   };
   for (const step of lesson.interactive ?? []) if (step.type === 'learn') add(step.terms);
   for (const chunk of lesson.chunks) add(chunk.terms);
+  if (!out.length) add(keyWordsFor(lesson.id)); // lessons that name none themselves (data/key-words/)
   return out;
 }
 

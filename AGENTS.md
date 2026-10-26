@@ -206,7 +206,7 @@ The interactive layer has a fourth step type, `simulate` (`SimulationStep` in `s
 
 ## Study from the basics up (owner, 2026-10-24)
 
-* Every step-by-step lesson opens with **Start simple** (`StartSimple` in `interactive-layer.tsx`): the big idea (`description`), the lesson's own key words (`terms`, at most six) and `objectives`. It is a card above step 1, not a step, so sessions in progress keep their place. `tests/start-simple.test.mjs`.
+* Every step-by-step lesson opens with **Start simple** (`StartSimple` in `interactive-layer.tsx`): the big idea (`description`), the lesson's own key words (`terms` of its learn steps and reading sections, at most six; lessons that name none use `src/data/key-words/<topic>.ts`, written from the lesson's own text — `tests/key-words.test.mjs` checks every word appears in its lesson and that no lesson is left without) and `objectives`. It is a card above step 1, not a step, so sessions in progress keep their place. `tests/start-simple.test.mjs`.
 * **Explain it more simply** (`ExplainSimplyButton` in `ai-study.tsx`) under every learn step and every answered checkpoint: Ask AI with `autoAsk` asks for a from-zero explanation.
 * HB2 lesson pages recommend the step-by-step version first ("New to this? Start here"); the reading is the notes to revise from.
 * **Lesson order follows the lecture decks** (`tests/lesson-order.test.mjs` for numbered decks). Reorder by changing the `lessons` array only; lesson ids never change, so progress is kept.
