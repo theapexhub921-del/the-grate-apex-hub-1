@@ -21,6 +21,7 @@ import { collection, doc, getDoc, getDocs, limit, query, setDoc, where } from 'f
 
 import { getLeagueOutcome, type LeagueOutcome } from '@/data/ranks';
 import { auth, db } from '@/lib/firebase';
+import { API_BASE } from '@/lib/live-site';
 import { getProgressSnapshot, waitForProgressSync } from '@/data/progress';
 
 export const LEAGUE_TIERS = [
@@ -100,6 +101,8 @@ async function lifetimeXp(uids: readonly string[]) {
  * for it (their XP since then belongs to the new week).
  */
 async function tierRows(week: string, tier: number, me: string, finished = false): Promise<LeagueRow[]> {
+  const shared = await serverTierRows(week, tier, me);
+  if (shared) return shared;
   const [current, moved] = await Promise.all([
     getDocs(query(collection(db, 'users'), where('league.week', '==', week), where('league.tier', '==', tier), limit(200))).catch(() => null),
     getDocs(query(collection(db, 'users'), where('league.prev.week', '==', week), where('league.prev.tier', '==', tier), limit(200))).catch(() => null),
@@ -124,6 +127,30 @@ async function tierRows(week: string, tier: number, me: string, finished = false
     if (!rows.has(item.id)) rows.set(item.id, { userId: item.id, username: (item.data().username as string) ?? null, weeklyXp: Math.max(0, Number(prev.weeklyXp) || 0), isMe: item.id === me });
   }
   return [...rows.values()];
+}
+
+/**
+ * The league table from the server (api/league.mjs), which builds it once for everyone in
+ * the tier and keeps it a few minutes: a handful of reads instead of hundreds per learner.
+ * Null when it cannot be reached (a local preview, or not set up): then the app reads Firebase.
+ */
+async function serverTierRows(week: string, tier: number, me: string): Promise<LeagueRow[] | null> {
+  try {
+    const token = await auth.currentUser?.getIdToken();
+    if (!token) return null;
+    const response = await fetch(`${API_BASE}/api/league?week=${week}&tier=${tier}`, { headers: { Authorization: `Bearer ${token}` } });
+    if (!response.ok) return null;
+    const body = (await response.json()) as { rows?: { userId?: unknown; username?: unknown; weeklyXp?: unknown }[] };
+    if (!Array.isArray(body.rows)) return null;
+    return body.rows.map((row) => ({
+      userId: String(row.userId ?? ''),
+      username: typeof row.username === 'string' ? row.username : null,
+      weeklyXp: Math.max(0, Number(row.weeklyXp) || 0),
+      isMe: row.userId === me,
+    }));
+  } catch {
+    return null;
+  }
 }
 
 export type LeagueView = { week: string; tier: number; endsAt: number; rows: LeagueRow[]; prev: LeagueEntry['prev'] | null };

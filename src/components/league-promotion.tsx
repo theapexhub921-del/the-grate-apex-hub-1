@@ -9,6 +9,7 @@ import { Text } from '@/components/ui/text';
 import { Type, type ThemeColors } from '@/constants/theme';
 import { LEAGUE_TIERS, loadLeague, type LeagueView, savedLeague, saveWeeklyLeagueXp, weekKey } from '@/data/leagues';
 import { markNotificationsRead, type AppNotification } from '@/data/notifications';
+import { useProgress } from '@/data/progress';
 import { useAuth } from '@/hooks/use-auth';
 import { useThemedStyles } from '@/hooks/use-theme';
 
@@ -21,6 +22,9 @@ import { useThemedStyles } from '@/hooks/use-theme';
 
 const KEY = 'grateapex_league_congrats'; // the last promotion week congratulated
 const WEEK_CHECK_MS = 30 * 60_000; // notices a new week while the app stays open (no reads)
+// My weekly XP is saved on my league entry this long after it last changed, so the shared league
+// table (api/league.mjs) is up to date without reading everyone's leaderboard entry. A write, no reads.
+const WEEKLY_XP_SAVE_MS = 2 * 60_000;
 
 let items: AppNotification[] = [];
 const listeners = new Set<() => void>();
@@ -55,6 +59,13 @@ export function LeaguePromotionWatcher() {
   const profileLoaded = user?.profileLoaded ?? false;
   const league = user?.profile?.league;
   const leagueKey = JSON.stringify(league ?? null);
+  const xp = useProgress().xp;
+  useEffect(() => {
+    if (!uid || !league) return;
+    const timer = setTimeout(() => void saveWeeklyLeagueXp(league).catch(() => {}), WEEKLY_XP_SAVE_MS);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `league` is followed through leagueKey
+  }, [uid, xp, leagueKey]);
   const [week, setWeek] = useState(weekKey);
   useEffect(() => {
     const timer = setInterval(() => setWeek(weekKey()), WEEK_CHECK_MS);

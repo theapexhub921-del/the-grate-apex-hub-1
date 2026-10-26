@@ -14,68 +14,8 @@
 // that changed after it was read is left to that learner's app (never overwritten).
 // Needs FIREBASE_SERVICE_ACCOUNT (like api/reminders.mjs).
 import { adminToken, serviceAccount } from './_admin.mjs';
+import { DB, encode, firestore, lifetimeXp, usersWhere } from './_league-store.mjs';
 import { leagueFinalPlaces, leagueWeek, nextLeagueTier } from './_push-logic.mjs';
-
-const DB = 'projects/grate-apex/databases/(default)/documents';
-
-function plain(value) {
-  if (!value || typeof value !== 'object') return undefined;
-  if ('stringValue' in value) return value.stringValue;
-  if ('integerValue' in value) return Number(value.integerValue);
-  if ('doubleValue' in value) return value.doubleValue;
-  if ('booleanValue' in value) return value.booleanValue;
-  if ('nullValue' in value) return null;
-  if ('arrayValue' in value) return (value.arrayValue.values ?? []).map(plain);
-  if ('mapValue' in value) return Object.fromEntries(Object.entries(value.mapValue.fields ?? {}).map(([key, item]) => [key, plain(item)]));
-  return undefined;
-}
-
-function encode(value) {
-  if (value === null || value === undefined) return { nullValue: null };
-  if (typeof value === 'string') return { stringValue: value };
-  if (typeof value === 'boolean') return { booleanValue: value };
-  if (typeof value === 'number') return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
-  return { mapValue: { fields: Object.fromEntries(Object.entries(value).filter(([, item]) => item !== undefined).map(([key, item]) => [key, encode(item)])) } };
-}
-
-const idOf = (doc) => String(doc.name).split('/').pop();
-
-/** Talks to Firestore with the service account (or the local emulator in checks). */
-function firestore(token) {
-  const emulator = process.env.FIRESTORE_EMULATOR_HOST;
-  const base = emulator ? `http://${emulator}/v1/${DB}` : `https://firestore.googleapis.com/v1/${DB}`;
-  return async (path, body) => {
-    const response = await fetch(`${base}${path}`, {
-      method: 'POST',
-      headers: { authorization: `Bearer ${emulator ? 'owner' : token}`, 'content-type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!response.ok) throw new Error(`Firestore ${path} failed (${response.status}): ${(await response.text()).slice(0, 200)}`);
-    return response.json();
-  };
-}
-
-/** Learners whose league entry has `field` == week, with the entry and when the document last changed. */
-async function usersWhere(call, field, week) {
-  const rows = await call(':runQuery', {
-    structuredQuery: {
-      from: [{ collectionId: 'users' }],
-      where: { fieldFilter: { field: { fieldPath: field }, op: 'EQUAL', value: { stringValue: week } } },
-      select: { fields: [{ fieldPath: 'league' }] },
-    },
-  });
-  return rows.filter((row) => row.document).map((row) => ({ id: idOf(row.document), updateTime: row.document.updateTime, league: plain(row.document.fields?.league) ?? {} }));
-}
-
-/** Lifetime XP from the shared leaderboard (scores/{uid}.xp), 100 at a time. */
-async function lifetimeXp(call, ids) {
-  const out = new Map();
-  for (let i = 0; i < ids.length; i += 100) {
-    const rows = await call(':batchGet', { documents: ids.slice(i, i + 100).map((id) => `${DB}/scores/${id}`), mask: { fieldPaths: ['xp'] } });
-    for (const row of rows) if (row.found) out.set(idOf(row.found), Number(plain(row.found.fields?.xp)) || 0);
-  }
-  return out;
-}
 
 /** Settles one finished week. Returns what changed (or would, when dry). */
 export async function settleLeagueWeek(call, week, newWeek, dry) {
