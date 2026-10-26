@@ -1,6 +1,7 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import { connectAuthEmulator } from 'firebase/auth';
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+import { connectFirestoreEmulator, type Firestore, getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+import { Platform } from 'react-native';
 
 import { createAuth } from '@/lib/firebase-auth';
 
@@ -17,7 +18,26 @@ const firebaseConfig = {
 export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 // Sign-ins are saved on the device (web storage, or AsyncStorage on phones: lib/firebase-auth*.ts).
 export const auth = createAuth(app);
-export const db = getFirestore(app);
+export const db = makeFirestore();
+
+/**
+ * On the web, what the app reads from Firebase is also kept in the browser (IndexedDB),
+ * like the original app kept its data on the device (owner, 2026-10-26): when Firebase
+ * can't be reached — no connection, or the free plan's daily reads used up — learners
+ * still see what they had already opened, and what they do is kept and sent once
+ * Firebase answers again. Shared by all open tabs. If the browser refuses storage
+ * (e.g. some private windows), Firebase keeps working in memory as before.
+ */
+function makeFirestore(): Firestore {
+  if (Platform.OS === 'web' && typeof indexedDB !== 'undefined') {
+    try {
+      return initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
+    } catch {
+      // Already set up (a hot reload in development): use it.
+    }
+  }
+  return getFirestore(app);
+}
 
 // Local checks only: a web build made with EXPO_PUBLIC_FIREBASE_EMULATOR=1 talks to
 // the local Firebase emulators instead of the live project. Never set for a release.
