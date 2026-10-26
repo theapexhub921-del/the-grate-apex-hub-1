@@ -198,9 +198,23 @@ function toCloudAttempt(attempt: QuizAttempt): CloudQuizAttempt {
   };
 }
 
+// The account's attempts are read (up to 200 reads) at most this often; in between, only
+// attempts this device knows the account lacks are uploaded (2026-10-26: reading them on
+// every sync helped use up the free plan's daily reads).
+const CLOUD_ATTEMPTS_KEEP_MS = 30 * 60_000;
+let cloudKnown: { userId: string; at: number; ids: Set<string> } | null = null;
+
 async function hydrateQuizHistory() {
   const requestedUserId = await getAuthenticatedLearningUserId();
   if (!requestedUserId) return;
+  if (cloudKnown?.userId === requestedUserId && Date.now() - cloudKnown.at < CLOUD_ATTEMPTS_KEEP_MS) {
+    const known = cloudKnown;
+    for (const attempt of attempts) {
+      if (known.ids.has(attempt.id)) continue;
+      if (await saveCloudQuizAttempt(toCloudAttempt(attempt))) known.ids.add(attempt.id);
+    }
+    return;
+  }
   const remote = await loadCloudQuizAttempts();
   if ((await getAuthenticatedLearningUserId()) !== requestedUserId) return;
   if (remote.length === 0 && attempts.length === 0) return;
@@ -218,6 +232,7 @@ async function hydrateQuizHistory() {
   // Local records win: they carry answers, questions and XP lines.
   attempts.forEach((attempt) => combined.set(attempt.id, attempt));
   const remoteIds = new Set(remote.map((attempt) => attempt.id));
+  cloudKnown = { userId: requestedUserId, at: Date.now(), ids: remoteIds };
   attempts = Array.from(combined.values())
     .sort((a, b) => b.completedAt - a.completedAt)
     .slice(0, MAX_ATTEMPTS);
@@ -225,7 +240,7 @@ async function hydrateQuizHistory() {
   await saveLocalHistory();
 
   for (const attempt of attempts) {
-    if (!remoteIds.has(attempt.id)) await saveCloudQuizAttempt(toCloudAttempt(attempt));
+    if (!remoteIds.has(attempt.id) && (await saveCloudQuizAttempt(toCloudAttempt(attempt)))) remoteIds.add(attempt.id);
   }
 }
 

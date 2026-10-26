@@ -73,6 +73,12 @@ async function readProfileCopy(uid: string): Promise<Record<string, any> | null>
   }
 }
 
+// When the profile can't be read and this device has no copy of it yet, Study would have no class
+// and show "Coming soon" (2026-10-26, the free plan's reads used up). Until the profile arrives,
+// the app's one class with lessons is assumed — in memory only, never saved to the account.
+const ASSUMED_CLASS = { grateapex_academic_selection: { classId: 'HB2', semester: 1 } };
+const hasClass = (profile: Record<string, any>) => Boolean(profile.grateapex_academic_selection || profile.classLocked === true);
+
 function authUserOf(firebaseUser: FirebaseUser, profile: Record<string, any>, profileLoaded: boolean): AuthUser {
   return {
     id: firebaseUser.uid,
@@ -81,6 +87,7 @@ function authUserOf(firebaseUser: FirebaseUser, profile: Record<string, any>, pr
     displayName: profile.displayName || profile.username || firebaseUser.displayName || null,
     created_at: firebaseUser.metadata.creationTime,
     user_metadata: {
+      ...(!profileLoaded && !hasClass(profile) ? ASSUMED_CLASS : {}),
       ...profile,
       onboarding_completed: profile.onboardingDone === true,
       full_name: profile.displayName || profile.username || firebaseUser.displayName || '',

@@ -22,6 +22,7 @@ import { rankSuggestions, relationshipOf } from '@/data/friend-suggestions';
 import { rankAndFilterCandidates, tokenizeWords } from '@/data/social-search';
 import type { AppNotification } from '@/data/notifications';
 import { chooseUsername } from '@/lib/accounts';
+import { API_BASE } from '@/lib/live-site';
 import { auth, db } from '@/lib/firebase';
 import { ONLINE_WITHIN_MS } from '@/lib/presence';
 import { announceFollow } from '@/lib/web-push';
@@ -393,17 +394,24 @@ const searchSpellings = (text: string) => [...new Set([text, text.toLowerCase(),
 let directory: { at: number; docs: Promise<{ id: string; data: Record<string, unknown> }[]> } | null = null;
 
 /**
- * Learner accounts for name search (users is readable by every signed-in
- * learner). Reading it costs one Firebase read per account, so it is kept for
- * 30 minutes (the project is on the free plan's daily read allowance).
+ * Learner accounts for matching part of a name in search. It comes from the server
+ * (api/learners.mjs), which reads it once for everyone: reading every account from
+ * each learner's app cost one Firebase read per account and helped use up the free
+ * plan's daily reads (2026-10-26). If the server can't be reached, search relies on
+ * the name-start lookups alone. Kept 30 minutes on the device.
  */
 function learnerDirectory() {
   if (!directory || Date.now() - directory.at > 30 * 60_000) {
     directory = {
       at: Date.now(),
-      docs: getDocs(query(collection(db, 'users'), limit(2000)))
-        .then((snap) => snap.docs.map((item) => ({ id: item.id, data: item.data() as Record<string, unknown> })))
-        .catch(() => []),
+      docs: (async () => {
+        const token = await auth.currentUser?.getIdToken();
+        if (!token) return [];
+        const response = await fetch(`${API_BASE}/api/learners`, { headers: { Authorization: `Bearer ${token}` } });
+        if (!response.ok) return [];
+        const body = (await response.json()) as { learners?: { id: string; username: string | null; displayName: string | null; avatar_url: string | null; discoverable: boolean }[] };
+        return (body.learners ?? []).map((item) => ({ id: item.id, data: { username: item.username, displayName: item.displayName, avatar_url: item.avatar_url, discoverable: item.discoverable } as Record<string, unknown> }));
+      })().catch(() => []),
     };
   }
   return directory.docs;

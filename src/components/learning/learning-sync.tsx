@@ -13,6 +13,14 @@ import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 import { Radius, Type, type ThemeColors } from '@/constants/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+// A full sync reads the learner's progress, every lesson completion and up to 200 quiz
+// attempts (hundreds of Firebase reads). It used to run on every return to the window or
+// app, which alone could use up the free plan's daily reads (2026-10-26): returning now
+// syncs at most this often. Start-up and coming back online still sync at once, and
+// everything the learner does is saved when they do it, not by this sync.
+const RESYNC_MS = 15 * 60_000;
+let lastSync = 0;
+
 // Mounted once in the root layout. It retries local-first learning writes
 // when connectivity returns, and shows a small notice while offline.
 // - Subscribing through useLearning() loads every learning store early,
@@ -39,8 +47,10 @@ export function LearningSync() {
     let active = true;
     let syncing = false;
 
-    const syncLocalLearning = async () => {
+    const syncLocalLearning = async (force = false) => {
       if (syncing || (Platform.OS === 'web' && typeof navigator !== 'undefined' && !navigator.onLine)) return;
+      if (!force && Date.now() - lastSync < RESYNC_MS) return;
+      lastSync = Date.now();
       syncing = true;
       try {
         await Promise.allSettled([
@@ -58,7 +68,7 @@ export function LearningSync() {
 
     const onOnline = () => {
       setOnline(true);
-      void syncLocalLearning();
+      void syncLocalLearning(true);
     };
     const onOffline = () => setOnline(false);
     const onFocus = () => {
@@ -78,7 +88,7 @@ export function LearningSync() {
       window.addEventListener('focus', onFocus);
     }
     const appStateSubscription = AppState.addEventListener('change', onAppState);
-    void syncLocalLearning();
+    void syncLocalLearning(true);
 
     return () => {
       active = false;

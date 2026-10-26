@@ -243,7 +243,16 @@ export async function loadCloudProgress(): Promise<CloudProgress | null> {
 
 // progress/{uid}/completions as a map, or null when it can't be read — for
 // example while its rule is not deployed (then nothing can be stored there).
+// One read per completed lesson, so it is read once and kept for a while
+// (2026-10-26: reading it on every sync helped use up the free plan's daily
+// reads); what this device writes is added to the kept copy.
+const COMPLETIONS_KEEP_MS = 30 * 60_000;
+let completionsCache: { userId: string; at: number; stored: Map<string, StoredCompletion> } | null = null;
+
 async function readCompletionDocs(userId: string): Promise<Map<string, StoredCompletion> | null> {
+  if (completionsCache && completionsCache.userId === userId && Date.now() - completionsCache.at < COMPLETIONS_KEEP_MS) {
+    return new Map(completionsCache.stored);
+  }
   try {
     const snap = await getDocs(collection(db, 'progress', userId, 'completions'));
     const stored = new Map<string, StoredCompletion>();
@@ -251,10 +260,16 @@ async function readCompletionDocs(userId: string): Promise<Map<string, StoredCom
       const data = item.data();
       stored.set(item.id, { completedAt: Number(data.completedAt) || 0, xp: Number(data.xp) || 0 });
     });
+    completionsCache = { userId, at: Date.now(), stored: new Map(stored) };
     return stored;
   } catch {
     return null;
   }
+}
+
+function rememberCompletions(userId: string, writes: readonly { lessonId: string; completedAt: number; xp: number }[]) {
+  if (completionsCache?.userId !== userId) return;
+  for (const write of writes) completionsCache.stored.set(write.lessonId, { completedAt: write.completedAt, xp: write.xp });
 }
 
 const isPermissionDenied = (error: unknown) => (error as { code?: string } | null)?.code === 'permission-denied';
@@ -263,6 +278,7 @@ const isPermissionDenied = (error: unknown) => (error as { code?: string } | nul
 // the rules don't open can't hold anything, so "permission denied" on the
 // listing means there is nothing to delete.
 async function deleteOwnSubcollection(userId: string, name: 'completions' | 'attempts') {
+  if (name === 'completions') completionsCache = null;
   let snap;
   try {
     snap = await getDocs(collection(db, 'progress', userId, name));
@@ -370,6 +386,7 @@ export async function saveCloudProgress(
         );
         await batch.commit();
       }
+      rememberCompletions(userId, writes);
       return;
     }
 
