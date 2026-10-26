@@ -232,3 +232,15 @@ test('a finished league week: final places and the next tier, as the app settles
   assert.equal(nextLeagueTier(9, 'promoted'), 9);
   assert.equal(nextLeagueTier(4, 'stays'), 4);
 });
+
+test('a learner moved on with the wrong league is put right, and a right one is left alone', async () => {
+  const { settledLeagueFix } = await import('../api/_push-logic.mjs');
+  const W = '2026-10-19';
+  const place = { position: 1, size: 164, weeklyXp: 790, outcome: 'promoted' };
+  // Recorded as promoted but still in Bronze (2026-10-26): moved up.
+  assert.deepEqual(settledLeagueFix({ week: '2026-10-26', tier: 0, prev: { week: W, tier: 0, weeklyXp: 790, position: 1, size: 164, outcome: 'promoted', rechecked: true } }, W, place), { tier: 1, prev: { week: W, tier: 0, weeklyXp: 790, position: 1, size: 164, outcome: 'promoted', rechecked: true } });
+  // Promoted by an app that saw only itself, though really 8th of 10: back to Bronze.
+  assert.equal(settledLeagueFix({ tier: 1, prev: { week: W, tier: 0, weeklyXp: 20, position: 1, size: 1, outcome: 'promoted' } }, W, { position: 8, size: 10, weeklyXp: 20, outcome: 'stays' }).tier, 0);
+  // Already right: nothing to change.
+  assert.equal(settledLeagueFix({ tier: 1, prev: { week: W, tier: 0, weeklyXp: 790, position: 1, size: 164, outcome: 'promoted', rechecked: true } }, W, place), null);
+});

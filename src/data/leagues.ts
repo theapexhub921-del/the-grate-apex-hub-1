@@ -17,7 +17,7 @@
 // 0 when the shared total lagged), and kept some top learners from moving up.
 // Last week's result is checked again once with these rules; it can only move a
 // learner up, never down.
-import { collection, doc, getDoc, getDocs, limit, query, setDoc, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocFromServer, getDocs, limit, query, setDoc, updateDoc, where } from 'firebase/firestore';
 
 import { getLeagueOutcome, type LeagueOutcome } from '@/data/ranks';
 import { auth, db } from '@/lib/firebase';
@@ -70,8 +70,6 @@ function myXpInWeek(key: string) {
   const { start, end } = weekRange(key);
   return getProgressSnapshot().xpLedger.filter((item) => item.at >= start && item.at < end).reduce((sum, item) => sum + Math.max(0, item.amount), 0);
 }
-
-const OUTCOME_RANK: Record<LeagueOutcome, number> = { relegated: 0, stays: 1, promoted: 2 };
 
 const clampTier = (tier: number) => Math.max(0, Math.min(LEAGUE_TIERS.length - 1, Math.round(tier)));
 
@@ -153,7 +151,7 @@ async function serverTierRows(week: string, tier: number, me: string): Promise<L
   }
 }
 
-export type LeagueView = { week: string; tier: number; endsAt: number; rows: LeagueRow[]; prev: LeagueEntry['prev'] | null };
+export type LeagueView = { week: string; tier: number; endsAt: number; rows: LeagueRow[]; prev: LeagueEntry['prev'] | null; /** Last week's final table, while the server settles it. */ settling?: boolean };
 
 // A league load reads everyone in the tier (and their XP), hundreds of reads on
 // Firebase's free plan: one result is shared by every screen for a while.
@@ -216,7 +214,8 @@ export async function saveWeeklyLeagueXp(value: unknown) {
   const startXp = Math.max(0, progress.xp - weeklyXp);
   const entry = value as LeagueEntry;
   if (progress.xp <= 0 || (entry.weeklyXp === weeklyXp && entry.startXp === startXp)) return;
-  await setDoc(doc(db, 'users', uid), { league: { ...entry, startXp, weeklyXp } }, { merge: true }).catch(() => {});
+  // Only the XP figures, never the whole entry: a stale copy must not put back an old league.
+  await updateDoc(doc(db, 'users', uid), { 'league.startXp': startXp, 'league.weeklyXp': weeklyXp }).catch(() => {});
 }
 
 async function readLeague(): Promise<LeagueView> {
@@ -225,39 +224,35 @@ async function readLeague(): Promise<LeagueView> {
   if (!uid) throw new Error('Sign in to see your league.');
   const week = weekKey();
   const ref = doc(db, 'users', uid);
-  const mine = (await getDoc(ref)).data() ?? {};
+  // From the server, never a copy kept in the browser: what is written below depends on it.
+  const mine = (await getDocFromServer(ref)).data() ?? {};
   let entry = mine.league as LeagueEntry | undefined;
   const myXp = (await lifetimeXp([uid])).get(uid)?.xp ?? 0;
 
   // My XP history first: a finished week is settled with it.
   await waitForProgressSync().catch(() => {});
 
-  /** My place in a finished week, with my XP from my own history. */
-  const finalPlace = async (finishedWeek: string, tier: number) => {
-    const mineXp = myXpInWeek(finishedWeek);
-    const rows = (await tierRows(finishedWeek, tier, uid, true)).filter((row) => !row.isMe);
-    rows.push({ userId: uid, username: mine.username ?? null, weeklyXp: mineXp, isMe: true });
-    const ordered = standings(rows);
-    const position = ordered.findIndex((row) => row.isMe) + 1;
-    return { position, size: ordered.length, weeklyXp: mineXp, outcome: outcomeFor(position, ordered.length, mineXp) };
-  };
-
+  const lastWeek = weekKey(Date.now() - 7 * 86_400_000);
   if (!entry || typeof entry.week !== 'string') {
     entry = { week, tier: 0, startXp: myXp };
     await setDoc(ref, { league: entry }, { merge: true });
+  } else if (entry.week === lastWeek) {
+    // The week that just ended is settled by the server for everyone at once (api/leagues.mjs,
+    // at midnight and again every morning), never by the app: apps that settled it themselves
+    // saw only part of the league when the free plan's reads were used up, so some moved up
+    // wrongly and some who earned it stayed (2026-10-26). Until then the final table is shown,
+    // and my exact figure for that week (from my own XP history) is saved for the server.
+    const finalXp = myXpInWeek(entry.week);
+    if (finalXp > (typeof entry.weeklyXp === 'number' ? entry.weeklyXp : -1)) {
+      await updateDoc(ref, { 'league.weeklyXp': finalXp }).catch(() => {});
+    }
+    const finished = standings((await tierRows(entry.week, entry.tier, uid, true)).map((row) => (row.isMe ? { ...row, weeklyXp: finalXp } : row)));
+    if (!finished.some((row) => row.isMe)) finished.push({ userId: uid, username: mine.username ?? null, weeklyXp: finalXp, isMe: true });
+    return { week: entry.week, tier: entry.tier, endsAt: weekEnds(), rows: standings(finished), prev: null, settling: true };
   } else if (entry.week !== week) {
-    // Settle the week that ended: my place in my tier then.
-    const place = await finalPlace(entry.week, entry.tier);
-    entry = { week, tier: nextTier(entry.tier, place.outcome), startXp: myXp, prev: { week: entry.week, tier: entry.tier, ...place, rechecked: true } };
-    await setDoc(ref, { league: entry }, { merge: true });
-  } else if (entry.prev && !entry.prev.rechecked && entry.prev.outcome !== 'promoted') {
-    // Last week was settled with the old counting: check it once more, and move up if it should have.
-    const place = await finalPlace(entry.prev.week, entry.prev.tier);
-    const better = OUTCOME_RANK[place.outcome] > OUTCOME_RANK[entry.prev.outcome];
-    entry = better
-      ? { ...entry, tier: nextTier(entry.prev.tier, place.outcome), prev: { ...entry.prev, ...place, rechecked: true } }
-      : { ...entry, prev: { ...entry.prev, rechecked: true } };
-    await setDoc(ref, { league: entry }, { merge: true }).catch(() => {});
+    // Away for more than a week: back into this week's league at the same level (nothing to settle).
+    entry = { week, tier: clampTier(entry.tier), startXp: myXp };
+    await updateDoc(ref, { league: entry });
   }
   // My weekly XP comes from my own XP history (earned since Monday), so it is
   // never mixed up with lifetime XP; the start point others use is corrected to
@@ -267,7 +262,8 @@ async function readLeague(): Promise<LeagueView> {
   const fixedStart = Math.max(0, myXp - ledgerWeekly);
   if (myXp > 0 && (fixedStart !== entry.startXp || entry.weeklyXp !== ledgerWeekly)) {
     entry = { ...entry, startXp: fixedStart, weeklyXp: ledgerWeekly };
-    await setDoc(ref, { league: entry }, { merge: true }).catch(() => {});
+    // Only the XP figures: the league itself is the server's to change.
+    await updateDoc(ref, { 'league.startXp': fixedStart, 'league.weeklyXp': ledgerWeekly }).catch(() => {});
   }
   const rows = standings((await tierRows(week, entry.tier, uid)).map((row) => (row.isMe ? { ...row, weeklyXp: ledgerWeekly } : row)));
   if (!rows.some((row) => row.isMe)) rows.push({ userId: uid, username: mine.username ?? null, weeklyXp: ledgerWeekly, isMe: true });

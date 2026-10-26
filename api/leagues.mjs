@@ -15,7 +15,7 @@
 // Needs FIREBASE_SERVICE_ACCOUNT (like api/reminders.mjs).
 import { adminToken, serviceAccount } from './_admin.mjs';
 import { DB, encode, firestore, lifetimeXp, usersWhere } from './_league-store.mjs';
-import { leagueFinalPlaces, leagueWeek, nextLeagueTier } from './_push-logic.mjs';
+import { leagueFinalPlaces, leagueWeek, nextLeagueTier, settledLeagueFix } from './_push-logic.mjs';
 
 /** Settles one finished week. Returns what changed (or would, when dry). */
 export async function settleLeagueWeek(call, week, newWeek, dry) {
@@ -25,24 +25,38 @@ export async function settleLeagueWeek(call, week, newWeek, dry) {
   const add = (tier, row) => { if (!tiers.has(tier)) tiers.set(tier, []); tiers.get(tier).push(row); };
   for (const person of waiting) {
     const entry = person.league;
-    // The weekly figure the learner's app saved; otherwise lifetime XP − the week's start (as the app counts others).
+    // The higher of the weekly figure the learner's app saved (it may not have saved
+    // lately) and leaderboard XP minus the week's start point.
     const trusted = Number(entry.startXp) > 0 || typeof entry.weeklyXp === 'number';
-    const weeklyXp = typeof entry.weeklyXp === 'number' ? Math.max(0, entry.weeklyXp) : trusted ? Math.max(0, (xp.get(person.id) ?? 0) - (Number(entry.startXp) || 0)) : 0;
-    add(Math.round(Number(entry.tier) || 0), { uid: person.id, weeklyXp, person });
+    const saved = typeof entry.weeklyXp === 'number' ? Math.max(0, entry.weeklyXp) : 0;
+    const fromScores = trusted ? Math.max(0, (xp.get(person.id) ?? 0) - (Number(entry.startXp) || 0)) : 0;
+    add(Math.round(Number(entry.tier) || 0), { uid: person.id, weeklyXp: Math.max(saved, fromScores), person, moved: false });
   }
   for (const person of movedOn) {
     const prev = person.league.prev ?? {};
-    if (!waiting.some((other) => other.id === person.id)) add(Math.round(Number(prev.tier) || 0), { uid: person.id, weeklyXp: Math.max(0, Number(prev.weeklyXp) || 0), person: null });
+    // Moved on already: their final figure (counted from their own XP history by their app).
+    if (!waiting.some((other) => other.id === person.id)) add(Math.round(Number(prev.tier) || 0), { uid: person.id, weeklyXp: Math.max(0, Number(prev.weeklyXp) || 0), person, moved: true });
   }
 
   const writes = [];
-  const counts = { promoted: 0, stays: 0, relegated: 0 };
+  const counts = { promoted: 0, stays: 0, relegated: 0, corrected: 0 };
   for (const [tier, rows] of tiers) {
     const places = leagueFinalPlaces(rows);
     for (const row of rows) {
-      if (!row.person) continue; // already settled by their own app
       const place = places.get(row.uid);
       counts[place.outcome] += 1;
+      if (row.moved) {
+        // Already moved on: put them in the league their final place earned, if they aren't.
+        const fix = settledLeagueFix(row.person.league, week, place);
+        if (!fix) continue;
+        counts.corrected += 1;
+        writes.push({
+          update: { name: `${DB}/users/${row.uid}`, fields: { league: encode({ tier: fix.tier, prev: fix.prev }) } },
+          updateMask: { fieldPaths: ['league.tier', 'league.prev'] },
+          currentDocument: { updateTime: row.person.updateTime },
+        });
+        continue;
+      }
       const league = {
         week: newWeek,
         tier: nextLeagueTier(tier, place.outcome),
@@ -67,7 +81,7 @@ export async function settleLeagueWeek(call, week, newWeek, dry) {
       for (const status of result.status ?? []) if (!status.code) written += 1; else skipped += 1;
     }
   }
-  return { week, newWeek, learners: waiting.length, alreadyMoved: movedOn.length, ...counts, written, skipped, dry };
+  return { week, newWeek, learners: waiting.length, alreadyMoved: movedOn.length, ...counts, written, skipped, dry, ...(dry ? { changes: writes.map((write) => ({ uid: write.update.name.split('/').pop(), league: write.update.fields.league })) } : {}) };
 }
 
 export default async function handler(req, res) {

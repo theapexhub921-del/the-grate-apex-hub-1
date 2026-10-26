@@ -205,6 +205,23 @@ export function leagueFinalPlaces(rows) {
 }
 
 /**
+ * For a learner already moved on from `week` (their app or an earlier run settled it), the
+ * change that makes their league match their final place, or null when it already does
+ * (2026-10-26: apps that settled while the free plan's reads were used up saw only part of
+ * the league, so some moved up wrongly and some who earned it stayed). `league` is their
+ * current entry, `place` their final place from leagueFinalPlaces. Returns { tier, prev }.
+ */
+export function settledLeagueFix(league, week, place) {
+  const prev = league?.prev ?? {};
+  const lastTier = Math.round(Number(prev.tier) || 0);
+  const tier = nextLeagueTier(lastTier, place.outcome);
+  const fixedPrev = { week, tier: lastTier, weeklyXp: place.weeklyXp, position: place.position, size: place.size, outcome: place.outcome, rechecked: true };
+  const same = Math.round(Number(league?.tier) || 0) === tier
+    && Object.entries(fixedPrev).every(([key, value]) => prev[key] === value);
+  return same ? null : { tier, prev: fixedPrev };
+}
+
+/**
  * The end-of-week league push for one learner, or null.
  * `rows` is everyone in the learner's tier: [{ uid, weeklyXp }].
  */

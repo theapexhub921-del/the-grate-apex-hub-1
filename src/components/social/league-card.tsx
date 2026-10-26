@@ -50,7 +50,7 @@ export function LeagueCard() {
           <Text style={styles.badgeEmoji}>{tier.emoji}</Text>
         </View>
         <View style={styles.flex}>
-          <SectionHeader title={`${tier.name} League`} subtitle={view ? `${size} learner${size === 1 ? '' : 's'} · ends in ${days}d ${hours}h` : 'Loading…'} style={styles.noMargin} />
+          <SectionHeader title={`${tier.name} League`} subtitle={view ? (view.settling ? `Last week's final table · ${size} learner${size === 1 ? '' : 's'}` : `${size} learner${size === 1 ? '' : 's'} · ends in ${days}d ${hours}h`) : 'Loading…'} style={styles.noMargin} />
         </View>
         <Button label="Refresh" variant="ghost" size="sm" onPress={() => void refresh()} />
       </View>
@@ -63,6 +63,7 @@ export function LeagueCard() {
         </View>
       ) : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      {view?.settling ? <Text style={styles.rules}>{"Last week's results are being finalised for everyone (by 10:00 at the latest). You will then move to the league your place earned."}</Text> : null}
       <Text style={styles.rules}>Top 20% move up a league, the bottom 20% move down. Earn XP this week to climb.</Text>
       <View style={styles.list}>
         {view?.rows.slice(0, 30).map((row, index) => {
