@@ -63,7 +63,7 @@ export function LeagueCard() {
         </View>
       ) : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      {view?.settling ? <Text style={styles.rules}>{"Last week's results are being finalised for everyone (by 10:00 at the latest). You will then move to the league your place earned."}</Text> : null}
+      {view?.settling ? <Text style={styles.rules}>{`Last week's results are being finalised for everyone (by 10:00 at the latest). You will then move to the league your place earned. This week started on Monday at 00:00: your ${(view.thisWeekXp ?? 0).toLocaleString()} XP since then counts for this week.`}</Text> : null}
       <Text style={styles.rules}>Top 20% move up a league, the bottom 20% move down. Earn XP this week to climb.</Text>
       <View style={styles.list}>
         {view?.rows.slice(0, 30).map((row, index) => {

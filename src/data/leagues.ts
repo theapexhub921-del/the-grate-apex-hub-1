@@ -37,7 +37,12 @@ export const LEAGUE_TIERS = [
   { name: 'Diamond', emoji: '💎', color: '#4FD1E8' },
 ] as const;
 
-export type LeagueEntry = { week: string; tier: number; startXp: number; weeklyXp?: number; prev?: { week: string; tier: number; weeklyXp: number; position: number; size: number; outcome: LeagueOutcome; rechecked?: boolean } };
+/**
+ * `weeklyXp` is labelled with the week it counts (`xpWeek`). After a week ends and until the server
+ * settles it, the app also saves its XP since Monday 00:00 (`nextXp`, for `nextWeek`), so the new
+ * week starts at midnight, not when the server gets to it.
+ */
+export type LeagueEntry = { week: string; tier: number; startXp: number; weeklyXp?: number; xpWeek?: string; nextWeek?: string; nextXp?: number; prev?: { week: string; tier: number; weeklyXp: number; position: number; size: number; outcome: LeagueOutcome; rechecked?: boolean } };
 export type LeagueRow = { userId: string; username: string | null; weeklyXp: number; isMe: boolean };
 
 /** Monday 00:00 (local) of the week containing `time`, as 'YYYY-MM-DD'. */
@@ -108,7 +113,9 @@ async function tierRows(week: string, tier: number, me: string, finished = false
   const live = current?.docs ?? [];
   // A finished week uses the weekly figure each learner's app saved, so only those without one need their
   // leaderboard XP (free plan: every scores read counts, and everyone settles at the same moment).
-  const needXp = live.filter((item) => !(finished && typeof (item.data().league as LeagueEntry | undefined)?.weeklyXp === 'number'));
+  // Only a figure saved for this very week counts (older saves had no label).
+  const savedFor = (entry: LeagueEntry | undefined) => (finished && typeof entry?.weeklyXp === 'number' && (entry.xpWeek ?? week) === week ? entry.weeklyXp : null);
+  const needXp = live.filter((item) => savedFor(item.data().league as LeagueEntry | undefined) === null);
   const xp = await lifetimeXp(needXp.map((item) => item.id));
   const rows = new Map<string, LeagueRow>();
   for (const item of live) {
@@ -117,7 +124,8 @@ async function tierRows(week: string, tier: number, me: string, finished = false
     // A start point of 0 with no weekly figure is an entry made before XP had loaded: count 0 until that learner's app corrects it, never their lifetime XP.
     const trusted = Number(entry.startXp) > 0 || typeof entry.weeklyXp === 'number';
     const live = trusted ? Math.max(0, (now?.xp ?? 0) - (Number(entry.startXp) || 0)) : 0;
-    const weeklyXp = finished && typeof entry.weeklyXp === 'number' ? Math.max(0, entry.weeklyXp) : live;
+    const saved = savedFor(entry);
+    const weeklyXp = saved !== null ? Math.max(0, saved) : live;
     rows.set(item.id, { userId: item.id, username: (item.data().username as string) ?? now?.username ?? null, weeklyXp, isMe: item.id === me });
   }
   for (const item of moved?.docs ?? []) {
@@ -151,7 +159,7 @@ async function serverTierRows(week: string, tier: number, me: string): Promise<L
   }
 }
 
-export type LeagueView = { week: string; tier: number; endsAt: number; rows: LeagueRow[]; prev: LeagueEntry['prev'] | null; /** Last week's final table, while the server settles it. */ settling?: boolean };
+export type LeagueView = { week: string; tier: number; endsAt: number; rows: LeagueRow[]; prev: LeagueEntry['prev'] | null; /** Last week's final table, while the server settles it. */ settling?: boolean; /** While settling: my XP since Monday 00:00. */ thisWeekXp?: number };
 
 // A league load reads everyone in the tier (and their XP), hundreds of reads on
 // Firebase's free plan: one result is shared by every screen for a while.
@@ -206,16 +214,41 @@ export function savedLeague(value: unknown, week = weekKey()): { settled: boolea
 export async function saveWeeklyLeagueXp(value: unknown) {
   const uid = auth.currentUser?.uid;
   const saved = savedLeague(value);
-  if (!uid || !saved.settled) return;
+  if (!uid) return;
+  const entry = value as LeagueEntry | null;
+  if (entry?.week === weekKey(Date.now() - 7 * 86_400_000)) {
+    // The week has ended and the server has not settled it yet.
+    await waitForProgressSync().catch(() => {});
+    await saveClosedWeekXp(uid, entry);
+    return;
+  }
+  if (!saved.settled || !entry) return;
   await waitForProgressSync().catch(() => {});
   const progress = getProgressSnapshot();
-  const monday = new Date(); monday.setHours(0, 0, 0, 0); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
-  const weeklyXp = progress.xpLedger.filter((item) => item.at >= monday.getTime()).reduce((sum, item) => sum + Math.max(0, item.amount), 0);
+  const week = weekKey();
+  const weeklyXp = myXpInWeek(week);
   const startXp = Math.max(0, progress.xp - weeklyXp);
-  const entry = value as LeagueEntry;
-  if (progress.xp <= 0 || (entry.weeklyXp === weeklyXp && entry.startXp === startXp)) return;
+  if (progress.xp <= 0 || (entry.weeklyXp === weeklyXp && entry.startXp === startXp && entry.xpWeek === week)) return;
   // Only the XP figures, never the whole entry: a stale copy must not put back an old league.
-  await updateDoc(doc(db, 'users', uid), { 'league.startXp': startXp, 'league.weeklyXp': weeklyXp }).catch(() => {});
+  await updateDoc(doc(db, 'users', uid), { 'league.startXp': startXp, 'league.weeklyXp': weeklyXp, 'league.xpWeek': week }).catch(() => {});
+}
+
+/**
+ * A week runs Monday 00:00 to Monday 00:00. Once it has ended, and until the server settles it,
+ * my exact figure for it (from my own XP history) is saved for the server, labelled with that
+ * week, and so is my XP since this Monday 00:00: the server starts my new week from it, so XP
+ * earned before it got round to settling still counts for the new week, never the old one.
+ */
+async function saveClosedWeekXp(uid: string, entry: LeagueEntry) {
+  const earlier = typeof entry.weeklyXp === 'number' && (entry.xpWeek ?? entry.week) === entry.week ? entry.weeklyXp : 0;
+  const finalXp = Math.max(earlier, myXpInWeek(entry.week));
+  const nextWeek = weekKey();
+  const nextXp = myXpInWeek(nextWeek);
+  if (entry.weeklyXp !== finalXp || entry.xpWeek !== entry.week || entry.nextWeek !== nextWeek || entry.nextXp !== nextXp) {
+    // Labelled, so if the server settles first and this lands on the new week's entry, nobody counts it there.
+    await updateDoc(doc(db, 'users', uid), { 'league.weeklyXp': finalXp, 'league.xpWeek': entry.week, 'league.nextWeek': nextWeek, 'league.nextXp': nextXp }).catch(() => {});
+  }
+  return { finalXp, nextXp };
 }
 
 async function readLeague(): Promise<LeagueView> {
@@ -241,14 +274,11 @@ async function readLeague(): Promise<LeagueView> {
     // at midnight and again every morning), never by the app: apps that settled it themselves
     // saw only part of the league when the free plan's reads were used up, so some moved up
     // wrongly and some who earned it stayed (2026-10-26). Until then the final table is shown,
-    // and my exact figure for that week (from my own XP history) is saved for the server.
-    const finalXp = myXpInWeek(entry.week);
-    if (finalXp > (typeof entry.weeklyXp === 'number' ? entry.weeklyXp : -1)) {
-      await updateDoc(ref, { 'league.weeklyXp': finalXp }).catch(() => {});
-    }
+    // with my XP since Monday 00:00 beside it, and both my figures are saved for the server.
+    const { finalXp, nextXp } = await saveClosedWeekXp(uid, entry);
     const finished = standings((await tierRows(entry.week, entry.tier, uid, true)).map((row) => (row.isMe ? { ...row, weeklyXp: finalXp } : row)));
     if (!finished.some((row) => row.isMe)) finished.push({ userId: uid, username: mine.username ?? null, weeklyXp: finalXp, isMe: true });
-    return { week: entry.week, tier: entry.tier, endsAt: weekEnds(), rows: standings(finished), prev: null, settling: true };
+    return { week: entry.week, tier: entry.tier, endsAt: weekEnds(), rows: standings(finished), prev: null, settling: true, thisWeekXp: nextXp };
   } else if (entry.week !== week) {
     // Away for more than a week: back into this week's league at the same level (nothing to settle).
     entry = { week, tier: clampTier(entry.tier), startXp: myXp };
@@ -257,13 +287,12 @@ async function readLeague(): Promise<LeagueView> {
   // My weekly XP comes from my own XP history (earned since Monday), so it is
   // never mixed up with lifetime XP; the start point others use is corrected to
   // match (it was 0 for anyone who joined before their XP had loaded).
-  const monday = new Date(); monday.setHours(0, 0, 0, 0); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
-  const ledgerWeekly = getProgressSnapshot().xpLedger.filter((item) => item.at >= monday.getTime()).reduce((sum, item) => sum + Math.max(0, item.amount), 0);
+  const ledgerWeekly = myXpInWeek(week);
   const fixedStart = Math.max(0, myXp - ledgerWeekly);
-  if (myXp > 0 && (fixedStart !== entry.startXp || entry.weeklyXp !== ledgerWeekly)) {
-    entry = { ...entry, startXp: fixedStart, weeklyXp: ledgerWeekly };
+  if (myXp > 0 && (fixedStart !== entry.startXp || entry.weeklyXp !== ledgerWeekly || entry.xpWeek !== week)) {
+    entry = { ...entry, startXp: fixedStart, weeklyXp: ledgerWeekly, xpWeek: week };
     // Only the XP figures: the league itself is the server's to change.
-    await updateDoc(ref, { 'league.startXp': fixedStart, 'league.weeklyXp': ledgerWeekly }).catch(() => {});
+    await updateDoc(ref, { 'league.startXp': fixedStart, 'league.weeklyXp': ledgerWeekly, 'league.xpWeek': week }).catch(() => {});
   }
   const rows = standings((await tierRows(week, entry.tier, uid)).map((row) => (row.isMe ? { ...row, weeklyXp: ledgerWeekly } : row)));
   if (!rows.some((row) => row.isMe)) rows.push({ userId: uid, username: mine.username ?? null, weeklyXp: ledgerWeekly, isMe: true });

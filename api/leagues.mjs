@@ -14,7 +14,7 @@
 // that changed after it was read is left to that learner's app (never overwritten).
 // Needs FIREBASE_SERVICE_ACCOUNT (like api/reminders.mjs).
 import { adminToken, serviceAccount } from './_admin.mjs';
-import { DB, encode, firestore, lifetimeXp, usersWhere } from './_league-store.mjs';
+import { DB, encode, firestore, lifetimeXp, savedWeeklyXp, usersWhere } from './_league-store.mjs';
 import { leagueFinalPlaces, leagueWeek, nextLeagueTier, settledLeagueFix } from './_push-logic.mjs';
 
 /** Settles one finished week. Returns what changed (or would, when dry). */
@@ -25,12 +25,14 @@ export async function settleLeagueWeek(call, week, newWeek, dry) {
   const add = (tier, row) => { if (!tiers.has(tier)) tiers.set(tier, []); tiers.get(tier).push(row); };
   for (const person of waiting) {
     const entry = person.league;
-    // The higher of the weekly figure the learner's app saved (it may not have saved
-    // lately) and leaderboard XP minus the week's start point.
-    const trusted = Number(entry.startXp) > 0 || typeof entry.weeklyXp === 'number';
-    const saved = typeof entry.weeklyXp === 'number' ? Math.max(0, entry.weeklyXp) : 0;
-    const fromScores = trusted ? Math.max(0, (xp.get(person.id) ?? 0) - (Number(entry.startXp) || 0)) : 0;
-    add(Math.round(Number(entry.tier) || 0), { uid: person.id, weeklyXp: Math.max(saved, fromScores), person, moved: false });
+    const saved = savedWeeklyXp(entry, week, true);
+    // Saved after the week ended (with the new week's XP beside it): exact, counted Monday to
+    // Monday from the learner's own XP history. Otherwise the higher of the figure the app saved
+    // during the week (it may not have saved lately) and leaderboard XP minus the start point.
+    const closed = saved !== null && entry.nextWeek === newWeek && typeof entry.nextXp === 'number';
+    const trusted = Number(entry.startXp) > 0 || saved !== null;
+    const fromScores = !closed && trusted ? Math.max(0, (xp.get(person.id) ?? 0) - (Number(entry.startXp) || 0)) : 0;
+    add(Math.round(Number(entry.tier) || 0), { uid: person.id, weeklyXp: Math.max(saved ?? 0, fromScores), person, moved: false });
   }
   for (const person of movedOn) {
     const prev = person.league.prev ?? {};
@@ -57,10 +59,16 @@ export async function settleLeagueWeek(call, week, newWeek, dry) {
         });
         continue;
       }
+      // The new week counts from Monday 00:00, not from this run (which can be hours later):
+      // XP the learner's app says they earned since then is kept as this week's.
+      const lifetime = xp.get(row.uid) ?? 0;
+      const entry = row.person.league;
+      const since = entry.nextWeek === newWeek && typeof entry.nextXp === 'number' ? Math.max(0, Math.min(lifetime, Math.round(entry.nextXp))) : null;
       const league = {
         week: newWeek,
         tier: nextLeagueTier(tier, place.outcome),
-        startXp: xp.get(row.uid) ?? 0,
+        startXp: lifetime - (since ?? 0),
+        ...(since !== null ? { weeklyXp: since, xpWeek: newWeek } : {}),
         prev: { week, tier, weeklyXp: place.weeklyXp, position: place.position, size: place.size, outcome: place.outcome, rechecked: true },
       };
       writes.push({

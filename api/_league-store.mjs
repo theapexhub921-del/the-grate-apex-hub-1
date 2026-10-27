@@ -1,5 +1,6 @@
 // Reading leagues from Firestore on the server with the service account (api/leagues.mjs
 // settles the week; api/league.mjs serves the league table). Files starting with "_" are not routes.
+import { leagueWeek } from './_push-logic.mjs';
 
 export const DB = 'projects/grate-apex/databases/(default)/documents';
 
@@ -63,6 +64,19 @@ export async function lifetimeXp(call, ids) {
 }
 
 /**
+ * The weekly figure a learner's app saved for `week`, or null. A week runs from Monday 00:00 and
+ * every save says which week it counts (`xpWeek`): a figure saved for another week is never used
+ * (a Monday-morning save for the week that had just ended once landed on the new week's entry and
+ * showed last week's XP as this week's). Saves from before that label existed count only for a
+ * finished week.
+ */
+export function savedWeeklyXp(entry, week, finished) {
+  if (typeof entry?.weeklyXp !== 'number') return null;
+  if (entry.xpWeek === undefined ? !finished : entry.xpWeek !== week) return null;
+  return Math.max(0, entry.weeklyXp);
+}
+
+/**
  * Everyone in one tier of one week, with their weekly XP, the way the app counts it
  * (src/data/leagues.ts tierRows): the weekly figure each learner's app saved, or —
  * when there is none yet — leaderboard XP minus the week's start point. Learners who
@@ -84,12 +98,14 @@ export async function tierTable(call, week, tier) {
   const [current, moved] = await Promise.all([both('league'), both('league.prev')]);
   const people = (rows) => rows.filter((row) => row.document).map((row) => ({ id: idOf(row.document), username: plain(row.document.fields?.username) ?? null, league: plain(row.document.fields?.league) ?? {} }));
   const live = people(current);
-  const xp = await lifetimeXp(call, live.filter((person) => typeof person.league.weeklyXp !== 'number').map((person) => person.id));
+  const finished = week < leagueWeek(Date.now());
+  const xp = await lifetimeXp(call, live.filter((person) => savedWeeklyXp(person.league, week, finished) === null).map((person) => person.id));
   const rows = new Map();
   for (const person of live) {
     const entry = person.league;
-    const trusted = Number(entry.startXp) > 0 || typeof entry.weeklyXp === 'number';
-    const weeklyXp = typeof entry.weeklyXp === 'number' ? Math.max(0, entry.weeklyXp) : trusted ? Math.max(0, (xp.get(person.id) ?? 0) - (Number(entry.startXp) || 0)) : 0;
+    const saved = savedWeeklyXp(entry, week, finished);
+    const trusted = Number(entry.startXp) > 0 || saved !== null;
+    const weeklyXp = saved ?? (trusted ? Math.max(0, (xp.get(person.id) ?? 0) - (Number(entry.startXp) || 0)) : 0);
     rows.set(person.id, { userId: person.id, username: person.username, weeklyXp });
   }
   for (const person of people(moved)) {
