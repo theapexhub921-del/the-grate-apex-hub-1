@@ -66,6 +66,7 @@ Current routes include:
 * `src/app/learn/quiz.tsx` (lesson quiz, topic quiz, practice wrong answers, mastery check)
 * `src/app/learn/results.tsx` (`/learn/results?attempt=<attempt id>`)
 * `src/app/learn/review.tsx` (spaced-repetition review sessions)
+* `src/app/learn/label.tsx` ("Label a diagram": a lecture diagram from a studied lesson, in "Label it" mode)
 * `src/app/learn/apex.tsx` (Apex Challenge: `/learn/apex?course=<course id>`; 10 seconds per question, set in `src/data/learning/apex.ts`)
 * `src/app/login.tsx` (sign in, create account, Continue with Google, forgot / reset password)
 * `src/app/onboarding.tsx` (first-run interactive introduction: `/onboarding[?replay=1]`)
@@ -155,7 +156,7 @@ Social (real friends) is in `src/data/social.ts`, backed by Firestore:
 
 **Focus timer** (owner, 2026-10-20): `/learn/focus` (Learn home tile). The clock lives in `src/data/focus-timer.ts` (not the page), so it runs in the background; when a block ends an alarm rings (`alarmFeedback` in `lib/feedback.ts`, made ready by the Start tap with `primeAlarm`, rings even with answer sounds off), and a device alert shows if alerts are allowed and the app is hidden. The page tells the learner it runs in the background and that an alarm rings. 25/5, 50/10 or 15/3 blocks; the clock runs from an end time and is kept outside the page, so it survives a background tab or a visit to another page. A finished block (or stopping after 5+ minutes) records its minutes (`src/data/focus.ts`, pure rules in `focus-rules.ts`, `tests/focus-timer.test.mjs`), keeps the learning streak (`markStudyActivity`) and feeds the "Focus minutes" personal goal. The log is synced as `synced.focus`.
 
-**Same on every device** (owner, 2026-10-19): `src/data/account-sync.ts` keeps small per-account records on the private `progress/{uid}` document as `synced.<name>` (read once per sign-in, written a few seconds after a change, each name replaced whole; no rules change): `seenStories`, `viewedPosts`, `seenAlerts` (device alerts already shown), `lessonSessions` (lessons in progress, with clear marks so a finished one does not come back), `flashcards` (per card, the copy with more reviews) and `prePost`. Notification read marks were already synced (`progress/{uid}.notificationsRead`). XP, lessons, answers, quizzes, planner and quiz drafts sync on their own. After a review today, the "reinforcement is ready" reminder is gone for the day (`reviewedToday` in `buildNotifications`); the daily review push already skips anyone who studied that day.
+**Same on every device** (owner, 2026-10-19): `src/data/account-sync.ts` keeps small per-account records on the private `progress/{uid}` document as `synced.<name>` (read once per sign-in, written a few seconds after a change, each name replaced whole; no rules change): `seenStories`, `viewedPosts`, `seenAlerts` (device alerts already shown), `lessonSessions` (lessons in progress, with clear marks so a finished one does not come back), `flashcards` (per card, the copy with more reviews), `prePost` and `hooks` (memory hooks, newer change wins). Notification read marks were already synced (`progress/{uid}.notificationsRead`). XP, lessons, answers, quizzes, planner and quiz drafts sync on their own. After a review today, the "reinforcement is ready" reminder is gone for the day (`reviewedToday` in `buildNotifications`); the daily review push already skips anyone who studied that day.
 
 **Chat extras** (owner, 2026-10-26): WhatsApp formatting in messages (*bold*, _italic_, ~strike~, `code`, ```block```; `src/lib/chat-format.ts`, `components/chat/chat-text.tsx`, `tests/chat-format.test.mjs`; previews strip the markers). Pin (up to 3), archive and mute chats from a long-press or right-click in the chats list (`src/data/chat-list-prefs.ts`, synced as `synced.chatList`); muted chats give no bell entry, device alert or toast (`message-notifications.ts`). Server pushes for muted chats are not filtered yet.
 
@@ -211,6 +212,18 @@ The interactive layer has a fourth step type, `simulate` (`SimulationStep` in `s
 * **Simulations tab** (owner's request, 2026-10-18): Physiology has its own Simulations tab, like Anatomy's Atlas — on the HB2 Physiology course page (`hb-course.tsx`, `&tab=simulations`) and the Physiology subject page (`SubjectScreen` prop `simulations`). It lists every lesson simulation by topic (`src/components/learning/simulation-library.tsx`, `src/data/simulation-library.ts`); each opens on its own page, `/learn/simulation?lesson=<lesson id>` (`routes.simulation`), as practice (predictions there are not recorded).
 * **Checks**: `tests/simulations.test.mjs` — every prediction's marked answer must match what the model shows, every scenario stays in range, and every challenge is unsolved at its start and solvable with its unlocked controls.
 * Adding a simulation: write the model, its drawing, register both, then add a `simulate()` step with predictions to the topic. Bump the topic's `contentVersion` when steps are added, so half-finished lesson sessions restart cleanly.
+
+## Study boosts (owner, 2026-10-28: "implement everything")
+
+Details and rules: `docs/study-boosts.md`; pure rules checked by `tests/learning-boosts.test.mjs`.
+
+* **Sure / Guessing** (`confidence-toggle.tsx` in every `QuestionSession`): optional, picked before checking; saved as `confidence` on the answer and the quiz attempt. A right guess grows the interval like a partial recall; sure-but-wrong costs extra ease (`confidentWrongEasePenalty` in `scheduler.ts`). Results: "How sure you were".
+* **Daily 10** (`exam=daily`, run as a review), **2-minute sprint** (`exam=sprint`, `SPRINT_SECONDS`, only answered questions count) and **Confused pairs** (`exam=pairs`; wrong multiple-choice answers keep the option picked as `chosen`): Learn home tiles, rules in `src/data/learning/daily-practice.ts`, data in `src/data/daily-practice.ts`.
+* **Daily quest** card on the Learn home (`daily-quest-card.tsx`, ticks in `src/data/daily-quest.ts` on this device for today): Daily 10, label a diagram, finish a lesson/quiz/sprint; +25 XP once a day (`practice:daily-quest:<day>`). XP, not coins (coin kinds are rules-limited).
+* **Label it**: a third mode on every lecture diagram (`LabelBoard` in `figure-view.tsx`): pick a name, tap its pin; first tries are recorded against the part's spot question (`spotQuestionFor` in `src/data/figure-practice.ts`).
+* **Memory map** on topic pages (`memory-map.tsx`): every concept as a square by lesson, coloured by state, filled by mastery.
+* **Links to your other courses** at the end of a lesson's reading (`related-lessons.tsx`; shared key words across subjects) with "How do these link?" (Ask AI, `AiQuestionButton`).
+* **Memory hooks** under every answered question (`memory-hook.tsx`, `src/data/memory-hooks.ts`, synced as `synced.hooks`), also on the memory map; "Share with friends" posts one to the feed (friends only).
 
 ## Study from the basics up (owner, 2026-10-24)
 

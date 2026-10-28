@@ -1,3 +1,5 @@
+import { MemoryHookBox } from '@/components/learning/memory-hook';
+import { conceptKey } from '@/data/curriculum';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Text, TextInput } from '@/components/ui/text';
@@ -287,6 +289,9 @@ export function QuestionCard({
             {!correct && reviewNote ? <Text style={styles.reviewNote}>{reviewNote}</Text> : null}
           </View>
 
+          {question.conceptId && question.topicId ? (
+            <MemoryHookBox key={`hook:${question.id}`} conceptKey={conceptKey(question.topicId, question.conceptId)} concept={question.concept} />
+          ) : null}
           {!correct ? <AiExplain key={question.id} item={explainItem(question, value)} getLesson={() => aiLessonForQuestion(question)} /> : null}
           <QuestionReportLink key={`report:${question.id}`} question={question} place={courseNameForQuestion(question) ?? 'Quiz'} />
         </View>

@@ -20,6 +20,8 @@ import { selectQuestions, type SelectionRequest } from '@/data/learning/selectio
 import { currentMemoryModel } from '@/data/learning/state';
 import { nowMs } from '@/data/learning/time';
 import { XP_RULES } from '@/data/learning/xp-rules';
+import { isAnswerComplete } from '@/data/questions';
+import { markQuest, SPRINT_POOL, SPRINT_SECONDS } from '@/data/daily-practice';
 import { examBanks, examTitle, type ExamSettings, markWeakestDone, mockPool, parseExam, spotterPool, SUBJECT_NAME, bankSubject } from '@/data/exam-practice';
 import { pastCourseForSubject } from '@/data/past-question-topics';
 import { pastCourseOf, pastQuestionsFor, usePastQuestions } from '@/data/past-questions';
@@ -54,6 +56,9 @@ type QuizPlan = {
 // /learn/quiz?exam=mock&bank=<hb2 course>&size=…&minutes=…        mock exam (timed paper from past papers)
 // /learn/quiz?exam=spotter&subject=<subject|all>&size=…&seconds=…  spotter (timed picture stations)
 // /learn/quiz?exam=weakest&practice=<ids>                          "Your weakest 20"
+// /learn/quiz?exam=daily&practice=<ids>                            Daily 10 (due questions, courses mixed)
+// /learn/quiz?exam=pairs&practice=<ids>                            confused pairs drill
+// /learn/quiz?exam=sprint                                          2-minute sprint
 // Older links: ?course=<id>&challenge=apex → Apex Challenge;
 //              ?lesson=<id>&practiceWrong=true&wrongQuestions=<ids> → practice
 export default function QuizRoute() {
@@ -77,7 +82,8 @@ export default function QuizRoute() {
       : undefined;
   const practiceIds = practice ? practice.split(',').filter(Boolean) : undefined;
   const parsedExam = parseExam((name) => param(params[name]));
-  const exam = parsedExam?.kind === 'weakest' && !practiceIds?.length ? null : parsedExam;
+  const needsIds = parsedExam?.kind === 'weakest' || parsedExam?.kind === 'daily' || parsedExam?.kind === 'pairs';
+  const exam = needsIds && !practiceIds?.length ? null : parsedExam;
   // Past questions are loaded before the quiz is planned, so they can be found by id.
   const pastCourses = [
     ...(customPastTopicIds ?? []).map((id) => pastCourseForSubject(getTopic(id)!.subject)),
@@ -116,7 +122,7 @@ export default function QuizRoute() {
       customPastTopicIds={customPastTopicIds}
       customSize={customSize}
       customSettings={customSettings}
-      initialFeedback={exam && exam.kind !== 'weakest' ? 'submit' : custom ? feedback : undefined}
+      initialFeedback={exam && (exam.kind === 'mock' || exam.kind === 'spotter') ? 'submit' : custom ? feedback : undefined}
       perQuestionSeconds={exam?.kind === 'spotter' ? exam.seconds : perQuestionSeconds}
       exam={exam ?? undefined}
     />
@@ -156,6 +162,35 @@ function buildPlan(input: {
       backHref: back,
       crumbs: [{ label: exam.kind === 'mock' ? 'Mock exam' : 'Spotter', href: back }],
       customQuiz: { lessonIds: [], size, feedback: 'submit', secondsPerQuestion: exam.kind === 'spotter' ? exam.seconds : undefined, exam },
+    };
+  }
+  if ((exam?.kind === 'daily' || exam?.kind === 'pairs') && practiceIds?.length) {
+    const questions = getQuestionsByIds(practiceIds);
+    if (questions.length === 0) return null;
+    const daily = exam.kind === 'daily';
+    return {
+      kind: daily ? 'review' : 'practice',
+      attemptMode: daily ? 'review' : 'practice',
+      title: examTitle(exam),
+      subtitle: daily
+        ? `${questions.length} questions on what is due today, from all your courses, mixed. Switching between subjects is harder than one topic at a time, and that is what makes it stick.`
+        : `The answers you keep mixing up, asked side by side (${questions.length} questions). Look for what tells the two apart.`,
+      request: { scope: { kind: 'questions', questionIds: questions.map((question) => question.id) }, size: questions.length },
+      backHref: routes.learn(),
+      crumbs: [{ label: examTitle(exam) }],
+      customQuiz: { lessonIds: [], size: questions.length, feedback: 'instant', exam },
+    };
+  }
+  if (exam?.kind === 'sprint') {
+    return {
+      kind: 'practice',
+      attemptMode: 'practice',
+      title: examTitle(exam),
+      subtitle: `As many as you can in ${SPRINT_SECONDS / 60} minutes, from the lessons you have studied. Answers show as you go; only the questions you answered count.`,
+      request: { scope: { kind: 'curriculum' }, filters: { learnedOnly: true, types: ['choice'] }, strategy: 'random', size: SPRINT_POOL },
+      backHref: routes.learn(),
+      crumbs: [{ label: examTitle(exam) }],
+      customQuiz: { lessonIds: [], size: SPRINT_POOL, feedback: 'instant', exam },
     };
   }
   if (exam?.kind === 'weakest' && practiceIds?.length) {
@@ -266,6 +301,7 @@ function draftKey(plan: QuizPlan, practiceIds?: string[]): string {
   if (exam?.kind === 'mock') return `exam:mock:${exam.bank}`;
   if (exam?.kind === 'spotter') return `exam:spotter:${exam.subject}`;
   if (exam?.kind === 'weakest') return 'exam:weakest';
+  if (exam) return `exam:${exam.kind}`;
   if (plan.kind === 'practice') {
     const ids = plan.customQuiz
       ? [...plan.customQuiz.lessonIds, ...(plan.customQuiz.pastTopicIds ?? []).map((id) => `past:${id}`)]
@@ -507,15 +543,18 @@ function QuizScreen({
       sessionId: `quiz:${seed}`,
       lessonId: plan.lessonId,
       topicId: plan.topicId,
-      questions: items.map((item) => item.question),
+      // A sprint counts only what was answered in the time.
+      questions: (exam?.kind === 'sprint' ? items.filter((item) => isAnswerComplete(item.question, result.answers[item.question.id])) : items).map((item) => item.question),
       answers: result.answers,
       recordedIds: result.recordedIds,
       timeSeconds: result.timeSeconds,
+      confidence: result.confidence,
       feedbackMode: mode,
       practice: plan.kind === 'practice',
       customQuiz: plan.customQuiz,
     });
     if (exam?.kind === 'weakest') void markWeakestDone();
+    if (exam?.kind === 'daily') void markQuest('daily');
     const extra = outcome.milestones.reduce((sum, item) => sum + item.xp, 0);
     if (outcome.xpApplied !== 0 || extra !== 0) {
       setPendingXpReward({
@@ -542,7 +581,7 @@ function QuizScreen({
         mode={mode}
         onModeChange={setMode}
         perQuestionSeconds={perQuestionSeconds}
-        timeLimitSeconds={exam?.kind === 'mock' ? exam.minutes * 60 : undefined}
+        timeLimitSeconds={exam?.kind === 'mock' ? exam.minutes * 60 : exam?.kind === 'sprint' ? SPRINT_SECONDS : undefined}
         attemptMode={plan.attemptMode}
         sessionId={`quiz:${seed}`}
         seed={seed}
@@ -550,7 +589,7 @@ function QuizScreen({
         onProgress={onProgress}
         onSaveExit={saveAndExit}
         onSubmit={submit}
-        submitLabel={timedExam ? 'Hand in' : 'Finish quiz'}
+        submitLabel={timedExam ? 'Hand in' : exam?.kind === 'sprint' ? 'Stop' : 'Finish quiz'}
         reviewNote={plan.kind === 'practice' ? null : 'This concept comes back for review tomorrow.'}
         header={
           <View style={styles.sessionHeader}>
@@ -577,7 +616,11 @@ function QuizScreen({
               ? 'MOCK EXAM'
               : exam?.kind === 'spotter'
                 ? 'SPOTTER'
-                : plan.kind === 'practice'
+                : exam?.kind === 'sprint'
+                  ? '2-MINUTE SPRINT'
+                  : exam?.kind === 'daily'
+                    ? 'DAILY 10'
+                    : plan.kind === 'practice'
                   ? 'PRACTICE'
                   : 'LESSON QUIZ'}
       </Text>
@@ -657,7 +700,7 @@ function QuizScreen({
         ) : (
           <>
             <Button label="Back" variant="ghost" onPress={() => router.push(plan.backHref)} />
-            <Button label={saved ? (timedExam ? 'Start a fresh paper' : 'Start a fresh quiz') : exam?.kind === 'mock' ? 'Start the exam' : exam?.kind === 'spotter' ? 'Start the spotter' : 'Start quiz'} trailing="→" size="lg" variant={saved ? 'secondary' : 'primary'} onPress={() => void start()} loading={starting} />
+            <Button label={saved ? (timedExam ? 'Start a fresh paper' : 'Start a fresh quiz') : exam?.kind === 'mock' ? 'Start the exam' : exam?.kind === 'spotter' ? 'Start the spotter' : exam?.kind === 'sprint' ? 'Start the clock' : 'Start quiz'} trailing="→" size="lg" variant={saved ? 'secondary' : 'primary'} onPress={() => void start()} loading={starting} />
           </>
         )}
       </View>

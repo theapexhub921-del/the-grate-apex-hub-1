@@ -47,6 +47,7 @@ export type QuizAttempt = {
   wrongQuestionIds: string[];
   questionIds: string[];
   answers?: Record<string, Answer>; // local only — shown on Results
+  confidence?: Record<string, 'sure' | 'guess'>; // local only — "Sure / Guessing" per question
   feedbackMode?: 'instant' | 'submit' | 'timed';
   customQuiz?: CustomQuizSettings; // local-only settings used to retake a custom quiz
   practice: boolean; // true for "Practice Wrong Answers" runs

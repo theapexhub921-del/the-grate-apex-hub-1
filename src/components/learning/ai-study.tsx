@@ -287,29 +287,49 @@ export const explainSimplyQuestion = (focus: string) =>
  * computer, a sheet on a phone) and asks for a from-zero explanation of that step.
  */
 export function ExplainSimplyButton({ lesson, focus }: { lesson: AiLesson; focus: string }) {
+  return (
+    <AiQuestionButton
+      lesson={lesson}
+      focus={focus}
+      question={explainSimplyQuestion(focus)}
+      label="Explain it more simply"
+      title="Explain it more simply"
+      hint="Ask AI explains this step from the basics, using this lesson"
+    />
+  );
+}
+
+/** The question behind "How do these link?" (cross-course links, 2026-10-28). */
+export const linkLessonsQuestion = (here: string, there: string, shared: readonly string[]) =>
+  `How does “${here}” link to “${there}”${shared.length ? ` (both involve ${shared.join(', ')})` : ''}? Explain the connection in a few short points, using this lesson first, and give me one memory hook that ties the two together.`;
+
+/**
+ * A button that opens Ask AI (docked on the right on a computer, a sheet on a
+ * phone) and asks one question about this lesson straight away.
+ */
+export function AiQuestionButton({ lesson, focus, question, label, title, hint }: { lesson: AiLesson; focus: string; question: string; label: string; title: string; hint?: string }) {
   const colors = useTheme();
   const [open, setOpen] = useState(false);
   const docked = useSidePanelAvailable();
-  const panelId = `explain-simply:${lesson.id}`;
+  const panelId = `ai-question:${lesson.id}`;
   useFocusEffect(useCallback(() => () => closeSidePanel(panelId), [panelId]));
   useEffect(() => () => closeSidePanel(panelId), [panelId]);
-  const question = explainSimplyQuestion(focus);
   const press = () => {
     if (!docked) { setOpen(true); return; }
-    // A new panel for each step (the key makes it ask again for the new step).
-    openSidePanel({ id: panelId, title: 'Explain it more simply', subtitle: focus, content: <AskAiPanel key={focus} lesson={lesson} focus={focus} autoAsk={question} docked /> });
+    // A new panel for each question (the key makes it ask again).
+    openSidePanel({ id: panelId, title, subtitle: focus, content: <AskAiPanel key={question} lesson={lesson} focus={focus} autoAsk={question} docked /> });
   };
   return (
     <>
       <Button
-        label="Explain it more simply"
+        label={label}
         variant="ghost"
         size="sm"
         icon={<Icon name="sparkle" size={14} color={colors.primaryText} />}
         onPress={press}
-        accessibilityHint="Ask AI explains this step from the basics, using this lesson"
+        accessibilityHint={hint}
       />
-      <Sheet visible={open && !docked} onClose={() => setOpen(false)} title="Explain it more simply" subtitle={focus} width={640}>
+      <Sheet visible={open && !docked} onClose={() => setOpen(false)} title={title} subtitle={focus} width={640}>
         {open ? <AskAiPanel lesson={lesson} focus={focus} autoAsk={question} embedded /> : null}
       </Sheet>
     </>

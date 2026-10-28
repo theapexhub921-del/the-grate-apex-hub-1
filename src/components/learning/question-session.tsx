@@ -4,6 +4,8 @@ import { Text } from '@/components/ui/text';
 
 import { QuestionCard } from '@/components/question-card';
 import { QuestionNote } from '@/components/learning/question-note';
+import { ConfidenceToggle, confidenceNote } from '@/components/learning/confidence-toggle';
+import type { Confidence } from '@/data/learning/scheduler';
 import { prefetchQuestionPictures, questionPictureUri } from '@/components/learning/figure-view';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { toggleStar, useStarredIds } from '@/data/starred-questions';
@@ -34,12 +36,15 @@ export type SessionProgress = {
   recorded: string[];
   timedOut: string[];
   elapsed: number;
+  confidence?: Record<string, Confidence>;
 };
 
 export type SessionResult = {
   answers: Record<string, Answer>;
   recordedIds: Set<string>;
   timeSeconds: number;
+  /** "Sure / Guessing" per question id (only where the learner picked one). */
+  confidence: Record<string, Confidence>;
 };
 
 const REASON_LABEL: Partial<Record<SelectionReason, { label: string; tone: 'warning' | 'error' | 'primary' | 'neutral' | 'gold' }>> = {
@@ -108,6 +113,7 @@ export function QuestionSession({
   const [skipped, setSkipped] = useState<Set<string>>(() => new Set(initial?.skipped ?? []));
   const [recorded, setRecorded] = useState<Set<string>>(() => new Set(initial?.recorded ?? []));
   const [timedOut, setTimedOut] = useState<Set<string>>(() => new Set(initial?.timedOut ?? []));
+  const [confidence, setConfidence] = useState<Record<string, Confidence>>(() => initial?.confidence ?? {});
   const [confirming, setConfirming] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [leaving, setLeaving] = useState(false);
@@ -209,8 +215,9 @@ export function QuestionSession({
       recorded: [...recorded],
       timedOut: [...timedOut],
       elapsed: secondsSince(startedAt),
+      confidence,
     });
-  }, [index, answers, checked, skipped, recorded, timedOut, startedAt]);
+  }, [index, answers, checked, skipped, recorded, timedOut, startedAt, confidence]);
 
   const answeredCount = items.filter((item) => isAnswerComplete(item.question, answers[item.question.id])).length;
   const unanswered = total - answeredCount;
@@ -250,7 +257,7 @@ export function QuestionSession({
     setChecked((previous) => new Set(previous).add(question.id));
     setRecorded((previous) => new Set(previous).add(question.id));
     try {
-      await recordAnswer(question, answer, attemptMode, sessionId);
+      await recordAnswer(question, answer, attemptMode, sessionId, confidence[question.id]);
     } catch (problem) {
       console.warn('Could not record answer:', problem);
       setError('That answer could not be saved on this device. Your quiz continues; it will be saved when you finish.');
@@ -260,7 +267,8 @@ export function QuestionSession({
         return next;
       });
     }
-    if (correct) {
+    // A lucky guess waits like a wrong answer, so its note can be read.
+    if (correct && confidence[question.id] !== 'guess') {
       clearTimer();
       advanceTimer.current = setTimeout(() => go(index + 1), AUTO_ADVANCE_CORRECT_MS);
     }
@@ -292,7 +300,7 @@ export function QuestionSession({
     setConfirming(false);
     setError(null);
     try {
-      await onSubmit({ answers, recordedIds: recorded, timeSeconds: secondsSince(startedAt) });
+      await onSubmit({ answers, recordedIds: recorded, timeSeconds: secondsSince(startedAt), confidence });
     } catch (problem) {
       console.warn('Could not submit:', problem);
       setError('Your answers could not be submitted. Nothing is lost — please try again.');
@@ -315,6 +323,7 @@ export function QuestionSession({
         recorded: [...recorded],
         timedOut: [...timedOut],
         elapsed: secondsSince(startedAt),
+        confidence,
       });
     } catch (problem) {
       console.warn('Could not save and exit:', problem);
@@ -460,6 +469,22 @@ export function QuestionSession({
             showMeta
             onPictureReady={() => markPictureReady(question.id)}
           />
+          {complete && !timedOut.has(question.id) && !(mode === 'instant' && isChecked) ? (
+            <ConfidenceToggle
+              value={confidence[question.id]}
+              onChange={(value) =>
+                setConfidence((previous) => {
+                  const next = { ...previous };
+                  if (value) next[question.id] = value;
+                  else delete next[question.id];
+                  return next;
+                })
+              }
+            />
+          ) : null}
+          {mode === 'instant' && isChecked && confidenceNote(confidence[question.id], isAnswerCorrect(question, answers[question.id])) ? (
+            <Text style={styles.confidenceNote}>{confidenceNote(confidence[question.id], isAnswerCorrect(question, answers[question.id]))}</Text>
+          ) : null}
           <QuestionNote key={`note:${question.id}`} questionId={question.id} />
           <View style={styles.actions}>
             <Button label="Back" variant="ghost" onPress={() => go(index - 1)} disabled={index === 0} />
@@ -533,6 +558,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     screen: { flex: 1 },
     questionTimer: { marginBottom: 8 },
+    confidenceNote: { marginTop: 10, fontSize: 13, lineHeight: 19, color: colors.textSecondary },
     modeSwitch: { gap: 6, marginBottom: 14, maxWidth: 460 },
     modeLabel: { fontSize: 13, fontWeight: '600', color: colors.textSecondary },
     flex: { flex: 1 },

@@ -182,6 +182,7 @@ function ReviewScreen({
       answers: result.answers,
       recordedIds: result.recordedIds,
       timeSeconds: result.timeSeconds,
+      confidence: result.confidence,
       feedbackMode: mode,
     });
     const extra = outcome.milestones.reduce((sum, item) => sum + item.xp, 0);

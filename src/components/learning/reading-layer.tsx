@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 import { FigureExplorer } from '@/components/learning/figure-view';
+import { RelatedLessons } from '@/components/learning/related-lessons';
 import { PathwaySteps } from '@/components/pathway-steps';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Card } from '@/components/ui/interactive';
@@ -85,6 +86,8 @@ export function ReadingLayer({ lesson }: { lesson: Lesson }) {
           ))}
         </Card>
       ) : null}
+
+      <RelatedLessons lesson={lesson} />
     </View>
   );
 }

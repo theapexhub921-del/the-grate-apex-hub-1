@@ -22,6 +22,7 @@ import {
   type LessonSession,
 } from '@/data/learning/lesson-sessions';
 import type { MemoryModel } from '@/data/learning/memory';
+import type { Confidence } from '@/data/learning/scheduler';
 import { currentMemoryModel } from '@/data/learning/state';
 import { touchClock } from '@/data/learning/use-learning';
 import {
@@ -40,15 +41,20 @@ import { type Answer, isAnswerComplete, isAnswerCorrect, type Question } from '@
 import { type QuestionAttempt, recordQuestionAttempts } from '@/data/question-history';
 import { type AttemptKind, type CustomQuizSettings, type QuizAttempt, recordQuizAttempt, syncQuizAttemptToCloud } from '@/data/quiz-history';
 import type { RecallPrompt } from '@/data/lesson-types';
+import { markQuest } from '@/data/daily-quest';
 
 export function attemptFor(
   question: Question,
   correct: boolean,
   mode: AttemptMode,
   sessionId?: string,
-  at = Date.now()
+  at = Date.now(),
+  extra: { answer?: Answer; confidence?: Confidence } = {}
 ): QuestionAttempt {
+  const chosen = !correct ? chosenOption(question, extra.answer) : undefined;
   return {
+    ...(extra.confidence ? { confidence: extra.confidence } : {}),
+    ...(chosen ? { chosen } : {}),
     questionId: question.id,
     topicId: question.topicId ?? 'unknown',
     lessonId: question.lessonId ?? '',
@@ -61,15 +67,22 @@ export function attemptFor(
   };
 }
 
+/** The wrong option picked in a multiple-choice question (for confused pairs). */
+function chosenOption(question: Question, answer: Answer | undefined): string | undefined {
+  if (question.type !== 'choice' || typeof answer !== 'number') return undefined;
+  return question.options[answer];
+}
+
 // One answered question (instant feedback, interactive checkpoints).
 export async function recordAnswer(
   question: Question,
   answer: Answer | undefined,
   mode: AttemptMode,
-  sessionId?: string
+  sessionId?: string,
+  confidence?: Confidence
 ) {
   const correct = isAnswerCorrect(question, answer);
-  await recordQuestionAttempts([attemptFor(question, correct, mode, sessionId)]);
+  await recordQuestionAttempts([attemptFor(question, correct, mode, sessionId, Date.now(), { answer, confidence })]);
   touchClock();
   return correct;
 }
@@ -158,6 +171,7 @@ export async function finishLesson(lessonId: string, via: 'lesson' | 'mastery-ch
 
   const session = getLessonSession(lessonId);
   if (session) saveLessonSession({ ...session, phase: 'complete' });
+  void markQuest('study').catch(() => undefined);
 
   const milestones: MilestoneAward[] = [];
   if (awarded) {
@@ -186,6 +200,8 @@ export type QuizSubmission = {
   feedbackMode: 'instant' | 'submit' | 'timed';
   practice?: boolean;
   customQuiz?: CustomQuizSettings;
+  /** "Sure / Guessing" per question id, picked before checking. */
+  confidence?: Record<string, Confidence>;
 };
 
 export type QuizOutcome = {
@@ -218,7 +234,12 @@ export async function submitQuiz(submission: QuizSubmission): Promise<QuizOutcom
     (question) => !submission.recordedIds.has(question.id) && isAnswerComplete(question, answers[question.id])
   );
   await recordQuestionAttempts(
-    pending.map((question) => attemptFor(question, isAnswerCorrect(question, answers[question.id]), submission.mode, sessionId, at))
+    pending.map((question) =>
+      attemptFor(question, isAnswerCorrect(question, answers[question.id]), submission.mode, sessionId, at, {
+        answer: answers[question.id],
+        confidence: submission.confidence?.[question.id],
+      })
+    )
   );
 
   const answered = questions.filter((question) => isAnswerComplete(question, answers[question.id]));
@@ -262,6 +283,9 @@ export async function submitQuiz(submission: QuizSubmission): Promise<QuizOutcom
     }
   }
 
+  // Daily quest: a finished lesson, quiz, review or sprint ticks "study".
+  void markQuest('study').catch(() => undefined);
+
   const attempt = await recordQuizAttempt({
     kind: submission.practice ? 'practice' : submission.kind,
     lessonId: submission.lessonId ?? '',
@@ -276,6 +300,7 @@ export async function submitQuiz(submission: QuizSubmission): Promise<QuizOutcom
     wrongQuestionIds: wrongQuestions.map((question) => question.id),
     questionIds: questions.map((question) => question.id),
     answers,
+    ...(submission.confidence && Object.keys(submission.confidence).length ? { confidence: submission.confidence } : {}),
     feedbackMode: submission.feedbackMode,
     customQuiz: submission.customQuiz,
     practice: Boolean(submission.practice),

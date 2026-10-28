@@ -125,6 +125,8 @@ export const routes = {
   mockExamBuilder: () => '/learn/mock-exam' as Href,
   spotterBuilder: () => '/learn/spotter' as Href,
   focusTimer: () => '/learn/focus' as Href,
+  /** "Label a diagram": a lecture diagram to label (2026-10-28). */
+  labelDiagram: () => '/learn/label' as Href,
 
   results: (attemptId: string | null | undefined) =>
     valid(attemptId) ? (`/learn/results${query({ attempt: attemptId })}` as Href) : fallback('results', '/progress'),

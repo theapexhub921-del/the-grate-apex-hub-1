@@ -31,6 +31,9 @@ import { Type, type ThemeColors } from '@/constants/theme';
 import { CLASS_IDS, classLessonCompletion, classLessonIds, firstIncompleteClassBefore, isClassAhead, makeClassSelection, readAcademicTrial, readClassSelection, sameClassSelection, subjectsForClass, type ClassSelection } from '@/data/class-curriculum';
 import { contentTopics } from '@/data/content-catalog';
 import { prepareWeakest, useWeakestDoneToday, weakestCount } from '@/data/exam-practice';
+import { bestSprint, dailyMixPool, myConfusedPairs, preparePairDrill, useQuestMarks } from '@/data/daily-practice';
+import { useQuizHistory } from '@/data/quiz-history';
+import { DailyQuestCard } from '@/components/learning/daily-quest-card';
 import { getNextActions } from '@/data/learning/next-action';
 import { curriculumProgress, subjectProgress } from '@/data/learning/progress-model';
 import { useLearning } from '@/data/learning/use-learning';
@@ -63,6 +66,17 @@ export default function LearnScreen() {
   const weakest = useMemo(() => weakestCount(memory), [memory]);
   const weakestDone = useWeakestDoneToday();
   const [openingWeakest, setOpeningWeakest] = useState(false);
+  // Daily 10, sprints and confused pairs (data/daily-practice.ts).
+  const quizzes = useQuizHistory();
+  const questMarks = useQuestMarks();
+  const dailyIds = useMemo(() => dailyMixPool(memory), [memory]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- recomputed when answers or quizzes change
+  const pairs = useMemo(() => myConfusedPairs(), [attempts, quizzes]);
+  const sprintBest = useMemo(
+    () => bestSprint(quizzes.filter((quiz) => quiz.customQuiz?.exam?.kind === 'sprint').map((quiz) => quiz.score)),
+    [quizzes]
+  );
+  const [openingPairs, setOpeningPairs] = useState(false);
   const weekStart = new Date(now);
   weekStart.setHours(0, 0, 0, 0);
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
@@ -301,7 +315,46 @@ export default function LearnScreen() {
       setOpeningWeakest(false);
     }
   }
+  async function openPairs() {
+    if (openingPairs) return;
+    setOpeningPairs(true);
+    try {
+      const ids = await preparePairDrill(pairs);
+      if (ids.length > 0) router.push(routes.exam({ kind: 'pairs' }, ids));
+    } finally {
+      setOpeningPairs(false);
+    }
+  }
+  const openDaily = () => {
+    if (dailyIds.length > 0) router.push(routes.exam({ kind: 'daily' }, dailyIds));
+  };
+  function questStep(step: 'daily' | 'label' | 'study') {
+    if (step === 'daily') openDaily();
+    else if (step === 'label') router.push(routes.labelDiagram());
+    else router.push(lessonAction ? lessonAction.href : routes.exam({ kind: 'sprint' }));
+  }
   const studyTiles: Tile[] = [
+    {
+      id: 'daily', icon: 'reinforce', title: 'Daily 10',
+      detail: dailyIds.length === 0 ? 'Finish a lesson and ten mixed questions wait here each day.' : questMarks.daily ? 'Done today. Go again for more practice.' : 'Ten questions on what is due, from all your courses, mixed.',
+      badge: dailyIds.length > 0 && !questMarks.daily ? 'Today' : undefined,
+      onPress: openDaily,
+      disabled: dailyIds.length === 0,
+    },
+    {
+      id: 'sprint', icon: 'timer', title: '2-minute sprint',
+      detail: sprintBest !== null ? `As many as you can in two minutes. Your best: ${sprintBest} right.` : 'As many as you can in two minutes, from the lessons you have studied.',
+      onPress: () => router.push(routes.exam({ kind: 'sprint' })),
+      disabled: overall.counts.tracked === 0,
+    },
+    {
+      id: 'pairs', icon: 'connection', title: 'Confused pairs',
+      detail: pairs.length === 0 ? 'When you pick one answer for another, the pair is drilled here side by side.' : `You mix up ${pairs[0].terms[0]} and ${pairs[0].terms[1]}${pairs.length > 1 ? `, and ${pairs.length - 1} more` : ''}.`,
+      badge: pairs.length > 0 ? `${pairs.length}` : undefined,
+      onPress: () => void openPairs(),
+      disabled: pairs.length === 0 || openingPairs,
+    },
+    { id: 'label', icon: 'image', title: 'Label a diagram', detail: 'A lecture diagram with its labels covered: put each name in its place.', onPress: () => router.push(routes.labelDiagram()) },
     {
       id: 'review', icon: 'reinforce', title: 'Spaced review',
       detail: overall.counts.tracked > 0 ? (overall.due > 0 ? 'What you are most likely to forget comes back first.' : 'Nothing due right now. Practise anyway to stay sharp.') : 'Finish a lesson and its ideas start coming back for review.',
@@ -352,6 +405,7 @@ export default function LearnScreen() {
           onWeakest={weakest > 0 ? () => void openWeakest() : undefined}
         />
       ) : null}
+      <DailyQuestCard onStep={questStep} />
       <SectionHeader title="Practise and plan" subtitle="Ways to practise beyond the lessons, and your week." style={styles.hubSection} />
       <TileGrid columns={4} tiles={studyTiles} />
       <SectionHeader title="Your progress" subtitle="Your rank, this week and your goals." style={styles.hubSection} />

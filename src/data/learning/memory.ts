@@ -20,6 +20,7 @@ import {
   applyAnswer,
   applyLearned,
   classify,
+  type Confidence,
   emptyMemory,
   isDue,
   masteryEstimate,
@@ -38,6 +39,7 @@ export type HistoryAttempt = {
   attemptedAt: number;
   mode: string;
   partial?: boolean;
+  confidence?: Confidence;
 };
 
 export type LessonCompletion = { lessonId: string; completedAt: number };
@@ -181,6 +183,7 @@ export function buildMemoryModel(input: {
         mode: attempt.mode,
         difficulty: question?.difficulty,
         partial: attempt.partial,
+        confidence: attempt.confidence,
       })
     );
   }

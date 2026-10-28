@@ -11,7 +11,13 @@ export type ExamSettings =
   /** Timed stations on pictures (lecture diagrams and past-paper pictures), answers at the end. */
   | { kind: 'spotter'; subject: SubjectId | 'all'; size: number; seconds: number }
   /** The learner's most-missed questions, with instant feedback. */
-  | { kind: 'weakest' };
+  | { kind: 'weakest' }
+  /** Daily 10 (2026-10-28): due questions mixed across every course. */
+  | { kind: 'daily' }
+  /** 2-minute sprint: as many as possible from what has been studied. */
+  | { kind: 'sprint' }
+  /** Confused pairs: the answers the learner mixes up, asked side by side. */
+  | { kind: 'pairs' };
 
 export const MOCK_SIZES = [20, 40, 60, 100] as const;
 export const MOCK_MINUTES = [15, 30, 45, 60, 90, 120] as const;
@@ -30,7 +36,7 @@ const clampTo = (value: number, allowed: readonly number[], fallback: number) =>
 /** Reads exam settings from quiz-link values; null when they do not describe an exam. */
 export function parseExam(get: (name: string) => string | undefined): ExamSettings | null {
   const kind = get('exam');
-  if (kind === 'weakest') return { kind: 'weakest' };
+  if (kind === 'weakest' || kind === 'daily' || kind === 'sprint' || kind === 'pairs') return { kind };
   if (kind === 'mock') {
     const bank = get('bank') ?? '';
     if (!/^hb2-[a-z]+$/.test(bank)) return null;
@@ -58,7 +64,10 @@ export function examQuery(exam: ExamSettings): Record<string, string | number> {
     case 'spotter':
       return { exam: 'spotter', subject: exam.subject, size: exam.size, seconds: exam.seconds };
     case 'weakest':
-      return { exam: 'weakest' };
+    case 'daily':
+    case 'sprint':
+    case 'pairs':
+      return { exam: exam.kind };
   }
 }
 
@@ -71,6 +80,12 @@ export function examTitle(exam: ExamSettings, courseName?: string): string {
       return `Spotter${exam.subject === 'all' ? '' : ` · ${exam.subject[0].toUpperCase()}${exam.subject.slice(1)}`}`;
     case 'weakest':
       return 'Your weakest 20';
+    case 'daily':
+      return 'Daily 10';
+    case 'sprint':
+      return '2-minute sprint';
+    case 'pairs':
+      return 'Confused pairs';
   }
 }
 

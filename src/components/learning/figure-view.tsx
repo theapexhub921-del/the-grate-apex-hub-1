@@ -4,13 +4,15 @@
 //                   lesson. The interactive diagram opens in a sheet. "Explore": tap a numbered
 //                   pin to see what it is. "Test yourself": the slide's own
 //                   labels are covered; pick a pin, say the name to yourself,
-//                   then reveal it.
+//                   then reveal it. "Label it": pick a name, then tap the
+//                   pin it belongs to (answers are recorded like quiz
+//                   answers when the part has a quiz question).
 //   QuestionFigure  with a quiz question: labels covered and the asked-about
 //                   part marked; once answered, its label is uncovered.
 //   QuestionImage   a plain picture with a question (past papers' diagrams).
 import { LIVE_SITE } from '@/lib/live-site';
 import { Image } from 'expo-image';
-import { useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
@@ -20,7 +22,11 @@ import { Sheet } from '@/components/ui/sheet';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Text } from '@/components/ui/text';
 import { elevation, Paper, Radius, Type, type ThemeColors } from '@/constants/theme';
+import { markQuest } from '@/data/daily-quest';
+import { spotQuestionFor } from '@/data/figure-practice';
 import { getFigure, getSpot } from '@/data/figures';
+import { recordAnswer } from '@/data/learning/actions';
+import { chipDone, labelChips, labelFits } from '@/data/learning/label-it';
 import type { FigureSpot, LessonFigure } from '@/data/lesson-types';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
 
@@ -139,7 +145,7 @@ function Bubble({ spot, text }: { spot: FigureSpot; text: string }) {
   );
 }
 
-type PinTone = 'idle' | 'selected' | 'done' | 'target';
+type PinTone = 'idle' | 'selected' | 'done' | 'target' | 'wrong';
 
 function Pin({ spot, number, tone, onPress, label }: { spot: FigureSpot; number: string; tone: PinTone; onPress?: () => void; label: string }) {
   const styles = useThemedStyles(createStyles);
@@ -184,7 +190,7 @@ export function FigureExplorer({ figureId }: { figureId: string }) {
         <View style={styles.previewText}>
           <Text style={styles.kicker}>LECTURE DIAGRAM</Text>
           <Text style={styles.previewTitle} numberOfLines={2}>{figure.title}</Text>
-          <Text style={styles.muted} numberOfLines={1}>{figure.spots.length} labelled parts · explore or test yourself</Text>
+          <Text style={styles.muted} numberOfLines={1}>{figure.spots.length} labelled parts · explore, test or label it</Text>
           <View style={styles.previewGo}>
             <Icon name="sparkle" size={14} color={colors.primaryText} />
             <Text style={styles.previewGoText}>Explore diagram</Text>
@@ -198,18 +204,31 @@ export function FigureExplorer({ figureId }: { figureId: string }) {
   );
 }
 
-function FigureExplorerBody({ figure }: { figure: LessonFigure }) {
+type BoardMode = 'explore' | 'test' | 'label';
+
+/** The interactive diagram (also the "Label a diagram" page, which opens in "Label it"). */
+export function FigureExplorerBody({ figure, initialMode = 'explore', onLabelled }: { figure: LessonFigure; initialMode?: BoardMode; onLabelled?: (right: number, total: number) => void }) {
   const styles = useThemedStyles(createStyles);
-  const [mode, setMode] = useState<'explore' | 'test'>('explore');
+  const [mode, setMode] = useState<BoardMode>(initialMode);
   const [selected, setSelected] = useState<string | null>(null);
   const [shown, setShown] = useState<readonly string[]>([]);
+
+  if (mode === 'label') {
+    return (
+      <View style={styles.block}>
+        <ModeRow mode={mode} onChange={(next) => { setMode(next); setSelected(null); setShown([]); }} />
+        <LabelBoard key={figure.id} figure={figure} onDone={onLabelled} />
+        {figure.caption ? <Text style={styles.caption}>{figure.caption}</Text> : null}
+      </View>
+    );
+  }
 
   const testing = mode === 'test';
   const index = figure.spots.findIndex((spot) => spot.id === selected);
   const spot = index >= 0 ? figure.spots[index] : null;
   const isShown = (id: string) => shown.includes(id);
   const reveal = (id: string) => setShown((list) => (list.includes(id) ? list : [...list, id]));
-  const switchMode = (next: 'explore' | 'test') => {
+  const switchMode = (next: BoardMode) => {
     setMode(next);
     setSelected(null);
     setShown([]);
@@ -217,16 +236,7 @@ function FigureExplorerBody({ figure }: { figure: LessonFigure }) {
 
   return (
     <View style={styles.block}>
-      <View style={styles.headRow}>
-        <Text style={styles.kicker}>LECTURE DIAGRAM</Text>
-        <SegmentedControl
-          options={[{ value: 'explore', label: 'Explore' }, { value: 'test', label: 'Test yourself' }] as const}
-          value={mode}
-          onChange={switchMode}
-          label="Diagram mode"
-          style={styles.modes}
-        />
-      </View>
+      <ModeRow mode={mode} onChange={switchMode} />
       <Canvas figure={figure} label={`${figure.title} — lecture diagram`}>
         {testing ? figure.spots.filter((item) => !isShown(item.id)).map((item) => <Covers key={item.id} spot={item} />) : null}
         {figure.spots.map((item, i) => (
@@ -272,6 +282,139 @@ function FigureExplorerBody({ figure }: { figure: LessonFigure }) {
   );
 }
 
+function ModeRow({ mode, onChange }: { mode: BoardMode; onChange: (mode: BoardMode) => void }) {
+  const styles = useThemedStyles(createStyles);
+  return (
+    <View style={styles.headRow}>
+      <Text style={styles.kicker}>LECTURE DIAGRAM</Text>
+      <SegmentedControl
+        options={[{ value: 'explore', label: 'Explore' }, { value: 'test', label: 'Test yourself' }, { value: 'label', label: 'Label it' }] as const}
+        value={mode}
+        onChange={onChange}
+        label="Diagram mode"
+        style={styles.modes}
+      />
+    </View>
+  );
+}
+
+/**
+ * "Label it": the slide's labels are covered and listed as names below. Pick a
+ * name, then tap the pin it belongs to. The first try on each part is recorded
+ * like a quiz answer (when the part has a quiz question), so it counts for
+ * memory and Review; finishing a diagram ticks the daily quest.
+ */
+function LabelBoard({ figure, onDone }: { figure: LessonFigure; onDone?: (right: number, total: number) => void }) {
+  const styles = useThemedStyles(createStyles);
+  const [round, setRound] = useState(0);
+  const chips = useMemo(() => labelChips(figure.spots, `${figure.id}:${round}`), [figure, round]);
+  const [chip, setChip] = useState<string | null>(null);
+  const [placed, setPlaced] = useState<ReadonlySet<string>>(new Set());
+  const [tried, setTried] = useState<ReadonlySet<string>>(new Set()); // spots answered once (first try recorded)
+  const [firstRight, setFirstRight] = useState(0);
+  const [wrongPin, setWrongPin] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const done = placed.size === figure.spots.length;
+
+  function restart() {
+    setRound((value) => value + 1);
+    setChip(null);
+    setPlaced(new Set<string>());
+    setTried(new Set<string>());
+    setFirstRight(0);
+    setWrongPin(null);
+    setMessage(null);
+  }
+
+  function record(spot: FigureSpot, label: string, correct: boolean) {
+    const question = spotQuestionFor(figure.id, spot.id);
+    if (!question || question.type !== 'choice') return;
+    const picked = question.options.findIndex((option) => option.trim().toLowerCase() === label.trim().toLowerCase());
+    const answer = correct ? question.answer : picked >= 0 && picked !== question.answer ? picked : (question.answer + 1) % question.options.length;
+    void recordAnswer(question, answer, 'practice', `label:${figure.id}:${round}`).catch(() => undefined);
+  }
+
+  function tapPin(spot: FigureSpot) {
+    if (placed.has(spot.id)) return;
+    if (!chip) {
+      setMessage('Pick a name below first, then tap where it goes.');
+      return;
+    }
+    const correct = labelFits(spot, chip);
+    if (!tried.has(spot.id)) {
+      setTried((previous) => new Set<string>(previous).add(spot.id));
+      record(spot, chip, correct);
+      if (correct) setFirstRight((value) => value + 1);
+    }
+    if (!correct) {
+      setWrongPin(spot.id);
+      setMessage(`Not “${chip}”. Try another pin, or another name.`);
+      return;
+    }
+    const next = new Set<string>(placed).add(spot.id);
+    setPlaced(next);
+    setWrongPin(null);
+    if (chipDone(figure.spots, next, chip)) setChip(null);
+    setMessage(`${chip}: right.`);
+    if (next.size === figure.spots.length) {
+      const right = firstRight + (tried.has(spot.id) ? 0 : 1);
+      setMessage(null);
+      void markQuest('label').catch(() => undefined);
+      onDone?.(right, figure.spots.length);
+    }
+  }
+
+  const remaining = chips.filter((label) => !chipDone(figure.spots, placed, label));
+
+  return (
+    <>
+      <Canvas figure={figure} label={`${figure.title} — lecture diagram to label`}>
+        {figure.spots.filter((item) => !placed.has(item.id)).map((item) => <Covers key={item.id} spot={item} />)}
+        {figure.spots.map((item, i) => (
+          <Pin
+            key={item.id}
+            spot={item}
+            number={String(i + 1)}
+            tone={placed.has(item.id) ? 'done' : item.id === wrongPin ? 'wrong' : 'idle'}
+            onPress={placed.has(item.id) ? undefined : () => tapPin(item)}
+            label={placed.has(item.id) ? `Part ${i + 1}: ${item.label}` : `Part ${i + 1}, not labelled yet`}
+          />
+        ))}
+      </Canvas>
+      <View style={styles.panel} accessibilityLiveRegion="polite">
+        {done ? (
+          <View style={styles.panelRow}>
+            <Text style={styles.panelTitle}>
+              Labelled! {firstRight} of {figure.spots.length} right first time.
+            </Text>
+            <Button label="Again" size="sm" variant="secondary" onPress={restart} />
+          </View>
+        ) : (
+          <>
+            <Text style={styles.muted}>
+              {message ?? (chip ? `Now tap the pin for “${chip}”.` : 'Pick a name, then tap the pin it belongs to.')}
+            </Text>
+            <View style={styles.chips}>
+              {remaining.map((label) => (
+                <Interactive
+                  key={label}
+                  onPress={() => { setChip(label === chip ? null : label); setMessage(null); setWrongPin(null); }}
+                  accessibilityLabel={`Name: ${label}`}
+                  accessibilityState={{ selected: label === chip }}
+                  style={({ hovered }) => [styles.chip, label === chip && styles.chipOn, hovered && label !== chip && styles.chipHover]}
+                >
+                  <Text style={[styles.chipText, label === chip && styles.chipTextOn]}>{label}</Text>
+                </Interactive>
+              ))}
+            </View>
+            <Text style={styles.muted}>{placed.size} of {figure.spots.length} placed</Text>
+          </>
+        )}
+      </View>
+    </>
+  );
+}
+
 /** The diagram for a quiz question: labels covered, the asked-about part marked. */
 export function QuestionFigure({ figure: ref, revealed, onReady }: { figure: { id: string; spot?: string }; revealed: boolean; onReady?: () => void }) {
   const styles = useThemedStyles(createStyles);
@@ -294,7 +437,7 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     block: { gap: 10, marginTop: 4 },
     headRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-    modes: { minWidth: 230 },
+    modes: { minWidth: 300 },
     kicker: { fontSize: 11, fontWeight: '800', letterSpacing: 1, color: colors.textTertiary },
     title: { ...Type.headline, color: colors.text },
     canvas: { width: '100%', maxWidth: 760, alignSelf: 'center', borderRadius: Radius.md, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, backgroundColor: Paper },
@@ -307,6 +450,13 @@ function createStyles(colors: ThemeColors) {
     pin_idle: { backgroundColor: colors.primary, borderColor: colors.surface },
     pin_selected: { backgroundColor: colors.surface, borderColor: colors.primary, transform: [{ scale: 1.15 }] },
     pin_done: { backgroundColor: colors.success, borderColor: colors.surface },
+    pin_wrong: { backgroundColor: colors.error, borderColor: colors.surface },
+    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+    chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+    chipOn: { backgroundColor: colors.primary, borderColor: colors.primary },
+    chipHover: { borderColor: colors.primaryBorder },
+    chipText: { fontSize: 13, fontWeight: '600', color: colors.text },
+    chipTextOn: { color: colors.onPrimary },
     pin_target: { width: PIN + 6, height: PIN + 6, borderRadius: (PIN + 6) / 2, backgroundColor: colors.error, borderColor: colors.surface, borderWidth: 3 },
     pinText: { fontSize: 12, fontWeight: '800', color: colors.onPrimary },
     pinTextStrong: { color: colors.text },

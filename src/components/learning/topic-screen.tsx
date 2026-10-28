@@ -6,6 +6,7 @@ import { Text } from '@/components/ui/text';
 import { TopicGlyph } from '@/components/learning/glyphs';
 import { ClassAccessCard } from '@/components/learning/class-access-card';
 import { MemoryDistribution, MemoryStateBadge } from '@/components/learning/memory-ui';
+import { MemoryMap } from '@/components/learning/memory-map';
 import { Breadcrumbs, StatTile, BackLink } from '@/components/learning/nav-bits';
 import { NextActionHero } from '@/components/learning/next-action-card';
 import { Button } from '@/components/ui/button';
@@ -37,7 +38,7 @@ export function TopicScreen({ topicId }: { topicId: string | undefined }) {
   const { user } = useAuth();
   const ownSelection = readClassSelection(user?.user_metadata);
   const trial = readAcademicTrial(user?.user_metadata);
-  const { inputs, now } = useLearning();
+  const { inputs, now, memory } = useLearning();
   const topic = getTopic(topicId);
   const progress = useMemo(() => (topic ? topicProgress(topic, inputs) : null), [topic, inputs]);
   const action = useMemo(() => (topic ? getNextActions(inputs, { topicId: topic.id })[0] : null), [topic, inputs]);
@@ -100,6 +101,8 @@ export function TopicScreen({ topicId }: { topicId: string | undefined }) {
           />
         </View>
       </Card>
+
+      <MemoryMap topic={topic} memory={memory} now={now} />
 
       {progress.weakConcepts.length > 0 ? (
         <Card>

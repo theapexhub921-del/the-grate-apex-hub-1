@@ -25,6 +25,8 @@ export function examBanks(exam: ExamSettings | null): string[] {
   if (!exam) return [];
   if (exam.kind === 'mock') return [exam.bank];
   if (exam.kind === 'spotter') return exam.subject === 'all' ? [...EXAM_BANKS] : [pastCourseForSubject(exam.subject)];
+  // Daily 10 and sprints ask the app's own topic questions.
+  if (exam.kind === 'daily' || exam.kind === 'sprint') return [];
   return [...EXAM_BANKS];
 }
 

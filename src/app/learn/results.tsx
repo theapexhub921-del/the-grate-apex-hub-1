@@ -1,3 +1,5 @@
+import { calibration, confidenceSummary } from '@/data/learning/confidence';
+import { bestSprint } from '@/data/learning/daily-practice';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -178,6 +180,16 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
   );
 
   const missed = rows.filter((row) => !row.correct);
+  const sureness = useMemo(
+    () => confidenceSummary(rows.map((row) => ({ id: row.question.id, correct: row.correct, confidence: attempt.confidence?.[row.question.id] }))),
+    [rows, attempt.confidence]
+  );
+  const calibrated = calibration(sureness);
+  const quizzes = useQuizHistory();
+  const sprintBest = useMemo(
+    () => bestSprint(quizzes.filter((quiz) => quiz.customQuiz?.exam?.kind === 'sprint').map((quiz) => quiz.score)),
+    [quizzes]
+  );
   const accuracy = attempt.answered > 0 ? Math.round((attempt.score / attempt.answered) * 100) : 0;
   const validTime = attempt.timeSeconds >= 0 && attempt.timeSeconds <= MAX_TRUSTED_SECONDS;
 
@@ -235,7 +247,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
   const exam = attempt.customQuiz?.exam;
   const topicScores = useMemo(
     () =>
-      exam && exam.kind !== 'weakest'
+      exam && exam.kind !== 'weakest' && exam.kind !== 'pairs'
         ? scoreByTopic(rows.map((row) => ({ topic: getTopic(row.question.topicId)?.title ?? row.question.concept, correct: row.correct })))
         : [],
     [exam, rows]
@@ -243,7 +255,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
 
   function retake() {
     if (exam) {
-      router.replace(exam.kind === 'weakest' ? routes.learn() : routes.exam(exam));
+      router.replace(exam.kind === 'weakest' || exam.kind === 'daily' || exam.kind === 'pairs' ? routes.learn() : routes.exam(exam));
     } else if (attempt.customQuiz) {
       router.replace(
         routes.customQuiz({
@@ -355,6 +367,41 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
         </Card>
       ) : null}
 
+      {exam?.kind === 'sprint' ? (
+        <Card style={styles.card}>
+          <Text style={styles.kicker}>2-MINUTE SPRINT</Text>
+          <Text style={styles.body}>
+            {attempt.score} right in two minutes{sprintBest !== null && attempt.score >= sprintBest ? ': your best yet.' : sprintBest !== null ? ` (your best: ${sprintBest}).` : '.'}
+          </Text>
+        </Card>
+      ) : null}
+
+      {sureness.rated > 0 ? (
+        <Card style={styles.card}>
+          <Text style={styles.kicker}>HOW SURE YOU WERE</Text>
+          <Text style={styles.body}>
+            {sureness.known} sure and right · {sureness.luckyGuesses.length} lucky guess{sureness.luckyGuesses.length === 1 ? '' : 'es'} · {sureness.confidentMistakes.length} sure but wrong
+          </Text>
+          {sureness.confidentMistakes.length > 0 ? (
+            <Text style={styles.queueNote}>
+              Sure but wrong means something was learned wrongly. Read those explanations first: they come back for review sooner.
+            </Text>
+          ) : null}
+          {sureness.luckyGuesses.length > 0 ? (
+            <Text style={styles.queueNote}>Lucky guesses are not counted as known yet: they come back sooner than answers you were sure of.</Text>
+          ) : null}
+          {calibrated !== null ? <Text style={styles.queueNote}>Your confidence matched your answers {calibrated}% of the time.</Text> : null}
+          {sureness.confidentMistakes.length + sureness.luckyGuesses.length > 0 && attempt.kind !== 'apex' ? (
+            <Button
+              label="Practise these"
+              size="sm"
+              variant="secondary"
+              onPress={() => router.push(routes.practice([...sureness.confidentMistakes, ...sureness.luckyGuesses], { lessonId: attempt.lessonId, topicId: topic?.id }))}
+            />
+          ) : null}
+        </Card>
+      ) : null}
+
       {topicScores.length > 0 ? (
         <Card style={styles.card}>
           <Text style={styles.kicker}>SCORE BY TOPIC</Text>
@@ -438,7 +485,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
             fullWidth
           />
         ) : null}
-        <Button label={exam?.kind === 'weakest' ? 'Back to Study' : exam?.kind === 'mock' ? 'Sit another paper' : exam?.kind === 'spotter' ? 'Another spotter' : attempt.kind === 'review' ? 'Another review' : 'Retake'} variant="secondary" onPress={retake} fullWidth />
+        <Button label={exam?.kind === 'weakest' || exam?.kind === 'daily' || exam?.kind === 'pairs' ? 'Back to Study' : exam?.kind === 'sprint' ? 'Sprint again' : exam?.kind === 'mock' ? 'Sit another paper' : exam?.kind === 'spotter' ? 'Another spotter' : attempt.kind === 'review' ? 'Another review' : 'Retake'} variant="secondary" onPress={retake} fullWidth />
         {nextLesson && attempt.percentage >= XP_RULES.passPercent ? (
           <Button label={`Next: ${nextLesson.title}`} variant="secondary" onPress={() => router.push(routes.lesson(nextLesson.id))} fullWidth />
         ) : null}
@@ -463,7 +510,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
           ]}
           style={styles.crumbs}
         />
-        <Text style={styles.kindLabel}>{exam?.kind === 'mock' ? 'MOCK EXAM' : exam?.kind === 'spotter' ? 'SPOTTER' : exam ? 'PRACTICE RESULTS' : attempt.customQuiz ? 'CUSTOM PRACTICE' : KIND_LABEL[attempt.kind]}</Text>
+        <Text style={styles.kindLabel}>{exam?.kind === 'mock' ? 'MOCK EXAM' : exam?.kind === 'spotter' ? 'SPOTTER' : exam?.kind === 'sprint' ? '2-MINUTE SPRINT' : exam?.kind === 'daily' ? 'DAILY 10' : exam ? 'PRACTICE RESULTS' : attempt.customQuiz ? 'CUSTOM PRACTICE' : KIND_LABEL[attempt.kind]}</Text>
         <Text style={styles.title} accessibilityRole="header">
           {title}
         </Text>

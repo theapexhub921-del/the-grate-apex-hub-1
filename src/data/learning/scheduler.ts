@@ -62,6 +62,10 @@ export const SCHEDULER = {
   earlyReviewFraction: 0.5,
   overdueBonusCap: 1.3,
   partialGrowth: 0.5,
+  // "Sure / Guessing" (learner's confidence, 2026-10-28): a lucky guess grows
+  // the interval like a partial recall; a confident mistake costs extra ease
+  // (a misconception, which needs more reviews than a gap).
+  confidentWrongEasePenalty: 0.1,
   recentWindow: 6,
   rememberedDays: 3,
   masteredDays: 21,
@@ -97,7 +101,10 @@ export type RetrievalEvent = {
   mode: RetrievalMode | string;
   difficulty?: DifficultyLevel;
   partial?: boolean; // self-rated "partly" recall
+  confidence?: Confidence; // the learner's "Sure / Guessing" before checking
 };
+
+export type Confidence = 'sure' | 'guess';
 
 export type MemoryRecord = {
   firstSeenAt: number | null;
@@ -181,7 +188,8 @@ export function applyAnswer(record: MemoryRecord, event: RetrievalEvent): Memory
 
     const wasKnown = record.reviews > 0 || record.intervalDays >= SCHEDULER.secondIntervalDays;
     if (wasKnown) next.lapses += 1;
-    next.ease = clamp(next.ease - SCHEDULER.lapseEasePenalty, SCHEDULER.minEase, SCHEDULER.maxEase);
+    const penalty = SCHEDULER.lapseEasePenalty + (event.confidence === 'sure' ? SCHEDULER.confidentWrongEasePenalty : 0);
+    next.ease = clamp(next.ease - penalty, SCHEDULER.minEase, SCHEDULER.maxEase);
     next.reviews = 0;
     next.intervalDays = 0;
     next.dueAt = event.at + SCHEDULER.firstIntervalDays * DAY_MS;
@@ -214,7 +222,7 @@ export function applyAnswer(record: MemoryRecord, event: RetrievalEvent): Memory
     next.reviews === 1 ? SCHEDULER.secondIntervalDays : previousInterval * next.ease;
   const overdueFactor = clamp(elapsed / scheduledGapMs, 1, SCHEDULER.overdueBonusCap);
   target *= overdueFactor;
-  if (event.partial) {
+  if (event.partial || event.confidence === 'guess') {
     target = previousInterval + (target - previousInterval) * SCHEDULER.partialGrowth;
   }
   next.intervalDays = clamp(Math.round(target), SCHEDULER.firstIntervalDays, SCHEDULER.maxIntervalDays);

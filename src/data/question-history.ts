@@ -26,6 +26,8 @@ export type QuestionAttempt = {
   conceptId?: string;
   correct: boolean;
   partial?: boolean; // self-rated "partly" recall
+  confidence?: 'sure' | 'guess'; // "Sure / Guessing", picked before checking (2026-10-28)
+  chosen?: string; // the wrong option picked (multiple choice), for confused pairs
   attemptedAt: number;
   mode: AttemptMode;
   sessionId?: string; // quiz / review / lesson session it belonged to
