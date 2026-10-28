@@ -1,4 +1,4 @@
-// Which AI model to ask, shared by api/ai.mjs (lesson AI) and api/chat.mjs (Study chat).
+// Which AI model to ask, shared by api/ai.mjs (lesson AI) and api/chat.mjs (Apex AI).
 //
 // Providers retire models: on 2026-10-19 Groq dropped llama-3.3-70b-versatile and
 // every request failed with "model does not exist", while Gemini's model was

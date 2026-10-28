@@ -36,7 +36,7 @@ Lecture material lives in `content/<SUBJECT>/` and serves as the single source o
 - **AI Study Companion**:
   - **Ask AI & AI Flashcards**: Context-grounded questions answered directly from lecture text.
   - **AI Explanations**: "Explain my mistake" on incorrect quiz answers and review cards.
-  - **Study Chat**: General conversational AI tutor for study plans, mnemonics, and cross-subject queries.
+  - **Apex AI**: General conversational AI tutor for study plans, mnemonics, and cross-subject queries.
 
 - **Streak & Progression**:
   - Daily streak tracking with animated breathing flame widgets, celebration modals, and milestone boosts.

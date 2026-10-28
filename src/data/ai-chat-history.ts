@@ -5,11 +5,11 @@
 // users/{uid}/tutorChats/{chatId} (owner-only; the deployed rules allow
 // { title ≤120, turns: list ≤100, createdAt, updatedAt } and ids
 // /^[a-z0-9_-]{1,80}$/). Two things make that one place hold every kind:
-//   • the id starts with the kind: tc_ Study chat, la_<lesson>_ Ask AI in a
+//   • the id starts with the kind: tc_ Apex AI, la_<lesson>_ Ask AI in a
 //     lesson, ex_ an "Explain with AI" thread, vt_ a Voice tutor session;
 //   • the first stored turn is a context note ({ role: 'context', text: JSON })
 //     with the lesson (and, for an explanation, the question) the chat is about,
-//     so it can be continued later. Study chats saved before this have no note.
+//     so it can be continued later. Apex AI chats saved before this have no note.
 import type { ChatTurn, ExplainItem } from '@/lib/ai-study-api';
 
 export type AiChatKind = 'study' | 'lesson' | 'explain' | 'voice';
@@ -25,7 +25,7 @@ export type AiChatContext = {
 export const AI_CHAT_KINDS: readonly AiChatKind[] = ['study', 'lesson', 'explain', 'voice'];
 
 export const AI_CHAT_LABEL: Record<AiChatKind, string> = {
-  study: 'Study chat',
+  study: 'Apex AI',
   lesson: 'Ask AI',
   explain: 'AI explanation',
   voice: 'Voice tutor',
@@ -56,7 +56,7 @@ export function newAiChatId(kind: AiChatKind, lessonId?: string, now = Date.now(
   return id;
 }
 
-/** The kind of a saved chat, from its id (older Study chats: tc_…). */
+/** The kind of a saved chat, from its id (older Apex AI chats: tc_…). */
 export function kindOfChatId(id: string): AiChatKind {
   const prefix = id.split('_')[0];
   return (AI_CHAT_KINDS.find((kind) => PREFIX[kind] === prefix) ?? 'study');
@@ -108,5 +108,5 @@ export function aiChatTitle(context: AiChatContext, turns: readonly ChatTurn[]):
   return context.kind === 'voice' ? 'Voice tutor session' : AI_CHAT_LABEL[context.kind];
 }
 
-/** A chat can be continued in Study chat unless it was a voice call. */
+/** A chat can be continued in Apex AI unless it was a voice call. */
 export const canContinue = (kind: AiChatKind) => kind !== 'voice';

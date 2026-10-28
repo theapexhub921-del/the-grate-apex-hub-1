@@ -85,7 +85,7 @@ export function AskAiPanel({ lesson, focus, autoAsk, embedded = false, docked = 
       const answer = await askLessonAi(lesson, question, history);
       const finished: ChatTurn[] = [...history, { role: 'user', text: question }, { role: 'model', text: answer }];
       if (alive.current) setTurns(finished);
-      // Saved to the learner's AI chats (Study chat → Recent AI chats); a failed save never interrupts.
+      // Saved to the learner's AI chats (Apex AI → Recent AI chats); a failed save never interrupts.
       void saveTutorChat({ id, turns: finished, createdAt: started, context: { kind: 'lesson', lessonId: lesson.id, lessonTitle: lesson.title } })
         .then(loadRecent)
         .catch(() => undefined);
@@ -157,7 +157,7 @@ export function AskAiPanel({ lesson, focus, autoAsk, embedded = false, docked = 
                   <Icon name="chevronRight" size={16} color={colors.textTertiary} />
                 </Interactive>
               ))}
-              <Text style={styles.recentMeta}>All your AI chats: Learn → Study chat → Recent AI chats.</Text>
+              <Text style={styles.recentMeta}>All your AI chats: Learn → Apex AI → Recent AI chats.</Text>
             </View>
           ) : null}
         </>

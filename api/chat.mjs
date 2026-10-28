@@ -2,7 +2,7 @@
 //
 //   { message, history?: [{ role: 'user' | 'model', text }] }  ->  { answer, provider }
 //
-// The general "Study chat": not tied to a lesson, so it never touches the
+// The general "Apex AI": not tied to a lesson, so it never touches the
 // lesson-AI quota in api/ai.mjs. It has its own, larger per-learner allowance
 // and its own provider, so heavy lesson use and heavy chat use cannot starve
 // each other.
@@ -70,7 +70,7 @@ async function openAiCompatible(messages) {
   if (!key) return null;
   let data;
   try {
-    data = await openAiCompatibleCall({ key, base: process.env.CHAT_API_BASE, configured: process.env.CHAT_MODEL, payload: { messages, max_tokens: 4096, temperature: 0.6 }, timeoutMs: 20_000, label: 'Study chat' });
+    data = await openAiCompatibleCall({ key, base: process.env.CHAT_API_BASE, configured: process.env.CHAT_MODEL, payload: { messages, max_tokens: 4096, temperature: 0.6 }, timeoutMs: 20_000, label: 'Apex AI' });
   } catch (problem) {
     const status = problem instanceof ModelCallError ? problem.status : 0;
     throw new ProviderError(status === 429 ? 'busy' : 'upstream', status);
@@ -92,7 +92,7 @@ async function gemini(messages) {
   }
   let data;
   try {
-    data = await geminiCall({ key, configured, body: { systemInstruction: { parts: [{ text: RULES }] }, contents, generationConfig: { maxOutputTokens: 4096 } }, timeoutMs: 20_000, label: 'Study chat (Gemini)' });
+    data = await geminiCall({ key, configured, body: { systemInstruction: { parts: [{ text: RULES }] }, contents, generationConfig: { maxOutputTokens: 4096 } }, timeoutMs: 20_000, label: 'Apex AI (Gemini)' });
   } catch (problem) {
     const status = problem instanceof ModelCallError ? problem.status : 0;
     throw new ProviderError([429, 503].includes(status) ? 'busy' : 'upstream', status);
@@ -111,7 +111,7 @@ const PROVIDERS = [
 export default async function handler(req, res) {
   res.setHeader('cache-control', 'no-store');
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only.' });
-  if (!process.env.CHAT_API_KEY && !process.env.GEMINI_API_KEY) return res.status(503).json({ error: 'Study chat is not set up yet.', code: 'not-configured' });
+  if (!process.env.CHAT_API_KEY && !process.env.GEMINI_API_KEY) return res.status(503).json({ error: 'Apex AI is not set up yet.', code: 'not-configured' });
 
   const token = String(req.headers.authorization ?? '').replace(/^Bearer\s+/i, '');
   let uid;

@@ -29,7 +29,7 @@ export default function TutorScreen() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lineCounter = useRef(0);
   // The whole call's transcript (the screen shows the last 20 lines), saved to the
-  // learner's AI chats when the call ends (Study chat → Recent AI chats).
+  // learner's AI chats when the call ends (Apex AI → Recent AI chats).
   const callLines = useRef<TranscriptLine[]>([]);
   const callStarted = useRef<string | null>(null);
   const [savedNote, setSavedNote] = useState('');
@@ -68,7 +68,7 @@ export default function TutorScreen() {
     audioRef.current = null;
     setBusy(false);
     setStatus('Call ended');
-    void saveCall().then((ok) => setSavedNote(ok ? 'This call’s notes were saved to your AI chats (Learn → Study chat → Recent AI chats).' : ''));
+    void saveCall().then((ok) => setSavedNote(ok ? 'This call’s notes were saved to your AI chats (Learn → Apex AI → Recent AI chats).' : ''));
   }, [saveCall]);
 
   useEffect(() => () => {

@@ -13,7 +13,7 @@
 //     right answer is right (and the learner's pick is not), from the lecture text.
 //
 // "Ask AI", "AI Flashcards" and "AI Questions" on every lesson. Same provider chain as the
-// Study chat (api/chat.mjs), so the keys never reach the app:
+// Apex AI (api/chat.mjs), so the keys never reach the app:
 //   1. any OpenAI-compatible service (Groq by default): CHAT_API_KEY,
 //      optional CHAT_API_BASE and CHAT_MODEL
 //   2. Gemini: GEMINI_API_KEY (optional GEMINI_MODEL)

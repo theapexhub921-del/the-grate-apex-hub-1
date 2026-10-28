@@ -4,7 +4,7 @@ import { type AiChatContext, type AiChatKind, aiChatTitle, kindOfChatId, lessonC
 import { auth, db } from '@/lib/firebase';
 import type { ChatTurn } from '@/lib/ai-study-api';
 
-// AI chat history (every AI chat in the app: Study chat, Ask AI in lessons,
+// AI chat history (every AI chat in the app: Apex AI, Ask AI in lessons,
 // "Explain with AI" and Voice tutor), saved to the signed-in learner's account at
 // users/{uid}/tutorChats/{chatId} = { title, turns, createdAt, updatedAt }.
 // Only the owner can read, change or delete their chats (firestore.rules).
@@ -61,7 +61,7 @@ function read(id: string, data: Record<string, unknown>) {
   };
 }
 
-/** A new Study chat id (other kinds: newAiChatId in data/ai-chat-history.ts). */
+/** A new Apex AI id (other kinds: newAiChatId in data/ai-chat-history.ts). */
 export function newTutorChatId(): string {
   return newAiChatId('study');
 }

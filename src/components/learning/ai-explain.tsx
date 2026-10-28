@@ -44,7 +44,7 @@ export function AiExplain({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const lesson = useRef<Promise<AiLessonText | null> | null>(null);
-  // Saved to the learner's AI chats (Study chat → Recent AI chats), one thread per opening.
+  // Saved to the learner's AI chats (Apex AI → Recent AI chats), one thread per opening.
   const saved = useRef<{ id: string; createdAt: string } | null>(null);
   const busyRef = useRef(false);
   const alive = useRef(true);
@@ -142,7 +142,7 @@ export function AiExplain({
           <Button label="Ask" size="sm" onPress={followUp} loading={busy} disabled={busy || !draft.trim()} />
         </View>
       ) : null}
-      <Text style={styles.note}>AI can make mistakes. Check important points against your lecture notes. Saved in Learn → Study chat → Recent AI chats.</Text>
+      <Text style={styles.note}>AI can make mistakes. Check important points against your lecture notes. Saved in Learn → Apex AI → Recent AI chats.</Text>
     </Card>
   );
 }

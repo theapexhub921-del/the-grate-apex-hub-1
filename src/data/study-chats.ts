@@ -1,4 +1,4 @@
-// Saved Study chats. Kept on this device (AsyncStorage), one list per signed-in
+// Saved Apex AI chats. Kept on this device (AsyncStorage), one list per signed-in
 // learner, like the saved AI flashcards. Nothing here is sent to a server.
 import type { ChatTurn } from '@/lib/ai-study-api';
 

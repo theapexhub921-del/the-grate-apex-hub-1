@@ -107,11 +107,11 @@ export default function LearnScreen() {
 
       <Card style={styles.tutorCard} tone="outline">
         <View style={styles.tutorCopy}>
-          <Text style={styles.tutorEyebrow}>STUDY CHAT</Text>
+          <Text style={styles.tutorEyebrow}>APEX AI</Text>
           <Text style={styles.tutorTitle}>Ask the AI anything</Text>
           <Text style={styles.subjectTagline}>Concepts, study plans, memory tricks and quizzes, not tied to one lesson.</Text>
         </View>
-        <Button label="Open Study chat" variant="secondary" trailing="chevronRight" onPress={() => router.push('/learn/chat' as never)} />
+        <Button label="Open Apex AI" variant="secondary" trailing="chevronRight" onPress={() => router.push('/learn/chat' as never)} />
       </Card>
 
       <Card style={styles.tutorCard} tone="primary">
@@ -323,7 +323,7 @@ export default function LearnScreen() {
       disabled: weakest === 0 || openingWeakest,
     },
     { id: 'focus', icon: 'timer', title: 'Focus timer', detail: '25 minutes of study, 5 of rest. Focused time counts for your streak.', onPress: () => router.push(routes.focusTimer()) },
-    { id: 'chat', icon: 'sparkle', title: 'Study chat', detail: 'Ask the AI anything: concepts, study plans, memory tricks and quizzes.', onPress: () => router.push('/learn/chat' as never) },
+    { id: 'chat', icon: 'sparkle', title: 'Apex AI', detail: 'Ask the AI anything: concepts, study plans, memory tricks and quizzes.', onPress: () => router.push('/learn/chat' as never) },
   ];
   const reviewCalendar = (
     <Card style={styles.calendarCard}>

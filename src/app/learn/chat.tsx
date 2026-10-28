@@ -25,8 +25,8 @@ import {
   type TutorChatSummary,
 } from '@/data/tutor-chats';
 
-// Study chat: ask the AI anything, not tied to a lesson. It is also the home of
-// every saved AI chat in the app ("Recent AI chats"): Study chats, Ask AI in
+// Apex AI: ask the AI anything, not tied to a lesson. It is also the home of
+// every saved AI chat in the app ("Recent AI chats"): Apex AI chats, Ask AI in
 // lessons, "Explain with AI" threads and Voice tutor sessions, all saved to the
 // learner's account (data/tutor-chats.ts, data/ai-chat-history.ts). Any of them
 // except a voice call can be opened here and continued.
@@ -211,13 +211,13 @@ export default function StudyChatScreen() {
   return (
     <Screen width="content">
       <BackLink fallback={'/learn' as never} />
-      <PageHeader eyebrow="Learn" title="Study chat" subtitle="Ask anything: concepts, study plans, memory tricks, quizzes. Your AI chats from lessons, explanations and the voice tutor are saved below too. AI can make mistakes, so check exam details against your notes." />
+      <PageHeader eyebrow="Learn" title="Apex AI" subtitle="Ask anything: concepts, study plans, memory tricks, quizzes. Your AI chats from lessons, explanations and the voice tutor are saved below too. AI can make mistakes, so check exam details against your notes." />
 
       {about ? (
         <Card tone="muted" style={styles.about}>
           <Icon name="sparkle" size={16} color={colors.primaryText} />
           <Text style={styles.aboutText} numberOfLines={2}>{about}</Text>
-          <Button label="New study chat" variant="ghost" size="sm" onPress={newChat} disabled={busy} />
+          <Button label="New Apex AI chat" variant="ghost" size="sm" onPress={newChat} disabled={busy} />
         </Card>
       ) : null}
 
@@ -274,11 +274,11 @@ export default function StudyChatScreen() {
           <Button label="Send" icon={<Icon name="send" size={16} color={colors.onPrimary} />} onPress={() => void send(draft)} loading={busy} disabled={busy || !draft.trim()} />
         </View>
       ) : (
-        <Text style={styles.hint}>This is the transcript of a voice tutor call. Start a new call from Voice tutor, or a new study chat here.</Text>
+        <Text style={styles.hint}>This is the transcript of a voice tutor call. Start a new call from Voice tutor, or a new Apex AI chat here.</Text>
       )}
       {turns.length > 0 ? <Button label="New chat" variant="ghost" size="sm" onPress={newChat} disabled={busy} /> : null}
 
-      <SectionHeader title="Recent AI chats" subtitle="Study chats, Ask AI in lessons, explanations and voice tutor calls. Saved to your account; only you can see them." style={styles.section} />
+      <SectionHeader title="Recent AI chats" subtitle="Apex AI chats, Ask AI in lessons, explanations and voice tutor calls. Saved to your account; only you can see them." style={styles.section} />
       <SegmentedControl options={FILTERS} value={filter} onChange={setFilter} label="Show" />
       {past === null ? (
         <Text style={styles.hint}>Loading your chats…</Text>
