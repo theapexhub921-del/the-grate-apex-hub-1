@@ -1,0 +1,918 @@
+[
+ {
+  "name": "kidney-surface-markings",
+  "deck": "urinary",
+  "slide": 6,
+  "lesson": "urinary-system-gross-1",
+  "title": "Surface markings of the kidneys (posterior view)",
+  "spots": [
+   {
+    "label": "Median plane",
+    "box": [
+     0.02,
+     0.01,
+     0.165,
+     0.035
+    ]
+   },
+   {
+    "label": "Scapular line",
+    "box": [
+     0.02,
+     0.05,
+     0.165,
+     0.035
+    ]
+   },
+   {
+    "label": "Diaphragm",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Liver",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Spleen",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Transpyloric plane",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Left kidney",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "12th rib",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Right kidney",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Ureter",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Iliac crest",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Dimple indicating posterior superior iliac spine",
+    "ocr": [
+     17,
+     18,
+     19
+    ]
+   }
+  ],
+  "quiz": [
+   "transpyloric-plane",
+   "12th-rib",
+   "left-kidney",
+   "right-kidney"
+  ]
+ },
+ {
+  "name": "renal-fascia-sagittal",
+  "deck": "urinary",
+  "slide": 10,
+  "lesson": "urinary-system-gross-1",
+  "title": "Coverings of the kidney (sagittal section)",
+  "crop": [
+   0,
+   0,
+   1,
+   0.86
+  ],
+  "spots": [
+   {
+    "label": "Diaphragm",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Diaphragmatic fascia (continuation of transversalis fascia)",
+    "ocr": [
+     1,
+     3
+    ]
+   },
+   {
+    "label": "Lung",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Liver",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Costodiaphragmatic recess",
+    "ocr": [
+     5,
+     6
+    ]
+   },
+   {
+    "label": "Bare area of liver",
+    "ocr": [
+     7,
+     8
+    ]
+   },
+   {
+    "label": "Suprarenal gland",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Fibrous capsule of kidney",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Perirenal fat",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Peritoneum",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "12th rib",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Anterior and posterior layers of renal (Gerota's) fascia",
+    "ocr": [
+     14
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.03
+    ]
+   },
+   {
+    "label": "Pararenal fat (retroperitoneal)",
+    "ocr": [
+     16
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.03
+    ]
+   },
+   {
+    "label": "Right kidney",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Transversalis fascia",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Right colic (hepatic) flexure",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Quadratus lumborum muscle",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Iliac crest",
+    "ocr": [
+     21
+    ]
+   }
+  ],
+  "quiz": [
+   "perirenal-fat",
+   "pararenal-fat-retroperitoneal",
+   "anterior-and-posterior-layers-of-renal-gerota-s-fascia",
+   "fibrous-capsule-of-kidney"
+  ]
+ },
+ {
+  "name": "kidney-dissection",
+  "deck": "urinary",
+  "slide": 20,
+  "lesson": "urinary-system-gross-2",
+  "title": "Internal structure of the kidney and path of urine",
+  "crop": [
+   0,
+   0,
+   1,
+   0.95
+  ],
+  "spots": [
+   {
+    "label": "Nephron",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Collecting duct",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Renal hilum",
+    "ocr": [
+     3
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.03
+    ]
+   },
+   {
+    "label": "Minor calyx",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Major calyx",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Renal artery",
+    "box": [
+     0.71,
+     0.385,
+     0.09,
+     0.03
+    ]
+   },
+   {
+    "label": "Renal cortex",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Renal pelvis",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Renal medulla",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Renal column",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Renal pyramid in renal medulla",
+    "ocr": [
+     11,
+     13
+    ]
+   },
+   {
+    "label": "Renal papilla",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Ureter",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Renal capsule",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Renal lobe",
+    "box": [
+     0.525,
+     0.885,
+     0.07,
+     0.03
+    ]
+   },
+   {
+    "label": "Urinary bladder",
+    "ocr": [
+     19
+    ]
+   }
+  ],
+  "quiz": [
+   "minor-calyx",
+   "major-calyx",
+   "renal-column",
+   "renal-papilla",
+   "renal-pyramid-in-renal-medulla"
+  ]
+ },
+ {
+  "name": "segmental-arteries",
+  "deck": "urinary",
+  "slide": 23,
+  "lesson": "urinary-system-gross-2",
+  "title": "Segmental and intrarenal arteries of the kidney",
+  "spots": [
+   {
+    "label": "Superior (apical) segmental artery",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Anterior superior segmental artery",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Capsular and perirenal branches",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Interlobar arteries",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Inferior suprarenal artery",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Anterior branch of renal artery",
+    "ocr": [
+     10,
+     11
+    ]
+   },
+   {
+    "label": "Arcuate arteries",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Renal artery",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Posterior branch of renal artery (posterior segmental artery)",
+    "ocr": [
+     15,
+     18,
+     20
+    ]
+   },
+   {
+    "label": "Cortical radiate (interlobular) arteries",
+    "ocr": [
+     19,
+     21
+    ]
+   },
+   {
+    "label": "Pelvic and ureteric branches",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Anterior inferior segmental artery",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "(Capsular) perforating radiate artery",
+    "ocr": [
+     25,
+     27
+    ]
+   },
+   {
+    "label": "Posterior segmental arteries",
+    "ocr": [
+     28
+    ]
+   },
+   {
+    "label": "Inferior segmental artery",
+    "ocr": [
+     29
+    ]
+   }
+  ],
+  "quiz": [
+   "interlobar-arteries",
+   "arcuate-arteries",
+   "superior-apical-segmental-artery",
+   "inferior-segmental-artery"
+  ]
+ },
+ {
+  "name": "ureter-constrictions",
+  "deck": "urinary",
+  "slide": 44,
+  "lesson": "urinary-system-gross-3",
+  "title": "Sites where the ureter narrows",
+  "crop": [
+   0,
+   0,
+   1,
+   0.9
+  ],
+  "spots": [
+   {
+    "label": "Ureteropelvic junction",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Crossing of iliac artery (midureter)",
+    "ocr": [
+     1,
+     2
+    ]
+   },
+   {
+    "label": "Ureterovesical junction",
+    "ocr": [
+     4,
+     5
+    ]
+   }
+  ],
+  "quiz": [
+   "ureteropelvic-junction",
+   "crossing-of-iliac-artery-midureter",
+   "ureterovesical-junction"
+  ]
+ },
+ {
+  "name": "bladder-interior",
+  "deck": "urinary",
+  "slide": 59,
+  "lesson": "urinary-system-gross-4",
+  "title": "Interior of the urinary bladder (male)",
+  "crop": [
+   0,
+   0,
+   1,
+   0.91
+  ],
+  "spots": [
+   {
+    "label": "Median umbilical ligament",
+    "ocr": [
+     0,
+     1
+    ]
+   },
+   {
+    "label": "Ureter",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Lateral umbilical ligament",
+    "ocr": [
+     3,
+     4
+    ]
+   },
+   {
+    "label": "Detrusor",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Rugae",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Trigone (indicated by dashed lines)",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Ureteral orifices",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Centre of trigone",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Neck of urinary bladder",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Internal urethral sphincter",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Prostate",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Prostatic urethra",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "External urethral sphincter",
+    "ocr": [
+     16,
+     18
+    ]
+   },
+   {
+    "label": "Membranous urethra",
+    "ocr": [
+     17
+    ]
+   }
+  ],
+  "quiz": [
+   "trigone-indicated-by-dashed-lines",
+   "ureteral-orifices",
+   "detrusor",
+   "neck-of-urinary-bladder",
+   "rugae"
+  ]
+ },
+ {
+  "name": "bladder-posterior",
+  "deck": "urinary",
+  "slide": 41,
+  "lesson": "urinary-system-gross-4",
+  "title": "Posterior surface of the bladder (male)",
+  "spots": [
+   {
+    "label": "Apex of urinary bladder",
+    "ocr": [
+     0,
+     2
+    ]
+   },
+   {
+    "label": "Median umbilical ligament",
+    "ocr": [
+     1,
+     3
+    ]
+   },
+   {
+    "label": "Body of urinary bladder, muscular layer",
+    "ocr": [
+     5,
+     6,
+     7
+    ]
+   },
+   {
+    "label": "Ureter",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Vas deferens",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Ampulla of vas deferens",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Seminal vesicle",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Prostate, posterior surface",
+    "ocr": [
+     19,
+     20
+    ]
+   }
+  ],
+  "quiz": [
+   "seminal-vesicle",
+   "ampulla-of-vas-deferens",
+   "apex-of-urinary-bladder"
+  ]
+ },
+ {
+  "name": "male-urethra",
+  "deck": "urinary",
+  "slide": 73,
+  "lesson": "urinary-system-gross-5",
+  "title": "Parts of the male urethra",
+  "spots": [
+   {
+    "label": "Internal urethral sphincter (smooth muscle)",
+    "ocr": [
+     0,
+     1
+    ]
+   },
+   {
+    "label": "Prostate",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Preprostatic part of urethra",
+    "box": [
+     0.705,
+     0.18,
+     0.285,
+     0.055
+    ],
+    "pin": "l"
+   },
+   {
+    "label": "Prostatic part of urethra",
+    "box": [
+     0.705,
+     0.32,
+     0.285,
+     0.055
+    ],
+    "pin": "l"
+   },
+   {
+    "label": "External urethral sphincter (skeletal muscle)",
+    "ocr": [
+     5,
+     7
+    ]
+   },
+   {
+    "label": "Deep perineal pouch",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Perineal membrane",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Bulbo-urethral gland and duct",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "2nd bend when penis is flaccid",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Membranous part of urethra",
+    "box": [
+     0.655,
+     0.62,
+     0.29,
+     0.055
+    ],
+    "pin": "l"
+   },
+   {
+    "label": "Penis",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "1st bend",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Spongy part of urethra",
+    "box": [
+     0.455,
+     0.77,
+     0.235,
+     0.055
+    ],
+    "pin": "l"
+   },
+   {
+    "label": "Navicular fossa",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "External urethral orifice",
+    "ocr": [
+     14
+    ]
+   }
+  ],
+  "quiz": [
+   "membranous-part-of-urethra",
+   "spongy-part-of-urethra",
+   "navicular-fossa",
+   "bulbo-urethral-gland-and-duct",
+   "prostatic-part-of-urethra"
+  ]
+ },
+ {
+  "name": "prostatic-urethra",
+  "deck": "urinary",
+  "slide": 72,
+  "lesson": "urinary-system-gross-5",
+  "title": "The prostatic urethra",
+  "spots": [
+   {
+    "label": "Prostatic sinuses",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Internal urethral sphincter (smooth muscle)",
+    "ocr": [
+     1,
+     2
+    ]
+   },
+   {
+    "label": "Urethral crest",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Prostate",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Seminal colliculus",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Prostatic utricle",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Glandular elements of prostate",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Fibromuscular stroma (smooth muscle and fibrous connective tissue)",
+    "ocr": [
+     12,
+     14
+    ]
+   },
+   {
+    "label": "Openings of ducts of glandular elements of prostate",
+    "ocr": [
+     13,
+     15
+    ]
+   },
+   {
+    "label": "Openings of ejaculatory ducts",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Deep perineal pouch",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Perineal membrane",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "External urethral sphincter (skeletal muscle)",
+    "ocr": [
+     19
+    ]
+   }
+  ],
+  "quiz": [
+   "seminal-colliculus",
+   "prostatic-utricle",
+   "urethral-crest",
+   "openings-of-ejaculatory-ducts"
+  ]
+ }
+]

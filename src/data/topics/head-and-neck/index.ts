@@ -4,6 +4,7 @@
 //   interactive.ts — each lesson's interactive layer
 //   questions.ts   — the quiz bank (with Assertion–Reason questions)
 import { contentTopics } from '@/data/content-catalog';
+import { pictures } from '@/data/figures/pictures/head-and-neck';
 import { buildTopic } from '@/data/topics/build';
 import { lessons } from '@/data/topics/head-and-neck/lessons';
 import { questions } from '@/data/topics/head-and-neck/questions';
@@ -24,5 +25,6 @@ export const headAndNeck = buildTopic({
   concepts,
   lessons,
   questions,
+  pictures,
   discrepancies,
 });

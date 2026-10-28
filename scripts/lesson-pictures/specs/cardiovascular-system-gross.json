@@ -1,0 +1,1076 @@
+[
+ {
+  "name": "pleurae-section",
+  "deck": "cvs",
+  "slide": 18,
+  "lesson": "cardiovascular-system-gross-1",
+  "title": "Transverse section of the thorax",
+  "crop": [
+   0,
+   0.1,
+   1,
+   0.875
+  ],
+  "spots": [
+   {
+    "label": "Vertebra",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Oesophagus (in mediastinum)",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Root of lung at hilum",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Right lung",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Left main bronchus",
+    "ocr": [
+     6
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     -0.035
+    ]
+   },
+   {
+    "label": "Parietal pleura",
+    "ocr": [
+     7
+    ],
+    "grow": [
+     0,
+     0,
+     0.05,
+     0
+    ]
+   },
+   {
+    "label": "Left pulmonary artery",
+    "ocr": [
+     8
+    ],
+    "grow": [
+     0,
+     0.04,
+     0,
+     -0.033
+    ]
+   },
+   {
+    "label": "Left pulmonary vein",
+    "box": [
+     0.7867,
+     0.5,
+     0.2017,
+     0.033
+    ]
+   },
+   {
+    "label": "Visceral pleura",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Left lung",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Pleural cavity",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Thoracic wall",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Pulmonary trunk",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Pericardial membranes (visceral and parietal layers of serous pericardium)",
+    "ocr": [
+     14,
+     16
+    ]
+   },
+   {
+    "label": "Heart (in mediastinum)",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Anterior mediastinum",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Sternum",
+    "ocr": [
+     18
+    ]
+   }
+  ],
+  "quiz": [
+   "parietal-pleura",
+   "visceral-pleura",
+   "anterior-mediastinum",
+   "root-of-lung-at-hilum"
+  ]
+ },
+ {
+  "name": "great-vessels",
+  "deck": "cvs",
+  "slide": 35,
+  "lesson": "cardiovascular-system-gross-1",
+  "title": "Great vessels in the superior mediastinum",
+  "crop": [
+   0,
+   0.04,
+   1,
+   1
+  ],
+  "spots": [
+   {
+    "label": "Carotid artery",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Trachea",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Internal jugular vein",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Brachiocephalic artery",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Subclavian artery and vein",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Brachiocephalic veins",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Aortic arch",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Superior vena cava",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Left pulmonary artery",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Ligamentum arteriosum",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Right pulmonary artery",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Oesophagus",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Left pulmonary veins",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Inferior vena cava",
+    "ocr": [
+     15
+    ]
+   }
+  ],
+  "quiz": [
+   "ligamentum-arteriosum",
+   "brachiocephalic-veins",
+   "superior-vena-cava",
+   "aortic-arch"
+  ]
+ },
+ {
+  "name": "pericardium-layers",
+  "deck": "cvs",
+  "slide": 66,
+  "lesson": "cardiovascular-system-gross-2",
+  "title": "Layers of the pericardium",
+  "spots": [
+   {
+    "label": "Parietal layer of serous pericardium",
+    "ocr": [
+     0,
+     2
+    ]
+   },
+   {
+    "label": "Large blood vessel",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Visceral layer of serous pericardium (epicardium)",
+    "ocr": [
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "label": "Fibrous pericardium",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Heart",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Pericardial cavity",
+    "ocr": [
+     15
+    ],
+    "pin": "t"
+   }
+  ],
+  "quiz": [
+   "fibrous-pericardium",
+   "pericardial-cavity",
+   "parietal-layer-of-serous-pericardium"
+  ]
+ },
+ {
+  "name": "heart-anterior",
+  "deck": "cvs",
+  "slide": 105,
+  "lesson": "cardiovascular-system-gross-3",
+  "title": "Anterior (sternocostal) surface of the heart",
+  "spots": [
+   {
+    "label": "Superior vena cava",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Arch of aorta",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Ascending aorta",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Pulmonary trunk",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Left auricle",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Right coronary artery",
+    "ocr": [
+     6,
+     8
+    ]
+   },
+   {
+    "label": "Anterior interventricular branch of left coronary artery",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Great cardiac vein",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Right atrium",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Anterior interventricular groove",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Right ventricle",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Left ventricle",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Obtuse margin",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Small cardiac vein",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Inferior vena cava",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Apex",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Inferior margin",
+    "ocr": [
+     20
+    ],
+    "pin": "t"
+   }
+  ],
+  "quiz": [
+   "right-ventricle",
+   "obtuse-margin",
+   "anterior-interventricular-groove",
+   "left-auricle",
+   "inferior-margin"
+  ]
+ },
+ {
+  "name": "heart-posterior",
+  "deck": "cvs",
+  "slide": 86,
+  "lesson": "cardiovascular-system-gross-3",
+  "title": "Posterior surface (base) of the heart",
+  "spots": [
+   {
+    "label": "Arch of aorta",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Superior vena cava",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Right pulmonary artery",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Right auricle",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Left pulmonary artery",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Right superior pulmonary vein",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Left auricle",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Terminal groove (sulcus terminalis)",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Left superior pulmonary vein",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Left atrium",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Right atrium",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Left inferior pulmonary vein",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Right inferior pulmonary vein",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Pericardial reflection",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Oblique vein of left atrium (Marshall)",
+    "ocr": [
+     14
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.02
+    ]
+   },
+   {
+    "label": "Coronary sulcus",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Coronary sinus",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Inferior vena cava",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Left ventricle",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Right ventricle",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Apex",
+    "ocr": [
+     21
+    ]
+   }
+  ],
+  "quiz": [
+   "left-atrium",
+   "coronary-sinus",
+   "oblique-vein-of-left-atrium-marshall",
+   "terminal-groove-sulcus-terminalis"
+  ]
+ },
+ {
+  "name": "heart-skeleton",
+  "deck": "cvs",
+  "slide": 141,
+  "lesson": "cardiovascular-system-gross-4",
+  "title": "Valves and fibrous skeleton of the heart (from above)",
+  "spots": [
+   {
+    "label": "Fibrous ring of pulmonary valve",
+    "ocr": [
+     1,
+     2
+    ]
+   },
+   {
+    "label": "Left coronary artery",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Right coronary artery",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Left fibrous trigone",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Fibrous ring of aortic valve",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Anterior cusp of mitral valve",
+    "ocr": [
+     8,
+     9
+    ]
+   },
+   {
+    "label": "Anterior cusp of tricuspid valve",
+    "ocr": [
+     11,
+     12,
+     13
+    ]
+   },
+   {
+    "label": "Atrioventricular bundle",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Left atrioventricular ring",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Coronary sulcus",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Right atrioventricular ring",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Posterior cusp of mitral valve",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Coronary sinus",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Posterior cusp of tricuspid valve",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Right fibrous trigone",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Septal cusp of tricuspid valve",
+    "ocr": [
+     22,
+     23
+    ],
+    "grow": [
+     0.01,
+     0,
+     0,
+     0
+    ]
+   }
+  ],
+  "quiz": [
+   "right-fibrous-trigone",
+   "anterior-cusp-of-mitral-valve",
+   "septal-cusp-of-tricuspid-valve",
+   "fibrous-ring-of-aortic-valve",
+   "atrioventricular-bundle"
+  ]
+ },
+ {
+  "name": "left-ventricle",
+  "deck": "cvs",
+  "slide": 138,
+  "lesson": "cardiovascular-system-gross-4",
+  "title": "Interior of the left ventricle",
+  "spots": [
+   {
+    "label": "Arch of aorta",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Left auricle",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Great cardiac vein",
+    "box": [
+     0.27,
+     0.197,
+     0.11,
+     0.026
+    ]
+   },
+   {
+    "label": "Mitral valve: posterior cusp",
+    "box": [
+     0.165,
+     0.226,
+     0.165,
+     0.026
+    ]
+   },
+   {
+    "label": "Superior vena cava",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Pulmonary arteries",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Mitral valve: anterior cusp",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Chordae tendineae",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Anterior interventricular vessels",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Pulmonary veins",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Anterior papillary muscle",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Left atrium",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Trabeculae carneae",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Coronary sinus",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Inferior vena cava",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Posterior papillary muscle",
+    "ocr": [
+     21
+    ]
+   }
+  ],
+  "quiz": [
+   "chordae-tendineae",
+   "anterior-papillary-muscle",
+   "trabeculae-carneae",
+   "mitral-valve-anterior-cusp"
+  ]
+ },
+ {
+  "name": "cardiac-veins",
+  "deck": "cvs",
+  "slide": 179,
+  "lesson": "cardiovascular-system-gross-5",
+  "title": "Veins of the heart",
+  "spots": [
+   {
+    "label": "Arch of aorta",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Superior vena cava",
+    "ocr": [
+     1,
+     2
+    ]
+   },
+   {
+    "label": "Pulmonary trunk",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Ascending aorta",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Left atrium",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Right atrium",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Coronary sinus",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Anterior cardiac vein",
+    "ocr": [
+     8,
+     9
+    ]
+   },
+   {
+    "label": "Great cardiac vein",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Small cardiac vein",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Left ventricle",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Right ventricle",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Inferior vena cava",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Middle cardiac vein",
+    "ocr": [
+     15
+    ]
+   }
+  ],
+  "quiz": [
+   "coronary-sinus",
+   "great-cardiac-vein",
+   "middle-cardiac-vein",
+   "small-cardiac-vein",
+   "anterior-cardiac-vein"
+  ]
+ },
+ {
+  "name": "conduction-system",
+  "deck": "cvs",
+  "slide": 156,
+  "lesson": "cardiovascular-system-gross-5",
+  "title": "The cardiac conduction system",
+  "crop": [
+   0,
+   0.08,
+   1,
+   0.94
+  ],
+  "spots": [
+   {
+    "label": "Sinoatrial node (SAN)",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Left atrium",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Bundle of His",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Right atrium",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Left bundle branch (LBB)",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Atrioventricular node (AVN)",
+    "ocr": [
+     7,
+     8
+    ]
+   },
+   {
+    "label": "Right ventricle",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Left ventricle",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Right bundle branch (RBB)",
+    "ocr": [
+     14,
+     16
+    ]
+   },
+   {
+    "label": "Purkinje fibres (PF)",
+    "ocr": [
+     15
+    ]
+   }
+  ],
+  "quiz": [
+   "sinoatrial-node-san",
+   "atrioventricular-node-avn",
+   "bundle-of-his",
+   "purkinje-fibres-pf"
+  ]
+ },
+ {
+  "name": "coronary-arteries",
+  "deck": "cvs",
+  "slide": 169,
+  "lesson": "cardiovascular-system-gross-5",
+  "title": "Branches of the coronary arteries",
+  "spots": [
+   {
+    "label": "Left coronary artery",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Sinu-atrial nodal branch of left coronary artery",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Circumflex branch of left coronary artery",
+    "ocr": [
+     3
+    ],
+    "grow": [
+     0.09,
+     0.03,
+     0.0,
+     0
+    ]
+   },
+   {
+    "label": "Left marginal branch of circumflex branch",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Anterior interventricular branch of left coronary artery",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Diagonal branch of anterior interventricular branch",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Right marginal branch of right coronary artery",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Posterior interventricular branch of circumflex branch",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Right coronary artery",
+    "box": [
+     0.005,
+     0.575,
+     0.175,
+     0.03
+    ]
+   }
+  ],
+  "quiz": [
+   "anterior-interventricular-branch-of-left-coronary-artery",
+   "circumflex-branch-of-left-coronary-artery",
+   "right-marginal-branch-of-right-coronary-artery",
+   "left-marginal-branch-of-circumflex-branch"
+  ]
+ }
+]

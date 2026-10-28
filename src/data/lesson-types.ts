@@ -257,9 +257,17 @@ export type LessonChunk = {
   table?: LessonTable;
   keyPoints?: string[];
   figure?: string; // a tappable lecture diagram (LessonFigure id, data/figures/)
+  // More lecture pictures for this section (LessonFigure ids), shown after
+  // `figure`. Anatomy lessons get theirs from data/figures/pictures/.
+  figures?: string[];
   sourceRefs?: SourceReference[]; // lecture and/or textbook references
   notes?: LessonNote[];
 };
+
+/** Every diagram a reading section shows, in order. */
+export function chunkFigures(chunk: Pick<LessonChunk, 'figure' | 'figures'>): string[] {
+  return [...(chunk.figure ? [chunk.figure] : []), ...(chunk.figures ?? []).filter((id) => id !== chunk.figure)];
+}
 
 // "Students often think X — actually Y."
 export type LessonConfusion = {
@@ -285,6 +293,7 @@ export type InteractiveStep =
       terms?: LessonTerm[];
       keyPoint?: string;
       sourceRefs?: SourceReference[];
+      figures?: string[]; // lecture pictures shown on the card (LessonFigure ids)
     }
   | { type: 'ask'; question: Question; reveal?: string[] }
   | { type: 'recall'; recall: RecallPrompt }

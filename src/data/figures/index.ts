@@ -23,6 +23,13 @@ import { figures as portalVenousSystemFigures } from '@/data/figures/gastrointes
 import { figures as kidneyInternalFigures } from '@/data/figures/urinary-system-gross';
 import { figures as auricleFigures } from '@/data/figures/head-and-neck';
 import { figures as brainArteriesFigures } from '@/data/figures/neuroanatomy';
+import { figures as cardiovascularSystemGrossPictures } from '@/data/figures/pictures/cardiovascular-system-gross';
+import { figures as respiratorySystemGrossPictures } from '@/data/figures/pictures/respiratory-system-gross';
+import { figures as gastrointestinalSystemGrossPictures } from '@/data/figures/pictures/gastrointestinal-system-gross';
+import { figures as urinarySystemGrossPictures } from '@/data/figures/pictures/urinary-system-gross';
+import { figures as upperLimbPictures } from '@/data/figures/pictures/upper-limb';
+import { figures as headAndNeckPictures } from '@/data/figures/pictures/head-and-neck';
+import { figures as neuroanatomyPictures } from '@/data/figures/pictures/neuroanatomy';
 import type { FigureSpot, LessonFigure } from '@/data/lesson-types';
 
 export const allFigures: LessonFigure[] = [
@@ -42,6 +49,14 @@ export const allFigures: LessonFigure[] = [
   ...kidneyInternalFigures,
   ...auricleFigures,
   ...brainArteriesFigures,
+  // Lecture pictures added to every anatomy lesson (data/figures/pictures/).
+  ...cardiovascularSystemGrossPictures,
+  ...respiratorySystemGrossPictures,
+  ...gastrointestinalSystemGrossPictures,
+  ...urinarySystemGrossPictures,
+  ...upperLimbPictures,
+  ...headAndNeckPictures,
+  ...neuroanatomyPictures,
 ];
 
 const byId = new Map(allFigures.map((figure) => [figure.id, figure]));

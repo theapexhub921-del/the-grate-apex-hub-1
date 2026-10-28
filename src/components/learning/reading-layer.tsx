@@ -6,7 +6,7 @@ import { PathwaySteps } from '@/components/pathway-steps';
 import { Icon, type IconName } from '@/components/ui/icon';
 import { Card } from '@/components/ui/interactive';
 import { Fonts, type ThemeColors } from '@/constants/theme';
-import type { Lesson, LessonChunk, LessonChunkKind, LessonNote } from '@/data/lesson-types';
+import { chunkFigures, type Lesson, type LessonChunk, type LessonChunkKind, type LessonNote } from '@/data/lesson-types';
 import { describeSourceRefs, describeTextbookRefs } from '@/data/source-labels';
 import { useExperience } from '@/hooks/use-experience';
 import { useTheme, useThemedStyles } from '@/hooks/use-theme';
@@ -117,7 +117,7 @@ function ReadingSection({ chunk, index, total }: { chunk: LessonChunk; index: nu
 
       {chunk.steps ? <PathwaySteps steps={chunk.steps} /> : null}
 
-      {chunk.figure ? <FigureExplorer figureId={chunk.figure} /> : null}
+      {chunkFigures(chunk).map((id) => <FigureExplorer key={id} figureId={id} />)}
 
       {chunk.terms ? (
         <View style={styles.terms}>

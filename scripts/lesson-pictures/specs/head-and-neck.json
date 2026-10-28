@@ -1,0 +1,1446 @@
+[
+ {
+  "name": "cervical-fascia",
+  "deck": "hn",
+  "slide": 14,
+  "lesson": "head-and-neck-1",
+  "title": "Layers of the deep cervical fascia (cross-section of the neck)",
+  "spots": [
+   {
+    "label": "Trachea",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Oesophagus",
+    "box": [
+     0.55,
+     0.21,
+     0.17,
+     0.06
+    ]
+   },
+   {
+    "label": "Pretracheal layer",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Carotid sheath",
+    "box": [
+     0.597,
+     0.425,
+     0.17,
+     0.05
+    ]
+   },
+   {
+    "label": "Superficial (investing) layer",
+    "box": [
+     0.597,
+     0.505,
+     0.17,
+     0.05
+    ]
+   },
+   {
+    "label": "Deep cervical fascia",
+    "box": [
+     0.894,
+     0.4,
+     0.106,
+     0.17
+    ]
+   },
+   {
+    "label": "Prevertebral layer",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Superficial cervical fascia",
+    "ocr": [
+     7
+    ]
+   }
+  ],
+  "quiz": [
+   "pretracheal-layer",
+   "prevertebral-layer",
+   "carotid-sheath",
+   "superficial-investing-layer"
+  ]
+ },
+ {
+  "name": "scalp-layers",
+  "deck": "hn",
+  "slide": 63,
+  "lesson": "head-and-neck-2",
+  "title": "Layers of the scalp, skull and meninges",
+  "spots": [
+   {
+    "label": "Sagittal suture",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Superficial vein of scalp",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Skin",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Emissary vein",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Connective tissue",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Diploic vein",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Aponeurosis",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Superior sagittal sinus",
+    "box": [
+     0.773,
+     0.36,
+     0.2,
+     0.037
+    ]
+   },
+   {
+    "label": "Arachnoid granulation",
+    "box": [
+     0.773,
+     0.397,
+     0.2,
+     0.037
+    ]
+   },
+   {
+    "label": "Loose connective tissue",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Endosteal layer of dura mater",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Pericranium (periosteum)",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Meningeal layer of dura mater",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Outer table of parietal bone",
+    "box": [
+     0.055,
+     0.572,
+     0.125,
+     0.062
+    ]
+   },
+   {
+    "label": "Arachnoid",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Diplo\u00eb",
+    "box": [
+     0.14,
+     0.638,
+     0.045,
+     0.028
+    ]
+   },
+   {
+    "label": "Cerebral artery in subarachnoid space",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Inner table of parietal bone",
+    "box": [
+     0.09,
+     0.665,
+     0.12,
+     0.08
+    ]
+   },
+   {
+    "label": "Pia mater",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Cerebral vein in subarachnoid space",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Cerebral cortex",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Falx cerebri",
+    "ocr": [
+     25
+    ]
+   },
+   {
+    "label": "Inferior sagittal sinus",
+    "ocr": [
+     26
+    ]
+   }
+  ],
+  "quiz": [
+   "aponeurosis",
+   "loose-connective-tissue",
+   "pericranium-periosteum",
+   "emissary-vein",
+   "diploe",
+   "arachnoid-granulation"
+  ]
+ },
+ {
+  "name": "scalp-nerves-arteries",
+  "deck": "hn",
+  "slide": 68,
+  "lesson": "head-and-neck-2",
+  "title": "Nerves (left) and arteries (right) of the scalp",
+  "spots": [
+   {
+    "label": "Supratrochlear artery",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Supratrochlear nerve",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Supraorbital nerve",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Supraorbital artery",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Zygomaticotemporal nerve",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Zygomaticotemporal artery",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Auriculotemporal nerve",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Superficial temporal artery",
+    "ocr": [
+     7
+    ],
+    "grow": [
+     0.1,
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Lesser occipital nerve",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Posterior auricular artery",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Greater occipital nerve",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Occipital artery",
+    "ocr": [
+     11
+    ]
+   }
+  ],
+  "quiz": [
+   "auriculotemporal-nerve",
+   "greater-occipital-nerve",
+   "superficial-temporal-artery",
+   "supraorbital-nerve"
+  ]
+ },
+ {
+  "name": "extraocular-muscles",
+  "deck": "hn",
+  "slide": 126,
+  "lesson": "head-and-neck-3",
+  "title": "Extraocular muscles (lateral view)",
+  "spots": [
+   {
+    "label": "Levator palpebrae superioris",
+    "box": [
+     0.46,
+     0.0,
+     0.24,
+     0.075
+    ],
+    "pin": "b"
+   },
+   {
+    "label": "Trochlea (ligamentous sling)",
+    "box": [
+     0.76,
+     0.0,
+     0.24,
+     0.07
+    ],
+    "pin": "b"
+   },
+   {
+    "label": "Frontal bone",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Superior oblique",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Superior rectus",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Optic nerve",
+    "ocr": [
+     7,
+     8
+    ]
+   },
+   {
+    "label": "Lateral rectus",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Inferior rectus",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Maxilla",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Inferior oblique",
+    "ocr": [
+     14
+    ]
+   }
+  ],
+  "quiz": [
+   "superior-oblique",
+   "inferior-oblique",
+   "lateral-rectus",
+   "levator-palpebrae-superioris",
+   "trochlea-ligamentous-sling"
+  ]
+ },
+ {
+  "name": "lacrimal-apparatus",
+  "deck": "hn",
+  "slide": 136,
+  "lesson": "head-and-neck-3",
+  "title": "The lacrimal apparatus",
+  "spots": [
+   {
+    "label": "Medial canthus",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Superior canaliculus",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Lacrimal gland",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Palpebral lobe of lacrimal gland",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Lacrimal sac",
+    "box": [
+     0.86,
+     0.285,
+     0.1,
+     0.065
+    ]
+   },
+   {
+    "label": "Ducts of lacrimal gland",
+    "ocr": [
+     8,
+     9
+    ]
+   },
+   {
+    "label": "Nasal cavity",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Inferior canaliculus",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Nasolacrimal duct",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Inferior meatus",
+    "ocr": [
+     14
+    ]
+   }
+  ],
+  "quiz": [
+   "lacrimal-sac",
+   "nasolacrimal-duct",
+   "inferior-meatus",
+   "superior-canaliculus"
+  ]
+ },
+ {
+  "name": "maxillary-nerve",
+  "deck": "hn",
+  "slide": 173,
+  "lesson": "head-and-neck-4",
+  "title": "The maxillary nerve and pterygopalatine ganglion",
+  "spots": [
+   {
+    "label": "Posterior superior alveolar nerve",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Zygomatic nerve",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Ophthalmic nerve",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Infraorbital nerve",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Meningeal branch of maxillary nerve",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Foramen rotundum",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Zygomaticotemporal nerve",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Motor root",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Zygomaticofacial nerve",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Maxillary nerve",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Sensory root",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Trigeminal ganglion",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Infraorbital foramen",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Palpebral branches",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Mandibular nerve",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Nasal branches",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Superior labial branches",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Pharyngeal branch",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Sphenopalatine (pterygopalatine) ganglion",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Anterior superior alveolar nerve",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Nasal branch",
+    "ocr": [
+     24
+    ]
+   },
+   {
+    "label": "Incisive foramen",
+    "ocr": [
+     25
+    ]
+   },
+   {
+    "label": "Lesser palatine nerve",
+    "ocr": [
+     26
+    ]
+   },
+   {
+    "label": "Greater palatine nerve",
+    "ocr": [
+     27
+    ]
+   },
+   {
+    "label": "Lesser palatine foramen",
+    "ocr": [
+     28
+    ]
+   },
+   {
+    "label": "Middle superior alveolar nerve",
+    "ocr": [
+     29
+    ]
+   },
+   {
+    "label": "Nasopalatine nerve",
+    "ocr": [
+     30
+    ]
+   },
+   {
+    "label": "Greater palatine foramen",
+    "ocr": [
+     31
+    ]
+   }
+  ],
+  "quiz": [
+   "foramen-rotundum",
+   "sphenopalatine-pterygopalatine-ganglion",
+   "infraorbital-nerve",
+   "greater-palatine-nerve",
+   "posterior-superior-alveolar-nerve",
+   "nasopalatine-nerve"
+  ]
+ },
+ {
+  "name": "coronal-sinuses",
+  "deck": "hn",
+  "slide": 224,
+  "lesson": "head-and-neck-5",
+  "title": "Coronal section of the skull: nasal cavity and sinuses",
+  "crop": [
+   0,
+   0.12,
+   1,
+   0.86
+  ],
+  "spots": [
+   {
+    "label": "Cribriform plate of ethmoid",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Anterior cranial fossa",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Orbital plate of frontal bone",
+    "ocr": [
+     3,
+     4
+    ]
+   },
+   {
+    "label": "Air cells in ethmoidal labyrinth",
+    "ocr": [
+     5,
+     6
+    ]
+   },
+   {
+    "label": "Orbit",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Maxillary sinus",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Alveolar process",
+    "ocr": [
+     10
+    ]
+   }
+  ],
+  "quiz": [
+   "air-cells-in-ethmoidal-labyrinth",
+   "maxillary-sinus",
+   "cribriform-plate-of-ethmoid"
+  ]
+ },
+ {
+  "name": "ear-ossicles",
+  "deck": "hn",
+  "slide": 305,
+  "lesson": "head-and-neck-6",
+  "title": "The auditory ossicles",
+  "crop": [
+   0,
+   0.135,
+   1,
+   0.93
+  ],
+  "spots": [
+   {
+    "label": "Head",
+    "box": [
+     0.16,
+     0.165,
+     0.18,
+     0.055
+    ]
+   },
+   {
+    "label": "Body",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Short process",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Neck",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Long process",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Lateral process",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Lenticular process",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Anterior process",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Posterior crus",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Manubrium",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Footplate",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Umbo",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Anterior crus",
+    "ocr": [
+     13
+    ]
+   }
+  ],
+  "quiz": [
+   "manubrium",
+   "lenticular-process",
+   "footplate",
+   "short-process",
+   "umbo"
+  ]
+ },
+ {
+  "name": "tongue-muscles",
+  "deck": "hn",
+  "slide": 371,
+  "lesson": "head-and-neck-7",
+  "title": "Extrinsic muscles of the tongue",
+  "spots": [
+   {
+    "label": "Palatoglossus",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Styloglossus",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Genioglossus",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Hyoglossus",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Mylohyoid muscle (cut)",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Hyoid bone",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Geniohyoid",
+    "ocr": [
+     15
+    ]
+   }
+  ],
+  "quiz": [
+   "genioglossus",
+   "hyoglossus",
+   "styloglossus",
+   "palatoglossus"
+  ]
+ },
+ {
+  "name": "salivary-glands",
+  "deck": "hn",
+  "slide": 378,
+  "lesson": "head-and-neck-7",
+  "title": "The major salivary glands",
+  "spots": [
+   {
+    "label": "Salivary gland stone",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Parotid gland",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Accessory parotid gland",
+    "ocr": [
+     2,
+     3
+    ]
+   },
+   {
+    "label": "Parotid duct",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Sublingual gland",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Submandibular gland",
+    "ocr": [
+     8
+    ]
+   }
+  ],
+  "quiz": [
+   "parotid-duct",
+   "submandibular-gland",
+   "accessory-parotid-gland"
+  ]
+ },
+ {
+  "name": "superior-orbital-fissure",
+  "deck": "hn",
+  "slide": 131,
+  "lesson": "head-and-neck-8",
+  "title": "Nerves and vessels at the apex of the orbit",
+  "spots": [
+   {
+    "label": "Superior orbital fissure",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Recurrent meningeal artery",
+    "ocr": [
+     3
+    ],
+    "grow": [
+     0,
+     0.03,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Superior rectus",
+    "ocr": [
+     1
+    ],
+    "grow": [
+     0.05,
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Levator palpebrae superioris",
+    "ocr": [
+     2,
+     4
+    ]
+   },
+   {
+    "label": "Common tendinous ring",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Superior oblique",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Lacrimal nerve",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Rim of optic canal",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Frontal nerve",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Dural sheath",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Superior ophthalmic vein",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Nasociliary nerve",
+    "ocr": [
+     13
+    ],
+    "grow": [
+     0.07,
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Optic nerve",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Lateral rectus",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Medial rectus",
+    "ocr": [
+     16
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.025
+    ]
+   },
+   {
+    "label": "Inferior orbital fissure",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Ophthalmic artery",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Zygomatic nerve",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Inferior rectus",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Inferior ophthalmic vein",
+    "ocr": [
+     21
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.02
+    ]
+   },
+   {
+    "label": "Infraorbital nerve",
+    "ocr": [
+     22
+    ]
+   }
+  ],
+  "quiz": [
+   "common-tendinous-ring",
+   "nasociliary-nerve",
+   "frontal-nerve",
+   "lacrimal-nerve",
+   "superior-orbital-fissure"
+  ],
+  "chunk": 2,
+  "step": 3,
+  "concept": "eye-movement-nerves"
+ },
+ {
+  "name": "chorda-tympani",
+  "deck": "hn",
+  "slide": 384,
+  "lesson": "head-and-neck-9",
+  "title": "Chorda tympani and the lingual nerve",
+  "crop": [
+   0,
+   0,
+   1,
+   0.96
+  ],
+  "spots": [
+   {
+    "label": "Chorda tympani",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Mandibular nerve (lingual branch)",
+    "ocr": [
+     1
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.035
+    ]
+   },
+   {
+    "label": "Sublingual gland",
+    "ocr": [
+     2,
+     3
+    ]
+   },
+   {
+    "label": "Submandibular gland",
+    "ocr": [
+     4
+    ],
+    "grow": [
+     0.08,
+     0.045,
+     0,
+     0
+    ]
+   }
+  ],
+  "quiz": [
+   "chorda-tympani",
+   "submandibular-gland"
+  ]
+ },
+ {
+  "name": "larynx-sagittal",
+  "deck": "hn",
+  "slide": 451,
+  "lesson": "head-and-neck-10",
+  "title": "Interior of the larynx (sagittal view)",
+  "spots": [
+   {
+    "label": "Thyrohyoid membrane",
+    "ocr": [
+     2
+    ],
+    "grow": [
+     0,
+     0.035,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Cut surface of hyoid bone",
+    "ocr": [
+     4,
+     5,
+     3
+    ]
+   },
+   {
+    "label": "Opening for neurovascular bundle",
+    "ocr": [
+     6
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.035
+    ]
+   },
+   {
+    "label": "Epiglottis",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Quadrangular membrane",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Thyroepiglottic ligament",
+    "ocr": [
+     9
+    ],
+    "grow": [
+     0,
+     0.03,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Cut surface of thyroid cartilage",
+    "ocr": [
+     10
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.03
+    ]
+   },
+   {
+    "label": "Corniculate cartilage",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Muscular process of arytenoid cartilage",
+    "ocr": [
+     12,
+     14
+    ]
+   },
+   {
+    "label": "Vestibular ligament",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Vocal ligament",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Vocal process of arytenoid cartilage",
+    "ocr": [
+     16
+    ],
+    "grow": [
+     0.06,
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Cricovocal membrane",
+    "ocr": [
+     17
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.035
+    ]
+   },
+   {
+    "label": "Cricoid cartilage",
+    "ocr": [
+     18
+    ]
+   }
+  ],
+  "quiz": [
+   "quadrangular-membrane",
+   "vestibular-ligament",
+   "vocal-ligament",
+   "cricovocal-membrane",
+   "corniculate-cartilage"
+  ]
+ },
+ {
+  "name": "thyroid-cartilage",
+  "deck": "hn",
+  "slide": 430,
+  "lesson": "head-and-neck-10",
+  "title": "The thyroid cartilage",
+  "spots": [
+   {
+    "label": "Lateral thyroid ligaments",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Right lamina",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Left lamina",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Superior thyroid notch",
+    "ocr": [
+     3
+    ],
+    "grow": [
+     0,
+     0.035,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Superior horn",
+    "ocr": [
+     4
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.035
+    ]
+   },
+   {
+    "label": "Superior thyroid tubercle",
+    "ocr": [
+     5,
+     6
+    ]
+   },
+   {
+    "label": "Oblique line",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Inferior horn",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Laryngeal prominence",
+    "ocr": [
+     9
+    ],
+    "grow": [
+     0,
+     0.035,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Facet for cricoid (medial surface of horn)",
+    "ocr": [
+     10,
+     11,
+     13,
+     15
+    ]
+   },
+   {
+    "label": "Inferior thyroid notch",
+    "ocr": [
+     12,
+     14
+    ]
+   },
+   {
+    "label": "Inferior thyroid tubercle",
+    "ocr": [
+     16
+    ]
+   }
+  ],
+  "quiz": [
+   "laryngeal-prominence",
+   "superior-thyroid-notch",
+   "oblique-line",
+   "inferior-horn",
+   "superior-horn"
+  ]
+ }
+]

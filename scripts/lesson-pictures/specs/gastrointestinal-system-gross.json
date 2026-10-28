@@ -1,0 +1,2241 @@
+[
+ {
+  "name": "anterior-wall-muscles",
+  "deck": "abdwall",
+  "slide": 19,
+  "lesson": "gastrointestinal-system-gross-1",
+  "title": "Muscles of the anterolateral abdominal wall",
+  "crop": [
+   0,
+   0,
+   1,
+   0.92
+  ],
+  "spots": [
+   {
+    "label": "Pectoralis major muscle",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Xiphoid process",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Anterior layer of rectus sheath (cut edges)",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Linea alba",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Rectus abdominis muscle",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Serratus anterior muscle",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Latissimus dorsi muscle",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "External abdominal oblique muscle (cut away)",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "External abdominal oblique: muscular part",
+    "ocr": [
+     12,
+     13,
+     16
+    ],
+    "pin": [
+     0.36,
+     0.455
+    ]
+   },
+   {
+    "label": "External abdominal oblique: aponeurotic part",
+    "box": [
+     0.13,
+     0.49,
+     0.1,
+     0.03
+    ],
+    "pin": [
+     0.25,
+     0.505
+    ]
+   },
+   {
+    "label": "Tendinous intersection",
+    "ocr": [
+     14
+    ],
+    "grow": [
+     0.01,
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Internal abdominal oblique muscle",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Anterior superior iliac spine",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "External oblique aponeurosis (cut and turned down)",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Inguinal ligament (Poupart's)",
+    "ocr": [
+     27
+    ]
+   },
+   {
+    "label": "Pyramidalis muscle",
+    "ocr": [
+     28
+    ]
+   },
+   {
+    "label": "Superficial inguinal ring",
+    "ocr": [
+     29
+    ]
+   }
+  ],
+  "quiz": [
+   "linea-alba",
+   "tendinous-intersection",
+   "pyramidalis-muscle",
+   "superficial-inguinal-ring",
+   "internal-abdominal-oblique-muscle"
+  ]
+ },
+ {
+  "name": "wall-layers",
+  "deck": "abdwall",
+  "slide": 10,
+  "lesson": "gastrointestinal-system-gross-1",
+  "title": "Layers of the anterolateral abdominal wall",
+  "crop": [
+   0,
+   0.08,
+   1,
+   0.9
+  ],
+  "spots": [
+   {
+    "label": "External oblique",
+    "ocr": [
+     2
+    ],
+    "grow": [
+     -0.02,
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Skin (cut edge)",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Internal oblique",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Superficial fatty layer of subcutaneous tissue (Camper fascia)",
+    "ocr": [
+     5,
+     6
+    ]
+   },
+   {
+    "label": "Transversus abdominis",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Extraperitoneal fat",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Deep membranous layer of subcutaneous tissue (Scarpa fascia)",
+    "ocr": [
+     9,
+     11
+    ]
+   },
+   {
+    "label": "Endoabdominal (transversalis) fascia",
+    "ocr": [
+     10,
+     12,
+     13
+    ]
+   },
+   {
+    "label": "Investing (deep) fascia: superficial, intermediate and deep",
+    "ocr": [
+     14,
+     17
+    ]
+   },
+   {
+    "label": "Parietal peritoneum",
+    "ocr": [
+     15,
+     16
+    ]
+   }
+  ],
+  "quiz": [
+   "superficial-fatty-layer-of-subcutaneous-tissue-camper-fascia",
+   "deep-membranous-layer-of-subcutaneous-tissue-scarpa-fascia",
+   "endoabdominal-transversalis-fascia",
+   "transversus-abdominis"
+  ]
+ },
+ {
+  "name": "wall-veins",
+  "deck": "abdwall",
+  "slide": 33,
+  "lesson": "gastrointestinal-system-gross-2",
+  "title": "Veins of the anterolateral abdominal wall",
+  "crop": [
+   0,
+   0,
+   1,
+   0.94
+  ],
+  "spots": [
+   {
+    "label": "Subclavian vein",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Axillary vein",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Lateral thoracic vein",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Anterior intercostal veins",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Internal thoracic vein",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Superior epigastric veins",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Thoracoepigastric vein",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Paraumbilical veins in round ligament of liver",
+    "ocr": [
+     15,
+     16
+    ]
+   },
+   {
+    "label": "Tributaries of paraumbilical veins",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Inferior epigastric veins",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Superficial epigastric vein",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Superficial circumflex iliac vein",
+    "ocr": [
+     22
+    ]
+   }
+  ],
+  "quiz": [
+   "thoracoepigastric-vein",
+   "paraumbilical-veins-in-round-ligament-of-liver",
+   "superior-epigastric-veins",
+   "inferior-epigastric-veins"
+  ]
+ },
+ {
+  "name": "wall-nerves",
+  "deck": "abdwall",
+  "slide": 36,
+  "lesson": "gastrointestinal-system-gross-2",
+  "title": "Nerves of the anterolateral abdominal wall",
+  "spots": [
+   {
+    "label": "Xiphoid process",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Anterior cutaneous branches (ACB)",
+    "box": [
+     0.59,
+     0.19,
+     0.1,
+     0.11
+    ]
+   },
+   {
+    "label": "Thoraco-abdominal nerves (T7\u2013T11)",
+    "box": [
+     0.74,
+     0.25,
+     0.26,
+     0.11
+    ]
+   },
+   {
+    "label": "Lateral cutaneous branches (LCB)",
+    "box": [
+     0.59,
+     0.35,
+     0.1,
+     0.11
+    ]
+   },
+   {
+    "label": "Anterior rami (AR): continuations of intercostal nerves (TA)",
+    "box": [
+     0.74,
+     0.36,
+     0.26,
+     0.11
+    ]
+   },
+   {
+    "label": "Lateral cutaneous branch of subcostal nerve (T12)",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Anterior cutaneous branch of subcostal nerve (T12)",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Anterior superior iliac spine (ASIS)",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Iliohypogastric nerve (L1)",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Ilio-inguinal nerve (L1)",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Inguinal ligament",
+    "ocr": [
+     23
+    ]
+   }
+  ],
+  "quiz": [
+   "iliohypogastric-nerve-l1",
+   "ilio-inguinal-nerve-l1",
+   "thoraco-abdominal-nerves-t7-t11",
+   "lateral-cutaneous-branch-of-subcostal-nerve-t12"
+  ]
+ },
+ {
+  "name": "inguinal-canal",
+  "deck": "abdwall",
+  "slide": 54,
+  "lesson": "gastrointestinal-system-gross-3",
+  "title": "The inguinal canal and spermatic cord",
+  "spots": [
+   {
+    "label": "Parietal peritoneum",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "External oblique",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Internal oblique",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Transversus abdominis",
+    "ocr": [
+     7
+    ],
+    "grow": [
+     0,
+     0,
+     0.04,
+     0
+    ]
+   },
+   {
+    "label": "Inferior epigastric artery and vein",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Cremasteric vessels",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Transversalis fascia",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Ductus deferens",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Deep inguinal ring",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Urinary bladder",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Inguinal ligament",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Ilioinguinal nerve (branch of L1)",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Conjoint tendon",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "External oblique aponeurosis",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Superficial inguinal ring",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Spermatic cord",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Femoral artery and vein",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Genital branch of genitofemoral nerve",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Lacunar ligament",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Cremaster",
+    "ocr": [
+     23
+    ]
+   }
+  ],
+  "quiz": [
+   "deep-inguinal-ring",
+   "superficial-inguinal-ring",
+   "conjoint-tendon",
+   "lacunar-ligament",
+   "inferior-epigastric-artery-and-vein",
+   "ilioinguinal-nerve-branch-of-l1"
+  ]
+ },
+ {
+  "name": "umbilical-folds",
+  "deck": "abdwall",
+  "slide": 68,
+  "lesson": "gastrointestinal-system-gross-3",
+  "title": "Inner surface of the anterior abdominal wall",
+  "spots": [
+   {
+    "label": "Diaphragm",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Falciform ligament",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Umbilicus",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Round ligament of the liver",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Parietal peritoneum",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Arcuate line",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Inferior epigastric artery and vein",
+    "ocr": [
+     12,
+     14
+    ]
+   },
+   {
+    "label": "Median umbilical fold",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Obliterated umbilical artery",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Medial umbilical fold",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Urachus",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Lateral umbilical fold",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Deep inguinal ring",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Iliacus muscle",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Testicular artery and vein",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "External iliac artery and vein",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Inguinal ligament",
+    "ocr": [
+     25
+    ]
+   },
+   {
+    "label": "Internal iliac artery",
+    "ocr": [
+     27
+    ]
+   },
+   {
+    "label": "Obturator nerve, artery and vein",
+    "ocr": [
+     28
+    ]
+   },
+   {
+    "label": "Bladder",
+    "ocr": [
+     30
+    ]
+   }
+  ],
+  "quiz": [
+   "median-umbilical-fold",
+   "medial-umbilical-fold",
+   "lateral-umbilical-fold",
+   "urachus",
+   "arcuate-line"
+  ]
+ },
+ {
+  "name": "posterior-wall-veins",
+  "deck": "abdwall",
+  "slide": 90,
+  "lesson": "gastrointestinal-system-gross-4",
+  "title": "Veins of the posterior abdominal wall",
+  "spots": [
+   {
+    "label": "Hemiazygos vein",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Azygos vein",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Inferior phrenic vein",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Hepatic veins",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Oesophagus",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Inferior vena cava",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Abdominal aorta",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Left suprarenal vein",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Right suprarenal vein",
+    "ocr": [
+     9
+    ],
+    "grow": [
+     0.04,
+     0.03,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Right renal vein",
+    "ocr": [
+     11,
+     12
+    ]
+   },
+   {
+    "label": "Subcostal vein",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Left renal vein",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Left ovarian (female) or testicular (male) vein",
+    "ocr": [
+     19,
+     22
+    ]
+   },
+   {
+    "label": "Right ovarian (female) or testicular (male) vein",
+    "ocr": [
+     20,
+     23
+    ]
+   },
+   {
+    "label": "Lumbar veins",
+    "ocr": [
+     25
+    ]
+   },
+   {
+    "label": "Ureter",
+    "ocr": [
+     26
+    ]
+   },
+   {
+    "label": "Ascending lumbar vein",
+    "ocr": [
+     30,
+     31
+    ]
+   },
+   {
+    "label": "Median sacral vein",
+    "ocr": [
+     34
+    ]
+   },
+   {
+    "label": "Lateral sacral veins",
+    "ocr": [
+     35
+    ]
+   },
+   {
+    "label": "Common iliac vein",
+    "ocr": [
+     36
+    ]
+   }
+  ],
+  "quiz": [
+   "left-renal-vein",
+   "left-ovarian-female-or-testicular-male-vein",
+   "ascending-lumbar-vein",
+   "hemiazygos-vein"
+  ]
+ },
+ {
+  "name": "stomach-parts",
+  "deck": "gitract",
+  "slide": 13,
+  "lesson": "gastrointestinal-system-gross-5",
+  "title": "Parts and layers of the stomach",
+  "spots": [
+   {
+    "label": "Cardia",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Fundus",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Oesophagus",
+    "box": [
+     0.002,
+     0.125,
+     0.11,
+     0.045
+    ]
+   },
+   {
+    "label": "Muscularis externa: longitudinal, circular and oblique layers",
+    "box": [
+     0.002,
+     0.17,
+     0.285,
+     0.235
+    ],
+    "pin": [
+     0.3,
+     0.3
+    ]
+   },
+   {
+    "label": "Serosa",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Body",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Lesser curvature",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Rugae of mucosa",
+    "ocr": [
+     8,
+     10
+    ]
+   },
+   {
+    "label": "Pylorus",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Greater curvature",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Duodenum",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Pyloric sphincter (valve)",
+    "box": [
+     0.297,
+     0.875,
+     0.135,
+     0.125
+    ],
+    "pin": "t"
+   },
+   {
+    "label": "Pyloric canal",
+    "box": [
+     0.445,
+     0.834,
+     0.115,
+     0.123
+    ],
+    "pin": "t"
+   },
+   {
+    "label": "Pyloric antrum",
+    "box": [
+     0.565,
+     0.834,
+     0.125,
+     0.123
+    ],
+    "pin": "t"
+   }
+  ],
+  "quiz": [
+   "fundus",
+   "cardia",
+   "pyloric-antrum",
+   "pyloric-canal",
+   "lesser-curvature",
+   "rugae-of-mucosa"
+  ]
+ },
+ {
+  "name": "gastro-oesophageal-junction",
+  "deck": "gitract",
+  "slide": 15,
+  "lesson": "gastrointestinal-system-gross-5",
+  "title": "The gastro-oesophageal junction",
+  "spots": [
+   {
+    "label": "Longitudinal oesophageal muscle",
+    "ocr": [
+     0
+    ],
+    "grow": [
+     0.08,
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Oesophageal mucosa",
+    "ocr": [
+     1,
+     3
+    ]
+   },
+   {
+    "label": "Circular oesophageal muscle",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Submucosa",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Gradual slight muscular thickening",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Phrenico-oesophageal ligament (ascending or upper limb)",
+    "ocr": [
+     7
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.03
+    ]
+   },
+   {
+    "label": "Supradiaphragmatic fascia",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Diaphragm",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Infradiaphragmatic (transversalis) fascia",
+    "ocr": [
+     11
+    ],
+    "grow": [
+     0,
+     0.03,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Phrenico-oesophageal ligament (descending limb)",
+    "ocr": [
+     12,
+     13
+    ]
+   },
+   {
+    "label": "Subhiatal fat ring",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Zigzag (Z) line: juncture of oesophageal and gastric mucosa",
+    "ocr": [
+     15,
+     16,
+     20
+    ]
+   },
+   {
+    "label": "Peritoneum",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Cardiac notch",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Cardiac part (cardia)",
+    "ocr": [
+     21
+    ]
+   }
+  ],
+  "quiz": [
+   "zigzag-z-line-juncture-of-oesophageal-and-gastric-mucosa",
+   "phrenico-oesophageal-ligament-ascending-or-upper-limb",
+   "cardiac-notch",
+   "subhiatal-fat-ring"
+  ]
+ },
+ {
+  "name": "duodenum-parts",
+  "deck": "gitract",
+  "slide": 29,
+  "lesson": "gastrointestinal-system-gross-6",
+  "title": "Parts of the duodenum",
+  "spots": [
+   {
+    "label": "Hepatic artery proper",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Portal vein",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Supraduodenal artery",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Common hepatic artery",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Bile duct",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Cystic duct",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Superior part (first part)",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Gallbladder",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Splenic artery and vein",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Transverse colon",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Suspensory muscle (ligament) of duodenum (ligament of Treitz)",
+    "ocr": [
+     13,
+     14
+    ]
+   },
+   {
+    "label": "Duodenojejunal flexure",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Right kidney",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Superior mesenteric vein and artery",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Descending part (second part)",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Ascending part (fourth part)",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Minor duodenal papilla",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Major duodenal papilla",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Inferior vena cava",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Inferior part (third part)",
+    "ocr": [
+     24
+    ]
+   }
+  ],
+  "quiz": [
+   "descending-part-second-part",
+   "inferior-part-third-part",
+   "major-duodenal-papilla",
+   "suspensory-muscle-ligament-of-duodenum-ligament-of-treitz",
+   "duodenojejunal-flexure"
+  ]
+ },
+ {
+  "name": "duodenum-relations",
+  "deck": "gitract",
+  "slide": 21,
+  "lesson": "gastrointestinal-system-gross-6",
+  "title": "Relations of the duodenum",
+  "spots": [
+   {
+    "label": "Inferior vena cava",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Oesophagus",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Portal vein",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Right suprarenal gland",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Bile duct",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Duodenum: superior part",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Spleen",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Gallbladder",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Right kidney",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Pancreas",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Position of minor duodenal papilla",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Left kidney",
+    "box": [
+     0.83,
+     0.6,
+     0.1,
+     0.035
+    ]
+   },
+   {
+    "label": "Superior mesenteric vein and artery",
+    "box": [
+     0.83,
+     0.635,
+     0.17,
+     0.1
+    ]
+   },
+   {
+    "label": "Position of major duodenal papilla",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Duodenum: descending part",
+    "ocr": [
+     16,
+     17
+    ]
+   },
+   {
+    "label": "Descending colon",
+    "box": [
+     0.83,
+     0.79,
+     0.15,
+     0.035
+    ]
+   },
+   {
+    "label": "Duodenum: ascending part",
+    "box": [
+     0.83,
+     0.83,
+     0.17,
+     0.08
+    ]
+   },
+   {
+    "label": "Duodenum: inferior part",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Ascending colon",
+    "ocr": [
+     21
+    ]
+   }
+  ],
+  "quiz": [
+   "duodenum-superior-part",
+   "duodenum-descending-part",
+   "position-of-major-duodenal-papilla",
+   "right-kidney"
+  ]
+ },
+ {
+  "name": "anal-canal",
+  "deck": "gitract",
+  "slide": 51,
+  "lesson": "gastrointestinal-system-gross-7",
+  "title": "The anal canal",
+  "crop": [
+   0,
+   0.05,
+   1,
+   1
+  ],
+  "spots": [
+   {
+    "label": "Anal column",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Iliococcygeus",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Anal sinus",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Puborectalis",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Anal valve",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Internal anal sphincter (smooth muscle)",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Pectinate line",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "External anal sphincter: deep part",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "External anal sphincter (skeletal muscle)",
+    "ocr": [
+     8,
+     10
+    ]
+   },
+   {
+    "label": "External anal sphincter: superficial part",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Anocutaneous line",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "External anal sphincter: subcutaneous part",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Anal pecten",
+    "ocr": [
+     13
+    ],
+    "pin": "t"
+   },
+   {
+    "label": "Anal aperture",
+    "ocr": [
+     14
+    ],
+    "pin": "t"
+   }
+  ],
+  "quiz": [
+   "pectinate-line",
+   "anal-column",
+   "internal-anal-sphincter-smooth-muscle",
+   "anal-valve",
+   "puborectalis"
+  ]
+ },
+ {
+  "name": "large-intestine",
+  "deck": "gitract",
+  "slide": 38,
+  "lesson": "gastrointestinal-system-gross-7",
+  "title": "Features of the large intestine",
+  "spots": [
+   {
+    "label": "Greater omentum (cut away)",
+    "ocr": [
+     0,
+     1
+    ],
+    "pin": "r"
+   },
+   {
+    "label": "Right colic (hepatic) flexure",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Transverse mesocolon",
+    "ocr": [
+     4,
+     2
+    ],
+    "pin": "r"
+   },
+   {
+    "label": "Left colic (splenic) flexure",
+    "ocr": [
+     5,
+     7
+    ]
+   },
+   {
+    "label": "Transverse colon",
+    "ocr": [
+     6
+    ],
+    "pin": "r"
+   },
+   {
+    "label": "Omental taenia",
+    "ocr": [
+     8
+    ],
+    "pin": "r"
+   },
+   {
+    "label": "Omental (epiploic) appendices",
+    "ocr": [
+     11,
+     12
+    ]
+   },
+   {
+    "label": "Haustra",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Descending colon",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Free taenia",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Mesocolic taenia",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Ascending colon",
+    "ocr": [
+     24
+    ]
+   },
+   {
+    "label": "Semilunar folds",
+    "ocr": [
+     26
+    ]
+   },
+   {
+    "label": "Ileum",
+    "ocr": [
+     31
+    ]
+   },
+   {
+    "label": "Ileal orifice",
+    "ocr": [
+     32
+    ]
+   },
+   {
+    "label": "Caecum",
+    "ocr": [
+     35
+    ]
+   },
+   {
+    "label": "Vermiform appendix",
+    "ocr": [
+     36
+    ]
+   },
+   {
+    "label": "Rectum",
+    "ocr": [
+     37
+    ]
+   },
+   {
+    "label": "Sigmoid colon",
+    "ocr": [
+     38
+    ]
+   },
+   {
+    "label": "Sigmoid mesocolon",
+    "ocr": [
+     39
+    ]
+   },
+   {
+    "label": "Levator ani muscle",
+    "ocr": [
+     40
+    ]
+   },
+   {
+    "label": "External anal sphincter muscle",
+    "ocr": [
+     42
+    ]
+   }
+  ],
+  "quiz": [
+   "haustra",
+   "omental-epiploic-appendices",
+   "free-taenia",
+   "semilunar-folds",
+   "caecum",
+   "left-colic-splenic-flexure"
+  ]
+ },
+ {
+  "name": "liver-visceral",
+  "deck": "gitract",
+  "slide": 62,
+  "lesson": "gastrointestinal-system-gross-8",
+  "title": "Visceral and posterior surfaces of the liver",
+  "spots": [
+   {
+    "label": "Caudate lobe",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Falciform ligament",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Inferior vena cava",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Suprarenal impression",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Bare area",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Left triangular ligament",
+    "ocr": [
+     8
+    ],
+    "grow": [
+     0,
+     0,
+     0.1,
+     0
+    ]
+   },
+   {
+    "label": "Anterior coronary ligament",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Posterior coronary ligament",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Right triangular ligament",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Gastric impression",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Renal impression",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Right lobe of liver",
+    "ocr": [
+     16,
+     17
+    ]
+   },
+   {
+    "label": "Left lobe of liver",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Oesophageal impression",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Gallbladder",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Fissure for ligamentum venosum",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Porta hepatis",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Fundus of gallbladder",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Round ligament of the liver",
+    "ocr": [
+     24
+    ]
+   },
+   {
+    "label": "Quadrate lobe",
+    "ocr": [
+     25
+    ]
+   },
+   {
+    "label": "Colic impression",
+    "ocr": [
+     26
+    ]
+   }
+  ],
+  "quiz": [
+   "caudate-lobe",
+   "quadrate-lobe",
+   "porta-hepatis",
+   "bare-area",
+   "fissure-for-ligamentum-venosum",
+   "renal-impression"
+  ]
+ },
+ {
+  "name": "spleen",
+  "deck": "gitract",
+  "slide": 79,
+  "lesson": "gastrointestinal-system-gross-8",
+  "title": "The spleen: visceral surface and relations",
+  "spots": [
+   {
+    "label": "Short gastric vessels",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Superior border",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Stomach (cut)",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Hilum",
+    "box": [
+     0.495,
+     0.335,
+     0.05,
+     0.04
+    ]
+   },
+   {
+    "label": "Renal impression",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Splenorenal (lienorenal) ligament",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Splenic artery",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Left gastro-omental (gastroepiploic) vessels",
+    "ocr": [
+     13
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.03
+    ]
+   },
+   {
+    "label": "Suprarenal gland",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Left kidney",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Splenic vein",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Colic impression",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Attachment of transverse mesocolon (cut)",
+    "ocr": [
+     22
+    ]
+   }
+  ],
+  "quiz": [
+   "hilum",
+   "renal-impression",
+   "colic-impression",
+   "splenorenal-lienorenal-ligament"
+  ]
+ },
+ {
+  "name": "superior-mesenteric-artery",
+  "deck": "ginv",
+  "slide": 11,
+  "lesson": "gastrointestinal-system-gross-9",
+  "title": "Branches of the superior mesenteric artery",
+  "spots": [
+   {
+    "label": "Transverse colon",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Middle colic artery",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Inferior pancreaticoduodenal artery",
+    "box": [
+     0.73,
+     0.16,
+     0.27,
+     0.03
+    ]
+   },
+   {
+    "label": "Superior mesenteric artery",
+    "box": [
+     0.73,
+     0.19,
+     0.27,
+     0.03
+    ]
+   },
+   {
+    "label": "Jejunum",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Right colic artery",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Jejunal arteries",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Ascending colon",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Vasa recta",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Ileocolic artery",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Colic branch",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Anterior caecal artery",
+    "box": [
+     0.005,
+     0.855,
+     0.15,
+     0.03
+    ]
+   },
+   {
+    "label": "Ileal arteries",
+    "box": [
+     0.395,
+     0.9,
+     0.115,
+     0.03
+    ]
+   },
+   {
+    "label": "Posterior caecal artery",
+    "box": [
+     0.05,
+     0.965,
+     0.15,
+     0.03
+    ]
+   },
+   {
+    "label": "Appendicular artery",
+    "box": [
+     0.25,
+     0.965,
+     0.15,
+     0.03
+    ]
+   }
+  ],
+  "quiz": [
+   "middle-colic-artery",
+   "ileocolic-artery",
+   "right-colic-artery",
+   "appendicular-artery",
+   "vasa-recta"
+  ]
+ },
+ {
+  "name": "inferior-mesenteric-artery",
+  "deck": "ginv",
+  "slide": 13,
+  "lesson": "gastrointestinal-system-gross-9",
+  "title": "Branches of the inferior mesenteric artery",
+  "spots": [
+   {
+    "label": "Transverse colon",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Descending colon",
+    "ocr": [
+     1
+    ],
+    "grow": [
+     0,
+     0,
+     0.05,
+     0
+    ]
+   },
+   {
+    "label": "Ascending branch of left colic artery",
+    "ocr": [
+     2
+    ],
+    "grow": [
+     0,
+     0.03,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Descending branch of left colic artery",
+    "ocr": [
+     3
+    ],
+    "grow": [
+     0,
+     0.03,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Left colic artery",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Abdominal aorta",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Inferior mesenteric artery",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Superior rectal artery",
+    "ocr": [
+     8
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.025
+    ]
+   },
+   {
+    "label": "Sigmoid arteries",
+    "box": [
+     0.74,
+     0.88,
+     0.17,
+     0.03
+    ]
+   }
+  ],
+  "quiz": [
+   "left-colic-artery",
+   "superior-rectal-artery",
+   "sigmoid-arteries",
+   "inferior-mesenteric-artery"
+  ]
+ },
+ {
+  "name": "portosystemic-anastomoses",
+  "deck": "ginv",
+  "slide": 24,
+  "lesson": "gastrointestinal-system-gross-10",
+  "title": "Portal\u2013systemic (portocaval) anastomoses",
+  "spots": [
+   {
+    "label": "Azygos vein (caval)",
+    "ocr": [
+     0,
+     1
+    ]
+   },
+   {
+    "label": "Oesophageal vein (caval)",
+    "ocr": [
+     2,
+     3
+    ]
+   },
+   {
+    "label": "Oesophageal varices",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Oesophageal vein (portal)",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Left gastric vein",
+    "ocr": [
+     6,
+     8
+    ]
+   },
+   {
+    "label": "Hepatic portal vein",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Splenic vein",
+    "ocr": [
+     9,
+     11
+    ]
+   },
+   {
+    "label": "Paraumbilical vein (portal)",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Superior mesenteric vein",
+    "ocr": [
+     12,
+     13
+    ]
+   },
+   {
+    "label": "Inferior mesenteric vein",
+    "ocr": [
+     14,
+     17
+    ]
+   },
+   {
+    "label": "Caput medusae",
+    "ocr": [
+     15,
+     16
+    ]
+   },
+   {
+    "label": "Superior rectal vein (portal)",
+    "ocr": [
+     18,
+     20,
+     22
+    ]
+   },
+   {
+    "label": "Superficial abdominal veins (caval)",
+    "ocr": [
+     19,
+     21
+    ]
+   },
+   {
+    "label": "Inferior rectal vein (caval)",
+    "ocr": [
+     23,
+     24
+    ]
+   },
+   {
+    "label": "Internal haemorrhoids",
+    "ocr": [
+     25
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.04
+    ]
+   }
+  ],
+  "quiz": [
+   "oesophageal-varices",
+   "caput-medusae",
+   "paraumbilical-vein-portal",
+   "internal-haemorrhoids",
+   "left-gastric-vein"
+  ]
+ }
+]

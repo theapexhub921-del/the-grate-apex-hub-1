@@ -11,6 +11,7 @@ import { describe, it } from 'node:test';
 const { allFigures, getFigure, getSpot } = await import('@/data/figures');
 const { builtTopics } = await import('@/data/topics');
 const { isApexEligible } = await import('@/data/questions');
+const { chunkFigures } = await import('@/data/lesson-types');
 
 const inside = (n) => n >= 0 && n <= 1;
 
@@ -37,14 +38,21 @@ describe('lecture figures', () => {
   });
 
   it('are referenced correctly by lessons and questions', () => {
-    let sections = 0;
+    const shown = new Set();
     let questions = 0;
-    for (const { topic, questions: bank } of builtTopics) {
+    for (const { topic, questions: bank, problems } of builtTopics) {
+      for (const problem of problems) assert.ok(!problem.startsWith('Picture '), problem);
       for (const lesson of topic.lessons) {
         for (const chunk of lesson.chunks) {
-          if (!chunk.figure) continue;
-          sections++;
-          assert.ok(getFigure(chunk.figure), `${lesson.id} "${chunk.title}": unknown figure ${chunk.figure}`);
+          for (const id of chunkFigures(chunk)) {
+            shown.add(id);
+            assert.ok(getFigure(id), `${lesson.id} "${chunk.title}": unknown figure ${id}`);
+          }
+        }
+        for (const step of lesson.interactive ?? []) {
+          for (const id of step.type === 'learn' ? step.figures ?? [] : []) {
+            assert.ok(getFigure(id), `${lesson.id} "${step.title}": unknown figure ${id}`);
+          }
         }
       }
       for (const question of bank) {
@@ -56,7 +64,7 @@ describe('lecture figures', () => {
         assert.equal(isApexEligible(question), false, `${question.id}: diagram questions are not for Apex`);
       }
     }
-    assert.ok(sections >= allFigures.length, 'every figure is shown in a lesson');
+    for (const figure of allFigures) assert.ok(shown.has(figure.id), `${figure.id} is not shown in any lesson`);
     assert.ok(questions > 0, 'some questions use figures');
   });
 });

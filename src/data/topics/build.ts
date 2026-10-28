@@ -12,6 +12,7 @@
 //   usage 'learn' — retrieval checkpoints from the interactive layer;
 //                   Review can reuse them, quizzes only as a top-up
 import { sourceFiles } from '@/data/content-catalog';
+import { textbookRefsFor } from '@/data/textbook-refs';
 import type {
   ConceptCoverage,
   DifficultyLevel,
@@ -77,7 +78,44 @@ export type TopicDraft<K extends string> = Omit<Topic, 'lessons'> & {
   // The topic's quiz bank. Each question belongs to the lesson of its
   // concept.
   questions: QuestionDraft<K>[];
+  // Lecture pictures added to lessons (data/figures/pictures/<topic>.ts).
+  pictures?: PicturePlacement[];
 };
+
+// One lecture picture placed in a lesson: shown in reading section
+// `chunk` (index into lesson.chunks) and, when `step` is set, on that
+// interactive step (index into lesson.interactive; must be a 'learn'
+// step). Each spot in `quiz` becomes a "what is the marked part?"
+// question for `conceptId` (wrong answers: the picture's other labels).
+export type PicturePlacement = {
+  figure: LessonFigure;
+  lessonId: string;
+  chunk: number;
+  step?: number;
+  conceptId: string;
+  quiz?: string[];
+};
+
+// "What is the marked part?" questions for a placed picture.
+function pictureQuestions<K extends string>(placement: PicturePlacement): QuestionDraft<K>[] {
+  const { figure } = placement;
+  const name = figure.id.split(':').pop();
+  return (placement.quiz ?? []).map((spotId) => {
+    const target = figure.spots.find((spot) => spot.id === spotId);
+    const seen = new Set([target?.label.toLowerCase()]);
+    const others = figure.spots.filter((spot) => {
+      const key = spot.label.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    // Neighbours in the picture's own list first: they are usually nearby
+    // parts, which makes for fairer distractors.
+    const at = figure.spots.findIndex((spot) => spot.id === spotId);
+    others.sort((a, b) => Math.abs(figure.spots.indexOf(a) - at) - Math.abs(figure.spots.indexOf(b) - at));
+    return spotQuestion(`pic-${name}-${spotId}`, placement.conceptId as K, figure, spotId, others.slice(0, 3).map((spot) => spot.id));
+  });
+}
 
 export type BuiltTopic = {
   topic: Topic;
@@ -355,8 +393,10 @@ export function assertionReason<K extends string>(
 }
 
 export function buildTopic<K extends string>(draft: TopicDraft<K>): BuiltTopic {
-  const { concepts, questions: questionDrafts, lessons, ...topicFields } = draft;
+  const { concepts, questions: authoredQuestions, lessons: authoredLessons, pictures = [], ...topicFields } = draft;
   const problems: string[] = [];
+  const lessons = withPictures(authoredLessons, pictures, problems);
+  const questionDrafts = [...authoredQuestions, ...pictures.flatMap((placement) => pictureQuestions<K>(placement))];
 
   const conceptOf = (id: K) => {
     const concept = concepts[id];
@@ -409,10 +449,13 @@ export function buildTopic<K extends string>(draft: TopicDraft<K>): BuiltTopic {
         const { lessonId: _lessonId, ...concept } = concepts[id];
         return { ...concept, id, sourceRefs: withExports(concept.sourceRefs) };
       }),
-    chunks: lesson.chunks.map((chunk) => ({
-      ...chunk,
-      sourceRefs: chunk.sourceRefs && withExports(chunk.sourceRefs),
-    })),
+    chunks: lesson.chunks.map((chunk, index) => {
+      // Textbook pages for this section (data/textbook-refs/), after the
+      // section's own references.
+      const textbook = textbookRefsFor(draft.id, lesson.id, index);
+      const refs = textbook.length ? [...(chunk.sourceRefs ?? []), ...textbook] : chunk.sourceRefs;
+      return { ...chunk, sourceRefs: refs && withExports(refs) };
+    }),
     interactive: lesson.interactive?.map((step): InteractiveStep => {
       if (step.type === 'ask') {
         return { type: 'ask', question: toQuestion(step.question, lesson.id, 'learn'), reveal: step.reveal };
@@ -482,6 +525,34 @@ export function buildTopic<K extends string>(draft: TopicDraft<K>): BuiltTopic {
     recalls,
     problems,
   };
+}
+
+// Adds placed pictures to their reading sections and learn steps.
+function withPictures<K extends string>(lessons: LessonDraft<K>[], pictures: PicturePlacement[], problems: string[]): LessonDraft<K>[] {
+  if (pictures.length === 0) return lessons;
+  return lessons.map((lesson) => {
+    const mine = pictures.filter((placement) => placement.lessonId === lesson.id);
+    if (mine.length === 0) return lesson;
+    const add = (list: string[] | undefined, id: string) => (list?.includes(id) ? list : [...(list ?? []), id]);
+    const chunks = lesson.chunks.map((chunk, index) => {
+      let figures = chunk.figures;
+      for (const placement of mine) if (placement.chunk === index) figures = add(figures, placement.figure.id);
+      return figures === chunk.figures ? chunk : { ...chunk, figures };
+    });
+    const interactive = lesson.interactive?.map((step, index) => {
+      if (step.type !== 'learn') return step;
+      let figures = step.figures;
+      for (const placement of mine) if (placement.step === index) figures = add(figures, placement.figure.id);
+      return figures === step.figures ? step : { ...step, figures };
+    });
+    for (const placement of mine) {
+      if (!lesson.chunks[placement.chunk]) problems.push(`Picture ${placement.figure.id}: lesson "${lesson.id}" has no section ${placement.chunk}`);
+      if (placement.step !== undefined && lesson.interactive?.[placement.step]?.type !== 'learn') {
+        problems.push(`Picture ${placement.figure.id}: step ${placement.step} of "${lesson.id}" is not a learn step`);
+      }
+    }
+    return { ...lesson, chunks, interactive };
+  });
 }
 
 // Structural checks for one question (answer indexes in range, etc.).

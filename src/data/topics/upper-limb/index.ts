@@ -5,6 +5,7 @@
 //   questions.ts        — the topic question bank (quiz layer)
 //   assertion-reason.ts — 5 Assertion–Reason questions per lesson
 import { contentTopics } from '@/data/content-catalog';
+import { pictures } from '@/data/figures/pictures/upper-limb';
 import { buildTopic } from '@/data/topics/build';
 import { assertionReasonQuestions } from '@/data/topics/upper-limb/assertion-reason';
 import { lessons } from '@/data/topics/upper-limb/lessons';
@@ -26,6 +27,7 @@ export const upperLimb = buildTopic({
   concepts,
   lessons,
   questions: [...questions, ...assertionReasonQuestions],
+  pictures,
   discrepancies,
   diagrams,
 });

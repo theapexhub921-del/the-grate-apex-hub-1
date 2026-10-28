@@ -7,7 +7,8 @@
 // completions and the spaced-review memory keep working across both views.
 // Pure (no React Native, no Firebase), for tests.
 import { getLessonQuizBank, getSubjectTopics } from '@/data/curriculum';
-import type { Lesson, LessonChunk, LessonChunkKind, SubjectId, Topic } from '@/data/lesson-types';
+import { describeTextbookRefs } from '@/data/source-labels';
+import { chunkFigures, type Lesson, type LessonChunk, type LessonChunkKind, type SubjectId, type Topic } from '@/data/lesson-types';
 import type { Question } from '@/data/questions';
 import { trueFalseStatement } from '@/data/true-false';
 
@@ -70,7 +71,7 @@ function sectionOf(chunk: LessonChunk, index: number, lesson: Lesson): LocalSect
     blocks.push({ k: 'box', title: 'What you’ll learn', tone: 'recall', blocks: [{ k: 'ul', items: lesson.objectives.map(escape) }] });
   }
   for (const paragraph of chunk.paragraphs ?? []) blocks.push({ k: 'p', x: richWithTerms(paragraph, terms, used) });
-  if (chunk.figure) blocks.push({ k: 'lfig', id: chunk.figure });
+  for (const id of chunkFigures(chunk)) blocks.push({ k: 'lfig', id });
   chunk.steps?.forEach((step, n) => {
     blocks.push({ k: 'step', n: String(n + 1), title: richWithTerms(step.label, terms, used), blocks: step.detail ? [{ k: 'p', x: richWithTerms(step.detail, terms, used) }] : undefined });
   });
@@ -79,6 +80,9 @@ function sectionOf(chunk: LessonChunk, index: number, lesson: Lesson): LocalSect
   for (const term of terms) if (!used.has(term.term.toLowerCase())) blocks.push({ k: 'term', name: escape(term.term), def: escape(term.meaning) });
   if (chunk.keyPoints?.length) blocks.push({ k: 'box', title: 'Key points', tone: 'gold', blocks: [{ k: 'ul', items: chunk.keyPoints.map((point) => richWithTerms(point, terms, used)) }] });
   for (const note of chunk.notes ?? []) blocks.push({ k: 'box', title: NOTE_LABEL[note.kind] ?? 'Note', tone: note.kind === 'check' ? 'red' : undefined, blocks: [{ k: 'p', x: escape(note.text) }] });
+  // Where to read more: the reference-textbook pages for this section.
+  const textbook = chunk.sourceRefs ? describeTextbookRefs(chunk.sourceRefs) : '';
+  if (textbook) blocks.push({ k: 'box', title: 'Read more in the textbook', blocks: [{ k: 'p', x: escape(textbook) }] });
   const kicker = [chunk.kind ? KIND_LABEL[chunk.kind] : null, chunk.origin === 'textbook' ? 'From the textbook' : null].filter(Boolean).join(' · ');
   return { id: `s${index + 1}`, title: escape(chunk.title), kicker: kicker || undefined, blocks };
 }

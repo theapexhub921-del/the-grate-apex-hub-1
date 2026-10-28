@@ -4,6 +4,7 @@ import { Text, TextInput } from '@/components/ui/text';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
 
 import { type AiLesson, ExplainSimplyButton } from '@/components/learning/ai-study';
+import { FigureExplorer } from '@/components/learning/figure-view';
 import { SimulationStepView } from '@/components/learning/simulations/simulation-step';
 import { PathwaySteps } from '@/components/pathway-steps';
 import { QuestionCard } from '@/components/question-card';
@@ -509,6 +510,7 @@ function LearnCard({ step, styles }: { step: Extract<InteractiveStep, { type: 'l
         </Text>
       ))}
       {step.steps ? <PathwaySteps steps={step.steps} /> : null}
+      {step.figures?.map((id) => <FigureExplorer key={id} figureId={id} />)}
       {step.terms ? (
         <View style={styles.terms}>
           {step.terms.map((term) => (

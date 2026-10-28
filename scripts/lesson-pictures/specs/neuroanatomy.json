@@ -1,0 +1,1162 @@
+[
+ {
+  "name": "cerebral-lobes",
+  "deck": "cns",
+  "slide": 14,
+  "lesson": "neuroanatomy-1",
+  "title": "Lobes, poles and main sulci of the cerebral hemisphere",
+  "spots": [
+   {
+    "label": "Central sulcus",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Parieto-occipital sulcus",
+    "ocr": [
+     1,
+     2
+    ]
+   },
+   {
+    "label": "Occipital pole",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Frontal pole",
+    "ocr": [
+     4,
+     6
+    ]
+   },
+   {
+    "label": "Lateral fissure",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Preoccipital notch",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Temporal pole",
+    "ocr": [
+     9,
+     10
+    ]
+   }
+  ],
+  "quiz": [
+   "central-sulcus",
+   "lateral-fissure",
+   "parieto-occipital-sulcus",
+   "preoccipital-notch"
+  ]
+ },
+ {
+  "name": "lateral-surface-gyri",
+  "deck": "cns",
+  "slide": 13,
+  "lesson": "neuroanatomy-1",
+  "title": "Gyri and sulci of the lateral surface",
+  "spots": [
+   {
+    "label": "Central sulcus (of Rolando)",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Postcentral gyrus",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Precentral gyrus",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Postcentral sulcus",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Precentral sulcus",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Superior parietal lobule",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Superior frontal gyrus",
+    "ocr": [
+     6,
+     7
+    ]
+   },
+   {
+    "label": "Intraparietal sulcus",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Superior frontal sulcus",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Middle frontal gyrus",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Angular gyrus",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Inferior frontal sulcus",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Parieto-occipital sulcus",
+    "ocr": [
+     15,
+     16
+    ]
+   },
+   {
+    "label": "Frontal pole",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Occipital pole",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Calcarine sulcus",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Lateral sulcus (of Sylvius)",
+    "ocr": [
+     24
+    ]
+   },
+   {
+    "label": "Temporal pole",
+    "ocr": [
+     30
+    ]
+   },
+   {
+    "label": "Inferior temporal gyrus",
+    "ocr": [
+     31
+    ]
+   },
+   {
+    "label": "Middle temporal gyrus",
+    "ocr": [
+     32
+    ]
+   },
+   {
+    "label": "Inferior temporal sulcus",
+    "ocr": [
+     33
+    ]
+   }
+  ],
+  "quiz": [
+   "precentral-gyrus",
+   "postcentral-gyrus",
+   "angular-gyrus",
+   "superior-parietal-lobule",
+   "middle-frontal-gyrus",
+   "intraparietal-sulcus"
+  ]
+ },
+ {
+  "name": "medial-surface-gyri",
+  "deck": "cns",
+  "slide": 16,
+  "lesson": "neuroanatomy-2",
+  "title": "Gyri of the medial surface",
+  "spots": [
+   {
+    "label": "Paracentral lobule",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Precuneus",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Cingulate gyrus",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Cuneus",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Superior frontal gyrus",
+    "ocr": [
+     4,
+     5
+    ]
+   },
+   {
+    "label": "Lingual gyrus",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Subcallosal area",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Subcallosal gyrus",
+    "ocr": [
+     8
+    ]
+   }
+  ],
+  "quiz": [
+   "paracentral-lobule",
+   "cingulate-gyrus",
+   "cuneus",
+   "precuneus",
+   "lingual-gyrus"
+  ]
+ },
+ {
+  "name": "brain-sagittal",
+  "deck": "cns",
+  "slide": 35,
+  "lesson": "neuroanatomy-3",
+  "title": "Sagittal section of the brain: diencephalon and midline structures",
+  "spots": [
+   {
+    "label": "Fornix",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Interthalamic adhesion",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Thalamus and 3rd ventricle",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Habenular commissure",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Anterior commissure",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Subcallosal gyrus",
+    "ocr": [
+     26
+    ]
+   },
+   {
+    "label": "Hypothalamic sulcus",
+    "ocr": [
+     29
+    ]
+   },
+   {
+    "label": "Lamina terminalis",
+    "ocr": [
+     31
+    ]
+   },
+   {
+    "label": "Great cerebral vein (of Galen)",
+    "ocr": [
+     32
+    ]
+   },
+   {
+    "label": "Hypophysis (pituitary gland)",
+    "ocr": [
+     38
+    ]
+   },
+   {
+    "label": "Pons",
+    "ocr": [
+     43
+    ]
+   },
+   {
+    "label": "Cerebral aqueduct (of Sylvius)",
+    "ocr": [
+     44
+    ]
+   }
+  ],
+  "quiz": [
+   "interthalamic-adhesion",
+   "hypothalamic-sulcus",
+   "lamina-terminalis",
+   "anterior-commissure",
+   "fornix"
+  ]
+ },
+ {
+  "name": "hypothalamic-nuclei",
+  "deck": "cns",
+  "slide": 51,
+  "lesson": "neuroanatomy-4",
+  "title": "Nuclei of the hypothalamus",
+  "spots": [
+   {
+    "label": "Third ventricle",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Anterior commissure",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Pineal body",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Hypothalamus",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Mamillary body",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Pituitary",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Dorsal hypothalamus",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Paraventricular nucleus of hypothalamus",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Anterior commissure",
+    "ocr": [
+     8
+    ],
+    "id": "anterior-commissure-lower"
+   },
+   {
+    "label": "Dorsomedial hypothalamus",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Lateral hypothalamus (behind plane of view)",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Posterior hypothalamus",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Anterior hypothalamus",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Preoptic area",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Suprachiasmatic nucleus",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Mammillary body",
+    "ocr": [
+     15
+    ],
+    "grow": [
+     0.04,
+     0,
+     0,
+     0
+    ],
+    "id": "mammillary-body-lower"
+   },
+   {
+    "label": "Ventromedial hypothalamus",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Optic chiasm",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Anterior pituitary",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Posterior pituitary",
+    "ocr": [
+     20
+    ]
+   }
+  ],
+  "quiz": [
+   "paraventricular-nucleus-of-hypothalamus",
+   "suprachiasmatic-nucleus",
+   "ventromedial-hypothalamus",
+   "preoptic-area",
+   "posterior-pituitary"
+  ]
+ },
+ {
+  "name": "basal-nuclei-coronal",
+  "deck": "cns",
+  "slide": 63,
+  "lesson": "neuroanatomy-5",
+  "title": "Coronal section: basal nuclei, thalamus and hypothalamic nuclei",
+  "spots": [
+   {
+    "label": "Corpus callosum",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Lateral ventricle",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Caudate nucleus",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Thalamus",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Third ventricle",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Paraventricular nucleus",
+    "ocr": [
+     5,
+     6
+    ]
+   },
+   {
+    "label": "Interthalamic connection",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Dorsomedial nucleus",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Putamen",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Fornix",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Globus pallidus",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Optic tract",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Lateral nucleus",
+    "ocr": [
+     13
+    ],
+    "grow": [
+     0,
+     0,
+     0.07,
+     0
+    ]
+   },
+   {
+    "label": "Ventromedial nucleus",
+    "ocr": [
+     15,
+     16
+    ]
+   },
+   {
+    "label": "Infundibular nucleus",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Tuberomammillary nucleus",
+    "ocr": [
+     18
+    ]
+   }
+  ],
+  "quiz": [
+   "caudate-nucleus",
+   "putamen",
+   "globus-pallidus",
+   "thalamus",
+   "optic-tract"
+  ]
+ },
+ {
+  "name": "meninges-layers",
+  "deck": "meninges",
+  "slide": 12,
+  "lesson": "neuroanatomy-6",
+  "title": "Layers from scalp to brain",
+  "spots": [
+   {
+    "label": "Arachnoid granulation",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Venous lacuna",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Skin",
+    "box": [
+     0.599,
+     0.176,
+     0.215,
+     0.076
+    ]
+   },
+   {
+    "label": "Galea aponeurotica",
+    "box": [
+     0.599,
+     0.252,
+     0.215,
+     0.076
+    ]
+   },
+   {
+    "label": "Epicranium",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Calvaria",
+    "box": [
+     0.596,
+     0.425,
+     0.386,
+     0.07
+    ]
+   },
+   {
+    "label": "Dura mater (outer and inner layers)",
+    "box": [
+     0.596,
+     0.495,
+     0.386,
+     0.07
+    ]
+   },
+   {
+    "label": "Subdural space (potential)",
+    "ocr": [
+     9,
+     10
+    ]
+   },
+   {
+    "label": "Arachnoid",
+    "box": [
+     0.599,
+     0.633,
+     0.22,
+     0.07
+    ]
+   },
+   {
+    "label": "Subarachnoid space",
+    "box": [
+     0.599,
+     0.703,
+     0.22,
+     0.07
+    ]
+   },
+   {
+    "label": "Pia mater",
+    "box": [
+     0.599,
+     0.774,
+     0.226,
+     0.075
+    ]
+   },
+   {
+    "label": "Cerebral hemisphere",
+    "box": [
+     0.599,
+     0.849,
+     0.226,
+     0.075
+    ]
+   }
+  ],
+  "quiz": [
+   "subdural-space-potential",
+   "subarachnoid-space",
+   "arachnoid-granulation",
+   "venous-lacuna",
+   "pia-mater"
+  ]
+ },
+ {
+  "name": "dura-coronal",
+  "deck": "meninges",
+  "slide": 13,
+  "lesson": "neuroanatomy-6",
+  "title": "Meninges and dural folds (coronal section)",
+  "spots": [
+   {
+    "label": "Superior sagittal sinus",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Epidural space (potential)",
+    "ocr": [
+     1,
+     2
+    ]
+   },
+   {
+    "label": "Arachnoid granulation",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Arachnoid granulation indenting skull (foveola)",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Arachnoid",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Dura mater (outer layer)",
+    "ocr": [
+     8,
+     9
+    ]
+   },
+   {
+    "label": "Venous lacuna",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Dura mater (inner layer)",
+    "ocr": [
+     11
+    ],
+    "grow": [
+     0,
+     0,
+     0.03,
+     0
+    ]
+   },
+   {
+    "label": "Subarachnoid space",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Inner layer of dura mater",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Falx cerebri",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Pia mater",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Inferior sagittal sinus",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Middle meningeal artery and vein",
+    "ocr": [
+     21,
+     22
+    ]
+   }
+  ],
+  "quiz": [
+   "falx-cerebri",
+   "superior-sagittal-sinus",
+   "inferior-sagittal-sinus",
+   "middle-meningeal-artery-and-vein",
+   "epidural-space-potential"
+  ]
+ },
+ {
+  "name": "venous-sinuses",
+  "deck": "meninges",
+  "slide": 50,
+  "lesson": "neuroanatomy-7",
+  "title": "Dural venous sinuses and cerebral veins (from below)",
+  "spots": [
+   {
+    "label": "Anterior intercavernous sinus",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Ophthalmic vein",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Anterior cerebral vein",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Sphenoparietal sinus",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Sphenoparietal sinus",
+    "ocr": [
+     4
+    ],
+    "id": "sphenoparietal-sinus-left"
+   },
+   {
+    "label": "Superficial middle cerebral vein",
+    "box": [
+     0.0,
+     0.245,
+     0.24,
+     0.06
+    ]
+   },
+   {
+    "label": "Superficial middle cerebral vein",
+    "box": [
+     0.82,
+     0.27,
+     0.18,
+     0.06
+    ],
+    "id": "superficial-middle-cerebral-vein-right"
+   },
+   {
+    "label": "Cavernous sinus",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Deep middle cerebral vein",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Superior petrosal sinus",
+    "box": [
+     0.0,
+     0.41,
+     0.27,
+     0.065
+    ]
+   },
+   {
+    "label": "Inferior petrosal sinus",
+    "box": [
+     0.0,
+     0.48,
+     0.17,
+     0.075
+    ]
+   },
+   {
+    "label": "Basal vein (of Rosenthal)",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Posterior intercavernous sinus",
+    "ocr": [
+     14,
+     17
+    ]
+   },
+   {
+    "label": "Sigmoid sinus",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Straight sinus",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Transverse sinus",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Confluence of sinuses",
+    "box": [
+     0.75,
+     0.925,
+     0.24,
+     0.045
+    ]
+   },
+   {
+    "label": "Cerebellar veins",
+    "ocr": [
+     21
+    ]
+   }
+  ],
+  "quiz": [
+   "cavernous-sinus",
+   "sigmoid-sinus",
+   "straight-sinus",
+   "confluence-of-sinuses",
+   "superior-petrosal-sinus",
+   "basal-vein-of-rosenthal"
+  ]
+ },
+ {
+  "name": "csf-cisterns",
+  "deck": "meninges",
+  "slide": 63,
+  "lesson": "neuroanatomy-8",
+  "title": "Subarachnoid space, cisterns and CSF pathway",
+  "spots": [
+   {
+    "label": "Bridging veins",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Choroid plexus of lateral ventricle",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Supracallosal cistern",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Dura mater",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Arachnoid granulations",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Arachnoid",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Chiasmatic cistern",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Choroid plexus of 3rd ventricle",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Interpeduncular cistern",
+    "box": [
+     0.176,
+     0.606,
+     0.165,
+     0.027
+    ]
+   },
+   {
+    "label": "Prepontine cistern",
+    "box": [
+     0.226,
+     0.673,
+     0.14,
+     0.025
+    ]
+   },
+   {
+    "label": "Choroid plexus of 4th ventricle",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Cistern of great cerebral vein",
+    "ocr": [
+     16,
+     17
+    ]
+   },
+   {
+    "label": "Cerebellomedullary cistern (cisterna magna)",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Subarachnoid space",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Median aperture (foramen of Magendie)",
+    "ocr": [
+     23,
+     24
+    ]
+   },
+   {
+    "label": "Cerebral aqueduct (of Sylvius)",
+    "box": [
+     0.135,
+     0.638,
+     0.207,
+     0.024
+    ]
+   },
+   {
+    "label": "Lateral aperture (foramen of Luschka)",
+    "box": [
+     0.112,
+     0.704,
+     0.258,
+     0.024
+    ]
+   },
+   {
+    "label": "Subarachnoid space",
+    "box": [
+     0.647,
+     0.075,
+     0.145,
+     0.024
+    ],
+    "id": "subarachnoid-space-cranial"
+   },
+   {
+    "label": "Superior sagittal sinus",
+    "box": [
+     0.578,
+     0.05,
+     0.148,
+     0.024
+    ]
+   },
+   {
+    "label": "Dura mater",
+    "box": [
+     0.309,
+     0.77,
+     0.082,
+     0.024
+    ],
+    "id": "dura-mater-spinal"
+   },
+   {
+    "label": "Arachnoid",
+    "box": [
+     0.325,
+     0.803,
+     0.074,
+     0.024
+    ],
+    "id": "arachnoid-spinal"
+   }
+  ],
+  "quiz": [
+   "cerebellomedullary-cistern-cisterna-magna",
+   "median-aperture-foramen-of-magendie",
+   "bridging-veins",
+   "interpeduncular-cistern",
+   "chiasmatic-cistern",
+   "lateral-aperture-foramen-of-luschka",
+   "cerebral-aqueduct-of-sylvius"
+  ]
+ }
+]

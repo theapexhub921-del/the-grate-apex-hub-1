@@ -1,0 +1,1159 @@
+[
+ {
+  "name": "nose-cartilages",
+  "deck": "resp",
+  "slide": 21,
+  "lesson": "respiratory-system-gross-1",
+  "title": "Bones and cartilages of the external nose",
+  "spots": [
+   {
+    "label": "Nasion",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Rhinion",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Frontal process of maxilla",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Nasal bones",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Septal cartilage",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Upper lateral cartilage",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Accessory alar (sesamoid) cartilage",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Nasal dome",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Lesser alar cartilage",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Lower lateral cartilage",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Alar fibrofatty tissue",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Medial crus",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Lateral crus",
+    "ocr": [
+     12
+    ],
+    "grow": [
+     0.01,
+     0,
+     0,
+     0
+    ]
+   }
+  ],
+  "quiz": [
+   "upper-lateral-cartilage",
+   "lower-lateral-cartilage",
+   "nasal-bones",
+   "medial-crus"
+  ]
+ },
+ {
+  "name": "lateral-nasal-wall",
+  "deck": "resp",
+  "slide": 26,
+  "lesson": "respiratory-system-gross-1",
+  "title": "Lateral wall of the nasal cavity and nasopharynx",
+  "spots": [
+   {
+    "label": "Frontal sinus",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Superior nasal concha",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Superior nasal meatus",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Hypophysis (pituitary gland) in sella turcica",
+    "ocr": [
+     4
+    ],
+    "grow": [
+     0,
+     0.03,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Middle nasal concha",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Agger nasi",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Sphenoidal sinus",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Pharyngeal tonsil (adenoid if enlarged)",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Basilar part of occipital bone",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Limen nasi",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Pharyngeal raphe",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Choana",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Torus tubarius",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Opening of pharyngotympanic (auditory) tube",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Nasal vestibule",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Inferior nasal concha (turbinate)",
+    "ocr": [
+     20,
+     22
+    ]
+   },
+   {
+    "label": "Pharyngeal recess",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Inferior nasal meatus",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Incisive canal",
+    "ocr": [
+     24
+    ]
+   },
+   {
+    "label": "Soft palate",
+    "ocr": [
+     26
+    ]
+   },
+   {
+    "label": "Tongue",
+    "ocr": [
+     27
+    ]
+   }
+  ],
+  "quiz": [
+   "middle-nasal-concha",
+   "torus-tubarius",
+   "opening-of-pharyngotympanic-auditory-tube",
+   "pharyngeal-recess",
+   "choana",
+   "agger-nasi"
+  ]
+ },
+ {
+  "name": "pharyngeal-constrictors",
+  "deck": "resp",
+  "slide": 33,
+  "lesson": "respiratory-system-gross-1",
+  "title": "Constrictor muscles of the pharynx",
+  "crop": [
+   0,
+   0,
+   1,
+   0.93
+  ],
+  "spots": [
+   {
+    "label": "Pharyngeal tubercle",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Pharyngeal fascia",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Styloid process",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Superior constrictor",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Stylohyoid ligament",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Middle constrictor",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Stylopharyngeus muscle",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Inferior constrictor",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Oesophagus",
+    "ocr": [
+     12
+    ]
+   }
+  ],
+  "quiz": [
+   "superior-constrictor",
+   "middle-constrictor",
+   "inferior-constrictor",
+   "stylopharyngeus-muscle"
+  ]
+ },
+ {
+  "name": "larynx-from-above",
+  "deck": "resp",
+  "slide": 60,
+  "lesson": "respiratory-system-gross-2",
+  "title": "The larynx viewed from above",
+  "spots": [
+   {
+    "label": "Cricoid cartilage",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Cricothyroid muscles",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Aryepiglottic muscles",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Arytenoid muscle",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Corniculate tubercle",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "True vocal cords",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Cuneiform tubercle",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Trachea",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "False vocal cords",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Thyroid cartilage",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Aryepiglottic fold",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Thyrohyoid membrane",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Hyoid bone",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Epiglottis",
+    "ocr": [
+     15
+    ],
+    "pin": "t"
+   }
+  ],
+  "quiz": [
+   "true-vocal-cords",
+   "false-vocal-cords",
+   "aryepiglottic-fold",
+   "cuneiform-tubercle",
+   "corniculate-tubercle"
+  ],
+  "chunk": 3,
+  "step": 3,
+  "concept": "laryngeal-aditus"
+ },
+ {
+  "name": "laryngeal-membranes",
+  "deck": "resp",
+  "slide": 70,
+  "lesson": "respiratory-system-gross-2",
+  "title": "Membranes and ligaments of the larynx",
+  "spots": [
+   {
+    "label": "Median thyrohyoid ligament",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Lateral thyrohyoid ligament",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Internal laryngeal nerve",
+    "ocr": [
+     2,
+     3
+    ]
+   },
+   {
+    "label": "Thyrohyoid membrane",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Superior laryngeal artery",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Median cricothyroid ligament",
+    "ocr": [
+     6,
+     7
+    ]
+   },
+   {
+    "label": "Cricotracheal ligament",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Cricothyroid ligament",
+    "ocr": [
+     9
+    ]
+   }
+  ],
+  "quiz": [
+   "thyrohyoid-membrane",
+   "median-cricothyroid-ligament",
+   "cricotracheal-ligament"
+  ]
+ },
+ {
+  "name": "bronchial-arteries",
+  "deck": "resp",
+  "slide": 107,
+  "lesson": "respiratory-system-gross-3",
+  "title": "Arterial supply of the trachea and bronchi",
+  "spots": [
+   {
+    "label": "Thyroid gland",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Inferior thyroid artery",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Thyrocervical trunk",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Subclavian artery",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Upper left bronchial artery",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Lower left bronchial artery",
+    "ocr": [
+     5,
+     6
+    ]
+   },
+   {
+    "label": "Right bronchial artery",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Descending thoracic aorta",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "3rd right posterior intercostal artery",
+    "ocr": [
+     9
+    ]
+   }
+  ],
+  "quiz": [
+   "inferior-thyroid-artery",
+   "right-bronchial-artery",
+   "upper-left-bronchial-artery"
+  ]
+ },
+ {
+  "name": "thoracic-wall-veins",
+  "deck": "resp",
+  "slide": 193,
+  "lesson": "respiratory-system-gross-4",
+  "title": "Veins of the thoracic wall",
+  "spots": [
+   {
+    "label": "Right brachiocephalic vein",
+    "ocr": [
+     0,
+     1
+    ]
+   },
+   {
+    "label": "Left brachiocephalic vein",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Right subclavian vein",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Right superior intercostal vein",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Superior vena cava (SVC)",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Azygos vein",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Left superior intercostal vein",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Posterior intercostal veins",
+    "ocr": [
+     10,
+     11
+    ]
+   },
+   {
+    "label": "Internal thoracic vein",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Diaphragm",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Anterior intercostal veins",
+    "ocr": [
+     15,
+     17
+    ]
+   },
+   {
+    "label": "Accessory hemi-azygos vein",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Musculophrenic vein",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Superior epigastric veins",
+    "ocr": [
+     19,
+     21
+    ]
+   },
+   {
+    "label": "Hemi-azygos vein",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Subcostal vein",
+    "ocr": [
+     24
+    ]
+   },
+   {
+    "label": "Inferior vena cava (IVC)",
+    "ocr": [
+     25,
+     26,
+     27
+    ]
+   }
+  ],
+  "quiz": [
+   "azygos-vein",
+   "hemi-azygos-vein",
+   "accessory-hemi-azygos-vein",
+   "internal-thoracic-vein",
+   "left-superior-intercostal-vein"
+  ]
+ },
+ {
+  "name": "diaphragm-inferior",
+  "deck": "resp",
+  "slide": 179,
+  "lesson": "respiratory-system-gross-5",
+  "title": "The diaphragm from below",
+  "spots": [
+   {
+    "label": "Inferior vena cava",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Sternal portion of diaphragm",
+    "ocr": [
+     1,
+     2
+    ],
+    "grow": [
+     0.012,
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "label": "Costal portion of diaphragm",
+    "ocr": [
+     3,
+     4
+    ]
+   },
+   {
+    "label": "Oesophagus",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Central tendon",
+    "ocr": [
+     6
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.035
+    ]
+   },
+   {
+    "label": "Left crus",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Median arcuate ligament",
+    "ocr": [
+     8
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.03
+    ]
+   },
+   {
+    "label": "Medial arcuate ligament",
+    "ocr": [
+     9
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.03
+    ]
+   },
+   {
+    "label": "Lateral arcuate ligament",
+    "ocr": [
+     10,
+     11
+    ]
+   },
+   {
+    "label": "Lumbar vertebrae",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Right crus",
+    "ocr": [
+     15
+    ]
+   }
+  ],
+  "quiz": [
+   "central-tendon",
+   "median-arcuate-ligament",
+   "medial-arcuate-ligament",
+   "lateral-arcuate-ligament",
+   "right-crus"
+  ]
+ },
+ {
+  "name": "pleura-coronal",
+  "deck": "resp",
+  "slide": 251,
+  "lesson": "respiratory-system-gross-6",
+  "title": "Parts of the pleura (coronal section)",
+  "spots": [
+   {
+    "label": "Parietal pleura",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Cervical pleura (cupola)",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Costal pleura",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Visceral pleura",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Mediastinal pleura",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Parietal pericardium",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Visceral pericardium",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Diaphragmatic pleura",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Pleural cavity",
+    "box": [
+     0.79,
+     0.78,
+     0.18,
+     0.04
+    ]
+   },
+   {
+    "label": "Costodiaphragmatic recess",
+    "box": [
+     0.79,
+     0.82,
+     0.2,
+     0.09
+    ]
+   },
+   {
+    "label": "Pericardial space",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Heart",
+    "ocr": [
+     11
+    ]
+   }
+  ],
+  "quiz": [
+   "cervical-pleura-cupola",
+   "costodiaphragmatic-recess",
+   "mediastinal-pleura",
+   "diaphragmatic-pleura"
+  ]
+ },
+ {
+  "name": "pleura-transverse",
+  "deck": "resp",
+  "slide": 249,
+  "lesson": "respiratory-system-gross-6",
+  "title": "Pleura and pericardium (transverse section)",
+  "spots": [
+   {
+    "label": "Parietal pleura",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Visceral pleura",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Costal pleura",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Pleural cavity",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Parietal pericardium",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Mediastinal pleura",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Visceral pericardium",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Costomediastinal recess",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Heart",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Pericardial space",
+    "ocr": [
+     9
+    ]
+   }
+  ],
+  "quiz": [
+   "costomediastinal-recess",
+   "pleural-cavity",
+   "costal-pleura"
+  ]
+ },
+ {
+  "name": "left-lung-medial",
+  "deck": "resp",
+  "slide": 267,
+  "lesson": "respiratory-system-gross-7",
+  "title": "Medial (mediastinal) surface of the left lung",
+  "spots": [
+   {
+    "label": "Apex",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Groove for subclavian artery",
+    "ocr": [
+     1,
+     2
+    ]
+   },
+   {
+    "label": "Groove for left brachiocephalic vein",
+    "ocr": [
+     3,
+     4
+    ]
+   },
+   {
+    "label": "Area for trachea and oesophagus",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Groove for 1st rib",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Oblique fissure",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Groove for arch of aorta",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Anterior border",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Pleura (cut edge)",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Area for thymus and fatty tissue of anterior mediastinum",
+    "ocr": [
+     13,
+     14
+    ]
+   },
+   {
+    "label": "Left pulmonary artery",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Left bronchial arteries",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Hilum",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Left main bronchus",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Cardiac impression",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Left superior pulmonary veins",
+    "ocr": [
+     22,
+     23
+    ]
+   },
+   {
+    "label": "Pulmonary ligament",
+    "ocr": [
+     24
+    ]
+   },
+   {
+    "label": "Bronchopulmonary (hilar) lymph nodes",
+    "ocr": [
+     25
+    ],
+    "grow": [
+     0,
+     0,
+     0,
+     0.02
+    ]
+   },
+   {
+    "label": "Cardiac notch",
+    "ocr": [
+     26
+    ],
+    "grow": [
+     0,
+     0,
+     0.05,
+     0
+    ]
+   },
+   {
+    "label": "Inferior lobe",
+    "ocr": [
+     27
+    ]
+   },
+   {
+    "label": "Oblique fissure",
+    "ocr": [
+     28
+    ],
+    "id": "oblique-fissure-lower"
+   },
+   {
+    "label": "Left inferior pulmonary vein",
+    "ocr": [
+     29
+    ]
+   },
+   {
+    "label": "Groove for oesophagus",
+    "ocr": [
+     30
+    ]
+   },
+   {
+    "label": "Diaphragmatic surface",
+    "ocr": [
+     31
+    ]
+   },
+   {
+    "label": "Groove for descending aorta",
+    "ocr": [
+     32
+    ]
+   },
+   {
+    "label": "Lingula",
+    "ocr": [
+     33
+    ]
+   },
+   {
+    "label": "Inferior border",
+    "ocr": [
+     34
+    ]
+   }
+  ],
+  "quiz": [
+   "groove-for-arch-of-aorta",
+   "pulmonary-ligament",
+   "cardiac-notch",
+   "lingula",
+   "groove-for-descending-aorta",
+   "hilum"
+  ]
+ }
+]

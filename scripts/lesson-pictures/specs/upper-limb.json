@@ -1,0 +1,1263 @@
+[
+ {
+  "name": "humerus",
+  "deck": "ul",
+  "slide": 11,
+  "lesson": "upper-limb-1",
+  "title": "The humerus: anterior and posterior views",
+  "crop": [
+   0,
+   0,
+   1,
+   0.94
+  ],
+  "spots": [
+   {
+    "label": "Lesser tubercle",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Greater tubercle",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Head",
+    "box": [
+     0.48,
+     0.17,
+     0.06,
+     0.03
+    ]
+   },
+   {
+    "label": "Greater tubercle (posterior view)",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Anatomical neck",
+    "box": [
+     0.49,
+     0.195,
+     0.15,
+     0.03
+    ]
+   },
+   {
+    "label": "Intertubercular sulcus",
+    "ocr": [
+     5
+    ],
+    "grow": [
+     0,
+     0,
+     0.01,
+     0
+    ]
+   },
+   {
+    "label": "Surgical neck",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Scapula",
+    "box": [
+     0.49,
+     0.305,
+     0.07,
+     0.03
+    ]
+   },
+   {
+    "label": "Deltoid tuberosity",
+    "ocr": [
+     11
+    ],
+    "grow": [
+     0,
+     0,
+     0.02,
+     0
+    ]
+   },
+   {
+    "label": "Radial fossa",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Coronoid fossa",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Olecranon fossa",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Lateral epicondyle",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Medial epicondyle",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Lateral epicondyle (posterior view)",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Capitulum",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Trochlea",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Olecranon",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Head of radius",
+    "ocr": [
+     24
+    ]
+   },
+   {
+    "label": "Coronoid process",
+    "ocr": [
+     25
+    ]
+   },
+   {
+    "label": "Ulna",
+    "ocr": [
+     26
+    ]
+   }
+  ],
+  "quiz": [
+   "surgical-neck",
+   "anatomical-neck",
+   "intertubercular-sulcus",
+   "deltoid-tuberosity",
+   "capitulum",
+   "trochlea",
+   "olecranon-fossa"
+  ]
+ },
+ {
+  "name": "radius-ulna",
+  "deck": "ul",
+  "slide": 16,
+  "lesson": "upper-limb-2",
+  "title": "Radius and ulna with the radioulnar joints",
+  "crop": [
+   0,
+   0,
+   1,
+   0.92
+  ],
+  "spots": [
+   {
+    "label": "Radial notch",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Olecranon process",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Trochlear notch",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Head of radius",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Head of radius (posterior view)",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Neck of radius",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Coronoid process",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Neck of radius (posterior view)",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Radial tuberosity",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Proximal radioulnar joint",
+    "ocr": [
+     10,
+     14
+    ]
+   },
+   {
+    "label": "Interosseous membrane",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Ulna",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Radius",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Ulnar notch",
+    "box": [
+     0.52,
+     0.635,
+     0.1,
+     0.03
+    ]
+   },
+   {
+    "label": "Head of ulna",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Styloid process of ulna",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Distal radioulnar joint",
+    "ocr": [
+     22,
+     25
+    ]
+   },
+   {
+    "label": "Styloid process of radius",
+    "ocr": [
+     24
+    ]
+   }
+  ],
+  "quiz": [
+   "proximal-radioulnar-joint",
+   "distal-radioulnar-joint",
+   "interosseous-membrane",
+   "radial-notch",
+   "trochlear-notch",
+   "radial-tuberosity"
+  ],
+  "chunk": 4,
+  "step": 5,
+  "concept": "radioulnar-wrist-joints"
+ },
+ {
+  "name": "posterior-shoulder",
+  "deck": "ul",
+  "slide": 114,
+  "lesson": "upper-limb-3",
+  "title": "Posterior shoulder: rotator cuff and intermuscular spaces",
+  "spots": [
+   {
+    "label": "Suprascapular artery",
+    "ocr": [
+     1,
+     3
+    ]
+   },
+   {
+    "label": "Suprascapular notch",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Suprascapular nerve",
+    "ocr": [
+     4,
+     6
+    ]
+   },
+   {
+    "label": "Teres minor",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Supraspinatus",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Deltoid",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Axillary nerve",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Infraspinatus",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Posterior circumflex humeral artery",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Deep brachial artery",
+    "box": [
+     0.76,
+     0.665,
+     0.24,
+     0.035
+    ]
+   },
+   {
+    "label": "Triangular space",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Circumflex scapular artery",
+    "ocr": [
+     16,
+     19
+    ]
+   },
+   {
+    "label": "Radial nerve",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Lateral head, triceps",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Teres major",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Long head, triceps",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Quadrangular space",
+    "box": [
+     0.745,
+     0.26,
+     0.255,
+     0.045
+    ]
+   },
+   {
+    "label": "Triangular interval",
+    "box": [
+     0.745,
+     0.62,
+     0.245,
+     0.045
+    ]
+   }
+  ],
+  "quiz": [
+   "suprascapular-nerve",
+   "axillary-nerve",
+   "circumflex-scapular-artery",
+   "radial-nerve",
+   "teres-minor",
+   "quadrangular-space",
+   "triangular-interval"
+  ]
+ },
+ {
+  "name": "arm-anterior-compartment",
+  "deck": "ul",
+  "slide": 123,
+  "lesson": "upper-limb-4",
+  "title": "Anterior compartment of the arm",
+  "spots": [
+   {
+    "label": "Coracobrachialis",
+    "pin": [
+     0.34,
+     0.16
+    ]
+   },
+   {
+    "label": "Biceps brachii",
+    "pin": [
+     0.2,
+     0.31
+    ]
+   },
+   {
+    "label": "Brachialis",
+    "pin": [
+     0.76,
+     0.74
+    ]
+   },
+   {
+    "label": "Brachial artery",
+    "pin": [
+     0.23,
+     0.62
+    ]
+   },
+   {
+    "label": "Musculocutaneous nerve",
+    "pin": [
+     0.79,
+     0.58
+    ]
+   }
+  ],
+  "quiz": [
+   "coracobrachialis",
+   "brachialis",
+   "musculocutaneous-nerve"
+  ]
+ },
+ {
+  "name": "arm-neurovasculature",
+  "deck": "ul",
+  "slide": 209,
+  "lesson": "upper-limb-4",
+  "title": "Arm: anterior view of nerves and vessels",
+  "spots": [
+   {
+    "label": "Coracoid process",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Axillary artery",
+    "ocr": [
+     1
+    ]
+   },
+   {
+    "label": "Deltoid muscle",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Pectoralis minor muscle (cut)",
+    "ocr": [
+     3,
+     4
+    ]
+   },
+   {
+    "label": "Lateral and medial cords of brachial plexus",
+    "ocr": [
+     6,
+     8
+    ]
+   },
+   {
+    "label": "Musculocutaneous nerve",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Pectoralis major muscle and tendon (cut)",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Subscapularis muscle",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Biceps brachii: long and short heads",
+    "ocr": [
+     14,
+     16
+    ]
+   },
+   {
+    "label": "Teres major muscle",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Coracobrachialis muscle",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Latissimus dorsi tendon and muscle",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Brachial artery",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Profunda brachii (deep brachial) artery",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Median nerve",
+    "ocr": [
+     26
+    ]
+   },
+   {
+    "label": "Ulnar nerve",
+    "ocr": [
+     27
+    ]
+   },
+   {
+    "label": "Medial antebrachial cutaneous nerve",
+    "ocr": [
+     28
+    ]
+   },
+   {
+    "label": "Triceps brachii muscle",
+    "ocr": [
+     31
+    ]
+   },
+   {
+    "label": "Biceps brachii muscle",
+    "ocr": [
+     32
+    ]
+   },
+   {
+    "label": "Superior ulnar collateral artery",
+    "ocr": [
+     34
+    ]
+   },
+   {
+    "label": "Brachialis muscle",
+    "ocr": [
+     35
+    ]
+   },
+   {
+    "label": "Medial intermuscular septum",
+    "ocr": [
+     36
+    ]
+   },
+   {
+    "label": "Radial recurrent artery",
+    "ocr": [
+     37
+    ]
+   },
+   {
+    "label": "Inferior ulnar collateral artery",
+    "ocr": [
+     38
+    ]
+   },
+   {
+    "label": "Biceps brachii tendon",
+    "ocr": [
+     39
+    ]
+   },
+   {
+    "label": "Medial epicondyle of humerus",
+    "ocr": [
+     40
+    ]
+   },
+   {
+    "label": "Bicipital aponeurosis",
+    "ocr": [
+     42
+    ]
+   },
+   {
+    "label": "Radial artery",
+    "ocr": [
+     43
+    ]
+   },
+   {
+    "label": "Pronator teres muscle",
+    "ocr": [
+     44
+    ]
+   },
+   {
+    "label": "Ulnar artery",
+    "ocr": [
+     45
+    ]
+   },
+   {
+    "label": "Flexor carpi radialis muscle",
+    "ocr": [
+     46
+    ]
+   },
+   {
+    "label": "Brachioradialis muscle",
+    "ocr": [
+     47
+    ]
+   }
+  ],
+  "quiz": [
+   "median-nerve",
+   "ulnar-nerve",
+   "profunda-brachii-deep-brachial-artery",
+   "musculocutaneous-nerve",
+   "bicipital-aponeurosis",
+   "brachial-artery"
+  ]
+ },
+ {
+  "name": "forearm-anterior",
+  "deck": "ul",
+  "slide": 138,
+  "lesson": "upper-limb-5",
+  "title": "Anterior forearm: superficial muscles",
+  "spots": [
+   {
+    "label": "Biceps brachii muscle",
+    "ocr": [
+     0
+    ]
+   },
+   {
+    "label": "Ulnar nerve",
+    "ocr": [
+     2
+    ]
+   },
+   {
+    "label": "Brachial artery and median nerve",
+    "ocr": [
+     3,
+     4
+    ]
+   },
+   {
+    "label": "Triceps brachii muscle",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Brachialis muscle",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Ulnar artery",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Biceps brachii tendon",
+    "ocr": [
+     11,
+     13
+    ]
+   },
+   {
+    "label": "Medial epicondyle of humerus",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Common flexor tendon",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Radial artery",
+    "ocr": [
+     15
+    ]
+   },
+   {
+    "label": "Pronator teres muscle",
+    "ocr": [
+     16,
+     17
+    ]
+   },
+   {
+    "label": "Bicipital aponeurosis",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Flexor carpi radialis muscle",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Brachioradialis muscle",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Palmaris longus muscle",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Extensor carpi radialis longus muscle",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Flexor carpi ulnaris muscle",
+    "ocr": [
+     25
+    ]
+   },
+   {
+    "label": "Extensor carpi radialis brevis muscle",
+    "ocr": [
+     26
+    ]
+   },
+   {
+    "label": "Flexor digitorum superficialis muscle",
+    "ocr": [
+     28
+    ]
+   },
+   {
+    "label": "Flexor pollicis longus muscle and tendon",
+    "ocr": [
+     29
+    ]
+   },
+   {
+    "label": "Palmaris longus tendon",
+    "ocr": [
+     30
+    ]
+   },
+   {
+    "label": "Median nerve",
+    "ocr": [
+     34
+    ]
+   },
+   {
+    "label": "Flexor digitorum superficialis tendons",
+    "ocr": [
+     37
+    ]
+   },
+   {
+    "label": "Pisiform",
+    "ocr": [
+     41
+    ]
+   },
+   {
+    "label": "Thenar muscles",
+    "ocr": [
+     42
+    ]
+   },
+   {
+    "label": "Palmar branch of median nerve",
+    "ocr": [
+     43
+    ]
+   },
+   {
+    "label": "Hypothenar muscles",
+    "ocr": [
+     44
+    ]
+   },
+   {
+    "label": "Palmar aponeurosis",
+    "ocr": [
+     46
+    ]
+   }
+  ],
+  "quiz": [
+   "pronator-teres-muscle",
+   "flexor-carpi-radialis-muscle",
+   "palmaris-longus-muscle",
+   "flexor-carpi-ulnaris-muscle",
+   "flexor-digitorum-superficialis-muscle",
+   "brachioradialis-muscle"
+  ]
+ },
+ {
+  "name": "forearm-posterior",
+  "deck": "ul",
+  "slide": 154,
+  "lesson": "upper-limb-5",
+  "title": "Posterior forearm: deep muscles and posterior interosseous nerve",
+  "spots": [
+   {
+    "label": "Medial intermuscular septum",
+    "ocr": [
+     3
+    ]
+   },
+   {
+    "label": "Lateral intermuscular septum",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Ulnar nerve",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Brachioradialis muscle",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Extensor carpi radialis longus muscle",
+    "ocr": [
+     9,
+     10
+    ]
+   },
+   {
+    "label": "Medial epicondyle of humerus",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Lateral epicondyle of humerus",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Triceps brachii tendon (cut)",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Common extensor tendon (partially cut)",
+    "ocr": [
+     14,
+     15
+    ]
+   },
+   {
+    "label": "Olecranon",
+    "ocr": [
+     16
+    ]
+   },
+   {
+    "label": "Extensor carpi radialis brevis muscle",
+    "ocr": [
+     17
+    ]
+   },
+   {
+    "label": "Anconeus muscle",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Supinator muscle",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Posterior interosseous nerve (continuation of deep branch of radial nerve)",
+    "ocr": [
+     20,
+     22,
+     23
+    ]
+   },
+   {
+    "label": "Flexor carpi ulnaris muscle",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Posterior interosseous artery",
+    "ocr": [
+     27
+    ]
+   },
+   {
+    "label": "Ulna",
+    "ocr": [
+     29
+    ]
+   },
+   {
+    "label": "Extensor pollicis longus muscle",
+    "ocr": [
+     31
+    ]
+   },
+   {
+    "label": "Abductor pollicis longus muscle",
+    "ocr": [
+     32
+    ]
+   },
+   {
+    "label": "Extensor indicis muscle",
+    "ocr": [
+     33
+    ]
+   },
+   {
+    "label": "Extensor pollicis brevis muscle",
+    "ocr": [
+     34
+    ]
+   },
+   {
+    "label": "Radial artery",
+    "ocr": [
+     38
+    ]
+   }
+  ],
+  "quiz": [
+   "supinator-muscle",
+   "anconeus-muscle",
+   "abductor-pollicis-longus-muscle",
+   "extensor-pollicis-brevis-muscle",
+   "extensor-indicis-muscle",
+   "extensor-pollicis-longus-muscle"
+  ]
+ },
+ {
+  "name": "upper-limb-arteries",
+  "deck": "ul",
+  "slide": 214,
+  "lesson": "upper-limb-6",
+  "title": "Arteries of the upper limb",
+  "spots": [
+   {
+    "label": "Thoracoacromial artery",
+    "ocr": [
+     4
+    ]
+   },
+   {
+    "label": "Superior thoracic artery",
+    "ocr": [
+     5
+    ]
+   },
+   {
+    "label": "Axillary artery",
+    "ocr": [
+     6
+    ]
+   },
+   {
+    "label": "Anterior circumflex humeral artery",
+    "ocr": [
+     7
+    ]
+   },
+   {
+    "label": "Lateral thoracic artery",
+    "ocr": [
+     8
+    ]
+   },
+   {
+    "label": "Posterior circumflex humeral artery",
+    "ocr": [
+     9
+    ]
+   },
+   {
+    "label": "Subscapular artery",
+    "ocr": [
+     10
+    ]
+   },
+   {
+    "label": "Circumflex scapular artery",
+    "ocr": [
+     11
+    ]
+   },
+   {
+    "label": "Brachial artery",
+    "ocr": [
+     12
+    ]
+   },
+   {
+    "label": "Thoracodorsal artery",
+    "ocr": [
+     13
+    ]
+   },
+   {
+    "label": "Profunda brachii (deep brachial) artery",
+    "ocr": [
+     14
+    ]
+   },
+   {
+    "label": "Level of lower margin of teres major: axillary artery becomes brachial artery",
+    "ocr": [
+     15,
+     16,
+     17
+    ]
+   },
+   {
+    "label": "Radial collateral artery",
+    "ocr": [
+     18
+    ]
+   },
+   {
+    "label": "Middle collateral artery",
+    "ocr": [
+     19
+    ]
+   },
+   {
+    "label": "Superior ulnar collateral artery",
+    "ocr": [
+     20
+    ]
+   },
+   {
+    "label": "Inferior ulnar collateral artery",
+    "ocr": [
+     21
+    ]
+   },
+   {
+    "label": "Radial recurrent artery",
+    "ocr": [
+     22
+    ]
+   },
+   {
+    "label": "Recurrent interosseous artery",
+    "ocr": [
+     23
+    ]
+   },
+   {
+    "label": "Posterior interosseous artery",
+    "ocr": [
+     25
+    ]
+   },
+   {
+    "label": "Anterior ulnar recurrent artery",
+    "ocr": [
+     26
+    ]
+   },
+   {
+    "label": "Posterior ulnar recurrent artery",
+    "ocr": [
+     27
+    ]
+   },
+   {
+    "label": "Radial artery",
+    "ocr": [
+     28
+    ]
+   },
+   {
+    "label": "Common interosseous artery",
+    "ocr": [
+     29
+    ]
+   },
+   {
+    "label": "Anterior interosseous artery",
+    "ocr": [
+     30
+    ]
+   },
+   {
+    "label": "Ulnar artery",
+    "ocr": [
+     31
+    ]
+   },
+   {
+    "label": "Deep palmar arch",
+    "ocr": [
+     33
+    ]
+   },
+   {
+    "label": "Dorsal carpal artery",
+    "ocr": [
+     34
+    ]
+   },
+   {
+    "label": "Princeps pollicis artery",
+    "ocr": [
+     35
+    ]
+   },
+   {
+    "label": "Radialis indicis artery",
+    "ocr": [
+     38
+    ]
+   },
+   {
+    "label": "Superficial palmar arch",
+    "ocr": [
+     40
+    ]
+   },
+   {
+    "label": "Common palmar digital arteries",
+    "ocr": [
+     41
+    ]
+   },
+   {
+    "label": "Proper palmar digital arteries",
+    "ocr": [
+     42
+    ]
+   }
+  ],
+  "quiz": [
+   "subscapular-artery",
+   "profunda-brachii-deep-brachial-artery",
+   "common-interosseous-artery",
+   "superficial-palmar-arch",
+   "deep-palmar-arch",
+   "thoracoacromial-artery"
+  ]
+ }
+]
