@@ -5,6 +5,8 @@
 // file into Firebase console → Firestore Database → Rules → Publish).
 // 2026-10-18: added pushDevices, posts/*/stumpAnswers and groups/*/stumpAnswers.
 // 2026-10-25: Apex Coins can only go up through users/{uid}/coinLog (see "Apex Coins" below).
+// 2026-10-27 (security audit): a new profile must use the username it claims in the registry; verified
+// names can't be claimed from the app; group notices and stamps can't be faked.
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -14,9 +16,12 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if request.auth != null;
       allow create: if request.auth.uid == uid
+        // A new profile's username is in the shared format and is the name this user claims in the
+        // usernames registry in the same batch (src/lib/accounts.ts does both), so nobody can start
+        // a profile under someone else's name, e.g. a verified one (2026-10-27 audit).
         && request.resource.data.username is string
-        && request.resource.data.username.size() >= 3
-        && request.resource.data.username.size() <= 20
+        && request.resource.data.username.matches('^[a-z0-9_]{3,20}$')
+        && getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.username)).data.uid == request.auth.uid
         // A new account starts with no coins.
         && request.resource.data.get('coins', 0) == 0
         && !('apexCoins' in request.resource.data);
@@ -254,7 +259,14 @@ service cloud.firestore {
       allow list: if request.auth != null;
       allow create: if request.auth.uid == request.resource.data.uid
         && request.resource.data.keys().hasOnly(['uid', 'login'])
-        && name.matches('^[a-z0-9_]{3,20}$');
+        && name.matches('^[a-z0-9_]{3,20}$')
+        // The verified names (VERIFIED_USERNAMES and BLUE_VERIFIED_USERNAMES in src/data/verified.ts;
+        // keep this list in step) can't be claimed from the app: their owners may predate the
+        // registry, so a free entry would let someone else take the name and its tick. An admin
+        // adds an entry by hand in the Firebase console when one is needed.
+        && !(name in ['prince', 'theapexhub', 'originate', 'robotnik', 'stbretro', 'grate_apex', 'myuncletouchesme',
+             'grate_apex02', 'stickyfingers', 'retro', 'retr0', 'patricia_a', 'atu', 'grateapex_official', 'nate',
+             'echocircuitnkn07', 'ev', 'drev', 'heisgoddey', 'dennis', 'yeezy', 'bevelyn', 'amtul', 'akua', 'cupid']);
       allow update: if resource.data.uid == request.auth.uid && request.resource.data.uid == request.auth.uid
         && request.resource.data.keys().hasOnly(['uid', 'login']);
       allow delete: if false;
@@ -742,15 +754,20 @@ service cloud.firestore {
           && (request.resource.data.text.size() >= 1 || ('media' in request.resource.data && request.resource.data.media.size() >= 1) || 'share' in request.resource.data || 'audio' in request.resource.data || 'doc' in request.resource.data || 'call' in request.resource.data)
           && (!('media' in request.resource.data) || (request.resource.data.media is list && request.resource.data.media.size() <= 3))
           && (!('share' in request.resource.data) || (request.resource.data.share is map && request.resource.data.share.get('text', '').size() <= 300))
+          // A stamp names its sender: only the sender's own uid (2026-10-27 audit).
+          && (!('share' in request.resource.data) || request.resource.data.share.get('kind', '') != 'stump' || request.resource.data.share.get('uid', '') == request.auth.uid)
           && (!('audio' in request.resource.data) || (request.resource.data.audio is map && request.resource.data.audio.url is string && request.resource.data.audio.url.matches('^https://res\\.cloudinary\\.com/.*') && request.resource.data.audio.d is number && request.resource.data.audio.d <= 120))
           && (!('doc' in request.resource.data) || (request.resource.data.doc is map && request.resource.data.doc.url is string && request.resource.data.doc.url.matches('^https://res\\.cloudinary\\.com/.*') && request.resource.data.doc.name is string && request.resource.data.doc.name.size() <= 100))
-          && (!('fwd' in request.resource.data) || request.resource.data.fwd is bool);
+          && (!('fwd' in request.resource.data) || request.resource.data.fwd is bool)
+          // Notices ("X left the group") go only through the rule below.
+          && !('system' in request.resource.data);
         // "X left the group" notice. It is written in the same batch as the member removal, so the group is still
         // read as it was before the batch and I'm still a member at this point.
         allow create: if request.auth.uid in get(/databases/$(database)/documents/groups/$(gid)).data.memberUids
           && request.resource.data.system == true
           && request.resource.data.authorUid == request.auth.uid
-          && request.resource.data.authorName is string
+          && request.resource.data.authorName ==
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username
           && request.resource.data.text == '@' + request.resource.data.authorName + ' left the group'
           && request.resource.data.keys().hasOnly(['text', 'system', 'authorUid', 'authorName', 'createdAt']);
         allow delete: if request.auth.uid == resource.data.authorUid;
@@ -838,6 +855,7 @@ service cloud.firestore {
           && (!('media' in request.resource.data) || (request.resource.data.media is list && request.resource.data.media.size() <= 3))
           && (!('share' in request.resource.data) || (request.resource.data.share is map && request.resource.data.share.get('text', '').size() <= 300))
           && (!('audio' in request.resource.data) || (request.resource.data.audio is map && request.resource.data.audio.url is string && request.resource.data.audio.url.matches('^https://res\\.cloudinary\\.com/.*') && request.resource.data.audio.d is number && request.resource.data.audio.d <= 120))
+          && (!('share' in request.resource.data) || request.resource.data.share.get('kind', '') != 'stump' || request.resource.data.share.get('uid', '') == request.auth.uid)
           && (!('reply' in request.resource.data) || (request.resource.data.reply is map && request.resource.data.reply.get('text', '').size() <= 120))
           && (!('doc' in request.resource.data) || (request.resource.data.doc is map && request.resource.data.doc.url is string && request.resource.data.doc.url.matches('^https://res\\.cloudinary\\.com/.*') && request.resource.data.doc.name is string && request.resource.data.doc.name.size() <= 100))
           && (!('fwd' in request.resource.data) || request.resource.data.fwd is bool)
