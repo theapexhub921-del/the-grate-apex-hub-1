@@ -84,3 +84,32 @@ Pure rules are checked by `tests/learning-boosts.test.mjs`.
   It shows whenever the concept comes up and on the memory map, is synced as
   `synced.hooks` on `progress/{uid}` (newer change wins, `memory-hook-rules.ts`),
   and "Share with friends" posts it to the feed for friends.
+
+## 9. Anatomy drills (2026-10-28, second request)
+
+Owner: "instead of reading features of where certain body parts are … is there
+another way?" Three active ways in, for every Gross Anatomy topic
+(`src/data/anatomy-drills/<topic>.ts`, page `/learn/anatomy-drills`, a "Learn
+where things are" card on each anatomy topic page, and a Learn home tile).
+A "draw it from memory" mode was proposed too and is on hold (owner).
+
+- **Stack the layers** — order questions: front to back (e.g. the superior
+  mediastinum in front of the trachea, from the trachea lesson), outside in
+  (scalp, abdominal wall, kidney coverings), or along a route (a tear, a stone
+  in the ureter, the facial nerve). **What gets hit?** — short cases: an injury,
+  a needle or a blockage and what it reaches or causes. Both run in the quiz
+  engine (`exam=drill&topic=…&drill=layers|cases`, `DRILL_SIZE` = 8 per run),
+  with ids `drill:<topic>:<kind>:<id>`, registered with the curriculum by
+  `ensureDrillQuestions()` (called from `exam-practice.ts`), and tied to the
+  lesson concept their words match (`conceptFor`, or `conceptId` on the item),
+  so answers feed memory and Review.
+- **Why is it there?** — flip cards (`WhyCards` in
+  `components/learning/anatomy-drills.tsx`): say the reason, reveal it, rate it,
+  "Ask AI more".
+- **Source rule:** every item is written from its lesson's own text, with the
+  lesson named on it. `tests/anatomy-drills.test.mjs` checks the key words of
+  every layer item, case answer and explanation, and why answer appear in that
+  lesson, that every topic has at least five of each, and that every question
+  maps to a concept of its lesson. Where the lecture does not give an order (for
+  example a full front-to-back list of the superior mediastinum), there is no
+  drill for it.

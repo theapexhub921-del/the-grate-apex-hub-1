@@ -17,7 +17,9 @@ export type ExamSettings =
   /** 2-minute sprint: as many as possible from what has been studied. */
   | { kind: 'sprint' }
   /** Confused pairs: the answers the learner mixes up, asked side by side. */
-  | { kind: 'pairs' };
+  | { kind: 'pairs' }
+  /** Anatomy drills (2026-10-28): "Stack the layers" or "What gets hit?" for one topic. */
+  | { kind: 'drill'; topic: string; drill: 'layers' | 'cases' };
 
 export const MOCK_SIZES = [20, 40, 60, 100] as const;
 export const MOCK_MINUTES = [15, 30, 45, 60, 90, 120] as const;
@@ -37,6 +39,12 @@ const clampTo = (value: number, allowed: readonly number[], fallback: number) =>
 export function parseExam(get: (name: string) => string | undefined): ExamSettings | null {
   const kind = get('exam');
   if (kind === 'weakest' || kind === 'daily' || kind === 'sprint' || kind === 'pairs') return { kind };
+  if (kind === 'drill') {
+    const topic = get('topic') ?? '';
+    const drill = get('drill');
+    if (!/^[a-z0-9-]+$/.test(topic) || (drill !== 'layers' && drill !== 'cases')) return null;
+    return { kind: 'drill', topic, drill };
+  }
   if (kind === 'mock') {
     const bank = get('bank') ?? '';
     if (!/^hb2-[a-z]+$/.test(bank)) return null;
@@ -63,6 +71,8 @@ export function examQuery(exam: ExamSettings): Record<string, string | number> {
       return { exam: 'mock', bank: exam.bank, size: exam.size, minutes: exam.minutes };
     case 'spotter':
       return { exam: 'spotter', subject: exam.subject, size: exam.size, seconds: exam.seconds };
+    case 'drill':
+      return { exam: 'drill', topic: exam.topic, drill: exam.drill };
     case 'weakest':
     case 'daily':
     case 'sprint':
@@ -86,6 +96,8 @@ export function examTitle(exam: ExamSettings, courseName?: string): string {
       return '2-minute sprint';
     case 'pairs':
       return 'Confused pairs';
+    case 'drill':
+      return `${exam.drill === 'layers' ? 'Stack the layers' : 'What gets hit?'}${courseName ? ` · ${courseName}` : ''}`;
   }
 }
 

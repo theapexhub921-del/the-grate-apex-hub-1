@@ -7,6 +7,8 @@ import { TopicGlyph } from '@/components/learning/glyphs';
 import { ClassAccessCard } from '@/components/learning/class-access-card';
 import { MemoryDistribution, MemoryStateBadge } from '@/components/learning/memory-ui';
 import { MemoryMap } from '@/components/learning/memory-map';
+import { DrillLaunchers } from '@/components/learning/anatomy-drills';
+import { drillsFor } from '@/data/anatomy-drills';
 import { Breadcrumbs, StatTile, BackLink } from '@/components/learning/nav-bits';
 import { NextActionHero } from '@/components/learning/next-action-card';
 import { Button } from '@/components/ui/button';
@@ -101,6 +103,13 @@ export function TopicScreen({ topicId }: { topicId: string | undefined }) {
           />
         </View>
       </Card>
+
+      {drillsFor(topic.id) ? (
+        <Card style={styles.progressCard}>
+          <Text style={styles.cardKicker}>LEARN WHERE THINGS ARE</Text>
+          <DrillLaunchers drills={drillsFor(topic.id)!} compact />
+        </Card>
+      ) : null}
 
       <MemoryMap topic={topic} memory={memory} now={now} />
 

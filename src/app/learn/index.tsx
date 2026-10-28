@@ -354,6 +354,7 @@ export default function LearnScreen() {
       onPress: () => void openPairs(),
       disabled: pairs.length === 0 || openingPairs,
     },
+    { id: 'drills', icon: 'anatomy', title: 'Anatomy drills', detail: 'Stack the layers, work out what an injury hits, and learn why each part sits where it does.', onPress: () => router.push(routes.anatomyDrills()) },
     { id: 'label', icon: 'image', title: 'Label a diagram', detail: 'A lecture diagram with its labels covered: put each name in its place.', onPress: () => router.push(routes.labelDiagram()) },
     {
       id: 'review', icon: 'reinforce', title: 'Spaced review',

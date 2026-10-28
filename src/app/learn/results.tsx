@@ -152,7 +152,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
         ? 'Apex Challenge'
         : attempt.kind === 'practice'
           ? attempt.customQuiz?.exam
-            ? examTitle(attempt.customQuiz.exam, attempt.customQuiz.exam.kind === 'mock' ? SUBJECT_NAME[bankSubject(attempt.customQuiz.exam.bank) ?? 'anatomy'] : undefined)
+            ? examTitle(attempt.customQuiz.exam, attempt.customQuiz.exam.kind === 'mock' ? SUBJECT_NAME[bankSubject(attempt.customQuiz.exam.bank) ?? 'anatomy'] : attempt.customQuiz.exam.kind === 'drill' ? getTopic(attempt.customQuiz.exam.topic)?.title : undefined)
             : attempt.customQuiz
             ? 'Custom practice'
             : 'Practice'
@@ -247,7 +247,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
   const exam = attempt.customQuiz?.exam;
   const topicScores = useMemo(
     () =>
-      exam && exam.kind !== 'weakest' && exam.kind !== 'pairs'
+      exam && exam.kind !== 'weakest' && exam.kind !== 'pairs' && exam.kind !== 'drill'
         ? scoreByTopic(rows.map((row) => ({ topic: getTopic(row.question.topicId)?.title ?? row.question.concept, correct: row.correct })))
         : [],
     [exam, rows]
@@ -485,7 +485,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
             fullWidth
           />
         ) : null}
-        <Button label={exam?.kind === 'weakest' || exam?.kind === 'daily' || exam?.kind === 'pairs' ? 'Back to Study' : exam?.kind === 'sprint' ? 'Sprint again' : exam?.kind === 'mock' ? 'Sit another paper' : exam?.kind === 'spotter' ? 'Another spotter' : attempt.kind === 'review' ? 'Another review' : 'Retake'} variant="secondary" onPress={retake} fullWidth />
+        <Button label={exam?.kind === 'weakest' || exam?.kind === 'daily' || exam?.kind === 'pairs' ? 'Back to Study' : exam?.kind === 'sprint' ? 'Sprint again' : exam?.kind === 'drill' ? 'Drill again' : exam?.kind === 'mock' ? 'Sit another paper' : exam?.kind === 'spotter' ? 'Another spotter' : attempt.kind === 'review' ? 'Another review' : 'Retake'} variant="secondary" onPress={retake} fullWidth />
         {nextLesson && attempt.percentage >= XP_RULES.passPercent ? (
           <Button label={`Next: ${nextLesson.title}`} variant="secondary" onPress={() => router.push(routes.lesson(nextLesson.id))} fullWidth />
         ) : null}
@@ -510,7 +510,7 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
           ]}
           style={styles.crumbs}
         />
-        <Text style={styles.kindLabel}>{exam?.kind === 'mock' ? 'MOCK EXAM' : exam?.kind === 'spotter' ? 'SPOTTER' : exam?.kind === 'sprint' ? '2-MINUTE SPRINT' : exam?.kind === 'daily' ? 'DAILY 10' : exam ? 'PRACTICE RESULTS' : attempt.customQuiz ? 'CUSTOM PRACTICE' : KIND_LABEL[attempt.kind]}</Text>
+        <Text style={styles.kindLabel}>{exam?.kind === 'mock' ? 'MOCK EXAM' : exam?.kind === 'spotter' ? 'SPOTTER' : exam?.kind === 'sprint' ? '2-MINUTE SPRINT' : exam?.kind === 'daily' ? 'DAILY 10' : exam?.kind === 'drill' ? 'ANATOMY DRILL' : exam ? 'PRACTICE RESULTS' : attempt.customQuiz ? 'CUSTOM PRACTICE' : KIND_LABEL[attempt.kind]}</Text>
         <Text style={styles.title} accessibilityRole="header">
           {title}
         </Text>

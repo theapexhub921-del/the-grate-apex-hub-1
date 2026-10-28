@@ -67,6 +67,7 @@ Current routes include:
 * `src/app/learn/results.tsx` (`/learn/results?attempt=<attempt id>`)
 * `src/app/learn/review.tsx` (spaced-repetition review sessions)
 * `src/app/learn/label.tsx` ("Label a diagram": a lecture diagram from a studied lesson, in "Label it" mode)
+* `src/app/learn/anatomy-drills.tsx` (Anatomy drills: `/learn/anatomy-drills[?topic=<topic id>]`)
 * `src/app/learn/apex.tsx` (Apex Challenge: `/learn/apex?course=<course id>`; 10 seconds per question, set in `src/data/learning/apex.ts`)
 * `src/app/login.tsx` (sign in, create account, Continue with Google, forgot / reset password)
 * `src/app/onboarding.tsx` (first-run interactive introduction: `/onboarding[?replay=1]`)
@@ -224,6 +225,7 @@ Details and rules: `docs/study-boosts.md`; pure rules checked by `tests/learning
 * **Memory map** on topic pages (`memory-map.tsx`): every concept as a square by lesson, coloured by state, filled by mastery.
 * **Links to your other courses** at the end of a lesson's reading (`related-lessons.tsx`; shared key words across subjects) with "How do these link?" (Ask AI, `AiQuestionButton`).
 * **Memory hooks** under every answered question (`memory-hook.tsx`, `src/data/memory-hooks.ts`, synced as `synced.hooks`), also on the memory map; "Share with friends" posts one to the feed (friends only).
+* **Anatomy drills** (owner, 2026-10-28: learning where things are without reading lists): "Stack the layers" (order questions), "What gets hit?" (cases) and "Why is it there?" (flip cards) for every Gross Anatomy topic, in `src/data/anatomy-drills/<topic>.ts`, each item written from its named lesson's text (`tests/anatomy-drills.test.mjs` checks the words are there — do not add items the lecture does not support). Layers and cases run as `exam=drill` quizzes (ids `drill:<topic>:<kind>:<id>`, registered by `ensureDrillQuestions()`). Page `/learn/anatomy-drills`, topic-page card, Learn home tile. A "draw it from memory" mode is on hold (owner).
 
 ## Study from the basics up (owner, 2026-10-24)
 

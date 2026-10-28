@@ -127,6 +127,8 @@ export const routes = {
   focusTimer: () => '/learn/focus' as Href,
   /** "Label a diagram": a lecture diagram to label (2026-10-28). */
   labelDiagram: () => '/learn/label' as Href,
+  /** Anatomy drills (2026-10-28): layers, cases and why cards, optionally opened on one topic. */
+  anatomyDrills: (topicId?: string | null) => `/learn/anatomy-drills${query({ topic: valid(topicId) ? topicId : undefined })}` as Href,
 
   results: (attemptId: string | null | undefined) =>
     valid(attemptId) ? (`/learn/results${query({ attempt: attemptId })}` as Href) : fallback('results', '/progress'),

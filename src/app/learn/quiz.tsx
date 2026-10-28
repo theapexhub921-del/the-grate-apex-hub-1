@@ -21,6 +21,7 @@ import { currentMemoryModel } from '@/data/learning/state';
 import { nowMs } from '@/data/learning/time';
 import { XP_RULES } from '@/data/learning/xp-rules';
 import { isAnswerComplete } from '@/data/questions';
+import { DRILL_SIZE, drillQuestions } from '@/data/anatomy-drills';
 import { markQuest, SPRINT_POOL, SPRINT_SECONDS } from '@/data/daily-practice';
 import { examBanks, examTitle, type ExamSettings, markWeakestDone, mockPool, parseExam, spotterPool, SUBJECT_NAME, bankSubject } from '@/data/exam-practice';
 import { pastCourseForSubject } from '@/data/past-question-topics';
@@ -179,6 +180,25 @@ function buildPlan(input: {
       backHref: routes.learn(),
       crumbs: [{ label: examTitle(exam) }],
       customQuiz: { lessonIds: [], size: questions.length, feedback: 'instant', exam },
+    };
+  }
+  if (exam?.kind === 'drill') {
+    const pool = drillQuestions(exam.topic, exam.drill);
+    const topic = getTopic(exam.topic);
+    if (pool.length === 0 || !topic) return null;
+    const size = Math.min(DRILL_SIZE, pool.length);
+    return {
+      kind: 'practice',
+      attemptMode: 'practice',
+      title: examTitle(exam, topic.title),
+      subtitle:
+        exam.drill === 'layers'
+          ? `Put the structures in order — front to back, outside in, or along a route — as your lecture lists them. ${size} of ${pool.length} from ${topic.title}.`
+          : `Short cases: an injury, a needle, a blockage. Work out what is hit or what follows, from where things lie. ${size} of ${pool.length} from ${topic.title}.`,
+      request: { scope: { kind: 'questions', questionIds: pool.map((question) => question.id) }, strategy: 'random', size },
+      backHref: routes.anatomyDrills(exam.topic),
+      crumbs: [{ label: 'Anatomy drills', href: routes.anatomyDrills(exam.topic) }],
+      customQuiz: { lessonIds: [], size, feedback: 'instant', exam },
     };
   }
   if (exam?.kind === 'sprint') {
@@ -616,7 +636,9 @@ function QuizScreen({
               ? 'MOCK EXAM'
               : exam?.kind === 'spotter'
                 ? 'SPOTTER'
-                : exam?.kind === 'sprint'
+                : exam?.kind === 'drill'
+                  ? 'ANATOMY DRILL'
+                  : exam?.kind === 'sprint'
                   ? '2-MINUTE SPRINT'
                   : exam?.kind === 'daily'
                     ? 'DAILY 10'

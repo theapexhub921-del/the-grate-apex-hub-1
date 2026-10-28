@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { getQuestion, getTopicQuestions, publishedTopics } from '@/data/curriculum';
 import type { ExamSettings } from '@/data/exam-practice-rules';
 import { weakestQuestionIds, localDay } from '@/data/learning/weakest';
+import { ensureDrillQuestions } from '@/data/anatomy-drills';
 import type { MemoryModel } from '@/data/learning/memory';
 import type { SubjectId } from '@/data/lesson-types';
 import { pastCourseForSubject } from '@/data/past-question-topics';
@@ -13,6 +14,9 @@ import { allPastQuestions, loadPastQuestions, pastCourseOf } from '@/data/past-q
 import type { Question } from '@/data/questions';
 
 export * from '@/data/exam-practice-rules';
+
+// Anatomy drill questions are found by id like any other (quiz, results, weakest 20).
+ensureDrillQuestions();
 
 export const EXAM_SUBJECTS: readonly SubjectId[] = ['anatomy', 'physiology', 'biochemistry'];
 /** The HB2 past-paper banks (one per subject). */
@@ -25,8 +29,8 @@ export function examBanks(exam: ExamSettings | null): string[] {
   if (!exam) return [];
   if (exam.kind === 'mock') return [exam.bank];
   if (exam.kind === 'spotter') return exam.subject === 'all' ? [...EXAM_BANKS] : [pastCourseForSubject(exam.subject)];
-  // Daily 10 and sprints ask the app's own topic questions.
-  if (exam.kind === 'daily' || exam.kind === 'sprint') return [];
+  // Daily 10, sprints and anatomy drills ask the app's own questions.
+  if (exam.kind === 'daily' || exam.kind === 'sprint' || exam.kind === 'drill') return [];
   return [...EXAM_BANKS];
 }
 
