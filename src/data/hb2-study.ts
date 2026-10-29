@@ -70,6 +70,9 @@ function sectionOf(chunk: LessonChunk, index: number, lesson: Lesson): LocalSect
   if (index === 0 && lesson.objectives?.length) {
     blocks.push({ k: 'box', title: 'What you’ll learn', tone: 'recall', blocks: [{ k: 'ul', items: lesson.objectives.map(escape) }] });
   }
+  // The section taught in full first (data/teaching/), then the lecture's key points.
+  chunk.teach?.forEach((paragraph, n) => blocks.push({ k: 'p', x: richWithTerms(paragraph, terms, used), ...(n === 0 ? { lede: 1 as const } : {}) }));
+  if (chunk.teach?.length) blocks.push({ k: 'p', x: '<b>Key points from the lecture</b>' });
   for (const paragraph of chunk.paragraphs ?? []) blocks.push({ k: 'p', x: richWithTerms(paragraph, terms, used) });
   for (const id of chunkFigures(chunk)) blocks.push({ k: 'lfig', id });
   chunk.steps?.forEach((step, n) => {

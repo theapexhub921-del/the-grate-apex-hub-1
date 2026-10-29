@@ -257,6 +257,10 @@ export type LessonChunk = {
   table?: LessonTable;
   keyPoints?: string[];
   figure?: string; // a tappable lecture diagram (LessonFigure id, data/figures/)
+  // The section taught in full, the way a textbook teaches it: from the
+  // basics, step by step, with the reasons (data/teaching/; set by
+  // buildTopic). Shown before the lecture's key points.
+  teach?: string[];
   // What the section's textbook pages add, summarised in our own words
   // (data/textbook-notes/; never copied text). Set by buildTopic.
   textbookNote?: string;

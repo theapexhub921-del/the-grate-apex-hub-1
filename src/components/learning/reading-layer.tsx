@@ -112,6 +112,19 @@ function ReadingSection({ chunk, index, total }: { chunk: LessonChunk; index: nu
         {chunk.title}
       </Text>
 
+      {chunk.teach?.map((paragraph, i) => (
+        <Text key={`teach-${i}`} style={[styles.paragraph, serif]}>
+          {paragraph}
+        </Text>
+      ))}
+
+      {chunk.teach?.length ? (
+        <View style={[styles.kickerRow, styles.keyPointsHeading]}>
+          <Icon name="pin" size={14} color={colors.textTertiary} />
+          <Text style={styles.sectionKicker}>KEY POINTS FROM THE LECTURE</Text>
+        </View>
+      ) : null}
+
       {chunk.paragraphs?.map((paragraph, i) => (
         <Text key={i} style={[styles.paragraph, serif]}>
           {paragraph}
@@ -213,6 +226,7 @@ function createStyles(colors: ThemeColors) {
     reading: { gap: 14 },
     section: { gap: 4 },
     kickerRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 },
+    keyPointsHeading: { marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border },
     sectionKicker: { fontSize: 11, fontWeight: '800', letterSpacing: 1.1, color: colors.textTertiary },
     sectionTitle: { fontSize: 21, fontWeight: '800', lineHeight: 28, color: colors.text, marginBottom: 10 },
     paragraph: { fontSize: 16, lineHeight: 26, color: colors.textSecondary, marginBottom: 12 },

@@ -22,6 +22,7 @@ export function lessonToText(lesson: Lesson): string {
   if (lesson.objectives?.length) out.push('Objectives:', ...lesson.objectives.map((item) => `- ${item}`));
   for (const chunk of lesson.chunks) {
     out.push('', `## ${chunk.title}`);
+    chunk.teach?.forEach((paragraph) => out.push(paragraph));
     chunk.paragraphs?.forEach((paragraph) => out.push(paragraph));
     chunk.steps?.forEach((step, i) => out.push(`${i + 1}. ${step.label}${step.detail ? `: ${step.detail}` : ''}`));
     chunk.terms?.forEach((term) => out.push(`${term.term}: ${term.meaning}`));

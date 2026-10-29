@@ -13,6 +13,7 @@
 //                   Review can reuse them, quizzes only as a top-up
 import { sourceFiles } from '@/data/content-catalog';
 import { textbookNoteFor } from '@/data/textbook-notes';
+import { teachingFor } from '@/data/teaching';
 import { textbookRefsFor } from '@/data/textbook-refs';
 import type {
   ConceptCoverage,
@@ -457,7 +458,9 @@ export function buildTopic<K extends string>(draft: TopicDraft<K>): BuiltTopic {
       const refs = textbook.length ? [...(chunk.sourceRefs ?? []), ...textbook] : chunk.sourceRefs;
       // What those pages add, summarised in our own words (data/textbook-notes/).
       const note = textbookNoteFor(draft.id, lesson.id, index);
-      return { ...chunk, sourceRefs: refs && withExports(refs), ...(note ? { textbookNote: note } : {}) };
+      // The section taught in full (data/teaching/), shown before the key points.
+      const teach = teachingFor(draft.id, lesson.id, index);
+      return { ...chunk, sourceRefs: refs && withExports(refs), ...(note ? { textbookNote: note } : {}), ...(teach ? { teach } : {}) };
     }),
     interactive: lesson.interactive?.map((step): InteractiveStep => {
       if (step.type === 'ask') {
