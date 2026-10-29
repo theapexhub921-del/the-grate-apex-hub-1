@@ -1,3 +1,4 @@
+import { rememberReturnTo, takeReturnTo } from '@/lib/return-to';
 import { DarkTheme, DefaultTheme, type Href, ThemeProvider, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -86,6 +87,8 @@ function AppGuard({ children }: { children: ReactNode }) {
     if (!session) {
       // Unauthenticated: push to /login unless already there.
       if (!onLoginScreen) {
+        // A shared question or quiz link opens after signing in (lib/return-to.ts).
+        rememberReturnTo();
         router.replace('/login');
       }
       return;
@@ -152,6 +155,13 @@ function AppGuard({ children }: { children: ReactNode }) {
       router.replace(routes.learnEnvironment(classSelection));
       return;
     }
+    // Fully set up: open a shared link that was waiting for the sign-in.
+    const waiting = takeReturnTo();
+    if (waiting) {
+      router.replace(waiting as Href);
+      return;
+    }
+
     // Authenticated on /login: send them to the app home.
     if (onLoginScreen) {
       router.replace('/');

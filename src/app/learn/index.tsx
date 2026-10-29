@@ -35,6 +35,7 @@ import { bestSprint, dailyMixPool, myConfusedPairs, preparePairDrill, useQuestMa
 import { useQuizHistory } from '@/data/quiz-history';
 import { DailyQuestCard } from '@/components/learning/daily-quest-card';
 import { getNextActions } from '@/data/learning/next-action';
+import { studiedLessonIds } from '@/data/learning/selection';
 import { curriculumProgress, subjectProgress } from '@/data/learning/progress-model';
 import { useLearning } from '@/data/learning/use-learning';
 import { useDisplayName } from '@/data/user';
@@ -69,7 +70,9 @@ export default function LearnScreen() {
   // Daily 10, sprints and confused pairs (data/daily-practice.ts).
   const quizzes = useQuizHistory();
   const questMarks = useQuestMarks();
-  const dailyIds = useMemo(() => dailyMixPool(memory), [memory]);
+  // Daily 10 and confused pairs use only lessons really studied (owner, 2026-10-29).
+  const studied = useMemo(() => studiedLessonIds(progress.completedLessons, memory), [progress.completedLessons, memory]);
+  const dailyIds = useMemo(() => dailyMixPool(memory, studied), [memory, studied]);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- recomputed when answers or quizzes change
   const pairs = useMemo(() => myConfusedPairs(), [attempts, quizzes]);
   const sprintBest = useMemo(
@@ -319,7 +322,7 @@ export default function LearnScreen() {
     if (openingPairs) return;
     setOpeningPairs(true);
     try {
-      const ids = await preparePairDrill(pairs);
+      const ids = await preparePairDrill(pairs, studied);
       if (ids.length > 0) router.push(routes.exam({ kind: 'pairs' }, ids));
     } finally {
       setOpeningPairs(false);

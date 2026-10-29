@@ -1,4 +1,5 @@
 import { MemoryHookBox } from '@/components/learning/memory-hook';
+import { ShareQuestionButton } from '@/components/learning/share-outside';
 import { conceptKey } from '@/data/curriculum';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -292,6 +293,7 @@ export function QuestionCard({
           {question.conceptId && question.topicId ? (
             <MemoryHookBox key={`hook:${question.id}`} conceptKey={conceptKey(question.topicId, question.conceptId)} concept={question.concept} />
           ) : null}
+          <ShareQuestionButton key={`share:${question.id}`} question={question} />
           {!correct ? <AiExplain key={question.id} item={explainItem(question, value)} getLesson={() => aiLessonForQuestion(question)} /> : null}
           <QuestionReportLink key={`report:${question.id}`} question={question} place={courseNameForQuestion(question) ?? 'Quiz'} />
         </View>

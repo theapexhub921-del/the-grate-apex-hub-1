@@ -113,3 +113,20 @@ A "draw it from memory" mode was proposed too and is on hold (owner).
   maps to a concept of its lesson. Where the lecture does not give an order (for
   example a full front-to-back list of the superior mediastinum), there is no
   drill for it.
+
+## 10. Only what you have studied, and sharing outside the app (2026-10-29)
+
+- **Daily 10, sprints and confused pairs** now use only lessons the learner has
+  really studied (`studiedLessonIds` in `selection.ts`: completed lessons and
+  lessons worked through step by step), never concepts met only in an Apex
+  Challenge, a stamp or the question of the day (owner: "do not bring stuff the
+  user has not studied").
+- **Share outside the app**: "Share outside the app" under every answered
+  question and "Share this quiz" on Results. A picture with the GrAte Apex logo
+  (drawn on a canvas, `lib/share-card.ts`; content in
+  `data/share-card-rules.ts`) goes to the phone's share sheet (WhatsApp,
+  Instagram, …) with a message and a link. The answer is never shown; options
+  are shuffled. On a computer the picture is downloaded and the message is
+  copied. The link opens the same question(s) as a practice quiz; someone signed
+  out is sent to sign in and then taken to it (`lib/return-to.ts`, used by the
+  guard in `_layout.tsx`). `tests/share-card.test.mjs`.

@@ -21,19 +21,25 @@ export * from '@/data/daily-quest';
 
 const askable = (question: Question) => question.usage !== 'learn' && question.reviewEligible !== false;
 
-/** Today's Daily 10: one question for each of the most urgent concepts, courses mixed. */
-export function dailyMixPool(memory: MemoryModel): string[] {
+/**
+ * Today's Daily 10: one question for each of the most urgent concepts, courses
+ * mixed — only from lessons the learner has really studied (owner, 2026-10-29:
+ * "do not bring stuff the user has not studied"; `studied` is
+ * studiedLessonIds() from selection.ts: completed lessons and lessons worked
+ * through step by step), and only questions from those lessons.
+ */
+export function dailyMixPool(memory: MemoryModel, studied: ReadonlySet<string>): string[] {
   const byTopic = new Map<string, Question[]>();
   const topicQuestions = (topicId: string) => {
     let list = byTopic.get(topicId);
     if (!list) {
-      list = getTopicQuestions(topicId).filter(askable);
+      list = getTopicQuestions(topicId).filter((question) => askable(question) && studied.has(question.lessonId ?? ''));
       byTopic.set(topicId, list);
     }
     return list;
   };
   return dailyMixIds(
-    memory.concepts.values(),
+    [...memory.concepts.values()].filter((concept) => studied.has(concept.lessonId)),
     (concept) => topicQuestions(concept.topicId).filter((question) => question.conceptId === concept.conceptId).map((question) => question.id),
     (id) => memory.questions.get(id)
   );
@@ -67,8 +73,11 @@ export function myMixUps(): MixUp[] {
 /** The answers this learner mixes up most. */
 export const myConfusedPairs = (limit?: number): ConfusedPair[] => confusedPairs(myMixUps(), limit);
 
-/** A drill on those pairs, from the topics where the mix-ups happened. */
-export async function preparePairDrill(pairs: readonly ConfusedPair[]): Promise<string[]> {
+/**
+ * A drill on those pairs: the questions where the mix-ups happened, plus other
+ * questions on the same two answers from lessons the learner has studied.
+ */
+export async function preparePairDrill(pairs: readonly ConfusedPair[], studied: ReadonlySet<string>): Promise<string[]> {
   const ids = pairs.flatMap((pair) => pair.questionIds);
   if (ids.some((id) => pastCourseOf(id))) await Promise.allSettled(EXAM_BANKS.map(loadPastQuestions));
   const topics = new Set(ids.map((id) => getQuestion(id)?.topicId).filter((id): id is string => Boolean(id)));
@@ -78,7 +87,7 @@ export async function preparePairDrill(pairs: readonly ConfusedPair[]): Promise<
     const choice = question as ChoiceQuestion;
     bank.set(choice.id, { id: choice.id, options: choice.options, right: choice.options[choice.answer] });
   };
-  for (const topicId of topics) getTopicQuestions(topicId).forEach(add);
+  for (const topicId of topics) getTopicQuestions(topicId).filter((question) => studied.has(question.lessonId ?? '')).forEach(add);
   ids.forEach((id) => add(getQuestion(id)));
   return pairDrillIds(pairs, [...bank.values()]);
 }

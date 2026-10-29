@@ -226,6 +226,8 @@ Details and rules: `docs/study-boosts.md`; pure rules checked by `tests/learning
 * **Links to your other courses** at the end of a lesson's reading (`related-lessons.tsx`; shared key words across subjects) with "How do these link?" (Ask AI, `AiQuestionButton`).
 * **Memory hooks** under every answered question (`memory-hook.tsx`, `src/data/memory-hooks.ts`, synced as `synced.hooks`), also on the memory map; "Share with friends" posts one to the feed (friends only).
 * **Anatomy drills** (owner, 2026-10-28: learning where things are without reading lists): "Stack the layers" (order questions), "What gets hit?" (cases) and "Why is it there?" (flip cards) for every Gross Anatomy topic, in `src/data/anatomy-drills/<topic>.ts`, each item written from its named lesson's text (`tests/anatomy-drills.test.mjs` checks the words are there — do not add items the lecture does not support). Layers and cases run as `exam=drill` quizzes (ids `drill:<topic>:<kind>:<id>`, registered by `ensureDrillQuestions()`). Page `/learn/anatomy-drills`, topic-page card, Learn home tile. A "draw it from memory" mode is on hold (owner).
+* **Only studied lessons** (owner, 2026-10-29): Daily 10, sprints and confused pairs use `studiedLessonIds` only.
+* **Share outside the app** (owner, 2026-10-29): "Share outside the app" on answered questions (`QuestionCard`) and "Share this quiz" on Results (`components/learning/share-outside.tsx`): a picture with the GrAte Apex logo (`lib/share-card.ts`, content `data/share-card-rules.ts`, never the answer) plus a link to the same questions; signed-out visitors return to the link after signing in (`lib/return-to.ts` in the `_layout.tsx` guard). `tests/share-card.test.mjs`.
 
 ## Study from the basics up (owner, 2026-10-24)
 

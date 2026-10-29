@@ -1,4 +1,5 @@
 import { calibration, confidenceSummary } from '@/data/learning/confidence';
+import { ShareQuizButton } from '@/components/learning/share-outside';
 import { bestSprint } from '@/data/learning/daily-practice';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
@@ -486,6 +487,16 @@ function ResultsView({ attempt }: { attempt: QuizAttempt }) {
           />
         ) : null}
         <Button label={exam?.kind === 'weakest' || exam?.kind === 'daily' || exam?.kind === 'pairs' ? 'Back to Study' : exam?.kind === 'sprint' ? 'Sprint again' : exam?.kind === 'drill' ? 'Drill again' : exam?.kind === 'mock' ? 'Sit another paper' : exam?.kind === 'spotter' ? 'Another spotter' : attempt.kind === 'review' ? 'Another review' : 'Retake'} variant="secondary" onPress={retake} fullWidth />
+        {attempt.questionIds.length > 0 ? (
+          <ShareQuizButton
+            title={title}
+            topicId={topic?.id}
+            questionIds={attempt.questionIds}
+            score={attempt.score}
+            total={attempt.total}
+            timeLabel={validTime ? formatDuration(attempt.timeSeconds) : undefined}
+          />
+        ) : null}
         {nextLesson && attempt.percentage >= XP_RULES.passPercent ? (
           <Button label={`Next: ${nextLesson.title}`} variant="secondary" onPress={() => router.push(routes.lesson(nextLesson.id))} fullWidth />
         ) : null}

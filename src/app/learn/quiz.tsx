@@ -16,7 +16,7 @@ import type { ThemeColors } from '@/constants/theme';
 import { findLesson, getLessonQuestions, getLessonQuizBank, getQuestionsByIds, getTopic } from '@/data/curriculum';
 import type { AttemptMode } from '@/data/learning-sync';
 import { logSessionStart, submitQuiz } from '@/data/learning/actions';
-import { selectQuestions, type SelectionRequest } from '@/data/learning/selection';
+import { selectQuestions, type SelectionRequest, studiedLessonIds } from '@/data/learning/selection';
 import { currentMemoryModel } from '@/data/learning/state';
 import { nowMs } from '@/data/learning/time';
 import { XP_RULES } from '@/data/learning/xp-rules';
@@ -207,7 +207,8 @@ function buildPlan(input: {
       attemptMode: 'practice',
       title: examTitle(exam),
       subtitle: `As many as you can in ${SPRINT_SECONDS / 60} minutes, from the lessons you have studied. Answers show as you go; only the questions you answered count.`,
-      request: { scope: { kind: 'curriculum' }, filters: { learnedOnly: true, types: ['choice'] }, strategy: 'random', size: SPRINT_POOL },
+      // Only lessons really studied; filled in when the sprint starts (start()).
+      request: { scope: { kind: 'curriculum' }, filters: { types: ['choice'] }, strategy: 'random', size: SPRINT_POOL },
       backHref: routes.learn(),
       crumbs: [{ label: examTitle(exam) }],
       customQuiz: { lessonIds: [], size: SPRINT_POOL, feedback: 'instant', exam },
@@ -510,14 +511,19 @@ function QuizScreen({
           attempt.lessonId === (plan.lessonId ?? '') &&
           (!plan.topicId || attempt.topicId === plan.topicId)
       );
-      const selected = selectQuestions(
-        { ...plan.request, seed: nextSeed, now, recentIds: previous?.questionIds },
-        currentMemoryModel(now)
-      );
+      const memoryNow = currentMemoryModel(now);
+      // A sprint asks only about lessons the learner has really studied.
+      const request: QuizPlan['request'] =
+        exam?.kind === 'sprint'
+          ? { ...plan.request, filters: { ...plan.request.filters, studiedLessons: studiedLessonIds(progress.completedLessons, memoryNow) } }
+          : plan.request;
+      const selected = selectQuestions({ ...request, seed: nextSeed, now, recentIds: previous?.questionIds }, memoryNow);
       if (selected.length === 0) {
         setError(
           plan.kind === 'topic'
             ? 'Complete at least one lesson in this topic first — the cumulative quiz only asks about lessons you have studied.'
+            : exam?.kind === 'sprint'
+              ? 'Finish a lesson first: sprints only ask about lessons you have studied.'
             : 'There are no questions available for this quiz yet.'
         );
         setStarting(false);
