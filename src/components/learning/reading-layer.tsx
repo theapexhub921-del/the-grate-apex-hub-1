@@ -188,6 +188,17 @@ function ReadingSection({ chunk, index, total }: { chunk: LessonChunk; index: nu
         </View>
       ))}
 
+      {chunk.textbookNote ? (
+        <View style={styles.textbookNote}>
+          <View style={styles.kickerRow}>
+            <Icon name="book" size={14} color={colors.primaryText} />
+            <Text style={styles.textbookKicker}>FROM THE TEXTBOOK (SUMMARISED)</Text>
+          </View>
+          <Text style={[styles.textbookText, serif]}>{chunk.textbookNote}</Text>
+          {textbookSource ? <Text style={styles.textbookPages}>{textbookSource}</Text> : null}
+        </View>
+      ) : null}
+
       {lectureSource || textbookSource ? (
         <Text style={styles.sourceLine}>
           Source: {[lectureSource, textbookSource].filter(Boolean).join(' · ')}
@@ -252,6 +263,10 @@ function createStyles(colors: ThemeColors) {
     noteTitleNeutral: { color: colors.textTertiary },
     noteText: { fontSize: 13, lineHeight: 20, color: colors.textSecondary },
     sourceLine: { fontSize: 11, lineHeight: 16, color: colors.textTertiary, marginTop: 10 },
+    textbookNote: { marginTop: 12, padding: 12, gap: 6, borderRadius: 10, borderLeftWidth: 3, borderLeftColor: colors.primary, backgroundColor: colors.surfaceMuted },
+    textbookKicker: { fontSize: 11, fontWeight: '800', letterSpacing: 1, color: colors.primaryText },
+    textbookText: { fontSize: 15, lineHeight: 23, color: colors.text },
+    textbookPages: { fontSize: 12, color: colors.textSecondary, fontStyle: 'italic' },
     highYield: { borderColor: colors.accent, gap: 2 },
     highYieldTitle: { fontSize: 11, fontWeight: '800', letterSpacing: 1.1, color: colors.accentText },
     confusions: { gap: 8 },

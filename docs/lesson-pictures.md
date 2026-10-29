@@ -65,3 +65,34 @@ Lehninger for biochemistry".
   so a section the book does not cover gets no page. Spot-checked by hand.
 - `tests/textbook-refs.test.mjs` checks every reference and that each course has
   pages.
+
+## What the textbook adds — summarised notes (2026-10-29)
+
+Owner: "instead of just saying read more in a textbook, add a small extract from
+the textbook that communicates what you want to teach" — then "start with option
+1 and do all". The books are copyrighted and the app is public, so these are
+**not extracts**: each note is 2–4 sentences in our own words saying what the
+section's own textbook pages add to the slides (a clearer explanation, the
+"why", numbers, a clinical point, or where the book disagrees with the lecture —
+those are said openly, e.g. capacitation time, CO affinity, the male urethra's
+parts).
+
+- **Data:** `src/data/textbook-notes/<topic>.ts` (lesson → section index → note,
+  498 notes across 23 topics), read by `textbookNoteFor` in `index.ts`;
+  `buildTopic` puts it on the section as `textbookNote`.
+- **Shown:** a "From the textbook (summarised)" box with the pages on the Read
+  tab (`reading-layer.tsx`) and on HB2 lesson pages (`hb2-study.ts`, in place of
+  "Read more in the textbook").
+- **Not covered:** sections whose only textbook is Lehninger (fatty acid,
+  cholesterol and heme metabolism, inborn errors, part of oxygen carriers — 69
+  sections), because its text was not available; and about 20 sections whose
+  matched pages turned out to be about something else. They keep the plain page
+  reference.
+- **How they were written:** the paragraphs of each section's referenced pages
+  were pulled from the book text (kept outside the repo), the note written from
+  them, then every note was checked against the full book text so that no run of
+  7 words is copied. Never commit textbook text.
+- `tests/textbook-notes.test.mjs`: every note belongs to a section with textbook
+  pages, names only that section's books, is 120–700 characters, does not repeat
+  the slide text, and at least 75% of each anatomy and physiology topic's
+  sections with pages have one.

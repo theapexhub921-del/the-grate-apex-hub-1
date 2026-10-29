@@ -82,7 +82,9 @@ function sectionOf(chunk: LessonChunk, index: number, lesson: Lesson): LocalSect
   for (const note of chunk.notes ?? []) blocks.push({ k: 'box', title: NOTE_LABEL[note.kind] ?? 'Note', tone: note.kind === 'check' ? 'red' : undefined, blocks: [{ k: 'p', x: escape(note.text) }] });
   // Where to read more: the reference-textbook pages for this section.
   const textbook = chunk.sourceRefs ? describeTextbookRefs(chunk.sourceRefs) : '';
-  if (textbook) blocks.push({ k: 'box', title: 'Read more in the textbook', blocks: [{ k: 'p', x: escape(textbook) }] });
+  if (chunk.textbookNote) {
+    blocks.push({ k: 'box', title: 'From the textbook (summarised)', blocks: [{ k: 'p', x: escape(chunk.textbookNote) }, ...(textbook ? [{ k: 'p' as const, x: `<i>${escape(textbook)}</i>` }] : [])] });
+  } else if (textbook) blocks.push({ k: 'box', title: 'Read more in the textbook', blocks: [{ k: 'p', x: escape(textbook) }] });
   const kicker = [chunk.kind ? KIND_LABEL[chunk.kind] : null, chunk.origin === 'textbook' ? 'From the textbook' : null].filter(Boolean).join(' · ');
   return { id: `s${index + 1}`, title: escape(chunk.title), kicker: kicker || undefined, blocks };
 }

@@ -1,0 +1,39 @@
+import type { TextbookNotes } from '@/data/textbook-notes/types';
+
+export const notes: TextbookNotes = {
+  'endocrinology-1': {
+    3: "Costanzo contrasts neural and feedback control: catecholamine release is neural, sympathetic nerves firing the adrenal medulla, but feedback is far more common. Long-loop feedback reaches back to the hypothalamus and pituitary, short-loop feedback is the pituitary hormone acting on the hypothalamus, and simple loops such as glucose switching insulin on and off need no pituitary at all.",
+  },
+  'endocrinology-2': {
+    0: "Costanzo describes the hypothalamus and pituitary as one coordinated unit controlling the thyroid, adrenal and reproductive glands, growth, milk production and water balance. The posterior lobe (neurohypophysis) is neural tissue, linked to the hypothalamus by nerve fibres; the anterior lobe (adenohypophysis) is glandular, linked by the portal blood vessels that carry the releasing factors.",
+    1: "Guyton notes that the posterior pituitary contains no hormone-making cells: its pituicytes only support the nerve endings from the supraoptic and paraventricular nuclei. A nerve impulse releases the hormone from granules in these endings by exocytosis, together with its carrier protein neurophysin, which then separates from it in the blood.",
+    2: "Costanzo spells out the milk ejection reflex: suckling stimulates the nipple, signals travel up to the paraventricular nuclei, and within seconds oxytocin is released from the posterior pituitary. If suckling continues, more oxytocin is made in the hypothalamus and moved down the axons. The sight, sound or smell of the baby, and cervical dilation, also trigger release.",
+    3: "Costanzo's table lists what changes ADH release: raised plasma osmolarity, low ECF volume, angiotensin II, pain, nausea, low glucose, nicotine and opiates increase it; low osmolarity, ethanol, α-agonists and ANP reduce it. Guyton adds that hypothalamic osmoreceptors shrink when ECF is concentrated, which triggers ADH, and that ADH levels can change within minutes. SIADH, for example from a lung tumour, causes water retention.",
+  },
+  'endocrinology-3': {
+    1: "Costanzo adds GH's anti-insulin side: it lowers glucose uptake by tissues and raises blood glucose and fatty acid breakdown, while its growth effects (longer bones, more protein, more cartilage cells) work mainly through somatomedins (IGFs) made in the liver. Somatomedins, and GH itself, feed back to slow GH release.",
+    2: "Costanzo lists what changes GH release: low glucose, low fatty acids, fasting, arginine, sleep, stress, exercise and puberty raise it, while high glucose, high fatty acids, obesity, old age and somatostatin lower it. Three feedback loops are involved, including somatomedins acting on the pituitary and GHRH inhibiting its own release.",
+    3: "Guyton explains why the timing matters: a GH-secreting tumour before the epiphyses fuse causes gigantism, because the long bones can keep lengthening, whereas after puberty it causes acromegaly, with thick bones of the hands, feet, jaw and skull and enlarged soft tissues instead of greater height. Pituitary failure in adults leaves several hormones short at once.",
+    4: "Costanzo explains why prolactin is unusual: it is held down mainly by dopamine from the hypothalamus rather than switched on by a releasing hormone. So cutting the hypothalamic link raises prolactin, unlike other pituitary hormones. High prolactin causes milk flow and infertility, because it suppresses GnRH; lactotrophs make up about 15% of the anterior pituitary and multiply in pregnancy.",
+    5: "Costanzo shows that one precursor, POMC, is cut into several hormones: ACTH (containing α-MSH), β-lipotropin (containing β-MSH) and a fragment containing γ-MSH. This explains the skin darkening in Addison disease: low cortisol removes feedback, so POMC and ACTH rise, and their MSH activity pigments the skin.",
+  },
+  'endocrinology-4': {
+    1: "Guyton gives the numbers for iodide trapping: the pump normally concentrates iodide about 30 times above blood, up to 250 times when the gland is very active, and TSH is the main stimulus. The cells then make thyroglobulin, a large glycoprotein with about 70 tyrosines, and secrete it into the colloid, where those tyrosines are iodinated to make T3 and T4.",
+    5: "Guyton defines cretinism as extreme hypothyroidism in fetal life, infancy or childhood, marked above all by failure of body growth and intellectual disability. Thyroid hormone has a long half-life, so a daily tablet keeps levels steady, and properly treated hypothyroid patients can live normal lives.",
+  },
+  'endocrinology-5': {
+    0: "Costanzo adds that, for their size, the adrenal glands receive one of the highest blood flows in the body. The medulla, about 20% of the gland, comes from neuroectoderm and releases adrenaline and noradrenaline; all cortical hormones are modifications of the same steroid nucleus made from cholesterol.",
+    1: "Costanzo points out that ACTH is essential for the zona fasciculata and reticularis: it stimulates the first step of steroid synthesis (cholesterol desmolase), so without ACTH cortisol and adrenal androgen production stop. ACTH release itself follows CRH from the hypothalamus and is inhibited by cortisol.",
+    3: "Costanzo adds that potassium is a second main controller: a rise in plasma K+ directly stimulates aldosterone, which then increases K+ secretion by the kidney, closing the loop. Guyton describes losing aldosterone entirely: sodium and water are lost, ECF volume falls and, untreated, circulatory shock and death follow within days.",
+  },
+  'endocrinology-6': {
+    1: "Guyton notes that insulin and C peptide are released in equal amounts, which is why C peptide is measured to judge how much insulin the pancreas itself is making; 5–10% is still released as proinsulin. Costanzo adds that islet cells talk to each other through gap junctions and local secretions, so alpha, beta and delta cells influence each other.",
+    4: "Guyton explains the dehydration in untreated diabetes: very high glucose (up to 8–10 times normal) draws water out of cells by osmosis, and glucose spilling into the urine causes osmotic diuresis, so large volumes of fluid are lost. Fat breakdown also produces keto acids that lower blood bicarbonate, causing metabolic acidosis.",
+  },
+  'endocrinology-7': {
+    2: "Guyton explains how bone building and breakdown are balanced: osteoblasts make RANKL, which activates osteoclasts, and osteoprotegerin (OPG), a decoy that blocks it. PTH and vitamin D favour RANKL (more resorption) and oestrogen raises OPG, which helps explain bone loss after the menopause; drugs that block RANKL treat osteoporosis.",
+    3: "Costanzo stresses that vitamin D's job is to supply minerals for new bone: it raises both calcium and phosphate. 25-hydroxycholecalciferol made in the liver is the main circulating form; the kidney then makes either the active 1,25-form when calcium is low (1α-hydroxylase switched on by PTH and low phosphate) or an inactive form when it is not needed.",
+    4: "Guyton describes PTH's two-phase effect on bone: a fast phase within minutes, from existing bone cells moving calcium out of bone fluid, and a slow phase over days, from more and more active osteoclasts. Costanzo's case of primary hyperparathyroidism shows the result: high calcium, low phosphate, thirst, large urine volume and weakness.",
+    5: "Costanzo notes that calcitonin, made by the thyroid's parafollicular (C) cells in response to high calcium, inhibits osteoclast bone resorption, but plays only a minor role in day-to-day calcium control in humans: removing the thyroid does not upset calcium balance. Costanzo also notes hypoparathyroidism is often an accidental result of thyroid or parathyroid surgery.",
+  },
+};

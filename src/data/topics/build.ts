@@ -12,6 +12,7 @@
 //   usage 'learn' — retrieval checkpoints from the interactive layer;
 //                   Review can reuse them, quizzes only as a top-up
 import { sourceFiles } from '@/data/content-catalog';
+import { textbookNoteFor } from '@/data/textbook-notes';
 import { textbookRefsFor } from '@/data/textbook-refs';
 import type {
   ConceptCoverage,
@@ -454,7 +455,9 @@ export function buildTopic<K extends string>(draft: TopicDraft<K>): BuiltTopic {
       // section's own references.
       const textbook = textbookRefsFor(draft.id, lesson.id, index);
       const refs = textbook.length ? [...(chunk.sourceRefs ?? []), ...textbook] : chunk.sourceRefs;
-      return { ...chunk, sourceRefs: refs && withExports(refs) };
+      // What those pages add, summarised in our own words (data/textbook-notes/).
+      const note = textbookNoteFor(draft.id, lesson.id, index);
+      return { ...chunk, sourceRefs: refs && withExports(refs), ...(note ? { textbookNote: note } : {}) };
     }),
     interactive: lesson.interactive?.map((step): InteractiveStep => {
       if (step.type === 'ask') {

@@ -257,6 +257,9 @@ export type LessonChunk = {
   table?: LessonTable;
   keyPoints?: string[];
   figure?: string; // a tappable lecture diagram (LessonFigure id, data/figures/)
+  // What the section's textbook pages add, summarised in our own words
+  // (data/textbook-notes/; never copied text). Set by buildTopic.
+  textbookNote?: string;
   // More lecture pictures for this section (LessonFigure ids), shown after
   // `figure`. Anatomy lessons get theirs from data/figures/pictures/.
   figures?: string[];
