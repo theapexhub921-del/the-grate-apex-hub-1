@@ -1,6 +1,6 @@
-// Physiology taught like a textbook (data/teaching/). Run with: npm test
+// Every course taught like a textbook (data/teaching/). Run with: npm test
 // - every teaching entry belongs to a real lesson section and is attached to it
-// - every physiology reading section is taught (none left as slide notes only)
+// - every reading section of every topic (all subjects) is taught (none left as slide notes only)
 // - paragraphs are plain prose of a sensible length, and do not just repeat the
 //   section's own lecture text
 import assert from 'node:assert/strict';
@@ -17,7 +17,7 @@ const runs = (text, n) => {
   return out;
 };
 
-describe('physiology teaching', () => {
+describe('textbook-style teaching', () => {
   const topics = new Map(builtTopics.map(({ topic }) => [topic.id, topic]));
 
   it('belongs to real sections and is attached by buildTopic', () => {
@@ -37,9 +37,8 @@ describe('physiology teaching', () => {
     }
   });
 
-  it('covers every reading section of every physiology topic', () => {
+  it('covers every reading section of every topic', () => {
     for (const { topic } of builtTopics) {
-      if (topic.subject !== 'physiology') continue;
       assert.ok(teachingTopics.includes(topic.id), `${topic.id}: no teaching file`);
       for (const lesson of topic.lessons) {
         lesson.chunks.forEach((chunk, index) => {

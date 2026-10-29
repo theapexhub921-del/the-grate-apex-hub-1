@@ -11,6 +11,7 @@ import type { Teaching } from '@/data/teaching/types';
 import { teaching as aminoAcidMetabolism } from '@/data/teaching/amino-acid-metabolism';
 import { teaching as bloodCoagulationAndFibrinolysis } from '@/data/teaching/blood-coagulation-and-fibrinolysis';
 import { teaching as cardiovascularPhysiology } from '@/data/teaching/cardiovascular-physiology';
+import { teaching as cardiovascularSystemGross } from '@/data/teaching/cardiovascular-system-gross';
 import { teaching as centralNervousSystem } from '@/data/teaching/central-nervous-system';
 import { teaching as cholesterolAndBileBiosynthesis } from '@/data/teaching/cholesterol-and-bile-biosynthesis';
 import { teaching as collagenSynthesis } from '@/data/teaching/collagen-synthesis';
@@ -18,21 +19,28 @@ import { teaching as endocrinology } from '@/data/teaching/endocrinology';
 import { teaching as fattyAcidBiosynthesis } from '@/data/teaching/fatty-acid-biosynthesis';
 import { teaching as freeRadicalsAndOxygenToxicity } from '@/data/teaching/free-radicals-and-oxygen-toxicity';
 import { teaching as gastrointestinalPhysiology } from '@/data/teaching/gastrointestinal-physiology';
+import { teaching as gastrointestinalSystemGross } from '@/data/teaching/gastrointestinal-system-gross';
+import { teaching as headAndNeck } from '@/data/teaching/head-and-neck';
 import { teaching as hemeMetabolism } from '@/data/teaching/heme-metabolism';
 import { teaching as hormonesEndocrineBiochemistry } from '@/data/teaching/hormones-endocrine-biochemistry';
 import { teaching as immunology } from '@/data/teaching/immunology';
 import { teaching as inbornErrorsOfMetabolism } from '@/data/teaching/inborn-errors-of-metabolism';
+import { teaching as neuroanatomy } from '@/data/teaching/neuroanatomy';
 import { teaching as nucleicAcids } from '@/data/teaching/nucleic-acids';
 import { teaching as oxygenCarriers } from '@/data/teaching/oxygen-carriers';
 import { teaching as renalPhysiology } from '@/data/teaching/renal-physiology';
 import { teaching as reproductivePhysiology } from '@/data/teaching/reproductive-physiology';
 import { teaching as respiratoryPhysiology } from '@/data/teaching/respiratory-physiology';
+import { teaching as respiratorySystemGross } from '@/data/teaching/respiratory-system-gross';
 import { teaching as specialSenses } from '@/data/teaching/special-senses';
+import { teaching as upperLimb } from '@/data/teaching/upper-limb';
+import { teaching as urinarySystemGross } from '@/data/teaching/urinary-system-gross';
 
 const byTopic: Record<string, Teaching> = {
   'amino-acid-metabolism': aminoAcidMetabolism,
   'blood-coagulation-and-fibrinolysis': bloodCoagulationAndFibrinolysis,
   'cardiovascular-physiology': cardiovascularPhysiology,
+  'cardiovascular-system-gross': cardiovascularSystemGross,
   'central-nervous-system': centralNervousSystem,
   'cholesterol-and-bile-biosynthesis': cholesterolAndBileBiosynthesis,
   'collagen-synthesis': collagenSynthesis,
@@ -40,16 +48,22 @@ const byTopic: Record<string, Teaching> = {
   'fatty-acid-biosynthesis': fattyAcidBiosynthesis,
   'free-radicals-and-oxygen-toxicity': freeRadicalsAndOxygenToxicity,
   'gastrointestinal-physiology': gastrointestinalPhysiology,
+  'gastrointestinal-system-gross': gastrointestinalSystemGross,
+  'head-and-neck': headAndNeck,
   'heme-metabolism': hemeMetabolism,
   'hormones-endocrine-biochemistry': hormonesEndocrineBiochemistry,
   'immunology': immunology,
   'inborn-errors-of-metabolism': inbornErrorsOfMetabolism,
+  'neuroanatomy': neuroanatomy,
   'nucleic-acids': nucleicAcids,
   'oxygen-carriers': oxygenCarriers,
   'renal-physiology': renalPhysiology,
   'reproductive-physiology': reproductivePhysiology,
   'respiratory-physiology': respiratoryPhysiology,
+  'respiratory-system-gross': respiratorySystemGross,
   'special-senses': specialSenses,
+  'upper-limb': upperLimb,
+  'urinary-system-gross': urinarySystemGross,
 };
 
 export const teachingTopics = Object.keys(byTopic);
