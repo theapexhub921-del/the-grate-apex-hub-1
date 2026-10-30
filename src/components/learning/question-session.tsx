@@ -61,6 +61,9 @@ const REASON_LABEL: Partial<Record<SelectionReason, { label: string; tone: 'warn
 const AUTO_ADVANCE_CORRECT_MS = 1300;
 // A picture that never reports it has loaded still lets the clock start after this long.
 const PICTURE_WAIT_MS = 25_000;
+// The question squares (side card on computers, strip on phones).
+const DOT_SIZE = 36;
+const DOT_GAP = 6;
 
 export function QuestionSession({
   items,
@@ -108,6 +111,7 @@ export function QuestionSession({
   const { width } = useWindowDimensions();
   const desktop = isDesktopWidth(width);
   const scrollRef = useRef<ScrollView>(null);
+  const dotStrip = useRef<ScrollView>(null);
   // Starred questions are shared with the Starred page.
   const starredIds = useStarredIds();
   const [index, setIndex] = useState(() => Math.max(0, Math.min(items.length, initial?.index ?? 0)));
@@ -147,6 +151,12 @@ export function QuestionSession({
     const timer = setTimeout(() => markPictureReady(currentQuestionId), PICTURE_WAIT_MS);
     return () => clearTimeout(timer);
   }, [pictureWaiting, currentQuestionId]);
+
+  // Phones: keep the current question's square in view in the strip.
+  useEffect(() => {
+    if (desktop) return;
+    dotStrip.current?.scrollTo({ x: Math.max(0, index * (DOT_SIZE + DOT_GAP) - 2 * (DOT_SIZE + DOT_GAP)), animated: true });
+  }, [index, desktop]);
 
   useEffect(() => {
     const timer = setInterval(() => setElapsed(secondsSince(startedAt)), 1000);
@@ -362,6 +372,32 @@ export function QuestionSession({
     ['Enter']
   );
 
+  // One square per question: answered, skipped, right / wrong once checked, and the current one.
+  // The side card shows them on computers; phones get them as a strip under the progress bar.
+  const questionDots = items.map((item, i) => {
+    const id = item.question.id;
+    const answered = isAnswerComplete(item.question, answers[id]);
+    const revealedResult = checked.has(id);
+    const right = revealedResult && isAnswerCorrect(item.question, answers[id]);
+    return (
+      <Interactive
+        key={id}
+        onPress={() => go(i)}
+        accessibilityLabel={`Question ${i + 1}${answered ? ', answered' : skipped.has(id) ? ', skipped' : ', not answered'}`}
+        style={({ hovered }) => [
+          styles.navDot,
+          answered && styles.navAnswered,
+          skipped.has(id) && styles.navSkipped,
+          revealedResult && (right ? styles.navRight : styles.navWrong),
+          i === index && styles.navCurrent,
+          hovered && styles.navHover,
+        ]}
+      >
+        <Text style={[styles.navText, (answered || revealedResult) && styles.navTextOn]}>{i + 1}</Text>
+      </Interactive>
+    );
+  });
+
   const navigator = (
     <Card style={styles.navCard}>
       <View style={styles.navHeader}>
@@ -376,31 +412,7 @@ export function QuestionSession({
           </Text>
         )}
       </View>
-      <View style={styles.navGrid}>
-        {items.map((item, i) => {
-          const id = item.question.id;
-          const answered = isAnswerComplete(item.question, answers[id]);
-          const revealedResult = checked.has(id);
-          const right = revealedResult && isAnswerCorrect(item.question, answers[id]);
-          return (
-            <Interactive
-              key={id}
-              onPress={() => go(i)}
-              accessibilityLabel={`Question ${i + 1}${answered ? ', answered' : skipped.has(id) ? ', skipped' : ''}`}
-              style={({ hovered }) => [
-                styles.navDot,
-                answered && styles.navAnswered,
-                skipped.has(id) && styles.navSkipped,
-                revealedResult && (right ? styles.navRight : styles.navWrong),
-                i === index && styles.navCurrent,
-                hovered && styles.navHover,
-              ]}
-            >
-              <Text style={[styles.navText, (answered || revealedResult) && styles.navTextOn]}>{i + 1}</Text>
-            </Interactive>
-          );
-        })}
-      </View>
+      <View style={styles.navGrid}>{questionDots}</View>
       <Text style={styles.navMeta}>
         {answeredCount}/{total} answered{skipped.size > 0 ? ` · ${skipped.size} skipped` : ''}
       </Text>
@@ -424,8 +436,11 @@ export function QuestionSession({
         <View style={styles.mobileProgress}>
           <ProgressBar value={total ? (index + (question ? 0 : 1)) / total : 0} label="Quiz progress" />
           <Text style={styles.mobileMeta}>
-            {question ? `Question ${index + 1} of ${total}` : 'All questions seen'} · {answeredCount} answered · {paperLeft !== null ? `${formatDuration(paperLeft)} left` : `⏱ ${formatDuration(elapsed)}`}
+            {question ? `Question ${index + 1} of ${total}` : 'All questions seen'} · {answeredCount} answered{unanswered > 0 ? ` · ${unanswered} not answered` : ''} · {paperLeft !== null ? `${formatDuration(paperLeft)} left` : `⏱ ${formatDuration(elapsed)}`}
           </Text>
+          <ScrollView ref={dotStrip} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dotStrip} accessibilityLabel="Questions answered and not answered">
+            {questionDots}
+          </ScrollView>
         </View>
       ) : null}
 
@@ -570,10 +585,10 @@ function createStyles(colors: ThemeColors) {
     navHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     timer: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },
     timerLow: { color: colors.warningStrong },
-    navGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+    navGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: DOT_GAP },
     navDot: {
-      width: 36,
-      height: 36,
+      width: DOT_SIZE,
+      height: DOT_SIZE,
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
@@ -593,6 +608,7 @@ function createStyles(colors: ThemeColors) {
     keys: { fontSize: 11, color: colors.textTertiary },
     mobileProgress: { gap: 6, marginBottom: 14 },
     mobileMeta: { fontSize: 12, fontWeight: '600', color: colors.textSecondary },
+    dotStrip: { flexDirection: 'row', gap: DOT_GAP, paddingVertical: 2 },
     reason: { marginBottom: 8 },
     actions: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
     actionsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },

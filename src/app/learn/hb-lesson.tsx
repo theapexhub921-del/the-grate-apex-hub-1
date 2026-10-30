@@ -45,7 +45,14 @@ import { friendlyError } from '@/lib/errors';
 // and blocks), key words that explain themselves when tapped, and the
 // lesson's study aids (mnemonics, facts, steps) at the end. Finishing every
 // section completes the lesson here (XP once), then its practice questions.
-export default function LegacyLessonScreen() {
+export default function LegacyLessonRoute() {
+  const params = useLocalSearchParams<{ lesson?: string | string[] }>();
+  // Each lesson opens fresh. The tab keeps this page mounted, so without the key
+  // the last lesson's "Lesson completed" card stayed on the next lesson opened.
+  return <LegacyLessonScreen key={param(params.lesson) ?? ''} />;
+}
+
+function LegacyLessonScreen() {
   const drafts = useQuizDrafts();
   const styles = useThemedStyles(createStyles);
   const colors = useTheme();
