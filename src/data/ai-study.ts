@@ -7,6 +7,7 @@
 import { hash, type Flashcard } from '@/data/flashcards';
 import { plainText } from '@/data/legacy-questions';
 import type { Lesson } from '@/data/lesson-types';
+import { stripMarkdown } from '@/lib/markdown';
 
 /** The server accepts at most this much lesson text (api/ai.mjs). */
 export const MAX_LESSON_CHARS = 60_000;
@@ -102,7 +103,10 @@ export function parseSavedCards(raw: string | null): Flashcard[] {
   try {
     const list = JSON.parse(raw) as unknown;
     if (!Array.isArray(list)) return [];
-    return list.filter((card): card is Flashcard => Boolean(card) && typeof card.id === 'string' && typeof card.front === 'string' && typeof card.back === 'string');
+    return list
+      .filter((card): card is Flashcard => Boolean(card) && typeof card.id === 'string' && typeof card.front === 'string' && typeof card.back === 'string')
+      // Cards saved before the AI's Markdown marks were taken out (the id stays, so reviews are kept).
+      .map((card) => ({ ...card, front: stripMarkdown(card.front), back: stripMarkdown(card.back) }));
   } catch {
     return [];
   }

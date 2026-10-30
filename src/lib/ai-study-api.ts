@@ -3,6 +3,7 @@
 import { API_BASE, LIVE_SITE_LABEL } from '@/lib/live-site';
 
 import { auth } from '@/lib/firebase';
+import { stripMarkdown } from '@/lib/markdown';
 
 const SERVER = API_BASE;
 
@@ -33,7 +34,8 @@ export async function askLessonAi(lesson: { title: string; text: string }, quest
 
 export async function makeLessonCards(lesson: { title: string; text: string }, count: number, avoid: readonly string[]): Promise<{ front: string; back: string }[]> {
   const data = await call<{ cards: { front: string; back: string }[] }>({ mode: 'flashcards', lesson, count, avoid });
-  return data.cards;
+  // Cards are shown as plain text, so any Markdown marks the AI added are taken out.
+  return data.cards.map((card) => ({ front: stripMarkdown(card.front), back: stripMarkdown(card.back) }));
 }
 
 /** A quiz question (or flashcard) the learner wants explained. `picked` is set when they got it wrong. */
@@ -57,12 +59,13 @@ export type LessonQuestion ={ question: string; options: string[]; answer: numbe
 
 export async function makeLessonQuestions(lesson: { title: string; text: string }, count: number, avoid: readonly string[]): Promise<LessonQuestion[]> {
   const data = await call<{ questions: LessonQuestion[] }>({ mode: 'questions', lesson, count, avoid });
-  return data.questions;
+  return data.questions.map((item) => ({ ...item, question: stripMarkdown(item.question), options: item.options.map(stripMarkdown), explanation: stripMarkdown(item.explanation) }));
 }
 
 /** The AI's mark for an answer typed "in your own words", made against the lecture slides first. */
 export type RecallGrade = { verdict: 'yes' | 'partial' | 'no'; feedback: string; missing: string[]; beyond: string };
 
 export async function gradeRecallWithAi(lesson: { title: string; text: string }, item: { prompt: string; model: readonly string[]; answer: string }): Promise<RecallGrade> {
-  return call<RecallGrade>({ mode: 'grade', lesson, item: { prompt: item.prompt, model: [...item.model], answer: item.answer } });
+  const grade = await call<RecallGrade>({ mode: 'grade', lesson, item: { prompt: item.prompt, model: [...item.model], answer: item.answer } });
+  return { ...grade, feedback: stripMarkdown(grade.feedback ?? ''), missing: (grade.missing ?? []).map(stripMarkdown), beyond: stripMarkdown(grade.beyond ?? '') };
 }

@@ -131,20 +131,37 @@ export function parseMarkdown(source: string): MarkdownBlock[] {
 
 // Bold, italic, code and inline maths. Italic uses only single *, so words like
 // snake_case are left alone. Maths needs non-space text next to each $.
-const INLINE = /((?:`[^`\n]+`)|(?:\*\*[^*\n]+\*\*)|(?:\*[^*\s][^*\n]*\*)|(?:\$(?!\s)[^$\n]*?\S\$))/;
+// Bold may hold an italic part (**a *b***), ***x*** is bold italic and __x__ is bold too.
+const INLINE = /((?:`[^`\n]+`)|(?:\*\*\*[^*\n]+\*\*\*)|(?:\*\*(?:[^*\n]|\*[^*\s][^*\n]*\*)+?\*\*)|(?:__(?!\s)[^_\n]+?__)|(?:\*[^*\s][^*\n]*\*)|(?:\$(?!\s)[^$\n]*?\S\$))/;
 
 export function parseInline(text: string, style: { bold?: boolean; italic?: boolean } = {}): InlineSpan[] {
   const parts = text.split(INLINE);
   const spans: InlineSpan[] = [];
   parts.forEach((part, index) => {
     if (!part) return;
-    if (index % 2 === 0) { spans.push({ kind: 'text', text: part, ...style }); return; }
+    // A ** left without its pair (the AI cut a reply short) is dropped, never shown.
+    if (index % 2 === 0) { const plain = part.replace(/\*\*/g, ''); if (plain) spans.push({ kind: 'text', text: plain, ...style }); return; }
     if (part.startsWith('`')) spans.push({ kind: 'code', text: part.slice(1, -1), ...style });
-    else if (part.startsWith('**')) spans.push(...parseInline(part.slice(2, -2), { ...style, bold: true }));
+    else if (part.startsWith('***')) spans.push(...parseInline(part.slice(3, -3), { ...style, bold: true, italic: true }));
+    else if (part.startsWith('**') || part.startsWith('__')) spans.push(...parseInline(part.slice(2, -2), { ...style, bold: true }));
     else if (part.startsWith('$')) spans.push({ kind: 'math', text: latexToText(part.slice(1, -1)), ...style });
     else spans.push(...parseInline(part.slice(1, -1), { ...style, italic: true }));
   });
   return spans;
+}
+
+/** AI text shown as plain text (flashcards, short feedback): the Markdown marks taken out. */
+export function stripMarkdown(text: string): string {
+  return text
+    .split('\n')
+    .map((line) => line.replace(/^\s{0,3}#{1,6}\s+/, ''))
+    .join('\n')
+    .replace(/\*\*\*([^*\n]+)\*\*\*/g, '$1')
+    .replace(/\*\*([^\n]+?)\*\*/g, '$1')
+    .replace(/__(?!\s)([^_\n]+?)__/g, '$1')
+    .replace(/\*\*/g, '')
+    .replace(/(^|[^*\w])\*(?!\s)([^*\n]+?)\*(?!\w)/g, '$1$2')
+    .replace(/`([^`\n]+)`/g, '$1');
 }
 
 // ---- LaTeX to readable text -------------------------------------------------

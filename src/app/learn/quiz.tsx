@@ -606,6 +606,7 @@ function QuizScreen({
         items={items}
         mode={mode}
         onModeChange={setMode}
+        modeSwitchAnytime={items.some((item) => item.question.id.startsWith('legacy:'))}
         perQuestionSeconds={perQuestionSeconds}
         timeLimitSeconds={exam?.kind === 'mock' ? exam.minutes * 60 : exam?.kind === 'sprint' ? SPRINT_SECONDS : undefined}
         attemptMode={plan.attemptMode}

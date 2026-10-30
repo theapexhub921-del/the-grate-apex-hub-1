@@ -167,7 +167,7 @@ export function AskAiPanel({ lesson, focus, autoAsk, embedded = false, docked = 
             <View key={i} style={[styles.row, turn.role === 'user' && styles.rowUser]}>
               <Card tone={turn.role === 'user' ? 'primary' : 'surface'} style={styles.bubble}>
                 <Text style={styles.who}>{turn.role === 'user' ? 'You' : 'Ask AI'}</Text>
-                <Text selectable style={styles.message}>{turn.text}</Text>
+                {turn.role === 'model' ? <MarkdownMessage text={turn.text} /> : <Text selectable style={styles.message}>{turn.text}</Text>}
               </Card>
             </View>
           ))}

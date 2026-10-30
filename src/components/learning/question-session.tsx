@@ -66,6 +66,7 @@ export function QuestionSession({
   items,
   mode,
   onModeChange,
+  modeSwitchAnytime = false,
   perQuestionSeconds,
   timeLimitSeconds,
   attemptMode,
@@ -83,6 +84,8 @@ export function QuestionSession({
   items: SessionItem[];
   mode: FeedbackMode;
   onModeChange?: (mode: FeedbackMode) => void;
+  /** Keep the "when to see the answers" switch for the whole quiz, not only before the first answer (past questions). */
+  modeSwitchAnytime?: boolean;
   perQuestionSeconds?: number;
   /** A time limit for the whole paper (mock exams): when it runs out, the answers are submitted. */
   timeLimitSeconds?: number;
@@ -377,7 +380,7 @@ export function QuestionSession({
         {items.map((item, i) => {
           const id = item.question.id;
           const answered = isAnswerComplete(item.question, answers[id]);
-          const revealedResult = mode === 'instant' && checked.has(id);
+          const revealedResult = checked.has(id);
           const right = revealedResult && isAnswerCorrect(item.question, answers[id]);
           return (
             <Interactive
@@ -426,7 +429,7 @@ export function QuestionSession({
         </View>
       ) : null}
 
-      {onModeChange && !anyAnswered && question ? (
+      {onModeChange && (modeSwitchAnytime || !anyAnswered) && question ? (
         <View style={styles.modeSwitch}>
           <Text style={styles.modeLabel}>When do you want to see the answers?</Text>
           <SegmentedControl
@@ -460,7 +463,7 @@ export function QuestionSession({
             onStar={() => void toggleStar(question.id).catch(() => undefined)}
             value={answers[question.id]}
             onChange={select}
-            revealed={mode === 'instant' && isChecked}
+            revealed={isChecked}
             heading={`QUESTION ${index + 1} OF ${total}`}
             shuffleSeed={`${seed}:${question.id}`}
             onSubmitTyped={() => (mode === 'instant' ? void check() : go(index + 1))}

@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-const { parseMarkdown, parseInline, latexToText, splitRow } = await import('@/lib/markdown');
+const { parseMarkdown, parseInline, latexToText, splitRow, stripMarkdown } = await import('@/lib/markdown');
 
 describe('Markdown blocks', () => {
   it('reads headings, paragraphs and rules', () => {
@@ -66,6 +66,27 @@ describe('Inline text', () => {
   it('does not treat prices as maths', () => {
     const spans = parseInline('It costs $5 and $10 today');
     assert.ok(spans.every((s) => s.kind !== 'math'));
+  });
+
+  // AI replies kept showing ** (owner, 2026-10-30): no ** may ever reach the screen.
+  it('never shows ** from AI replies', () => {
+    const samples = ['**Step 1 – *glycolysis***', '***Key***', '__Note__ this', '**Key point:** it rises', '**unclosed bold', 'x ** y'];
+    for (const sample of samples) {
+      const shown = parseInline(sample).map((s) => s.text).join('');
+      assert.ok(!shown.includes('**') && !shown.includes('__'), `${sample} → ${shown}`);
+    }
+    const spans = parseInline('**Step 1 – *glycolysis***');
+    assert.deepEqual(spans.map((s) => [s.text, Boolean(s.bold), Boolean(s.italic)]), [['Step 1 – ', true, false], ['glycolysis', true, true]]);
+    assert.deepEqual(parseInline('***Key***').map((s) => [s.text, Boolean(s.bold), Boolean(s.italic)]), [['Key', true, true]]);
+  });
+});
+
+describe('Plain AI text', () => {
+  it('takes the Markdown marks out', () => {
+    assert.equal(stripMarkdown('**ATP** is made by *ATP synthase*'), 'ATP is made by ATP synthase');
+    assert.equal(stripMarkdown('## Heading\n- **Na⁺** in, `K⁺` out'), 'Heading\n- Na⁺ in, K⁺ out');
+    assert.equal(stripMarkdown('***Key*** and __this__ and a stray **'), 'Key and this and a stray ');
+    assert.equal(stripMarkdown('snake_case_name and 2 * 3'), 'snake_case_name and 2 * 3');
   });
 });
 

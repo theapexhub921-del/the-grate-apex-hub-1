@@ -424,7 +424,8 @@ function LegacyPracticeAttempt() {
         key={reviewing?.round ?? 0}
         items={reviewing ? reviewing.questions.map((question) => ({ question })) : items}
         mode={mode}
-        onModeChange={apex || reviewing ? undefined : setMode}
+        onModeChange={apex ? undefined : setMode}
+        modeSwitchAnytime
         perQuestionSeconds={settings.seconds}
         attemptMode={apex ? 'apex' : 'practice'}
         sessionId={`hb:${seed}${reviewing ? `:r${reviewing.round}` : ''}`}
@@ -439,7 +440,7 @@ function LegacyPracticeAttempt() {
           <View style={styles.header}>
             <BackLink fallback={routes.legacyCourse(course.id)} />
             <Text style={styles.title} numberOfLines={2}>{reviewing ? `${title} · mistakes` : title}</Text>
-            <Text style={styles.sub}>{reviewing ? `${reviewing.questions.length} question${reviewing.questions.length === 1 ? '' : 's'} you missed, answers shown as you go` : [`${questions.length} questions`, settings.seconds ? `${settings.seconds} seconds a question` : null, mode === 'submit' ? 'answers at the end, like the real paper' : 'answers after each question', settings.variants ? 'multiple choice, typing, true/false and matching' : null].filter(Boolean).join(' · ')}</Text>
+            <Text style={styles.sub}>{reviewing ? `${reviewing.questions.length} question${reviewing.questions.length === 1 ? '' : 's'} you missed, ${mode === 'submit' ? 'answers at the end' : 'answers shown as you go'}` : [`${questions.length} questions`, settings.seconds ? `${settings.seconds} seconds a question` : null, mode === 'submit' ? 'answers at the end, like the real paper' : 'answers after each question', settings.variants ? 'multiple choice, typing, true/false and matching' : null].filter(Boolean).join(' · ')}</Text>
           </View>
         }
       />
