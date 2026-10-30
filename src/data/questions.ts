@@ -144,6 +144,24 @@ function editDistance(a: string, b: string) {
   return row[b.length];
 }
 
+// A typed answer that is a set, such as "{−3, −2, −1, 0}", is marked as a set: the order, the
+// spacing and the kind of minus sign do not matter, but every element (and its sign) does.
+// (The usual marking below drops signs, so it cannot tell −3 from 3.) The braces are optional
+// when the learner types the answer.
+function setElements(text: string, bracesOptional: boolean): string[] | null {
+  const trimmed = text.trim();
+  const braced = /^\{[\s\S]*\}$/.test(trimmed);
+  if (!braced && !bracesOptional) {
+    return null;
+  }
+  const body = braced ? trimmed.slice(1, -1) : trimmed;
+  return body
+    .split(',')
+    .map((item) => item.replace(/[\u2212\u2012-\u2015]/g, '-').replace(/\s+/g, '').toLowerCase())
+    .filter(Boolean)
+    .sort();
+}
+
 // Typed answers ignore capitals, spaces, hyphens and punctuation.
 // Longer answers also forgive a small typo; short ones (NADH vs NADPH)
 // must be exact, because one letter changes the meaning.
@@ -155,6 +173,18 @@ export function typedAnswerMatches(input: string, accept: string[]) {
   }
 
   return accept.some((option) => {
+    const expectedSet = setElements(option, false);
+
+    if (expectedSet) {
+      const typedSet = setElements(input, true);
+
+      return (
+        typedSet !== null &&
+        typedSet.length === expectedSet.length &&
+        typedSet.every((item, index) => item === expectedSet[index])
+      );
+    }
+
     const expected = normalizeAnswer(option);
 
     if (typed === expected) {

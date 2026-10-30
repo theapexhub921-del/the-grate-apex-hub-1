@@ -11,7 +11,7 @@ type Q = QuestionDraft<ConceptId>;
 
 const lesson1: Q[] = [
   mcq('q1-01', 'rs-components', 'Which structure belongs to the respiratory (not conducting) division?', 'Alveoli', ['Trachea', 'Bronchioles', 'Larynx'], { explanation: 'Slide 16.' }),
-  mcq('q1-02', 'rs-components', 'In this lecture, the upper respiratory tract ends at the:', 'Trachea', ['Larynx', 'Pharynx', 'Bronchioles'], { explanation: 'Slide 17: nasal cavity, pharynx, larynx and trachea.' }),
+  mcq('q1-02', 'rs-components', 'In this lecture, the upper respiratory tract ends at the:', 'Trachea', ['Larynx', 'Pharynx', 'Bronchioles'], { explanation: 'Slide 17: in this lecture the upper respiratory tract is the nasal cavity, pharynx, larynx and trachea. Many textbooks end the upper tract at the larynx, so follow the lecture’s definition here.' }),
   mcq('q1-03', 'rs-components', 'Respiratory movements are accomplished by:', 'The diaphragm and the muscles of the thoracic wall', ['The lungs contracting by their own muscle', 'The pleura sliding over the chest wall', 'The trachealis muscle of the trachea'], { explanation: 'Slide 17.' }),
   mcq('q1-04', 'nasal-cavity-resp', 'The posterior openings of the nasal cavity into the pharynx are the:', 'Choanae', ['Nares', 'Vestibules', 'Meatuses'], { explanation: 'Slide 19.', skill: 'terminology' }),
   mcq('q1-05', 'nasal-cavity-resp', 'The anterior part of the nasal cavity just inside the nostrils is the:', 'Vestibule', ['Choana', 'Sphenoethmoidal recess', 'Concha'], { explanation: 'Slide 24.' }),

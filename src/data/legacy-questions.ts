@@ -50,7 +50,9 @@ export function shuffleSeeded<T>(items: readonly T[], seed: string): T[] {
 
 // ── Original questions as this app's question types ────────────────
 
-const ORDER_WORDS = /\b(all|none|both|neither) of the (above|following)|\b(a|b|c|d) (and|&) (b|c|d|e)\b|^all the above|^none of the above/i;
+// Options that point at other options by letter ("Both (a) and (b)", "(C) and (D)", "Either (a) or (b)") must keep
+// their order, or the letters stop pointing at the right options.
+const ORDER_WORDS = /\b(all|none|both|neither) of the (above|following)|\b(a|b|c|d) (and|&) (b|c|d|e)\b|^all the above|^none of the above|\(\s*[a-e]\s*\)\s*(,|and|&|or|nor|\+)\s*\(?\s*[a-e]\b/i;
 
 function seeded(seed: string) {
   let h = 2166136261;
